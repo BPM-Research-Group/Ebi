@@ -1,0 +1,42 @@
+stages:
+  - build
+  - compile_manual
+
+buildlatex: 
+  stage: compile_manual
+  script:
+    - echo "Hello, $GITLAB_USER_LOGIN!"
+    - cargo build --target x86_64-pc-windows-gnu --release
+    - cargo build --target x86_64-unknown-linux-gnu --release
+    
+    - cd manual
+    - cargo run latex manual -o functions.tex
+    - cargo run latex graph -o graph.svg
+    - rsvg-convert -f pdf -o graph.pdf graph.svg
+    - lualatex manual.tex
+    - bibtex manual
+    - lualatex manual.tex
+    - lualatex manual.tex
+    - cd ..
+    
+    - mkdir -p build
+    - mkdir -p build/nightly
+    - git config --global user.name "CI pipeline"
+    - git config --global user.email "cipipeline@example.com"
+    
+    - mv manual/manual.pdf build/nightly/manual.pdf
+    - git add build/nightly/manual.pdf
+
+    - mv target/x86_64-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-x86_64-windows.exe
+    - git add build/nightly/Ebi-x86_64-windows.exe
+
+    - mv target/x86_64-unknown-linux-gnu/release/ebi build/nightly/Ebi-x86_64-linux
+    - git add build/nightly/Ebi-x86_64-linux
+
+    - git commit -m "Automatically triggered compilation [skip ci]"
+    - git push -f https://ci_token:$ACCESS_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main
+  artifacts:
+    expose_as: 'manual'
+    name: "manual"
+    paths:
+      - manual/manual.pdf

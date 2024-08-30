@@ -1,0 +1,38 @@
+[package]
+name = "ebi"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bitvec = "*"
+num-integer = "*"
+num-traits = "*"
+num-bigint = { version = "*", features = ["rand"] }
+clap = { version = "*", features = ["derive", "cargo", "string"] }
+anyhow = "*"
+clap-verbosity-flag = "*"
+log = "*"
+env_logger = "*"
+layout-rs = "*"
+fraction = { version = "*", features = ["with-approx"] }
+serde_json = "*"
+priority-queue = "*"
+process_mining = { version = "*", features = ["graphviz-export"] }
+rand = "*"
+chrono = "*"
+flate2 = "*"
+rayon = "*"
+strsim = "*"
+Inflector = "*"
+strum = "*"
+strum_macros = "*"
+indicatif = "*"
+
+[dependencies.num-rational]
+version = "0.4.1"
+
+[profile.release]
+debug = true
+strip = false

@@ -1,0 +1,34 @@
+/target
+/data
+/.vscode
+/src/main.rs
+
+# Added by cargo
+#
+# already existing elements were commented out
+
+#/target
+perf.data
+flamegraph.svg
+perf.data.old
+manual/main.aux
+manual/main.idx
+manual/main.ind
+manual/main.log
+manual/main.out
+manual/main.ilg
+manual/main.synctex.gz
+manual/main.toc
+manual/manual.aux
+manual/manual.bbl
+manual/manual.blg
+manual/manual.idx
+manual/manual.ilg
+manual/manual.ind
+manual/manual.log
+manual/manual.out
+manual/manual.synctex.gz
+manual/manual.toc
+manual/manual.pdf
+manual/graph.svg
+manual/graph.pdf

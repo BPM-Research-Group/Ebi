@@ -1,0 +1,514 @@
+\def\version{0.1.0}
+\def\ebicommandlist{\begin{itemize}
+\item\texttt{Ebi analyse completeness} or \texttt{Ebi ana comp}
+\item\texttt{Ebi analyse medoid} or \texttt{Ebi ana med}
+\item\texttt{Ebi analyse minimum-probability-traces} or \texttt{Ebi ana minprob}
+\item\texttt{Ebi analyse most-likely-traces} or \texttt{Ebi ana mostlikely}
+\item\texttt{Ebi association all-trace-attributes} or \texttt{Ebi asso atts}
+\item\texttt{Ebi association trace-attribute} or \texttt{Ebi asso att}
+\item\texttt{Ebi conformance entropic-relevance} or \texttt{Ebi conf er}
+\item\texttt{Ebi conformance jensen-shannon} or \texttt{Ebi conf jssc}
+\item\texttt{Ebi conformance jensen-shannon-sample} or \texttt{Ebi conf jssc-sample}
+\item\texttt{Ebi conformance unit-earth-movers-stochastic-conformance} or \texttt{Ebi conf uemsc}
+\item\texttt{Ebi convert finite-stochastic-language} or \texttt{Ebi conv slang}
+\item\texttt{Ebi convert labelled-Petri-net} or \texttt{Ebi conv lpn}
+\item\texttt{Ebi convert stochastic-finite-deterministic-automaton} or \texttt{Ebi conv sdfa}
+\item\texttt{Ebi discover occurrence} or \texttt{Ebi disc occ}
+\item\texttt{Ebi discover uniform} or \texttt{Ebi disc uni}
+\item\texttt{Ebi help-latex} or \texttt{Ebi latex}
+\item\texttt{Ebi information} or \texttt{Ebi info}
+\item\texttt{Ebi probability model} or \texttt{Ebi prob model}
+\item\texttt{Ebi probability trace} or \texttt{Ebi prob trace}
+\item\texttt{Ebi validate} or \texttt{Ebi vali}
+\item\texttt{Ebi visualise svg} or \texttt{Ebi vis svg}
+\item\texttt{Ebi visualise text} or \texttt{Ebi vis txt}
+\end{itemize}}
+\def\ebicommands{
+\subsection{\texttt{Ebi analyse completeness}}
+Alias: \texttt{Ebi ana comp}.\\
+Estimate the completeness of a finite language.\\
+More information: ~\cite{DBLP:conf/icpm/KabierskiRW23}.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE}>&The event log.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad compressed event log (.xes.gz) and event log (.xes).\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The fraction file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: fraction.
+\subsection{\texttt{Ebi analyse medoid}}
+Alias: \texttt{Ebi ana med}.\\
+Find the traces with the lowest average normalised Levenshtein distance to the other traces; ties are resolved arbritrarily.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE}>&The file with an object that has deterministic stochastic semantics.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad finite stochastic language (.slang), event log (.xes) and compressed event log (.xes.gz).\\
+<\texttt{NUMBER\_OF\_TRACES}>&The number of traces that should be extracted.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad integer.\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The finite language (.lang) file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: finite language.
+\subsection{\texttt{Ebi analyse minimum-probability-traces}}
+Alias: \texttt{Ebi ana minprob}.\\
+Find all traces that have a given minimum probability.
+Please be aware of models containing livelocks: these may cause the computation to never finish.
+Will return an error if there are no such traces.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE}>&The file with an object that has deterministic stochastic semantics.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad stochastic deterministic finite automaton (.sdfa), stochastic labelled Petri net (.slpn), event log (.xes) and compressed event log (.xes.gz).\\
+<\texttt{MINIMUM\_PROBABILITY}>&The minimum probability that a trace should have to be included.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad fraction.\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The finite stochastic language (.slang) file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: finite stochastic language.
+\subsection{\texttt{Ebi analyse most-likely-traces}}
+Alias: \texttt{Ebi ana mostlikely}.\\
+Find the traces with the highest probabilities; ties are resolved arbritrarily.
+Please be aware of models containing livelocks: these may cause the computation to never finish.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE}>&The file with an object that has deterministic stochastic semantics.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad event log (.xes), compressed event log (.xes.gz), stochastic deterministic finite automaton (.sdfa) and stochastic labelled Petri net (.slpn).\\
+<\texttt{NUMBER\_OF\_TRACES}>&The number of traces that should be extracted.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad integer.\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The finite stochastic language (.slang) file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: finite stochastic language.
+\subsection{\texttt{Ebi association all-trace-attributes}}
+Alias: \texttt{Ebi asso atts}.\\
+Compute the association between the process and trace attributes; 500 samples are taken.\\
+More information: \cite{DBLP:journals/tkde/LeemansMPH23}.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE}>&The event log for which association is to be computed.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad compressed event log (.xes.gz) and event log (.xes).\\
+-\texttt{s} or --\texttt{number-of-samples}
+&Take a number of samples.\\
+&\textit{Mandatory:}\quad no\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The text file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: text.
+\subsection{\texttt{Ebi association trace-attribute}}
+Alias: \texttt{Ebi asso att}.\\
+Compute the association between the process and a given trace attribute; 500 samples are taken.\\
+More information: \cite{DBLP:journals/tkde/LeemansMPH23}.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE}>&The event log for which association is to be computed.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad compressed event log (.xes.gz) and event log (.xes).\\
+<\texttt{ATTRIBUTE}>&The trace attribute for which association is to be computed. The trace attributes of a log can be found using `Ebi info`.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad text.\\
+-\texttt{s} or --\texttt{number-of-samples}
+&Take a number of samples.\\
+&\textit{Mandatory:}\quad no\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The root file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: root.
+\subsection{\texttt{Ebi conformance entropic-relevance}}
+Alias: \texttt{Ebi conf er}.\\
+Compute entropic relevance (uniform).\\
+More information: \cite{DBLP:journals/is/AlkhammashPMG22}.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE\_1}>&A finite stochastic language (log) to compare.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad event log (.xes), finite stochastic language (.slang) and compressed event log (.xes.gz).\\
+<\texttt{FILE\_2}>&A queriable stochastic language (model) to compare.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad stochastic deterministic finite automaton (.sdfa), stochastic labelled Petri net (.slpn), compressed event log (.xes.gz), event log (.xes) and finite stochastic language (.slang).\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The logarithm file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: logarithm.
+\subsection{\texttt{Ebi conformance jensen-shannon}}
+Alias: \texttt{Ebi conf jssc}.\\
+Compute Jensen-Shannon stochastic conformance.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE\_1}>&A finite stochastic language to compare.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad compressed event log (.xes.gz), event log (.xes) and finite stochastic language (.slang).\\
+<\texttt{FILE\_2}>&A queriable stochastic language to compare.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad compressed event log (.xes.gz), event log (.xes), stochastic labelled Petri net (.slpn), finite stochastic language (.slang) and stochastic deterministic finite automaton (.sdfa).\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The rootlog file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\bottomrule
+\end{tabularx}
+Output: rootlog.
+\subsection{\texttt{Ebi conformance jensen-shannon-sample}}
+Alias: \texttt{Ebi conf jssc-sample}.\\
+Compute Jensen-Shannon stochastic conformance with sampling.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE\_1}>&A queriable stochastic language to compare.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad finite stochastic language (.slang), stochastic deterministic finite automaton (.sdfa), stochastic labelled Petri net (.slpn), event log (.xes) and compressed event log (.xes.gz).\\
+<\texttt{FILE\_2}>&A queriable stochastic language to compare.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad finite stochastic language (.slang), stochastic deterministic finite automaton (.sdfa), compressed event log (.xes.gz), stochastic labelled Petri net (.slpn) and event log (.xes).\\
+<\texttt{NUMBER\_OF\_TRACES}>&Number of traces to sample.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad integer.\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The rootlog file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\bottomrule
+\end{tabularx}
+Output: rootlog.
+\subsection{\texttt{Ebi conformance unit-earth-movers-stochastic-conformance}}
+Alias: \texttt{Ebi conf uemsc}.\\
+Compute unit-earth movers' stochastic conformance.\\
+More information: \cite{DBLP:conf/bpm/LeemansSA19}.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE\_1}>&A finite stochastic language (log) to compare.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad compressed event log (.xes.gz), finite stochastic language (.slang) and event log (.xes).\\
+<\texttt{FILE\_2}>&A queriable stochastic language (model) to compare.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad compressed event log (.xes.gz), event log (.xes), stochastic deterministic finite automaton (.sdfa), finite stochastic language (.slang) and stochastic labelled Petri net (.slpn).\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The fraction file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: fraction.
+\subsection{\texttt{Ebi convert finite-stochastic-language}}
+Alias: \texttt{Ebi conv slang}.\\
+Convert an object to a finite stochastic language.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE}>&Any file supported by Ebi that can be converted.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad finite stochastic language (.slang), event log (.xes) and compressed event log (.xes.gz).\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The finite stochastic language (.slang) file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: finite stochastic language.
+\subsection{\texttt{Ebi convert labelled-Petri-net}}
+Alias: \texttt{Ebi conv lpn}.\\
+Convert an object to a labelled Petri net.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE}>&Any file supported by Ebi that can be converted.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad Petri net markup language (.pnml), stochastic labelled Petri net (.slpn), stochastic deterministic finite automaton (.sdfa), directly follows model (.dfm) and labelled Petri net (.lpn).\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The file to which the results must be written. Based on the file extension, Ebi will output either a labelled Petri net (.lpn) or a Petri net markup language (.pnml).
+If the parameter is not given, the results will be written to STDOUT as a labelled Petri net (.lpn).\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: labelled Petri net.
+\subsection{\texttt{Ebi convert stochastic-finite-deterministic-automaton}}
+Alias: \texttt{Ebi conv sdfa}.\\
+Convert an object to a finite stochastic language.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE}>&Any file supported by Ebi that can be converted.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad event log (.xes), compressed event log (.xes.gz), finite stochastic language (.slang) and stochastic deterministic finite automaton (.sdfa).\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The stochastic deterministic finite automaton (.sdfa) file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: stochastic deterministic finite automaton.
+\subsection{\texttt{Ebi discover occurrence}}
+Alias: \texttt{Ebi disc occ}.\\
+Give each transition a weight that matches the occurrences of its label; silent transitions get a weight of 1.\\
+More information: ~\cite{DBLP:conf/icpm/BurkeLW20}.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE\_1}>&A finite stochastic language (log) to get the occurrences from.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad compressed event log (.xes.gz), finite stochastic language (.slang) and event log (.xes).\\
+<\texttt{FILE\_2}>&A labelled Petri net with the control flow.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad directly follows model (.dfm), stochastic labelled Petri net (.slpn), Petri net markup language (.pnml) and labelled Petri net (.lpn).\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The stochastic labelled Petri net (.slpn) file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: stochastic labelled Petri net.
+\subsection{\texttt{Ebi discover uniform}}
+Alias: \texttt{Ebi disc uni}.\\
+Give each transition a weight of 1.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{LPN\_FILE}>&A labelled Petri net.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad Petri net markup language (.pnml), directly follows model (.dfm), labelled Petri net (.lpn) and stochastic labelled Petri net (.slpn).\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The stochastic labelled Petri net (.slpn) file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: stochastic labelled Petri net.
+\subsection{\texttt{Ebi help-latex}}
+Alias: \texttt{Ebi latex}.\\
+Print the help of Ebi in Latex format.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The text file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\bottomrule
+\end{tabularx}
+Output: text.
+\subsection{\texttt{Ebi information}}
+Alias: \texttt{Ebi info}.\\
+Show information about an object.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE}>&Any file supported by Ebi.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad stochastic labelled Petri net (.slpn), Petri net markup language (.pnml), event log (.xes), directly follows model (.dfm), stochastic deterministic finite automaton (.sdfa), labelled Petri net (.lpn), finite stochastic language (.slang), finite language (.lang) and compressed event log (.xes.gz).\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The text file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: text.
+\subsection{\texttt{Ebi probability model}}
+Compute the probability that a queriable stochastic language (stochastic model) produces any trace of the model.\\
+More information: ~\cite{DBLP:journals/is/LeemansMM24}.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE\_1}>&The queriable stochastic language (model).\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad event log (.xes), compressed event log (.xes.gz), stochastic deterministic finite automaton (.sdfa), stochastic labelled Petri net (.slpn) and finite stochastic language (.slang).\\
+<\texttt{FILE\_2}>&The finite language (log).\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad compressed event log (.xes.gz), finite language (.lang), finite stochastic language (.slang) and event log (.xes).\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The fraction file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: fraction.
+\subsection{\texttt{Ebi probability trace}}
+Compute the probability of a trace in a queriable stochastic language (model).\\
+More information: ~\cite{DBLP:journals/is/LeemansMM24}.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE}>&The queriable stochastic language (model).\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad compressed event log (.xes.gz), event log (.xes), stochastic deterministic finite automaton (.sdfa), finite stochastic language (.slang) and stochastic labelled Petri net (.slpn).\\
+<\texttt{TRACE}>
+&The trace.\\
+&\textit{Mandatory:}\quad yes\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The fraction file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: fraction.
+\subsection{\texttt{Ebi validate}}
+Alias: \texttt{Ebi vali}.\\
+Attempt to parse any file supported by Ebi. If you do not know the type the file should have, try `Ebi info`.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{TYPE}>&The type for which parsing should be attempted.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad the file extension of any file type supported by Ebi (lang, lpn, slpn, slang, sdfa, xes, xes.gz, dfm or pnml).\\
+<\texttt{FILE}>
+&The file to be parsed.\\
+&\textit{Mandatory:}\quad yes\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The text file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: text.
+\subsection{\texttt{Ebi visualise svg}}
+Visualise an object as scalable vector graphics.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE}>&Any file that can be visualised as a graph.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad stochastic deterministic finite automaton (.sdfa), Petri net markup language (.pnml), stochastic labelled Petri net (.slpn), labelled Petri net (.lpn) and directly follows model (.dfm).\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The text file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\texttt{-a} or \texttt{--approximate} & Use approximate arithmetic instead of exact arithmetic.\\
+&\textit{Mandatory:}\quad no\\
+\bottomrule
+\end{tabularx}
+Output: text.
+\subsection{\texttt{Ebi visualise text}}
+Alias: \texttt{Ebi vis txt}.\\
+Visualise an object as text.\\
+\begin{tabularx}{\linewidth}{lX}
+\toprule
+Parameter \\\midrule
+<\texttt{FILE}>&Any file that can be visualised textually.\\
+&\textit{Mandatory:} \quad yes\\
+&\textit{Accepted values:}\quad finite stochastic language (.slang), directly follows model (.dfm), finite language (.lang), compressed event log (.xes.gz), labelled Petri net (.lpn), event log (.xes), Petri net markup language (.pnml), stochastic labelled Petri net (.slpn) and stochastic deterministic finite automaton (.sdfa).\\
+\texttt{-o} or \texttt{--output} <\texttt{FILE}> &
+The text file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\
+&\textit{Mandatory:} \quad no\\
+\bottomrule
+\end{tabularx}
+Output: text.
+}
+\def\ebifilehandlers{
+\subsection{finite language (.lang)}
+Import as objects: finite language.
+\\Import as traits: finite language.
+\\Input to commands: \texttt{Ebi information, Ebi probability model, Ebi validate, Ebi visualise text}.
+\subsection{labelled Petri net (.lpn)}
+Import as objects: labelled Petri net.
+\\Import as traits: labelled Petri net, semantics.
+\\Input to commands: \texttt{Ebi convert labelled-Petri-net, Ebi discover occurrence, Ebi discover uniform, Ebi information, Ebi validate, Ebi visualise svg, Ebi visualise text}.
+\subsection{stochastic labelled Petri net (.slpn)}
+Import as objects: stochastic labelled Petri net, labelled Petri net.
+\\Import as traits: queriable stochastic language, stochastic semantics, stochastic deterministic semantics, labelled Petri net.
+\\Input to commands: \texttt{Ebi analyse minimum-probability-traces, Ebi analyse most-likely-traces, Ebi conformance entropic-relevance, Ebi conformance jensen-shannon, Ebi conformance jensen-shannon-sample, Ebi conformance unit-earth-movers-stochastic-conformance, Ebi convert labelled-Petri-net, Ebi discover occurrence, Ebi discover uniform, Ebi information, Ebi probability model, Ebi probability trace, Ebi validate, Ebi visualise svg, Ebi visualise text}.
+\subsection{finite stochastic language (.slang)}
+Import as objects: finite stochastic language.
+\\Import as traits: finite language, finite stochastic language, queriable stochastic language, iterable stochastic language, stochastic semantics.
+\\Input to commands: \texttt{Ebi analyse medoid, Ebi conformance entropic-relevance, Ebi conformance jensen-shannon, Ebi conformance jensen-shannon-sample, Ebi conformance unit-earth-movers-stochastic-conformance, Ebi convert finite-stochastic-language, Ebi convert stochastic-finite-deterministic-automaton, Ebi discover occurrence, Ebi information, Ebi probability model, Ebi probability trace, Ebi validate, Ebi visualise text}.
+\subsection{stochastic deterministic finite automaton (.sdfa)}
+Import as objects: stochastic deterministic finite automaton.
+\\Import as traits: queriable stochastic language, stochastic deterministic semantics.
+\\Input to commands: \texttt{Ebi analyse minimum-probability-traces, Ebi analyse most-likely-traces, Ebi conformance entropic-relevance, Ebi conformance jensen-shannon, Ebi conformance jensen-shannon-sample, Ebi conformance unit-earth-movers-stochastic-conformance, Ebi convert labelled-Petri-net, Ebi convert stochastic-finite-deterministic-automaton, Ebi information, Ebi probability model, Ebi probability trace, Ebi validate, Ebi visualise svg, Ebi visualise text}.
+\subsection{event log (.xes)}
+Import as objects: event log.
+\\Import as traits: finite language, finite stochastic language, queriable stochastic language, iterable stochastic language, event log, stochastic deterministic semantics.
+\\Input to commands: \texttt{Ebi analyse completeness, Ebi analyse medoid, Ebi analyse minimum-probability-traces, Ebi analyse most-likely-traces, Ebi association all-trace-attributes, Ebi association trace-attribute, Ebi conformance entropic-relevance, Ebi conformance jensen-shannon, Ebi conformance jensen-shannon-sample, Ebi conformance unit-earth-movers-stochastic-conformance, Ebi convert finite-stochastic-language, Ebi convert stochastic-finite-deterministic-automaton, Ebi discover occurrence, Ebi information, Ebi probability model, Ebi probability trace, Ebi validate, Ebi visualise text}.
+\subsection{compressed event log (.xes.gz)}
+Import as objects: event log.
+\\Import as traits: finite language, finite stochastic language, queriable stochastic language, iterable stochastic language, event log, stochastic deterministic semantics.
+\\Input to commands: \texttt{Ebi analyse completeness, Ebi analyse medoid, Ebi analyse minimum-probability-traces, Ebi analyse most-likely-traces, Ebi association all-trace-attributes, Ebi association trace-attribute, Ebi conformance entropic-relevance, Ebi conformance jensen-shannon, Ebi conformance jensen-shannon-sample, Ebi conformance unit-earth-movers-stochastic-conformance, Ebi convert finite-stochastic-language, Ebi convert stochastic-finite-deterministic-automaton, Ebi discover occurrence, Ebi information, Ebi probability model, Ebi probability trace, Ebi validate, Ebi visualise text}.
+\subsection{directly follows model (.dfm)}
+Import as objects: directly follows model, labelled Petri net.
+\\Import as traits: labelled Petri net.
+\\Input to commands: \texttt{Ebi convert labelled-Petri-net, Ebi discover occurrence, Ebi discover uniform, Ebi information, Ebi validate, Ebi visualise svg, Ebi visualise text}.
+\subsection{Petri net markup language (.pnml)}
+Import as objects: labelled Petri net.
+\\Import as traits: labelled Petri net.
+\\Input to commands: \texttt{Ebi convert labelled-Petri-net, Ebi discover occurrence, Ebi discover uniform, Ebi information, Ebi validate, Ebi visualise svg, Ebi visualise text}.
+}
+\def\ebifilehandlerlist{\begin{itemize}
+\item finite language (.lang)
+\item labelled Petri net (.lpn)
+\item stochastic labelled Petri net (.slpn)
+\item finite stochastic language (.slang)
+\item stochastic deterministic finite automaton (.sdfa)
+\item event log (.xes)
+\item compressed event log (.xes.gz)
+\item directly follows model (.dfm)
+\item Petri net markup language (.pnml)
+\end{itemize}}
+\def\ebitraitlist{\begin{itemize}
+\item event log
+\item finite language
+\item finite stochastic language
+\item iterable stochastic language
+\item queriable stochastic language
+\item semantics
+\item stochastic deterministic semantics
+\item stochastic semantics
+\item labelled Petri net
+\end{itemize}}
+\def\ebiobjecttypelist{\begin{itemize}
+\item directly follows model
+\item event log
+\item finite language
+\item finite stochastic language
+\item labelled Petri net
+\item stochastic deterministic finite automaton
+\item stochastic labelled Petri net
+\end{itemize}}
+

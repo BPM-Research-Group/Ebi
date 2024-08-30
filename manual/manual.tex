@@ -1,0 +1,334 @@
+\documentclass{article}
+\usepackage{amsmath,amsfonts,booktabs,stmaryrd,tabularx,multirow,xfrac,nicematrix}
+\usepackage{ltablex}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathmorphing,calc,positioning}
+\usepackage{imakeidx}
+\makeindex
+\def\indexx#1{\index{#1}#1}
+\usepackage{geometry}
+
+\usepackage{amsmath,amsthm}
+\newtheorem{definition}{Definition}
+
+\usepackage{todonotes}
+\setuptodonotes{inline}
+
+\input{functions}
+
+\title{Ebi - a stochastic process mining tool\\{\small\version}\\Manual}
+\author{The BPM group at RWTH Aachen University\\
+Sander J.J. Leemans, Tian Li}
+\date{\today}
+
+\DeclareMathOperator{\logdiv}{logdiv}
+\DeclareMathOperator{\Logdiv}{Logdiv}
+\newcommand\xsnakearrow[1]{\overset{#1}{\rightsquigarrow}}
+\DeclareMathOperator{\multisetminus}{\mathbin{{\setminus}\mspace{-7mu}{-}}}
+\DeclareMathOperator{\entrel}{\smash{\text{ER}}}
+
+\def\ebiCommand#1{\texttt{#1}}
+
+\usepackage{hyperref}
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\section{Commands}
+
+    \ebicommands
+
+\section{Supported files}
+    Please note that Ebi does not consider input file extensions.
+    For plug-ins with multiple output file formats, the file extension is used to determine the output format.
+
+    \ebifilehandlers
+
+\section{Architecture}
+
+    \subsection{Files and objects}
+        Figure~\ref{fig:traits} shows the main architectural concepts of Ebi with regards to files and objects.
+        It's a bit verbose, but it enables commands to be completely detached from any I/O, and reduces overhead when adding new functionality, and guarantees the documentation is up-to-date.
+    
+        \begin{figure}
+            \centering
+            \begin{tikzpicture}
+                \def\dx{1.5cm}
+                \def\dy{1cm}
+                \node (command) {command\strut};
+    
+                \node (trait) [left=\dx of command] {trait\strut};
+    
+                \node (objecttype) [left=\dx of trait, align=center] {object\\type};
+    
+                \node (filehandler) [left=\dx of objecttype, align=center] {file\\handler};
+    
+                \draw [->] (objecttype) to node[above, font=\scriptsize] {implements} (trait);
+                \draw [->] (trait) to node[above, font=\scriptsize] {input to} (command);
+    
+                \draw [->, out=-20, in=200] (objecttype) to node[below, font=\scriptsize] {input to} (command);
+    
+                \draw [->] (filehandler) to node[above, font=\scriptsize] {imports} (objecttype);
+    
+                \node [align=center] (inputtype) at ($(trait)!0.5!(command)+(0,\dy)$) {input\\type};
+                \draw [dotted] (inputtype) to ++(0,-2*\dy);
+                
+            \end{tikzpicture}\\
+            \begin{tikzpicture}
+                \def\dx{1.5cm}
+                \def\dy{1cm}
+                \node (command) {command\strut};  
+    
+                \node (objecttype) [left=\dx of trait, align=center] {object\\type};
+    
+                \node (filehandler) [left=\dx of objecttype, align=center] {file\\handler};
+    
+                \draw [<-, out=-20, in=200] (objecttype) to node[below, font=\scriptsize] {output of} (command);
+    
+                \draw [<-] (filehandler) to node[above, font=\scriptsize] {exported by} (objecttype);
+    
+                \node [align=center] (inputtype) at ($(trait)!0.5!(command)+(0,\dy)$) {output\\type};
+                \draw [dotted] (inputtype) to ++(0,-2*\dy);
+                
+            \end{tikzpicture}
+            \caption{Traits and object types in Ebi.}
+            \label{fig:traits}
+        \end{figure}
+        
+        
+        \newgeometry{top=1mm,bottom=1mm,right=30mm,left=30mm}
+        	\includegraphics[width=0.8\linewidth]{graph}
+        \restoregeometry
+    
+        \paragraph{Command}
+            A command is a function of Ebi that users can call.
+            A command declares what types of inputs it needs and what type of output it generates. 
+            Preferably, commands take traits as inputs rather than object types.
+    
+            Commands can circumvent the Ebi object handling on their inputs by declaring an \texttt{cli\_command} function, which gives direct access to the command line interface building process.
+            This is for instance used in the \ebiCommand{validate} command, where we want to obtain the parsing error for a particular object type.
+    
+            The actual input for a command gets wrapped in the \texttt{EbiInput} enum, and the output must be wrapped in the \texttt{EbiOutput} enum.
+            The Ebi machinery verifies whether the output of a command matches the declared output type at run time.
+            
+            Commands define a number of inputs, and for each input a list of acceptable types.
+            However, these types need to be similar: a command cannot ask for either a file and a fraction, for instance.
+    
+            Ebi has the following commands:
+            \ebicommandlist
+    
+        \paragraph{Input type}
+            An input type is a declaration of what a command needs as input.
+            An input type can be:
+            \begin{itemize}
+                \item a trait;
+                \item an object type;
+                \item a basic data type such as fraction, integer or string;
+                \item the ``any object" input type, which denotes that any object type will be accepted;
+                \item a ``file handler", which indicates the (name of) a file handler (for instance used in the \ebiCommand{validate} command).
+            \end{itemize}
+    
+            The actual input for a command gets wrapped in the \texttt{EbiInput} enum.
+    
+        \paragraph{Trait}
+            A ``trait" is like an interface: it provides some functions but does not say how these are implemented.
+            For instance ``finite stochastic language" is a trait, which allows to iterate over traces and their probabilities, and to obtain the number of traces.
+            Preferably, commands should require traits as inputs.
+
+            Ebi has the following traits:
+            \ebitraitlist
+    
+        \paragraph{Object type}
+            An object type is a struct or class.
+            It is a specific implementation with a fixed data structure.
+            The output of a command is an object of a specific object type.
+            The input of a command rather not uses object types, but sometimes this is unavoidable.
+            Objects are wrapped in an \texttt{EbiObject} enum to ensure type safety by the compiler.
+
+            Ebi has the following object types:
+            \ebiobjecttypelist
+    
+        \paragraph{File handler}
+            A file handler is an importer for a particular file format.
+    
+            Ebi has the following file handlers:
+            \ebifilehandlerlist
+
+    \subsection{Exact Computation}
+        In Ebi, several computations are performed without rounding.
+        To this end, it uses positive fractions: 
+        $$\mathbb{Q} = \{ \frac{x}{y} \mid x, y \in \mathbb{N} \}$$
+    
+        Fractions are well-supported by standard libraries.
+        Even for seemingly small fractions, the natural numbers that compose the fraction can get \emph{huge}.
+        Therefore, simple 32 or 64 bit integers do not suffice for $x$ and $y$, and a large, unbounded, integer library is necessary.
+    
+        By default, Ebi uses exact arithmetic, unless it is disabled by a function explicitly.
+        This can be done with \verb=Fraction::set_exact_globally(exact: bool)=.
+        Please note that exact and approximate (double precision) arithmetic cannot be combined, thus functions should set this function as early as possible.
+
+        \subsubsection{Square roots}
+            Square roots can only be expressed in $\mathbb{N}$ or in $\mathbb{I}$.
+            Thus, we need to represent square roots symbolically.
+            For this, we use the following operations:
+            \begin{align*}
+                \frac{a}{b} ={}& \sqrt{\frac{a^2}{b^2}}\\
+                \sqrt{a} \sqrt{b} ={}& \sqrt{a b}\\
+                \frac{\sqrt{a}}{\sqrt{b}} ={}& \sqrt{\frac{a}{b}}
+            \end{align*}
+    
+            Thus, we can represent all of these square root operations with the square root of a fractional number.
+
+        \subsubsection{Logdiv}
+            Logarithms can often not be expressed in $\mathbb{Q}$.
+            For instance, $\log_2(3) \notin \mathbb{Q}$ is not a rational number.
+            To perform computations exactly and to delay rounding to the very last moment, Ebi uses \emph{log division} objects.
+            That is, computations that involve logarithms are performed symbolically in order not to have to evaluate the logarithm.
+            
+            A log division object ($\logdiv$) is a base-2 logarithm of a positive fraction, divided by a natural number:
+            \begin{align*}
+                \logdiv &{}\colon \mathbb{Q} \times \mathbb{N} \rightarrow \mathbb{I}\\
+                \logdiv(\frac{a}{b}, c) &{}= \frac{\log(\frac{a}{b})}{c}\\
+                &{}= \log \sqrt[\leftroot{-1}\uproot{2}\scriptstyle c]{\frac{a}{b}}
+            \end{align*}
+
+            \paragraph{From a fraction}
+                Any non-negative fraction can be written as a $\logdiv$:
+                \begin{align*}
+                    \frac{a}{b} ={}& \frac{\log(2^a)}{b} \\
+                    {}={}& \logdiv(\frac{2^a}{1}, b)
+                \end{align*}
+    
+            \paragraph{Sum \& Difference}
+                $\Logdiv$s are closed under addition:
+                \begin{align*}
+                    \logdiv(\frac{a}{b}, c) + \logdiv(\frac{d}{e}, f) = {}& 
+                    \frac{\log(\frac{a}{b})}{c} + \frac{\log(\frac{d}{e})}{f}\\
+                    {}={}& \frac{f\log(\frac{a}{b}) + c\log(\frac{d}{e})}{cf}\\
+                    {}={}& \frac{\log(\frac{a^f}{b^f}) + \log(\frac{d^c}{e^c})}{cf}\\
+                    {}={}& \frac{\log(\frac{a^f d^c}{b^f e^c})}{cf}\\
+                    {}={}& \logdiv(\frac{a^f d^c}{b^f e^c}, cf)
+                \end{align*}
+                As $a$, $b$, $c$, $d$, $e$ and $f$ are all positive integers, the sum of two $\logdiv$s is also a $\logdiv$.
+                Similarly, for subtraction:
+                \begin{align*}
+                    \logdiv(\frac{a}{b}, c) - \logdiv(\frac{d}{e}, f) = {}& 
+                    \frac{\log(\frac{a}{b})}{c} - \frac{\log(\frac{d}{e})}{f}\\
+                    {}={}& \frac{\log(\frac{a^f}{b^f}) - \log(\frac{d^c}{e^c})}{cf}\\
+                    {}={}& \frac{\log(\frac{a^f}{b^f} / \frac{d^c}{e^c})}{cf}\\
+                    {}={}& \logdiv(\frac{a^f e^c}{b^f d^c}, cf)\\
+                \end{align*}
+                As $a$, $b$, $d$ and $e$ are all positive integers, the difference between two $\logdiv$s is also a $\logdiv$.
+
+            \paragraph{Additive identity (0)}
+                The additive identity of $\logdiv$ is $\logdiv(\frac{1}{1}, 1) = 0$.
+                
+                While there are infinitely many $\logdiv$s that equal 0, such as $\logdiv(\frac{5}{5}, 100) = 0$, only a second argument of 1 guarantees that addition and subtraction work as intended.
+                
+            \paragraph{$n \log n$}
+                Given a fraction $\frac{a}{b} \in \mathbb{Q}$, the value $\frac{a}{b} \log \frac{a}{b}$ can be represented by
+                \begin{align*}
+                    \frac{a}{b} \log \frac{a}{b} ={} & 
+                    \frac{a \log(\frac{a}{b})}{b}\\
+                    {}={}& \frac{\log(\frac{a^a}{b^a})}{b}\\
+                    {}={}& \logdiv(\frac{a^a}{b^a}, b)\\
+                \end{align*}
+
+            \paragraph{Approximation}
+                In order to provide readable results that can be used in other tools, at the end of the computation chain, $\logdiv$s need to be approximated to a fraction.
+                To this end, we consider that:
+                \begin{align*}
+                    \logdiv(\frac{a}{b}, c) ={}& \frac{\log(\frac{a}{b})}{c}
+                \end{align*}
+    
+                Thus, we need to compute $\log(q)$ with $q \in \mathbb{Q}$.
+                As the libraries we use do not support computing logarithms on fractions with arbitrary large representations, we must implement this ourselves.
+
+                \subparagraph{Taylor expansion}
+                    Using Taylor expansion, we translate the approximation of the logarithm base 2 to $q$ to smaller and smaller values, until we end up with a $q' \leq 2$.
+                    That is, we repeatedly divide $q$ by two and add one to the result, until $q$ drops below 2.
+                    Then, we can approximate $\log_2(q)$ with a Taylor series on the natural logarithm\footnote{\url{https://en.wikipedia.org/wiki/Logarithm}}.
+                    
+                    \begin{align*}
+                        \log(q) ={}& \begin{cases}
+                            1 + \log(\frac{q}{2}) & \text{ if } q > 2\\ 
+                            \frac{\ln(q)}{\ln(2)} & \text{ if } 0 < q \leq 2
+                        \end{cases}\\
+                        \ln(q) ={}& \sum_{k=1}^{\infty} (-1)^{k+1} \frac{(z-1)^k}{k} \text{ for } 0 < q \leq 2
+                    \end{align*}
+                    We then approximate $\ln(q)$ up until the terms become small enough for the required precision.
+
+                \subparagraph{Bits}
+                    As even standard multiplications are expensive for fractions, we need a more efficient strategy to bring the approximation to acceptable speed:
+                    \begin{itemize}
+                        \item If $\frac{a}{b} < \frac{1}{2}$:
+                        \begin{align*}
+                            \log(\frac{a}{b}) ={}& \log(a) - \log(b)\\
+                            {}={}& -(\log(b) - \log(a))\\
+                            {}={}& -\log(\frac{b}{a})
+                        \end{align*}
+                        In which $\frac{b}{a}$ is larger than 2.
+    
+                        Complexity: pointer swap.
+                        
+                        \item While $\frac{a}{b} > 1$:
+                        \begin{align*}
+                            \log(\frac{a}{b}) ={}& \begin{cases}
+                                1 + \log(\frac{a}{2b}) & \text{if } a \text{ is odd}\\
+                                1 + \log(\frac{a/2}{b}) & \text{if } a \text{ is even} \end{cases}
+                        \end{align*}
+                        Complexity: for each iteration a left or right bit shift plus a comparison (right bit shift).
+                        
+                        \item Then, $\frac{1}{2} < \frac{a}{b} < 1$.
+                        %https://math.stackexchange.com/questions/1706939/approximation-log-2x
+                        As $a$ and $b$ may be \emph{huge}, we cannot easily translate our fraction to a standard floating-point number.
+                        Therefore, we use the following procedure to obtain as many digits as necessary for the required precision (where 3.3 bits yield one decimal):
+                        \begin{align*}
+                            \log(\frac{a}{b})_n ={}& \begin{cases}
+                                1 & \text{if } a = b\\
+                                \log(\frac{a^2}{2 b^2})_{n+1} - \frac{1}{2^n} & \text{if } \frac{a^2}{b^2} > 2 \qquad \text{report a binary } 1\\
+                                \log(\frac{a^2}{b^2})_{n+1} & \text{otherwise} \qquad \text{report a binary } 0\\
+                            \end{cases}
+                        \end{align*}
+                        In which $n$ denotes the iteration.
+    
+                        Complexity: two multiplications and at most one bit shift per bit precision.
+                        As multiplications are prohibitively expensive, and squaring roughly doubles the number of bits each iteration, we truncate $a$ and $b$ by the same number of bit-shifts every iteration, such that in each number enough bits are left.
+                    \end{itemize}
+
+        \subsubsection{RootLogDiv}
+            A RootLogDiv is the following:
+            \begin{align*}
+                \text{RootLogDiv}(\frac{a}{b},c) ={}& \sqrt{\logdiv(\frac{a}{b}, c)}\\
+                {}={}& \sqrt{\frac{\log\frac{a}{b}}{c}}& 
+            \end{align*}
+
+            There is an option to perform the 1- operation on a RootLogDiv.
+        
+    \section{Entropic Relevance}
+    \label{sec:er}
+        Entropic relevance is computed as follows:
+        
+        \begin{definition}[Entropic Relevance~\cite{DBLP:journals/is/AlkhammashPMG22}]
+            \label{def:ER}
+                Let $L$ be a finite stochastic language and let $M$ be a queriable stochastic langauge.
+                Let $\Lambda$ be the set of all activities appearing in the traces of $L$.
+                Then, the \emph{entropic relevance ($\entrel$) of $M$ to $L$} is defined as follows: 
+                \begin{align*}
+                    \entrel(L, M) ={}& H_0\left(\sum_{\sigma \in \bar{L},\, M(\sigma)>0}{L(\sigma)}\right) + 
+                    \sum_{\sigma \in \bar{L}}L(\sigma) J(\sigma, M)\\
+                    J(\sigma, M) ={}& \begin{cases}
+                    -\log_2 M(\sigma) & M(\sigma) > 0\\
+                    (1+|\sigma|) \log_2 (1 + |\Lambda|)) & \text{otherwise}
+                    \end{cases}\\
+                    H_0(x) ={}& -x \log_2{x} - (1-x) \log_2{(1-x)} \text{ with } H_0(0) = H_0(1) = 0 &\\
+                \end{align*}       
+            \end{definition}
+            
+    \bibliographystyle{plain}
+    \bibliography{bibliography}
+
+    \printindex
+\end{document}

@@ -1,0 +1,60 @@
+use crate::{ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_language::EbiTraitFiniteLanguage}, export::{EbiOutput, EbiOutputType}, medoid, medoid_non_stochastic};
+
+use super::ebi_command::EbiCommand;
+
+pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
+    name_short: "anans",
+    name_long: Some("analyse-non-stochastic"),
+    explanation_short: "Analyse a language without considering its stochastic perspective.",
+    explanation_long: None,
+    children: &[
+        &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
+        &EBI_ANALYSE_NON_STOCHASTIC_MEDOID
+    ],
+};
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command { 
+    name_short: "med", 
+    name_long: Some("medoid"),
+    explanation_short: "Find the traces with the least distance to the other traces, without considering the stochastic perspective.", 
+    explanation_long: Some("Find the traces with the lowest average normalised Levenshtein distance to the other traces; ties are resolved arbritrarily. The computation is random and does not take into account how often each trace occurs."), 
+    latex_link: None, 
+    cli_command: None, 
+    exact_arithmetic: true, 
+    input_types: &[ 
+        &[ &EbiInputType::Trait(EbiTrait::FiniteLanguage)], 
+        &[ &EbiInputType::Usize] 
+    ],
+    input_names: &[ "FILE", "NUMBER_OF_TRACES"],
+    input_helps: &[ "The finite stochastic language.", "The number of traces that should be extracted."],
+    execute: |mut objects, _| {
+        let language = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+        let number_of_traces = objects.remove(0).to_type::<usize>()?;
+        let result = medoid_non_stochastic::medoid(language.as_ref(), &number_of_traces)?;
+        return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
+    }, 
+    output: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
+};
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
+    name_short: "clus", 
+    name_long: Some("cluster"),
+    explanation_short: "Apply k-medoid clustering on a finite set of traces, without considering the stochastic perspective.", 
+    explanation_long: Some("Apply k-medoid clustering: group the traces into a given number of clusters, such that the average distance of each trace to its closest medoid is minimal. The computation is random and does not take into account how often each trace occurs."), 
+    latex_link: Some("~\\cite{DBLP:journals/is/SchubertR21}"), 
+    cli_command: None, 
+    exact_arithmetic: true, 
+    input_types: &[ 
+        &[ &EbiInputType::Trait(EbiTrait::FiniteLanguage)], 
+        &[ &EbiInputType::Usize ] 
+    ],
+    input_names: &[ "FILE", "NUMBER_OF_CLUSTERS"],
+    input_helps: &[ "The finite stochastic language.", "The number of clusters."],
+    execute: |mut objects, cli_matches| {
+        let language = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+        let number_of_clusters = objects.remove(0).to_type::<usize>()?;
+        let result = medoid_non_stochastic::k_medoids_clustering(language.as_ref(), *number_of_clusters)?;
+        return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
+    }, 
+    output: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
+};
