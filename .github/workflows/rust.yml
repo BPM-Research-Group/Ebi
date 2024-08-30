@@ -21,4 +21,4 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
     - name: manual
-      run: cd manual; cargo run latex manual -o functions.tex
+      run: cd manual; cargo run latex manual -o functions.tex; rsvg-convert -f pdf -o graph.pdf graph.svg; lualatex manual.tex; bibtex manual
