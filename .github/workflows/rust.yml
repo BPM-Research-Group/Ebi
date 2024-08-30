@@ -14,6 +14,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    container:
+      image: ghcr.io/moderncv/debian-texlive-docker:main
+
     steps:
     - uses: actions/checkout@v4
     - name: Build
@@ -21,4 +24,4 @@ jobs:
     - name: Run tests
       run: cargo test --verbose
     - name: manual
-      run: cd manual; cargo run latex manual -o functions.tex; rsvg-convert -f pdf -o graph.pdf graph.svg; lualatex manual.tex; bibtex manual
+      run: cd manual; cargo run latex manual -o functions.tex; lualatex manual.tex; bibtex manual
