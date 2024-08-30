@@ -20,13 +20,9 @@ jobs:
       run: cargo build --verbose
     - name: Run tests
       run: cargo test --verbose
-    - name: Build Windows
-      run: |
-        rustup target add x86_64-pc-windows-gnu
-        cargo build --target x86_64-pc-windows-gnu --release
     - name: Build Linux
       run: cargo build --target x86_64-unknown-linux-gnu --release
-    - name: Move
+    - name: Move Linux
       run: |
         mkdir out
         cp ./target/x86_64-unknown-linux-gnu/release/ebi ./out/Ebi-x86_64-linux
@@ -34,3 +30,12 @@ jobs:
       with:
         name: Linux
         path: out/Ebi-x86_64-linux
+    - name: Build Windows
+      run: |
+        apt install mingw-w64
+        rustup target add x86_64-pc-windows-gnu
+        cargo build --target x86_64-pc-windows-gnu --release
+    - name: Move Windows
+      run: |
+        mkdir out
+        cp ./target/x86_64-pc-windows-gnu/release/ebi ./out/Ebi-x86_64-windows.exe
