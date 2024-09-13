@@ -16,20 +16,7 @@ More information on its use can be found in its [manual.pdf](https://git.rwth-aa
 1. Install extension 'rust-analyzer' in Visual Studio Code
     - https://code.visualstudio.com/docs/languages/rust
 
-1. Add an SSH key to your RWTH Gitlab account
-
-1. Test whether your computer can connect to the RWTH Gitlab server:
-    - (Ubuntu)
-        - `ssh -T git@git.rwth-aachen.de`
-        - Add the fingerprint from the server when asked
-
-1. Go to the project at https://git.rwth-aachen.de/rwth-bpm/rustlibrary choose "Clone" and "Visual Studio Code (SSH)".
-
-1. Set a git email and name
-    - (Ubuntu)
-        - Go in a terminal to the cloned folder and execute
-            - `git config user.email "your email"`
-            - `git config user.name "your name"`
+1. Go to the project at https://github.com/BPM-Research-Group/Ebi choose "Clone" and "Visual Studio Code (SSH)", and clone it in your favourite editor.
 
 # Setting up cross-platform compilation (not necessary for development)
 
