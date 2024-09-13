@@ -5,7 +5,7 @@ use rand::{thread_rng,Rng};
 use fraction::{BigUint, GenericFraction, One, Zero};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
-use crate::{activity_key::{self, Activity, ActivityKey}, dottable::Dottable, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, TransitionIndex}}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, follower_semantics::FollowerSemantics, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, marking::Marking, math::fraction::Fraction, net::Transition, Trace};
+use crate::{activity_key::{self, Activity, ActivityKey}, dottable::Dottable, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, TransitionIndex}}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, follower_semantics::FollowerSemantics, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, marking::Marking, math::fraction::Fraction, net::Transition, Trace};
 
 use super::{ebi_object::EbiObject, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
 
@@ -456,12 +456,14 @@ impl Dottable for StochasticDeterministicFiniteAutomaton {
 }
 
 struct StochasticDeterministicFiniteAutomatonSemantics {
+    activity_key: ActivityKey, //need to clone for the borrow checker
     sdfa: Rc<StochasticDeterministicFiniteAutomaton>
 }
 
 impl StochasticDeterministicFiniteAutomatonSemantics {
     pub fn new(sdfa: Rc<StochasticDeterministicFiniteAutomaton>) -> Self {
         Self {
+            activity_key: sdfa.activity_key.clone(),
             sdfa: sdfa
         }
     }
@@ -516,7 +518,11 @@ impl Semantics for StochasticDeterministicFiniteAutomatonSemantics {
     type State = usize; //In semantics, the final state must be a deadlock state. Therefore, for every state in which we can terminate, we add a virtual silent transition to a virtual deadlock state.
 
     fn get_activity_key(&self) -> &ActivityKey {
-        self.sdfa.get_activity_key()
+        &self.activity_key
+    }
+
+    fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
+        &mut self.activity_key
     }
 
     fn get_initial_state(&self) -> Self::State {

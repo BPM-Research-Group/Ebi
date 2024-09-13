@@ -8,7 +8,7 @@ use layout::topo::layout::VisualGraph;
 use rand::{thread_rng,Rng};
 
 use crate::ebi_commands::ebi_command_info::Infoable;
-use crate::ebi_traits::ebi_semantics::{EbiTraitSemantics, Semantics};
+use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics};
 use crate::ebi_traits::ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet;
 use crate::ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage;
 use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics;

@@ -3,9 +3,9 @@ use anyhow::{anyhow, Error, Result};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::{ebi_commands::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_command_info::Infoable}, ebi_input_output::EbiInputType, ebi_objects::{compressed_event_log::EBI_COMPRESSED_EVENT_LOG, event_log::{EventLog, EBI_EVENT_LOG}, finite_language::{FiniteLanguage, EBI_FINITE_LANGUAGE}, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}, stochastic_deterministic_finite_automaton::{StochasticDeterministicFiniteAutomaton, EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON}, stochastic_labelled_petri_net::{StochasticLabelledPetriNet, EBI_STOCHASTIC_LABELLED_PETRI_NET}}, ebi_traits::{ebi_semantics::EbiTraitSemantics, ebi_trait::{EbiTrait, FromEbiTraitObject}, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, export::Exportable, file_handler::{self, EbiFileHandler, EBI_FILE_HANDLERS}, import::EbiTraitImporter, math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot}};
+use crate::{ebi_commands::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_command_info::Infoable}, ebi_input_output::EbiInputType, ebi_objects::{compressed_event_log::EBI_COMPRESSED_EVENT_LOG, event_log::{EventLog, EBI_EVENT_LOG}, finite_language::{FiniteLanguage, EBI_FINITE_LANGUAGE}, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}, stochastic_deterministic_finite_automaton::{StochasticDeterministicFiniteAutomaton, EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON}, stochastic_labelled_petri_net::{StochasticLabelledPetriNet, EBI_STOCHASTIC_LABELLED_PETRI_NET}}, ebi_traits::{ebi_trait_semantics::EbiTraitSemantics, ebi_trait::{EbiTrait, FromEbiTraitObject}, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, export::Exportable, file_handler::{self, EbiFileHandler, EBI_FILE_HANDLERS}, import::EbiTraitImporter, math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot}};
 
-use super::directly_follows_model::{DirectlyFollowsModel, EBI_DIRCTLY_FOLLOWS_MODEL};
+use super::{alignments::Alignments, directly_follows_model::{DirectlyFollowsModel, EBI_DIRCTLY_FOLLOWS_MODEL}};
 
 #[derive(PartialEq,Clone,EnumIter,Hash)]
 pub enum EbiObjectType {
@@ -16,6 +16,7 @@ pub enum EbiObjectType {
     LabelledPetriNet,
     StochasticDeterministicFiniteAutomaton,
     StochasticLabelledPetriNet,
+    Alignments,
 }
 
 impl EbiObjectType {
@@ -28,7 +29,8 @@ impl EbiObjectType {
             EbiObjectType::StochasticDeterministicFiniteAutomaton => "a",
             EbiObjectType::EventLog => "an",
             EbiObjectType::FiniteLanguage => "a",
-            EbiObjectType::DirectlyFollowsModel => "a"
+            EbiObjectType::DirectlyFollowsModel => "a",
+            EbiObjectType::Alignments => "an",
         }
     }
     
@@ -74,7 +76,8 @@ impl Display for EbiObjectType {
             EbiObjectType::StochasticDeterministicFiniteAutomaton => "stochastic deterministic finite automaton",
             EbiObjectType::EventLog => "event log",
             EbiObjectType::FiniteLanguage => "finite language",
-            EbiObjectType::DirectlyFollowsModel => "directly follows model"
+            EbiObjectType::DirectlyFollowsModel => "directly follows model",
+            EbiObjectType::Alignments => "alignment",
         })
     }
 }
@@ -86,7 +89,8 @@ pub enum EbiObject {
     StochasticDeterministicFiniteAutomaton(StochasticDeterministicFiniteAutomaton),
     EventLog(EventLog),
     FiniteLanguage(FiniteLanguage),
-    DirectlyFollowsModel(DirectlyFollowsModel)
+    DirectlyFollowsModel(DirectlyFollowsModel),
+    Alignments(Alignments),
 }
 
 impl EbiObject {
@@ -98,7 +102,8 @@ impl EbiObject {
             EbiObject::StochasticDeterministicFiniteAutomaton(_) => EbiObjectType::StochasticDeterministicFiniteAutomaton,
             EbiObject::EventLog(_) => EbiObjectType::EventLog,
             EbiObject::FiniteLanguage(_) => EbiObjectType::FiniteLanguage,
-            EbiObject::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel
+            EbiObject::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
+            EbiObject::Alignments(_) => EbiObjectType::Alignments,
         }
     }
 }
@@ -112,7 +117,8 @@ impl Display for EbiObject {
             EbiObject::StochasticDeterministicFiniteAutomaton(o) => write!(f, "{}", o),
             EbiObject::EventLog(o) => write!(f, "{}", o),
             EbiObject::FiniteLanguage(o) => write!(f, "{}", o),
-            EbiObject::DirectlyFollowsModel(o) => write!(f, "{}", o)
+            EbiObject::DirectlyFollowsModel(o) => write!(f, "{}", o),
+            EbiObject::Alignments(o) => write!(f, "{}", o),
         }
     }
 }
@@ -126,7 +132,8 @@ impl Infoable for EbiObject {
             EbiObject::StochasticDeterministicFiniteAutomaton(o) => o.info(f),
             EbiObject::EventLog(o) => o.info(f),
             EbiObject::FiniteLanguage(o) => o.info(f),
-            EbiObject::DirectlyFollowsModel(o) => o.info(f)
+            EbiObject::DirectlyFollowsModel(o) => o.info(f),
+            EbiObject::Alignments(o) => o.info(f),
         }
     }
 }

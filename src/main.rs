@@ -37,6 +37,7 @@ pub mod ebi_objects {
     pub mod finite_stochastic_language;
     pub mod directly_follows_model;
     pub mod petri_net_markup_language;
+    pub mod alignments;
 }
 pub mod ebi_traits {
     pub mod ebi_trait;
@@ -49,7 +50,7 @@ pub mod ebi_traits {
     pub mod ebi_trait_event_log;
     pub mod ebi_trait_stochastic_semantics;
     pub mod ebi_trait_labelled_petri_net;
-    pub mod ebi_semantics;
+    pub mod ebi_trait_semantics;
 }
 pub mod math {
     pub mod average;

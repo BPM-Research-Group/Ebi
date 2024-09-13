@@ -3,7 +3,7 @@ use anyhow::{Result, anyhow};
 use fraction::Zero;
 
 use crate::ebi_commands::ebi_command_info::Infoable;
-use crate::ebi_traits::ebi_semantics::Semantics;
+use crate::ebi_traits::ebi_trait_semantics::Semantics;
 use crate::ebi_traits::ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage;
 use crate::math::fraction::Fraction;
 use crate::{activity_key::{Activity, ActivityKey}, ebi_traits::ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}};
@@ -88,6 +88,10 @@ impl Semantics for FiniteStochasticLanguageSemantics {
 
     fn get_activity_key(&self) -> &ActivityKey {
         &self.activity_key
+    }
+
+    fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
+        &mut self.activity_key
     }
 
     fn get_initial_state(&self) -> Self::State {

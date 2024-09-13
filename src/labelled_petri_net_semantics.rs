@@ -4,11 +4,12 @@ use bitvec::{bitvec, vec::BitVec, prelude::Lsb0};
 use anyhow::{anyhow, Context};
 use fraction::Zero;
 
-use crate::{activity_key::{Activity, ActivityKey}, ebi_objects::{labelled_petri_net::LPNMarking, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_semantics::Semantics, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, export::Displayable, marking::Marking, math::fraction::Fraction, net::{Net, StochasticNet}};
+use crate::{activity_key::{self, Activity, ActivityKey}, ebi_objects::{labelled_petri_net::LPNMarking, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet, ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, export::Displayable, marking::Marking, math::fraction::Fraction, net::{Net, StochasticNet}};
 
 #[derive(Clone, Debug)]
 pub struct LabelledPetriNetSemantics {
     net: Rc<dyn EbiTraitLabelledPetriNet>,
+    activity_key: ActivityKey, //needs to be cloned to satisfy the borrow checker
     input_places:  Vec<Vec<usize>>, //hashmaps would be more safe here, but that's a lot of overhead
 	output_places: Vec<Vec<usize>>,
     input_places_weights: Vec<Vec<u64>>,
@@ -23,8 +24,10 @@ impl LabelledPetriNetSemantics {
 
         let transitions = net.get_number_of_transitions();
         let places: usize = net.get_number_of_places();
+        let activity_key = net.get_activity_key().clone();
         let mut result = LabelledPetriNetSemantics {
             net: net,
+            activity_key: activity_key,
             input_places: vec![vec![]; transitions],
             output_places: vec![vec![]; transitions],
             input_places_weights: vec![vec![]; transitions],
@@ -94,7 +97,11 @@ impl Semantics for LabelledPetriNetSemantics {
 	type State = LPNMarking;
 
     fn get_activity_key(&self) -> &ActivityKey {
-        self.net.get_activity_key()
+        &self.activity_key
+    }
+
+    fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
+        &mut self.activity_key
     }
     
 	fn is_final_state(&self, state: &LPNMarking) -> bool {

@@ -159,7 +159,7 @@ impl Display for EbiOutputType {
             EbiOutputType::Fraction => Display::fmt(&"fraction", f),
             EbiOutputType::LogDiv => Display::fmt(&"logarithm", f),
             EbiOutputType::ContainsRoot => Display::fmt(&"root", f),
-            EbiOutputType::RootLogDiv => Display::fmt(&"rootlog", f)
+            EbiOutputType::RootLogDiv => Display::fmt(&"rootlog", f),
         }
     }
 }

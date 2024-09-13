@@ -23,6 +23,8 @@ pub trait Semantics {
 
 	fn get_activity_key(&self) -> &ActivityKey;
 
+	fn get_activity_key_mut(&mut self) -> &mut ActivityKey;
+
     /**
 	 * (Re)set the semantics to the initial state.
 	 */

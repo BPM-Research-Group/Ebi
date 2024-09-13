@@ -3,7 +3,7 @@ use anyhow::{Result, Ok, Context, anyhow};
 use clap::{arg, value_parser, Arg, ArgAction, ArgMatches, Command};
 use fraction::{One, Zero};
 
-use crate::{ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, export::{self, EbiOutput, EbiOutputType}, follower_semantics::FollowerSemantics, import, math::fraction::Fraction};
+use crate::{ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}}, export::{self, EbiOutput, EbiOutputType}, follower_semantics::FollowerSemantics, import, math::fraction::Fraction};
 
 use super::ebi_command::EbiCommand;
 
@@ -14,7 +14,8 @@ pub const EBI_PROBABILITY: EbiCommand = EbiCommand::Group {
     explanation_long: None, 
     children: &[
         &EBI_PROBABILITY_MODEL,
-        &EBI_PROBABILITY_TRACE
+        &EBI_PROBABILITY_TRACE,
+        &EBI_PROBABILITY_EXPLAIN_TRACE
     ]
 };
 
@@ -82,4 +83,45 @@ pub const EBI_PROBABILITY_TRACE: EbiCommand = EbiCommand::Command {
         }
     }, 
     output: &EbiOutputType::Fraction,
+};
+
+pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command { 
+    name_short: "exptra", 
+    name_long: Some("explain-trace"), 
+    explanation_short: "Compute the most likely explanation of a trace given the stochastic model.", 
+    explanation_long: None, 
+    latex_link: None, 
+    cli_command: Some(|command| {
+        command.arg(Arg::new("trace")
+            .action(ArgAction::Set)
+            .value_name("TRACE")
+            .help("The trace.")
+            .required(true)
+            .value_parser(value_parser!(String))
+            .num_args(0..))
+    }), 
+    exact_arithmetic: true, 
+    input_types: &[ 
+        &[ &EbiInputType::Trait(EbiTrait::StochasticSemantics) ],
+        &[ &EbiInputType::Fraction ]
+    ], 
+    input_names: &[ "FILE", "VALUE" ], 
+    input_helps: &[ "The model.", "Balance between 0 (=only consider deviations) to 1 (=only consider weight in the model)" ], 
+    execute: |mut inputs, cli_matches| {
+        let mut semantics = inputs.remove(0).to_type::<EbiTraitStochasticSemantics>()?;
+        let mut balance = inputs.remove(0).to_type::<Fraction>()?;
+        if let Some(x) = cli_matches.get_many::<String>("trace") {
+            let t: Vec<&String> = x.collect();
+            let trace = t.into_iter().map(|activity| activity.as_str()).collect::<Vec<_>>();
+            let trace = semantics.get_activity_key_mut().process_trace_ref(&trace);
+
+            log::trace!("explain the trace {:?} given the model", trace);
+        
+            let result = semantics.explain_trace(&balance, &trace).with_context(|| format!("cannot explain the trace {:?}", trace))?;
+            return Ok(EbiOutput::Object(EbiObject::Alignments(result)));
+        } else {
+            return Err(anyhow!("no trace given"));
+        }
+    }, 
+    output: &EbiOutputType::ObjectType(EbiObjectType::Alignments),
 };

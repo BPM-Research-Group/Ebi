@@ -4,7 +4,7 @@ use bitvec::{bitvec, vec::BitVec, prelude::Lsb0};
 use anyhow::{anyhow, Context};
 use fraction::Zero;
 
-use crate::{activity_key::{self, Activity, ActivityKey}, ebi_objects::{labelled_petri_net::LPNMarking, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_semantics::Semantics, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, export::Displayable, marking::Marking, math::fraction::Fraction, net::{Net, StochasticNet}};
+use crate::{activity_key::{self, Activity, ActivityKey}, ebi_objects::{labelled_petri_net::LPNMarking, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, export::Displayable, marking::Marking, math::fraction::Fraction, net::{Net, StochasticNet}};
 
 #[derive(Clone, Debug)]
 pub struct StochasticLabelledPetriNetSemantics {
@@ -97,7 +97,11 @@ impl Semantics for StochasticLabelledPetriNetSemantics {
 	type State = LPNMarking;
 
     fn get_activity_key(&self) -> &ActivityKey {
-        self.net.get_activity_key()
+        &self.activity_key
+    }
+
+    fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
+        &mut self.activity_key
     }
 
 	fn is_final_state(&self, state: &LPNMarking) -> bool {
