@@ -98,7 +98,12 @@ impl StochasticDeterministicFiniteAutomaton {
             self.activities.insert(from, activity);
             self.terminating_probabilities[source] -= &probability;
             self.probabilities.insert(from, probability);
-            Ok(())
+
+            if self.terminating_probabilities[source].is_negative() {
+                Err(anyhow!("tried to insert an edge that brings the sum outgoing probability of the source state above 1"))
+            } else {
+                Ok(())
+            }
         }
     }
 
@@ -363,47 +368,10 @@ impl EbiTraitQueriableStochasticLanguage for StochasticDeterministicFiniteAutoma
                         return Ok(Fraction::zero());
                     }
                     state = self.targets[pos];
-                    result *= self.probabilities[pos].clone();
+                    result *= &self.probabilities[pos];
                 }
 
-                let mut not_real_final = false;
-                // iterate sources and check whether the state is a partial-final
-                for (i,source) in self.sources.iter().enumerate(){
-                    if state == *source{
-                        not_real_final = true;
-                        break;
-                    }
-                }
-
-                if not_real_final{
-                    let mut possible_transitions = vec![];
-                    let mut possible_prob = vec![];
-                    let mut real_prob = Vec::new();
-                    let mut prob_map = HashMap::new();
-
-                    let mut temp_i = 0;
-                    for (idx, &source) in self.sources.iter().enumerate() {
-                        if source == state {
-                            possible_transitions.push(idx);
-                            possible_prob.push(idx);
-                            real_prob.push(self.probabilities[idx].clone());
-                            prob_map.insert(temp_i, idx);
-                            temp_i+=1
-                        }
-                    }
-                    // if the sum of element in real_prob is less than 1, add the difference to the last element
-                    let mut sum = Fraction::zero();
-                    for i in real_prob.iter(){
-                        sum += i;
-                    }
-
-                    let mut sum_less_than_1 = false;
-                    if sum < Fraction::one(){
-                        let mut diff = sum.one_minus();
-                        result *= diff;
-                    }
-                }
-
+                result *= &self.terminating_probabilities[state];
 
                 Ok(result)
             },
