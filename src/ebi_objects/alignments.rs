@@ -7,9 +7,16 @@ use super::ebi_object::EbiObject;
 
 pub const HEADER: &str = "alignments";
 
+pub enum Move {
+    LogMove(Activity),
+    ModelMove(Activity, TransitionIndex),
+    SynchronousMove(Activity, TransitionIndex),
+    SilentMove(TransitionIndex)
+}
+
 pub struct Alignments {
     activity_key: ActivityKey,
-    alignments: Vec<Vec<(Option<Activity>, Option<(Option<Activity>, TransitionIndex)>)>>// (log move, model move)
+    alignments: Vec<Vec<Move>>
 }
 
 impl Alignments {
@@ -45,37 +52,29 @@ impl Display for Alignments {
             writeln!(f, "# alignment {}", i)?;
             writeln!(f, "# number of moves\n{}", moves.len())?;
 
-            for (j, (log, model)) in moves.iter().enumerate() {
+            for (j, movee) in moves.iter().enumerate() {
                 writeln!(f, "# move {}", j)?;
 
-                match (log, model) {
-                    (None, None) => {
-                        writeln!(f, "error: empty move encountered"); //Rust defines that string building should never fail
-                    },
-                    (None, Some((Some(activity), transition))) => {
-                        //model move
-                        writeln!(f, "model move")?;
-                        writeln!(f, "label {}", self.activity_key.get_activity_label(activity))?;
-                        writeln!(f, "{}", transition)?;
-                    },
-                    (None, Some((None, transition))) => {
-                        //model move on silent transition
-                        writeln!(f, "model move")?;
-                        writeln!(f, "silent")?;
-                        writeln!(f, "{}", transition)?;
-                    },
-                    (Some(activity), None) => { 
-                        //log move
+                match movee {
+                    Move::LogMove(activity) => {
                         writeln!(f, "log move")?;
                         writeln!(f, "label {}", self.activity_key.get_activity_label(activity))?;
                     },
-                    (Some(activity), Some((_, transition))) => {
-                        //synchronous move
+                    Move::ModelMove(activity, transition) => {
+                        writeln!(f, "model move")?;
+                        writeln!(f, "label {}", self.activity_key.get_activity_label(activity))?;
+                        writeln!(f, "{}", transition)?;
+                    },
+                    Move::SynchronousMove(activity, transition) => {
                         writeln!(f, "synchronous move")?;
                         writeln!(f, "label {}", self.activity_key.get_activity_label(activity))?;
                         writeln!(f, "{}", transition)?;
                     },
-                }
+                    Move::SilentMove(transition) => {
+                        writeln!(f, "silent move")?;
+                        writeln!(f, "{}", transition)?;
+                    },
+                };
             }
         }
 
@@ -117,30 +116,29 @@ impl Importable for Alignments {
                     if label_line.trim_start().starts_with("label ") {
                         let label = label_line[6..].to_string();
                         let activity = activity_key.process_activity(&label);
-                        moves.push((Some(activity), None));
+                        moves.push(Move::LogMove(activity));
                     } else {
                         return Err(anyhow!("Line must have a label"));
                     }
-                    
 
-                } else if move_type_line.starts_with("model move") {
+                } else if move_type_line.trim_start().starts_with("model move") {
 
                     //read the label
                     let label_line = lreader.next_line_string().with_context(|| format!("failed to read label of model move {} of alignment {}", move_number, alignment_number))?;
                     let activity = if label_line.trim_start().starts_with("label ") {
                         let label = label_line.trim_start()[6..].to_string();
                         let activity = activity_key.process_activity(&label);
-                        Some(activity)
+                        activity
                     } else {
-                        None
+                        return Err(anyhow!("Line must have a label"));
                     };
 
                     //read the transition
                     let transition = lreader.next_line_index().with_context(|| format!("failed to read transition of move {} in alignemnt {}", move_number, alignment_number))?;
 
-                    moves.push((None, Some((activity, transition))));
+                    moves.push(Move::ModelMove(activity, transition));
 
-                } else if move_type_line.starts_with("synchronous move") {
+                } else if move_type_line.trim_start().starts_with("synchronous move") {
 
                     //read the label
                     let label_line = lreader.next_line_string().with_context(|| format!("failed to read label of synchronous move {} of alignment {}", move_number, alignment_number))?;
@@ -151,11 +149,18 @@ impl Importable for Alignments {
                         //read the transition
                         let transition = lreader.next_line_index().with_context(|| format!("failed to read transition of move {} in alignemnt {}", move_number, alignment_number))?;
 
-                        moves.push((Some(activity), Some((Some(activity), transition))));
+                        moves.push(Move::SynchronousMove(activity, transition));
 
                     } else {
                         return Err(anyhow!("Line must have a label"));
                     }
+
+                } else if move_type_line.trim_start().starts_with("silent move") {
+
+                    //read the transition
+                    let transition = lreader.next_line_index().with_context(|| format!("failed to read transition of move {} in alignemnt {}", move_number, alignment_number))?;
+
+                    moves.push(Move::SilentMove(transition));
 
                 } else {
                     return Err(anyhow!("Type of log move {} of alignment {} is not recognised.", move_number, alignment_number));
