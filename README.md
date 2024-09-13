@@ -4,6 +4,8 @@ Ebi is a command line tool that requires neither installation nor internet acces
 
 More information on its use can be found in its [manual.pdf](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
 
+Compiled versions are available on [Ebi's  website](https://ebitools.org).
+
 # Getting started with development
 
 1. Install Rustup
