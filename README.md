@@ -17,3 +17,5 @@ More information on its use can be found in its [manual.pdf](https://git.rwth-aa
     - https://code.visualstudio.com/docs/languages/rust
 
 1. Go to the project at https://github.com/BPM-Research-Group/Ebi choose "Clone" and "Visual Studio Code (SSH)", and clone it in Visual Studio Code.
+
+1. To run Ebi, use the terminal of Visual Studio Code to give the command "cargo run --" instead of "Ebi". Everything else is equivalent to the commands mentioned in the manual.
