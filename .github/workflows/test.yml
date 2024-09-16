@@ -27,6 +27,10 @@ jobs:
         git config user.name "Github auto committer"
         git config user.email "cipipeline@example.com"
         rm -rf src/*
+        rm README.md
+        rm -rf manual/*
         cp -R -a ../src/. src/
-        git commit -m "github CI"
+        cp ../README.md README.md
+        cp -R -a ../manual/. manual/
+        git commit -a -m "github CI"
         git push -f https://ci_token:$GITLAB_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main
