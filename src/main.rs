@@ -83,6 +83,7 @@ mod distances;
 mod tests;
 mod test;
 mod sample;
+mod alignments;
 // mod earth_movers_stochastic_conformance;
 
 use std::sync::atomic::AtomicBool;

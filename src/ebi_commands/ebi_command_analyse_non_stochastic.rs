@@ -1,4 +1,4 @@
-use crate::{ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_language::EbiTraitFiniteLanguage}, export::{EbiOutput, EbiOutputType}, medoid, medoid_non_stochastic};
+use crate::{alignments, ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics}, export::{EbiOutput, EbiOutputType}, medoid, medoid_non_stochastic};
 
 use super::ebi_command::EbiCommand;
 
@@ -9,7 +9,8 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[
         &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
-        &EBI_ANALYSE_NON_STOCHASTIC_MEDOID
+        &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
+        // &EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT,
     ],
 };
 
@@ -57,4 +58,29 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
         return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
     }, 
     output: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
+};
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command {
+    name_short: "ali", 
+    name_long: Some("alignment"),
+    explanation_short: "Compute alignments.", 
+    explanation_long: Some("Compute alignments. Note that the model must be able to terminate and its states must be bounded."), 
+    latex_link: Some("~\\cite{DBLP:conf/edoc/AdriansyahDA11}"), 
+    cli_command: None, 
+    exact_arithmetic: true, 
+    input_types: &[ 
+        &[ &EbiInputType::Trait(EbiTrait::FiniteLanguage)],
+        &[ &EbiInputType::Trait(EbiTrait::Semantics)]
+    ],
+    input_names: &[ "LOG", "MODEL"],
+    input_helps: &[ "The finite language.", "The model."],
+    execute: |mut objects, cli_matches| {
+        let log = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+        let mut model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
+        
+        let result = model.align_log(log)?;
+        
+        return Ok(EbiOutput::Object(EbiObject::Alignments(result)));
+    }, 
+    output: &EbiOutputType::ObjectType(EbiObjectType::Alignments)
 };

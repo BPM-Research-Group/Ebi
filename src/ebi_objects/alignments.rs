@@ -20,6 +20,17 @@ pub struct Alignments {
 }
 
 impl Alignments {
+    pub fn new() -> Self {
+        Self {
+            activity_key: ActivityKey::new(),
+            alignments: vec![]
+        }
+    }
+
+    pub fn push(&mut self, alignment: Vec<Move>) {
+        self.alignments.push(alignment);
+    }
+
     pub fn get_activity_key(&self) -> &ActivityKey {
         &self.activity_key
     }

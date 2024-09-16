@@ -1,8 +1,8 @@
 use std::{hash::Hash, fmt::Display};
 use anyhow::{anyhow, Result};
-use crate::{activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::{ebi_object::EbiTraitObject, labelled_petri_net::LPNMarking}};
+use crate::{activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::{alignments::{Alignments, Move}, ebi_object::EbiTraitObject, labelled_petri_net::LPNMarking}};
 
-use super::{ebi_trait::FromEbiTraitObject, ebi_trait_stochastic_semantics::TransitionIndex};
+use super::{ebi_trait::FromEbiTraitObject, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_stochastic_semantics::TransitionIndex};
 
 pub enum EbiTraitSemantics {
 	Marking(Box<dyn Semantics<State = LPNMarking>>),
@@ -16,6 +16,21 @@ impl FromEbiTraitObject for EbiTraitSemantics {
             _ => Err(anyhow!("Cannot read {} {} as a semantics.", object.get_type().get_article(), object.get_type()))
         }
     }
+}
+
+impl EbiTraitSemantics {
+	pub fn align_log(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
+		match self {
+			EbiTraitSemantics::Usize(s) => {
+				let mut semantics = s.as_mut();
+				semantics.align_log(log)
+			},
+			EbiTraitSemantics::Marking(s) => {
+				let mut semantics = s.as_mut();
+				semantics.align_log(log)
+			},
+		}
+	}
 }
 
 pub trait Semantics {
