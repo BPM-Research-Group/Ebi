@@ -1,9 +1,7 @@
 use std::{fmt::{Alignment, Display, Debug}, hash::Hash, io::BufRead, rc::Rc};
 use anyhow::{anyhow, Result};
 
-use crate::{activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::{alignments::Alignments, ebi_object::EbiTraitObject, labelled_petri_net::LPNMarking}, math::fraction::Fraction};
-
-use super::{ebi_trait_semantics::Semantics, ebi_trait::FromEbiTraitObject};
+use crate::{ebi_traits::{ebi_trait::FromEbiTraitObject,ebi_trait_semantics::Semantics}, activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::{alignments::Alignments, ebi_object::EbiTraitObject, labelled_petri_net::LPNMarking}, math::fraction::Fraction};
 
 pub enum EbiTraitStochasticSemantics {
 	Marking(Box<dyn StochasticSemantics<State = LPNMarking>>),
