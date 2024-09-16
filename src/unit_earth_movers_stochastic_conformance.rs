@@ -10,10 +10,6 @@ pub fn uemsc(log1: Box<dyn EbiTraitFiniteStochasticLanguage>, mut language2: Box
         let translator = ActivityKeyTranslator::new(log1.get_activity_key(), language2.get_activity_key_mut());
         let probability2 = language2.get_probability(&FollowerSemantics::Trace(&translator.translate_trace(trace)))?;
 
-        // if !probability2.is_zero() {
-            log::debug!("trace {:?} probability in model {}", trace, probability2);
-        // }
-
         if *probability1 > probability2 {
             sum += probability1;
             sum -= probability2;
