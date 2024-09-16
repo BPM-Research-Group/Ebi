@@ -32,6 +32,6 @@ jobs:
         cp -R -a ../src/. src/
         cp ../README.md README.md
         cp -R -a ../manual/. manual/
-        git add -all
+        git add --all
         git commit -a -m "github CI"
         git push -f https://ci_token:$GITLAB_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main
