@@ -34,7 +34,10 @@ pub fn trace_probability_semantics<A: Eq + Hash + Clone + Display>(semantics_a: 
         seen: HashMap::<Rc<ABState<A>>, usize>::new(),
         worklist: Vec::<Rc<ABState<A>>>::new(),
         state_counter: 0,
-    };    
+    };
+
+    // log::debug!("trace probability init");
+
     //initialise
     {
         let state = Rc::new(ABState::<A> { state_a: semantics_a.get_initial_state(), state_b: follower_b.get_initial_state() });

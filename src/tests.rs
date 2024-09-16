@@ -2,7 +2,7 @@
 mod tests {
     use std::{fs, rc::Rc};
 
-    use crate::{deterministic_semantics_for_stochastic_semantics::DeterministicStochasticSemantics, ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, medoid, medoid_non_stochastic, occurrences_miner, stochastic_labelled_petri_net_semantics::StochasticLabelledPetriNetSemantics, test, trace_probability, uniform_stochastic_miner::uniform_stochastic_miner};
+    use crate::{deterministic_semantics_for_stochastic_semantics::DeterministicStochasticSemantics, ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, medoid, medoid_non_stochastic, occurrences_miner, stochastic_labelled_petri_net_semantics::StochasticLabelledPetriNetSemantics, test, trace_probability, uniform_stochastic_miner::uniform_stochastic_miner, unit_earth_movers_stochastic_conformance::uemsc};
 
     use super::*;
 
@@ -272,5 +272,17 @@ mod tests {
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "0".parse::<Fraction>().unwrap());
         }
+    }
+
+    #[test]
+    fn uemsc_activity_key() {
+        let fin1 = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
+        let mut slang1 = fin1.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/ba-aa-ab.slang").unwrap();
+        let mut slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let uemsc = uemsc(Box::new(slang1), Box::new(slang2)).unwrap();
+        assert_eq!(uemsc, Fraction::one())
     }
 }
