@@ -106,7 +106,7 @@ impl Fraction {
     /// Returns true if the number is positive and false if the number is zero or negative.
     pub fn is_positive(&self) -> bool {
         match self {
-            Fraction::Exact(f) => f.is_positive(),
+            Fraction::Exact(f) => !f.is_zero() && f.is_positive(),
             Fraction::Approx(f) => *f != 0f64 && f.is_positive(),
             Fraction::CannotCombineExactAndApprox => false,
         }

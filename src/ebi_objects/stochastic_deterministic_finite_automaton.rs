@@ -256,6 +256,7 @@ impl StochasticDeterministicFiniteAutomaton {
     }
 
     pub fn get_semantics(sdfa: Rc<Self>) -> EbiTraitSemantics {
+        log::info!("convert SDFA to semantics");
         EbiTraitSemantics::Usize(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
     }
 
@@ -455,6 +456,7 @@ impl Dottable for StochasticDeterministicFiniteAutomaton {
     }
 }
 
+#[derive(Debug)]
 struct StochasticDeterministicFiniteAutomatonSemantics {
     activity_key: ActivityKey, //need to clone for the borrow checker
     sdfa: Rc<StochasticDeterministicFiniteAutomaton>
@@ -546,13 +548,8 @@ impl Semantics for StochasticDeterministicFiniteAutomatonSemantics {
             }
         }
 
-        let (found, i) = self.sdfa.binary_search(*state, transition);
-        if found{
-            *state = self.sdfa.targets[i];
-            return Ok(())
-        } else {
-            return Err(anyhow!("Transition cannot fire as it is not enabled."));
-        }
+        *state = self.sdfa.targets[transition];
+        return Ok(())
     }
 
     fn is_final_state(&self, state: &Self::State) -> bool {
@@ -574,15 +571,27 @@ impl Semantics for StochasticDeterministicFiniteAutomatonSemantics {
     fn get_enabled_transitions(&self, state: &Self::State) -> Vec<TransitionIndex> {
         let mut result = vec![];
 
+        // log::debug!("get enabled transitions of state {}", state);
+
         let (_, mut i) = self.sdfa.binary_search(*state, 0);
         while i < self.sdfa.activities.len() && self.sdfa.sources[i] == *state {
             result.push(i);
             i += 1;
         }
 
-        if self.is_final_state(state) {
+        // log::debug!("enabled transitions halfway {:?}", result);
+
+        // if !self.is_final_state(state) {
+        //     log::debug!("termination probability in state {} is {}", state, self.sdfa.get_termination_probability(*state));
+
+        //     log::debug!("termination probability positive {}", self.sdfa.get_termination_probability(*state).is_positive());
+        // }
+
+        if !self.is_final_state(state) && self.sdfa.get_termination_probability(*state).is_positive() {
             result.push(self.sdfa.targets.len() + 1)
         }
+
+        // log::debug!("enabled transitions of state {}: {:?}", state, result);
 
         return result;
     }

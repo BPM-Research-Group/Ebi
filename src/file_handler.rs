@@ -2,9 +2,10 @@ use std::{collections::{BTreeSet, HashSet}, fmt::Display, hash::Hash, io::BufRea
 use anyhow::{anyhow, Result, Error};
 use bitvec::slice::RSplit;
 
-use crate::{ebi_commands::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_command_validate::EBI_VALIDATE}, ebi_input_output::EbiInput, ebi_objects::{compressed_event_log::EBI_COMPRESSED_EVENT_LOG, directly_follows_model::EBI_DIRCTLY_FOLLOWS_MODEL, ebi_object::EbiObject, event_log::EBI_EVENT_LOG, finite_language::EBI_FINITE_LANGUAGE, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE, labelled_petri_net::EBI_LABELLED_PETRI_NET, petri_net_markup_language::EBI_PETRI_NET_MARKUP_LANGUAGE, stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON, stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET}, ebi_traits::ebi_trait::{EbiTrait, FromEbiTraitObject}, export::EbiObjectExporter, import::{EbiObjectImporter, EbiTraitImporter}};
+use crate::{ebi_commands::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_command_validate::EBI_VALIDATE}, ebi_input_output::EbiInput, ebi_objects::{alignments::EBI_ALIGNMENTS, compressed_event_log::EBI_COMPRESSED_EVENT_LOG, directly_follows_model::EBI_DIRCTLY_FOLLOWS_MODEL, ebi_object::EbiObject, event_log::EBI_EVENT_LOG, finite_language::EBI_FINITE_LANGUAGE, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE, labelled_petri_net::EBI_LABELLED_PETRI_NET, petri_net_markup_language::EBI_PETRI_NET_MARKUP_LANGUAGE, stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON, stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET}, ebi_traits::ebi_trait::{EbiTrait, FromEbiTraitObject}, export::EbiObjectExporter, import::{EbiObjectImporter, EbiTraitImporter}};
 
 pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
+    EBI_ALIGNMENTS,
     EBI_FINITE_LANGUAGE,
     EBI_LABELLED_PETRI_NET,
     EBI_STOCHASTIC_LABELLED_PETRI_NET,

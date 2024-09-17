@@ -1,12 +1,29 @@
-use std::{fmt::Display, str::FromStr};
+use std::{fmt::Display, io::BufRead, str::FromStr};
 use anyhow::{anyhow, Context, Error, Result};
 
-use crate::{activity_key::{Activity, ActivityKey}, ebi_commands::ebi_command_info::Infoable, ebi_traits::ebi_trait_stochastic_semantics::TransitionIndex, export::{EbiOutput, Exportable}, import::Importable, line_reader::LineReader};
+use crate::{activity_key::{self, Activity, ActivityKey}, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait_alignments::EbiTraitAlignments, ebi_trait_stochastic_semantics::TransitionIndex}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, line_reader::LineReader};
 
 use super::ebi_object::EbiObject;
 
 pub const HEADER: &str = "alignments";
 
+pub const EBI_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
+    name: "alignments",
+    article: "",
+    file_extension: "ali",
+    validator: import::validate::<Alignments>,
+    trait_importers: &[
+        EbiTraitImporter::Alignments(Alignments::read_as_alignments),
+    ],
+    object_importers: &[
+        EbiObjectImporter::Alignments(Alignments::import_as_object)
+    ],
+    object_exporters: &[ 
+        EbiObjectExporter::Alignments(Alignments::export_from_object)
+    ]
+};
+
+#[derive(Debug)]
 pub enum Move {
     LogMove(Activity),
     ModelMove(Activity, TransitionIndex),
@@ -20,9 +37,9 @@ pub struct Alignments {
 }
 
 impl Alignments {
-    pub fn new() -> Self {
+    pub fn new(activity_key: ActivityKey) -> Self {
         Self {
-            activity_key: ActivityKey::new(),
+            activity_key: activity_key,
             alignments: vec![]
         }
     }
@@ -38,6 +55,15 @@ impl Alignments {
     pub fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
         &mut self.activity_key
     }
+
+    pub fn read_as_alignments(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitAlignments>> {
+        let alignments = Self::import(reader)?;
+        Ok(Box::new(alignments))
+    }
+}
+
+impl EbiTraitAlignments for Alignments {
+    
 }
 
 impl Exportable for Alignments {

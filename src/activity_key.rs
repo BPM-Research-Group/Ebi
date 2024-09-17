@@ -149,6 +149,15 @@ impl <'a> ActivityKey {
     }
 }
 
+impl Display for ActivityKey {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        for (i, label) in self.activity2name.iter().enumerate() {
+            write!(f, "ac{}: {}, ", i, label)?;
+        }
+        write!(f, "")
+    }
+}
+
 pub struct ActivityKeyTranslator {
     from2to: Vec<Activity>
 }

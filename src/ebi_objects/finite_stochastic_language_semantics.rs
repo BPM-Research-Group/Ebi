@@ -10,6 +10,7 @@ use crate::{activity_key::{Activity, ActivityKey}, ebi_traits::ebi_trait_stochas
 
 use super::finite_stochastic_language::FiniteStochasticLanguage;
 
+#[derive(Debug)]
 pub struct FiniteStochasticLanguageSemantics {
     activity_key: ActivityKey,
     nodes: Vec<HashMap<Option<Activity>, (usize, Fraction)>> //state -> activity or silent -> (state, probability)

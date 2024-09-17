@@ -1,4 +1,4 @@
-use std::{hash::Hash, fmt::Display};
+use std::{fmt::{Debug, Display}, hash::Hash};
 use anyhow::{anyhow, Result};
 use crate::{activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::{alignments::{Alignments, Move}, ebi_object::EbiTraitObject, labelled_petri_net::LPNMarking}};
 
@@ -33,7 +33,7 @@ impl EbiTraitSemantics {
 	}
 }
 
-pub trait Semantics {
+pub trait Semantics : Debug {
 	type State: Eq + Hash + Clone + Display;
 
 	fn get_activity_key(&self) -> &ActivityKey;

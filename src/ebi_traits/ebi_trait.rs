@@ -17,6 +17,7 @@ pub enum EbiTrait {
     StochasticDeterministicSemantics,
     StochasticSemantics,
     LabelledPetriNet,
+    Alignments,
 }
 
 impl EbiTrait {
@@ -50,6 +51,7 @@ impl EbiTrait {
             EbiTrait::StochasticSemantics => "a",
             EbiTrait::LabelledPetriNet => "a",
             EbiTrait::Semantics => "a",
+            EbiTrait::Alignments => "",
         }
     }
     
@@ -84,6 +86,7 @@ impl Display for EbiTrait {
             EbiTrait::StochasticSemantics => "stochastic semantics",
             EbiTrait::LabelledPetriNet => "labelled Petri net",
             EbiTrait::Semantics => "semantics",
+            EbiTrait::Alignments => "alignments",
         })
     }
 }

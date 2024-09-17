@@ -51,6 +51,7 @@ pub mod ebi_traits {
     pub mod ebi_trait_stochastic_semantics;
     pub mod ebi_trait_labelled_petri_net;
     pub mod ebi_trait_semantics;
+    pub mod ebi_trait_alignments;
 }
 pub mod math {
     pub mod average;
@@ -83,7 +84,7 @@ mod distances;
 mod tests;
 mod test;
 mod sample;
-mod alignments;
+mod align;
 // mod earth_movers_stochastic_conformance;
 
 use std::sync::atomic::AtomicBool;

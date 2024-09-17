@@ -1,4 +1,4 @@
-use crate::{alignments, ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics}, export::{EbiOutput, EbiOutputType}, medoid, medoid_non_stochastic};
+use crate::{align, ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics}, export::{EbiOutput, EbiOutputType}, medoid, medoid_non_stochastic};
 
 use super::ebi_command::EbiCommand;
 
@@ -10,7 +10,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     children: &[
         &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
         &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
-        // &EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT,
+        &EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT,
     ],
 };
 
@@ -64,7 +64,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command
     name_short: "ali", 
     name_long: Some("alignment"),
     explanation_short: "Compute alignments.", 
-    explanation_long: Some("Compute alignments. Note that the model must be able to terminate and its states must be bounded."), 
+    explanation_long: Some("Compute alignments.\nNB 1: the model must be able to terminate and its states must be bounded.\nNB 2: the search performed is not optimised. For Petri nets, the ProM implementation may be more efficient."), 
     latex_link: Some("~\\cite{DBLP:conf/edoc/AdriansyahDA11}"), 
     cli_command: None, 
     exact_arithmetic: true, 
