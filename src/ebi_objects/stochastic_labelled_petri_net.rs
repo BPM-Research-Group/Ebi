@@ -77,7 +77,7 @@ impl StochasticLabelledPetriNet {
         &self.activity_key
     }
 
-    pub fn get_semantics(net: Rc<Self>) -> EbiTraitSemantics {
+    pub fn get_semantics(net: Box<Self>) -> EbiTraitSemantics {
         let stochastic_semantics = LabelledPetriNetSemantics::from_lpn(net);
         EbiTraitSemantics::Marking(Box::new(stochastic_semantics))
     }
@@ -103,7 +103,7 @@ impl StochasticLabelledPetriNet {
     }
 
     pub fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
-        let net = Rc::new(Self::import(reader)?);
+        let net = Box::new(Self::import(reader)?);
         Ok(Self::get_semantics(net))
     }
 
@@ -250,19 +250,22 @@ impl Importable for StochasticLabelledPetriNet {
             //read weight
             {
                 let weight = lreader.next_line_weight().with_context(|| format!("failed to read weight of transition {}", transition))?;
+                // if !weight.is_positive() {
+                //     return Err(anyhow!("Transition {}, at line {}, has a non-positive weight. Found `{}`.", transition, lreader.get_last_line_number(), lreader.get_last_line()));
+                // }
                 weights.push(weight);
             }
 
             //read input places
             let mut input_places;
             {
-                let number_of_input_places = lreader.next_line_index().with_context(|| format!("failed to read number of input places of transition {}", transition))?;                
+                let number_of_input_places = lreader.next_line_index().with_context(|| format!("Failed to read number of input places of transition {}.", transition))?;                
                 input_places = vec![0; number_of_input_places];
                 for p in 0 .. number_of_input_places {
-                    input_places[p] = lreader.next_line_index().with_context(|| format!("failed to read input place number {} of transition {}", p, transition))?;
+                    input_places[p] = lreader.next_line_index().with_context(|| format!("Failed to read input place number {} of transition {}.", p, transition))?;
 
                     if input_places[p] >= number_of_places {
-                        return Err(anyhow!("non-existing place referenced for transition {}, input place number {}, at line {}; found `{}`", transition, p, lreader.get_last_line_number(), lreader.get_last_line()));
+                        return Err(anyhow!("Non-existing place referenced for transition {}, input place number {}, at line {}; found `{}`.", transition, p, lreader.get_last_line_number(), lreader.get_last_line()));
                     }
                 }
             }

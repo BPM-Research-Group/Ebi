@@ -28,9 +28,11 @@ jobs:
         git config user.email "cipipeline@example.com"
         rm -rf src/*
         rm README.md
+        rm Cargo.toml
         rm -rf manual/*
         cp -R -a ../src/. src/
         cp ../README.md README.md
+        cp ../Cargo.toml Cargo.toml
         cp -R -a ../manual/. manual/
         git add --all
         git commit -a -m "github CI"

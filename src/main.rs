@@ -85,6 +85,7 @@ mod tests;
 mod test;
 mod sample;
 mod align;
+mod alignment_miner;
 // mod earth_movers_stochastic_conformance;
 
 use std::sync::atomic::AtomicBool;

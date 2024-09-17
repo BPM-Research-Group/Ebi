@@ -72,13 +72,13 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command
         &[ &EbiInputType::Trait(EbiTrait::FiniteLanguage)],
         &[ &EbiInputType::Trait(EbiTrait::Semantics)]
     ],
-    input_names: &[ "LOG", "MODEL"],
+    input_names: &[ "FILE_1", "FILE_2"],
     input_helps: &[ "The finite language.", "The model."],
     execute: |mut objects, cli_matches| {
         let log = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
         let mut model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
         
-        let result = model.align_log(log)?;
+        let result = model.align_language(log)?;
         
         return Ok(EbiOutput::Object(EbiObject::Alignments(result)));
     }, 

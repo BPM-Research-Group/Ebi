@@ -19,15 +19,45 @@ impl FromEbiTraitObject for EbiTraitSemantics {
 }
 
 impl EbiTraitSemantics {
-	pub fn align_log(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
+	pub fn get_activity_key(&self) -> &ActivityKey {
+		match self {
+			EbiTraitSemantics::Marking(semantics) => semantics.get_activity_key(),
+			EbiTraitSemantics::Usize(semantics) => semantics.get_activity_key(),
+		}
+	}
+
+	pub fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
+		match self {
+			EbiTraitSemantics::Marking(semantics) => semantics.get_activity_key_mut(),
+			EbiTraitSemantics::Usize(semantics) => semantics.get_activity_key_mut(),
+		}
+	}
+
+	pub fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
 		match self {
 			EbiTraitSemantics::Usize(s) => {
 				let mut semantics = s.as_mut();
-				semantics.align_log(log)
+				semantics.align_language(log)
 			},
 			EbiTraitSemantics::Marking(s) => {
 				let mut semantics = s.as_mut();
-				semantics.align_log(log)
+				semantics.align_language(log)
+			},
+		}
+	}
+
+	/**
+	 * Please note to ensure the trace and the semantics use the same ActivityKey, or they have been translated
+	 */
+	pub fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
+		match self {
+			EbiTraitSemantics::Usize(s) => {
+				let mut semantics = s.as_ref();
+				semantics.align_trace(trace)
+			},
+			EbiTraitSemantics::Marking(s) => {
+				let mut semantics = s.as_ref();
+				semantics.align_trace(trace)
 			},
 		}
 	}

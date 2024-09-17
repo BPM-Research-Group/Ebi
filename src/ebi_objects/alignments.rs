@@ -23,7 +23,7 @@ pub const EBI_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     ]
 };
 
-#[derive(Debug)]
+#[derive(Debug,PartialEq,Eq)]
 pub enum Move {
     LogMove(Activity),
     ModelMove(Activity, TransitionIndex),
@@ -46,6 +46,10 @@ impl Alignments {
 
     pub fn push(&mut self, alignment: Vec<Move>) {
         self.alignments.push(alignment);
+    }
+
+    pub fn get(&self, index: usize) -> Option<&Vec<Move>> {
+        self.alignments.get(index)
     }
 
     pub fn get_activity_key(&self) -> &ActivityKey {

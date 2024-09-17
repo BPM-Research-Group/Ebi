@@ -1,6 +1,6 @@
 use crate::{activity_key::{self, Activity, ActivityKey}, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, line_reader::LineReader, ActivityTrace, Trace};
-use anyhow::{anyhow, Result, Context};
-use std::{collections::{hash_set::Iter, HashSet}, fmt::Display, io::BufRead};
+use anyhow::{anyhow, Result, Context, Error};
+use std::{collections::{hash_set::Iter, HashSet}, fmt::Display, io::{self, BufRead}, str::FromStr};
 
 use super::ebi_object::EbiObject;
 
@@ -99,6 +99,15 @@ impl Display for FiniteLanguage {
         }
 
         write!(f, "")
+    }
+}
+
+impl FromStr for FiniteLanguage {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::prelude::v1::Result<Self, Self::Err> {
+        let mut reader = io::Cursor::new(s);
+        Self::import(&mut reader)
     }
 }
 

@@ -8,8 +8,9 @@ use crate::{activity_key::{self, Activity, ActivityKey}, ebi_objects::{labelled_
 
 #[derive(Clone, Debug)]
 pub struct LabelledPetriNetSemantics {
-    net: Rc<dyn EbiTraitLabelledPetriNet>,
     activity_key: ActivityKey, //needs to be cloned to satisfy the borrow checker
+    initial_marking: Marking,
+    labels: Vec<Option<Activity>>,
     input_places:  Vec<Vec<usize>>, //hashmaps would be more safe here, but that's a lot of overhead
 	output_places: Vec<Vec<usize>>,
     input_places_weights: Vec<Vec<u64>>,
@@ -20,14 +21,15 @@ pub struct LabelledPetriNetSemantics {
 
 impl LabelledPetriNetSemantics {
     
-    pub fn from_lpn(net: Rc<dyn EbiTraitLabelledPetriNet>) -> LabelledPetriNetSemantics {
+    pub fn from_lpn(net: Box<dyn EbiTraitLabelledPetriNet>) -> LabelledPetriNetSemantics {
 
         let transitions = net.get_number_of_transitions();
         let places: usize = net.get_number_of_places();
         let activity_key = net.get_activity_key().clone();
         let mut result = LabelledPetriNetSemantics {
-            net: net,
             activity_key: activity_key,
+            initial_marking: net.get_initial_marking().clone(),
+            labels: vec![],
             input_places: vec![vec![]; transitions],
             output_places: vec![vec![]; transitions],
             input_places_weights: vec![vec![]; transitions],
@@ -36,10 +38,11 @@ impl LabelledPetriNetSemantics {
             output_transitions: vec![vec![]; places]
         };
 
-        for transition in result.net.get_transitions() {
+        for transition in net.get_transitions() {
+            result.labels.push(transition.get_label());
+
             for place in &transition.incoming {
                 result.output_transitions[*place].push(transition.index);
-                
                 
                 if let Some(pos) = result.input_places[transition.index].iter().position(|p| p == place) {
                     result.input_places_weights[transition.index][pos] += 1;
@@ -64,6 +67,10 @@ impl LabelledPetriNetSemantics {
         result
     }
 
+    fn get_number_of_transitions(&self) -> usize {
+        self.output_places.len()
+    }
+
 	fn compute_enabled_transition(&self, state: &mut LPNMarking, transition: TransitionIndex) -> bool {
 		for (in_place_pos, in_place) in self.input_places[transition].iter().enumerate() {
 			if state.marking.place2token[*in_place] < self.input_places_weights[transition][in_place_pos] {
@@ -86,7 +93,7 @@ impl LabelledPetriNetSemantics {
     pub(crate) fn compute_enabled_transitions(&self, state: &mut LPNMarking) {
 		state.number_of_enabled_transitions = 0;
         state.enabled_transitions.fill(false);
-        for transition in 0 .. self.net.get_number_of_transitions() {
+        for transition in 0 .. self.get_number_of_transitions() {
 			self.compute_enabled_transition(state, transition);
 		}
 	}
@@ -110,8 +117,8 @@ impl Semantics for LabelledPetriNetSemantics {
 
     fn get_initial_state(&self) -> LPNMarking {
         let mut result = LPNMarking {
-            marking: self.net.get_initial_marking().clone(),
-            enabled_transitions: bitvec![0; self.net.get_number_of_transitions()],
+            marking: self.initial_marking.clone(),
+            enabled_transitions: bitvec![0; self.get_number_of_transitions()],
             number_of_enabled_transitions: 0,
         };
 		self.compute_enabled_transitions(&mut result);
@@ -143,7 +150,7 @@ impl Semantics for LabelledPetriNetSemantics {
         Ok(())
     }
 
-    fn get_enabled_transitions(&self, state: &LPNMarking) -> Vec<usize> {
+    fn get_enabled_transitions(&self, state: &LPNMarking) -> Vec<TransitionIndex> {
         let mut result = Vec::new();
         result.reserve_exact(state.number_of_enabled_transitions as usize);
         for index in state.enabled_transitions.iter_ones() {
@@ -153,11 +160,11 @@ impl Semantics for LabelledPetriNetSemantics {
     }
 
     fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
-        self.net.get_transitions()[transition].is_silent()
+        self.labels[transition].is_none()        
     }
 
     fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
-        self.net.get_transitions()[transition].get_label()
+        self.labels[transition]
     }
 }
 

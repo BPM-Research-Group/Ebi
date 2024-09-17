@@ -44,7 +44,7 @@ impl LabelledPetriNet {
     }
 
     pub fn to_semantics(self) -> Box<LabelledPetriNetSemantics> {
-        let stochastic_semantics = LabelledPetriNetSemantics::from_lpn(Rc::new(self));
+        let stochastic_semantics = LabelledPetriNetSemantics::from_lpn(Box::new(self));
         Box::new(stochastic_semantics)
     }
 

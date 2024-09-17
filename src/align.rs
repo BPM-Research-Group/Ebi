@@ -6,23 +6,30 @@ use crate::{activity_key::{Activity, ActivityKeyTranslator}, align, ebi_objects:
 
 impl <FS: Display + Debug + Clone + Hash + Eq> dyn Semantics<State = FS> {
     
-    pub fn align_log(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
+    pub fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
         let translator = ActivityKeyTranslator::new(log.get_activity_key(), self.get_activity_key_mut());
 
         let mut result = Alignments::new(self.get_activity_key().clone());
         for trace in log.iter() {
             let trace_translated = translator.translate_trace(trace);
-            if let Some((states, _)) = self.align_trace(&trace_translated) {
-                result.push(self.transform_alignment(trace, states)?);
-            } else {
-                return Err(anyhow!("The model has no way to terminate: it is impossible to reach a deadlock."));
-            }
+            result.push(self.align_trace(&trace_translated)?.0);
         }
 
         Ok(result)
     }
 
-    pub fn align_trace(&self, trace: &Vec<Activity>) -> Option<(Vec<(usize, FS)>, usize)> {
+    /**
+	 * Please note to ensure the trace and the semantics use the same ActivityKey, or they have been translated
+	 */
+    pub fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
+        if let Some((states, cost)) = self.align_astar(trace) {
+            Ok((self.transform_alignment(trace, states)?, cost))
+        } else {
+            Err(anyhow!("The model has no way to terminate: it is impossible to reach a deadlock."))
+        }
+    }
+
+    fn align_astar(&self, trace: &Vec<Activity>) -> Option<(Vec<(usize, FS)>, usize)> {
         // log::debug!("activity key {}", self.get_activity_key());
         // log::debug!("align trace {:?}", trace);
 
@@ -87,7 +94,7 @@ impl <FS: Display + Debug + Clone + Hash + Eq> dyn Semantics<State = FS> {
      * 
      * This function assumes equal costs (of 10000) for the log and model mvoes, and 1 for the silent moves.
      */
-    pub fn transform_alignment(&self, trace: &Vec<Activity>, states: Vec<(usize, FS)>) -> Result<Vec<Move>> {
+    fn transform_alignment(&self, trace: &Vec<Activity>, states: Vec<(usize, FS)>) -> Result<Vec<Move>> {
         let mut alignment = vec![];
 
         let mut it = states.into_iter();
