@@ -79,6 +79,10 @@ impl StochasticLabelledPetriNetSemantics {
 			state.enabled_transitions.set(transition, true);
 			state.number_of_enabled_transitions += 1;
 		}
+
+        if !self.get_transition_weight(state, transition).is_positive() {
+            return false;
+        }
 		
         true
     }
