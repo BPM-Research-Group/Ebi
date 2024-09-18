@@ -115,7 +115,7 @@ impl FiniteStochasticLanguage {
         FiniteLanguage::from((self.activity_key, map))
     }
 
-    pub fn to_deterministic_stochastic_semantics(&self) -> Result<EbiTraitStochasticDeterministicSemantics> {
+    pub fn get_deterministic_stochastic_semantics(&self) -> Result<EbiTraitStochasticDeterministicSemantics> {
         let sdfa = self.to_stochastic_deterministic_finite_automaton();
         let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Rc::new(sdfa))?;
         Ok(EbiTraitStochasticDeterministicSemantics::Usize(semantics))
@@ -123,7 +123,7 @@ impl FiniteStochasticLanguage {
 
     pub fn read_as_stochastic_deterministic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
         let mut slang = Self::import(reader)?;
-        slang.to_deterministic_stochastic_semantics()
+        slang.get_deterministic_stochastic_semantics()
     }
 
     fn contains(&self, atrace_b: Vec<&str>, probability_b: &Fraction) -> bool {

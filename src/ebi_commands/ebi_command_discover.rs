@@ -2,7 +2,7 @@ use std::{path::PathBuf, io::{self, IsTerminal}};
 use anyhow::{anyhow, Result, Context};
 use clap::{Command, arg, value_parser, ArgMatches, ArgAction, Arg};
 
-use crate::{alignment_miner, ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::{ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet}, export::{self, EbiOutput, EbiOutputType}, import, occurrences_miner, uniform_stochastic_miner::{self, uniform_stochastic_miner}};
+use crate::{ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::{ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet}, export::{self, EbiOutput, EbiOutputType}, import, occurrences_miner, techniques::alignment_miner::{self, AlignmentMiner}, uniform_stochastic_miner::{self, uniform_stochastic_miner}};
 use super::ebi_command::EbiCommand;
 
 pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
@@ -34,7 +34,7 @@ pub const EBI_DISCOVER_ALIGNMENTS: EbiCommand = EbiCommand::Command {
     execute: |mut inputs, _| {
         let language = inputs.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let lpn = inputs.remove(0).to_type::<dyn EbiTraitLabelledPetriNet>()?;
-        Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(alignment_miner::mine(lpn, language)?)))
+        Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(lpn.mine_alignment(language)?)))
     }, 
     output: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet)
 };

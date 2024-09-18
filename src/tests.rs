@@ -2,7 +2,7 @@
 mod tests {
     use std::{fs, rc::Rc};
 
-    use crate::{activity_key::{ActivityKey, ActivityKeyTranslator}, align::Align, deterministic_semantics_for_stochastic_semantics::DeterministicStochasticSemantics, ebi_objects::{alignments::Move, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics, ebi_trait_stochastic_semantics::StochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, medoid, medoid_non_stochastic, occurrences_miner, sample::{self, Sampler}, stochastic_labelled_petri_net_semantics::StochasticLabelledPetriNetSemantics, test, trace_probability, uniform_stochastic_miner::uniform_stochastic_miner, unit_earth_movers_stochastic_conformance::uemsc};
+    use crate::{activity_key::{ActivityKey, ActivityKeyTranslator}, deterministic_semantics_for_stochastic_semantics::DeterministicStochasticSemantics, ebi_objects::{alignments::Move, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics, ebi_trait_stochastic_semantics::StochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, medoid, medoid_non_stochastic, occurrences_miner, sample::{self, Sampler}, stochastic_labelled_petri_net_semantics::StochasticLabelledPetriNetSemantics, techniques::{align::Align, probabilistic_queries::FiniteStochasticLanguageAnalyser}, test, trace_probability, uniform_stochastic_miner::uniform_stochastic_miner, unit_earth_movers_stochastic_conformance::uemsc};
 
     use super::*;
 
@@ -111,20 +111,30 @@ mod tests {
     }
 
     #[test]
-    fn slang_minprob_one() {
+    fn slang_minprob_one_deterministic() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
-        let semantics = slang.to_deterministic_stochastic_semantics().unwrap();
+        let semantics = slang.get_deterministic_stochastic_semantics().unwrap();
         
         //should error
         assert!(semantics.analyse_minimum_probability(&Fraction::one()).is_err());
     }
 
     #[test]
+    fn slang_minprob_one() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
+        let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
+        
+        let slang2: &dyn EbiTraitFiniteStochasticLanguage = &slang;
+        //should error
+        assert!(slang2.analyse_minimum_probability(&Fraction::one()).is_err());
+    }
+
+    #[test]
     fn slang_minprob_zero() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
-        let semantics = slang.to_deterministic_stochastic_semantics().unwrap();
+        let semantics = slang.get_deterministic_stochastic_semantics().unwrap();
         
         //should return the same
         let slang2 = semantics.analyse_minimum_probability(&Fraction::zero()).unwrap();
@@ -384,7 +394,7 @@ mod tests {
         assert_eq!(slpn.get_probability(&trace_follower).unwrap(), Fraction::zero());
     }
 
-    // #[test]
+    // #[test] //disabled until we can handle livelocks
     fn sample_sdfa_no_language() {
         let fin1 = fs::read_to_string("testfiles/a-livelock-zeroweight.sdfa").unwrap();
         let sdfa = fin1.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
@@ -397,7 +407,7 @@ mod tests {
         assert!(sample.is_err())
     }
 
-    //#[test]
+    //#[test] //disabled until we can handle livelocks
     fn sample_slpn_no_language() {
         let fin1 = fs::read_to_string("testfiles/a-livelock-zeroweight.slpn").unwrap();
         let slpn = fin1.parse::<StochasticLabelledPetriNet>().unwrap();

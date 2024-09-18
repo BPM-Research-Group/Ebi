@@ -2,7 +2,7 @@ use std::{fmt::{Debug, Display}, hash::Hash, mem::transmute};
 
 use anyhow::{anyhow, Context, Result};
 
-use crate::{activity_key::{Activity, ActivityKeyTranslator}, align, ebi_objects::alignments::{Alignments, Move}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
+use crate::{activity_key::{Activity, ActivityKeyTranslator}, ebi_objects::alignments::{Alignments, Move}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
 pub trait Align {
     fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments>;

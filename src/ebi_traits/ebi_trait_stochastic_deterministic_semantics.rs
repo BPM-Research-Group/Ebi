@@ -23,34 +23,6 @@ impl FromEbiTraitObject for EbiTraitStochasticDeterministicSemantics {
     }
 }
 
-impl EbiTraitStochasticDeterministicSemantics {
-    pub fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
-        match self {
-            EbiTraitStochasticDeterministicSemantics::Usize(s) => {
-                let semantics = s.as_ref();
-                semantics.analyse_minimum_probability(at_least)
-            },
-            EbiTraitStochasticDeterministicSemantics::PMarking(s) => {
-                let semantics = s.as_ref();
-                semantics.analyse_minimum_probability(at_least)
-            },
-        }
-    }
-
-    pub fn analyse_most_likely_traces(&self, number_of_traces: &usize) -> Result<FiniteStochasticLanguage> {
-        match self {
-            EbiTraitStochasticDeterministicSemantics::Usize(s) => {
-                let semantics = s.as_ref();
-                semantics.analyse_most_likely_traces_i(number_of_traces)
-            },
-            EbiTraitStochasticDeterministicSemantics::PMarking(s) => {
-                let semantics = s.as_ref();
-                semantics.analyse_most_likely_traces_i(number_of_traces)
-            },
-        }
-    }
-}
-
 pub trait StochasticDeterministicSemantics {
     type DState;
 

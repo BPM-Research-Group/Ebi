@@ -64,6 +64,12 @@ pub mod math {
     pub mod root;
     pub mod root_log_div;
 }
+pub mod techniques {
+    pub mod align;
+    pub mod alignment_miner;
+    pub mod association;
+    pub mod probabilistic_queries;
+}
 mod dottable;
 mod unit_earth_movers_stochastic_conformance;
 mod jenson_shannon_stochastic_conformance;
@@ -71,9 +77,7 @@ mod activity_key;
 mod export;
 mod occurrences_miner;
 mod entropic_relevance;
-mod analysis;
 mod deterministic_semantics_for_stochastic_semantics;
-mod association;
 mod medoid;
 mod medoid_non_stochastic;
 mod levenshtein;
@@ -85,8 +89,6 @@ mod distances;
 mod tests;
 mod test;
 mod sample;
-mod align;
-mod alignment_miner;
 // mod earth_movers_stochastic_conformance;
 
 use std::sync::atomic::AtomicBool;

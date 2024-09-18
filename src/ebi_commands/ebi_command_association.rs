@@ -3,7 +3,7 @@ use std::{io::{self, IsTerminal, Write}, path::PathBuf};
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use anyhow::{anyhow, Context, Result};
 use fraction::One;
-use crate::{association, ebi_info, ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_event_log::EbiTraitEventLog}, export::{EbiOutput, EbiOutputType}, import, math::fraction::Fraction};
+use crate::{ebi_info, ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_event_log::EbiTraitEventLog}, export::{EbiOutput, EbiOutputType}, import, math::fraction::Fraction, techniques::association::{self, Associations}};
 
 use super::ebi_command::EbiCommand;
 
@@ -42,7 +42,7 @@ pub const ASSOCIATION_ATTRIBUTE: EbiCommand = EbiCommand::Command {
         let attribute = inputs.remove(0).to_type::<String>()?;
         let number_of_samples = cli_matches.get_one::<usize>("samples").unwrap();
 
-        let ass = association::association(&mut event_log, *number_of_samples, &attribute).with_context(|| format!("attribute {}", attribute))?;
+        let ass = event_log.association(*number_of_samples, &attribute).with_context(|| format!("attribute {}", attribute))?;
 
         Ok(EbiOutput::ContainsRoot(ass))
     }, 
@@ -66,7 +66,7 @@ pub const ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command {
         let mut event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         let number_of_samples = cli_matches.get_one::<usize>("samples").unwrap();
 
-        let result = association::associations(&mut event_log, *number_of_samples);
+        let result = event_log.associations(*number_of_samples);
 
         let mut f = vec![];
         for (x, y) in result {

@@ -7,7 +7,31 @@ use fraction::{One, Zero};
 use priority_queue::PriorityQueue;
 
 pub trait FiniteStochasticLanguageAnalyser {
+    /**
+     * Find all traces that have a given minimum probability.
+     */
+    fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage>;
+
+    /**
+     * Find the traces with the highest probabilities.
+     */
     fn analyse_most_likely_traces(&self, number_of_traces: &usize) -> Result<FiniteStochasticLanguage>;
+}
+
+impl FiniteStochasticLanguageAnalyser for EbiTraitStochasticDeterministicSemantics {
+    fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
+        match self {
+            EbiTraitStochasticDeterministicSemantics::Usize(sem) => sem.analyse_minimum_probability(at_least),
+            EbiTraitStochasticDeterministicSemantics::PMarking(sem) => sem.analyse_minimum_probability(at_least),
+        }
+    }
+
+    fn analyse_most_likely_traces(&self, number_of_traces: &usize) -> Result<FiniteStochasticLanguage> {
+        match self {
+            EbiTraitStochasticDeterministicSemantics::Usize(sem) => sem.analyse_most_likely_traces(number_of_traces),
+            EbiTraitStochasticDeterministicSemantics::PMarking(sem) => sem.analyse_most_likely_traces(number_of_traces),
+        }
+    }
 }
 
 impl FiniteStochasticLanguageAnalyser for dyn EbiTraitFiniteStochasticLanguage {
@@ -45,11 +69,30 @@ impl FiniteStochasticLanguageAnalyser for dyn EbiTraitFiniteStochasticLanguage {
             Ok((result2, self.get_activity_key().clone()).into())
         }
     }
+
+    fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
+        let mut result = vec![];
+        for (trace, probability) in self.iter_trace_probability() {
+            if probability >= at_least {
+                result.push((trace, probability));
+            }
+        }
+
+        let mut result2 = HashMap::new();
+        for (trace, probability) in result {
+            result2.insert(trace.clone(), probability.clone());
+        }
+
+        if result2.is_empty() {
+            return Err(anyhow!("Analsyis returned an empty language; there are no traces that have a probability of at least {}.", at_least));
+        }
+
+        Ok((result2, self.get_activity_key().clone()).into())
+    }
 }
 
-impl <FS: Hash + Display + Debug + Clone + Eq> dyn StochasticDeterministicSemantics<DState = FS> {
-
-    pub fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
+impl <FS: Hash + Display + Debug + Clone + Eq> FiniteStochasticLanguageAnalyser for dyn StochasticDeterministicSemantics<DState = FS> {
+    fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
         let error_at_loop = at_least.is_zero(); //If at_least is zero, we are asked to return all traces. If there is a loop, then this is impossible.
         
         let mut seen = HashSet::new();
@@ -57,7 +100,6 @@ impl <FS: Hash + Display + Debug + Clone + Eq> dyn StochasticDeterministicSemant
             seen.insert(self.get_initial_state()?);
         }
 
-        log::info!("start minimum probability analysis");
         let mut result = HashMap::new();
 
         let mut queue = vec![];
@@ -119,8 +161,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq> dyn StochasticDeterministicSemant
         Ok((result, self.get_activity_key().clone()).into())
     }
 
-    pub fn analyse_most_likely_traces_i(&self, number_of_traces: &usize) -> Result<FiniteStochasticLanguage> {
-        log::info!("start number of traces analysis");
+    fn analyse_most_likely_traces(&self, number_of_traces: &usize) -> Result<FiniteStochasticLanguage> {
         let mut result = HashMap::new();
 
         let mut queue = PriorityQueue::new();
