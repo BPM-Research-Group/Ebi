@@ -109,7 +109,7 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
     name_long: Some("entropic-relevance"), 
     explanation_short: "Compute entropic relevance (uniform).", 
     explanation_long: None, 
-    latex_link: Some("Section~\ref{sec:er}"), 
+    latex_link: Some("Section~\\ref{sec:er}"), 
     cli_command: None, 
     exact_arithmetic: true,
     input_types: &[ 
