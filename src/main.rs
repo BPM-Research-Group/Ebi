@@ -63,6 +63,7 @@ pub mod math {
     pub mod matrix;
     pub mod root;
     pub mod root_log_div;
+    pub mod correlation;
 }
 pub mod techniques {
     pub mod align;
