@@ -7,7 +7,7 @@ use layout::topo::layout::VisualGraph;
 use serde_json::Value;
 use crate::{activity_key::{self, Activity, ActivityKey}, dottable::Dottable, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, TransitionIndex}}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, follower_semantics::FollowerSemantics, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, marking::Marking, math::fraction::Fraction, net::Transition, Trace};
 
-use super::{ebi_object::EbiObject, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
+use super::{ebi_object::EbiObject, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
 
 pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     name: "stochastic deterministic finite automaton",
@@ -55,10 +55,6 @@ impl StochasticDeterministicFiniteAutomaton {
         }
     }
 
-    pub fn get_activity_key(&mut self) -> &mut ActivityKey {
-        &mut self.activity_key
-    }
-
     pub fn get_sources(&self) -> &Vec<usize> {
         &self.sources
     }
@@ -69,6 +65,10 @@ impl StochasticDeterministicFiniteAutomaton {
 
     pub fn get_activities(&self) -> &Vec<Activity> {
         &self.activities
+    }
+
+    pub fn get_probabilities(&self) -> &Vec<Fraction> {
+        &self.probabilities
     }
 
     pub fn set_initial_state(&mut self, state: usize) {
@@ -105,6 +105,10 @@ impl StochasticDeterministicFiniteAutomaton {
                 Ok(())
             }
         }
+    }
+
+    pub fn get_number_of_transitions(&self) -> usize {
+        self.sources.len()
     }
 
     /**
@@ -156,6 +160,10 @@ impl StochasticDeterministicFiniteAutomaton {
 		return self.max_state;
 	}
 
+    pub fn get_max_state(&self) -> usize {
+        self.max_state
+    }
+
     fn compare(source1: usize, activity1: usize, source2: usize, activity2: Activity) -> Ordering {
 		if source1 < source2 {
 			return Ordering::Greater;
@@ -170,7 +178,7 @@ impl StochasticDeterministicFiniteAutomaton {
 		}
 	}
 
-    fn binary_search(&self, source: usize, activity: usize) -> (bool, usize) {
+    pub(crate) fn binary_search(&self, source: usize, activity: usize) -> (bool, usize) {
         if self.sources.is_empty() {
             return (false, 0);
         }
@@ -247,17 +255,17 @@ impl StochasticDeterministicFiniteAutomaton {
         }
     }
 
-    pub fn get_deterministic_semantics(sdfa: Rc<Self>) -> Result<Box<dyn StochasticDeterministicSemantics<DState = usize>>> {
-        Ok(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
+    pub fn get_semantics(sdfa: Rc<Self>) -> EbiTraitSemantics {
+        log::info!("convert SDFA to semantics");
+        EbiTraitSemantics::Usize(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
     }
 
     pub fn get_stochastic_semantics(sdfa: Rc<Self>) -> EbiTraitStochasticSemantics {
         EbiTraitStochasticSemantics::Usize(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
     }
 
-    pub fn get_semantics(sdfa: Rc<Self>) -> EbiTraitSemantics {
-        log::info!("convert SDFA to semantics");
-        EbiTraitSemantics::Usize(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
+    pub fn get_deterministic_semantics(sdfa: Rc<Self>) -> Result<Box<dyn StochasticDeterministicSemantics<DState = usize>>> {
+        Ok(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
     }
 
     pub fn import_as_stochastic_deterministic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
@@ -456,162 +464,6 @@ impl Dottable for StochasticDeterministicFiniteAutomaton {
     }
 }
 
-#[derive(Debug)]
-struct StochasticDeterministicFiniteAutomatonSemantics {
-    activity_key: ActivityKey, //need to clone for the borrow checker
-    sdfa: Rc<StochasticDeterministicFiniteAutomaton>
-}
-
-impl StochasticDeterministicFiniteAutomatonSemantics {
-    pub fn new(sdfa: Rc<StochasticDeterministicFiniteAutomaton>) -> Self {
-        Self {
-            activity_key: sdfa.activity_key.clone(),
-            sdfa: sdfa
-        }
-    }
-}
-
-impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomatonSemantics {
-    type DState = usize;
-
-    fn get_activity_key(&self) -> &ActivityKey {
-        self.sdfa.get_activity_key()
-    }
-
-    fn get_initial_state(&self) -> Result<Self::DState> {
-        Ok(self.sdfa.get_initial_state())
-    }
-
-    fn execute_activity(&self, state: &Self::DState, activity: Activity) -> Result<Self::DState> {
-        let (found, i) = self.sdfa.binary_search(*state, self.sdfa.activity_key.get_id_from_activity(activity));
-        if found{
-            Ok(self.sdfa.targets[i])
-        } else {
-            Err(anyhow!("activity not enabled"))
-        }
-    }
-
-    fn get_termination_probability(&self, state: &Self::DState) -> Fraction {
-        self.sdfa.get_termination_probability(*state).clone()
-    }
-
-    fn get_activity_probability(&self, state: &Self::DState, activity: Activity) -> Fraction {
-        let (found, i) = self.sdfa.binary_search(*state, self.sdfa.activity_key.get_id_from_activity(activity));
-        match found {
-            true => self.sdfa.probabilities[i].clone(),
-            false => Fraction::zero(),
-        }
-    }
-
-    fn get_enabled_activities(&self, state: &Self::DState) -> Vec<Activity> {
-        let mut result = vec![];
-
-        let (_, mut i) = self.sdfa.binary_search(*state, 0);
-        while i < self.sdfa.activities.len() && self.sdfa.sources[i] == *state {
-            result.push(self.sdfa.activities[i]);
-            i += 1;
-        }
-
-        return result;
-    }
-}
-
-impl Semantics for StochasticDeterministicFiniteAutomatonSemantics {
-    type State = usize; //In semantics, the final state must be a deadlock state. Therefore, for every state in which we can terminate, we add a virtual silent transition to a virtual deadlock state.
-
-    fn get_activity_key(&self) -> &ActivityKey {
-        &self.activity_key
-    }
-
-    fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
-        &mut self.activity_key
-    }
-
-    fn get_initial_state(&self) -> Self::State {
-        self.sdfa.get_initial_state()
-    }
-
-    fn execute_transition(&self, state: &mut Self::State, transition: TransitionIndex) -> Result<()> {
-        if self.is_final_state(state) {
-            return Err(anyhow!("Cannot execute a transition in a final state in these semantics."))
-        }
-
-        if self.is_transition_silent(transition) {
-            //request for termination
-            if self.sdfa.get_termination_probability(*state).is_positive() {
-                //termination possible
-                *state = self.sdfa.max_state + 1;
-                return Ok(());
-            } else {
-                //termination not possible
-                return Err(anyhow!("Cannot execute a terminating transition in this state in these semantics."))
-            }
-        }
-
-        *state = self.sdfa.targets[transition];
-        return Ok(())
-    }
-
-    fn is_final_state(&self, state: &Self::State) -> bool {
-        state > &self.sdfa.max_state
-    }
-
-    fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
-        transition > self.sdfa.targets.len()
-    }
-
-    fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
-        if self.is_transition_silent(transition) {
-            None
-        } else {
-            Some(self.sdfa.activities[transition])
-        }
-    }
-
-    fn get_enabled_transitions(&self, state: &Self::State) -> Vec<TransitionIndex> {
-        let mut result = vec![];
-
-        // log::debug!("get enabled transitions of state {}", state);
-
-        let (_, mut i) = self.sdfa.binary_search(*state, 0);
-        while i < self.sdfa.activities.len() && self.sdfa.sources[i] == *state {
-            result.push(i);
-            i += 1;
-        }
-
-        // log::debug!("enabled transitions halfway {:?}", result);
-
-        // if !self.is_final_state(state) {
-        //     log::debug!("termination probability in state {} is {}", state, self.sdfa.get_termination_probability(*state));
-
-        //     log::debug!("termination probability positive {}", self.sdfa.get_termination_probability(*state).is_positive());
-        // }
-
-        if !self.is_final_state(state) && self.sdfa.get_termination_probability(*state).is_positive() {
-            result.push(self.sdfa.targets.len() + 1)
-        }
-
-        // log::debug!("enabled transitions of state {}: {:?}", state, result);
-
-        return result;
-    }
-}
-
-impl StochasticSemantics for StochasticDeterministicFiniteAutomatonSemantics {
-    fn get_transition_weight(&self, state: &Self::State, transition: TransitionIndex) -> &Fraction {
-        if self.is_transition_silent(transition) {
-            //terminating transition
-            &self.sdfa.get_termination_probability(*state)
-        } else {
-            &self.sdfa.probabilities[transition]
-        }
-    }
-
-    fn get_total_weight_of_enabled_transitions(&self, state: &Self::State) -> Result<Fraction> {
-        Ok(Fraction::one())
-    }
-}
-
 impl<'a> IntoIterator for &'a StochasticDeterministicFiniteAutomaton {
     type Item = (&'a usize, &'a usize, &'a Activity, &'a Fraction);
 
@@ -619,10 +471,10 @@ impl<'a> IntoIterator for &'a StochasticDeterministicFiniteAutomaton {
 
     fn into_iter(self) -> Self::IntoIter {
         Self::IntoIter {
-            it_sources:  self.sources.iter(),
-            it_targets:  self.targets.iter(),
-            it_activities: self.activities.iter(),
-            it_probabilities: self.probabilities.iter()
+            it_sources:  self.get_sources().iter(),
+            it_targets:  self.get_targets().iter(),
+            it_activities: self.get_activities().iter(),
+            it_probabilities: self.get_probabilities().iter()
         }
     }
 }

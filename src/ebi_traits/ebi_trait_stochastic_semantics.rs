@@ -1,7 +1,7 @@
 use std::{fmt::{Alignment, Display, Debug}, hash::Hash, io::BufRead, rc::Rc};
 use anyhow::{anyhow, Result};
 
-use crate::{ebi_traits::{ebi_trait::FromEbiTraitObject,ebi_trait_semantics::Semantics}, activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::{alignments::Alignments, ebi_object::EbiTraitObject, labelled_petri_net::LPNMarking}, math::fraction::Fraction};
+use crate::{activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::{alignments::Alignments, ebi_object::EbiTraitObject, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LPNMarking}, ebi_traits::{ebi_trait::FromEbiTraitObject,ebi_trait_semantics::Semantics}, math::fraction::Fraction, sample::Sampler};
 
 pub enum EbiTraitStochasticSemantics {
 	Marking(Box<dyn StochasticSemantics<State = LPNMarking>>),
@@ -31,17 +31,13 @@ impl EbiTraitStochasticSemantics {
 			EbiTraitStochasticSemantics::Usize(sem) => sem.get_activity_key_mut(),
 		}
 	}
+}
 
+impl EbiTraitStochasticSemantics {
     pub fn explain_trace(&self, balance: &Fraction, trace: &Vec<Activity>) -> Result<Alignments> {
         match self {
-            EbiTraitStochasticSemantics::Usize(s) => {
-                let semantics = s.as_ref();
-                semantics.explain_trace(trace, balance)
-            },
-            EbiTraitStochasticSemantics::Marking(s) => {
-                let semantics = s.as_ref();
-                semantics.explain_trace(trace, balance)
-            },
+            EbiTraitStochasticSemantics::Usize(sem) => sem.explain_trace(trace, balance),
+            EbiTraitStochasticSemantics::Marking(sem) => sem.explain_trace(trace, balance),
         }
     }
 }

@@ -34,7 +34,7 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     trait_importers: &[
         EbiTraitImporter::QueriableStochasticLanguage(import::read_as_queriable_stochastic_language::<StochasticLabelledPetriNet>),
         EbiTraitImporter::StochasticSemantics(StochasticLabelledPetriNet::import_as_stochastic_semantics),
-        EbiTraitImporter::StochasticDeterministicSemantics(StochasticLabelledPetriNet::import_as_deterministic_semantics),
+        EbiTraitImporter::StochasticDeterministicSemantics(StochasticLabelledPetriNet::import_as_deterministic_stochastic_semantics),
         EbiTraitImporter::LabelledPetriNet(StochasticLabelledPetriNet::import_as_labelled_petri_net),
         EbiTraitImporter::Semantics(StochasticLabelledPetriNet::import_as_semantics),
     ],
@@ -78,18 +78,28 @@ impl StochasticLabelledPetriNet {
     }
 
     pub fn get_semantics(net: Box<Self>) -> EbiTraitSemantics {
-        let stochastic_semantics = LabelledPetriNetSemantics::from_lpn(net);
-        EbiTraitSemantics::Marking(Box::new(stochastic_semantics))
+        let semantics = LabelledPetriNetSemantics::from_lpn(net);
+        EbiTraitSemantics::Marking(Box::new(semantics))
     }
 
-    pub fn get_deterministic_semantics(net: Rc<Self>) -> EbiTraitStochasticDeterministicSemantics {
-        let stochastic_semantics = StochasticLabelledPetriNetSemantics::from_slpn(net);
+    fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics> {
+        let slpn = Self::import(reader)?;
+        Ok(slpn.get_stochastic_semantics())
+    }
+
+    pub fn get_stochastic_semantics(&self) -> EbiTraitStochasticSemantics {
+        let stochastic_semantics = StochasticLabelledPetriNetSemantics::from_slpn(self);
+        EbiTraitStochasticSemantics::Marking(Box::new(stochastic_semantics))
+    }
+
+    pub fn get_deterministic_stochastic_semantics(&self) -> EbiTraitStochasticDeterministicSemantics {
+        let stochastic_semantics = StochasticLabelledPetriNetSemantics::from_slpn(self);
         EbiTraitStochasticDeterministicSemantics::PMarking(Box::new(DeterministicStochasticSemantics::new(Rc::new(stochastic_semantics))))
     }
 
-    pub fn import_as_deterministic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
+    pub fn import_as_deterministic_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
         let net = Rc::new(Self::import(reader)?);
-        Ok(Self::get_deterministic_semantics(net))
+        Ok(net.get_deterministic_stochastic_semantics())
     }
 
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitLabelledPetriNet>> {
@@ -374,11 +384,9 @@ struct Prob {
 
 impl EbiTraitQueriableStochasticLanguage for StochasticLabelledPetriNet {
 
-
     fn get_probability(&mut self, follower_semantics: &FollowerSemantics) -> Result<Fraction> {
         if self.semantics.is_none() {
-            let s = Rc::new(self.clone());
-            self.semantics = Some(Box::new(StochasticLabelledPetriNetSemantics::from_slpn(s)));
+            self.semantics = Some(Box::new(StochasticLabelledPetriNetSemantics::from_slpn(self)));
         }
 
 
@@ -396,18 +404,4 @@ impl EbiTraitQueriableStochasticLanguage for StochasticLabelledPetriNet {
         &mut self.activity_key
     }
 
-}
-
-impl ToStochasticSemantics for StochasticLabelledPetriNet {
-    type State = LPNMarking;
-
-    fn get_stochastic_semantics(net: Rc<Self>) -> Box<dyn StochasticSemantics<State = Self::State>> {
-        Box::new(StochasticLabelledPetriNetSemantics::from_slpn(net))
-    }
-
-    fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics> {
-        let slpn = Self::import(reader)?;
-        let s = Rc::new(slpn);
-        Ok(EbiTraitStochasticSemantics::Marking(Self::get_stochastic_semantics(s)))
-    }
 }

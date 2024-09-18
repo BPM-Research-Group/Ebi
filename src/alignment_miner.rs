@@ -2,7 +2,7 @@ use std::{collections::HashMap, rc::Rc};
 
 use anyhow::Result;
 use fraction::{One, Zero};
-use crate::{activity_key::{Activity, ActivityKeyTranslator}, ebi_objects::{alignments::Move, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet, ebi_trait_stochastic_semantics::TransitionIndex}, math::fraction::Fraction};
+use crate::{activity_key::{Activity, ActivityKeyTranslator}, align::Align, ebi_objects::{alignments::Move, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet, ebi_trait_stochastic_semantics::TransitionIndex}, math::fraction::Fraction};
 
 pub fn mine(mut net: Box<dyn EbiTraitLabelledPetriNet>, language: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<StochasticLabelledPetriNet> {
     let mut weights: Vec<Fraction> = vec![Fraction::zero(); net.get_number_of_transitions()];

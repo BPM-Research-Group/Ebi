@@ -8,8 +8,10 @@ use crate::{activity_key::{self, Activity, ActivityKey}, ebi_objects::{labelled_
 
 #[derive(Clone, Debug)]
 pub struct StochasticLabelledPetriNetSemantics {
-    net: Rc<StochasticLabelledPetriNet>,
     activity_key: ActivityKey, //needs to be cloned to satisfy the borrow checker
+    initial_marking: Marking,
+    labels: Vec<Option<Activity>>,
+    weights: Vec<Fraction>,
     input_places:  Vec<Vec<usize>>, //hashmaps would be more safe here, but that's a lot of overhead
 	output_places: Vec<Vec<usize>>,
     input_places_weights: Vec<Vec<u64>>,
@@ -20,14 +22,16 @@ pub struct StochasticLabelledPetriNetSemantics {
 
 impl StochasticLabelledPetriNetSemantics {
     
-    pub fn from_slpn(net: Rc<StochasticLabelledPetriNet>) -> StochasticLabelledPetriNetSemantics {
+    pub fn from_slpn(net: &StochasticLabelledPetriNet) -> StochasticLabelledPetriNetSemantics {
 
         let transitions = net.get_number_of_transitions();
         let places: usize = net.get_number_of_places();
         let activity_key = net.get_activity_key().clone();
         let mut result = StochasticLabelledPetriNetSemantics {
-            net: net,
             activity_key: activity_key,
+            initial_marking: net.get_initial_marking().clone(),
+            labels: vec![],
+            weights: vec![],
             input_places: vec![vec![]; transitions],
             output_places: vec![vec![]; transitions],
             input_places_weights: vec![vec![]; transitions],
@@ -36,7 +40,10 @@ impl StochasticLabelledPetriNetSemantics {
             output_transitions: vec![vec![]; places]
         };
 
-        for transition in result.net.get_transitions() {
+        for transition in net.get_transitions() {
+            result.labels.push(transition.get_label());
+            result.weights.push(net.get_weight(transition).clone());
+
             for place in &transition.incoming {
                 result.output_transitions[*place].push(transition.index);
                 
@@ -62,6 +69,10 @@ impl StochasticLabelledPetriNetSemantics {
         }
         
         result
+    }
+
+    fn get_number_of_transitions(&self) -> usize {
+        self.output_places.len()
     }
 
 	fn compute_enabled_transition(&self, state: &mut LPNMarking, transition: TransitionIndex) -> bool {
@@ -90,7 +101,7 @@ impl StochasticLabelledPetriNetSemantics {
     fn compute_enabled_transitions(&self, state: &mut LPNMarking) {
 		state.number_of_enabled_transitions = 0;
         state.enabled_transitions.fill(false);
-        for transition in 0 .. self.net.get_number_of_transitions() {
+        for transition in 0 .. self.get_number_of_transitions() {
 			self.compute_enabled_transition(state, transition);
 		}
 	}
@@ -114,8 +125,8 @@ impl Semantics for StochasticLabelledPetriNetSemantics {
 
     fn get_initial_state(&self) -> LPNMarking {
         let mut result = LPNMarking {
-            marking: self.net.get_initial_marking().clone(),
-            enabled_transitions: bitvec![0; self.net.get_number_of_transitions()],
+            marking: self.initial_marking.clone(),
+            enabled_transitions: bitvec![0; self.get_number_of_transitions()],
             number_of_enabled_transitions: 0,
         };
 		self.compute_enabled_transitions(&mut result);
@@ -157,17 +168,17 @@ impl Semantics for StochasticLabelledPetriNetSemantics {
     }
 
     fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
-        self.net.get_transitions()[transition].is_silent()
+        self.labels[transition].is_none()
     }
 
     fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
-        self.net.get_transitions()[transition].get_label()
+        self.labels[transition]
     }
 }
 
 impl StochasticSemantics for StochasticLabelledPetriNetSemantics {
     fn get_transition_weight(&self, _state: &LPNMarking, transition: usize) -> &Fraction {
-        self.net.get_weight(&self.net.get_transitions()[transition])
+        &self.weights[transition]
     }
 
 	fn get_total_weight_of_enabled_transitions(&self, state: &LPNMarking) -> anyhow::Result<Fraction> {

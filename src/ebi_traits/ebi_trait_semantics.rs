@@ -32,35 +32,6 @@ impl EbiTraitSemantics {
 			EbiTraitSemantics::Usize(semantics) => semantics.get_activity_key_mut(),
 		}
 	}
-
-	pub fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
-		match self {
-			EbiTraitSemantics::Usize(s) => {
-				let mut semantics = s.as_mut();
-				semantics.align_language(log)
-			},
-			EbiTraitSemantics::Marking(s) => {
-				let mut semantics = s.as_mut();
-				semantics.align_language(log)
-			},
-		}
-	}
-
-	/**
-	 * Please note to ensure the trace and the semantics use the same ActivityKey, or they have been translated
-	 */
-	pub fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
-		match self {
-			EbiTraitSemantics::Usize(s) => {
-				let mut semantics = s.as_ref();
-				semantics.align_trace(trace)
-			},
-			EbiTraitSemantics::Marking(s) => {
-				let mut semantics = s.as_ref();
-				semantics.align_trace(trace)
-			},
-		}
-	}
 }
 
 pub trait Semantics : Debug {

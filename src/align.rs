@@ -2,11 +2,36 @@ use std::{fmt::{Debug, Display}, hash::Hash, mem::transmute};
 
 use anyhow::{anyhow, Context, Result};
 
-use crate::{activity_key::{Activity, ActivityKeyTranslator}, align, ebi_objects::alignments::{Alignments, Move}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::TransitionIndex}};
+use crate::{activity_key::{Activity, ActivityKeyTranslator}, align, ebi_objects::alignments::{Alignments, Move}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
-impl <FS: Display + Debug + Clone + Hash + Eq> dyn Semantics<State = FS> {
+pub trait Align {
+    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments>;
+
+    /**
+	 * Please note to ensure the trace and the semantics use the same ActivityKey, or they have been translated
+	 */
+    fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)>;
+}
+
+impl Align for EbiTraitSemantics {
+    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
+		match self {
+			EbiTraitSemantics::Usize(sem) => sem.align_language(log),
+			EbiTraitSemantics::Marking(sem) => sem.align_language(log),
+		}
+	}
+
+	fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
+		match self {
+			EbiTraitSemantics::Usize(sem) => sem.align_trace(trace),
+			EbiTraitSemantics::Marking(sem) => sem.align_trace(trace),
+		}
+	}
+}
+
+impl <FS: Display + Debug + Clone + Hash + Eq> Align for dyn Semantics<State = FS> {
     
-    pub fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
+    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
         let translator = ActivityKeyTranslator::new(log.get_activity_key(), self.get_activity_key_mut());
 
         let mut result = Alignments::new(self.get_activity_key().clone());
@@ -21,7 +46,7 @@ impl <FS: Display + Debug + Clone + Hash + Eq> dyn Semantics<State = FS> {
     /**
 	 * Please note to ensure the trace and the semantics use the same ActivityKey, or they have been translated
 	 */
-    pub fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
+    fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
         if let Some((states, cost)) = self.align_astar(trace) {
             Ok((self.transform_alignment(trace, states)?, cost))
         } else {
@@ -29,6 +54,9 @@ impl <FS: Display + Debug + Clone + Hash + Eq> dyn Semantics<State = FS> {
         }
     }
 
+}
+
+impl <FS: Display + Debug + Clone + Hash + Eq> dyn Semantics<State = FS> {
     fn align_astar(&self, trace: &Vec<Activity>) -> Option<(Vec<(usize, FS)>, usize)> {
         // log::debug!("activity key {}", self.get_activity_key());
         // log::debug!("align trace {:?}", trace);

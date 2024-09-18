@@ -1,4 +1,4 @@
-use crate::{align, ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics}, export::{EbiOutput, EbiOutputType}, medoid, medoid_non_stochastic};
+use crate::{align::{self, Align}, ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics}, export::{EbiOutput, EbiOutputType}, medoid, medoid_non_stochastic};
 
 use super::ebi_command::EbiCommand;
 

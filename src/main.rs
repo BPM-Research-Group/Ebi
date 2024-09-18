@@ -29,6 +29,7 @@ pub mod ebi_objects {
     pub mod ebi_object;
     pub mod finite_stochastic_language_semantics;
     pub mod stochastic_deterministic_finite_automaton;
+    pub mod stochastic_deterministic_finite_automaton_semantics;
     pub mod event_log;
     pub mod finite_language;
     pub mod compressed_event_log;
