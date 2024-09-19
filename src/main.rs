@@ -1,7 +1,6 @@
 #![allow(unused)]
 
 mod line_reader;
-mod stochastic_labelled_petri_net_semantics;
 mod follower_semantics;
 mod cross_product;
 mod net;
@@ -32,7 +31,9 @@ pub mod ebi_objects {
     pub mod finite_language;
     pub mod compressed_event_log;
     pub mod labelled_petri_net;
+    pub mod labelled_petri_net_semantics;
     pub mod stochastic_labelled_petri_net;
+    pub mod stochastic_labelled_petri_net_semantics;
     pub mod finite_stochastic_language;
     pub mod directly_follows_model;
     pub mod petri_net_markup_language;
@@ -86,7 +87,6 @@ mod deterministic_semantics_for_stochastic_semantics;
 mod medoid;
 mod ebi_input_output;
 mod file_handler;
-mod labelled_petri_net_semantics;
 mod distances;
 mod tests;
 mod sample;

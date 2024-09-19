@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 use std::{fmt::Debug, rc::Rc};
-use crate::{activity_key::ActivityKey, ebi_input_output::EbiInput, ebi_objects::ebi_object::{EbiObject, EbiTraitObject}, labelled_petri_net_semantics::LabelledPetriNetSemantics, marking::Marking, net::Transition};
+use crate::{activity_key::ActivityKey, ebi_input_output::EbiInput, ebi_objects::{ebi_object::{EbiObject, EbiTraitObject}, labelled_petri_net_semantics::LabelledPetriNetSemantics}, marking::Marking, net::Transition};
 
 use super::{ebi_trait::FromEbiTraitObject, ebi_trait_semantics::EbiTraitSemantics};
 

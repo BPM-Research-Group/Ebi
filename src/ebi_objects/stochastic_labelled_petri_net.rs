@@ -15,14 +15,15 @@ use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::EbiTraitSto
 use crate::ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, ToStochasticSemantics};
 use crate::export::{EbiObjectExporter, EbiOutput, Exportable};
 use crate::file_handler::EbiFileHandler;
-use crate::labelled_petri_net_semantics::LabelledPetriNetSemantics;
 use crate::math::fraction::Fraction;
-use crate::{activity_key::ActivityKey, dottable::Dottable, follower_semantics::FollowerSemantics, import, line_reader::LineReader, marking::Marking, net::{Net, StochasticNet, Transition}, deterministic_semantics_for_stochastic_semantics::{PMarking, DeterministicStochasticSemantics}, stochastic_labelled_petri_net_semantics::StochasticLabelledPetriNetSemantics};
+use crate::{activity_key::ActivityKey, dottable::Dottable, follower_semantics::FollowerSemantics, import, line_reader::LineReader, marking::Marking, net::{Net, StochasticNet, Transition}, deterministic_semantics_for_stochastic_semantics::{PMarking, DeterministicStochasticSemantics}};
 use crate::import::{EbiObjectImporter, EbiTraitImporter, Importable};
 
 use super::ebi_object::EbiObject;
 use super::finite_stochastic_language::FiniteStochasticLanguage;
 use super::labelled_petri_net::{LPNMarking, LabelledPetriNet};
+use super::labelled_petri_net_semantics::LabelledPetriNetSemantics;
+use super::stochastic_labelled_petri_net_semantics::StochasticLabelledPetriNetSemantics;
 
 pub const HEADER: &str = "stochastic labelled Petri net";
 
