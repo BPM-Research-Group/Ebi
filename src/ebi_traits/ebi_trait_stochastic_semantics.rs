@@ -3,6 +3,8 @@ use anyhow::{anyhow, Result};
 
 use crate::{activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::{alignments::Alignments, ebi_object::EbiTraitObject, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LPNMarking}, ebi_traits::{ebi_trait::FromEbiTraitObject,ebi_trait_semantics::Semantics}, math::fraction::Fraction, sample::Sampler};
 
+use super::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage;
+
 pub enum EbiTraitStochasticSemantics {
 	Marking(Box<dyn StochasticSemantics<State = LPNMarking>>),
 	Usize(Box<dyn StochasticSemantics<State = usize>>)

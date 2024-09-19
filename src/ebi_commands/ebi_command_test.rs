@@ -2,7 +2,7 @@ use clap::{value_parser, Arg, ArgAction, Command};
 use anyhow::Context;
 use std::io::Write;
 
-use crate::{ebi_info, ebi_input_output::EbiInputType, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_event_log::EbiTraitEventLog}, export::{EbiOutput, EbiOutputType}, math::fraction::{Fraction, FractionNotParsedYet}, test};
+use crate::{ebi_info, ebi_input_output::EbiInputType, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_event_log::EbiTraitEventLog}, export::{EbiOutput, EbiOutputType}, math::fraction::{Fraction, FractionNotParsedYet}, techniques::statistical_test::StatisticalTests};
 
 use super::{ebi_command::EbiCommand, ebi_command_association::{self, number_of_samples}};
 
@@ -41,7 +41,7 @@ pub const TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
         let number_of_samples = cli_matches.get_one::<usize>("samples").unwrap();
         let p_value = cli_matches.get_one::<FractionNotParsedYet>("pvalue").unwrap().try_into().context("Parsing p value")?;
 
-        let (value, sustained)= test::log_categorical_attribute(&mut event_log, *number_of_samples, &attribute, &p_value).with_context(|| format!("attribute {}", attribute))?;
+        let (value, sustained)= event_log.log_categorical_attribute( *number_of_samples, &attribute, &p_value).with_context(|| format!("attribute {}", attribute))?;
 
         let mut f = vec![];
         writeln!(f, "p-value \t {}", value);

@@ -13,8 +13,9 @@ use crate::ebi_commands::ebi_command::EbiCommand;
 use crate::ebi_traits::ebi_trait_event_log::{EbiTraitEventLog, IndexTrace};
 use crate::ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage;
 use crate::math::fraction_matched::FractionMatched;
+use crate::math::levenshtein;
 use crate::Trace;
-use crate::{ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, levenshtein, math::fraction::Fraction};
+use crate::{ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::fraction::Fraction};
 
 pub struct TriangularDistanceMatrix {
     len: usize, //lenght of one side of the matrix

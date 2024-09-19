@@ -4,57 +4,98 @@ use fraction::{One, Zero};
 
 use crate::{distances::TriangularDistanceMatrix, ebi_objects::finite_language::FiniteLanguage, ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage, math::fraction::Fraction};
 
-pub fn medoid<T>(log: &T, number_of_traces: &usize) -> Result<FiniteLanguage> where T: EbiTraitFiniteLanguage + ?Sized {
+pub trait MedoidNonStochastic {
+	fn medoid(&self, number_of_traces: usize) -> Result<FiniteLanguage>;
 
-    let mut activity_key = log.get_activity_key().clone();
-    let mut result = HashSet::new();
+	/**
+	 * Applies an adaption of the FasterPAM algorithm from Fast and Eager k-Medoids Clustering: O(k) Runtime Improvement of the PAM, CLARA, and CLARANS Algorithms?
+	 */
+	fn k_medoids_clustering(&self, number_of_clusters: usize) -> Result<FiniteLanguage>;
+}
 
-    log::info!("Computing {} medoid traces", number_of_traces);
+impl <T: ?Sized> MedoidNonStochastic for T where T: EbiTraitFiniteLanguage {
+	fn medoid(&self, number_of_traces: usize) -> Result<FiniteLanguage> {
+		let mut activity_key = self.get_activity_key().clone();
+		let mut result = HashSet::new();
 
-    let distances = TriangularDistanceMatrix::new(log);
+		let distances = TriangularDistanceMatrix::new(self);
 
-    if number_of_traces.is_one() {
-        let trace_number = medoid_single(log, &distances);
-        if trace_number.is_none() {
-            return Err(anyhow!("1 trace was requested, but the stochastic language contains none."));
-        }
-        result.insert(log.get_trace(trace_number.unwrap()).unwrap().to_owned());
-        return Ok((activity_key, result).into());
-    }
+		if number_of_traces.is_one() {
+			let trace_number = medoid_single(self, &distances);
+			if trace_number.is_none() {
+				return Err(anyhow!("1 trace was requested, but the stochastic language contains none."));
+			}
+			result.insert(self.get_trace(trace_number.unwrap()).unwrap().to_owned());
+			return Ok((activity_key, result).into());
+		}
 
-    if log.len() < *number_of_traces {
-        return Err(anyhow!("{} traces were requested, but the stochastic language contains only {} traces.", number_of_traces, log.len()));
-    }
+		if self.len() < number_of_traces {
+			return Err(anyhow!("{} traces were requested, but the stochastic language contains only {} traces.", number_of_traces, self.len()));
+		}
 
-    let mut sum_distance = sum_distances(log, &distances);
+		let mut sum_distance = sum_distances(self, &distances);
 
-    let mut list = Vec::new();
-    while list.len() < *number_of_traces {
+		let mut list = Vec::new();
+		while list.len() < number_of_traces {
 
-        //find the position of the minimum value
-        let mut min_pos = 0;
-        for i in 1..sum_distance.len() {
-            if sum_distance[i] < sum_distance[min_pos] {
-                min_pos = i;
-            }
-        }
+			//find the position of the minimum value
+			let mut min_pos = 0;
+			for i in 1..sum_distance.len() {
+				if sum_distance[i] < sum_distance[min_pos] {
+					min_pos = i;
+				}
+			}
 
-        //report the minimum value
-        list.push(min_pos);
-        sum_distance[min_pos] = Fraction::two();
-    }
-    list.sort();
+			//report the minimum value
+			list.push(min_pos);
+			sum_distance[min_pos] = Fraction::two();
+		}
+		list.sort();
 
-    //put in the output format
-    let mut list_i = 0;
-    for (i1, trace1) in log.iter().enumerate() {
-        if list_i < list.len() && i1 == list[list_i] {
-            result.insert(trace1.to_vec());
-            list_i += 1;
-        }
-    }
+		//put in the output format
+		let mut list_i = 0;
+		for (i1, trace1) in self.iter().enumerate() {
+			if list_i < list.len() && i1 == list[list_i] {
+				result.insert(trace1.to_vec());
+				list_i += 1;
+			}
+		}
 
-    Ok((activity_key, result).into())
+		Ok((activity_key, result).into())
+	}
+
+	/**
+	 * Applies an adaption of the FasterPAM algorithm from Fast and Eager k-Medoids Clustering: O(k) Runtime Improvement of the PAM, CLARA, and CLARANS Algorithms?
+	 */
+	fn k_medoids_clustering(&self, number_of_clusters: usize) -> Result<FiniteLanguage> {
+		//there is a Rust k-medoids crate, but that does not support exact arithmetic
+
+		if self.len() < number_of_clusters {
+			return Err(anyhow!("Language contains only {} different traces, and {} clusters were requested.", self.len(), number_of_clusters));
+		}
+		if number_of_clusters <= 0 {
+			return Err(anyhow!("No clusters were requested"));
+		}
+
+		let distances = TriangularDistanceMatrix::new(self);
+		let mut rng = rand::thread_rng();
+		let mut medoids = random_initialization(self.len(), number_of_clusters, &mut rng);
+
+		fasterpam(&distances, &mut medoids, 500);
+
+		//create output (the medoids of the clusters)
+		let mut result = HashSet::new();
+		medoids.sort();
+		let mut list_i = 0;
+		for (i1, trace1) in self.iter().enumerate() {
+			if list_i < medoids.len() && i1 == medoids[list_i] {
+				result.insert(trace1.to_vec());
+				list_i += 1;
+			}
+		}
+		Ok((self.get_activity_key().clone(), result).into())
+
+	}
 }
 
 /**
@@ -83,39 +124,6 @@ pub fn sum_distances<T>(log: &T, distances: &TriangularDistanceMatrix) -> Vec<Fr
     }
 
     sum_distance
-}
-
-/**
- * Applies an adaption of the FasterPAM algorithm from Fast and Eager k-Medoids Clustering: O(k) Runtime Improvement of the PAM, CLARA, and CLARANS Algorithms?
- */
-pub fn k_medoids_clustering<T>(log: &T, number_of_clusters: usize) -> Result<FiniteLanguage> where T: EbiTraitFiniteLanguage + ?Sized {
-    //there is a Rust k-medoids crate, but that does not support exact arithmetic
-
-    if log.len() < number_of_clusters {
-        return Err(anyhow!("Language contains only {} different traces, and {} clusters were requested.", log.len(), number_of_clusters));
-    }
-    if number_of_clusters <= 0 {
-        return Err(anyhow!("No clusters were requested"));
-    }
-
-	let distances = TriangularDistanceMatrix::new(log);
-	let mut rng = rand::thread_rng();
-	let mut medoids = random_initialization(log.len(), number_of_clusters, &mut rng);
-
-    fasterpam(&distances, &mut medoids, 500);
-
-	//create output (the medoids of the clusters)
-	let mut result = HashSet::new();
-	medoids.sort();
-	let mut list_i = 0;
-    for (i1, trace1) in log.iter().enumerate() {
-        if list_i < medoids.len() && i1 == medoids[list_i] {
-            result.insert(trace1.to_vec());
-            list_i += 1;
-        }
-    }
-	Ok((log.get_activity_key().clone(), result).into())
-
 }
 
 /**

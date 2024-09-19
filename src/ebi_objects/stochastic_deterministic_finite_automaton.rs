@@ -365,7 +365,7 @@ impl Importable for StochasticDeterministicFiniteAutomaton {
 
 impl EbiTraitQueriableStochasticLanguage for StochasticDeterministicFiniteAutomaton {
 
-    fn get_probability(&mut self, follower: &FollowerSemantics) -> Result<Fraction> {
+    fn get_probability(&self, follower: &FollowerSemantics) -> Result<Fraction> {
         match follower {
             FollowerSemantics::Trace(trace) => {
                 let mut state = self.get_initial_state();

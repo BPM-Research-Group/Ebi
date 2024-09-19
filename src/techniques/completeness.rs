@@ -4,8 +4,13 @@ use fraction::{One, Zero};
 
 use crate::math::fraction::Fraction;
 
-pub fn estimate_completeness <T> (multiset: &HashMap<T, usize>) -> Fraction {
-    //from https://github.com/MartinKabierski/process-completeness-estimation/blob/main/src/estimation/metrics.py
+pub trait Completeness {
+    fn estimate_completeness (&self) -> Fraction;
+}
+
+impl <T> Completeness for HashMap<T, usize> {
+    fn estimate_completeness (&self) -> Fraction {
+        //from https://github.com/MartinKabierski/process-completeness-estimation/blob/main/src/estimation/metrics.py
 
     /**
      * computes the completeness of the sample data. A value of '1' indicates full completeness,
@@ -13,14 +18,16 @@ pub fn estimate_completeness <T> (multiset: &HashMap<T, usize>) -> Fraction {
      * :param obs_species_counts: the species with corresponding incidence counts
      * :return: the estimated completeness
     */
-    let s_p = estimate_species_richness_chao(multiset);
+    let s_p = estimate_species_richness_chao(self);
     if s_p.is_zero() {
         Fraction::zero()
     } else {
-        let obs_species_count: Fraction = get_number_observed_species(multiset).into();
+        let obs_species_count: Fraction = get_number_observed_species(self).into();
         &obs_species_count / &s_p
     }
+    }
 }
+
 
 fn get_singletons <T> (multiset: &HashMap<T, usize>) -> usize {
     multiset.iter().filter(|&(_, c)| c == &1).count()
@@ -37,9 +44,9 @@ fn get_number_observed_species <T> (multiset: &HashMap<T, usize>) -> usize {
 fn estimate_species_richness_chao <T> (multiset: &HashMap<T, usize>) -> Fraction {
     /**
     * computes the asymptotic(=estimated) species richness using the Chao1 estimator(for abundance data)
-     * or Chao2 estimator (for incidence data)
-     * :param obs_species_counts: the species with corresponding incidence counts
-     * :return: the estimated species richness
+    * or Chao2 estimator (for incidence data)
+    * :param obs_species_counts: the species with corresponding incidence counts
+    * :return: the estimated species richness
     **/
     let mut obs_species_count: Fraction = get_number_observed_species(multiset).into();
     let f_1: Fraction = get_singletons(multiset).into();

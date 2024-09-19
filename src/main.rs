@@ -2,8 +2,6 @@
 
 mod line_reader;
 mod stochastic_labelled_petri_net_semantics;
-mod uniform_stochastic_miner;
-mod trace_probability;
 mod follower_semantics;
 mod cross_product;
 mod net;
@@ -64,31 +62,33 @@ pub mod math {
     pub mod root;
     pub mod root_log_div;
     pub mod correlation;
+    pub mod levenshtein;
 }
 pub mod techniques {
     pub mod align;
-    pub mod alignment_miner;
+    pub mod alignment_stochastic_miner;
     pub mod association;
     pub mod probabilistic_queries;
+    pub mod completeness;
+    pub mod jensen_shannon_stochastic_conformance;
+    pub mod uniform_stochastic_miner;
+    pub mod unit_earth_movers_stochastic_conformance;
+    pub mod entropic_relevance;
+    pub mod occurrences_stochastic_miner;
+    pub mod trace_probability;
+    pub mod statistical_test;
+    pub mod medoid_non_stochastic;
 }
 mod dottable;
-mod unit_earth_movers_stochastic_conformance;
-mod jenson_shannon_stochastic_conformance;
 mod activity_key;
 mod export;
-mod occurrences_miner;
-mod entropic_relevance;
 mod deterministic_semantics_for_stochastic_semantics;
 mod medoid;
-mod medoid_non_stochastic;
-mod levenshtein;
-mod completeness;
 mod ebi_input_output;
 mod file_handler;
 mod labelled_petri_net_semantics;
 mod distances;
 mod tests;
-mod test;
 mod sample;
 // mod earth_movers_stochastic_conformance;
 

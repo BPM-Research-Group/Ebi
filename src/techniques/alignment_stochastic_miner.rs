@@ -7,11 +7,11 @@ use crate::{activity_key::{Activity, ActivityKeyTranslator}, ebi_objects::{align
 use super::align::Align;
 
 pub trait AlignmentMiner {
-    fn mine_alignment(self: Box<Self>, language: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<StochasticLabelledPetriNet>;
+    fn mine_stochastic_alignment(self: Box<Self>, language: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<StochasticLabelledPetriNet>;
 }
 
-impl AlignmentMiner for dyn EbiTraitLabelledPetriNet {
-    fn mine_alignment(self: Box<Self>, language: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<StochasticLabelledPetriNet> {
+impl AlignmentMiner for dyn EbiTraitLabelledPetriNet { //use the dyn syntax as we need to consume the input net
+    fn mine_stochastic_alignment(self: Box<Self>, language: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<StochasticLabelledPetriNet> {
         let mut weights: Vec<Fraction> = vec![Fraction::zero(); self.get_number_of_transitions()];
 
         let mut net = self.clone();

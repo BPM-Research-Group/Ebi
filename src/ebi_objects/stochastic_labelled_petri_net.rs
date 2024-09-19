@@ -17,7 +17,7 @@ use crate::export::{EbiObjectExporter, EbiOutput, Exportable};
 use crate::file_handler::EbiFileHandler;
 use crate::labelled_petri_net_semantics::LabelledPetriNetSemantics;
 use crate::math::fraction::Fraction;
-use crate::{activity_key::ActivityKey, dottable::Dottable, follower_semantics::FollowerSemantics, import, line_reader::LineReader, marking::Marking, net::{Net, StochasticNet, Transition}, deterministic_semantics_for_stochastic_semantics::{PMarking, DeterministicStochasticSemantics}, stochastic_labelled_petri_net_semantics::StochasticLabelledPetriNetSemantics, trace_probability};
+use crate::{activity_key::ActivityKey, dottable::Dottable, follower_semantics::FollowerSemantics, import, line_reader::LineReader, marking::Marking, net::{Net, StochasticNet, Transition}, deterministic_semantics_for_stochastic_semantics::{PMarking, DeterministicStochasticSemantics}, stochastic_labelled_petri_net_semantics::StochasticLabelledPetriNetSemantics};
 use crate::import::{EbiObjectImporter, EbiTraitImporter, Importable};
 
 use super::ebi_object::EbiObject;
@@ -53,8 +53,7 @@ pub struct StochasticLabelledPetriNet {
     places: usize, //number of places in the net
     transitions: Vec<Transition>,
     weights: Vec<Fraction>,
-    initial_marking: Marking,
-    semantics: Option<Box<StochasticLabelledPetriNetSemantics>>
+    initial_marking: Marking
 }
 
 impl StochasticLabelledPetriNet {
@@ -64,8 +63,7 @@ impl StochasticLabelledPetriNet {
             places: places,
             transitions: transitions,
             initial_marking: initial_marking,
-            weights: weights,
-            semantics: None
+            weights: weights
         }
     }
 
@@ -117,6 +115,15 @@ impl StochasticLabelledPetriNet {
         Ok(Self::get_semantics(net))
     }
 
+    pub fn from_lpn<T>(lpn: &T, weights: Vec<Fraction>) -> Self where T: EbiTraitLabelledPetriNet + ?Sized {
+        Self {
+            activity_key: lpn.get_activity_key().clone(),
+            places: lpn.get_number_of_places(),
+            transitions: lpn.get_transitions().clone(),
+            weights: weights,
+            initial_marking: lpn.get_initial_marking().clone()
+        }
+    }
 }
 
 impl EbiTraitLabelledPetriNet for StochasticLabelledPetriNet {
@@ -305,21 +312,19 @@ impl Importable for StochasticLabelledPetriNet {
             places: number_of_places,
             transitions: transitions,
             weights: weights,
-            initial_marking: Marking::from_vec(place2token),
-            semantics: None
+            initial_marking: Marking::from_vec(place2token)
         })
     }
 }
 
 impl From<(Box<dyn EbiTraitLabelledPetriNet>, Vec<Fraction>)> for StochasticLabelledPetriNet {
-    fn from(mut value: (Box<dyn EbiTraitLabelledPetriNet>, Vec<Fraction>)) -> Self {
+    fn from(value: (Box<dyn EbiTraitLabelledPetriNet>, Vec<Fraction>)) -> Self {
         Self {
             activity_key: value.0.get_activity_key().clone(),
             places: value.0.get_number_of_places(),
             transitions: value.0.get_transitions().clone(),
             weights: value.1,
-            initial_marking: value.0.get_initial_marking().clone(),
-            semantics: None,
+            initial_marking: value.0.get_initial_marking().clone()
         }
     }
 }
@@ -384,16 +389,13 @@ struct Prob {
 
 impl EbiTraitQueriableStochasticLanguage for StochasticLabelledPetriNet {
 
-    fn get_probability(&mut self, follower_semantics: &FollowerSemantics) -> Result<Fraction> {
-        if self.semantics.is_none() {
-            self.semantics = Some(Box::new(StochasticLabelledPetriNetSemantics::from_slpn(self)));
-        }
-
-
-        let binding = self.semantics.as_ref().unwrap();
-        let semantics1: &StochasticLabelledPetriNetSemantics = binding.as_ref();
-
-        trace_probability::trace_probability_semantics(semantics1, follower_semantics)
+    /**
+     * If this function is to be called repeatedly, it is more efficient to create a semantics object and call if from there.
+     */
+    fn get_probability(&self, follower_semantics: &FollowerSemantics) -> Result<Fraction> {
+        let semantics = Box::new(StochasticLabelledPetriNetSemantics::from_slpn(self));
+        let semantics: Box<dyn StochasticSemantics<State = _>> = semantics;
+        semantics.get_probability(follower_semantics)
     }
     
     fn get_activity_key(&self) -> &ActivityKey {

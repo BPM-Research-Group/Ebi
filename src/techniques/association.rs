@@ -7,7 +7,7 @@ use num_bigint::ToBigUint;
 use process_mining::event_log::{AttributeValue, XESEditableAttribute};
 use rand::Rng;
 use rayon::prelude::*;
-use crate::{activity_key::Activity, ebi_objects::event_log::DataType, ebi_traits::ebi_trait_event_log::EbiTraitEventLog, levenshtein, math::{correlation::correlation, fraction::Fraction, root::{ContainsRoot, Root}}};
+use crate::{activity_key::Activity, ebi_objects::event_log::DataType, ebi_traits::ebi_trait_event_log::EbiTraitEventLog, math::{correlation::correlation, fraction::Fraction, levenshtein, root::{ContainsRoot, Root}}};
 
 pub trait Associations {
     fn association(self: &mut Box<Self>, number_of_samples: usize, attribute: &String) -> Result<ContainsRoot>;

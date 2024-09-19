@@ -2,7 +2,7 @@
 mod tests {
     use std::{fs, rc::Rc};
 
-    use crate::{activity_key::{ActivityKey, ActivityKeyTranslator}, deterministic_semantics_for_stochastic_semantics::DeterministicStochasticSemantics, ebi_objects::{alignments::Move, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics, ebi_trait_stochastic_semantics::StochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, medoid, medoid_non_stochastic, occurrences_miner, sample::{self, Sampler}, stochastic_labelled_petri_net_semantics::StochasticLabelledPetriNetSemantics, techniques::{align::Align, probabilistic_queries::FiniteStochasticLanguageAnalyser}, test, trace_probability, uniform_stochastic_miner::uniform_stochastic_miner, unit_earth_movers_stochastic_conformance::uemsc};
+    use crate::{activity_key::{ActivityKey, ActivityKeyTranslator}, deterministic_semantics_for_stochastic_semantics::DeterministicStochasticSemantics, ebi_objects::{alignments::Move, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics, ebi_trait_stochastic_semantics::StochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, medoid, sample::{self, Sampler}, stochastic_labelled_petri_net_semantics::StochasticLabelledPetriNetSemantics, techniques::{align::Align, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probabilistic_queries::FiniteStochasticLanguageAnalyser, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 
     use super::*;
 
@@ -20,7 +20,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
         let fout = fs::read_to_string("testfiles/aa.lang").unwrap();
-        let medoid = medoid_non_stochastic::medoid(&slang, &1).unwrap();
+        let medoid = slang.medoid(1).unwrap();
         assert_eq!(fout, medoid.to_string())
     }
 
@@ -28,7 +28,7 @@ mod tests {
     fn non_stochastic_clustering() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
-        let cluster = medoid_non_stochastic::k_medoids_clustering(&slang, 1).unwrap();
+        let cluster = slang.k_medoids_clustering(1).unwrap();
         let fout = fs::read_to_string("testfiles/aa.lang").unwrap();
         assert_eq!(fout, cluster.to_string())
     }
@@ -36,8 +36,9 @@ mod tests {
     #[test]
     fn lpn_uniform() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.lpn").unwrap();
-        let lpn = fin.parse::<LabelledPetriNet>().unwrap();
-        let slpn = uniform_stochastic_miner(Box::new(lpn));
+        let lpn = Box::new(fin.parse::<LabelledPetriNet>().unwrap());
+        let lpn: Box<dyn EbiTraitLabelledPetriNet> = lpn;
+        let slpn = lpn.mine_uniform_stochastic();
         let fout = fs::read_to_string("testfiles/aa-ab-ba_uni.slpn").unwrap();
         assert_eq!(fout, slpn.to_string())
     }
@@ -48,7 +49,8 @@ mod tests {
         let lpn = fin1.parse::<LabelledPetriNet>().unwrap();
         let fin2 = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin2.parse::<FiniteStochasticLanguage>().unwrap();
-        let slpn = occurrences_miner::mine(Box::new(lpn), Box::new(slang));
+        let lpn: Box<dyn EbiTraitLabelledPetriNet> = Box::new(lpn);
+        let slpn = lpn.mine_occurrences_stochastic(Box::new(slang));
         let fout = fs::read_to_string("testfiles/aa-ab-ba_occ.slpn").unwrap();
         assert_eq!(fout, slpn.to_string())
     }
@@ -147,7 +149,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
         let event_log: Box<dyn EbiTraitEventLog> = Box::new(fin.parse::<EventLog>().unwrap());
 
-        let (x, sustain) = test::log_categorical_attribute(&event_log, 500, &"attribute".to_string(), &Fraction::from((1, 20))).unwrap();
+        let (x, sustain) = event_log.log_categorical_attribute(500, &"attribute".to_string(), &Fraction::from((1, 20))).unwrap();
         assert!(sustain) //The hypothesis should be rejected if we consider the meaning of things, however, as we have only two traces, it will be sustained.
     }
 
@@ -208,7 +210,7 @@ mod tests {
         //a
         {
             let strace = vec!["a".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = EbiTraitLabelledPetriNet::get_activity_key_mut(&mut slpn).process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "2/5".parse::<Fraction>().unwrap());
@@ -217,7 +219,7 @@ mod tests {
         //b
         {
             let strace = vec!["b".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = EbiTraitLabelledPetriNet::get_activity_key_mut(&mut slpn).process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "1/5".parse::<Fraction>().unwrap());
@@ -226,7 +228,7 @@ mod tests {
         //c (part of livelock trace)
         {
             let strace = vec!["c".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = EbiTraitLabelledPetriNet::get_activity_key_mut(&mut slpn).process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "0".parse::<Fraction>().unwrap());
@@ -235,7 +237,7 @@ mod tests {
         //d (non-existing label)
         {
             let strace = vec!["d".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = EbiTraitLabelledPetriNet::get_activity_key_mut(&mut slpn).process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "0".parse::<Fraction>().unwrap());
@@ -250,7 +252,7 @@ mod tests {
         //a
         {
             let strace = vec!["a".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = EbiTraitLabelledPetriNet::get_activity_key_mut(&mut slpn).process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "2/5".parse::<Fraction>().unwrap());
@@ -259,7 +261,7 @@ mod tests {
         //b
         {
             let strace = vec!["b".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = EbiTraitLabelledPetriNet::get_activity_key_mut(&mut slpn).process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "1/5".parse::<Fraction>().unwrap());
@@ -268,7 +270,7 @@ mod tests {
         //empty trace (part of livelock trace)
         {
             let strace = vec![];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = EbiTraitLabelledPetriNet::get_activity_key_mut(&mut slpn).process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "0".parse::<Fraction>().unwrap());
@@ -277,7 +279,7 @@ mod tests {
         //d (non-existing label)
         {
             let strace = vec!["d".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = EbiTraitLabelledPetriNet::get_activity_key_mut(&mut slpn).process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "0".parse::<Fraction>().unwrap());
@@ -292,7 +294,9 @@ mod tests {
         let fin2 = fs::read_to_string("testfiles/ba-aa-ab.slang").unwrap();
         let mut slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
 
-        let uemsc = uemsc(Box::new(slang1), Box::new(slang2)).unwrap();
+        let slang1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang1);
+
+        let uemsc = slang1.unit_earth_movers_stochastic_conformance(Box::new(slang2)).unwrap();
         assert_eq!(uemsc, Fraction::one())
     }
 
@@ -371,25 +375,25 @@ mod tests {
 
         //a ends in a livelock and has probability 0
         let strace = vec!["a".to_string()];
-        let trace = slpn.get_activity_key_mut().process_trace(&strace);
+        let trace = EbiTraitLabelledPetriNet::get_activity_key_mut(&mut slpn).process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         assert_eq!(slpn.get_probability(&trace_follower).unwrap(), Fraction::zero());
 
         //a, a ends in a livelock and has probability 0
         let strace = vec!["a".to_string(), "a".to_string()];
-        let trace = slpn.get_activity_key_mut().process_trace(&strace);
+        let trace = EbiTraitLabelledPetriNet::get_activity_key_mut(&mut slpn).process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         assert_eq!(slpn.get_probability(&trace_follower).unwrap(), Fraction::zero());
 
         //b has weight 0
         let strace = vec!["b".to_string()];
-        let trace = slpn.get_activity_key_mut().process_trace(&strace);
+        let trace = EbiTraitLabelledPetriNet::get_activity_key_mut(&mut slpn).process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         assert_eq!(slpn.get_probability(&trace_follower).unwrap(), Fraction::zero());
 
         //c has weight 0
         let strace = vec!["c".to_string()];
-        let trace = slpn.get_activity_key_mut().process_trace(&strace);
+        let trace = EbiTraitLabelledPetriNet::get_activity_key_mut(&mut slpn).process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         assert_eq!(slpn.get_probability(&trace_follower).unwrap(), Fraction::zero());
     }

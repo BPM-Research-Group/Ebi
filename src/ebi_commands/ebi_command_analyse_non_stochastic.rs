@@ -1,4 +1,6 @@
-use crate::{ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics}, export::{EbiOutput, EbiOutputType}, medoid, medoid_non_stochastic, techniques::align::Align};
+use process_mining::EventLog;
+
+use crate::{ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics}, export::{EbiOutput, EbiOutputType}, medoid, techniques::{align::Align, medoid_non_stochastic::MedoidNonStochastic}};
 
 use super::ebi_command::EbiCommand;
 
@@ -31,7 +33,8 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command {
     execute: |mut objects, _| {
         let language = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
         let number_of_traces = objects.remove(0).to_type::<usize>()?;
-        let result = medoid_non_stochastic::medoid(language.as_ref(), &number_of_traces)?;
+        let language: Box<dyn EbiTraitFiniteLanguage> = language;
+        let result = language.medoid(*number_of_traces)?;
         return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
     }, 
     output: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
@@ -54,7 +57,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
     execute: |mut objects, cli_matches| {
         let language = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
         let number_of_clusters = objects.remove(0).to_type::<usize>()?;
-        let result = medoid_non_stochastic::k_medoids_clustering(language.as_ref(), *number_of_clusters)?;
+        let result = language.k_medoids_clustering(*number_of_clusters)?;
         return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
     }, 
     output: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)

@@ -356,7 +356,7 @@ impl EbiTraitIterableStochasticLanguage for FiniteStochasticLanguage {
 }
 
 impl EbiTraitQueriableStochasticLanguage for FiniteStochasticLanguage {
-    fn get_probability(&mut self, follower: &FollowerSemantics) -> Result<Fraction> {
+    fn get_probability(&self, follower: &FollowerSemantics) -> Result<Fraction> {
         match follower {
             FollowerSemantics::Trace(trace) => {
                 return match self.traces.get(*trace) {

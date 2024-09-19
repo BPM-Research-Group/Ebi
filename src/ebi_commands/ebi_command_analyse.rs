@@ -3,7 +3,7 @@ use std::{io::{self, IsTerminal}, path::PathBuf};
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use anyhow::{anyhow, Context, Result};
 use process_mining::event_log::stream_xes::Mode;
-use crate::{completeness, ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, export::{EbiOutput, EbiOutputType}, math::fraction::{Fraction, FractionNotParsedYet}, medoid, techniques::probabilistic_queries::FiniteStochasticLanguageAnalyser};
+use crate::{ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, export::{EbiOutput, EbiOutputType}, math::fraction::{Fraction, FractionNotParsedYet}, medoid, techniques::{completeness::{self, Completeness}, probabilistic_queries::FiniteStochasticLanguageAnalyser}};
 
 use super::ebi_command::EbiCommand;
 
@@ -72,7 +72,7 @@ pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
     execute: |mut objects, _| {
         let mut log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         
-        let result = completeness::estimate_completeness(&log.to_multiset());
+        let result = log.to_multiset().estimate_completeness();
         
         return Ok(EbiOutput::Fraction(result));
     }, 

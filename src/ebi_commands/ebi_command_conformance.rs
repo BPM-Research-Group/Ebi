@@ -2,7 +2,7 @@ use std::{path::PathBuf, io::{self, IsTerminal}};
 use clap::{Command, ArgMatches, value_parser, Arg, ArgAction};
 use anyhow::{Result, Context, anyhow};
 
-use crate::{ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, entropic_relevance, export::{self, EbiOutput, EbiOutputType}, import, jenson_shannon_stochastic_conformance, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}, sample::{self, Sampler}, unit_earth_movers_stochastic_conformance};
+use crate::{ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, export::{self, EbiOutput, EbiOutputType}, import, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}, sample::{self, Sampler}, techniques::{entropic_relevance::EntropicRelvance, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 use fraction::{One, Zero};
 use super::{ebi_command::EbiCommand, ebi_command_sample::{self, SAMPLED_OBJECT_INPUTS}};
 
@@ -99,7 +99,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
     execute: |mut inputs, _| {
         let log = inputs.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let model = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
-        Ok(EbiOutput::Fraction(unit_earth_movers_stochastic_conformance::uemsc(log, model).context("cannot compute uEMSC")?))
+        Ok(EbiOutput::Fraction(log.unit_earth_movers_stochastic_conformance(model).context("cannot compute uEMSC")?))
     },
     output: &EbiOutputType::Fraction
 };
@@ -121,7 +121,7 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
     execute: |mut inputs, _| {
         let log = inputs.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let model = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
-        Ok(EbiOutput::LogDiv(entropic_relevance::er(log, model).context("cannot compute uEMSC")?))
+        Ok(EbiOutput::LogDiv(log.er(model).context("cannot compute uEMSC")?))
     }, 
     output: &EbiOutputType::LogDiv
 };
@@ -145,10 +145,10 @@ pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
 
         match inputs.remove(0) {            
             EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => {
-                Ok(EbiOutput::RootLogDiv(jenson_shannon_stochastic_conformance::jssc_log2log(event_log, slang).context("Compute JSSC.")?))
+                Ok(EbiOutput::RootLogDiv(event_log.jssc_log2log(slang).context("Compute JSSC.")?))
             },
             EbiInput::Trait(EbiTraitObject::QueriableStochasticLanguage(slang), _) => {
-                Ok(EbiOutput::RootLogDiv(jenson_shannon_stochastic_conformance::jssc_log2model(event_log, slang).context("Compute JSSC.")?))
+                Ok(EbiOutput::RootLogDiv(event_log.jssc_log2model(slang).context("Compute JSSC.")?))
             }
             _ => Err(anyhow!("wrong input given"))
         }
@@ -179,7 +179,8 @@ pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
         let lang1 = Box::new(ebi_command_sample::get_sampled_object(object1, *number_of_traces)?);
         let lang2 = Box::new(ebi_command_sample::get_sampled_object(object2, *number_of_traces)?);
 
-        Ok(EbiOutput::RootLogDiv(jenson_shannon_stochastic_conformance::jssc_log2log(lang1, lang2).context("Compute JSSC by sampling.")?))
+        let lang1: Box<dyn EbiTraitFiniteStochasticLanguage> = lang1;
+        Ok(EbiOutput::RootLogDiv(lang1.jssc_log2log(lang2).context("Compute JSSC by sampling.")?))
     },
     output: &EbiOutputType::RootLogDiv 
 };

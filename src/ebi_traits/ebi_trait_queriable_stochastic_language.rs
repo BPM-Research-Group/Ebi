@@ -8,7 +8,7 @@ pub trait EbiTraitQueriableStochasticLanguage {
 
     fn get_activity_key_mut(&mut self) -> &mut ActivityKey;
 
-    fn get_probability(&mut self, follower: &FollowerSemantics) -> Result<Fraction>;
+    fn get_probability(&self, follower: &FollowerSemantics) -> Result<Fraction>;
 }
 
 impl FromEbiTraitObject for dyn EbiTraitQueriableStochasticLanguage {
