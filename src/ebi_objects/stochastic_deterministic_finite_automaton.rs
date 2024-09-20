@@ -1,11 +1,12 @@
 use std::{cmp::{max, Ordering}, collections::{HashMap, HashSet}, fmt, io::{self, BufRead}, mem::zeroed, rc::Rc, slice::Iter, str::FromStr};
 use anyhow::{anyhow, Context, Result, Error};
 use num_traits::zero;
+use process_mining::petri_net::petri_net_struct::Transition;
 use rand::{thread_rng,Rng};
 use fraction::{BigUint, GenericFraction, One, Zero};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
-use crate::{activity_key::{self, Activity, ActivityKey}, dottable::Dottable, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, TransitionIndex}}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, follower_semantics::FollowerSemantics, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, marking::Marking, math::fraction::Fraction, net::Transition, Trace};
+use crate::{activity_key::{self, Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, TransitionIndex}}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, follower_semantics::FollowerSemantics, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, marking::Marking, math::fraction::Fraction, Trace};
 
 use super::{ebi_object::EbiObject, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
 
@@ -15,7 +16,7 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
     file_extension: "sdfa",
     validator: import::validate::<StochasticDeterministicFiniteAutomaton>,
     trait_importers: &[
-        EbiTraitImporter::QueriableStochasticLanguage(import::read_as_queriable_stochastic_language::<StochasticDeterministicFiniteAutomaton>),
+        EbiTraitImporter::QueriableStochasticLanguage(import::import_as_queriable_stochastic_language::<StochasticDeterministicFiniteAutomaton>),
         EbiTraitImporter::StochasticDeterministicSemantics(StochasticDeterministicFiniteAutomaton::import_as_stochastic_deterministic_semantics),
         EbiTraitImporter::StochasticSemantics(StochasticDeterministicFiniteAutomaton::import_as_stochastic_semantics),
         EbiTraitImporter::Semantics(StochasticDeterministicFiniteAutomaton::import_as_semantics),
@@ -285,41 +286,48 @@ impl StochasticDeterministicFiniteAutomaton {
         Ok(Self::get_semantics(sdfa))
     }
     
-    pub fn to_stochastic_labelled_petri_net(self) -> StochasticLabelledPetriNet {
+    pub fn to_stochastic_labelled_petri_net(&self) -> StochasticLabelledPetriNet {
         log::info!("convert SDFA to stochastic labelled Petri net");
-        let activity_key = self.activity_key;
-        let mut transitions = vec![];
+
+        let mut result = LabelledPetriNet::new();
+        let translator = ActivityKeyTranslator::new(self.get_activity_key(), result.get_activity_key_mut());
         let mut weights = vec![];
-        let mut places = 2 + self.max_state; //0 = source, 1 = sink
-        let mut initial_marking = Marking::new(places);
-        initial_marking.increase(0, 1);
 
-        //add edges
-        let mut source_probability = Fraction::one();
-        if let Some(mut source_last) = self.sources.get(0) {
-            for (source, (target, (activity, probability))) in self.sources.iter().zip(self.targets.iter().zip(self.activities.iter().zip(self.probabilities.iter()))) {
-                //add finalisation transition
-                if source_last != source {
-                    if !source_probability.is_zero() {
-                        let mut transition = Transition::new_silent(transitions.len());
-                        transition.incoming.push(2 + source_last);
-                        transition.outgoing.push(1);
-                        transitions.push(transition);
-                        weights.push(source_probability);
-                    }
+        let source = result.add_place();
+        result.get_initial_marking_mut().increase(source, 1);
 
-                    source_probability = Fraction::one();
-                    source_last = source;
-                }
-                
-                //add transition
-                let mut transition = Transition::new_labelled(transitions.len(), *activity);
-                transition.incoming.push(2 + source);
-                transition.outgoing.push(2 + target);
+        //add places
+        let mut state2place = vec![];
+        for state in 0..=self.max_state {
+            let lpn_place = result.add_place();
+            state2place.push(lpn_place);
+
+            //add termination
+            if self.get_termination_probability(state).is_positive() {
+                let lpn_transition = result.add_transition(None);
+                weights.push(self.get_termination_probability(state).clone());
+                result.add_place_transition_arc(lpn_place, lpn_transition, 1);
+                result.add_transition_place_arc(lpn_transition, lpn_place, 1);
             }
         }
 
-        StochasticLabelledPetriNet::from_fields(activity_key, places, transitions, initial_marking, weights)
+        //add edges
+        if let Some(mut source_last) = self.sources.get(0) {
+            for (source, (target, (activity, probability))) in self.sources.iter().zip(self.targets.iter().zip(self.activities.iter().zip(self.probabilities.iter()))) {
+                
+                //add transition
+                let lpn_activity = translator.translate_activity(activity);
+                let lpn_transition = result.add_transition(Some(lpn_activity));
+                let source_place = state2place[*source];
+                let target_place = state2place[*target];
+                result.add_place_transition_arc(source_place, lpn_transition, 1);
+                result.add_transition_place_arc(lpn_transition, target_place, 1);
+
+                weights.push(probability.clone());
+            }
+        }
+
+        StochasticLabelledPetriNet::from((result, weights))
     }
 
     pub fn set_activity_key(&mut self, activity_key: &ActivityKey) {

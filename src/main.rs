@@ -3,7 +3,6 @@
 mod line_reader;
 mod follower_semantics;
 mod cross_product;
-mod net;
 mod marking;
 mod import;
 pub mod ebi_commands {
@@ -49,7 +48,6 @@ pub mod ebi_traits {
     pub mod ebi_trait_finite_language;
     pub mod ebi_trait_event_log;
     pub mod ebi_trait_stochastic_semantics;
-    pub mod ebi_trait_labelled_petri_net;
     pub mod ebi_trait_semantics;
     pub mod ebi_trait_alignments;
 }
@@ -79,6 +77,7 @@ pub mod techniques {
     pub mod trace_probability;
     pub mod statistical_test;
     pub mod medoid_non_stochastic;
+    pub mod sample;
 }
 mod dottable;
 mod activity_key;
@@ -89,7 +88,6 @@ mod ebi_input_output;
 mod file_handler;
 mod distances;
 mod tests;
-mod sample;
 // mod earth_movers_stochastic_conformance;
 
 use std::sync::atomic::AtomicBool;

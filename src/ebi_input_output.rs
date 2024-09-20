@@ -9,7 +9,7 @@ use crate::{ebi_commands::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_command_
 #[derive(PartialEq,Eq)]
 pub enum EbiInputType {
     Trait(EbiTrait),
-    ObjectType(EbiObjectType),
+    Object(EbiObjectType),
     AnyObject,
     FileHandler,
     String,
@@ -22,7 +22,7 @@ impl EbiInputType {
     pub fn get_article(&self) -> &str {
         match self {
             EbiInputType::Trait(t) => t.get_article(),
-            EbiInputType::ObjectType(o) => o.get_article(),
+            EbiInputType::Object(o) => o.get_article(),
             EbiInputType::AnyObject => "an",
             EbiInputType::String => "a",
             EbiInputType::Usize => "an",
@@ -34,7 +34,7 @@ impl EbiInputType {
     pub fn get_parser_of_list(traits: &[&EbiInputType]) -> ValueParser {
         match traits[0] {
             EbiInputType::Trait(_) => value_parser!(PathBuf),
-            EbiInputType::ObjectType(_) => value_parser!(PathBuf),
+            EbiInputType::Object(_) => value_parser!(PathBuf),
             EbiInputType::AnyObject => value_parser!(PathBuf),
             EbiInputType::String => value_parser!(String).into(),
             EbiInputType::Usize => value_parser!(usize).into(),
@@ -51,7 +51,7 @@ impl EbiInputType {
                 EbiInputType::Trait(t) => {
                     result.extend(Self::show_file_handlers(t.get_file_handlers()));
                 },
-                EbiInputType::ObjectType(o) => {
+                EbiInputType::Object(o) => {
                     result.extend(Self::show_file_handlers(o.get_file_handlers()));
                 },
                 EbiInputType::AnyObject => {
@@ -101,7 +101,7 @@ impl Display for EbiInputType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             EbiInputType::Trait(t) => t.fmt(f),
-            EbiInputType::ObjectType(o) => o.fmt(f),
+            EbiInputType::Object(o) => o.fmt(f),
             EbiInputType::AnyObject => write!(f, "object"),
             EbiInputType::String => write!(f, "text"),
             EbiInputType::Usize => write!(f, "integer"),
@@ -128,7 +128,7 @@ impl EbiInput {
     pub fn get_type(&self) -> EbiInputType {
         match self {
             EbiInput::Trait(t, _) => EbiInputType::Trait(t.get_trait()),
-            EbiInput::Object(o, _) => EbiInputType::ObjectType(o.get_type()),
+            EbiInput::Object(o, _) => EbiInputType::Object(o.get_type()),
             EbiInput::String(_) => EbiInputType::String,
             EbiInput::Usize(_) => EbiInputType::Usize,
             EbiInput::FileHandler(_) => EbiInputType::FileHandler,

@@ -6,7 +6,7 @@ use fraction::ToPrimitive;
 use layout::topo::placer::place;
 use process_mining::{petri_net::petri_net_struct::{self, ArcType}, PetriNet};
 
-use crate::{activity_key::{self, ActivityKey}, dottable::Dottable, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, marking::Marking, net::Transition};
+use crate::{activity_key::{self, ActivityKey}, dottable::Dottable, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics}}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, marking::Marking};
 
 use super::{ebi_object::EbiObject, labelled_petri_net::{LPNMarking, LabelledPetriNet}};
 
@@ -16,7 +16,6 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     file_extension: "pnml",
     validator: PetriNetMarkupLanguage::validate,
     trait_importers: &[
-        EbiTraitImporter::LabelledPetriNet(PetriNetMarkupLanguage::import_as_labelled_petri_net),
         EbiTraitImporter::Semantics(PetriNetMarkupLanguage::import_as_semantics),
     ],
     object_importers: &[
@@ -41,9 +40,9 @@ impl PetriNetMarkupLanguage {
         Ok(())
     }
 
-    pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitLabelledPetriNet>> {
+    pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<LabelledPetriNet> {
         match Self::import(reader) {
-            Ok(pnml) => Ok(Box::new(LabelledPetriNet::try_from(pnml)?)),
+            Ok(pnml) => Ok(LabelledPetriNet::try_from(pnml)?),
             Err(x) => Err(x),
         }
     }
@@ -51,7 +50,7 @@ impl PetriNetMarkupLanguage {
     pub fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
         let pnml = Self::import(reader)?;
         let lpn = LabelledPetriNet::try_from(pnml)?;
-        Ok(EbiTraitSemantics::Marking(lpn.to_semantics()))
+        Ok(EbiTraitSemantics::Marking(Box::new(lpn)))
     }
 }
 
@@ -91,27 +90,25 @@ impl TryFrom<PetriNetMarkupLanguage> for LabelledPetriNet {
     fn try_from(pnml: PetriNetMarkupLanguage) -> std::result::Result<Self, Self::Error> {
         log::info!("Convert PNML into LPN.");
 
-        let mut activity_key = ActivityKey::new();
-        let places = pnml.net.places.len();
+        let mut result = LabelledPetriNet::new();
 
         //create map of places
         let mut place2index = HashMap::new();
-        for (index, (place_id, _)) in pnml.net.places.iter().enumerate() {
-            place2index.insert(place_id, index);
+        for (place_id, _) in pnml.net.places {
+            let place = result.add_place();
+            place2index.insert(place_id, place);
         }
 
         //transitions
-        let mut transitions = vec![];
         let mut transition2index = HashMap::new();
-        for (index, (transition_id, transition)) in pnml.net.transitions.iter().enumerate() {
-            let mut new_transition = match &transition.label {
-                Some(activity) => Transition::new_labelled(index, activity_key.process_activity(activity)),
-                None => Transition::new_silent(index)
+        for (transition_id, transition) in &pnml.net.transitions {
+            let label = match &transition.label {
+                Some(activity) => Some(result.get_activity_key_mut().process_activity(activity)),
+                None => None
             };
+            let mut transition = result.add_transition(label);
 
-            transition2index.insert(transition_id, index);
-
-            transitions.push(new_transition);
+            transition2index.insert(transition_id, transition);
         }
 
         //arcs
@@ -119,54 +116,39 @@ impl TryFrom<PetriNetMarkupLanguage> for LabelledPetriNet {
             match arc.from_to {
                 process_mining::petri_net::petri_net_struct::ArcType::PlaceTransition(place_id, transition_id) => {
                     let new_place = place2index.get(&place_id).ok_or(anyhow!("Undeclared place referenced."))?;
-                    let mut new_transition = transitions.get_mut(*transition2index.get(&transition_id).ok_or(anyhow!("undeclared place referenced"))?).unwrap();
-                    for _ in 0..arc.weight {
-                        new_transition.incoming.push(*new_place);
-                    }
+                    let new_transition = transition2index.get(&transition_id).ok_or(anyhow!("undeclared transition referenced"))?;
+                    result.add_place_transition_arc(*new_place, *new_transition, arc.weight.into());
                 },
                 process_mining::petri_net::petri_net_struct::ArcType::TransitionPlace(transition_id, place_id) => {
                     let new_place = place2index.get(&place_id).ok_or(anyhow!("Undeclared place referenced."))?;
-                    let mut new_transition = transitions.get_mut(*transition2index.get(&transition_id).ok_or(anyhow!("undeclared place referenced"))?).unwrap();
-                    for _ in 0..arc.weight {
-                        new_transition.outgoing.push(*new_place);
-                    }
+                    let new_transition = transition2index.get(&transition_id).ok_or(anyhow!("undeclared transition referenced"))?;
+                    result.add_transition_place_arc(*new_transition, *new_place, arc.weight.into());
                 },
             };
         }
         
         //initial marking
-        let mut new_initial_marking = Marking::new(places);
-        {
-            for (place_id, cardinality) in pnml.net.initial_marking.as_ref().ok_or(anyhow!("The given net has no initial marking. Ebi requires an innitial marking for its Petri nets."))?.iter() {
-                let new_place = place2index.get(&place_id.get_uuid()).ok_or(anyhow!("Undeclared place found."))?;
-                new_initial_marking.increase(*new_place, 1);
-            }
+        for (place_id, cardinality) in pnml.net.initial_marking.as_ref().ok_or(anyhow!("The given net has no initial marking. Ebi requires an innitial marking for its Petri nets."))?.iter() {
+            let new_place = place2index.get(&place_id.get_uuid()).ok_or(anyhow!("Undeclared place found."))?;
+            result.get_initial_marking_mut().increase(*new_place, 1);
         }
-
-        let result = LabelledPetriNet {
-            activity_key: activity_key,
-            places: places,
-            transitions: transitions,
-            initial_marking: new_initial_marking
-        };
 
         //final markings
         if let Some(final_markings) = &pnml.net.final_markings {
             //The nets used by Ebi do not have final markings, as each of their deadlocks is taken as a final marking.
             //The best we can do here is to verify that no non-deadlocks have been declared as final markings.
-            let semantics = result.clone().to_semantics();
             for final_marking in final_markings.iter() {
                 //transform to an Ebi-final marking
-                let mut new_final_marking = Marking::new(places);
+                let mut new_final_marking = Marking::new(result.get_number_of_places());
                 for (place_id, cardinality) in final_marking.iter() {
                     let new_place = place2index.get(&place_id.get_uuid()).ok_or(anyhow!("Undeclared place found."))?;
                     new_final_marking.increase(*new_place, *cardinality);
                 }
 
                 //verify that this is a deadlock marking
-                let mut state = LPNMarking { marking: new_final_marking, enabled_transitions: bitvec![0; result.transitions.len()], number_of_enabled_transitions: 0 };
-                semantics.compute_enabled_transitions(&mut state);
-                if !semantics.is_final_state(&state) {
+                let mut state = LPNMarking { marking: new_final_marking, enabled_transitions: bitvec![0; result.get_number_of_transitions()], number_of_enabled_transitions: 0 };
+                result.compute_enabled_transitions(&mut state);
+                if !result.is_final_state(&state) {
                     return Err(anyhow!("This PNML file has a final marking that is not a deadlock. In Ebi, each final marking must be a deadlock. This final marking is {:?}", final_marking))
                 }
             }
@@ -187,22 +169,25 @@ impl TryFrom<LabelledPetriNet> for PetriNetMarkupLanguage {
         //create places
         let mut place2new_place = HashMap::new();
         {
-            for place in 0..lpn.places {
+            for place in 0..lpn.get_number_of_places() {
                 let new_place = result.add_place(None);
                 place2new_place.insert(place, new_place);
             }
         }
 
         //create transitions
-        for transition in lpn.transitions {
-            let new_transition = result.add_transition(if transition.is_silent() {None} else {Some(lpn.activity_key.get_activity_label(&transition.get_label().unwrap()).to_string())}, None);
+        for transition in 0..lpn.get_number_of_transitions() {
+            let new_transition = result.add_transition(match lpn.get_transition_label(transition) {
+                Some(activity) => Some(lpn.activity_key.get_activity_label(&activity).to_string()),
+                None => None,
+            }, None);
 
             //incoming
             {
                 //transform to a map of places and arc weights
-                let mut map: HashMap<usize, u32> = HashMap::new();
-                for place in transition.incoming {
-                    *map.entry(place).or_insert(0) += 1;
+                let mut map = HashMap::new();
+                for (pos, place) in lpn.transition2input_places[transition].iter().enumerate() {
+                    *map.entry(*place).or_insert(0) += u32::try_from(lpn.transition2input_places_cardinality[transition][pos])?;
                 }
                 
                 //add
@@ -215,9 +200,9 @@ impl TryFrom<LabelledPetriNet> for PetriNetMarkupLanguage {
             //outgoing
             {
                 //transform to a map of places and arc weights
-                let mut map: HashMap<usize, u32> = HashMap::new();
-                for place in transition.outgoing {
-                    *map.entry(place).or_insert(0) += 1;
+                let mut map = HashMap::new();
+                for (pos, place) in lpn.transition2output_places[transition].iter().enumerate() {
+                    *map.entry(*place).or_insert(0) += u32::try_from(lpn.transition2output_places_cardinality[transition][pos])?;
                 }
 
                 //add

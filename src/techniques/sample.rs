@@ -35,7 +35,7 @@ impl Sampler for dyn EbiTraitFiniteStochasticLanguage {
     }
 }
 
-impl <T> Sampler for dyn StochasticSemantics<State = T> where T: Display + Clone + Hash + Eq {
+impl <T, A> Sampler for T where T: StochasticSemantics<State = A> + ?Sized, A: Display + Clone + Hash + Eq {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage> {
         let mut result = HashMap::new();
 

@@ -4,7 +4,7 @@ use clap::{ArgMatches, Command, value_parser, arg};
 use anyhow::{Result, Context, anyhow};
 use process_mining::EventLog;
 
-use crate::{ebi_commands::{ebi_command_analyse::EBI_ANALYSE, ebi_command_discover::EBI_DISCOVER, ebi_command_validate::{self, EBI_VALIDATE}}, ebi_input_output::EbiInputType, ebi_objects::{alignments::Alignments, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_alignments::EbiTraitAlignments, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, ebi_validate, file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}};
+use crate::{ebi_commands::{ebi_command_analyse::EBI_ANALYSE, ebi_command_discover::EBI_DISCOVER, ebi_command_validate::{self, EBI_VALIDATE}}, ebi_input_output::EbiInputType, ebi_objects::{alignments::Alignments, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_alignments::EbiTraitAlignments, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, ebi_validate, file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}};
 
 #[derive(Debug)]
 pub enum EbiTraitImporter {
@@ -16,7 +16,6 @@ pub enum EbiTraitImporter {
     Semantics(fn(&mut dyn BufRead) -> Result<EbiTraitSemantics>), //can walk over states  using transitions, potentially forever
     StochasticSemantics(fn(&mut dyn BufRead) -> Result<EbiTraitStochasticSemantics>), //can walk over states  using transitions, potentially forever
     StochasticDeterministicSemantics(fn(&mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics>), //can walk over states using activities, potentially forever
-    LabelledPetriNet(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitLabelledPetriNet>>), //labelled Petri net
     Alignments(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitAlignments>>) //alignments
 }
 
@@ -31,7 +30,6 @@ impl EbiTraitImporter {
             EbiTraitImporter::Semantics(_) => EbiTrait::Semantics,
             EbiTraitImporter::StochasticSemantics(_) => EbiTrait::StochasticSemantics,
             EbiTraitImporter::StochasticDeterministicSemantics(_) => EbiTrait::StochasticDeterministicSemantics,
-            EbiTraitImporter::LabelledPetriNet(_) => EbiTrait::LabelledPetriNet,
             EbiTraitImporter::Alignments(_) => EbiTrait::Alignments
         }
     }
@@ -46,7 +44,6 @@ impl EbiTraitImporter {
             EbiTraitImporter::Semantics(f) => EbiTraitObject::Semantics((f)(reader)?),
             EbiTraitImporter::StochasticSemantics(f) => EbiTraitObject::StochasticSemantics((f)(reader)?),
             EbiTraitImporter::StochasticDeterministicSemantics(f) => EbiTraitObject::StochasticDeterministicSemantics((f)(reader)?),
-            EbiTraitImporter::LabelledPetriNet(f) => EbiTraitObject::LabelledPetriNet((f)(reader)?),
             EbiTraitImporter::Alignments(f) => EbiTraitObject::Alignments((f)(reader)?),
         })
     }
@@ -193,7 +190,7 @@ pub fn read_as_finite_stochastic_language<X: 'static + Importable + EbiTraitFini
     }
 }
 
-pub fn read_as_queriable_stochastic_language<X: 'static + Importable + EbiTraitQueriableStochasticLanguage> (reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>> {
+pub fn import_as_queriable_stochastic_language<X: 'static + Importable + EbiTraitQueriableStochasticLanguage> (reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>> {
     match X::import(reader) {
         Ok(x) => Ok(Box::new(x)),
         Err(x) => Err(x),
@@ -201,13 +198,6 @@ pub fn read_as_queriable_stochastic_language<X: 'static + Importable + EbiTraitQ
 }
 
 pub fn read_as_iterable_stochastic_language<X: 'static + Importable + EbiTraitIterableStochasticLanguage> (reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>> {
-    match X::import(reader) {
-        Ok(x) => Ok(Box::new(x)),
-        Err(x) => Err(x),
-    }
-}
-
-pub fn read_as_labelled_petri_net<X: 'static + Importable + EbiTraitLabelledPetriNet> (reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitLabelledPetriNet>> {
     match X::import(reader) {
         Ok(x) => Ok(Box::new(x)),
         Err(x) => Err(x),

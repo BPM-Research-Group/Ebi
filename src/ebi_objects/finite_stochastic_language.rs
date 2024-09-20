@@ -17,7 +17,7 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     trait_importers: &[
         EbiTraitImporter::FiniteLanguage(FiniteStochasticLanguage::read_as_finite_language),
         EbiTraitImporter::FiniteStochasticLanguage(import::read_as_finite_stochastic_language::<FiniteStochasticLanguage>),
-        EbiTraitImporter::QueriableStochasticLanguage(import::read_as_queriable_stochastic_language::<FiniteStochasticLanguage>),
+        EbiTraitImporter::QueriableStochasticLanguage(import::import_as_queriable_stochastic_language::<FiniteStochasticLanguage>),
         EbiTraitImporter::IterableStochasticLanguage(import::read_as_iterable_stochastic_language::<FiniteStochasticLanguage>),
         EbiTraitImporter::StochasticSemantics(FiniteStochasticLanguage::import_as_stochastic_semantics),
         EbiTraitImporter::StochasticDeterministicSemantics(FiniteStochasticLanguage::read_as_stochastic_deterministic_semantics),

@@ -60,10 +60,10 @@ pub const EBI_VISUALISE_SVG: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true, 
     input_types: &[ 
         &[
-            &EbiInputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
-            &EbiInputType::ObjectType(EbiObjectType::StochasticDeterministicFiniteAutomaton),
-            &EbiInputType::ObjectType(EbiObjectType::LabelledPetriNet),
-            &EbiInputType::ObjectType(EbiObjectType::DirectlyFollowsModel),
+            &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
+            &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
+            &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
+            &EbiInputType::Object(EbiObjectType::DirectlyFollowsModel),
         ] ], 
     input_names: &[ "FILE" ], 
     input_helps: &[ "Any file that can be visualised as a graph." ], 

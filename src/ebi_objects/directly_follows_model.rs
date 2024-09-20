@@ -1,7 +1,8 @@
 use std::{collections::{HashMap, HashSet}, fmt::Display, io::{self, BufRead}, str::FromStr};
 use anyhow::{anyhow, Context, Result, Error};
 use layout::topo::layout::VisualGraph;
-use crate::{activity_key::{self, Activity, ActivityKey}, dottable::Dottable, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, line_reader::LineReader, marking::Marking, net::Transition};
+use process_mining::petri_net::petri_net_struct::Transition;
+use crate::{activity_key::{self, Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_commands::ebi_command_info::Infoable, ebi_traits::ebi_trait::EbiTrait, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, line_reader::LineReader, marking::Marking};
 
 use super::{ebi_object::EbiObject, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
 
@@ -13,11 +14,11 @@ pub const EBI_DIRCTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     file_extension: "dfm",
     validator: import::validate::<DirectlyFollowsModel>,
     trait_importers: &[
-        EbiTraitImporter::LabelledPetriNet(DirectlyFollowsModel::import_as_labelled_petri_net)
+        
     ],
     object_importers: &[
         EbiObjectImporter::DirectlyFollowsModel(DirectlyFollowsModel::import_as_object),
-        EbiObjectImporter::LabelledPetriNet(DirectlyFollowsModel::import_as_labelled_petri_net_object)
+        EbiObjectImporter::LabelledPetriNet(DirectlyFollowsModel::import_as_labelled_petri_net)
     ],
     object_exporters: &[
         EbiObjectExporter::DirectlyFollowsModel(DirectlyFollowsModel::export_from_object)
@@ -30,11 +31,16 @@ pub struct DirectlyFollowsModel {
 	edges: Vec<Vec<bool>>, //matrix of edges
 	activity_key: ActivityKey,
     node_2_activity: Vec<Activity>,
-    start_activities: HashSet<usize>,
-    end_activities: HashSet<usize>
+    start_nodes: HashSet<usize>,
+    end_nodes: HashSet<usize>
 }
 
 impl DirectlyFollowsModel {
+
+    pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let dfm = Self::import(reader)?;
+        Ok(EbiObject::LabelledPetriNet(dfm.to_labelled_petri_net()))
+    }
 
     pub fn get_number_of_edges(&self) -> usize {
         self.edges.iter().fold(0usize, |a, b| {
@@ -45,58 +51,47 @@ impl DirectlyFollowsModel {
     pub fn get_number_of_nodes(&self) -> usize {
         self.node_2_activity.len()
     }
-
-    pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitLabelledPetriNet>> {
-        let lang = Self::import(reader)?;
-        Ok(Box::new(lang.to_labelled_petri_net()))
-    }
-
-    pub fn import_as_labelled_petri_net_object(reader: &mut dyn BufRead) -> Result<EbiObject> {
-        let dfm = Self::import(reader)?;
-        Ok(EbiObject::LabelledPetriNet(dfm.to_labelled_petri_net()))
-    }
     
     pub fn to_labelled_petri_net(&self) -> LabelledPetriNet {
-        let mut places = 2; //0 = source, 1 = sink
-        let mut transitions = vec![];
+        let mut result = LabelledPetriNet::new();
+        let translator = ActivityKeyTranslator::new(&self.activity_key, &mut result.get_activity_key_mut());
+        let source = result.add_place();
+        let sink = result.add_place();
+        result.get_initial_marking_mut().increase(source, 1);
         
 		/**
 		 * empty traces
 		 */
 		if (self.empty_traces) {
-            let mut transition = Transition::new_silent(0);
-			transition.incoming.push(0);
-            transition.outgoing.push(1);
-            transitions.push(transition);
+            let transition = result.add_transition(None);
+            
+            result.add_place_transition_arc(source, transition, 1);
+            result.add_transition_place_arc(transition, sink, 1);
 		}
 
 		/*
-		 * Activities (states)
+		 * Nodes (states): after doing a node you end up in the corresponding place.
 		 */
-        places += self.node_2_activity.len();
-
-        /**
-         * Initial marking
-         */
-        let mut initial_marking = vec![0u64; places];
-        initial_marking[0] = 1;
+        let mut node2place = vec![];
+        for node in 0..self.get_number_of_nodes() {
+            let place = result.add_place();
+            node2place.push(place);
+        }
 
 		/**
 		 * Transitions
 		 */
-        for source in 0..self.edges.len() {
-            for target in 0..self.edges.len() {
-                if self.edges[source][target] {
-                    let source_place = source + 2;
-                    let target_place = target + 2;
+        for source_node in 0..self.get_number_of_nodes() {
+            for target_node in 0..self.get_number_of_nodes() {
+                if self.edges[source_node][target_node] {
 
-                    let target_activity = self.node_2_activity[target];
-                    let mut transition = Transition::new_labelled(transitions.len(), target_activity);
+                    let from_place = node2place[source_node];
+                    let to_place = node2place[target_node];
+                    let activity = translator.translate_activity(&self.node_2_activity[target_node]);
+                    let transition = result.add_transition(Some(activity));
 
-                    transition.incoming.push(source_place);
-                    transition.outgoing.push(target_place);
-
-                    transitions.push(transition);
+                    result.add_place_transition_arc(from_place, transition, 1);
+                    result.add_transition_place_arc(transition, to_place, 1);
                 }
             }
         }
@@ -104,27 +99,26 @@ impl DirectlyFollowsModel {
 		/**
 		 * Starts
 		 */
-        for start_activity in self.start_activities.iter() {
-            let source_activity = self.node_2_activity[*start_activity];
-            let mut transition = Transition::new_labelled(transitions.len(), source_activity);
-            let target_place = start_activity + 2;
-            transition.incoming.push(0);
-            transition.outgoing.push(target_place);
-            transitions.push(transition);
+        for start_node in self.start_nodes.iter() {
+            let activity = translator.translate_activity(&self.node_2_activity[*start_node]);
+            let transition = result.add_transition(Some(activity));
+            result.add_place_transition_arc(source, transition, 1);
+            let target_place = node2place[*start_node];
+            result.add_transition_place_arc(transition, target_place, 1);
+            
         }
 
 		/**
 		 * Ends
 		*/
-        for end_activity in self.end_activities.iter() {
-            let mut transition = Transition::new_silent(transitions.len());
-            let source_place = end_activity + 2;
-            transition.incoming.push(source_place);
-            transition.outgoing.push(1);
-            transitions.push(transition);
+        for end_node in self.end_nodes.iter() {
+            let transition = result.add_transition(None);
+            let source_place = node2place[transition];
+            result.add_place_transition_arc(source_place, transition, 1);
+            result.add_transition_place_arc(transition, sink, 1);
         }
 
-        LabelledPetriNet::from_fields(self.activity_key.clone(), places, transitions, initial_marking.into())
+        result
     }
 }
 
@@ -155,19 +149,19 @@ impl Importable for DirectlyFollowsModel {
         }
 
         //read start activities
-        let mut start_activities = HashSet::new();
+        let mut start_nodes = HashSet::new();
         let number_of_start_activities = lreader.next_line_index().context("could not read the number of start activities")?;
         for i in 0..number_of_start_activities {
             let start_activity = lreader.next_line_index().with_context(|| format!("could not read start activity {}", i))?;
-            start_activities.insert(start_activity);
+            start_nodes.insert(start_activity);
         }
 
         //read end activities
-        let mut end_activities = HashSet::new();
+        let mut end_nodes = HashSet::new();
         let number_of_end_activities = lreader.next_line_index().context("could not read the number of end activities")?;
         for i in 0..number_of_end_activities {
             let end_activity = lreader.next_line_index().with_context(|| format!("could not read end activity {}", i))?;
-            end_activities.insert(end_activity);
+            end_nodes.insert(end_activity);
         }
 
         //read edges
@@ -190,12 +184,12 @@ impl Importable for DirectlyFollowsModel {
         }
 
         Ok(Self {
-            empty_traces: empty_traces,
-            edges: edges,
-            activity_key: activity_key,
-            node_2_activity: node_2_activity,
-            start_activities: start_activities,
-            end_activities: end_activities
+            empty_traces,
+            edges,
+            activity_key,
+            node_2_activity,
+            start_nodes,
+            end_nodes
         })
     }
 }
@@ -222,14 +216,14 @@ impl Display for DirectlyFollowsModel {
         }
 
         //start activities
-        writeln!(f, "# number of start activites\n{}", self.start_activities.len())?;
-        for (i, start_activity) in self.start_activities.iter().enumerate() {
+        writeln!(f, "# number of start activites\n{}", self.start_nodes.len())?;
+        for (i, start_activity) in self.start_nodes.iter().enumerate() {
             writeln!(f, "# start activity {}\n{}", i, start_activity)?;
         }
 
         //end activities
-        writeln!(f, "# number of end activites\n{}", self.end_activities.len())?;
-        for (i, end_activity) in self.end_activities.iter().enumerate() {
+        writeln!(f, "# number of end activites\n{}", self.end_nodes.len())?;
+        for (i, end_activity) in self.end_nodes.iter().enumerate() {
             writeln!(f, "# end activity {}\n{}", i, end_activity)?;
         }
 
@@ -267,12 +261,12 @@ impl Dottable for DirectlyFollowsModel {
         }
 
         //start activities
-        for start_activity in self.start_activities.iter() {
+        for start_activity in self.start_nodes.iter() {
             <dyn Dottable>::create_edge(&mut graph, &source, &nodes[*start_activity], "");
         }
 
         //end activities
-        for end_activity in self.end_activities.iter() {
+        for end_activity in self.end_nodes.iter() {
             <dyn Dottable>::create_edge(&mut graph, &nodes[*end_activity], &sink, "");
         }
 

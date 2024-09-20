@@ -27,19 +27,19 @@ pub const EBI_CONVERT_LPN: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true, 
     input_types: &[ 
         &[
-            &EbiInputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
-            &EbiInputType::ObjectType(EbiObjectType::StochasticDeterministicFiniteAutomaton),
-            &EbiInputType::ObjectType(EbiObjectType::LabelledPetriNet),
-            &EbiInputType::ObjectType(EbiObjectType::DirectlyFollowsModel),
+            &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
+            &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
+            &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
+            &EbiInputType::Object(EbiObjectType::DirectlyFollowsModel),
         ] ], 
     input_names: &[ "FILE" ], 
     input_helps: &[ "Any file supported by Ebi that can be converted." ], 
     execute: |mut inputs, _| {
         let lpn = match inputs.remove(0) {
             EbiInput::Object(EbiObject::DirectlyFollowsModel(dfm), _) => dfm.to_labelled_petri_net(),
-            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => slpn.to_labelled_petri_net(),
+            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => slpn.into(),
             EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn,
-            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => sdfa.to_stochastic_labelled_petri_net().to_labelled_petri_net(),
+            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => sdfa.to_stochastic_labelled_petri_net().into(),
             _ => unreachable!()
         };
         Ok(EbiOutput::Object(EbiObject::LabelledPetriNet(lpn)))
@@ -57,8 +57,8 @@ pub const EBI_CONVERT_SLANG: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true, 
     input_types: &[ 
         &[
-            &EbiInputType::ObjectType(EbiObjectType::EventLog),
-            &EbiInputType::ObjectType(EbiObjectType::FiniteStochasticLanguage),
+            &EbiInputType::Object(EbiObjectType::EventLog),
+            &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage),
         ] ], 
     input_names: &[ "FILE" ], 
     input_helps: &[ "Any file supported by Ebi that can be converted." ], 
@@ -83,9 +83,9 @@ pub const EBI_CONVERT_SDFA: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true, 
     input_types: &[ 
         &[
-            &EbiInputType::ObjectType(EbiObjectType::EventLog),
-            &EbiInputType::ObjectType(EbiObjectType::FiniteStochasticLanguage),
-            &EbiInputType::ObjectType(EbiObjectType::StochasticDeterministicFiniteAutomaton),
+            &EbiInputType::Object(EbiObjectType::EventLog),
+            &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage),
+            &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
         ] ], 
     input_names: &[ "FILE" ], 
     input_helps: &[ "Any file supported by Ebi that can be converted." ], 

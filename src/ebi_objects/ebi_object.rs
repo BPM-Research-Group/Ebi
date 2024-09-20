@@ -3,7 +3,7 @@ use anyhow::{anyhow, Error, Result};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::{ebi_commands::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_command_info::Infoable}, ebi_input_output::EbiInputType, ebi_objects::{compressed_event_log::EBI_COMPRESSED_EVENT_LOG, event_log::{EventLog, EBI_EVENT_LOG}, finite_language::{FiniteLanguage, EBI_FINITE_LANGUAGE}, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}, stochastic_deterministic_finite_automaton::{StochasticDeterministicFiniteAutomaton, EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON}, stochastic_labelled_petri_net::{StochasticLabelledPetriNet, EBI_STOCHASTIC_LABELLED_PETRI_NET}}, ebi_traits::{ebi_trait::{EbiTrait, FromEbiTraitObject}, ebi_trait_alignments::EbiTraitAlignments, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, export::Exportable, file_handler::{self, EbiFileHandler, EBI_FILE_HANDLERS}, import::EbiTraitImporter, math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot}};
+use crate::{ebi_commands::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_command_info::Infoable}, ebi_input_output::EbiInputType, ebi_objects::{compressed_event_log::EBI_COMPRESSED_EVENT_LOG, event_log::{EventLog, EBI_EVENT_LOG}, finite_language::{FiniteLanguage, EBI_FINITE_LANGUAGE}, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}, stochastic_deterministic_finite_automaton::{StochasticDeterministicFiniteAutomaton, EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON}, stochastic_labelled_petri_net::{StochasticLabelledPetriNet, EBI_STOCHASTIC_LABELLED_PETRI_NET}}, ebi_traits::{ebi_trait::{EbiTrait, FromEbiTraitObject}, ebi_trait_alignments::EbiTraitAlignments, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, export::Exportable, file_handler::{self, EbiFileHandler, EBI_FILE_HANDLERS}, import::EbiTraitImporter, math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot}};
 
 use super::{alignments::Alignments, directly_follows_model::{DirectlyFollowsModel, EBI_DIRCTLY_FOLLOWS_MODEL}};
 
@@ -40,7 +40,7 @@ impl EbiObjectType {
             if let EbiCommand::Command { name_short, name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types, input_names, input_helps, execute, output } = path[path.len() - 1] {
                 for input_typess in input_types.iter() {
                     for input_typesss in input_typess.iter() {
-                        if input_typesss == &&EbiInputType::AnyObject || input_typesss == &&EbiInputType::ObjectType(self.clone()) {
+                        if input_typesss == &&EbiInputType::AnyObject || input_typesss == &&EbiInputType::Object(self.clone()) {
                             return true;
                         }
                     }
@@ -147,7 +147,6 @@ pub enum EbiTraitObject {
     QueriableStochasticLanguage(Box<dyn EbiTraitQueriableStochasticLanguage>),
     StochasticDeterministicSemantics(EbiTraitStochasticDeterministicSemantics),
     StochasticSemantics(EbiTraitStochasticSemantics),
-    LabelledPetriNet(Box<dyn EbiTraitLabelledPetriNet>),
     Semantics(EbiTraitSemantics),
     Alignments(Box<dyn EbiTraitAlignments>),
 }
@@ -163,7 +162,6 @@ impl EbiTraitObject {
             EbiTraitObject::QueriableStochasticLanguage(_) => EbiTrait::QueriableStochasticLanguage,
             EbiTraitObject::StochasticDeterministicSemantics(_) => EbiTrait::StochasticDeterministicSemantics,
             EbiTraitObject::StochasticSemantics(_) => EbiTrait::StochasticSemantics,
-            EbiTraitObject::LabelledPetriNet(_) => EbiTrait::LabelledPetriNet,
             EbiTraitObject::Semantics(_) => EbiTrait::Semantics,
             EbiTraitObject::Alignments(alignments) => todo!(),
         }

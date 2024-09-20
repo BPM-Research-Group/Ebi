@@ -29,7 +29,7 @@ struct Y {
     outgoing_state_probabilities: Vec<Fraction>
 }
 
-impl <A: Eq + Hash + Clone + Display> EbiTraitQueriableStochasticLanguage for dyn StochasticSemantics<State = A> {
+impl <T, A> EbiTraitQueriableStochasticLanguage for T where T: StochasticSemantics<State = A>, A: Eq + Hash + Clone + Display {
     fn get_activity_key(&self) -> &crate::activity_key::ActivityKey {
         self.get_activity_key()
     }
@@ -92,7 +92,7 @@ impl <A: Eq + Hash + Clone + Display> EbiTraitQueriableStochasticLanguage for dy
                         //silent transition; only A takes a step
                         let new_state_b = state_ab.state_b.clone();
                         
-                        self.process_new_state(&mut z, &mut y, &total_weight, transition, &state_a, new_state_a, new_state_b);
+                        process_new_state(self, &mut z, &mut y, &total_weight, transition, &state_a, new_state_a, new_state_b);
                     } else {
                         //labelled transition; both A and B need to take steps
                         if follower_b.is_final_state(&state_ab.state_b) {
@@ -103,7 +103,7 @@ impl <A: Eq + Hash + Clone + Display> EbiTraitQueriableStochasticLanguage for dy
                         } else {
                             let new_state_b = follower_b.take_step(&state_ab.state_b, &self.get_transition_activity(transition).unwrap());
                             if new_state_b.is_some() {
-                                self.process_new_state(&mut z, &mut y, &total_weight, transition, &state_a, new_state_a, new_state_b.unwrap());
+                                process_new_state(self, &mut z, &mut y, &total_weight, transition, &state_a, new_state_a, new_state_b.unwrap());
                             } else {
                                 //dead state
                                 y.outgoing_states.push(dead_state_a);
@@ -122,30 +122,28 @@ impl <A: Eq + Hash + Clone + Display> EbiTraitQueriableStochasticLanguage for dy
     }
 }
 
-impl <A: Eq + Hash + Clone + Display> dyn StochasticSemantics<State = A> {
-    fn process_new_state(&self, 
-            z: &mut Z<A>,
-            y: &mut Y, 
-            total_weight: &Fraction, 
-            transition: usize, 
-            state_a: &A,
-            new_state_a: A, 
-            new_state_b: usize) {
-        let new_state_ab = ABState::<A>{state_a: new_state_a, state_b: new_state_b};
-        let new_state_indexx = z.seen.get(&new_state_ab);
-        let new_state_index: usize;
-        if new_state_indexx.is_some() {
-            new_state_index = *new_state_indexx.unwrap();
-        } else {
-            //newStateAB was not encountered before
-            let new_state_ab_rc = Rc::new(new_state_ab);
-            z.worklist.push(new_state_ab_rc.clone());
-            z.seen.insert(new_state_ab_rc, z.state_counter);
-            new_state_index = z.state_counter.clone();
-            z.state_counter += 1;
-        }
-
-        y.outgoing_states.push(new_state_index);
-        y.outgoing_state_probabilities.push(self.get_transition_weight(&state_a, transition) / total_weight);
+fn process_new_state<T: StochasticSemantics<State = A>, A: Eq + Hash + Clone + Display>(semantics: &T, 
+        z: &mut Z<A>,
+        y: &mut Y, 
+        total_weight: &Fraction, 
+        transition: usize, 
+        state_a: &A,
+        new_state_a: A, 
+        new_state_b: usize) {
+    let new_state_ab = ABState::<A>{state_a: new_state_a, state_b: new_state_b};
+    let new_state_indexx = z.seen.get(&new_state_ab);
+    let new_state_index: usize;
+    if new_state_indexx.is_some() {
+        new_state_index = *new_state_indexx.unwrap();
+    } else {
+        //newStateAB was not encountered before
+        let new_state_ab_rc = Rc::new(new_state_ab);
+        z.worklist.push(new_state_ab_rc.clone());
+        z.seen.insert(new_state_ab_rc, z.state_counter);
+        new_state_index = z.state_counter.clone();
+        z.state_counter += 1;
     }
+
+    y.outgoing_states.push(new_state_index);
+    y.outgoing_state_probabilities.push(semantics.get_transition_weight(&state_a, transition) / total_weight);
 }

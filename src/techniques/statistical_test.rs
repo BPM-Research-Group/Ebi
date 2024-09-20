@@ -6,7 +6,7 @@ use fraction::{One, Zero};
 use indicatif::ProgressBar;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
-use crate::{distances::{self, TriangularDistanceMatrix}, ebi_commands::{ebi_command::EbiCommand, ebi_command_info::Infoable}, ebi_traits::ebi_trait_event_log::{AttributeKey, EbiTraitEventLog}, math::{average::{Average, MatchedDistances}, fraction::Fraction, fraction_matched::FractionMatched}, sample};
+use crate::{distances::{self, TriangularDistanceMatrix}, ebi_commands::{ebi_command::EbiCommand, ebi_command_info::Infoable}, ebi_traits::ebi_trait_event_log::{AttributeKey, EbiTraitEventLog}, math::{average::{Average, MatchedDistances}, fraction::Fraction, fraction_matched::FractionMatched}, techniques::sample};
 
 pub trait StatisticalTests {
     /**

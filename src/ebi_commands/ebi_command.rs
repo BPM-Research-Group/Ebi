@@ -284,7 +284,7 @@ impl EbiCommand {
                         Err(e) => error = Some(e)
                     }
                 },
-                EbiInputType::ObjectType(etype) => {
+                EbiInputType::Object(etype) => {
                     
                     //try to parse a specific object
                     match import::get_reader(cli_matches, cli_id).context("Getting reader.") {

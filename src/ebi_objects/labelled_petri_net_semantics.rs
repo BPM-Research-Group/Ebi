@@ -4,76 +4,15 @@ use bitvec::{bitvec, vec::BitVec, prelude::Lsb0};
 use anyhow::{anyhow, Context};
 use fraction::Zero;
 
-use crate::{activity_key::{self, Activity, ActivityKey}, ebi_objects::{labelled_petri_net::LPNMarking, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_labelled_petri_net::EbiTraitLabelledPetriNet, ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, export::Displayable, marking::Marking, math::fraction::Fraction, net::{Net, StochasticNet}};
+use crate::{activity_key::{self, Activity, ActivityKey}, ebi_objects::{labelled_petri_net::LPNMarking, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, export::Displayable, marking::Marking, math::fraction::Fraction};
 
-#[derive(Clone, Debug)]
-pub struct LabelledPetriNetSemantics {
-    activity_key: ActivityKey, //needs to be cloned to satisfy the borrow checker
-    initial_marking: Marking,
-    labels: Vec<Option<Activity>>,
-    input_places:  Vec<Vec<usize>>, //hashmaps would be more safe here, but that's a lot of overhead
-	output_places: Vec<Vec<usize>>,
-    input_places_weights: Vec<Vec<u64>>,
-    output_places_weights: Vec<Vec<u64>>,
-	input_transitions: Vec<Vec<usize>>,
-	output_transitions: Vec<Vec<usize>>
-}
+use super::labelled_petri_net::LabelledPetriNet;
 
-impl LabelledPetriNetSemantics {
-    
-    pub fn from_lpn(net: Box<dyn EbiTraitLabelledPetriNet>) -> LabelledPetriNetSemantics {
-
-        let transitions = net.get_number_of_transitions();
-        let places: usize = net.get_number_of_places();
-        let activity_key = net.get_activity_key().clone();
-        let mut result = LabelledPetriNetSemantics {
-            activity_key: activity_key,
-            initial_marking: net.get_initial_marking().clone(),
-            labels: vec![],
-            input_places: vec![vec![]; transitions],
-            output_places: vec![vec![]; transitions],
-            input_places_weights: vec![vec![]; transitions],
-            output_places_weights: vec![vec![]; transitions],
-            input_transitions: vec![vec![]; places],
-            output_transitions: vec![vec![]; places]
-        };
-
-        for transition in net.get_transitions() {
-            result.labels.push(transition.get_label());
-
-            for place in &transition.incoming {
-                result.output_transitions[*place].push(transition.index);
-                
-                if let Some(pos) = result.input_places[transition.index].iter().position(|p| p == place) {
-                    result.input_places_weights[transition.index][pos] += 1;
-                } else {
-                    result.input_places[transition.index].push(*place);
-                    result.input_places_weights[transition.index].push(1);
-                }
-
-            }
-            for place in &transition.outgoing {
-                result.input_transitions[*place].push(transition.index);
-
-                if let Some(pos) = result.output_places[transition.index].iter().position(|p| p == place) {
-                    result.output_places_weights[transition.index][pos] += 1;
-                } else {
-                    result.output_places[transition.index].push(*place);
-                    result.output_places_weights[transition.index].push(1);
-                }
-            }
-        }
-        
-        result
-    }
-
-    fn get_number_of_transitions(&self) -> usize {
-        self.output_places.len()
-    }
+impl LabelledPetriNet{
 
 	fn compute_enabled_transition(&self, state: &mut LPNMarking, transition: TransitionIndex) -> bool {
-		for (in_place_pos, in_place) in self.input_places[transition].iter().enumerate() {
-			if state.marking.place2token[*in_place] < self.input_places_weights[transition][in_place_pos] {
+		for (in_place_pos, in_place) in self.transition2input_places[transition].iter().enumerate() {
+			if state.marking.place2token[*in_place] < self.transition2input_places_cardinality[transition][in_place_pos] {
 				if state.enabled_transitions[transition] {
 					state.enabled_transitions.set(transition, false);
 					state.number_of_enabled_transitions -= 1;
@@ -100,7 +39,7 @@ impl LabelledPetriNetSemantics {
 
 }
 
-impl Semantics for LabelledPetriNetSemantics {
+impl Semantics for LabelledPetriNet {
 	type State = LPNMarking;
 
     fn get_activity_key(&self) -> &ActivityKey {
@@ -127,22 +66,22 @@ impl Semantics for LabelledPetriNetSemantics {
     }
 
 	fn execute_transition(&self, state: &mut LPNMarking, transition: TransitionIndex) -> anyhow::Result<()>{
-		for (place_pos, place) in self.input_places[transition].iter().enumerate() {
-            let arc_weight = self.input_places_weights[transition][place_pos];
+		for (place_pos, place) in self.transition2input_places[transition].iter().enumerate() {
+            let arc_weight = self.transition2input_places_cardinality[transition][place_pos];
 			state.marking.decrease(*place, arc_weight).with_context(|| format!("transition {} is not enabled", transition))?;
 
 			//update the enabled transitions; some transitions might be disabled by this execution
-			for transition_t in &self.output_transitions[*place]  {
+			for transition_t in &self.place2output_transitions[*place]  {
 				self.compute_enabled_transition(state, *transition_t);
 			}
 		}
 
-		for (place_pos, place) in self.output_places[transition].iter().enumerate() {
-            let arc_weight = self.output_places_weights[transition][place_pos];
+		for (place_pos, place) in self.transition2output_places[transition].iter().enumerate() {
+            let arc_weight = self.transition2output_places_cardinality[transition][place_pos];
 			state.marking.increase(*place, arc_weight).with_context(|| format!("when firing transition {}", transition))?;
 
 			//update the enabled transitions; some transitions might be enabled by this execution
-            for transition_t in &self.output_transitions[*place]  {
+            for transition_t in &self.place2output_transitions[*place]  {
 				self.compute_enabled_transition(state, *transition_t);
 			}
 		}

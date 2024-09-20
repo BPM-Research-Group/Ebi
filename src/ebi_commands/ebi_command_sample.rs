@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use crate::{ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::{ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, finite_stochastic_language::FiniteStochasticLanguage}, ebi_traits::ebi_trait::EbiTrait, export::{EbiOutput, EbiOutputType}, sample::Sampler};
+use crate::{ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::{ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, finite_stochastic_language::FiniteStochasticLanguage}, ebi_traits::ebi_trait::EbiTrait, export::{EbiOutput, EbiOutputType}, techniques::sample::Sampler};
 
 use super::ebi_command::EbiCommand;
 
