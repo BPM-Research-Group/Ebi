@@ -1,4 +1,4 @@
-use crate::{activity_key::{self, Activity, ActivityKey}, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, line_reader::LineReader, ActivityTrace, Trace};
+use crate::{activity_key::{self, Activity, ActivityKey}, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, line_reader::LineReader, ActivityTrace, Trace};
 use anyhow::{anyhow, Result, Context, Error};
 use std::{collections::{hash_set::Iter, HashSet}, fmt::Display, io::{self, BufRead}, str::FromStr};
 
@@ -12,7 +12,7 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     file_extension: "lang",
     validator: import::validate::<FiniteLanguage>,
     trait_importers: &[
-        EbiTraitImporter::FiniteLanguage(import::read_as_finite_language::<FiniteLanguage>),
+        EbiTraitImporter::FiniteLanguage(ebi_trait_finite_language::import::<FiniteLanguage>),
     ],
     object_importers: &[
         EbiObjectImporter::FiniteLanguage(FiniteLanguage::import_as_object),

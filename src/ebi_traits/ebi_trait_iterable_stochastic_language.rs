@@ -1,8 +1,8 @@
-use std::collections::hash_map::Iter;
+use std::{collections::hash_map::Iter, io::BufRead};
 
 use anyhow::{anyhow, Result};
 
-use crate::{activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::ebi_object::EbiTraitObject, math::fraction::Fraction, ActivityTrace, Trace};
+use crate::{activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::ebi_object::EbiTraitObject, import::Importable, math::fraction::Fraction, ActivityTrace, Trace};
 
 use super::ebi_trait::FromEbiTraitObject;
 
@@ -18,5 +18,12 @@ impl FromEbiTraitObject for dyn EbiTraitIterableStochasticLanguage {
             EbiInput::Trait(EbiTraitObject::IterableStochasticLanguage(e), _) => Ok(e),
             _ => Err(anyhow!("Cannot read {} {} as an iterable stochastic language.", object.get_type().get_article(), object.get_type()))
         }
+    }
+}
+
+pub fn import<X: 'static + Importable + EbiTraitIterableStochasticLanguage> (reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>> {
+    match X::import(reader) {
+        Ok(x) => Ok(Box::new(x)),
+        Err(x) => Err(x),
     }
 }

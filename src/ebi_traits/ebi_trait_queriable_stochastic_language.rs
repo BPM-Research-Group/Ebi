@@ -1,4 +1,6 @@
-use crate::{activity_key::ActivityKey, ebi_input_output::EbiInput, ebi_objects::{ebi_object::EbiTraitObject, finite_stochastic_language::FiniteStochasticLanguage}, follower_semantics::FollowerSemantics, math::fraction::Fraction};
+use std::io::BufRead;
+
+use crate::{activity_key::ActivityKey, ebi_input_output::EbiInput, ebi_objects::{ebi_object::EbiTraitObject, finite_stochastic_language::FiniteStochasticLanguage}, follower_semantics::FollowerSemantics, import::Importable, math::fraction::Fraction};
 use anyhow::{anyhow, Result};
 
 use super::ebi_trait::FromEbiTraitObject;
@@ -17,5 +19,12 @@ impl FromEbiTraitObject for dyn EbiTraitQueriableStochasticLanguage {
             EbiInput::Trait(EbiTraitObject::QueriableStochasticLanguage(e), _) => Ok(e),
             _ => Err(anyhow!("cannot read {} {} as a queriable stochastic language", object.get_type().get_article(), object.get_type()))
         }
+    }
+}
+
+pub fn import<X: 'static + Importable + EbiTraitQueriableStochasticLanguage> (reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>> {
+    match X::import(reader) {
+        Ok(x) => Ok(Box::new(x)),
+        Err(x) => Err(x),
     }
 }

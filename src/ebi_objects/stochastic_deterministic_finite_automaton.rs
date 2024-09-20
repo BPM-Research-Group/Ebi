@@ -6,7 +6,7 @@ use rand::{thread_rng,Rng};
 use fraction::{BigUint, GenericFraction, One, Zero};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
-use crate::{activity_key::{self, Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, TransitionIndex}}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, follower_semantics::FollowerSemantics, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, marking::Marking, math::fraction::Fraction, Trace};
+use crate::{activity_key::{self, Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, TransitionIndex}}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, follower_semantics::FollowerSemantics, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, marking::Marking, math::fraction::Fraction, Trace};
 
 use super::{ebi_object::EbiObject, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
 
@@ -16,7 +16,7 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
     file_extension: "sdfa",
     validator: import::validate::<StochasticDeterministicFiniteAutomaton>,
     trait_importers: &[
-        EbiTraitImporter::QueriableStochasticLanguage(import::import_as_queriable_stochastic_language::<StochasticDeterministicFiniteAutomaton>),
+        EbiTraitImporter::QueriableStochasticLanguage(ebi_trait_queriable_stochastic_language::import::<StochasticDeterministicFiniteAutomaton>),
         EbiTraitImporter::StochasticDeterministicSemantics(StochasticDeterministicFiniteAutomaton::import_as_stochastic_deterministic_semantics),
         EbiTraitImporter::StochasticSemantics(StochasticDeterministicFiniteAutomaton::import_as_stochastic_semantics),
         EbiTraitImporter::Semantics(StochasticDeterministicFiniteAutomaton::import_as_semantics),

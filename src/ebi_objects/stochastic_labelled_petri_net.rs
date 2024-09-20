@@ -11,7 +11,7 @@ use bitvec::{bitvec, vec::BitVec, prelude::Lsb0};
 use crate::activity_key::Activity;
 use crate::ebi_commands::ebi_command_info::Infoable;
 use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics};
-use crate::ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage;
+use crate::ebi_traits::ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage};
 use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics;
 use crate::ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, ToStochasticSemantics, TransitionIndex};
 use crate::export::{EbiObjectExporter, EbiOutput, Exportable};
@@ -32,7 +32,7 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     file_extension: "slpn",
     validator: import::validate::<StochasticLabelledPetriNet>,
     trait_importers: &[
-        EbiTraitImporter::QueriableStochasticLanguage(import::import_as_queriable_stochastic_language::<StochasticLabelledPetriNet>),
+        EbiTraitImporter::QueriableStochasticLanguage(ebi_trait_queriable_stochastic_language::import::<StochasticLabelledPetriNet>),
         EbiTraitImporter::StochasticSemantics(StochasticLabelledPetriNet::import_as_stochastic_semantics),
         EbiTraitImporter::StochasticDeterministicSemantics(StochasticLabelledPetriNet::import_as_deterministic_stochastic_semantics),
         EbiTraitImporter::Semantics(StochasticLabelledPetriNet::import_as_semantics),

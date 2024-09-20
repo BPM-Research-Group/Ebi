@@ -1,6 +1,8 @@
+use std::io::BufRead;
+
 use anyhow::{anyhow, Result};
 
-use crate::{activity_key::Activity, ebi_input_output::EbiInput, ebi_objects::{ebi_object::EbiTraitObject, finite_stochastic_language::FiniteStochasticLanguage}, math::fraction::Fraction, Trace};
+use crate::{activity_key::Activity, ebi_input_output::EbiInput, ebi_objects::{ebi_object::EbiTraitObject, finite_stochastic_language::FiniteStochasticLanguage}, import::Importable, math::fraction::Fraction, Trace};
 
 use super::{ebi_trait::FromEbiTraitObject, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage};
 
@@ -16,5 +18,12 @@ impl FromEbiTraitObject for dyn EbiTraitFiniteStochasticLanguage {
             EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(e), _) => Ok(e),
             _ => Err(anyhow!("cannot read {} {} as a finite stochastic language", object.get_type().get_article(), object.get_type()))
         }
+    }
+}
+
+pub fn import<X: 'static + Importable + EbiTraitFiniteStochasticLanguage> (reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>> {
+    match X::import(reader) {
+        Ok(x) => Ok(Box::new(x)),
+        Err(x) => Err(x),
     }
 }
