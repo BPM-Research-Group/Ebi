@@ -1,9 +1,7 @@
 use std::io::BufRead;
-
-use crate::{activity_key::ActivityKey, ebi_input_output::EbiInput, ebi_objects::{ebi_object::EbiTraitObject, finite_stochastic_language::FiniteStochasticLanguage}, follower_semantics::FollowerSemantics, import::Importable, math::fraction::Fraction};
 use anyhow::{anyhow, Result};
 
-use super::ebi_trait::FromEbiTraitObject;
+use crate::{ebi_framework::{activity_key::ActivityKey, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, follower_semantics::FollowerSemantics, math::fraction::Fraction};
 
 pub trait EbiTraitQueriableStochasticLanguage {
     fn get_activity_key(&self) -> &ActivityKey;

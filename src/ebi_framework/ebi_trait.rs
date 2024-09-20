@@ -1,9 +1,8 @@
-use std::{collections::{BTreeSet, HashSet}, fmt::{Debug, Display}, path::PathBuf};
+use std::{collections::{BTreeSet, HashSet}, fmt::{Debug, Display}};
 use anyhow::{anyhow, Result};
-use clap::{builder::ValueParser, value_parser};
 use strum_macros::EnumIter;
 
-use crate::{ebi_commands::ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::ebi_object::{EbiObjectType, EbiTraitObject}, file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, math::fraction::Fraction};
+use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_input::{EbiInput, EbiInputType}};
 
 #[derive(Clone, Copy, PartialEq, Eq, EnumIter, Hash)]
 pub enum EbiTrait {
@@ -58,7 +57,7 @@ impl EbiTrait {
     pub fn get_applicable_commands(&self) -> BTreeSet<Vec<&'static EbiCommand>> {
         let mut result = EBI_COMMANDS.get_command_paths();
         result.retain(|path| {
-            if let EbiCommand::Command { name_short, name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types, input_names, input_helps, execute, output } = path[path.len() - 1] {
+            if let EbiCommand::Command { input_types, .. } = path[path.len() - 1] {
                 for input_typess in input_types.iter() {
                     for input_typesss in input_typess.iter() {
                         if input_typesss == &&EbiInputType::Trait(self.clone()) {

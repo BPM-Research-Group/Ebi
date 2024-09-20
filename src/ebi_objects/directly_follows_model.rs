@@ -1,10 +1,10 @@
-use std::{collections::{HashMap, HashSet}, fmt::Display, io::{self, BufRead}, str::FromStr};
+use std::{collections::HashSet, fmt::Display, io::{self, BufRead, Write}, str::FromStr};
 use anyhow::{anyhow, Context, Result, Error};
 use layout::topo::layout::VisualGraph;
-use process_mining::petri_net::petri_net_struct::Transition;
-use crate::{activity_key::{self, Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_commands::ebi_command_info::Infoable, ebi_traits::ebi_trait::EbiTrait, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, line_reader::LineReader, marking::Marking};
 
-use super::{ebi_object::EbiObject, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, line_reader::LineReader};
+
+use super::labelled_petri_net::LabelledPetriNet;
 
 pub const HEADER: &str = "directly follows model";
 
@@ -12,7 +12,7 @@ pub const EBI_DIRCTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "directly follows model",
     article: "a",
     file_extension: "dfm",
-    validator: import::validate::<DirectlyFollowsModel>,
+    validator: ebi_input::validate::<DirectlyFollowsModel>,
     trait_importers: &[
         
     ],
@@ -54,15 +54,15 @@ impl DirectlyFollowsModel {
     
     pub fn to_labelled_petri_net(&self) -> LabelledPetriNet {
         let mut result = LabelledPetriNet::new();
-        let translator = ActivityKeyTranslator::new(&self.activity_key, &mut result.get_activity_key_mut());
+        let translator = ActivityKeyTranslator::new(&self.activity_key, result.get_activity_key_mut());
         let source = result.add_place();
         let sink = result.add_place();
         result.get_initial_marking_mut().increase(source, 1);
         
-		/**
+		/*
 		 * empty traces
 		 */
-		if (self.empty_traces) {
+		if self.empty_traces {
             let transition = result.add_transition(None);
             
             result.add_place_transition_arc(source, transition, 1);
@@ -78,7 +78,7 @@ impl DirectlyFollowsModel {
             node2place.push(place);
         }
 
-		/**
+		/*
 		 * Transitions
 		 */
         for source_node in 0..self.get_number_of_nodes() {
@@ -96,7 +96,7 @@ impl DirectlyFollowsModel {
             }
         }
 
-		/**
+		/*
 		 * Starts
 		 */
         for start_node in self.start_nodes.iter() {
@@ -108,7 +108,7 @@ impl DirectlyFollowsModel {
             
         }
 
-		/**
+		/*
 		 * Ends
 		*/
         for end_node in self.end_nodes.iter() {
@@ -123,7 +123,7 @@ impl DirectlyFollowsModel {
 }
 
 impl Importable for DirectlyFollowsModel {
-    fn import_as_object(reader: &mut dyn std::io::prelude::BufRead) -> anyhow::Result<super::ebi_object::EbiObject> {
+    fn import_as_object(reader: &mut dyn std::io::prelude::BufRead) -> Result<EbiObject> {
         Ok(EbiObject::DirectlyFollowsModel(Self::import(reader)?))
     }
 
@@ -284,7 +284,7 @@ impl Dottable for DirectlyFollowsModel {
 }
 
 impl Exportable for DirectlyFollowsModel {
-    fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+    fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => Self::export(&dfm, f),
             _ => unreachable!()

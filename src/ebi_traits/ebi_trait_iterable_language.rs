@@ -1,12 +1,12 @@
 use anyhow::{anyhow, Result};
-use crate::{activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::ebi_object::EbiTraitObject, ActivityTrace};
 
-use super::ebi_trait::FromEbiTraitObject;
+use crate::ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject};
+
 
 pub trait EbiTraitIterableLanguage {
     fn get_activity_key(&self) -> &ActivityKey;
 
-    fn iter(&self) -> Box<dyn Iterator<Item = &ActivityTrace> + '_>;
+    fn iter(&self) -> Box<dyn Iterator<Item = &Vec<Activity>> + '_>;
 }
 
 impl FromEbiTraitObject for dyn EbiTraitIterableLanguage {

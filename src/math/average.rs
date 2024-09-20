@@ -1,6 +1,6 @@
 use std::{borrow::Borrow, sync::Arc, fmt::Debug};
 use anyhow::{anyhow, Result};
-use fraction::{BigUint, GenericFraction, Ratio, Sign, Zero};
+use fraction::{BigUint, GenericFraction, Ratio, Sign};
 
 use crate::distances::TriangularDistanceMatrix;
 

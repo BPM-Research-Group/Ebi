@@ -1,7 +1,7 @@
 use std::{fmt::Display, mem, ops::{AddAssign, Neg}};
 
 use anyhow::{anyhow, Error, Result};
-use fraction::{BigFraction, BigUint, GenericFraction, Integer, One, Sign, Zero};
+use fraction::{BigFraction, BigUint, Integer, One, Sign, Zero};
 
 use super::fraction::{Fraction, APPROX_DIGITS};
 

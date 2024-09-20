@@ -1,11 +1,6 @@
-use std::{io::{self, IsTerminal}, path::PathBuf};
+use anyhow::Context;
 
-use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
-use anyhow::{anyhow, Context, Result};
-use process_mining::event_log::stream_xes::Mode;
-use crate::{ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, export::{EbiOutput, EbiOutputType}, math::fraction::{Fraction, FractionNotParsedYet}, medoid, techniques::{completeness::{self, Completeness}, probabilistic_queries::FiniteStochasticLanguageAnalyser}};
-
-use super::ebi_command::EbiCommand;
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::fraction::Fraction, medoid, techniques::{completeness::Completeness, probabilistic_queries::FiniteStochasticLanguageAnalyser}};
 
 pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
     name_short: "ana",
@@ -49,10 +44,10 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
         };
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
 
-        let semantics = objects.remove(0).to_type::<EbiTraitStochasticDeterministicSemantics>()?;
-        let at_least = objects.remove(0).to_type::<Fraction>()?;
-        let result = semantics.analyse_minimum_probability(&at_least).context("could not analyse")?;
-        return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
+        // let semantics = objects.remove(0).to_type::<EbiTraitStochasticDeterministicSemantics>()?;
+        // let at_least = objects.remove(0).to_type::<Fraction>()?;
+        // let result = semantics.analyse_minimum_probability(&at_least).context("could not analyse")?;
+        // return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     }, 
     output: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
 };
@@ -70,7 +65,7 @@ pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
     input_names: &[ "FILE" ],
     input_helps: &[ "The event log."],
     execute: |mut objects, _| {
-        let mut log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
+        let log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         
         let result = log.to_multiset().estimate_completeness();
         

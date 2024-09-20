@@ -1,11 +1,12 @@
-use std::{fmt::{self, Debug, Display}, hash::{Hash, Hasher}, io::{self, BufRead}, rc::Rc, str::FromStr};
+use std::{fmt::{self, Debug}, hash::{Hash, Hasher}, io::{self, BufRead}, str::FromStr};
 use anyhow::{anyhow, Context, Error, Ok, Result};
 use bitvec::vec::BitVec;
-use layout::topo::{layout::VisualGraph, placer::place};
+use layout::topo::layout::VisualGraph;
 
-use crate::{activity_key::{Activity, ActivityKey}, dottable::Dottable, ebi_commands::ebi_command_info::Infoable, ebi_input_output::EbiInput, ebi_traits::{ebi_trait::FromEbiTraitObject, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, export::{Displayable, EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, line_reader::LineReader, marking::Marking};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, displayable::Displayable, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader, marking::Marking};
 
-use super::{ebi_object::EbiObject, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
+use super::stochastic_labelled_petri_net::StochasticLabelledPetriNet;
+
 
 pub const HEADER: &str = "labelled Petri net";
 
@@ -13,7 +14,7 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "labelled Petri net",
     article: "a",
     file_extension: "lpn",
-    validator: import::validate::<LabelledPetriNet>,
+    validator: ebi_input::validate::<LabelledPetriNet>,
     trait_importers: &[
         EbiTraitImporter::Semantics(LabelledPetriNet::import_as_semantics),
     ],
@@ -76,7 +77,7 @@ impl LabelledPetriNet {
         Self {
             activity_key: ActivityKey::new(),
             initial_marking: Marking::new(0),
-            labels: todo!(),
+            labels: vec![],
             place2output_transitions: vec![],
             transition2input_places: vec![],
             transition2output_places: vec![],
@@ -350,7 +351,7 @@ impl Dottable for LabelledPetriNet {
             let node = if let Some(activity) = self.get_transition_label(transition) {
                 <dyn Dottable>::create_transition(&mut graph, self.activity_key.get_activity_label(&activity), "")
             } else {
-                <dyn Dottable>::create_silent_transition(&mut graph, transition, "")
+                <dyn Dottable>::create_silent_transition(&mut graph, "")
             };
 
 

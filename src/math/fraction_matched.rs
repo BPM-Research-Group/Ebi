@@ -1,8 +1,7 @@
 use std::{borrow::Borrow, ops::{AddAssign, Mul}, sync::Arc};
 
-use fraction::{BigUint, GenericFraction, Integer, One, Ratio, Sign, Zero};
+use fraction::{BigUint, GenericFraction, Integer, Sign, Zero};
 use anyhow::{anyhow, Result};
-use num_integer::lcm;
 
 use super::fraction::Fraction;
 

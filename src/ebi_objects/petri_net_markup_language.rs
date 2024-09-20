@@ -1,14 +1,13 @@
-use std::{collections::HashMap, io::BufRead, rc::Rc};
+use std::{collections::HashMap, io::{BufRead, Write}};
 
-use anyhow::{anyhow, Context, Error, Result};
-use bitvec::{bitvec, vec::{self, BitVec}};
+use anyhow::{anyhow, Error, Result};
+use bitvec::bitvec;
 use fraction::ToPrimitive;
-use layout::topo::placer::place;
 use process_mining::{petri_net::petri_net_struct::{self, ArcType}, PetriNet};
 
-use crate::{activity_key::{self, ActivityKey}, dottable::Dottable, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics}}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, marking::Marking};
+use crate::{ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_input::{EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable}, ebi_objects::labelled_petri_net::LPNMarking, ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics}, marking::Marking};
 
-use super::{ebi_object::EbiObject, labelled_petri_net::{LPNMarking, LabelledPetriNet}};
+use super::labelled_petri_net::LabelledPetriNet;
 
 pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "Petri net markup language",
@@ -55,7 +54,7 @@ impl PetriNetMarkupLanguage {
 }
 
 impl Importable for PetriNetMarkupLanguage {
-    fn import_as_object(reader: &mut dyn BufRead) -> Result<super::ebi_object::EbiObject> {
+    fn import_as_object(reader: &mut dyn BufRead) -> Result<EbiObject> {
         Ok(EbiObject::LabelledPetriNet(Self::import(reader)?.try_into()?))
     }
 
@@ -71,7 +70,7 @@ impl Importable for PetriNetMarkupLanguage {
 }
 
 impl Exportable for PetriNetMarkupLanguage {
-    fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+    fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::LabelledPetriNet(lpn)) => PetriNetMarkupLanguage::try_from(lpn)?.export(f),
             _ => unreachable!()

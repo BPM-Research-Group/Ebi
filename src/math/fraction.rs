@@ -1,13 +1,12 @@
-use std::{borrow::Borrow, cmp::Ordering, f32::EPSILON, fmt::{write, Debug, Display}, hash::Hash, iter::Sum, mem, ops::{Add, AddAssign, Div, DivAssign, Index, IndexMut, Mul, MulAssign, Neg, Sub, SubAssign}, rc::Rc, str::FromStr, sync::{atomic::AtomicBool, Arc}};
-use anyhow::{anyhow, Result, Error};
-use fraction::{approx::{self, sqrt}, BigFraction, BigUint, GenericFraction, Integer, One, Sign, Zero};
-use num_bigint::{ToBigInt, ToBigUint, RandBigInt};
+use std::{borrow::Borrow, cmp::Ordering, hash::Hash, iter::Sum, ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign}, str::FromStr, sync::{atomic::AtomicBool, Arc}};
+use anyhow::{anyhow, Error, Result};
+use fraction::{BigFraction, BigUint, GenericFraction, One, Sign, Zero};
+use num_bigint::{ToBigUint, RandBigInt};
 use num_rational::Ratio;
-use num_traits::{Pow, Signed, ToPrimitive};
+use num_traits::{Signed, ToPrimitive};
 use rand::Rng;
-use serde_json::Value;
 
-use crate::{ebi_commands::ebi_command_info::Infoable, ebi_input_output::EbiInput, ebi_objects::ebi_object::EbiTraitObject, ebi_traits::ebi_trait::FromEbiTraitObject, export::{EbiOutput, Exportable}};
+use crate::ebi_framework::{ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait::FromEbiTraitObject, exportable::Exportable, infoable::Infoable};
 
 use super::fraction_raw::FractionRaw;
 

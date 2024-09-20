@@ -2,7 +2,7 @@ use std::{mem, ops::{Index, IndexMut, Mul}, sync::atomic::AtomicBool};
 
 use fraction::{One, Zero};
 use anyhow::{anyhow, Result};
-use rayon::iter::{IndexedParallelIterator, IntoParallelIterator, IntoParallelRefMutIterator, ParallelIterator};
+use rayon::iter::{IndexedParallelIterator, IntoParallelRefMutIterator, ParallelIterator};
 
 use super::fraction::Fraction;
 

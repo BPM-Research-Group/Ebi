@@ -25,7 +25,7 @@ impl dyn Dottable {
         return graph.add_node(node);
     }
 
-    pub fn create_silent_transition(graph: &mut VisualGraph, index: usize, xlabel: &str) -> NodeHandle {
+    pub fn create_silent_transition(graph: &mut VisualGraph, xlabel: &str) -> NodeHandle {
         let shape = layout::std_shapes::shapes::ShapeKind::Box(xlabel.to_string());
         let mut look = StyleAttr::simple();
         look.fill_color = Some(Color::fast("grey"));

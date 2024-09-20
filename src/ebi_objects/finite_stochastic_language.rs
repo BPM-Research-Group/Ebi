@@ -1,11 +1,9 @@
-use std::{collections::{hash_map::{Entry, Iter}, HashMap, HashSet}, fmt, io::{self, BufRead, Cursor}, rc::Rc, str::FromStr};
-
+use std::{collections::{hash_map::Entry, HashMap, HashSet}, fmt, io::{self, BufRead, Write}, rc::Rc, str::FromStr};
 use anyhow::{anyhow, Context, Error, Result};
-use fraction::Zero;
-use num_traits::One;
-use crate::{activity_key::{self, Activity, ActivityKey}, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::{self, EbiTraitFiniteStochasticLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::{self, EbiTraitIterableStochasticLanguage}, ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage}, ebi_trait_semantics::Semantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, ToStochasticSemantics}}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, follower_semantics::FollowerSemantics, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, line_reader::LineReader, math::fraction::Fraction, ActivityTrace, Trace};
 
-use super::{ebi_object::EbiObject, finite_language::FiniteLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::{self, EbiTraitFiniteStochasticLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::{self, EbiTraitIterableStochasticLanguage}, ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage}, ebi_trait_semantics::Semantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, ToStochasticSemantics}}, follower_semantics::FollowerSemantics, line_reader::LineReader, math::fraction::Fraction};
+
+use super::{finite_language::FiniteLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
 
 pub const HEADER: &str = "finite stochastic language";
 
@@ -13,7 +11,7 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "finite stochastic language",
     article: "a",
     file_extension: "slang",
-    validator: import::validate::<FiniteStochasticLanguage>,
+    validator: ebi_input::validate::<FiniteStochasticLanguage>,
     trait_importers: &[
         EbiTraitImporter::FiniteLanguage(FiniteStochasticLanguage::read_as_finite_language),
         EbiTraitImporter::FiniteStochasticLanguage(ebi_trait_finite_stochastic_language::import::<FiniteStochasticLanguage>),
@@ -33,7 +31,7 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
 #[derive(Clone,Debug)]
 pub struct FiniteStochasticLanguage {
     activity_key: ActivityKey,
-    traces: HashMap<ActivityTrace, Fraction>
+    traces: HashMap<Vec<Activity>, Fraction>
 }
 
 impl FiniteStochasticLanguage {
@@ -41,7 +39,7 @@ impl FiniteStochasticLanguage {
     /**
      * Does not normalise the distribution.
      */
-    pub fn new_raw(traces: HashMap<ActivityTrace, Fraction>, activity_key: ActivityKey) -> Self {
+    pub fn new_raw(traces: HashMap<Vec<Activity>, Fraction>, activity_key: ActivityKey) -> Self {
         Self {
             activity_key: ActivityKey::new(),
             traces: traces
@@ -143,7 +141,7 @@ impl EbiTraitIterableLanguage for FiniteStochasticLanguage {
         &self.activity_key
     }
     
-    fn iter(&self) -> Box<dyn Iterator<Item = &ActivityTrace> + '_> {
+    fn iter(&self) -> Box<dyn Iterator<Item = &Vec<Activity>> + '_> {
         Box::new(self.traces.keys())
     }
 }
@@ -289,7 +287,7 @@ impl Importable for FiniteStochasticLanguage {
 
 impl Exportable for FiniteStochasticLanguage {
 
-    fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+    fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::FiniteStochasticLanguage(slang)) => slang.export(f),
             _ => unreachable!()
@@ -346,7 +344,7 @@ impl ToStochasticSemantics for FiniteStochasticLanguage {
 }
 
 impl EbiTraitIterableStochasticLanguage for FiniteStochasticLanguage {
-    fn iter_trace_probability(&self) -> Box<dyn Iterator<Item = (&ActivityTrace, &Fraction)> + '_> {
+    fn iter_trace_probability(&self) -> Box<dyn Iterator<Item = (&Vec<Activity>, &Fraction)> + '_> {
         Box::new(self.traces.iter())
     }
     

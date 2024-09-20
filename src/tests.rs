@@ -2,9 +2,7 @@
 mod tests {
     use std::{fs, rc::Rc};
 
-    use crate::{activity_key::{ActivityKey, ActivityKeyTranslator}, deterministic_semantics_for_stochastic_semantics::DeterministicStochasticSemantics, ebi_objects::{alignments::Move, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics, ebi_trait_stochastic_semantics::StochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, medoid, techniques::{align::Align, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probabilistic_queries::FiniteStochasticLanguageAnalyser, sample::Sampler, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
-
-    use super::*;
+    use crate::{ebi_objects::{alignments::Move, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_semantics::StochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, medoid, techniques::{align::Align, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probabilistic_queries::FiniteStochasticLanguageAnalyser, sample::Sampler, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 
     #[test]
     fn medoid() {
@@ -65,7 +63,7 @@ mod tests {
 
     #[test]
     fn fraction_exact() {
-        let mut zero = Fraction::one().one_minus();
+        let zero = Fraction::one().one_minus();
 
         assert!(zero.is_zero());
     }
@@ -147,14 +145,14 @@ mod tests {
         let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
         let event_log: Box<dyn EbiTraitEventLog> = Box::new(fin.parse::<EventLog>().unwrap());
 
-        let (x, sustain) = event_log.log_categorical_attribute(500, &"attribute".to_string(), &Fraction::from((1, 20))).unwrap();
+        let (_, sustain) = event_log.log_categorical_attribute(500, &"attribute".to_string(), &Fraction::from((1, 20))).unwrap();
         assert!(sustain) //The hypothesis should be rejected if we consider the meaning of things, however, as we have only two traces, it will be sustained.
     }
 
     #[test]
     fn sdfa_invalid() {
         let fin = fs::read_to_string("testfiles/a-b-c-livelock_invalid.sdfa").unwrap();
-        let mut err = fin.parse::<StochasticDeterministicFiniteAutomaton>();
+        let err = fin.parse::<StochasticDeterministicFiniteAutomaton>();
         assert!(err.is_err());
     }
 
@@ -287,10 +285,10 @@ mod tests {
     #[test]
     fn uemsc_activity_key() {
         let fin1 = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
-        let mut slang1 = fin1.parse::<FiniteStochasticLanguage>().unwrap();
+        let slang1 = fin1.parse::<FiniteStochasticLanguage>().unwrap();
 
         let fin2 = fs::read_to_string("testfiles/ba-aa-ab.slang").unwrap();
-        let mut slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+        let slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
 
         let slang1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang1);
 
@@ -301,7 +299,7 @@ mod tests {
     #[test]
     fn align_sdfa_trace() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
-        let mut sdfa = Rc::new(fin.parse::<StochasticDeterministicFiniteAutomaton>().unwrap());
+        let sdfa = Rc::new(fin.parse::<StochasticDeterministicFiniteAutomaton>().unwrap());
         let mut semantics = StochasticDeterministicFiniteAutomaton::get_semantics(sdfa);
 
         let a = semantics.get_activity_key_mut().process_activity("a");
@@ -309,7 +307,7 @@ mod tests {
 
         let trace = vec![b, b];
         
-        let (alignment, cost) = semantics.align_trace(&trace).unwrap();
+        let (alignment, _) = semantics.align_trace(&trace).unwrap();
 
         let correct_1 = vec![Move::SynchronousMove(b, 1), Move::ModelMove(a, 4), Move::SilentMove(5), Move::LogMove(b)];
         let correct_2 = vec![Move::SynchronousMove(b, 1), Move::LogMove(b), Move::ModelMove(a, 4), Move::SilentMove(5)];
@@ -320,11 +318,11 @@ mod tests {
     #[test]
     fn align_sdfa_lang() {
         let fin1 = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
-        let mut sdfa = Rc::new(fin1.parse::<StochasticDeterministicFiniteAutomaton>().unwrap());
+        let sdfa = Rc::new(fin1.parse::<StochasticDeterministicFiniteAutomaton>().unwrap());
         let mut semantics = StochasticDeterministicFiniteAutomaton::get_semantics(sdfa);
 
         let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
-        let mut lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
+        let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
 
         let a = semantics.get_activity_key_mut().process_activity("a");
         let b = semantics.get_activity_key_mut().process_activity("b");
@@ -335,11 +333,6 @@ mod tests {
         let correct_2 = vec![Move::SynchronousMove(b, 1), Move::LogMove(b), Move::ModelMove(a, 4), Move::SilentMove(5)];
 
         assert!(alignment.get(0) == Some(&correct_1) || alignment.get(0) == Some(&correct_2));
-    }
-
-    #[test]
-    fn align_miner_non_appearing() {
-        let fin1 = fs::read_to_string("testfiles/aa-ab-ba.lpn").unwrap();
     }
 
     #[test]
@@ -397,26 +390,26 @@ mod tests {
     }
 
     // #[test] //disabled until we can handle livelocks
-    fn sample_sdfa_no_language() {
-        let fin1 = fs::read_to_string("testfiles/a-livelock-zeroweight.sdfa").unwrap();
-        let sdfa = fin1.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
-        let semantics: Box<dyn StochasticSemantics<State = usize>> = Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(Rc::new(sdfa)));
+    // fn sample_sdfa_no_language() {
+    //     let fin1 = fs::read_to_string("testfiles/a-livelock-zeroweight.sdfa").unwrap();
+    //     let sdfa = fin1.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
+    //     let semantics: Box<dyn StochasticSemantics<State = usize>> = Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(Rc::new(sdfa)));
 
-        let sample = semantics.sample(1);
+    //     let sample = semantics.sample(1);
         
-        //the language of this model is empty, so it should not have any traces in the sample
-        println!("{:?}", sample);
-        assert!(sample.is_err())
-    }
+    //     //the language of this model is empty, so it should not have any traces in the sample
+    //     println!("{:?}", sample);
+    //     assert!(sample.is_err())
+    // }
 
-    //#[test] //disabled until we can handle livelocks
-    fn sample_slpn_no_language() {
-        let fin1 = fs::read_to_string("testfiles/a-livelock-zeroweight.slpn").unwrap();
-        let slpn = fin1.parse::<StochasticLabelledPetriNet>().unwrap();
+    // //#[test] //disabled until we can handle livelocks
+    // fn sample_slpn_no_language() {
+    //     let fin1 = fs::read_to_string("testfiles/a-livelock-zeroweight.slpn").unwrap();
+    //     let slpn = fin1.parse::<StochasticLabelledPetriNet>().unwrap();
 
-        let sample = slpn.sample(1);
+    //     let sample = slpn.sample(1);
         
-        //the language of this model is empty, so it should not have any traces in the sample
-        assert!(sample.is_err())
-    }
+    //     //the language of this model is empty, so it should not have any traces in the sample
+    //     assert!(sample.is_err())
+    // }
 }

@@ -1,11 +1,12 @@
-use std::{fmt::Display, ops::{Add, AddAssign, Div, DivAssign, MulAssign, Neg, Sub, SubAssign}};
-
-use anyhow::{anyhow, Error, Result};
-use fraction::{BigFraction, BigUint, GenericFraction, Integer, One, ToPrimitive, Zero};
+use std::{fmt::Display, io::Write, ops::{Add, AddAssign, DivAssign, MulAssign, Neg, Sub, SubAssign}};
+use anyhow::Result;
+use fraction::{BigFraction, BigUint, GenericFraction, Integer, One, Zero};
 use num_bigint::{ToBigInt, ToBigUint};
 use num_traits::Pow;
 
-use crate::{ebi_commands::ebi_command_info::Infoable, export::{EbiOutput, Exportable}};
+
+
+use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
 use super::{fraction::{Fraction, UInt}, fraction_raw::FractionRaw};
 
@@ -369,14 +370,14 @@ impl DivAssign<&Fraction> for LogDiv {
 }
 
 impl Exportable for LogDiv {
-    fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+    fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
             EbiOutput::LogDiv(fr) => fr.export(f),
             _ => unreachable!()
         }
     }
 
-    fn export(&self, f: &mut dyn std::io::Write) -> Result<()> {
+    fn export(&self, f: &mut dyn Write) -> Result<()> {
         if self.is_exact() {
             writeln!(f, "{}", self)?;
         }
@@ -389,7 +390,7 @@ impl Exportable for LogDiv {
 }
 
 impl Infoable for LogDiv {
-    fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
+    fn info(&self, f: &mut impl Write) -> Result<()> {
         match self {
             LogDiv::Exact(ab_log, c_denom) => {
                 write!(f, "log(")?;

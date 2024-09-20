@@ -1,11 +1,7 @@
-use anyhow::{Result,anyhow};
-use fraction::{Zero,One};
-use log::Log;
-use rand::{thread_rng,Rng};
-use rayon::{collections::hash_set::Iter, iter};
-use std::{borrow::Borrow, clone, collections::{HashMap,HashSet}, ops::{Add, Sub}, process::Termination};
-use crate::{ebi_objects::{finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}};
-use num_traits::ToPrimitive;
+use anyhow::Result;
+use fraction::Zero;
+
+use crate::{ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}};
 
 pub trait JensenShannonStochasticConformance {
     fn jssc_log2log(&self, event_log2: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<RootLogDiv>;

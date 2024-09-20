@@ -1,7 +1,7 @@
 use anyhow::{Context, Result};
-use crate::{ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::{ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, finite_stochastic_language::FiniteStochasticLanguage}, ebi_traits::ebi_trait::EbiTrait, export::{EbiOutput, EbiOutputType}, techniques::sample::Sampler};
 
-use super::ebi_command::EbiCommand;
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, techniques::sample::Sampler};
+
 
 pub const SAMPLED_OBJECT_INPUTS: &[&EbiInputType] = &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticSemantics) ];
 

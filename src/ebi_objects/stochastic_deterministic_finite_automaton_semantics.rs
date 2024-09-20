@@ -1,7 +1,7 @@
 use std::rc::Rc;
 use anyhow::{anyhow, Result};
 
-use crate::{activity_key::{Activity, ActivityKey}, ebi_traits::{ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::Semantics, ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
+use crate::{ebi_framework::activity_key::{Activity, ActivityKey}, ebi_traits::{ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::Semantics, ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
 
 use super::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton;
 

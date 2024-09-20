@@ -1,8 +1,5 @@
-use std::{collections::HashMap, rc::Rc};
-
 use anyhow::Result;
-use fraction::{One, Zero};
-use crate::{activity_key::{Activity, ActivityKeyTranslator}, ebi_objects::{alignments::Move, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_stochastic_semantics::TransitionIndex}, math::fraction::Fraction};
+use crate::{ebi_framework::activity_key::ActivityKeyTranslator, ebi_objects::{alignments::Move, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::fraction::Fraction};
 
 use super::align::Align;
 

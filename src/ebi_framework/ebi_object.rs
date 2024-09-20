@@ -1,11 +1,11 @@
-use std::{any::Any, collections::{BTreeSet, HashSet}, fmt::Display, hash::Hash, io::BufRead, str::FromStr};
-use anyhow::{anyhow, Error, Result};
-use strum::IntoEnumIterator;
+use std::{collections::BTreeSet, fmt::Display};
+use anyhow::Result;
 use strum_macros::EnumIter;
 
-use crate::{ebi_commands::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_command_info::Infoable}, ebi_input_output::EbiInputType, ebi_objects::{compressed_event_log::EBI_COMPRESSED_EVENT_LOG, event_log::{EventLog, EBI_EVENT_LOG}, finite_language::{FiniteLanguage, EBI_FINITE_LANGUAGE}, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}, stochastic_deterministic_finite_automaton::{StochasticDeterministicFiniteAutomaton, EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON}, stochastic_labelled_petri_net::{StochasticLabelledPetriNet, EBI_STOCHASTIC_LABELLED_PETRI_NET}}, ebi_traits::{ebi_trait::{EbiTrait, FromEbiTraitObject}, ebi_trait_alignments::EbiTraitAlignments, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, export::Exportable, file_handler::{self, EbiFileHandler, EBI_FILE_HANDLERS}, import::EbiTraitImporter, math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot}};
+use crate::{ebi_objects::{alignments::Alignments, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}};
 
-use super::{alignments::Alignments, directly_follows_model::{DirectlyFollowsModel, EBI_DIRCTLY_FOLLOWS_MODEL}};
+use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_input::EbiInputType, ebi_trait::EbiTrait, infoable::Infoable};
+
 
 #[derive(PartialEq,Clone,EnumIter,Hash)]
 pub enum EbiObjectType {
@@ -37,7 +37,7 @@ impl EbiObjectType {
     pub fn get_applicable_commands(&self) -> BTreeSet<Vec<&'static EbiCommand>> {
         let mut result = EBI_COMMANDS.get_command_paths();
         result.retain(|path| {
-            if let EbiCommand::Command { name_short, name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types, input_names, input_helps, execute, output } = path[path.len() - 1] {
+            if let EbiCommand::Command { input_types, .. } = path[path.len() - 1] {
                 for input_typess in input_types.iter() {
                     for input_typesss in input_typess.iter() {
                         if input_typesss == &&EbiInputType::AnyObject || input_typesss == &&EbiInputType::Object(self.clone()) {
@@ -148,7 +148,6 @@ pub enum EbiTraitObject {
     StochasticDeterministicSemantics(EbiTraitStochasticDeterministicSemantics),
     StochasticSemantics(EbiTraitStochasticSemantics),
     Semantics(EbiTraitSemantics),
-    Alignments(Box<dyn EbiTraitAlignments>),
 }
 
 impl EbiTraitObject {
@@ -163,7 +162,6 @@ impl EbiTraitObject {
             EbiTraitObject::StochasticDeterministicSemantics(_) => EbiTrait::StochasticDeterministicSemantics,
             EbiTraitObject::StochasticSemantics(_) => EbiTrait::StochasticSemantics,
             EbiTraitObject::Semantics(_) => EbiTrait::Semantics,
-            EbiTraitObject::Alignments(alignments) => todo!(),
         }
     }
 }

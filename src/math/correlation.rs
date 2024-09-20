@@ -1,7 +1,4 @@
-use std::ops::{Add, AddAssign, Div, Mul, Sub};
-
 use anyhow::{anyhow, Result};
-use fraction::{Signed, Zero};
 
 use super::{fraction::Fraction, root::Root};
 

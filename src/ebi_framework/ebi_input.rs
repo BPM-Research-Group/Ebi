@@ -1,10 +1,141 @@
-use std::{collections::HashSet, fmt::Display, fs::File, io::{self, BufRead, BufReader, Bytes, Cursor, IsTerminal, Read, Seek}, path::PathBuf};
+use std::{collections::{BTreeSet, HashSet}, fmt::Display, fs::File, io::BufRead, path::PathBuf};
+use anyhow::{anyhow, Context, Result};
+use clap::{builder::ValueParser, value_parser, ArgMatches};
 
-use clap::{ArgMatches, Command, value_parser, arg};
-use anyhow::{Result, Context, anyhow};
-use process_mining::EventLog;
+use crate::{ebi_framework::ebi_file_handler::EbiFileHandler, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, ebi_validate, math::fraction::{Fraction, FractionNotParsedYet}, multiple_reader::MultipleReader, text::Joiner};
 
-use crate::{ebi_commands::{ebi_command_analyse::EBI_ANALYSE, ebi_command_discover::EBI_DISCOVER, ebi_command_validate::{self, EBI_VALIDATE}}, ebi_input_output::EbiInputType, ebi_objects::{alignments::Alignments, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_alignments::EbiTraitAlignments, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, ebi_validate, file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}};
+use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_trait::{EbiTrait, FromEbiTraitObject}, importable::Importable};
+
+pub enum EbiInput {
+    Trait(EbiTraitObject, &'static EbiFileHandler),
+    Object(EbiObject, &'static EbiFileHandler),
+    String(String),
+    Usize(usize),
+    FileHandler(EbiFileHandler),
+    Fraction(Fraction),
+}
+
+impl EbiInput {
+    pub fn to_type<T: FromEbiTraitObject + ?Sized>(self) -> Result<Box<T>> {
+        FromEbiTraitObject::from_trait_object(self)
+    }
+
+    pub fn get_type(&self) -> EbiInputType {
+        match self {
+            EbiInput::Trait(t, _) => EbiInputType::Trait(t.get_trait()),
+            EbiInput::Object(o, _) => EbiInputType::Object(o.get_type()),
+            EbiInput::String(_) => EbiInputType::String,
+            EbiInput::Usize(_) => EbiInputType::Usize,
+            EbiInput::FileHandler(_) => EbiInputType::FileHandler,
+            EbiInput::Fraction(_) => EbiInputType::Fraction,
+        }
+    }
+}
+
+#[derive(PartialEq,Eq)]
+pub enum EbiInputType {
+    Trait(EbiTrait),
+    Object(EbiObjectType),
+    AnyObject,
+    FileHandler,
+    String,
+    Usize,
+    Fraction,
+}
+
+impl EbiInputType {
+
+    pub fn get_article(&self) -> &str {
+        match self {
+            EbiInputType::Trait(t) => t.get_article(),
+            EbiInputType::Object(o) => o.get_article(),
+            EbiInputType::AnyObject => "an",
+            EbiInputType::String => "a",
+            EbiInputType::Usize => "an",
+            EbiInputType::FileHandler => "a",
+            EbiInputType::Fraction => "a",
+        }
+    }
+
+    pub fn get_parser_of_list(traits: &[&EbiInputType]) -> ValueParser {
+        match traits[0] {
+            EbiInputType::Trait(_) => value_parser!(PathBuf),
+            EbiInputType::Object(_) => value_parser!(PathBuf),
+            EbiInputType::AnyObject => value_parser!(PathBuf),
+            EbiInputType::String => value_parser!(String).into(),
+            EbiInputType::Usize => value_parser!(usize).into(),
+            EbiInputType::FileHandler => value_parser!(EbiFileHandler).into(),
+            EbiInputType::Fraction => value_parser!(FractionNotParsedYet).into(),
+        }
+    }
+
+    pub fn get_possible_inputs(traits: &[&'static EbiInputType]) -> Vec<String> {
+        let mut result = HashSet::new();
+
+        for input_type in traits {
+            match input_type {
+                EbiInputType::Trait(t) => {
+                    result.extend(Self::show_file_handlers(t.get_file_handlers()));
+                },
+                EbiInputType::Object(o) => {
+                    result.extend(Self::show_file_handlers(o.get_file_handlers()));
+                },
+                EbiInputType::AnyObject => {
+                    result.extend(Self::show_file_handlers(EBI_FILE_HANDLERS.iter().collect()));
+                },
+                EbiInputType::String => {result.insert("text".to_string());},
+                EbiInputType::Usize => {result.insert("integer".to_string());},
+                EbiInputType::FileHandler => {
+                    let extensions: Vec<String> = EBI_FILE_HANDLERS.iter().map(|file_type| file_type.file_extension.to_string()).collect();
+                    result.insert("the file extension of any file type supported by Ebi (".to_owned() + &extensions.join_with(", ", " or ") + ")");
+                },
+                EbiInputType::Fraction => {result.insert("fraction".to_string());},
+            };
+        }
+
+        result.into_iter().collect::<Vec<_>>()
+    }
+
+    pub fn possible_inputs_as_strings_with_articles(traits: &[&'static EbiInputType], last_connector: &str) -> String {
+        let list = Self::get_possible_inputs(traits);
+        list.join_with(", ", last_connector)
+    }
+
+    pub fn show_file_handlers(file_handlers: Vec<&'static EbiFileHandler>) -> Vec<String> {
+        file_handlers.iter().map(|file_handler| format!("{}", file_handler)).collect::<Vec<_>>()
+    }
+    
+    pub fn get_applicable_commands(&self) -> BTreeSet<Vec<&'static EbiCommand>> {
+        let mut result = EBI_COMMANDS.get_command_paths();
+        result.retain(|path| {
+            if let EbiCommand::Command { input_types, .. } = path[path.len() - 1] {
+                for input_typess in input_types.iter() {
+                    for input_typesss in input_typess.iter() {
+                        if input_typesss == &self {
+                            return true;
+                        }
+                    }
+                }
+            }
+            false
+        });
+        result
+    }
+}
+
+impl Display for EbiInputType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            EbiInputType::Trait(t) => t.fmt(f),
+            EbiInputType::Object(o) => o.fmt(f),
+            EbiInputType::AnyObject => write!(f, "object"),
+            EbiInputType::String => write!(f, "text"),
+            EbiInputType::Usize => write!(f, "integer"),
+            EbiInputType::FileHandler => write!(f, "file"),
+            EbiInputType::Fraction => write!(f, "fraction"),
+        }
+    }
+}
 
 #[derive(Debug)]
 pub enum EbiTraitImporter {
@@ -16,7 +147,6 @@ pub enum EbiTraitImporter {
     Semantics(fn(&mut dyn BufRead) -> Result<EbiTraitSemantics>), //can walk over states  using transitions, potentially forever
     StochasticSemantics(fn(&mut dyn BufRead) -> Result<EbiTraitStochasticSemantics>), //can walk over states  using transitions, potentially forever
     StochasticDeterministicSemantics(fn(&mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics>), //can walk over states using activities, potentially forever
-    Alignments(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitAlignments>>) //alignments
 }
 
 impl EbiTraitImporter {
@@ -30,7 +160,6 @@ impl EbiTraitImporter {
             EbiTraitImporter::Semantics(_) => EbiTrait::Semantics,
             EbiTraitImporter::StochasticSemantics(_) => EbiTrait::StochasticSemantics,
             EbiTraitImporter::StochasticDeterministicSemantics(_) => EbiTrait::StochasticDeterministicSemantics,
-            EbiTraitImporter::Alignments(_) => EbiTrait::Alignments
         }
     }
 
@@ -44,7 +173,6 @@ impl EbiTraitImporter {
             EbiTraitImporter::Semantics(f) => EbiTraitObject::Semantics((f)(reader)?),
             EbiTraitImporter::StochasticSemantics(f) => EbiTraitObject::StochasticSemantics((f)(reader)?),
             EbiTraitImporter::StochasticDeterministicSemantics(f) => EbiTraitObject::StochasticDeterministicSemantics((f)(reader)?),
-            EbiTraitImporter::Alignments(f) => EbiTraitObject::Alignments((f)(reader)?),
         })
     }
 }
@@ -81,7 +209,7 @@ impl EbiObjectImporter {
         }
     }
     
-    pub fn get_importer(&self) -> (fn(&mut dyn BufRead) -> Result<EbiObject>) {
+    pub fn get_importer(&self) -> fn(&mut dyn BufRead) -> Result<EbiObject> {
         match self {
             EbiObjectImporter::EventLog(importer) => *importer,
             EbiObjectImporter::DirectlyFollowsModel(importer) => *importer,
@@ -101,54 +229,10 @@ impl Display for EbiObjectImporter {
     }
 }
 
-pub trait Importable {
-    fn import_as_object(reader: &mut dyn BufRead) -> Result<EbiObject>;
-    fn import(reader: &mut dyn BufRead) -> Result<Self> where Self: Sized;
-}
-
 pub fn validate<X: Importable> (reader: &mut dyn BufRead) -> Result<()> {
     match X::import(reader) {
         Ok(_) => Ok(()),
         Err(x) => Err(x),
-    }
-}
-
-pub enum MultipleReader {
-    String(String),
-    File(File),
-    Bytes(Vec<u8>)
-}
-
-impl MultipleReader {
-    pub fn from_stdin() -> Result<Self> {
-        let stdin = io::stdin();
-        let mut reader = stdin.lock();
-        if cfg!(windows) { //windows does not support reading bytes from STDIN, so read it as text
-            let mut buf = String::new();
-            reader.read_to_string(&mut buf).context("Could not read text from STDIN (on Windows, reading bytes from STDIN is not supported.");
-            log::info!("read from stdin in text mode with length {}", buf.len());
-            return Ok(Self::String(buf));
-        } else {
-            let mut buf = Vec::new();
-            reader.read_to_end(&mut buf)?;
-            log::info!("read from stdin in binary mode with length {}", buf.len());
-            return Ok(Self::Bytes(buf));
-        }
-    }
-
-    pub fn from_file(file: File) -> Self {
-        return Self::File(file);
-    }
-
-    pub fn get(&mut self) -> Result<Box<dyn BufRead + '_>> {
-        match self {
-            MultipleReader::String(s) => Ok(Box::new(Cursor::new(s))),
-            MultipleReader::File(ref mut file) => {
-                file.seek(io::SeekFrom::Start(0))?;
-                return Ok(Box::new(BufReader::new(file)));
-            },
-            MultipleReader::Bytes(b) => Ok(Box::new(Cursor::new(b))),
-        }
     }
 }
 

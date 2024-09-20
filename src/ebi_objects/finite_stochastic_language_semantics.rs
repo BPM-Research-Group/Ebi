@@ -1,12 +1,7 @@
 use std::{collections::HashMap, rc::Rc};
 use anyhow::{Result, anyhow};
-use fraction::Zero;
 
-use crate::ebi_commands::ebi_command_info::Infoable;
-use crate::ebi_traits::ebi_trait_semantics::Semantics;
-use crate::ebi_traits::ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage;
-use crate::math::fraction::Fraction;
-use crate::{activity_key::{Activity, ActivityKey}, ebi_traits::ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, infoable::Infoable}, ebi_traits::{ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
 
 use super::finite_stochastic_language::FiniteStochasticLanguage;
 

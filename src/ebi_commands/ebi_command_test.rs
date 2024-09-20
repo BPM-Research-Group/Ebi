@@ -2,9 +2,9 @@ use clap::{value_parser, Arg, ArgAction, Command};
 use anyhow::Context;
 use std::io::Write;
 
-use crate::{ebi_info, ebi_input_output::EbiInputType, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_event_log::EbiTraitEventLog}, export::{EbiOutput, EbiOutputType}, math::fraction::{Fraction, FractionNotParsedYet}, techniques::statistical_test::StatisticalTests};
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_info, ebi_traits::ebi_trait_event_log::EbiTraitEventLog, math::fraction::{Fraction, FractionNotParsedYet}, techniques::statistical_test::StatisticalTests};
 
-use super::{ebi_command::EbiCommand, ebi_command_association::{self, number_of_samples}};
+use super::ebi_command_association::{self, number_of_samples};
 
 macro_rules! p_value {
     () => {Fraction::from((1usize, 20usize))};
@@ -36,7 +36,7 @@ pub const TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     input_names: &[ "FILE", "ATTRIBUTE" ], 
     input_helps: &[ "The event log for which the test is to be performed.", concat!(concat!("The trace attribute for which the test is to be performed. The trace attributes of a log can be found using `Ebi ", ebi_info!()), "`.")], 
     execute: |mut inputs, cli_matches| {
-        let mut event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
+        let event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         let attribute = inputs.remove(0).to_type::<String>()?;
         let number_of_samples = cli_matches.get_one::<usize>("samples").unwrap();
         let p_value = cli_matches.get_one::<FractionNotParsedYet>("pvalue").unwrap().try_into().context("Parsing p value")?;
@@ -44,13 +44,13 @@ pub const TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
         let (value, sustained)= event_log.log_categorical_attribute( *number_of_samples, &attribute, &p_value).with_context(|| format!("attribute {}", attribute))?;
 
         let mut f = vec![];
-        writeln!(f, "p-value \t {}", value);
-        writeln!(f, "Null-hypothesis: the sub-logs defined by trace attribute `{}` all follow identical processes.", attribute);
+        writeln!(f, "p-value \t {}", value)?;
+        writeln!(f, "Null-hypothesis: the sub-logs defined by trace attribute `{}` all follow identical processes.", attribute)?;
 
         if sustained {
-            writeln!(f, "The data does not provide enough evidence to make a claim on this hypothesis.\nDo not reject the null-hypothesis.");
+            writeln!(f, "The data does not provide enough evidence to make a claim on this hypothesis.\nDo not reject the null-hypothesis.")?;
         } else {
-            writeln!(f, "The data provides enough evidence to conclude that at least one value of the categorical attribute `{}` associates with a difference in process.\nReject the null-hypothesis.", attribute);
+            writeln!(f, "The data provides enough evidence to conclude that at least one value of the categorical attribute `{}` associates with a difference in process.\nReject the null-hypothesis.", attribute)?;
         };
 				
         Ok(EbiOutput::String(String::from_utf8(f).unwrap()))

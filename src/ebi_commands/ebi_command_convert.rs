@@ -1,9 +1,6 @@
-use std::{io::{self, IsTerminal}, path::PathBuf};
-use anyhow::{anyhow, Context, Result};
-use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 
-use crate::{ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::{directly_follows_model::DirectlyFollowsModel, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton}, ebi_traits::ebi_trait::EbiTrait, export::{self, EbiOutput, EbiOutputType}, import::{self, MultipleReader}};
-use super::{ebi_command::EbiCommand, ebi_command_analyse::EBI_ANALYSE, ebi_command_discover::EBI_DISCOVER};
+
+use crate::ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}};
 
 pub const EBI_CONVERT: EbiCommand = EbiCommand::Group { 
     name_short: "conv",
@@ -62,7 +59,7 @@ pub const EBI_CONVERT_SLANG: EbiCommand = EbiCommand::Command {
         ] ], 
     input_names: &[ "FILE" ], 
     input_helps: &[ "Any file supported by Ebi that can be converted." ], 
-    execute: |mut inputs, cli_matches| {
+    execute: |mut inputs, _| {
         let slang = match inputs.remove(0) {
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(slang), _) => slang,
             EbiInput::Object(EbiObject::EventLog(log), _) => log.to_finite_stochastic_language(),
@@ -91,7 +88,7 @@ pub const EBI_CONVERT_SDFA: EbiCommand = EbiCommand::Command {
     input_helps: &[ "Any file supported by Ebi that can be converted." ], 
     execute: |mut inputs, _| {
         let sdfa = match inputs.remove(0) {
-            EbiInput::Object(EbiObject::FiniteStochasticLanguage(mut slang), _) => slang.to_stochastic_deterministic_finite_automaton(),
+            EbiInput::Object(EbiObject::FiniteStochasticLanguage(slang), _) => slang.to_stochastic_deterministic_finite_automaton(),
             EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => sdfa,
             EbiInput::Object(EbiObject::EventLog(mut log), _) => log.to_stochastic_deterministic_finite_automaton(),
             _ => unreachable!()

@@ -1,13 +1,11 @@
-use std::{collections::hash_map::Iter, io::BufRead};
-
+use std::io::BufRead;
 use anyhow::{anyhow, Result};
 
-use crate::{activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::ebi_object::EbiTraitObject, import::Importable, math::fraction::Fraction, ActivityTrace, Trace};
+use crate::{ebi_framework::{activity_key::Activity, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, math::fraction::Fraction};
 
-use super::ebi_trait::FromEbiTraitObject;
 
 pub trait EbiTraitIterableStochasticLanguage { //an iterable language is not necessarily finite
-    fn iter_trace_probability(&self) -> Box<dyn Iterator<Item = (&ActivityTrace, &Fraction)> + '_>;
+    fn iter_trace_probability(&self) -> Box<dyn Iterator<Item = (&Vec<Activity>, &Fraction)> + '_>;
 
     fn get_probability(&self, trace_index: usize) -> Option<&Fraction>;
 }

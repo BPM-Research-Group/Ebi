@@ -1,10 +1,7 @@
-use std::{path::PathBuf, io::{self, IsTerminal}};
-use clap::{Command, ArgMatches, value_parser, Arg, ArgAction};
-use anyhow::{Result, Context, anyhow};
+use anyhow::{Context, anyhow};
 
-use crate::{ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, export::{self, EbiOutput, EbiOutputType}, import, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}, techniques::{entropic_relevance::EntropicRelvance, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
-use fraction::{One, Zero};
-use super::{ebi_command::EbiCommand, ebi_command_sample::{self, SAMPLED_OBJECT_INPUTS}};
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::EbiTraitObject, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, techniques::{entropic_relevance::EntropicRelvance, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
+use super::ebi_command_sample::{self, SAMPLED_OBJECT_INPUTS};
 
 pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group { 
     name_short: "conf",

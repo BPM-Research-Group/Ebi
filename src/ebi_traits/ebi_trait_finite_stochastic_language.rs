@@ -1,10 +1,10 @@
 use std::io::BufRead;
-
 use anyhow::{anyhow, Result};
 
-use crate::{activity_key::Activity, ebi_input_output::EbiInput, ebi_objects::{ebi_object::EbiTraitObject, finite_stochastic_language::FiniteStochasticLanguage}, import::Importable, math::fraction::Fraction, Trace};
+use crate::{ebi_framework::{ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, math::fraction::Fraction};
 
-use super::{ebi_trait::FromEbiTraitObject, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage};
+use super::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage};
+
 
 pub trait EbiTraitFiniteStochasticLanguage : EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync {
     fn get_trace_proability(&self, trace_index: usize) -> Option<&Fraction>;

@@ -1,12 +1,9 @@
-use core::num;
-use std::{collections::HashSet, fmt::Debug, iter::FusedIterator, mem, ops::{Add, AddAssign}, rc::Rc, slice::Iter, sync::Arc};
-
-use crate::{activity_key::{self, ActivityKey}, distances::TriangularDistanceMatrix, ebi_objects::finite_language::FiniteLanguage, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage}, math::fraction::Fraction};
+use std::collections::HashSet;
 use anyhow::{anyhow, Result};
-use fraction::{approx, One, Signed, Zero};
-use rand::Rng;
-use rayon::{iter::plumbing::{bridge, Producer}, prelude::*};
-use bitvec::prelude::*;
+use fraction::One;
+
+use crate::{distances::TriangularDistanceMatrix, ebi_objects::finite_language::FiniteLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::fraction::Fraction};
+
 
 pub fn medoid<T>(log: &T, number_of_traces: &usize) -> Result<FiniteLanguage> where T: EbiTraitFiniteStochasticLanguage + ?Sized {
 

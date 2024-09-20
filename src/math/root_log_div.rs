@@ -1,8 +1,7 @@
 use std::fmt::Display;
 use anyhow::Result;
-use fraction::One;
 
-use crate::export::{EbiOutput, Exportable};
+use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable};
 
 use super::{fraction::Fraction, log_div::LogDiv};
 

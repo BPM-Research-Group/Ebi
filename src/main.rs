@@ -1,12 +1,21 @@
-#![allow(unused)]
-
 mod line_reader;
 mod follower_semantics;
-mod cross_product;
 mod marking;
-mod import;
-pub mod ebi_commands {
+pub mod ebi_framework {
+    pub mod ebi_input;
+    pub mod ebi_output;
+    pub mod ebi_file_handler;
+    pub mod ebi_object;
     pub mod ebi_command;
+    pub mod ebi_trait;
+    pub mod dottable;
+    pub mod displayable;
+    pub mod infoable;
+    pub mod importable;
+    pub mod exportable;
+    pub mod activity_key;
+}
+pub mod ebi_commands {
     pub mod ebi_command_analyse_non_stochastic;
     pub mod ebi_command_conformance;
     pub mod ebi_command_discover;
@@ -22,7 +31,6 @@ pub mod ebi_commands {
     pub mod ebi_command_test;
 }
 pub mod ebi_objects {
-    pub mod ebi_object;
     pub mod finite_stochastic_language_semantics;
     pub mod stochastic_deterministic_finite_automaton;
     pub mod stochastic_deterministic_finite_automaton_semantics;
@@ -39,7 +47,6 @@ pub mod ebi_objects {
     pub mod alignments;
 }
 pub mod ebi_traits {
-    pub mod ebi_trait;
     pub mod ebi_trait_stochastic_deterministic_semantics;
     pub mod ebi_trait_queriable_stochastic_language;
     pub mod ebi_trait_finite_stochastic_language;
@@ -49,7 +56,6 @@ pub mod ebi_traits {
     pub mod ebi_trait_event_log;
     pub mod ebi_trait_stochastic_semantics;
     pub mod ebi_trait_semantics;
-    pub mod ebi_trait_alignments;
 }
 pub mod math {
     pub mod average;
@@ -79,27 +85,19 @@ pub mod techniques {
     pub mod medoid_non_stochastic;
     pub mod sample;
 }
-mod dottable;
-mod activity_key;
-mod export;
 mod deterministic_semantics_for_stochastic_semantics;
 mod medoid;
-mod ebi_input_output;
-mod file_handler;
 mod distances;
 mod tests;
+mod text;
+mod multiple_reader;
 // mod earth_movers_stochastic_conformance;
 
-use std::sync::atomic::AtomicBool;
-use activity_key::Activity;
 use anyhow::{Context, Result};
-use clap::{builder::Str, command, crate_version, Command};
-use ebi_commands::ebi_command::EBI_COMMANDS;
+use clap::crate_version;
+use ebi_framework::ebi_command::EBI_COMMANDS;
 use env_logger::Builder;
 use log::LevelFilter;
-
-pub type Trace = Vec<String>;
-pub type ActivityTrace = Vec<Activity>;
 
 fn main() -> Result<()> {
 

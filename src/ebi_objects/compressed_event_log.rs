@@ -1,16 +1,16 @@
-use std::{io::{BufRead, BufReader}, rc::Rc};
+use std::{io::{BufRead, BufReader, Write}, rc::Rc};
 use anyhow::Result;
 use flate2::{bufread::GzDecoder, write::GzEncoder, Compression};
 
-use crate::{ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}};
+use crate::{ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}};
 
-use super::{ebi_object::EbiObject, event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
+use super::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
 
 pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     name: "compressed event log",
     article: "a",
     file_extension: "xes.gz",
-    validator: import::validate::<CompressedEventLog>,
+    validator: ebi_input::validate::<CompressedEventLog>,
     trait_importers: &[
         EbiTraitImporter::FiniteLanguage(CompressedEventLog::read_as_finite_language),
         EbiTraitImporter::FiniteStochasticLanguage(CompressedEventLog::read_as_finite_stochastic_language),
@@ -82,7 +82,7 @@ impl Importable for CompressedEventLog {
 }
 
 impl Exportable for CompressedEventLog {
-    fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+    fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::EventLog(log)) => Self::export(&Self { log: log}, f),
             _ => unreachable!()

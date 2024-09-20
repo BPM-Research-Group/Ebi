@@ -1,11 +1,9 @@
-use std::{path::PathBuf, io::{self, IsTerminal}};
-use anyhow::{Result, Ok, Context, anyhow};
-use clap::{arg, value_parser, Arg, ArgAction, ArgMatches, Command};
-use fraction::{One, Zero};
+use anyhow::{anyhow, Context};
+use clap::{value_parser, Arg, ArgAction};
 
-use crate::{ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}}, export::{self, EbiOutput, EbiOutputType}, follower_semantics::FollowerSemantics, import, math::fraction::Fraction};
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction};
 
-use super::ebi_command::EbiCommand;
+
 
 pub const EBI_PROBABILITY: EbiCommand = EbiCommand::Group { 
     name_short: "prob",
@@ -33,9 +31,9 @@ pub const EBI_PROBABILITY_MODEL: EbiCommand = EbiCommand::Command {
     ], 
     input_names: &[ "FILE_1", "FILE_2" ], 
     input_helps: &[ "The queriable stochastic language (model).", "The finite language (log)." ], 
-    execute: |mut inputs, cli_matches| {
-        let mut model: Box<dyn EbiTraitQueriableStochasticLanguage> = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
-        let mut log = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+    execute: |mut inputs, _| {
+        let model: Box<dyn EbiTraitQueriableStochasticLanguage> = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
+        let log = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
         
         let mut sum = Fraction::zero();
         for trace in log.iter() {
@@ -109,7 +107,7 @@ pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command {
     input_helps: &[ "The model.", "Balance between 0 (=only consider deviations) to 1 (=only consider weight in the model)" ], 
     execute: |mut inputs, cli_matches| {
         let mut semantics = inputs.remove(0).to_type::<EbiTraitStochasticSemantics>()?;
-        let mut balance = inputs.remove(0).to_type::<Fraction>()?;
+        let balance = inputs.remove(0).to_type::<Fraction>()?;
         if let Some(x) = cli_matches.get_many::<String>("trace") {
             let t: Vec<&String> = x.collect();
             let trace = t.into_iter().map(|activity| activity.as_str()).collect::<Vec<_>>();

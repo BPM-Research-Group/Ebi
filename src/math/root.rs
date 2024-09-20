@@ -1,8 +1,9 @@
 use std::{ops::{Div, Mul, Neg}, fmt::{Debug, Display}};
 use anyhow::Result;
-use fraction::{One, Sign, Zero};
+use fraction::Sign;
 
-use crate::{ebi_commands::ebi_command_info::Infoable, export::{EbiOutput, Exportable}};
+
+use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
 use super::fraction::Fraction;
 

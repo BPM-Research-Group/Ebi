@@ -1,11 +1,8 @@
-use std::{io::{self, IsTerminal, Write}, path::PathBuf};
+use std::io::Write;
+use clap::{value_parser, Arg, ArgAction, Command};
+use anyhow::Context;
 
-use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
-use anyhow::{anyhow, Context, Result};
-use fraction::One;
-use crate::{ebi_info, ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_event_log::EbiTraitEventLog}, export::{EbiOutput, EbiOutputType}, import, math::fraction::Fraction, techniques::association::{self, Associations}};
-
-use super::ebi_command::EbiCommand;
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_info, ebi_traits::ebi_trait_event_log::EbiTraitEventLog, techniques::association::Associations};
 
 macro_rules! number_of_samples {
     () => {500};
@@ -71,7 +68,7 @@ pub const ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command {
         let mut f = vec![];
         for (x, y) in result {
             let y = y?;
-            writeln!(f, "Trace atribute `{}` has an association of approximately {}. Exact value: {:?}", x, &y.approximate(), &y);
+            writeln!(f, "Trace atribute `{}` has an association of approximately {}. Exact value: {:?}", x, &y.approximate(), &y)?;
         }
         Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
     }, 

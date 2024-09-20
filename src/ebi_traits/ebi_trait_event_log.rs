@@ -1,12 +1,10 @@
-use std::{borrow::Borrow, collections::{HashMap, HashSet}, fmt::{Debug, Display}, hash::Hash};
-
+use std::{borrow::Borrow, collections::HashMap, fmt::{Debug, Display}, hash::Hash};
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, Utc};
 use process_mining::event_log::{AttributeValue, XESEditableAttribute};
 
-use crate::{activity_key::{Activity, ActivityKey}, ebi_commands::ebi_command_info::Infoable, ebi_input_output::EbiInput, ebi_objects::{ebi_object::EbiTraitObject, event_log::DataType, finite_language::FiniteLanguage}, math::fraction::Fraction, Trace};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::event_log::DataType, math::fraction::Fraction};
 
-use super::{ebi_trait::FromEbiTraitObject, ebi_trait_finite_language::EbiTraitFiniteLanguage};
 
 pub trait EbiTraitEventLog: IndexTrace {
     /**

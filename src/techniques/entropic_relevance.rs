@@ -1,10 +1,8 @@
-use core::num;
-use std::{collections::HashSet, str::FromStr, borrow::Borrow};
+use std::collections::HashSet;
 
-use anyhow::{Result, Context, anyhow};
-use num_bigint::{ToBigUint,ToBigInt};
-use num_traits::{One, ToPrimitive, Zero};
-use crate::{ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv}, ActivityTrace};
+use anyhow::{Result, Context};
+use num_traits::Zero;
+use crate::{ebi_framework::activity_key::Activity, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv}};
 
 pub trait EntropicRelvance {
     fn er(&self, model: Box<dyn EbiTraitQueriableStochasticLanguage>) -> Result<LogDiv>;
@@ -82,7 +80,7 @@ impl dyn EbiTraitFiniteStochasticLanguage {
     }
 }
 
-fn bits(trace: &ActivityTrace, number_of_activities_in_log: usize) -> LogDiv {
+fn bits(trace: &Vec<Activity>, number_of_activities_in_log: usize) -> LogDiv {
     let mut result = LogDiv::log2(Fraction::from(number_of_activities_in_log + 1));
     result *= trace.len() + 1;
     result

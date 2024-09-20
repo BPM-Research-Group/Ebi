@@ -1,28 +1,28 @@
 use std::io;
 use std::str::FromStr;
 use std::{fmt, io::BufRead, rc::Rc};
-use std::collections::HashMap;
 use anyhow::{anyhow, Result, Context, Error};
-use fraction::{One, Zero};
 use layout::topo::layout::VisualGraph;
-use rand::{thread_rng,Rng};
-use bitvec::{bitvec, vec::BitVec, prelude::Lsb0};
 
-use crate::activity_key::Activity;
-use crate::ebi_commands::ebi_command_info::Infoable;
+use crate::deterministic_semantics_for_stochastic_semantics::DeterministicStochasticSemantics;
+use crate::ebi_framework::activity_key::{Activity, ActivityKey};
+use crate::ebi_framework::dottable::Dottable;
+use crate::ebi_framework::ebi_file_handler::EbiFileHandler;
+use crate::ebi_framework::ebi_input::{self, EbiObjectImporter, EbiTraitImporter};
+use crate::ebi_framework::ebi_object::EbiObject;
+use crate::ebi_framework::ebi_output::{EbiObjectExporter, EbiOutput};
+use crate::ebi_framework::exportable::Exportable;
+use crate::ebi_framework::importable::Importable;
+use crate::ebi_framework::infoable::Infoable;
+use crate::ebi_traits::ebi_trait_queriable_stochastic_language;
 use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics};
-use crate::ebi_traits::ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage};
 use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics;
-use crate::ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, ToStochasticSemantics, TransitionIndex};
-use crate::export::{EbiObjectExporter, EbiOutput, Exportable};
-use crate::file_handler::EbiFileHandler;
+use crate::ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, TransitionIndex};
+use crate::line_reader::LineReader;
+use crate::marking::Marking;
 use crate::math::fraction::Fraction;
-use crate::{activity_key::ActivityKey, dottable::Dottable, follower_semantics::FollowerSemantics, import, line_reader::LineReader, marking::Marking, deterministic_semantics_for_stochastic_semantics::{PMarking, DeterministicStochasticSemantics}};
-use crate::import::{EbiObjectImporter, EbiTraitImporter, Importable};
 
-use super::ebi_object::EbiObject;
-use super::finite_stochastic_language::FiniteStochasticLanguage;
-use super::labelled_petri_net::{LPNMarking, LabelledPetriNet};
+use super::labelled_petri_net::LabelledPetriNet;
 
 pub const HEADER: &str = "stochastic labelled Petri net";
 
@@ -30,7 +30,7 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "stochastic labelled Petri net",
     article: "a",
     file_extension: "slpn",
-    validator: import::validate::<StochasticLabelledPetriNet>,
+    validator: ebi_input::validate::<StochasticLabelledPetriNet>,
     trait_importers: &[
         EbiTraitImporter::QueriableStochasticLanguage(ebi_trait_queriable_stochastic_language::import::<StochasticLabelledPetriNet>),
         EbiTraitImporter::StochasticSemantics(StochasticLabelledPetriNet::import_as_stochastic_semantics),
@@ -336,7 +336,7 @@ impl Dottable for StochasticLabelledPetriNet {
             let node = if let Some(activity) = self.get_transition_label(transition) {
                 <dyn Dottable>::create_transition(&mut graph, self.activity_key.get_activity_label(&activity), &self.get_transition_weight(transition).to_string())
             } else {
-                <dyn Dottable>::create_silent_transition(&mut graph, transition, &self.get_transition_weight(transition).to_string())
+                <dyn Dottable>::create_silent_transition(&mut graph, &self.get_transition_weight(transition).to_string())
             };
 
             for (pos, inplace) in self.transition2input_places[transition].iter().enumerate() {

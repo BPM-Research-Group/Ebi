@@ -1,6 +1,4 @@
-use std::{borrow::Borrow, collections::{HashMap, HashSet}, fmt::{write, Display, Debug}, hash::Hash};
-
-use crate::{ActivityTrace, Trace};
+use std::{borrow::Borrow, collections::{HashMap, HashSet}, fmt::{Display, Debug}, hash::Hash};
 
 #[derive(Clone,Copy)]
 pub struct Activity {
@@ -71,7 +69,7 @@ impl <'a> ActivityKey {
         return self.name2activity.len()
     }
 
-    pub fn process_trace(&mut self, trace: &Trace) -> Vec<Activity> {
+    pub fn process_trace(&mut self, trace: &Vec<String>) -> Vec<Activity> {
         let mut result = vec![];
         for activity in trace {
             match self.name2activity.get(activity) {
@@ -132,7 +130,7 @@ impl <'a> ActivityKey {
         activity.borrow().id
     }
 
-    pub fn deprocess_trace(&self, trace: &ActivityTrace) -> Vec<&str> {
+    pub fn deprocess_trace(&self, trace: &Vec<Activity>) -> Vec<&str> {
         let mut result = vec![];
         for activity in trace {
             result.push(self.get_activity_label(&activity));
@@ -140,7 +138,7 @@ impl <'a> ActivityKey {
         result
     }
 
-    pub fn deprocess_set(&'a self, set: &HashSet<ActivityTrace>) -> HashSet<Vec<&'a str>> {
+    pub fn deprocess_set(&'a self, set: &HashSet<Vec<Activity>>) -> HashSet<Vec<&'a str>> {
         set.iter().map(|trace| self.deprocess_trace(trace)).collect()
     }
     

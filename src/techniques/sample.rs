@@ -1,9 +1,9 @@
-use std::{collections::{hash_map::Entry, HashMap, HashSet}, fmt::Display, hash::Hash};
+use std::{collections::{hash_map::Entry, HashMap}, fmt::Display, hash::Hash};
 
 use anyhow::{anyhow, Result};
-use fraction::{One, Zero};
-use rand::{thread_rng, Rng};
-use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}}, math::fraction::Fraction};
+use rand::Rng;
+
+use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}}, math::fraction::Fraction};
 
 pub trait Sampler {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage>;

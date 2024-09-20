@@ -1,9 +1,7 @@
-use std::{fmt::Display, io::BufRead, str::FromStr};
+use std::{fmt::Display, str::FromStr};
 use anyhow::{anyhow, Context, Error, Result};
 
-use crate::{activity_key::{self, Activity, ActivityKey}, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait_alignments::EbiTraitAlignments, ebi_trait_stochastic_semantics::TransitionIndex}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, line_reader::LineReader};
-
-use super::ebi_object::EbiObject;
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::ebi_trait_stochastic_semantics::TransitionIndex, line_reader::LineReader};
 
 pub const HEADER: &str = "alignments";
 
@@ -11,9 +9,9 @@ pub const EBI_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     name: "alignments",
     article: "",
     file_extension: "ali",
-    validator: import::validate::<Alignments>,
+    validator: ebi_input::validate::<Alignments>,
     trait_importers: &[
-        EbiTraitImporter::Alignments(Alignments::read_as_alignments),
+        
     ],
     object_importers: &[
         EbiObjectImporter::Alignments(Alignments::import_as_object)
@@ -59,15 +57,6 @@ impl Alignments {
     pub fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
         &mut self.activity_key
     }
-
-    pub fn read_as_alignments(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitAlignments>> {
-        let alignments = Self::import(reader)?;
-        Ok(Box::new(alignments))
-    }
-}
-
-impl EbiTraitAlignments for Alignments {
-    
 }
 
 impl Exportable for Alignments {
@@ -124,7 +113,7 @@ impl Display for Alignments {
 }
 
 impl Importable for Alignments {
-    fn import_as_object(reader: &mut dyn std::io::BufRead) -> anyhow::Result<super::ebi_object::EbiObject> {
+    fn import_as_object(reader: &mut dyn std::io::BufRead) -> Result<EbiObject> {
         Ok(EbiObject::Alignments(Self::import(reader)?))
     }
 

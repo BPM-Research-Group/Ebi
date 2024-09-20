@@ -1,10 +1,7 @@
-use std::{collections::HashMap, fmt::{self, Debug}, hash::{Hash, Hasher}, rc::Rc};
+use bitvec::bitvec;
+use anyhow::{anyhow, Context};
 
-use bitvec::{bitvec, vec::BitVec, prelude::Lsb0};
-use anyhow::{anyhow, Context, Result};
-use fraction::Zero;
-
-use crate::{activity_key::{self, Activity, ActivityKey}, cross_product::CrossProductResultImpl, ebi_objects::{labelled_petri_net::LPNMarking, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, export::Displayable, follower_semantics::FollowerSemantics, marking::Marking, math::fraction::Fraction};
+use crate::{ebi_framework::activity_key::{Activity, ActivityKey}, ebi_objects::{labelled_petri_net::LPNMarking, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
 
 impl StochasticLabelledPetriNet {
 

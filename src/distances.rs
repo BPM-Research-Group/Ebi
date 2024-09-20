@@ -1,21 +1,12 @@
-use std::borrow::Borrow;
-use std::collections::HashMap;
 use std::{iter::FusedIterator, sync::Arc};
 use std::fmt::Debug;
-use anyhow::Result;
 
-use fraction::{BigUint, GenericFraction, Ratio, Sign, Zero};
-use indicatif::ProgressBar;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
-use crate::activity_key::Activity;
-use crate::ebi_commands::ebi_command::EbiCommand;
-use crate::ebi_traits::ebi_trait_event_log::{EbiTraitEventLog, IndexTrace};
-use crate::ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage;
-use crate::math::fraction_matched::FractionMatched;
+use crate::ebi_framework::ebi_command::EbiCommand;
+use crate::ebi_traits::ebi_trait_event_log::IndexTrace;
 use crate::math::levenshtein;
-use crate::Trace;
-use crate::{ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::fraction::Fraction};
+use crate::math::fraction::Fraction;
 
 pub struct TriangularDistanceMatrix {
     len: usize, //lenght of one side of the matrix
@@ -160,30 +151,3 @@ impl <'a> Iterator for TriangularIterator<'a> {
 impl <'a> FusedIterator for TriangularIterator<'a> {}
 
 impl <'a> ExactSizeIterator for TriangularIterator<'a> {}
-
-pub struct DistanceMatrix {
-    distances: Vec<Vec<Fraction>>,
-}
-
-impl DistanceMatrix {
-    pub fn new<A, B>(log1: &A, log2: &B) -> Self where A: IndexTrace  + ?Sized, B: IndexTrace + ?Sized {
-        let log1 = Arc::new(log1);
-        let log2 = Arc::new(log2);
-        
-        let distances = (0..log1.len()).into_par_iter().map(|index1| {
-            (0..log2.len()).into_par_iter().map(|index2| {
-                let log1 = Arc::clone(&log1);
-                let log2 = Arc::clone(&log2);
-            
-                let trace1 = log1.get_trace(index1).unwrap();
-                let trace2 = log2.get_trace(index2).unwrap();
-                
-                levenshtein::normalised(trace1, trace2)
-            }).collect::<Vec<_>>()
-        }).collect::<Vec<_>>();
-
-        Self {
-            distances: distances,
-        }
-    }
-}

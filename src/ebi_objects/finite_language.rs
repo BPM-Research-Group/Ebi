@@ -1,8 +1,7 @@
-use crate::{activity_key::{self, Activity, ActivityKey}, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, line_reader::LineReader, ActivityTrace, Trace};
 use anyhow::{anyhow, Result, Context, Error};
-use std::{collections::{hash_set::Iter, HashSet}, fmt::Display, io::{self, BufRead}, str::FromStr};
+use std::{collections::HashSet, fmt::Display, io::{self, BufRead}, str::FromStr};
 
-use super::ebi_object::EbiObject;
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage}, line_reader::LineReader};
 
 pub const HEADER: &str = "finite language";
 
@@ -10,7 +9,7 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "finite language",
     article: "a",
     file_extension: "lang",
-    validator: import::validate::<FiniteLanguage>,
+    validator: ebi_input::validate::<FiniteLanguage>,
     trait_importers: &[
         EbiTraitImporter::FiniteLanguage(ebi_trait_finite_language::import::<FiniteLanguage>),
     ],
@@ -24,15 +23,15 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
 
 pub struct FiniteLanguage {
     activity_key: ActivityKey,
-    traces: HashSet<ActivityTrace>
+    traces: HashSet<Vec<Activity>>
 }
 
 impl FiniteLanguage {
-    pub fn push_string(&mut self, trace: Trace) {
+    pub fn push_string(&mut self, trace: Vec<String>) {
         self.traces.insert(self.activity_key.process_trace(&trace));
     }
 
-    pub fn push(&mut self, trace: ActivityTrace) {
+    pub fn push(&mut self, trace: Vec<Activity>) {
         self.traces.insert(trace);
     }
 }
@@ -157,8 +156,8 @@ impl Importable for FiniteLanguage {
     }
 }
 
-impl From<HashSet<Trace>> for FiniteLanguage {
-    fn from(value: HashSet<Trace>) -> Self {
+impl From<HashSet<Vec<String>>> for FiniteLanguage {
+    fn from(value: HashSet<Vec<String>>) -> Self {
         let mut activity_key = ActivityKey::new();
         let traces = value.into_iter().map(|trace| activity_key.process_trace(&trace)).collect();
         Self { 
@@ -168,8 +167,8 @@ impl From<HashSet<Trace>> for FiniteLanguage {
     }
 }
 
-impl From<(ActivityKey, HashSet<ActivityTrace>)> for FiniteLanguage {
-    fn from(value: (ActivityKey, HashSet<ActivityTrace>)) -> Self {
+impl From<(ActivityKey, HashSet<Vec<Activity>>)> for FiniteLanguage {
+    fn from(value: (ActivityKey, HashSet<Vec<Activity>>)) -> Self {
         Self{
             activity_key: value.0,
             traces: value.1

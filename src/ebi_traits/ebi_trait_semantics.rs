@@ -1,8 +1,8 @@
 use std::{fmt::{Debug, Display}, hash::Hash};
 use anyhow::{anyhow, Result};
-use crate::{activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::{alignments::{Alignments, Move}, ebi_object::EbiTraitObject, labelled_petri_net::LPNMarking}};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::labelled_petri_net::LPNMarking};
 
-use super::{ebi_trait::FromEbiTraitObject, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_stochastic_semantics::TransitionIndex};
+use super::ebi_trait_stochastic_semantics::TransitionIndex;
 
 pub enum EbiTraitSemantics {
 	Marking(Box<dyn Semantics<State = LPNMarking>>),

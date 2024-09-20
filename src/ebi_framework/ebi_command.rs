@@ -1,13 +1,11 @@
-use std::{collections::{BTreeSet, HashSet}, fmt::{Debug, Display}, hash::Hash, io::{self, IsTerminal}, path::PathBuf};
-use std::fmt::Write;
-
+use std::{collections::BTreeSet, fmt::{Debug, Display}, hash::Hash, path::PathBuf};
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use anyhow::{anyhow, Context, Result};
-use indicatif::{ProgressBar, ProgressState, ProgressStyle};
+use indicatif::{ProgressBar, ProgressStyle};
 
-use crate::{ebi_commands::{ebi_command_analyse, ebi_command_association, ebi_command_conformance, ebi_command_convert, ebi_command_discover, ebi_command_latex, ebi_command_probability, ebi_command_validate, ebi_command_visualise}, ebi_input_output::{self, EbiInput, EbiInputType}, ebi_objects::ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_traits::ebi_trait::EbiTrait, export::{self, EbiExporter, EbiOutput, EbiOutputType, Exportable}, file_handler::{self, EbiFileHandler}, import::{self, MultipleReader}, math::fraction::{Fraction, FractionNotParsedYet}};
+use crate::{ebi_commands::{ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association, ebi_command_conformance, ebi_command_convert, ebi_command_discover, ebi_command_info, ebi_command_latex, ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate, ebi_command_visualise}, ebi_framework::ebi_output, math::fraction::{Fraction, FractionNotParsedYet}};
 
-use super::{ebi_command_analyse_non_stochastic, ebi_command_info, ebi_command_sample, ebi_command_test};
+use super::{ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}};
 
 pub const EBI_COMMANDS: EbiCommand = EbiCommand::Group {
     name_short: "Ebi",
@@ -86,7 +84,7 @@ impl EbiCommand {
                     command = command.subcommand(subcommand);
                 }
             },
-            EbiCommand::Command { name_short, name_long, explanation_short, explanation_long, cli_command, latex_link, exact_arithmetic, execute, input_types, input_helps: input_help, input_names, output } => {
+            EbiCommand::Command { name_short, name_long, explanation_short, explanation_long, cli_command, exact_arithmetic, input_types, input_helps: input_help, input_names, ..} => {
                 let name = if let Some(x) = name_long {x} else {name_short};
                 command = Command::new(name)
                     .about(explanation_short);
@@ -100,7 +98,7 @@ impl EbiCommand {
                 }
 
                 for (i, (input_name, (input_type, input_help))) in input_names.iter().zip(input_types.iter().zip(input_help.iter())).enumerate() {
-                    let mut arg = Arg::new(format!("{}x{}", input_name, i))
+                    let arg = Arg::new(format!("{}x{}", input_name, i))
                     .action(ArgAction::Set)
                     .value_name(input_name)
                     .help(input_help)
@@ -145,18 +143,18 @@ impl EbiCommand {
 
     pub fn short_name(&self) -> &str {
         match self {
-            EbiCommand::Group { name_short, name_long, explanation_short, explanation_long, children } => name_short,
-            EbiCommand::Command { name_short, name_long, explanation_short, explanation_long, cli_command, latex_link, exact_arithmetic, input_types, execute, output, input_helps: input_help, input_names } => name_short,
+            EbiCommand::Group { name_short, .. } => name_short,
+            EbiCommand::Command { name_short, .. } => name_short,
         }
     }
 
     pub fn long_name(&self) -> &str {
         match self {
-            EbiCommand::Group { name_short, name_long, explanation_short, explanation_long, children } => match name_long {
+            EbiCommand::Group { name_short, name_long, .. } => match name_long {
                 Some(x) => x,
                 None => &name_short,
             },
-            EbiCommand::Command { name_short, name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_traits, input_names, input_helps, execute, output } => match name_long {
+            EbiCommand::Command { name_short, name_long, .. } => match name_long {
                 Some(x) => x,
                 None => &name_short,
             },
@@ -174,14 +172,14 @@ impl EbiCommand {
 
     pub fn execute(&self, cli_matches: &ArgMatches) -> Result<()> {
         match self {
-            EbiCommand::Group { name_short, name_long, explanation_short, explanation_long, children } => {
+            EbiCommand::Group { children, ..} => {
                 for child in children.iter() {
                     if let Some(sub_matches) = cli_matches.subcommand_matches(child.long_name()) {
                         return child.execute(sub_matches);
                     }
                 }
             },
-            EbiCommand::Command { name_short, name_long, explanation_short, explanation_long, cli_command, latex_link, exact_arithmetic, input_types: input_typess, execute, output: output_type, input_helps: input_help, input_names } => {
+            EbiCommand::Command { exact_arithmetic, input_types: input_typess, execute, output: output_type, input_names, .. } => {
                 //set exact arithmetic
                 if !exact_arithmetic || cli_matches.get_flag("approx") {
                     log::info!("Use approximate arithmetic");
@@ -211,12 +209,12 @@ impl EbiCommand {
                     //write result to file
                     let exporter = Self::select_exporter(output_type, Some(to_file));
                     log::info!("Writing result to {:?} as {} {}", to_file, exporter.get_article(), exporter);
-                    export::export_object(to_file, result, exporter)?;
+                    ebi_output::export_object(to_file, result, exporter)?;
                 } else {
                     //write result to STDOUT
                     let exporter = Self::select_exporter(output_type, None);
                     log::info!("Writing result as {} {}", exporter.get_article(), exporter);
-                    println!("{}", export::export_to_string(result, exporter)?);
+                    println!("{}", ebi_output::export_to_string(result, exporter)?);
                 }
 
                 return Ok(());
@@ -226,7 +224,7 @@ impl EbiCommand {
     }
 
     fn select_exporter(output_type: &EbiOutputType, to_file: Option<&PathBuf>) -> EbiExporter {
-        let mut exporters = output_type.get_exporters();
+        let exporters = output_type.get_exporters();
         
         if exporters.len() == 1 || to_file.is_none() {
             return exporters.into_iter().next().unwrap();
@@ -248,7 +246,7 @@ impl EbiCommand {
             });
 
             for exporter in exporters {
-                if let EbiExporter::Object(object_exporter, file_handler) = exporter {
+                if let EbiExporter::Object(_, file_handler) = exporter {
                     if to_file.unwrap().display().to_string().ends_with(&(".".to_string() + file_handler.file_extension)) {
                         return exporter;
                     }
@@ -274,9 +272,9 @@ impl EbiCommand {
                 EbiInputType::Trait(etrait) => {
                     
                     //try to parse a trait
-                    match import::get_reader(cli_matches, cli_id).context("Getting reader.") {
+                    match ebi_input::get_reader(cli_matches, cli_id).context("Getting reader.") {
                         Ok(mut reader) => {
-                            match import::read_as_trait(etrait, &mut reader).with_context(|| format!("Parsing as the trait `{}`.", etrait)) {
+                            match ebi_input::read_as_trait(etrait, &mut reader).with_context(|| format!("Parsing as the trait `{}`.", etrait)) {
                                 Ok((object, file_handler)) => return Ok(EbiInput::Trait(object, file_handler)),
                                 Err(e) => error = Some(e)
                             }
@@ -287,9 +285,9 @@ impl EbiCommand {
                 EbiInputType::Object(etype) => {
                     
                     //try to parse a specific object
-                    match import::get_reader(cli_matches, cli_id).context("Getting reader.") {
+                    match ebi_input::get_reader(cli_matches, cli_id).context("Getting reader.") {
                         Ok(mut reader) => {
-                            match import::read_as_object(etype, &mut reader).with_context(|| format!("Parsing as the object type `{}`.", etype)) {
+                            match ebi_input::read_as_object(etype, &mut reader).with_context(|| format!("Parsing as the object type `{}`.", etype)) {
                                 Ok((object, file_handler)) => return Ok(EbiInput::Object(object, file_handler)),
                                 Err(e) => error = Some(e)
                             }
@@ -298,9 +296,9 @@ impl EbiCommand {
                     }
                 },
                 EbiInputType::AnyObject => {
-                    match import::get_reader(cli_matches, cli_id).context("Getting reader.") {
+                    match ebi_input::get_reader(cli_matches, cli_id).context("Getting reader.") {
                         Ok(mut reader) => {
-                            match import::read_as_any_object(&mut reader).context("Parsing as any object.") {
+                            match ebi_input::read_as_any_object(&mut reader).context("Parsing as any object.") {
                                 Ok((object, file_handler)) => return Ok(EbiInput::Object(object, file_handler)),
                                 Err(e) => error = Some(e)
                             }
@@ -355,14 +353,14 @@ impl EbiCommand {
 
     fn get_paths_recursive(&self, command: &'static EbiCommand, result: &mut BTreeSet<Vec<&'static EbiCommand>>, prefix: Vec<&'static EbiCommand>) {
         match command {
-            EbiCommand::Group { name_short, name_long, explanation_short, explanation_long, children } => {
+            EbiCommand::Group { children, .. } => {
                 for child in children.iter() {
                     let mut prefix = prefix.clone();
                     prefix.push(command);
                     self.get_paths_recursive(child, result, prefix);
                 }
             },
-            EbiCommand::Command { name_short, name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types, input_names, input_helps, execute, output } => {
+            EbiCommand::Command { .. } => {
                 let mut prefix = prefix.clone();
                 prefix.push(command);
                 result.insert(prefix);
@@ -392,8 +390,8 @@ impl Display for EbiCommand {
 impl Debug for EbiCommand {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Self::Group { name_short, name_long, explanation_short, explanation_long, children } => f.debug_struct("Group").field("name_short", name_short).field("name_long", name_long).finish(),
-            Self::Command { name_short, name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_traits, input_names, input_helps, execute, output } => f.debug_struct("Command").field("name_short", name_short).field("name_long", name_long).finish(),
+            Self::Group { name_short, name_long, .. } => f.debug_struct("Group").field("name_short", name_short).field("name_long", name_long).finish(),
+            Self::Command { name_short, name_long, .. } => f.debug_struct("Command").field("name_short", name_short).field("name_long", name_long).finish(),
         }
     }
 }

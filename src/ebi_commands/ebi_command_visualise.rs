@@ -1,11 +1,8 @@
-use std::{path::PathBuf, io::{self, IsTerminal}};
-
-use crate::{dottable::Dottable, ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_traits::ebi_trait::EbiTrait, export::{self, EbiOutput, EbiOutputType}, import};
-use anyhow::{Result, Context, anyhow};
-use clap::{ArgMatches, Command, value_parser, ArgAction, Arg};
 use layout::backends::svg::SVGWriter;
 
-use super::ebi_command::EbiCommand;
+use crate::ebi_framework::{dottable::Dottable, ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}};
+
+
 
 pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group { 
     name_short: "vis", 

@@ -1,6 +1,6 @@
-use std::{collections::HashSet, rc::Rc, sync::Arc};
+use std::{collections::HashSet, sync::Arc};
 use anyhow::{anyhow, Result};
-use fraction::{One, Zero};
+use fraction::One;
 
 use crate::{distances::TriangularDistanceMatrix, ebi_objects::finite_language::FiniteLanguage, ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage, math::fraction::Fraction};
 

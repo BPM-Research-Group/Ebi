@@ -1,12 +1,7 @@
-use core::num;
-use std::sync::{atomic::{AtomicBool, AtomicUsize, Ordering}, Arc};
-
+use std::sync::{atomic::{AtomicUsize, Ordering}, Arc};
 use anyhow::{anyhow, Result};
-use fraction::{One, Zero};
-use indicatif::ProgressBar;
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
-use crate::{distances::{self, TriangularDistanceMatrix}, ebi_commands::{ebi_command::EbiCommand, ebi_command_info::Infoable}, ebi_traits::ebi_trait_event_log::{AttributeKey, EbiTraitEventLog}, math::{average::{Average, MatchedDistances}, fraction::Fraction, fraction_matched::FractionMatched}, techniques::sample};
+use crate::{distances::TriangularDistanceMatrix, ebi_framework::ebi_command::EbiCommand, ebi_traits::ebi_trait_event_log::{AttributeKey, EbiTraitEventLog}, math::{average::Average, fraction::Fraction}, techniques::sample};
 
 pub trait StatisticalTests {
     /**

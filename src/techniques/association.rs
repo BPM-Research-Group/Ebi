@@ -1,13 +1,8 @@
-use core::num;
-
 use anyhow::{anyhow, Result};
-use chrono::{DateTime, Utc};
 use fraction::Zero;
-use num_bigint::ToBigUint;
-use process_mining::event_log::{AttributeValue, XESEditableAttribute};
 use rand::Rng;
 use rayon::prelude::*;
-use crate::{activity_key::Activity, ebi_objects::event_log::DataType, ebi_traits::ebi_trait_event_log::EbiTraitEventLog, math::{correlation::correlation, fraction::Fraction, levenshtein, root::{ContainsRoot, Root}}};
+use crate::{ebi_objects::event_log::DataType, ebi_traits::ebi_trait_event_log::EbiTraitEventLog, math::{correlation::correlation, fraction::Fraction, levenshtein, root::ContainsRoot}};
 
 pub trait Associations {
     fn association(self: &mut Box<Self>, number_of_samples: usize, attribute: &String) -> Result<ContainsRoot>;
@@ -220,7 +215,7 @@ impl<'a> Iterator for SamplePairsSpaceIterator<'a> {
     type Item = (usize, usize);
 
     fn next(&mut self) -> Option<Self::Item> {
-        if (self.sample_space.len * self.sample_space.len > self.sample_space.number_of_samples) {
+        if self.sample_space.len * self.sample_space.len > self.sample_space.number_of_samples {
             //sample
             if self.done >= self.sample_space.number_of_samples {
                 None

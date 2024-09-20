@@ -1,4 +1,4 @@
-use crate::activity_key::Activity;
+use crate::ebi_framework::activity_key::Activity;
 
 
 #[derive(Clone,Debug)]

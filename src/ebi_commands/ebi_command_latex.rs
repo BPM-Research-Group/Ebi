@@ -1,13 +1,11 @@
-use std::{collections::{BTreeSet, HashMap, HashSet}, io::{self, Write}};
-
-use clap::{ArgMatches, Command};
+use std::{io::Write, collections::HashMap};
+use clap::Command;
 use anyhow::Result;
-use fraction::Zero;
-use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, gv, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
+use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
-use crate::{ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType}, ebi_traits::ebi_trait::EbiTrait, export::{EbiOutput, EbiOutputType}, file_handler::{self, EbiFileHandler, EBI_FILE_HANDLERS}, EBI_COMMANDS};
 
-use super::ebi_command::EbiCommand;
+use crate::ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait};
+
 
 pub const EBI_LATEX: EbiCommand = EbiCommand::Group { 
     name_short: "latex", 
@@ -54,55 +52,54 @@ fn manual() -> Result<EbiOutput> {
     let mut f = vec![];
 
     //version
-    writeln!(f, "\\def\\version{{{}}}", env!("CARGO_PKG_VERSION"));
+    writeln!(f, "\\def\\version{{{}}}", env!("CARGO_PKG_VERSION"))?;
 
     //command list
-    writeln!(f, "\\def\\ebicommandlist{{\\begin{{itemize}}");
+    writeln!(f, "\\def\\ebicommandlist{{\\begin{{itemize}}")?;
     for path in EBI_COMMANDS.get_command_paths() {
-        writeln!(f, "\\item\\texttt{{{}}} or \\texttt{{{}}}", EbiCommand::path_to_string(&path), EbiCommand::path_to_short_string(&path));
+        writeln!(f, "\\item\\texttt{{{}}} or \\texttt{{{}}}", EbiCommand::path_to_string(&path), EbiCommand::path_to_short_string(&path))?;
     }
-    writeln!(f, "\\end{{itemize}}}}");
+    writeln!(f, "\\end{{itemize}}}}")?;
 
     //commands
-    writeln!(f, "\\def\\ebicommands{{");
+    writeln!(f, "\\def\\ebicommands{{")?;
     for path in EBI_COMMANDS.get_command_paths() {
-        writeln!(f, "\\subsection{{\\texttt{{{}}}}}", EbiCommand::path_to_string(&path));
+        writeln!(f, "\\subsection{{\\texttt{{{}}}}}", EbiCommand::path_to_string(&path))?;
 
-        if let EbiCommand::Command { name_short, name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_typess, input_names, input_helps, execute, output: output_type } = path[path.len()-1] {
+        if let EbiCommand::Command { name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_typess, input_names, input_helps, output: output_type, .. } = path[path.len()-1] {
 
             //alias
-            if let Some(x) = name_long {
-                writeln!(f, "Alias: \\texttt{{{}}}.\\\\", EbiCommand::path_to_short_string(&path));
+            if let Some(_) = name_long {
+                writeln!(f, "Alias: \\texttt{{{}}}.\\\\", EbiCommand::path_to_short_string(&path))?;
             }
 
             //explanation
             if let Some(l) = explanation_long {
-                writeln!(f, "{}\\\\", l);
+                writeln!(f, "{}\\\\", l)?;
             } else {
-                writeln!(f, "{}\\\\", explanation_short);
+                writeln!(f, "{}\\\\", explanation_short)?;
             }
 
             //latex link
             if let Some(link) = latex_link {
-                writeln!(f, "More information: {}.\\\\", link);
+                writeln!(f, "More information: {}.\\\\", link)?;
             }
 
             //parameters table
-            writeln!(f, "\\begin{{tabularx}}{{\\linewidth}}{{lX}}");
-            writeln!(f, "\\toprule");
-            writeln!(f, "Parameter \\\\\\midrule");
-            let mut pos = 0;
+            writeln!(f, "\\begin{{tabularx}}{{\\linewidth}}{{lX}}")?;
+            writeln!(f, "\\toprule")?;
+            writeln!(f, "Parameter \\\\\\midrule")?;
 
             //standard parameters
-            for (i, (input_name, (input_types, input_help))) in input_names.iter().zip(input_typess.iter().zip(input_helps.iter())).enumerate() {
-                write!(f, "<\\texttt{{{}}}>", input_name.replace("_", "\\_"));    
-                writeln!(f, "&{}\\\\", input_help);
+            for (input_name, (input_types, input_help)) in input_names.iter().zip(input_typess.iter().zip(input_helps.iter())) {
+                write!(f, "<\\texttt{{{}}}>", input_name.replace("_", "\\_"))?;    
+                writeln!(f, "&{}\\\\", input_help)?;
 
                 //mandatoryness
-                writeln!(f, "&\\textit{{Mandatory:}} \\quad yes, though it can be given on STDIN by giving an `-' on the command line.\\\\");
+                writeln!(f, "&\\textit{{Mandatory:}} \\quad yes, though it can be given on STDIN by giving an `-' on the command line.\\\\")?;
 
                 //accepted values
-                writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", EbiInputType::possible_inputs_as_strings_with_articles(input_types, " and "));
+                writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", EbiInputType::possible_inputs_as_strings_with_articles(input_types, " and "))?;
             }
 
             //custom parameters
@@ -110,88 +107,86 @@ fn manual() -> Result<EbiOutput> {
                 for arg in (fu)(Command::new("")).get_arguments() {
                     if let Some(short) = arg.get_short() {
                         if let Some(long) = arg.get_long() {
-                            writeln!(f, "-\\texttt{{{}}} or --\\texttt{{{}}}", short, long);
+                            writeln!(f, "-\\texttt{{{}}} or --\\texttt{{{}}}", short, long)?;
                         } else {
-                            writeln!(f, "-\\texttt{{{}}}", short);
+                            writeln!(f, "-\\texttt{{{}}}", short)?;
                         }
                     } else {
                         if let Some(long) = arg.get_long() {
-                            writeln!(f, "--\\texttt{{{}}}", long);
+                            writeln!(f, "--\\texttt{{{}}}", long)?;
                         } else {
-                            writeln!(f, "<\\texttt{{{}}}>", arg.get_value_names().unwrap()[0]);
+                            writeln!(f, "<\\texttt{{{}}}>", arg.get_value_names().unwrap()[0])?;
                         }
                     }
-                    writeln!(f, "&{}\\\\", if let Some(h) = arg.get_long_help() {h.to_string()} else {arg.get_help().unwrap().to_string()});
+                    writeln!(f, "&{}\\\\", if let Some(h) = arg.get_long_help() {h.to_string()} else {arg.get_help().unwrap().to_string()})?;
 
                     if arg.get_short().is_none() && arg.get_long().is_none() {
                         //custom argument
 
-                        writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes"} else {"no"} );
+                        writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes"} else {"no"} )?;
                         // writeln!(f, "&\\textit{{Accepted file types:}}\\quad {}\\\\", get_file_types(input_types, pos));
                         // writeln!(f, "&\\textit{{Accepted traits:}}\\quad {}\\\\", get_traits(input_typess[pos]));
-
-                        pos += 1;
                     } else {
-                        writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\");
+                        writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
                     }
                 }
             }
 
             //output
-            writeln!(f, "\\texttt{{-o}} or \\texttt{{--output}} <\\texttt{{FILE}}> &");
+            writeln!(f, "\\texttt{{-o}} or \\texttt{{--output}} <\\texttt{{FILE}}> &")?;
             if output_type.get_exporters().len() == 1 {
                 let exporter = output_type.get_exporters().remove(0);
-                writeln!(f, "The {} file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\\\", exporter);
+                writeln!(f, "The {} file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\\\", exporter)?;
             } else {
-                writeln!(f, "The file to which the results must be written. Based on the file extension, Ebi will output either {}.", output_type.exporters_as_strings_with_articles("or"));
-                writeln!(f, "If the parameter is not given, the results will be written to STDOUT as {} {}.\\\\", output_type.get_exporters()[0].get_article(), output_type.get_exporters()[0]);
+                writeln!(f, "The file to which the results must be written. Based on the file extension, Ebi will output either {}.", output_type.exporters_as_strings_with_articles("or"))?;
+                writeln!(f, "If the parameter is not given, the results will be written to STDOUT as {} {}.\\\\", output_type.get_exporters()[0].get_article(), output_type.get_exporters()[0])?;
             }
-            writeln!(f, "&\\textit{{Mandatory:}} \\quad no\\\\");
+            writeln!(f, "&\\textit{{Mandatory:}} \\quad no\\\\")?;
             
             if *exact_arithmetic {
-                writeln!(f, "\\texttt{{-a}} or \\texttt{{--approximate}} & Use approximate arithmetic instead of exact arithmetic.\\\\");
-                writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\");
+                writeln!(f, "\\texttt{{-a}} or \\texttt{{--approximate}} & Use approximate arithmetic instead of exact arithmetic.\\\\")?;
+                writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
             }
 
-            writeln!(f, "\\bottomrule");
-            writeln!(f, "\\end{{tabularx}}");
+            writeln!(f, "\\bottomrule")?;
+            writeln!(f, "\\end{{tabularx}}")?;
 
             //output
-            writeln!(f, "Output: {}.", output_type);
+            writeln!(f, "Output: {}.", output_type)?;
         }
     }
-    writeln!(f, "}}");
+    writeln!(f, "}}")?;
 
     //file handlers
-    writeln!(f, "\\def\\ebifilehandlers{{");
+    writeln!(f, "\\def\\ebifilehandlers{{")?;
     for file_handler in EBI_FILE_HANDLERS {
-        writeln!(f, "\\subsection{{{} (.{})}}", file_handler.name, file_handler.file_extension);
-        writeln!(f, "Import as objects: {}.", file_handler.object_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", "));
-        writeln!(f, "\\\\Import as traits: {}.", file_handler.trait_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", "));
-        writeln!(f, "\\\\Input to commands: \\texttt{{{}}}.", file_handler.get_applicable_commands().iter().map(|path| EbiCommand::path_to_string(path)).collect::<Vec<_>>().join(", "));
+        writeln!(f, "\\subsection{{{} (.{})}}", file_handler.name, file_handler.file_extension)?;
+        writeln!(f, "Import as objects: {}.", file_handler.object_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", "))?;
+        writeln!(f, "\\\\Import as traits: {}.", file_handler.trait_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", "))?;
+        writeln!(f, "\\\\Input to commands: \\texttt{{{}}}.", file_handler.get_applicable_commands().iter().map(|path| EbiCommand::path_to_string(path)).collect::<Vec<_>>().join(", "))?;
     }
-    writeln!(f, "}}");
+    writeln!(f, "}}")?;
 
     //file handlers list
-    writeln!(f, "\\def\\ebifilehandlerlist{{\\begin{{itemize}}");
+    writeln!(f, "\\def\\ebifilehandlerlist{{\\begin{{itemize}}")?;
     for file_handler in EBI_FILE_HANDLERS {
-        writeln!(f, "\\item {} (.{})", file_handler.name, file_handler.file_extension);
+        writeln!(f, "\\item {} (.{})", file_handler.name, file_handler.file_extension)?;
     }
-    writeln!(f, "\\end{{itemize}}}}");
+    writeln!(f, "\\end{{itemize}}}}")?;
 
     //trait list
-    writeln!(f, "\\def\\ebitraitlist{{\\begin{{itemize}}");
+    writeln!(f, "\\def\\ebitraitlist{{\\begin{{itemize}}")?;
     for etrait in EbiTrait::iter() {
-        writeln!(f, "\\item {}", etrait);
+        writeln!(f, "\\item {}", etrait)?;
     }
-    writeln!(f, "\\end{{itemize}}}}");
+    writeln!(f, "\\end{{itemize}}}}")?;
 
     //object type list
-    writeln!(f, "\\def\\ebiobjecttypelist{{\\begin{{itemize}}");
+    writeln!(f, "\\def\\ebiobjecttypelist{{\\begin{{itemize}}")?;
     for object_type in EbiObjectType::iter() {
-        writeln!(f, "\\item {}", object_type);
+        writeln!(f, "\\item {}", object_type)?;
     }
-    writeln!(f, "\\end{{itemize}}}}");
+    writeln!(f, "\\end{{itemize}}}}")?;
 
     Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
 }

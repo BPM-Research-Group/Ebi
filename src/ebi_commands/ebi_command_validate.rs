@@ -1,11 +1,8 @@
-
 use std::path::PathBuf;
+use anyhow::{anyhow, Context, Ok};
+use clap::{value_parser, Arg, ArgAction};
 
-use crate::{ebi_info, ebi_input_output::EbiInputType, ebi_objects::ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_traits::ebi_trait::EbiTrait, export::{EbiOutput, EbiOutputType}, file_handler::EbiFileHandler, import, math::fraction::Fraction};
-use anyhow::{anyhow, Result, Ok, Context};
-use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
-
-use super::ebi_command::EbiCommand;
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInputType}, ebi_output::{EbiOutput, EbiOutputType}}, ebi_info};
 
 #[macro_export]
 macro_rules! ebi_validate {
@@ -36,8 +33,8 @@ pub const EBI_VALIDATE: EbiCommand = EbiCommand::Command {
         let file_handler = inputs.remove(0).to_type::<EbiFileHandler>()?;
         
         if let Some(file) = cli_matches.get_one::<PathBuf>("file") {
-            let mut reader = import::get_reader_file(file).context("Could not get reader for file.")?;
-            import::validate_object_of(&mut reader, &file_handler).context("Validating the file.")?;
+            let mut reader = ebi_input::get_reader_file(file).context("Could not get reader for file.")?;
+            ebi_input::validate_object_of(&mut reader, &file_handler).context("Validating the file.")?;
             return Ok(EbiOutput::String(format!("Object is a valid {}.", file_handler.name)));
         } else {
             return Err(anyhow!("No input file given."))

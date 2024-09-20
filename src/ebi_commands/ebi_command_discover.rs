@@ -1,9 +1,5 @@
-use std::{path::PathBuf, io::{self, IsTerminal}};
-use anyhow::{anyhow, Result, Context};
-use clap::{Command, arg, value_parser, ArgMatches, ArgAction, Arg};
 
-use crate::{ebi_input_output::{EbiInput, EbiInputType}, ebi_objects::{ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}}, ebi_traits::{ebi_trait::EbiTrait, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage}, export::{self, EbiOutput, EbiOutputType}, import, techniques::{alignment_stochastic_miner::{self, AlignmentMiner}, occurrences_stochastic_miner::OccurrencesStochasticMiner, uniform_stochastic_miner::{self, UniformStochasticMiner}}};
-use super::ebi_command::EbiCommand;
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_objects::labelled_petri_net::LabelledPetriNet, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, techniques::{alignment_stochastic_miner::AlignmentMiner, occurrences_stochastic_miner::OccurrencesStochasticMiner, uniform_stochastic_miner::UniformStochasticMiner}};
 
 pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
     name_short: "disc",

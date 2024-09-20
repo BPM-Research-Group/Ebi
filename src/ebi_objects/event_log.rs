@@ -1,20 +1,18 @@
 use core::fmt;
-use std::{any, collections::{HashMap, HashSet}, fmt::Display, fs::File, io::{self, BufRead, BufReader}, rc::Rc, str::FromStr};
-use anyhow::{anyhow, Context, Result, Error};
+use std::{collections::{HashMap, HashSet}, fmt::Display, io::{self, BufRead, Write}, rc::Rc, str::FromStr};
+use anyhow::{anyhow, Result, Error};
 use chrono::{DateTime, Utc};
-use flate2::bufread::GzDecoder;
-use fraction::One;
-use process_mining::{event_log::{event_log_struct::EventLogClassifier, export_xes::{self, export_xes_event_log_to_file}, AttributeValue}, XESImportOptions};
+use process_mining::{event_log::{event_log_struct::EventLogClassifier, AttributeValue}, XESImportOptions};
 
-use crate::{activity_key::{Activity, ActivityKey}, ebi_commands::ebi_command_info::Infoable, ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, ToStochasticSemantics}}, export::{EbiObjectExporter, EbiOutput, Exportable}, file_handler::EbiFileHandler, import::{self, EbiObjectImporter, EbiTraitImporter, Importable}, math::fraction::Fraction, Trace};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::Semantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, ToStochasticSemantics}}, math::fraction::Fraction};
 
-use super::{ebi_object::EbiObject, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
+use super::{finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
 
 pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     name: "event log",
     article: "an",
     file_extension: "xes",
-    validator: import::validate::<EventLog>,
+    validator: ebi_input::validate::<EventLog>,
     trait_importers: &[
         EbiTraitImporter::FiniteLanguage(EventLog::read_as_finite_language),
         EbiTraitImporter::FiniteStochasticLanguage(EventLog::read_as_finite_stochastic_language),
@@ -90,7 +88,7 @@ impl EventLog {
     pub fn to_finite_language(&self) -> FiniteLanguage {
         log::info!("create finite language");
 
-        let mut map: HashSet<Trace> = HashSet::new();
+        let mut map: HashSet<Vec<String>> = HashSet::new();
         for t in &self.log.traces {
             let trace = t.events.iter().map(|event| self.classifier.get_class_identity(event)).collect::<Vec<String>>();
             map.insert(trace);
@@ -101,7 +99,7 @@ impl EventLog {
 
     pub fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage {
         log::info!("create stochastic language");
-        let mut map: HashMap<Trace, Fraction> = HashMap::new();
+        let mut map = HashMap::new();
         for t in &self.log.traces {
             let trace = t.events.iter().map(|event| self.classifier.get_class_identity(event)).collect::<Vec<String>>();
             match map.entry(trace) {
@@ -174,7 +172,7 @@ impl ToStochasticSemantics for EventLog {
 }
 
 impl Importable for EventLog {
-    fn import_as_object(reader: &mut dyn BufRead) -> anyhow::Result<EbiObject> {
+    fn import_as_object(reader: &mut dyn BufRead) -> Result<EbiObject> {
         Ok(EbiObject::EventLog(Self::import(reader)?))
     }
 
@@ -202,7 +200,7 @@ impl FromStr for EventLog {
 }
 
 impl Exportable for EventLog {
-    fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+    fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::EventLog(log)) => log.export(f),
             _ => unreachable!()

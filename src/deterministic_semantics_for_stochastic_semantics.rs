@@ -1,17 +1,19 @@
-use crate::activity_key::{Activity, ActivityKey};
-use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics;
-use crate::ebi_traits::ebi_trait_stochastic_semantics::StochasticSemantics;
-use crate::export::Displayable;
-use crate::math::fraction::Fraction;
-use crate::math::matrix::Matrix;
 use std::collections::hash_map::DefaultHasher;
 use std::collections::HashMap;
 use std::fmt::{self, Debug};
 use std::hash::{Hash, Hasher};
 use std::rc::Rc;
 use anyhow::Result;
-use fraction::{One, Zero};
 use std::collections::hash_map::Entry;
+
+use crate::ebi_framework::activity_key::{Activity, ActivityKey};
+use crate::ebi_framework::displayable::Displayable;
+use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics;
+use crate::ebi_traits::ebi_trait_stochastic_semantics::StochasticSemantics;
+use crate::math::fraction::Fraction;
+use crate::math::matrix::Matrix;
+
+
 
 #[derive(Clone,Hash,Eq,PartialEq,Debug)]
 enum MarkovMarking<S: Displayable> {

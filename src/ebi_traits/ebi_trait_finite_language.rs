@@ -1,10 +1,9 @@
-use std::{collections::hash_set::Iter, fmt::Display, io::BufRead};
-
+use std::{fmt::Display, io::BufRead};
 use anyhow::{anyhow, Result};
 
-use crate::{activity_key::{Activity, ActivityKey}, ebi_input_output::EbiInput, ebi_objects::ebi_object::EbiTraitObject, import::Importable, ActivityTrace, Trace};
+use crate::ebi_framework::{ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable};
 
-use super::{ebi_trait::FromEbiTraitObject, ebi_trait_event_log::IndexTrace, ebi_trait_iterable_language::EbiTraitIterableLanguage};
+use super::{ebi_trait_event_log::IndexTrace, ebi_trait_iterable_language::EbiTraitIterableLanguage};
 
 pub trait EbiTraitFiniteLanguage : IndexTrace + Display + EbiTraitIterableLanguage + Sync {
     
