@@ -41,13 +41,12 @@ impl StatisticalTests for dyn EbiTraitEventLog {
         let distances = TriangularDistanceMatrix::new(&traces_with_attributes);
         let average_base = Arc::new(Average::new(distances)?);
 
-        let mut e = AtomicUsize::new(0);
-        let mut err = AtomicUsize::new(0);
+        let err = AtomicUsize::new(0);
 
         log::info!("Perform the test");
         let progress_bar = EbiCommand::get_progress_bar(number_of_samples);
 
-        let e: usize = (0..number_of_samples).into_iter().map(|s| {
+        let e: usize = (0..number_of_samples).into_iter().map(|_| {
 
             //get multi-threaded access to what we need
             let mut average_a = Arc::clone(&average_base).as_ref().clone();

@@ -105,7 +105,7 @@ impl StochasticSemantics for StochasticDeterministicFiniteAutomatonSemantics {
         }
     }
 
-    fn get_total_weight_of_enabled_transitions(&self, state: &Self::State) -> Result<Fraction> {
+    fn get_total_weight_of_enabled_transitions(&self, _: &Self::State) -> Result<Fraction> {
         Ok(Fraction::one())
     }
 }

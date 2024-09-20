@@ -47,18 +47,6 @@ impl Fraction {
         }
     }
 
-    pub(crate) fn is_approximate(&self) -> bool {
-        match self {
-            Fraction::Exact(_) => false,
-            Fraction::Approx(_) => true,
-            Fraction::CannotCombineExactAndApprox => false,
-        }
-    }
-
-    pub(crate) fn new_exact(numer: BigUint, denom: BigUint) -> Self {
-        Fraction::Exact(BigFraction::new(numer, denom))
-    }
-
     /**
      * Returns whether the two given fractions are either both exact or both approximate
      */
@@ -330,8 +318,8 @@ impl FromEbiTraitObject for Fraction {
 impl From<&Fraction> for Fraction {
     fn from(value: &Fraction) -> Self {
         match value {
-            Fraction::Exact(f) => value.clone(),
-            Fraction::Approx(f) => value.clone(),
+            Fraction::Exact(_) => value.clone(),
+            Fraction::Approx(_) => value.clone(),
             Fraction::CannotCombineExactAndApprox => value.clone(),
         }
     }
@@ -420,7 +408,7 @@ impl Exportable for Fraction {
     }
 
     fn export(&self, f: &mut dyn std::io::Write) -> Result<()> {
-        writeln!(f, "{}", self);
+        writeln!(f, "{}", self)?;
         Ok(writeln!(f, "Approximately {:.4}", self)?)
     }
 }

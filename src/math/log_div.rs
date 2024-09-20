@@ -176,7 +176,7 @@ impl LogDiv {
 
     pub(crate) fn is_exact(&self) -> bool {
         match self {
-            LogDiv::Exact(f, _) => true,
+            LogDiv::Exact(_, _) => true,
             LogDiv::Approx(_) => false,
             LogDiv::CannotCombineExactAndApprox => false
         }
@@ -211,11 +211,11 @@ impl From<Fraction> for LogDiv {
                     Self::nan_b(true)
                 } else {
                     match f {
-                        GenericFraction::Rational(sign, f) => {
+                        GenericFraction::Rational(_, f) => {
                             let g = BigFraction::new(Self::power_s_u(2, f.numer()), BigUint::one());
                             Self::Exact(g, f.denom().clone())
                         },
-                        GenericFraction::Infinity(sign) => Self::infinity(),
+                        GenericFraction::Infinity(_) => Self::infinity(),
                         GenericFraction::NaN => Self::nan_b(true),
                     }
                 }

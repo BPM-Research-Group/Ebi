@@ -1,4 +1,4 @@
-use std::{ops::{Div, Mul, Neg}, fmt::{Debug, Display}};
+use std::{fmt::{Debug, Display}, io::Write, ops::{Div, Mul, Neg}};
 use anyhow::Result;
 use fraction::Sign;
 
@@ -42,21 +42,21 @@ impl ContainsRoot {
 
 impl Exportable for ContainsRoot {
 
-    fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+    fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
             EbiOutput::ContainsRoot(fr) => fr.export(f),
             _ => unreachable!()
         }
     }
 
-    fn export(&self, f: &mut dyn std::io::Write) -> anyhow::Result<()> {
-        writeln!(f, "{}", self);
+    fn export(&self, f: &mut dyn Write) -> Result<()> {
+        writeln!(f, "{}", self)?;
         Ok(writeln!(f, "Approximately {:.4}", self.approximate())?)
     }
 }
 
 impl Infoable for ContainsRoot {
-    fn info(&self, f: &mut impl std::io::Write) -> anyhow::Result<()> {
+    fn info(&self, f: &mut impl Write) -> Result<()> {
         if self.one_minus {
             write!(f, "1-")?;
         }

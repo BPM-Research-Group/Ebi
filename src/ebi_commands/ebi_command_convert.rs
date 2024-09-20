@@ -33,10 +33,10 @@ pub const EBI_CONVERT_LPN: EbiCommand = EbiCommand::Command {
     input_helps: &[ "Any file supported by Ebi that can be converted." ], 
     execute: |mut inputs, _| {
         let lpn = match inputs.remove(0) {
-            EbiInput::Object(EbiObject::DirectlyFollowsModel(dfm), _) => dfm.to_labelled_petri_net(),
+            EbiInput::Object(EbiObject::DirectlyFollowsModel(dfm), _) => dfm.to_labelled_petri_net()?,
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => slpn.into(),
             EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn,
-            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => sdfa.to_stochastic_labelled_petri_net().into(),
+            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => sdfa.to_stochastic_labelled_petri_net()?.into(),
             _ => unreachable!()
         };
         Ok(EbiOutput::Object(EbiObject::LabelledPetriNet(lpn)))

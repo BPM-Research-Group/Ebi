@@ -39,6 +39,10 @@ impl Marking {
         self.place2token[place] -= amount;
         Ok(())
     }
+
+    pub fn add_place(&mut self) {
+        self.place2token.push(0);
+    }
 }
 
 impl From<Vec<u64>> for Marking {

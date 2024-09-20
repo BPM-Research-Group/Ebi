@@ -41,7 +41,7 @@ impl FiniteStochasticLanguage {
      */
     pub fn new_raw(traces: HashMap<Vec<Activity>, Fraction>, activity_key: ActivityKey) -> Self {
         Self {
-            activity_key: ActivityKey::new(),
+            activity_key: activity_key,
             traces: traces
         }
     }
@@ -120,7 +120,7 @@ impl FiniteStochasticLanguage {
     }
 
     pub fn read_as_stochastic_deterministic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
-        let mut slang = Self::import(reader)?;
+        let slang = Self::import(reader)?;
         slang.get_deterministic_stochastic_semantics()
     }
 
@@ -207,7 +207,7 @@ impl From<(HashMap<Vec<Activity>, Fraction>, ActivityKey)> for FiniteStochasticL
     /**
      * Normalises the distribution. Use new_raw to avoid normalisation.
      */
-    fn from(mut value: (HashMap<Vec<Activity>, Fraction>, ActivityKey)) -> Self {
+    fn from(value: (HashMap<Vec<Activity>, Fraction>, ActivityKey)) -> Self {
         let mut result = Self {
             activity_key: value.1,
             traces: value.0,

@@ -55,7 +55,7 @@ impl FractionRaw {
 
         if self.is_less_than_eq_half() {
             // log::debug!("invert fraction");
-            &mut self.invert();
+            self.invert()?;
             return Ok(-self.approximate_log2()?);
         }
 
@@ -75,11 +75,11 @@ impl FractionRaw {
 
         //Now 0.5 < self < 1
 
-        let sqrt2 = Self::sqrt2();
+        // let sqrt2 = Self::sqrt2();
         let mut matissa = Fraction::zero();
 
         //https://math.stackexchange.com/questions/1706939/approximation-log-2x
-        self.invert();
+        self.invert()?;
         for digit in 0..(APPROX_DIGITS as f64 * 3.3).floor() as u32 { //use 3.3 bits for every digit in the outcome
             //avoid operations on too many bits by truncating: 4 times as many decimals as digits in the outcome should be more than enough.
             self.truncate((APPROX_DIGITS as f64 * 3.3 * 4.0).ceil() as u64);

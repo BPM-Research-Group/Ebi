@@ -1,7 +1,7 @@
-use std::{fmt::{Display, Debug}, hash::Hash, io::BufRead, rc::Rc};
+use std::{fmt::Display, hash::Hash, io::BufRead, rc::Rc};
 use anyhow::{anyhow, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::{alignments::Alignments, labelled_petri_net::LPNMarking}, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::ActivityKey, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::labelled_petri_net::LPNMarking, math::fraction::Fraction};
 
 use super::ebi_trait_semantics::Semantics;
 
@@ -33,23 +33,6 @@ impl EbiTraitStochasticSemantics {
 			EbiTraitStochasticSemantics::Usize(sem) => sem.get_activity_key_mut(),
 		}
 	}
-}
-
-impl EbiTraitStochasticSemantics {
-    pub fn explain_trace(&self, balance: &Fraction, trace: &Vec<Activity>) -> Result<Alignments> {
-        match self {
-            EbiTraitStochasticSemantics::Usize(sem) => sem.explain_trace(trace, balance),
-            EbiTraitStochasticSemantics::Marking(sem) => sem.explain_trace(trace, balance),
-        }
-    }
-}
-
-impl <FS: Hash + Display + Debug + Clone + Eq> dyn StochasticSemantics<State = FS> {
-
-    pub fn explain_trace(&self, trace: &Vec<Activity>, balance: &Fraction) -> Result<Alignments> {
-        todo!()
-    }
-
 }
 
 pub trait StochasticSemantics: Semantics {

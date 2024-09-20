@@ -78,7 +78,7 @@ fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(usiz
 
             let mut new_state = state.clone();
             // log::debug!("\t\tnew state before {}", new_state);
-            semantics.execute_transition(&mut new_state, transition);
+            let _ = semantics.execute_transition(&mut new_state, transition);
             // log::debug!("\t\tnew state after {}", new_state);
 
             if let Some(activity) = semantics.get_transition_activity(transition) {
@@ -103,7 +103,7 @@ fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(usiz
     };
 
     //function that returns a heuristic on how far we are still minimally from a final state
-    let heuristic = |astate : &(usize, FS)| {
+    let heuristic = |_ : &(usize, FS)| {
         0
     };
 
@@ -169,7 +169,7 @@ fn is_there_a_silent_transition_enabled<T, FS>(semantics: &T, from: &FS, to: &FS
     for transition in semantics.get_enabled_transitions(from) {
         if semantics.is_transition_silent(transition) {
             let mut from = from.clone();
-            semantics.execute_transition(&mut from, transition);
+            let _ = semantics.execute_transition(&mut from, transition);
             if &from == to {
                 return Some(transition);
             }
@@ -184,7 +184,7 @@ fn find_transition_with_label<T, FS>(semantics: &T, from: &FS, to: &FS, label: A
         // log::debug!("transition {} is enabled", transition);
         if semantics.get_transition_activity(transition) == Some(label) {
             let mut from = from.clone();
-            semantics.execute_transition(&mut from, transition);
+            semantics.execute_transition(&mut from, transition)?;
             if &from == to {
                 return Ok(transition);
             }
@@ -197,7 +197,7 @@ fn find_labelled_transition<T, FS>(semantics: &T, from: &FS, to: &FS) -> Result<
     for transition in semantics.get_enabled_transitions(from) {
         if !semantics.is_transition_silent(transition) {
             let mut from = from.clone();
-            semantics.execute_transition(&mut from, transition);
+            semantics.execute_transition(&mut from, transition)?;
             if &from == to {
                 return Ok(transition);
             }

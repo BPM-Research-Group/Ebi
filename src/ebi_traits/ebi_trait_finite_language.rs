@@ -9,12 +9,6 @@ pub trait EbiTraitFiniteLanguage : IndexTrace + Display + EbiTraitIterableLangua
     
 }
 
-impl dyn EbiTraitFiniteLanguage {
-    fn get_trace_string(&self, trace_index: usize) -> Option<Vec<&str>> {
-        Some(self.get_activity_key().deprocess_trace(self.get_trace(trace_index)?))
-    }
-}
-
 impl FromEbiTraitObject for dyn EbiTraitFiniteLanguage {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {

@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Context};
 use clap::{value_parser, Arg, ArgAction};
 
-use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction};
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, techniques::explain_trace::ExplainTrace};
 
 
 
@@ -115,7 +115,7 @@ pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command {
 
             log::trace!("explain the trace {:?} given the model", trace);
         
-            let result = semantics.explain_trace(&balance, &trace).with_context(|| format!("cannot explain the trace {:?}", trace))?;
+            let result = semantics.explain_trace(&trace, &balance).with_context(|| format!("cannot explain the trace {:?}", trace))?;
             return Ok(EbiOutput::Object(EbiObject::Alignments(result)));
         } else {
             return Err(anyhow!("no trace given"));

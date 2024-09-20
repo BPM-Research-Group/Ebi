@@ -7,7 +7,7 @@ use crate::{distances::TriangularDistanceMatrix, ebi_objects::finite_language::F
 
 pub fn medoid<T>(log: &T, number_of_traces: &usize) -> Result<FiniteLanguage> where T: EbiTraitFiniteStochasticLanguage + ?Sized {
 
-    let mut activity_key = log.get_activity_key().clone();
+    let activity_key = log.get_activity_key().clone();
     let mut result = HashSet::new();
 
     log::info!("Computing {} medoid traces", number_of_traces);

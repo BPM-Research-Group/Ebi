@@ -27,7 +27,7 @@ impl Sampler for dyn EbiTraitFiniteStochasticLanguage {
             
             match result.entry(self.get_trace(trace_index).unwrap().clone()) {
                 Entry::Occupied(mut e) => *e.get_mut() += 1,
-                Entry::Vacant(mut e) => {e.insert(Fraction::one());},
+                Entry::Vacant(e) => {e.insert(Fraction::one());},
             };
         }
 
@@ -59,7 +59,7 @@ impl <T, A> Sampler for T where T: StochasticSemantics<State = A> + ?Sized, A: D
                 let chosen_transition = enabled_transitions[i];
 
                 // execute transition
-                self.execute_transition(&mut current_state, chosen_transition);
+                self.execute_transition(&mut current_state, chosen_transition)?;
 
                 match self.get_transition_activity(chosen_transition) {
                     Some(activity) => trace.push(activity),
@@ -69,7 +69,7 @@ impl <T, A> Sampler for T where T: StochasticSemantics<State = A> + ?Sized, A: D
 
             match result.entry(trace) {
                 Entry::Occupied(mut e) => *e.get_mut() += 1,
-                Entry::Vacant(mut e) => {e.insert(Fraction::one());},
+                Entry::Vacant(e) => {e.insert(Fraction::one());},
             };
         } 
 

@@ -15,7 +15,7 @@ pub trait MedoidNonStochastic {
 
 impl <T: ?Sized> MedoidNonStochastic for T where T: EbiTraitFiniteLanguage {
 	fn medoid(&self, number_of_traces: usize) -> Result<FiniteLanguage> {
-		let mut activity_key = self.get_activity_key().clone();
+		let activity_key = self.get_activity_key().clone();
 		let mut result = HashSet::new();
 
 		let distances = TriangularDistanceMatrix::new(self);
@@ -106,7 +106,7 @@ pub fn medoid_single<T>(log: &T, distances: &TriangularDistanceMatrix) -> Option
 
     //report the minimum value
     let mut min_pos = 0;
-    for (pos, value) in sum_distance.iter().enumerate() {
+    for (pos, _) in sum_distance.iter().enumerate() {
         if sum_distance[pos] < sum_distance[min_pos] {
             min_pos = pos;
         }
@@ -411,22 +411,6 @@ pub(crate) fn find_min<'a, I: 'a>(a: &mut I) -> (usize, &'a Fraction)
 	let mut best = (0, a.next().unwrap().1);
 	for (ik, iv) in a {
 		if iv < &best.1 {
-			best = (ik, iv);
-		}
-	}
-	best
-}
-
-/// Find the maximum (index and value)
-#[inline]
-pub(crate) fn find_max<'a, L: 'a, I: 'a>(a: &mut I) -> (usize, &'a Fraction)
-	where
-		I: std::iter::Iterator<Item = &'a Fraction>,
-{
-	let mut a = a.enumerate();
-	let mut best = (0, a.next().unwrap().1);
-	for (ik, iv) in a {
-		if iv > &best.1 {
 			best = (ik, iv);
 		}
 	}

@@ -89,8 +89,7 @@ impl LabelledPetriNet {
     pub fn add_place(&mut self) -> usize {
         let place = self.get_number_of_places();
         self.place2output_transitions.push(vec![]);
-        self.initial_marking.increase(place, 1);
-        self.initial_marking.decrease(place, 1);
+        self.initial_marking.add_place();
         place
     }
 
@@ -115,7 +114,7 @@ impl LabelledPetriNet {
         }
 
         if let Some(pos) = self.transition2output_places[from_transition].iter().position(|p| *p == to_place) {
-            self.transition2output_places_cardinality[from_transition][pos] += 1;
+            self.transition2output_places_cardinality[from_transition][pos] += cardinality;
         } else {
             self.transition2output_places[from_transition].push(to_place);
             self.transition2output_places_cardinality[from_transition].push(1);
@@ -133,7 +132,7 @@ impl LabelledPetriNet {
         self.place2output_transitions[from_place].push(to_transition);
 
         if let Some(pos) = self.transition2input_places[to_transition].iter().position(|p| *p == from_place) {
-            self.transition2input_places_cardinality[to_transition][pos] += 1;
+            self.transition2input_places_cardinality[to_transition][pos] += cardinality;
         } else {
             self.transition2input_places[to_transition].push(from_place);
             self.transition2input_places_cardinality[to_transition].push(1);

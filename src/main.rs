@@ -84,6 +84,7 @@ pub mod techniques {
     pub mod statistical_test;
     pub mod medoid_non_stochastic;
     pub mod sample;
+    pub mod explain_trace;
 }
 mod deterministic_semantics_for_stochastic_semantics;
 mod medoid;

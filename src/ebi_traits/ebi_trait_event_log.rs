@@ -48,19 +48,19 @@ impl dyn EbiTraitEventLog {
                 match result.entry(trace) {
                     std::collections::hash_map::Entry::Occupied(mut e) => {
                         //we have seen this trace before
-                        let mut attributes: &mut HashMap<Attribute, u64> = e.get_mut();
+                        let attributes: &mut HashMap<Attribute, u64> = e.get_mut();
                         match attributes.entry(attribute_id) {
                             std::collections::hash_map::Entry::Occupied(mut ae) => {
                                 //attribute was seen before
                                 *ae.get_mut() += 1;
                             },
-                            std::collections::hash_map::Entry::Vacant(mut e) => {
+                            std::collections::hash_map::Entry::Vacant(e) => {
                                 //attribute was not seen before
                                 e.insert(1);
                             },
                         }
                     },
-                    std::collections::hash_map::Entry::Vacant(mut e) => {
+                    std::collections::hash_map::Entry::Vacant(e) => {
                         //trace was not seen before
                         let mut map = HashMap::new();
                         map.insert(attribute_id, 1);
@@ -84,7 +84,7 @@ impl dyn EbiTraitEventLog {
         let mut trace_index = 0;
         while let Some(trace) = self.get_trace(trace_index) {
             let language_index = match trace2language_index.entry(trace.clone()) {
-                std::collections::hash_map::Entry::Occupied(mut e) => {
+                std::collections::hash_map::Entry::Occupied(e) => {
                     //we have seen this trace before
                     *e.get()
                 },

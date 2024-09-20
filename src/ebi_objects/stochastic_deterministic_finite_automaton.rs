@@ -282,7 +282,7 @@ impl StochasticDeterministicFiniteAutomaton {
         Ok(Self::get_semantics(sdfa))
     }
     
-    pub fn to_stochastic_labelled_petri_net(&self) -> StochasticLabelledPetriNet {
+    pub fn to_stochastic_labelled_petri_net(&self) -> Result<StochasticLabelledPetriNet> {
         log::info!("convert SDFA to stochastic labelled Petri net");
 
         let mut result = LabelledPetriNet::new();
@@ -290,7 +290,7 @@ impl StochasticDeterministicFiniteAutomaton {
         let mut weights = vec![];
 
         let source = result.add_place();
-        result.get_initial_marking_mut().increase(source, 1);
+        result.get_initial_marking_mut().increase(source, 1)?;
 
         //add places
         let mut state2place = vec![];
@@ -302,28 +302,26 @@ impl StochasticDeterministicFiniteAutomaton {
             if self.get_termination_probability(state).is_positive() {
                 let lpn_transition = result.add_transition(None);
                 weights.push(self.get_termination_probability(state).clone());
-                result.add_place_transition_arc(lpn_place, lpn_transition, 1);
-                result.add_transition_place_arc(lpn_transition, lpn_place, 1);
+                result.add_place_transition_arc(lpn_place, lpn_transition, 1)?;
+                result.add_transition_place_arc(lpn_transition, lpn_place, 1)?;
             }
         }
 
         //add edges
-        if let Some(mut source_last) = self.sources.get(0) {
-            for (source, (target, (activity, probability))) in self.sources.iter().zip(self.targets.iter().zip(self.activities.iter().zip(self.probabilities.iter()))) {
-                
-                //add transition
-                let lpn_activity = translator.translate_activity(activity);
-                let lpn_transition = result.add_transition(Some(lpn_activity));
-                let source_place = state2place[*source];
-                let target_place = state2place[*target];
-                result.add_place_transition_arc(source_place, lpn_transition, 1);
-                result.add_transition_place_arc(lpn_transition, target_place, 1);
+        for (source, (target, (activity, probability))) in self.sources.iter().zip(self.targets.iter().zip(self.activities.iter().zip(self.probabilities.iter()))) {
+            
+            //add transition
+            let lpn_activity = translator.translate_activity(activity);
+            let lpn_transition = result.add_transition(Some(lpn_activity));
+            let source_place = state2place[*source];
+            let target_place = state2place[*target];
+            result.add_place_transition_arc(source_place, lpn_transition, 1)?;
+            result.add_transition_place_arc(lpn_transition, target_place, 1)?;
 
-                weights.push(probability.clone());
-            }
+            weights.push(probability.clone());
         }
 
-        StochasticLabelledPetriNet::from((result, weights))
+        Ok(StochasticLabelledPetriNet::from((result, weights)))
     }
 
     pub fn set_activity_key(&mut self, activity_key: &ActivityKey) {

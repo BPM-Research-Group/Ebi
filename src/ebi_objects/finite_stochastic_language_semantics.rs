@@ -13,7 +13,7 @@ pub struct FiniteStochasticLanguageSemantics {
 
 impl FiniteStochasticLanguageSemantics {
     pub fn from_language(lang: Rc<FiniteStochasticLanguage>) -> Self {
-        let mut activity_key = ActivityKey::new();
+        let activity_key = ActivityKey::new();
         let mut nodes: Vec<HashMap<Option<Activity>, (usize, Fraction)>> = vec![];
 
         nodes.push(HashMap::new()); //0: root

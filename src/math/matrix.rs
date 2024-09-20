@@ -190,7 +190,7 @@ impl Matrix {
 
         // log::info!("second step done");
 
-        let mut failed = AtomicBool::new(false);
+        let failed = AtomicBool::new(false);
         let number_of_columns = self.get_number_of_columns();
         let number_of_rows = self.get_number_of_rows();
         

@@ -103,7 +103,6 @@ impl <FS: Hash + Display + Debug + Clone + Eq> FiniteStochasticLanguageAnalyser 
         let mut result = HashMap::new();
 
         let mut queue = vec![];
-        let initial_q_state = 
         queue.push(X{
             prefix: vec![],
             probability: Fraction::one(),

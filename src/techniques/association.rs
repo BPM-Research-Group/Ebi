@@ -101,7 +101,7 @@ impl dyn EbiTraitEventLog {
 
         log::info!("found {} trace-attribute pairs for categorical attribute {}", pairs.len(), case_attribute);
 
-        let pairs_categorical: Vec<(Fraction, Fraction)> = (0..number_of_samples).into_par_iter().filter_map(|samplenr| { //parallel execution
+        let pairs_categorical: Vec<(Fraction, Fraction)> = (0..number_of_samples).into_par_iter().filter_map(|_| { //parallel execution
 
             let mut sample = vec![];
             //create sample

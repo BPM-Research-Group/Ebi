@@ -105,7 +105,7 @@ impl TryFrom<PetriNetMarkupLanguage> for LabelledPetriNet {
                 Some(activity) => Some(result.get_activity_key_mut().process_activity(activity)),
                 None => None
             };
-            let mut transition = result.add_transition(label);
+            let transition = result.add_transition(label);
 
             transition2index.insert(transition_id, transition);
         }
@@ -116,12 +116,12 @@ impl TryFrom<PetriNetMarkupLanguage> for LabelledPetriNet {
                 process_mining::petri_net::petri_net_struct::ArcType::PlaceTransition(place_id, transition_id) => {
                     let new_place = place2index.get(&place_id).ok_or(anyhow!("Undeclared place referenced."))?;
                     let new_transition = transition2index.get(&transition_id).ok_or(anyhow!("undeclared transition referenced"))?;
-                    result.add_place_transition_arc(*new_place, *new_transition, arc.weight.into());
+                    result.add_place_transition_arc(*new_place, *new_transition, arc.weight.into())?;
                 },
                 process_mining::petri_net::petri_net_struct::ArcType::TransitionPlace(transition_id, place_id) => {
                     let new_place = place2index.get(&place_id).ok_or(anyhow!("Undeclared place referenced."))?;
                     let new_transition = transition2index.get(&transition_id).ok_or(anyhow!("undeclared transition referenced"))?;
-                    result.add_transition_place_arc(*new_transition, *new_place, arc.weight.into());
+                    result.add_transition_place_arc(*new_transition, *new_place, arc.weight.into())?;
                 },
             };
         }
@@ -129,7 +129,7 @@ impl TryFrom<PetriNetMarkupLanguage> for LabelledPetriNet {
         //initial marking
         for (place_id, cardinality) in pnml.net.initial_marking.as_ref().ok_or(anyhow!("The given net has no initial marking. Ebi requires an innitial marking for its Petri nets."))?.iter() {
             let new_place = place2index.get(&place_id.get_uuid()).ok_or(anyhow!("Undeclared place found."))?;
-            result.get_initial_marking_mut().increase(*new_place, 1);
+            result.get_initial_marking_mut().increase(*new_place, *cardinality)?;
         }
 
         //final markings
@@ -141,7 +141,7 @@ impl TryFrom<PetriNetMarkupLanguage> for LabelledPetriNet {
                 let mut new_final_marking = Marking::new(result.get_number_of_places());
                 for (place_id, cardinality) in final_marking.iter() {
                     let new_place = place2index.get(&place_id.get_uuid()).ok_or(anyhow!("Undeclared place found."))?;
-                    new_final_marking.increase(*new_place, *cardinality);
+                    new_final_marking.increase(*new_place, *cardinality)?;
                 }
 
                 //verify that this is a deadlock marking

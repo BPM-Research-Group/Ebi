@@ -39,7 +39,7 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
         return Ok(RootLogDiv::sqrt(sum).one_minus());
     }
 
-    fn jssc_log2model(&self, mut logmodel2: Box<dyn EbiTraitQueriableStochasticLanguage>) -> Result<RootLogDiv> {
+    fn jssc_log2model(&self, logmodel2: Box<dyn EbiTraitQueriableStochasticLanguage>) -> Result<RootLogDiv> {
         let mut sum = LogDiv::zero();
         let mut sum4model = Fraction::zero();
         let mut sum4log = Fraction::zero();
