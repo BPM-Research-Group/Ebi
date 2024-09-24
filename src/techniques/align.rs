@@ -56,7 +56,7 @@ impl <T, FS> Align for T where T: Semantics<State = FS> + ?Sized, FS: Display + 
 
 }
 
-fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(usize, FS)>, usize)> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(usize, FS)>, usize)> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
     // log::debug!("activity key {}", self.get_activity_key());
     // log::debug!("align trace {:?}", trace);
 
@@ -121,7 +121,7 @@ fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(usiz
  * 
  * This function assumes equal costs (of 10000) for the log and model mvoes, and 1 for the silent moves.
  */
-fn transform_alignment<T, FS>(semantics: &T, trace: &Vec<Activity>, states: Vec<(usize, FS)>) -> Result<Vec<Move>> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+pub fn transform_alignment<T, FS>(semantics: &T, trace: &Vec<Activity>, states: Vec<(usize, FS)>) -> Result<Vec<Move>> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
     let mut alignment = vec![];
 
     let mut it = states.into_iter();
@@ -165,7 +165,7 @@ fn transform_alignment<T, FS>(semantics: &T, trace: &Vec<Activity>, states: Vec<
     Ok(alignment)
 }
 
-fn is_there_a_silent_transition_enabled<T, FS>(semantics: &T, from: &FS, to: &FS) -> Option<TransitionIndex> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+pub fn is_there_a_silent_transition_enabled<T, FS>(semantics: &T, from: &FS, to: &FS) -> Option<TransitionIndex> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
     for transition in semantics.get_enabled_transitions(from) {
         if semantics.is_transition_silent(transition) {
             let mut from = from.clone();
@@ -178,7 +178,7 @@ fn is_there_a_silent_transition_enabled<T, FS>(semantics: &T, from: &FS, to: &FS
     None
 }
 
-fn find_transition_with_label<T, FS>(semantics: &T, from: &FS, to: &FS, label: Activity) -> Result<TransitionIndex> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+pub fn find_transition_with_label<T, FS>(semantics: &T, from: &FS, to: &FS, label: Activity) -> Result<TransitionIndex> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
     // log::debug!("find transition with label {}", label);
     for transition in semantics.get_enabled_transitions(from) {
         // log::debug!("transition {} is enabled", transition);
@@ -193,7 +193,7 @@ fn find_transition_with_label<T, FS>(semantics: &T, from: &FS, to: &FS, label: A
     Err(anyhow!("There is no transition with activity {} that brings the model from {} to {}", label, from, to))
 }
 
-fn find_labelled_transition<T, FS>(semantics: &T, from: &FS, to: &FS) -> Result<TransitionIndex> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+pub fn find_labelled_transition<T, FS>(semantics: &T, from: &FS, to: &FS) -> Result<TransitionIndex> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
     for transition in semantics.get_enabled_transitions(from) {
         if !semantics.is_transition_silent(transition) {
             let mut from = from.clone();
