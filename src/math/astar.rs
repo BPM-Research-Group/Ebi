@@ -1,18 +1,21 @@
+// This file contains code derived from pathfinding,
+// which is dual-licensed under Apache 2.0 and MIT licenses.
+// The original code has been modified to support the Fraction type in this project.
+// For more information, see https://github.com/evenfurther/pathfinding?tab=readme-ov-file#license
+
+
 use indexmap::map::Entry::{Occupied, Vacant};
-use num_traits::Zero;
 use std::cmp::Ordering;
-use std::collections::{BinaryHeap, HashSet};
+use std::collections::BinaryHeap;
 use std::hash::Hash;
 use std::iter::FusedIterator;
 use std::hash::BuildHasherDefault;
-use std::ops::{Add, Mul};
 use std::fmt::Debug;
-use indexmap::{IndexMap, IndexSet};
+use indexmap::IndexMap;
 use rustc_hash::FxHasher;
-use crate::{math::{fraction::Fraction}};
+use crate::math::fraction::Fraction;
 
 type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
-type FxIndexSet<K> = IndexSet<K, BuildHasherDefault<FxHasher>>;
 
 
 #[allow(clippy::needless_collect)]
