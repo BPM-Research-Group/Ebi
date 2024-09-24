@@ -3,17 +3,16 @@
 // The original code has been modified to support the Fraction type in this project.
 // For more information, see https://github.com/evenfurther/pathfinding?tab=readme-ov-file#license
 
-
+use fraction::Zero;
 use indexmap::map::Entry::{Occupied, Vacant};
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::hash::Hash;
 use std::iter::FusedIterator;
 use std::hash::BuildHasherDefault;
-use std::fmt::Debug;
+use std::ops::AddAssign;
 use indexmap::IndexMap;
 use rustc_hash::FxHasher;
-use crate::math::fraction::Fraction;
 
 type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
@@ -104,61 +103,47 @@ where
 /// assert_eq!(result.expect("no path found").1, 4);
 /// ```
 #[allow(clippy::missing_panics_doc)]
-pub fn astar<N, FN, IN, FH, FS>(
+#[allow(clippy::missing_panics_doc)]
+pub fn astar<'a, N, C, FN, IN, FH, FS>(
     start: &N,
     mut successors: FN,
     mut heuristic: FH,
     mut success: FS,
-) -> Option<(Vec<N>, Fraction,Fraction,Fraction)>
+) -> Option<(Vec<N>, C)>
 where
-    N: Eq + Hash + Clone + Debug,
+    N: Eq + Hash + Clone,
+    C: Zero + Ord + Clone + AddAssign,
     FN: FnMut(&N) -> IN,
-    IN: IntoIterator<Item = (N, Fraction, Fraction)>,
-    FH: FnMut(&N) -> Fraction,
+    IN: IntoIterator<Item = (N, C)>,
+    FH: FnMut(&N) -> C,
     FS: FnMut(&N) -> bool,
 {
     let mut to_see = BinaryHeap::new();
-
-    // insert the initial state intto the open set to_see
     to_see.push(SmallestCostHolder {
-        prefix_cost: Fraction::zero(),
-        prefix_probability: Fraction::one(),
-        cost: Fraction::zero(),
+        estimated_cost: Zero::zero(),
+        cost: Zero::zero(),
         index: 0,
     });
-
-    let mut parents: FxIndexMap<N, (usize, Fraction)> = FxIndexMap::default();
-    parents.insert(start.clone(), (usize::MAX, Fraction::zero()));
-    while let Some(SmallestCostHolder { prefix_cost, prefix_probability, cost, index, .. }) = to_see.pop() {
-
+    let mut parents: FxIndexMap<N, (usize, C)> = FxIndexMap::default();
+    parents.insert(start.clone(), (usize::MAX, Zero::zero()));
+    while let Some(SmallestCostHolder { cost, index, .. }) = to_see.pop() {
         let successors = {
             let (node, &(_, ref c)) = parents.get_index(index).unwrap(); // Cannot fail
             if success(node) {
                 let path = reverse_path(&parents, |&(p, _)| p, index);
-                return Some((path, cost.clone(), prefix_cost.clone(), prefix_probability.clone()));
+                return Some((path, cost));
             }
             // We may have inserted a node several time into the binary heap if we found
             // a better way to access it. Ensure that we are currently dealing with the
             // best path and discard the others.
-
-            // if Fraction::ge(&cost, c) {
-            //     continue;
-            // }
-
+            if &cost > c {
+                continue;
+            }
             successors(node)
         };
-
-        for (successor, move_cost, move_probability) in successors {
-            let mut new_prefix_cost = prefix_cost.clone();
-            new_prefix_cost += move_cost;
-
-            let mut new_prefix_probability = prefix_probability.clone();
-            new_prefix_probability *= move_probability;
-
-            let mut new_cost = new_prefix_cost.clone();
-            new_cost *=  Fraction::one_minus(new_prefix_probability.clone());
-            // println!("cost:{:?}, prefix_cost:{:?}, prefix_probability:{:?}", new_cost, new_prefix_cost.clone(), new_prefix_probability.clone());
-
+        for (successor, mut move_cost) in successors {
+            move_cost += cost.clone();
+            let new_cost = move_cost;
             let h; // heuristic(&successor)
             let n; // index for successor
             match parents.entry(successor) {
@@ -178,17 +163,17 @@ where
                 }
             }
 
+            let mut estimated_cost = new_cost.clone();
+            estimated_cost += h;
             to_see.push(SmallestCostHolder {
-                prefix_cost:new_prefix_cost,
-                prefix_probability:new_prefix_probability,
-                cost: new_cost.clone(),
+                estimated_cost: estimated_cost,
+                cost: new_cost,
                 index: n,
             });
         }
     }
     None
 }
-
 /// This structure is used to implement Rust's max-heap as a min-heap
 /// version for A*. The smallest `estimated_cost` (which is the sum of
 /// the `cost` and the heuristic) is preferred. For the same
@@ -196,15 +181,14 @@ where
 /// indicate that the goal is nearer, thereby requiring fewer
 /// exploration steps.
 struct SmallestCostHolder<K> {
-    prefix_cost: K,
-    prefix_probability: K,
+    estimated_cost: K,
     cost: K,
     index: usize,
 }
 
 impl<K: PartialEq> PartialEq for SmallestCostHolder<K> {
     fn eq(&self, other: &Self) -> bool {
-        self.prefix_cost.eq(&other.prefix_cost) && self.prefix_probability.eq(&other.prefix_probability) && self.cost.eq(&other.cost)
+        self.estimated_cost.eq(&other.estimated_cost) && self.cost.eq(&other.cost)
     }
 }
 
@@ -218,12 +202,13 @@ impl<K: Ord> PartialOrd for SmallestCostHolder<K> {
 
 impl<K: Ord> Ord for SmallestCostHolder<K> {
     fn cmp(&self, other: &Self) -> Ordering {
-        match other.cost.cmp(&self.cost) {
+        match other.estimated_cost.cmp(&self.estimated_cost) {
             Ordering::Equal => self.cost.cmp(&other.cost),
             s => s,
         }
     }
 }
+
 
 /// Iterator structure created by the `astar_bag` function.
 #[derive(Clone)]
