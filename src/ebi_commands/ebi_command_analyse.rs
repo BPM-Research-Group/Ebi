@@ -21,7 +21,9 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
     name_short: "all", 
     name_long: Some("all-traces"), 
     explanation_short: "Find all traces.", 
-    explanation_long: Some("Find all traces.\nModels containing loops are not supported."),
+    explanation_long: Some("List all traces of a stohastic language.\n
+        Models containing loops are not supported and an error will be returned.\n
+        Computation is more efficient for an object with a finite stochastic language."),
     cli_command: None, 
     latex_link: None,
     exact_arithmetic: true,
@@ -29,7 +31,7 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics) ], 
     ],
     input_names: &[ "FILE" ],
-    input_helps: &[ "The file with an object that has deterministic stochastic semantics."],
+    input_helps: &[ "Any object with deterministic stochastic semantics."],
     execute: |mut objects, _| {
 
         let object = objects.remove(0);
@@ -56,14 +58,14 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
 pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
     name_short: "comp", 
     name_long: Some("completeness"), 
-    explanation_short: "Estimate the completeness of a finite language.", 
+    explanation_short: "Estimate the completeness of a finite language using species discovery.", 
     explanation_long: None,
     cli_command: None, 
     latex_link: Some("~\\cite{DBLP:conf/icpm/KabierskiRW23}"),
     exact_arithmetic: true,
     input_types: &[ &[ &EbiInputType::Trait(EbiTrait::EventLog) ] ],
     input_names: &[ "FILE" ],
-    input_helps: &[ "The event log."],
+    input_helps: &[ "An event log."],
     execute: |mut objects, _| {
         let log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         
@@ -78,7 +80,7 @@ pub const EBI_ANALYSE_MINPROB: EbiCommand = EbiCommand::Command {
     name_short: "minprob", 
     name_long: Some("minimum-probability-traces"), 
     explanation_short: "Find all traces that have a given minimum probability.", 
-    explanation_long: Some("Find all traces that have a given minimum probability.\nPlease be aware of models containing livelocks: these may cause the computation to never finish.\nWill return an error if there are no such traces."),
+    explanation_long: Some("Find all traces that have a given minimum probability.\nWill return a finate stochastic language with the extracted traces.\nWill return an error if there are no such traces. The computation may run forever if the model is unbounded."),
     cli_command: None, 
     latex_link: None,
     exact_arithmetic: true,
@@ -87,7 +89,7 @@ pub const EBI_ANALYSE_MINPROB: EbiCommand = EbiCommand::Command {
         &[ &EbiInputType::Fraction]
     ],
     input_names: &[ "FILE", "MINIMUM_PROBABILITY"],
-    input_helps: &[ "The file with an object that has deterministic stochastic semantics.", "The minimum probability that a trace should have to be included."],
+    input_helps: &[ "Any object with deterministic stochastic semantics.", "The minimum probability that a trace should have to be included."],
     execute: |mut objects, _| {
         let semantics = objects.remove(0).to_type::<EbiTraitStochasticDeterministicSemantics>()?;
         let at_least = objects.remove(0).to_type::<Fraction>()?;
@@ -101,7 +103,10 @@ pub const EBI_ANALYSE_MOSTLIKELY: EbiCommand = EbiCommand::Command {
     name_short: "mostlikely", 
     name_long: Some("most-likely-traces"), 
     explanation_short: "Find the traces with the highest probabilities.", 
-    explanation_long: Some("Find the traces with the highest probabilities; ties are resolved arbritrarily.\nPlease be aware of models containing livelocks: these may cause the computation to never finish."),
+    explanation_long: Some("Find the given number of traces with the highest probabilities.\n
+        If there are more than one trace with the same probability, an arbitrary choice is made which one to return.\n
+        The computation may run forever if the model is unbounded.\n
+        Computation is more efficient for an object with a finite stochastic language."),
     cli_command: None, 
     latex_link: None,
     exact_arithmetic: true,
@@ -110,7 +115,7 @@ pub const EBI_ANALYSE_MOSTLIKELY: EbiCommand = EbiCommand::Command {
         &[ &EbiInputType::Usize] 
     ],
     input_names: &[ "FILE", "NUMBER_OF_TRACES"],
-    input_helps: &[ "The file with an object that has deterministic stochastic semantics.", "The number of traces that should be extracted."],
+    input_helps: &[ "Any object with deterministic stochastic semantics.", "The number of traces that should be extracted."],
     execute: |mut objects, _| {
         let object = objects.remove(0);
         let number_of_traces = objects.remove(0).to_type::<usize>()?;
@@ -132,7 +137,11 @@ pub const EBI_ANALYSE_MODE: EbiCommand = EbiCommand::Command {
     name_short: "mode", 
     name_long: None,
     explanation_short: "Find the trace with the highest probability.", 
-    explanation_long: Some("Find the trace with the highest probability; ties are resolved arbritrarily. Equivalent to `Ebi evaluate mostlikely 1`."), 
+    explanation_long: Some("Find the trace with the highest probability.
+        If there is more than one trace with the highest probability, an arbitrary choice is made which one to return.\n
+        The computation may run forever if the model is unbounded.\n
+        Equivalent to `Ebi evaluate mostlikely 1`.\n
+        Computation is more efficient for a model with a finite stochastic language."),
     latex_link: None, 
     cli_command: None, 
     exact_arithmetic: true, 
@@ -140,7 +149,7 @@ pub const EBI_ANALYSE_MODE: EbiCommand = EbiCommand::Command {
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics)],  
     ],
     input_names: &[ "FILE" ],
-    input_helps: &[ "The file with an object that has deterministic stochastic semantics." ],
+    input_helps: &[ "Any object with deterministic stochastic semantics." ],
     execute: |mut objects, _| {
         let number_of_traces = 1;
         let result = match objects.remove(0) {
@@ -161,7 +170,8 @@ pub const EBI_ANALYSE_MEDOID: EbiCommand = EbiCommand::Command {
     name_short: "med", 
     name_long: Some("medoid"),
     explanation_short: "Find the traces with the least distance to the other traces.", 
-    explanation_long: Some("Find the traces with the lowest average normalised Levenshtein distance to the other traces; ties are resolved arbritrarily."), 
+    explanation_long: Some("Find the traces with the lowest average normalised Levenshtein distance to the other traces.\n
+        If there are more than one such trace, an arbitrary one is returned."), 
     latex_link: None, 
     cli_command: None, 
     exact_arithmetic: true, 
@@ -170,7 +180,7 @@ pub const EBI_ANALYSE_MEDOID: EbiCommand = EbiCommand::Command {
         &[ &EbiInputType::Usize] 
     ],
     input_names: &[ "FILE", "NUMBER_OF_TRACES"],
-    input_helps: &[ "The finite stochastic language.", "The number of traces that should be extracted."],
+    input_helps: &[ "Any object with a finite stochastic language.", "The number of traces that should be extracted."],
     execute: |mut objects, _| {
         let language = objects.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let number_of_traces = objects.remove(0).to_type::<usize>()?;
