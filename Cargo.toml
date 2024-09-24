@@ -29,7 +29,9 @@ Inflector = "*"
 strum = "*"
 strum_macros = "*"
 indicatif = "*"
-pathfinding = "*"
+indexmap = "*"
+rustc-hash="*"
+pathfinding="*"
 
 [dependencies.num-rational]
 version = "0.4.1"
