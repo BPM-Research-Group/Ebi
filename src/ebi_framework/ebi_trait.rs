@@ -7,16 +7,14 @@ use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileH
 #[derive(Clone, Copy, PartialEq, Eq, EnumIter, Hash)]
 pub enum EbiTrait {
     EventLog,
-    IterableLanguage,
     FiniteLanguage,
     FiniteStochasticLanguage,
+    IterableLanguage,
     IterableStochasticLanguage,
     QueriableStochasticLanguage,
     Semantics,
     StochasticDeterministicSemantics,
     StochasticSemantics,
-    LabelledPetriNet,
-    Alignments,
 }
 
 impl EbiTrait {
@@ -48,9 +46,7 @@ impl EbiTrait {
             EbiTrait::QueriableStochasticLanguage => "a",
             EbiTrait::StochasticDeterministicSemantics => "a",
             EbiTrait::StochasticSemantics => "a",
-            EbiTrait::LabelledPetriNet => "a",
             EbiTrait::Semantics => "a",
-            EbiTrait::Alignments => "",
         }
     }
     
@@ -83,9 +79,7 @@ impl Display for EbiTrait {
             EbiTrait::QueriableStochasticLanguage => "queriable stochastic language",
             EbiTrait::StochasticDeterministicSemantics => "stochastic deterministic semantics",
             EbiTrait::StochasticSemantics => "stochastic semantics",
-            EbiTrait::LabelledPetriNet => "labelled Petri net",
             EbiTrait::Semantics => "semantics",
-            EbiTrait::Alignments => "alignments",
         })
     }
 }

@@ -4,7 +4,7 @@ use anyhow::Result;
 use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
-use crate::ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait};
+use crate::{ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, text::Joiner};
 
 
 pub const EBI_LATEX: EbiCommand = EbiCommand::Group { 
@@ -57,7 +57,7 @@ fn manual() -> Result<EbiOutput> {
     //command list
     writeln!(f, "\\def\\ebicommandlist{{\\begin{{itemize}}")?;
     for path in EBI_COMMANDS.get_command_paths() {
-        writeln!(f, "\\item\\texttt{{{}}} or \\texttt{{{}}}", EbiCommand::path_to_string(&path), EbiCommand::path_to_short_string(&path))?;
+        writeln!(f, "\\item\\texttt{{{}}} or \\texttt{{{}}} (Section~\\ref{{command:{}}})", EbiCommand::path_to_string(&path), EbiCommand::path_to_short_string(&path), EbiCommand::path_to_string(&path))?;
     }
     writeln!(f, "\\end{{itemize}}}}")?;
 
@@ -65,6 +65,7 @@ fn manual() -> Result<EbiOutput> {
     writeln!(f, "\\def\\ebicommands{{")?;
     for path in EBI_COMMANDS.get_command_paths() {
         writeln!(f, "\\subsection{{\\texttt{{{}}}}}", EbiCommand::path_to_string(&path))?;
+        writeln!(f, "\\label{{command:{}}}", EbiCommand::path_to_string(&path))?;
 
         if let EbiCommand::Command { name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_typess, input_names, input_helps, output: output_type, .. } = path[path.len()-1] {
 
@@ -96,10 +97,10 @@ fn manual() -> Result<EbiOutput> {
                 writeln!(f, "&{}\\\\", input_help)?;
 
                 //mandatoryness
-                writeln!(f, "&\\textit{{Mandatory:}} \\quad yes, though it can be given on STDIN by giving an `-' on the command line.\\\\")?;
+                writeln!(f, "&\\textit{{Mandatory:}} \\quad yes, though it can be given on STDIN by giving a `-' on the command line.\\\\")?;
 
                 //accepted values
-                writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", EbiInputType::possible_inputs_as_strings_with_articles(input_types, " and "))?;
+                writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", EbiInputType::get_possible_inputs_with_latex(input_types).join_with(", ", " and "))?;
             }
 
             //custom parameters
@@ -124,8 +125,6 @@ fn manual() -> Result<EbiOutput> {
                         //custom argument
 
                         writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes"} else {"no"} )?;
-                        // writeln!(f, "&\\textit{{Accepted file types:}}\\quad {}\\\\", get_file_types(input_types, pos));
-                        // writeln!(f, "&\\textit{{Accepted traits:}}\\quad {}\\\\", get_traits(input_typess[pos]));
                     } else {
                         writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
                     }
@@ -161,16 +160,19 @@ fn manual() -> Result<EbiOutput> {
     writeln!(f, "\\def\\ebifilehandlers{{")?;
     for file_handler in EBI_FILE_HANDLERS {
         writeln!(f, "\\subsection{{{} (.{})}}", file_handler.name, file_handler.file_extension)?;
+        writeln!(f, "\\label{{filehandler:{}}}", file_handler.name)?;
         writeln!(f, "Import as objects: {}.", file_handler.object_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", "))?;
         writeln!(f, "\\\\Import as traits: {}.", file_handler.trait_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", "))?;
-        writeln!(f, "\\\\Input to commands: \\texttt{{{}}}.", file_handler.get_applicable_commands().iter().map(|path| EbiCommand::path_to_string(path)).collect::<Vec<_>>().join(", "))?;
+        writeln!(f, "\\\\Input to commands:{}.\n", file_handler.get_applicable_commands().iter().map(
+            |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (Section~\\ref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
+            .collect::<Vec<_>>().join(""))?;
     }
     writeln!(f, "}}")?;
 
     //file handlers list
     writeln!(f, "\\def\\ebifilehandlerlist{{\\begin{{itemize}}")?;
     for file_handler in EBI_FILE_HANDLERS {
-        writeln!(f, "\\item {} (.{})", file_handler.name, file_handler.file_extension)?;
+        writeln!(f, "\\item {} (.{}) (Section~\\ref{{filehandler:{}}})", file_handler.name, file_handler.file_extension, file_handler.name)?;
     }
     writeln!(f, "\\end{{itemize}}}}")?;
 

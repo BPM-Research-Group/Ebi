@@ -9,6 +9,7 @@ use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileH
 
 #[derive(PartialEq,Clone,EnumIter,Hash)]
 pub enum EbiObjectType {
+    Alignments,
     DirectlyFollowsModel,
     EventLog,
     FiniteLanguage,
@@ -16,7 +17,6 @@ pub enum EbiObjectType {
     LabelledPetriNet,
     StochasticDeterministicFiniteAutomaton,
     StochasticLabelledPetriNet,
-    Alignments,
 }
 
 impl EbiObjectType {

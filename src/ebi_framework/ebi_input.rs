@@ -96,6 +96,33 @@ impl EbiInputType {
         result.into_iter().collect::<Vec<_>>()
     }
 
+    pub fn get_possible_inputs_with_latex(traits: &[&'static EbiInputType]) -> Vec<String> {
+        let mut result = HashSet::new();
+
+        for input_type in traits {
+            match input_type {
+                EbiInputType::Trait(t) => {
+                    result.extend(Self::show_file_handlers_latex(t.get_file_handlers()));
+                },
+                EbiInputType::Object(o) => {
+                    result.extend(Self::show_file_handlers_latex(o.get_file_handlers()));
+                },
+                EbiInputType::AnyObject => {
+                    result.extend(Self::show_file_handlers_latex(EBI_FILE_HANDLERS.iter().collect()));
+                },
+                EbiInputType::String => {result.insert("text".to_string());},
+                EbiInputType::Usize => {result.insert("integer".to_string());},
+                EbiInputType::FileHandler => {
+                    let extensions: Vec<String> = EBI_FILE_HANDLERS.iter().map(|file_type| file_type.file_extension.to_string()).collect();
+                    result.insert("the file extension of any file type supported by Ebi (".to_owned() + &extensions.join_with(", ", " or ") + ")");
+                },
+                EbiInputType::Fraction => {result.insert("fraction".to_string());},
+            };
+        }
+
+        result.into_iter().collect::<Vec<_>>()
+    }
+
     pub fn possible_inputs_as_strings_with_articles(traits: &[&'static EbiInputType], last_connector: &str) -> String {
         let list = Self::get_possible_inputs(traits);
         list.join_with(", ", last_connector)
@@ -103,6 +130,10 @@ impl EbiInputType {
 
     pub fn show_file_handlers(file_handlers: Vec<&'static EbiFileHandler>) -> Vec<String> {
         file_handlers.iter().map(|file_handler| format!("{}", file_handler)).collect::<Vec<_>>()
+    }
+
+    pub fn show_file_handlers_latex(file_handlers: Vec<&'static EbiFileHandler>) -> Vec<String> {
+        file_handlers.iter().map(|file_handler| format!("\\hyperref[filehandler:{}]{{{}}}", file_handler.name, file_handler)).collect::<Vec<_>>()
     }
     
     pub fn get_applicable_commands(&self) -> BTreeSet<Vec<&'static EbiCommand>> {
