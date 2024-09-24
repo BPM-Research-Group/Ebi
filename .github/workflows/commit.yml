@@ -1,4 +1,4 @@
-name: Run Rust tests
+name: Run Rust tests and push to gitlab
 
 on:
   push:
