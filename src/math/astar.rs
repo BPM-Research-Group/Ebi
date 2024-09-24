@@ -8,7 +8,6 @@ use indexmap::map::Entry::{Occupied, Vacant};
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::hash::Hash;
-use std::iter::FusedIterator;
 use std::hash::BuildHasherDefault;
 use std::ops::AddAssign;
 use indexmap::IndexMap;
@@ -208,66 +207,3 @@ impl<K: Ord> Ord for SmallestCostHolder<K> {
         }
     }
 }
-
-
-/// Iterator structure created by the `astar_bag` function.
-#[derive(Clone)]
-pub struct AstarSolution<N> {
-    sinks: Vec<usize>,
-    parents: Vec<(N, Vec<usize>)>,
-    current: Vec<Vec<usize>>,
-    terminated: bool,
-}
-
-impl<N: Clone + Eq + Hash> AstarSolution<N> {
-    fn complete(&mut self) {
-        loop {
-            let ps = match self.current.last() {
-                None => self.sinks.clone(),
-                Some(last) => self.parents(*last.last().unwrap()).clone(),
-            };
-            if ps.is_empty() {
-                break;
-            }
-            self.current.push(ps);
-        }
-    }
-
-    fn next_vec(&mut self) {
-        while self.current.last().map(Vec::len) == Some(1) {
-            self.current.pop();
-        }
-        self.current.last_mut().map(Vec::pop);
-    }
-
-    fn node(&self, i: usize) -> &N {
-        &self.parents[i].0
-    }
-
-    fn parents(&self, i: usize) -> &Vec<usize> {
-        &self.parents[i].1
-    }
-}
-
-impl<N: Clone + Eq + Hash> Iterator for AstarSolution<N> {
-    type Item = Vec<N>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.terminated {
-            return None;
-        }
-        self.complete();
-        let path = self
-            .current
-            .iter()
-            .rev()
-            .map(|v| v.last().copied().unwrap())
-            .map(|i| self.node(i).clone())
-            .collect::<Vec<_>>();
-        self.next_vec();
-        self.terminated = self.current.is_empty();
-        Some(path)
-    }
-}
-
-impl<N: Clone + Eq + Hash> FusedIterator for AstarSolution<N> {}
