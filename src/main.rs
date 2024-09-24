@@ -58,6 +58,7 @@ pub mod ebi_traits {
     pub mod ebi_trait_semantics;
 }
 pub mod math {
+    pub mod astar;
     pub mod average;
     pub mod fraction;
     pub mod fraction_matched;

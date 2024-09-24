@@ -13,7 +13,7 @@ pub const EBI_PROBABILITY: EbiCommand = EbiCommand::Group {
     children: &[
         &EBI_PROBABILITY_MODEL,
         &EBI_PROBABILITY_TRACE,
-        // &EBI_PROBABILITY_EXPLAIN_TRACE
+        &EBI_PROBABILITY_EXPLAIN_TRACE
     ]
 };
 
