@@ -119,7 +119,7 @@ pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(
  * The a* function we use returns a sequence of states, while we need a sequence of moves.
  * This function transforms the sequence of states into a sequence of moves.
  * 
- * This function assumes equal costs (of 10000) for the log and model mvoes, and 1 for the silent moves.
+ * This function assumes equal costs (of 10000) for the log and model moves, and 1 for the silent moves.
  */
 pub fn transform_alignment<T, FS>(semantics: &T, trace: &Vec<Activity>, states: Vec<(usize, FS)>) -> Result<Vec<Move>> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
     let mut alignment = vec![];

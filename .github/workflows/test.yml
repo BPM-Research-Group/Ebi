@@ -1,8 +1,6 @@
 name: Run Rust tests
 
 on:
-  push:
-    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
@@ -18,22 +16,3 @@ jobs:
     - uses: actions/checkout@v4
     - name: Run tests
       run: cargo test --verbose
-    - name: commit to Gitlab
-      env:
-        GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
-      run: |
-        git clone https://ci_token:$GITLAB_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary
-        cd rustlibrary
-        git config user.name "Github auto committer"
-        git config user.email "cipipeline@example.com"
-        rm -rf src/*
-        rm README.md
-        rm Cargo.toml
-        rm -rf manual/*
-        cp -R -a ../src/. src/
-        cp ../README.md README.md
-        cp ../Cargo.toml Cargo.toml
-        cp -R -a ../manual/. manual/
-        git add --all
-        git commit -a -m "github CI"
-        git push -f https://ci_token:$GITLAB_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main
