@@ -81,7 +81,7 @@ impl ExplainTrace for EbiTraitStochasticSemantics {
     }
 }
 
-impl <FS: Hash + Display + Debug + Clone + Eq> dyn StochasticSemantics<State = FS> {
+impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSemantics<State = FS> {
 
     pub fn explain_trace(&self, trace: &Vec<Activity>, _balance: &Fraction) -> Result<Alignments> {
 

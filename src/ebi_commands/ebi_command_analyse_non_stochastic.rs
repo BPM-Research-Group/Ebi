@@ -1,4 +1,4 @@
-use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics}, techniques::{align::Align, medoid_non_stochastic::MedoidNonStochastic}};
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics}, techniques::medoid_non_stochastic::MedoidNonStochastic};
 
 
 pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
@@ -76,7 +76,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command
     input_helps: &[ "The finite language.", "The model."],
     execute: |mut objects, _| {
         let log = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
-        let mut model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
+        let model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
         
         let result = model.align_language(log)?;
         

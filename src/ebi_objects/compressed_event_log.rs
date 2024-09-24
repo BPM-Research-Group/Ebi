@@ -1,4 +1,4 @@
-use std::{io::{BufRead, BufReader, Write}, rc::Rc};
+use std::{io::{BufRead, BufReader, Write}, sync::Arc};
 use anyhow::Result;
 use flate2::{bufread::GzDecoder, write::GzEncoder, Compression};
 
@@ -61,7 +61,7 @@ impl CompressedEventLog {
     pub fn read_as_stochastic_deterministic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
         let mut event_log = EventLog::import(reader)?;
         let sdfa = event_log.to_stochastic_deterministic_finite_automaton();
-        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Rc::new(sdfa))?;
+        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Arc::new(sdfa))?;
         Ok(EbiTraitStochasticDeterministicSemantics::Usize(semantics))
     }
 }

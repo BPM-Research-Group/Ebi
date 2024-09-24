@@ -1,4 +1,4 @@
-use std::{cmp::{max, Ordering}, collections::HashMap, fmt, io::{self, BufRead}, rc::Rc, str::FromStr};
+use std::{cmp::{max, Ordering}, collections::HashMap, fmt, io::{self, BufRead}, str::FromStr, sync::Arc};
 use anyhow::{anyhow, Context, Result, Error};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
@@ -252,33 +252,33 @@ impl StochasticDeterministicFiniteAutomaton {
         }
     }
 
-    pub fn get_semantics(sdfa: Rc<Self>) -> EbiTraitSemantics {
+    pub fn get_semantics(sdfa: Arc<Self>) -> EbiTraitSemantics {
         log::info!("convert SDFA to semantics");
         EbiTraitSemantics::Usize(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
     }
 
-    pub fn get_stochastic_semantics(sdfa: Rc<Self>) -> EbiTraitStochasticSemantics {
+    pub fn get_stochastic_semantics(sdfa: Arc<Self>) -> EbiTraitStochasticSemantics {
         EbiTraitStochasticSemantics::Usize(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
     }
 
-    pub fn get_deterministic_semantics(sdfa: Rc<Self>) -> Result<Box<dyn StochasticDeterministicSemantics<DState = usize>>> {
+    pub fn get_deterministic_semantics(sdfa: Arc<Self>) -> Result<Box<dyn StochasticDeterministicSemantics<DState = usize>>> {
         Ok(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
     }
 
     pub fn import_as_stochastic_deterministic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
         log::info!("convert SDFA to stochastic deterministic semantics");
         let sdfa = StochasticDeterministicFiniteAutomaton::import(reader)?;
-        let s = Rc::new(sdfa);
+        let s = Arc::new(sdfa);
         Ok(EbiTraitStochasticDeterministicSemantics::Usize(Self::get_deterministic_semantics(s)?))
     }
 
     pub fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics> {
-        let sdfa = Rc::new(Self::import(reader)?);
+        let sdfa = Arc::new(Self::import(reader)?);
         Ok(Self::get_stochastic_semantics(sdfa))
     }
 
     pub fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
-        let sdfa = Rc::new(Self::import(reader)?);
+        let sdfa = Arc::new(Self::import(reader)?);
         Ok(Self::get_semantics(sdfa))
     }
     

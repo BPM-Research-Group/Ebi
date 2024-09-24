@@ -1,5 +1,5 @@
 use core::fmt;
-use std::{collections::{HashMap, HashSet}, fmt::Display, io::{self, BufRead, Write}, rc::Rc, str::FromStr};
+use std::{collections::{HashMap, HashSet}, fmt::Display, io::{self, BufRead, Write}, rc::Rc, str::FromStr, sync::Arc};
 use anyhow::{anyhow, Result, Error};
 use chrono::{DateTime, Utc};
 use process_mining::{event_log::{event_log_struct::EventLogClassifier, AttributeValue}, XESImportOptions};
@@ -81,7 +81,7 @@ impl EventLog {
     pub fn read_as_stochastic_deterministic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
         let mut event_log = EventLog::import(reader)?;
         let sdfa = event_log.to_stochastic_deterministic_finite_automaton();
-        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Rc::new(sdfa))?;
+        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Arc::new(sdfa))?;
         Ok(EbiTraitStochasticDeterministicSemantics::Usize(semantics))
     }
 

@@ -1,54 +1,78 @@
-use std::{fmt::{Debug, Display}, hash::Hash};
-
+use std::{fmt::{Debug, Display}, hash::Hash, sync::Arc};
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use anyhow::{anyhow, Context, Result};
 
-use crate::{ebi_framework::activity_key::{Activity, ActivityKeyTranslator}, ebi_objects::alignments::{Alignments, Move}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, ebi_command::EbiCommand}, ebi_objects::alignments::{Alignments, Move}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, EbiTraitSemanticsArc, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
 pub trait Align {
-    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments>;
+    fn align_language(self: Arc<Self>, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments>;
 
     /**
 	 * Please note to ensure the trace and the semantics use the same ActivityKey, or they have been translated
 	 */
-    fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)>;
+    fn align_trace(self: Arc<Self>, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)>;
 }
 
-impl Align for EbiTraitSemantics {
-    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
-		match self {
-			EbiTraitSemantics::Usize(sem) => sem.align_language(log),
-			EbiTraitSemantics::Marking(sem) => sem.align_language(log),
+impl EbiTraitSemantics {
+    pub fn align_language(self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
+		match self.get_arc() {
+			EbiTraitSemanticsArc::Usize(sem) => sem.align_language(log),
+			EbiTraitSemanticsArc::Marking(sem) => sem.align_language(log),
 		}
 	}
 
-	fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
-		match self {
-			EbiTraitSemantics::Usize(sem) => sem.align_trace(trace),
-			EbiTraitSemantics::Marking(sem) => sem.align_trace(trace),
+	pub fn align_trace(self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
+		match self.get_arc() {
+			EbiTraitSemanticsArc::Usize(sem) => sem.align_trace(trace),
+			EbiTraitSemanticsArc::Marking(sem) => sem.align_trace(trace),
 		}
 	}
 }
 
-impl <T, FS> Align for T where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
     
-    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
-        let translator = ActivityKeyTranslator::new(log.get_activity_key(), self.get_activity_key_mut());
+    fn align_language(self: Arc<Self>, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
+        let mut activity_key = self.get_activity_key().clone();
+        let translator = Arc::new(ActivityKeyTranslator::new(log.get_activity_key(), &mut activity_key));
+        let log = Arc::new(log);
 
-        let mut result = Alignments::new(self.get_activity_key().clone());
-        for trace in log.iter() {
+        log::info!("Perform the test");
+        let progress_bar = EbiCommand::get_progress_bar(log.len());
+
+        //compute alignments multi-threadedly
+        let mut aligned_traces = (0..log.len()).into_par_iter().filter_map(|trace_index| {
+            let log = Arc::clone(&log);
+            let translator = Arc::clone(&translator);
+            let self2 = Arc::clone(&self);
+
+            let trace = log.get_trace(trace_index).unwrap();
             let trace_translated = translator.translate_trace(trace);
-            result.push(self.align_trace(&trace_translated)?.0);
+
+            progress_bar.inc(1);
+
+            if let Ok((aligned_trace, _)) = self2.align_trace(&trace_translated) {
+                Some(aligned_trace)
+            } else {
+                None
+            }
+        }).collect::<Vec<_>>();// end parallel execution
+
+        if aligned_traces.len() != log.len() {
+            //something went wrong
+            return Err(anyhow!("An alignment was not completed and returned an error."));
         }
 
+        let mut result = Alignments::new(activity_key);
+        result.append(&mut aligned_traces);
         Ok(result)
     }
 
     /**
 	 * Please note to ensure the trace and the semantics use the same ActivityKey, or they have been translated
 	 */
-    fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
-        if let Some((states, cost)) = align_astar(self, trace) {
-            Ok((transform_alignment(self, trace, states)?, cost))
+    fn align_trace(self: Arc<Self>, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
+        if let Some((states, cost)) = align_astar(self.as_ref(), trace) {
+            Ok((transform_alignment(self.as_ref(), trace, states)?, cost))
         } else {
             Err(anyhow!("The model has no way to terminate: it is impossible to reach a deadlock."))
         }

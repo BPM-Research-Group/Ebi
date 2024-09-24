@@ -46,6 +46,10 @@ impl Alignments {
         self.alignments.push(alignment);
     }
 
+    pub fn append(&mut self, alignments: &mut Vec<Vec<Move>>) {
+        self.alignments.append(alignments);
+    }
+
     pub fn get(&self, index: usize) -> Option<&Vec<Move>> {
         self.alignments.get(index)
     }

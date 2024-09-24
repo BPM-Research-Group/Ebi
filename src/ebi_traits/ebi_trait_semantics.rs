@@ -1,4 +1,4 @@
-use std::{fmt::{Debug, Display}, hash::Hash};
+use std::{fmt::{Debug, Display}, hash::Hash, sync::Arc};
 use anyhow::{anyhow, Result};
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::labelled_petri_net::LPNMarking};
 
@@ -32,10 +32,17 @@ impl EbiTraitSemantics {
 			EbiTraitSemantics::Usize(semantics) => semantics.get_activity_key_mut(),
 		}
 	}
+
+	pub fn get_arc(self) -> EbiTraitSemanticsArc {
+		match self {
+			EbiTraitSemantics::Marking(semantics) => EbiTraitSemanticsArc::Marking(Arc::from(semantics)),
+			EbiTraitSemantics::Usize(semantics) => EbiTraitSemanticsArc::Usize(Arc::from(semantics)),
+		}
+	}
 }
 
-pub trait Semantics : Debug {
-	type State: Eq + Hash + Clone + Display;
+pub trait Semantics : Debug + Send + Sync {
+	type State: Eq + Hash + Clone + Display + Send + Sync;
 
 	fn get_activity_key(&self) -> &ActivityKey;
 
@@ -67,4 +74,10 @@ pub trait Semantics : Debug {
 
 	fn get_enabled_transitions(&self, state: &Self::State) -> Vec<TransitionIndex>;
 
+}
+
+//in multithreaded cases, we need Arcs instead of Boxes. Normally, the overhead is not necessary.
+pub enum EbiTraitSemanticsArc {
+	Marking(Arc<dyn Semantics<State = LPNMarking>>),
+	Usize(Arc<dyn Semantics<State = usize>>)
 }

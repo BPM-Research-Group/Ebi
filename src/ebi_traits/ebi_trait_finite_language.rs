@@ -5,7 +5,7 @@ use crate::ebi_framework::{ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_
 
 use super::{ebi_trait_event_log::IndexTrace, ebi_trait_iterable_language::EbiTraitIterableLanguage};
 
-pub trait EbiTraitFiniteLanguage : IndexTrace + Display + EbiTraitIterableLanguage + Sync {
+pub trait EbiTraitFiniteLanguage : IndexTrace + Display + EbiTraitIterableLanguage + Send + Sync {
     
 }
 

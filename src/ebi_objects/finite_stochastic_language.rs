@@ -1,4 +1,4 @@
-use std::{collections::{hash_map::Entry, HashMap, HashSet}, fmt, io::{self, BufRead, Write}, rc::Rc, str::FromStr};
+use std::{collections::{hash_map::Entry, HashMap, HashSet}, fmt, io::{self, BufRead, Write}, rc::Rc, str::FromStr, sync::Arc};
 use anyhow::{anyhow, Context, Error, Result};
 
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::{self, EbiTraitFiniteStochasticLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::{self, EbiTraitIterableStochasticLanguage}, ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage}, ebi_trait_semantics::Semantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, ToStochasticSemantics}}, follower_semantics::FollowerSemantics, line_reader::LineReader, math::fraction::Fraction};
@@ -115,7 +115,7 @@ impl FiniteStochasticLanguage {
 
     pub fn get_deterministic_stochastic_semantics(&self) -> Result<EbiTraitStochasticDeterministicSemantics> {
         let sdfa = self.to_stochastic_deterministic_finite_automaton();
-        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Rc::new(sdfa))?;
+        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Arc::new(sdfa))?;
         Ok(EbiTraitStochasticDeterministicSemantics::Usize(semantics))
     }
 

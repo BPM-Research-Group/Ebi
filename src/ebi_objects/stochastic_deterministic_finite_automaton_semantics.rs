@@ -1,4 +1,4 @@
-use std::rc::Rc;
+use std::sync::Arc;
 use anyhow::{anyhow, Result};
 
 use crate::{ebi_framework::activity_key::{Activity, ActivityKey}, ebi_traits::{ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::Semantics, ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
@@ -8,11 +8,11 @@ use super::stochastic_deterministic_finite_automaton::StochasticDeterministicFin
 #[derive(Debug)]
 pub struct StochasticDeterministicFiniteAutomatonSemantics {
     activity_key: ActivityKey, //need to clone for the borrow checker
-    sdfa: Rc<StochasticDeterministicFiniteAutomaton>
+    sdfa: Arc<StochasticDeterministicFiniteAutomaton>
 }
 
 impl StochasticDeterministicFiniteAutomatonSemantics {
-    pub fn new(sdfa: Rc<StochasticDeterministicFiniteAutomaton>) -> Self {
+    pub fn new(sdfa: Arc<StochasticDeterministicFiniteAutomaton>) -> Self {
         Self {
             activity_key: sdfa.get_activity_key().clone(),
             sdfa: sdfa

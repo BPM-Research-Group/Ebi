@@ -1,8 +1,8 @@
 #[cfg(test)]
 mod tests {
-    use std::{fs, rc::Rc};
+    use std::{fs, sync::Arc};
 
-    use crate::{ebi_objects::{alignments::Move, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, follower_semantics::FollowerSemantics, math::fraction::Fraction, medoid, techniques::{align::Align, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probabilistic_queries::FiniteStochasticLanguageAnalyser, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
+    use crate::{ebi_objects::{alignments::Move, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, follower_semantics::FollowerSemantics, math::fraction::Fraction, medoid, techniques::{medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probabilistic_queries::FiniteStochasticLanguageAnalyser, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 
     #[test]
     fn medoid() {
@@ -82,7 +82,7 @@ mod tests {
     fn sdfa_minprob_one() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
         let sdfa = fin.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
-        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Rc::new(sdfa)).unwrap();
+        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Arc::new(sdfa)).unwrap();
         assert!(semantics.analyse_minimum_probability(&Fraction::one()).is_err());
     }
 
@@ -90,7 +90,7 @@ mod tests {
     fn sdfa_minprob_zero() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
         let sdfa = fin.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
-        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Rc::new(sdfa)).unwrap();
+        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Arc::new(sdfa)).unwrap();
 
         let slang2 = semantics.analyse_minimum_probability(&Fraction::zero()).unwrap();
 
@@ -103,7 +103,7 @@ mod tests {
     fn sdfa_minprob_zero_loop() {
         let fin = fs::read_to_string("testfiles/a-loop.sdfa").unwrap();
         let sdfa = fin.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
-        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Rc::new(sdfa)).unwrap();
+        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Arc::new(sdfa)).unwrap();
 
         assert!(semantics.analyse_minimum_probability(&Fraction::zero()).is_err());
     }
@@ -299,7 +299,7 @@ mod tests {
     #[test]
     fn align_sdfa_trace() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
-        let sdfa = Rc::new(fin.parse::<StochasticDeterministicFiniteAutomaton>().unwrap());
+        let sdfa = Arc::new(fin.parse::<StochasticDeterministicFiniteAutomaton>().unwrap());
         let mut semantics = StochasticDeterministicFiniteAutomaton::get_semantics(sdfa);
 
         let a = semantics.get_activity_key_mut().process_activity("a");
@@ -318,7 +318,7 @@ mod tests {
     #[test]
     fn align_sdfa_lang() {
         let fin1 = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
-        let sdfa = Rc::new(fin1.parse::<StochasticDeterministicFiniteAutomaton>().unwrap());
+        let sdfa = Arc::new(fin1.parse::<StochasticDeterministicFiniteAutomaton>().unwrap());
         let mut semantics = StochasticDeterministicFiniteAutomaton::get_semantics(sdfa);
 
         let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
