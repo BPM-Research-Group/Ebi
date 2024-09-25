@@ -1,7 +1,9 @@
 use anyhow::{anyhow, Result, Context, Error};
 use std::{collections::HashSet, fmt::Display, io::{self, BufRead}, str::FromStr};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage}, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}}, line_reader::LineReader};
+
+use super::finite_language_semantics::FiniteLanguageSemantics;
 
 pub const HEADER: &str = "finite language";
 
@@ -12,6 +14,7 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     validator: ebi_input::validate::<FiniteLanguage>,
     trait_importers: &[
         EbiTraitImporter::FiniteLanguage(ebi_trait_finite_language::import::<FiniteLanguage>),
+        EbiTraitImporter::Semantics(FiniteLanguage::import_as_semantics),
     ],
     object_importers: &[
         EbiObjectImporter::FiniteLanguage(FiniteLanguage::import_as_object),
@@ -173,5 +176,18 @@ impl From<(ActivityKey, HashSet<Vec<Activity>>)> for FiniteLanguage {
             activity_key: value.0,
             traces: value.1
         }
+    }
+}
+
+impl ToSemantics for FiniteLanguage {
+    type State = <FiniteLanguageSemantics as Semantics>::State;
+
+    fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State>> {
+        Box::new(FiniteLanguageSemantics::from_language(self))
+    }
+
+    fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
+        let slang = Self::import(reader)?;
+        Ok(EbiTraitSemantics::Usize(slang.get_semantics()))
     }
 }

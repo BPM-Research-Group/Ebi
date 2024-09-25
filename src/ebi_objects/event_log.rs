@@ -160,14 +160,14 @@ impl EventLog {
 impl ToStochasticSemantics for EventLog {
     type State = <FiniteStochasticLanguageSemantics as Semantics>::State;
 
-    fn get_stochastic_semantics(net: Rc<Self>) -> Box<dyn StochasticSemantics<State = Self::State>> {
-        Box::new(FiniteStochasticLanguageSemantics::from_language(net.to_finite_stochastic_language().into()))
+    fn get_stochastic_semantics(&self) -> Box<dyn StochasticSemantics<State = Self::State>> {
+        Box::new(FiniteStochasticLanguageSemantics::from_language((&self.to_finite_stochastic_language()).into()))
     }
 
     fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics> {
         let log = Self::import(reader)?;
         let s = Rc::new(log);
-        Ok(EbiTraitStochasticSemantics::Usize(Self::get_stochastic_semantics(s)))
+        Ok(EbiTraitStochasticSemantics::Usize(s.get_stochastic_semantics()))
     }
 }
 

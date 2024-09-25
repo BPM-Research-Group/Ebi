@@ -1,4 +1,4 @@
-use std::{collections::{hash_map::Entry, HashMap, HashSet}, fmt, io::{self, BufRead, Write}, rc::Rc, str::FromStr, sync::Arc};
+use std::{collections::{hash_map::Entry, HashMap, HashSet}, fmt, io::{self, BufRead, Write}, str::FromStr, sync::Arc};
 use anyhow::{anyhow, Context, Error, Result};
 
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::{self, EbiTraitFiniteStochasticLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::{self, EbiTraitIterableStochasticLanguage}, ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage}, ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, ToStochasticSemantics}}, follower_semantics::FollowerSemantics, line_reader::LineReader, math::fraction::Fraction};
@@ -333,28 +333,26 @@ impl fmt::Display for FiniteStochasticLanguage {
 impl ToSemantics for FiniteStochasticLanguage {
     type State = <FiniteStochasticLanguageSemantics as Semantics>::State;
 
-    fn get_semantics(net: Rc<Self>) -> Box<dyn Semantics<State = Self::State>> {
-        Box::new(FiniteStochasticLanguageSemantics::from_language(net))
+    fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State>> {
+        Box::new(FiniteStochasticLanguageSemantics::from_language(self))
     }
 
     fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
         let slang = Self::import(reader)?;
-        let s = Rc::new(slang);
-        Ok(EbiTraitSemantics::Usize(Self::get_semantics(s)))
+        Ok(EbiTraitSemantics::Usize(slang.get_semantics()))
     }
 }
 
 impl ToStochasticSemantics for FiniteStochasticLanguage {
     type State = <FiniteStochasticLanguageSemantics as Semantics>::State;
 
-    fn get_stochastic_semantics(net: Rc<Self>) -> Box<dyn StochasticSemantics<State = Self::State>> {
-        Box::new(FiniteStochasticLanguageSemantics::from_language(net))
+    fn get_stochastic_semantics(&self) -> Box<dyn StochasticSemantics<State = Self::State>> {
+        Box::new(FiniteStochasticLanguageSemantics::from_language(self))
     }
 
     fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics> {
         let slang = Self::import(reader)?;
-        let s = Rc::new(slang);
-        Ok(EbiTraitStochasticSemantics::Usize(Self::get_stochastic_semantics(s)))
+        Ok(EbiTraitStochasticSemantics::Usize(slang.get_stochastic_semantics()))
     }
 }
 

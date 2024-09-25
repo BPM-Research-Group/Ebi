@@ -45,6 +45,7 @@ pub mod ebi_objects {
     pub mod directly_follows_model;
     pub mod petri_net_markup_language;
     pub mod alignments;
+    pub mod finite_language_semantics;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_stochastic_deterministic_semantics;

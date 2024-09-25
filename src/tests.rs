@@ -2,7 +2,10 @@
 mod tests {
     use std::{fs, sync::Arc};
 
-    use crate::{ebi_objects::{alignments::Move, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, follower_semantics::FollowerSemantics, math::fraction::Fraction, medoid, techniques::{align::Align, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probabilistic_queries::FiniteStochasticLanguageAnalyser, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
+    use env_logger::Builder;
+    use log::LevelFilter;
+
+    use crate::{ebi_objects::{alignments::Move, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::ToSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, medoid, techniques::{align::Align, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probabilistic_queries::FiniteStochasticLanguageAnalyser, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 
     #[test]
     fn medoid() {
@@ -320,6 +323,29 @@ mod tests {
         let fin1 = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
         let sdfa = Arc::new(fin1.parse::<StochasticDeterministicFiniteAutomaton>().unwrap());
         let mut semantics = StochasticDeterministicFiniteAutomaton::get_semantics(sdfa);
+
+        let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
+        let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
+
+        let a = semantics.get_activity_key_mut().process_activity("a");
+        let b = semantics.get_activity_key_mut().process_activity("b");
+        
+        let alignment = semantics.align_language(lang).unwrap();
+
+        let correct_1 = vec![Move::SynchronousMove(b, 1), Move::ModelMove(a, 4), Move::SilentMove(5), Move::LogMove(b)];
+        let correct_2 = vec![Move::SynchronousMove(b, 1), Move::LogMove(b), Move::ModelMove(a, 4), Move::SilentMove(5)];
+
+        assert!(alignment.get(0) == Some(&correct_1) || alignment.get(0) == Some(&correct_2));
+    }
+
+    #[test]
+    fn align_slang_lang() {
+        //enable debugging
+        Builder::new().filter_level(LevelFilter::Trace).init();
+
+        let fin1 = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
+        let sdfa = fin1.parse::<FiniteStochasticLanguage>().unwrap();
+        let mut semantics = sdfa.get_semantics();
 
         let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
         let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());

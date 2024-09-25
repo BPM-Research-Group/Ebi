@@ -1,4 +1,4 @@
-use std::{fmt::Display, hash::Hash, io::BufRead, rc::Rc};
+use std::{fmt::Display, hash::Hash, io::BufRead};
 use anyhow::{anyhow, Result};
 
 use crate::{ebi_framework::{activity_key::ActivityKey, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::labelled_petri_net::LPNMarking, math::fraction::Fraction};
@@ -57,7 +57,7 @@ pub type TransitionIndex = usize;
 
 pub trait ToStochasticSemantics {
 	type State: Eq + Hash + Clone + Display;
-	fn get_stochastic_semantics(net: Rc<Self>) -> Box<dyn StochasticSemantics<State = Self::State>>;
+	fn get_stochastic_semantics(&self) -> Box<dyn StochasticSemantics<State = Self::State>>;
 
 	fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics>;
 }

@@ -1,6 +1,6 @@
-use std::{fmt::{Debug, Display}, hash::Hash, sync::Arc};
+use std::{fmt::{Debug, Display}, hash::Hash, sync::{Arc, Mutex}};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use anyhow::{anyhow, Context, Result};
+use anyhow::{anyhow, Context, Error, Result};
 
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, ebi_command::EbiCommand}, ebi_objects::alignments::{Alignments, Move}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
@@ -35,8 +35,9 @@ impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, 
         let mut activity_key = self.get_activity_key().clone();
         let translator = Arc::new(ActivityKeyTranslator::new(log.get_activity_key(), &mut activity_key));
         let log = Arc::new(log);
+        let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
 
-        log::info!("Perform the test");
+        log::info!("Compute alignments");
         let progress_bar = EbiCommand::get_progress_bar(log.len());
 
         //compute alignments multi-threadedly
@@ -50,16 +51,26 @@ impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, 
 
             progress_bar.inc(1);
 
-            if let Ok((aligned_trace, _)) = self2.align_trace(&trace_translated) {
-                Some(aligned_trace)
-            } else {
+            match self2.align_trace(&trace_translated).with_context(|| format!("Aligning trace {:?}", trace)) {
+                Ok((aligned_trace, _)) => Some(aligned_trace),
+                Err(err) => {
+                    let error = Arc::clone(&error);
+                *error.lock().unwrap() = Some(err);
                 None
+                },
             }
         }).collect::<Vec<_>>();// end parallel execution
 
         if aligned_traces.len() != log.len() {
             //something went wrong
-            return Err(anyhow!("An alignment was not completed and returned an error."));
+            if let Ok(mutex) = Arc::try_unwrap(error) {
+                if let Ok(err) = mutex.into_inner() {
+                    if let Some(err) = err {
+                        return Err(err);
+                    }
+                }
+            }
+            return Err(anyhow!("Something went wrong when computing alignments."));
         }
 
         let mut result = Alignments::new(activity_key);
@@ -74,22 +85,22 @@ impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, 
         if let Some((states, cost)) = align_astar(self, trace) {
             Ok((transform_alignment(self, trace, states)?, cost))
         } else {
-            Err(anyhow!("The model has no way to terminate: it is impossible to reach a deadlock."))
+            Err(anyhow!("The synchronous product has no way to terminate: it is impossible to reach a deadlock."))
         }
     }
 
 }
 
 pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(usize, FS)>, usize)> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
-    // log::debug!("activity key {}", self.get_activity_key());
-    // log::debug!("align trace {:?}", trace);
+    log::debug!("activity key {}", semantics.get_activity_key());
+    log::debug!("align trace {:?}", trace);
 
     let start = (0, semantics.get_initial_state());
     let successors = |(trace_index, state) : &(usize, FS)| {
 
         let mut result = vec![];
 
-        // log::debug!("successors of log {} model {}", trace_index, state);
+        log::debug!("successors of log {} model {}", trace_index, state);
         
         if trace_index < &trace.len() {
             //we can do a log move
@@ -101,19 +112,19 @@ pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(
         for transition in semantics.get_enabled_transitions(&state) {
 
             let mut new_state = state.clone();
-            // log::debug!("\t\tnew state before {}", new_state);
+            log::debug!("\t\tnew state before {}", new_state);
             let _ = semantics.execute_transition(&mut new_state, transition);
-            // log::debug!("\t\tnew state after {}", new_state);
+            log::debug!("\t\tnew state after {}", new_state);
 
             if let Some(activity) = semantics.get_transition_activity(transition) {
                 //non-silent model move
                 result.push(((*trace_index, new_state.clone()), 10000));
-                // log::debug!("\tmodel move t{} {} to {}", transition, activity, new_state);
+                log::debug!("\tmodel move t{} {} to {}", transition, activity, new_state);
 
                 //which may also be a synchronous move
                 if trace_index < &trace.len() && activity == trace[*trace_index] {
                     //synchronous move
-                    // log::debug!("\tsynchronous move t{} {} to {}", transition, activity, new_state);
+                    log::debug!("\tsynchronous move t{} {} to {}", transition, activity, new_state);
                     result.push(((trace_index + 1, new_state), 0));
                 }
             } else {
@@ -122,7 +133,7 @@ pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(
             }
         }
 
-        // log::debug!("successors of {} {}: {:?}", trace_index, state, result);
+        log::debug!("successors of {} {}: {:?}", trace_index, state, result);
         result
     };
 

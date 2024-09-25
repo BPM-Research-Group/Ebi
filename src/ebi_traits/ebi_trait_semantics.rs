@@ -1,4 +1,4 @@
-use std::{fmt::{Debug, Display}, hash::Hash, io::BufRead, rc::Rc};
+use std::{fmt::{Debug, Display}, hash::Hash, io::BufRead};
 use anyhow::{anyhow, Result};
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::labelled_petri_net::LPNMarking};
 
@@ -72,7 +72,7 @@ pub trait Semantics : Debug + Send + Sync {
 
 pub trait ToSemantics {
 	type State: Eq + Hash + Clone + Display;
-	fn get_semantics(net: Rc<Self>) -> Box<dyn Semantics<State = Self::State>>;
+	fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State>>;
 
 	fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics>;
 }
