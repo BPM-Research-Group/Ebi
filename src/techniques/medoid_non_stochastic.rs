@@ -1,4 +1,4 @@
-use std::{collections::HashSet, sync::Arc};
+use std::sync::Arc;
 use anyhow::{anyhow, Result};
 use fraction::One;
 
@@ -16,7 +16,7 @@ pub trait MedoidNonStochastic {
 impl <T: ?Sized> MedoidNonStochastic for T where T: EbiTraitFiniteLanguage {
 	fn medoid(&self, number_of_traces: usize) -> Result<FiniteLanguage> {
 		let activity_key = self.get_activity_key().clone();
-		let mut result = HashSet::new();
+		let mut result = FiniteLanguage::new_hashmap();
 
 		let distances = TriangularDistanceMatrix::new(self);
 
@@ -84,7 +84,7 @@ impl <T: ?Sized> MedoidNonStochastic for T where T: EbiTraitFiniteLanguage {
 		fasterpam(&distances, &mut medoids, 500);
 
 		//create output (the medoids of the clusters)
-		let mut result = HashSet::new();
+		let mut result = FiniteLanguage::new_hashmap();
 		medoids.sort();
 		let mut list_i = 0;
 		for (i1, trace1) in self.iter().enumerate() {

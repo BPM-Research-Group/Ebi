@@ -1,9 +1,10 @@
 use anyhow::{anyhow, Result, Context, Error};
-use std::{collections::HashSet, fmt::Display, io::{self, BufRead}, str::FromStr};
+use fnv::FnvBuildHasher;
+use std::{collections::HashSet, fmt::Display, io::{self, BufRead}, str::FromStr, sync::Arc};
 
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}}, line_reader::LineReader};
 
-use super::finite_language_semantics::FiniteLanguageSemantics;
+use super::deterministic_finite_automaton::DeterministicFiniteAutomaton;
 
 pub const HEADER: &str = "finite language";
 
@@ -18,24 +19,53 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     ],
     object_importers: &[
         EbiObjectImporter::FiniteLanguage(FiniteLanguage::import_as_object),
+        EbiObjectImporter::DeterministicFiniteAutomaton(FiniteLanguage::import_as_deterministic_finite_automaton),
     ],
     object_exporters: &[
-        EbiObjectExporter::FiniteLanguage(FiniteLanguage::export_from_object)
+        EbiObjectExporter::FiniteLanguage(FiniteLanguage::export_from_object),
     ],
 };
 
 pub struct FiniteLanguage {
     activity_key: ActivityKey,
-    traces: HashSet<Vec<Activity>>
+    traces: HashSet<Vec<Activity>, FnvBuildHasher>
 }
 
 impl FiniteLanguage {
+
+    pub fn new_hashmap() -> HashSet::<Vec<Activity>, FnvBuildHasher> {
+        HashSet::<_, FnvBuildHasher>::default()
+    }
+
     pub fn push_string(&mut self, trace: Vec<String>) {
         self.traces.insert(self.activity_key.process_trace(&trace));
     }
 
     pub fn push(&mut self, trace: Vec<Activity>) {
         self.traces.insert(trace);
+    }
+
+    pub fn import_as_deterministic_finite_automaton(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let lang = Self::import(reader)?;
+        Ok(EbiObject::DeterministicFiniteAutomaton(lang.get_deterministic_finite_automaton()))
+    }
+
+    pub fn get_deterministic_finite_automaton(&self) -> DeterministicFiniteAutomaton {
+        let mut result = DeterministicFiniteAutomaton::new();
+        result.set_activity_key(self.get_activity_key().clone());
+        
+        for trace in self.iter() {
+            println!("{:?}", trace);
+            let mut state = result.get_initial_state();
+
+            for activity in trace {
+                state = result.take_or_add_transition(state, *activity);
+            }
+
+            result.set_final_state(state, true);
+        }
+
+        result
     }
 }
 
@@ -132,7 +162,7 @@ impl Importable for FiniteLanguage {
             return Err(anyhow!("language is empty"));
         }
 
-        let mut traces = HashSet::new();
+        let mut traces = HashSet::<Vec<Activity>, FnvBuildHasher>::default();
         let mut activity_key = ActivityKey::new();
         for trace_i in 0 .. number_of_traces {
             let number_of_events = lreader.next_line_index().with_context(|| format!("failed to read number of events for trace {} at line {}", trace_i, lreader.get_last_line_number()))?;
@@ -170,8 +200,8 @@ impl From<HashSet<Vec<String>>> for FiniteLanguage {
     }
 }
 
-impl From<(ActivityKey, HashSet<Vec<Activity>>)> for FiniteLanguage {
-    fn from(value: (ActivityKey, HashSet<Vec<Activity>>)) -> Self {
+impl From<(ActivityKey, HashSet<Vec<Activity>, FnvBuildHasher>)> for FiniteLanguage {
+    fn from(value: (ActivityKey, HashSet<Vec<Activity>, FnvBuildHasher>)) -> Self {
         Self{
             activity_key: value.0,
             traces: value.1
@@ -180,14 +210,17 @@ impl From<(ActivityKey, HashSet<Vec<Activity>>)> for FiniteLanguage {
 }
 
 impl ToSemantics for FiniteLanguage {
-    type State = <FiniteLanguageSemantics as Semantics>::State;
+    type State = usize;
 
     fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State>> {
-        Box::new(FiniteLanguageSemantics::from_language(self))
+        let dfa = self.get_deterministic_finite_automaton();
+        println!("{:?}", dfa);
+        Arc::new(dfa).get_semantics()
     }
 
     fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
-        let slang = Self::import(reader)?;
-        Ok(EbiTraitSemantics::Usize(slang.get_semantics()))
+        let lang = Self::import(reader)?;
+        let dfa = lang.get_deterministic_finite_automaton();
+        Ok(EbiTraitSemantics::Usize(Arc::new(dfa).get_semantics()))
     }
 }

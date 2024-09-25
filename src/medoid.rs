@@ -1,4 +1,3 @@
-use std::collections::HashSet;
 use anyhow::{anyhow, Result};
 use fraction::One;
 
@@ -8,7 +7,7 @@ use crate::{distances::TriangularDistanceMatrix, ebi_objects::finite_language::F
 pub fn medoid<T>(log: &T, number_of_traces: &usize) -> Result<FiniteLanguage> where T: EbiTraitFiniteStochasticLanguage + ?Sized {
 
     let activity_key = log.get_activity_key().clone();
-    let mut result = HashSet::new();
+    let mut result = FiniteLanguage::new_hashmap();
 
     log::info!("Computing {} medoid traces", number_of_traces);
 

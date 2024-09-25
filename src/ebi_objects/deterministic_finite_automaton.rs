@@ -3,7 +3,7 @@ use anyhow::{anyhow, Result, Error,Context};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_objects::deterministic_finite_automaton_semantics::DeterministicFiniteAutomatonSemantics, ebi_traits::ebi_trait_semantics::EbiTraitSemantics, json};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_objects::deterministic_finite_automaton_semantics::DeterministicFiniteAutomatonSemantics, ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics}, json};
 
 
 pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
@@ -116,6 +116,10 @@ impl DeterministicFiniteAutomaton {
         self.final_states[state]
     }
 
+    pub fn set_final_state(&mut self, state: usize, is_final: bool) {
+        self.final_states[state] = is_final
+    }
+
     pub fn add_state(&mut self) -> usize {
 		self.max_state += 1;
         self.final_states.push(false);
@@ -168,22 +172,25 @@ impl DeterministicFiniteAutomaton {
         (false, left)
 	}
 
-    pub fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
-        let dfa = Arc::new(Self::import(reader)?);
-        Ok(Self::get_semantics(dfa))
-    }
-
-    pub fn get_semantics(dfa: Arc<Self>) -> EbiTraitSemantics {
-        log::info!("convert DFA to semantics");
-        EbiTraitSemantics::Usize(Box::new(DeterministicFiniteAutomatonSemantics::new(dfa)))
-    }
-
     pub fn get_activity_key(&self) -> &ActivityKey {
         &self.activity_key
     }
     
     pub fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
         &mut self.activity_key
+    }
+    
+    pub fn set_activity_key(&mut self, activity_key: ActivityKey) {
+        self.activity_key = activity_key
+    }
+
+    pub fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
+        let dfa = Arc::new(Self::import(reader)?);
+        Ok(EbiTraitSemantics::Usize(Box::new(DeterministicFiniteAutomatonSemantics::new(dfa))))
+    }
+
+    pub fn get_semantics(self: Arc<Self>) -> Box<dyn Semantics<State = usize>> {
+        Box::new(DeterministicFiniteAutomatonSemantics::new(self))
     }
 }
 

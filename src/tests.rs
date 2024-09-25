@@ -368,9 +368,10 @@ mod tests {
         
         let alignment = semantics.align_language(lang).unwrap();
 
-        let correct_1 = vec![Move::ModelMove(a, 1), Move::SynchronousMove(b,2), Move::SilentMove(0), Move::LogMove(b)]; //other options may be valid, please check semantically when this fails
-        let correct_2 = vec![Move::SynchronousMove(b,2), Move::ModelMove(a, 1), Move::SilentMove(0), Move::LogMove(b)]; //other options may be valid, please check semantically when this fails
-        assert!(*alignment.get(0).unwrap() == correct_1 || *alignment.get(0).unwrap() == correct_2);
+        let correct_1 = vec![Move::SynchronousMove(b, 1), Move::ModelMove(a, 2), Move::SilentMove(5), Move::LogMove(b)]; //other options may be valid, please check semantically when this fails
+
+        assert_eq!(*alignment.get(0).unwrap(), correct_1);
+        // assert!(*alignment.get(0).unwrap() == correct_1 || *alignment.get(0).unwrap() == correct_2);
     }
 
     #[test]
