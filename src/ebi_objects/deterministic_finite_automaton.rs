@@ -18,7 +18,8 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
         EbiObjectImporter::DeterministicFiniteAutomaton(DeterministicFiniteAutomaton::import_as_object),
     ],
     object_exporters: &[
-        EbiObjectExporter::DeterministicFiniteAutomaton(DeterministicFiniteAutomaton::export_from_object)
+        EbiObjectExporter::DeterministicFiniteAutomaton(DeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::FiniteLanguage(DeterministicFiniteAutomaton::export_from_finite_language),
     ]
 };
 
@@ -191,6 +192,13 @@ impl DeterministicFiniteAutomaton {
 
     pub fn get_semantics(self: Arc<Self>) -> Box<dyn Semantics<State = usize>> {
         Box::new(DeterministicFiniteAutomatonSemantics::new(self))
+    }
+
+    pub fn export_from_finite_language(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+        match object {
+            EbiOutput::Object(EbiObject::FiniteLanguage(lang)) => lang.get_deterministic_finite_automaton().export(f),
+            _ => unreachable!()
+        }
     }
 }
 

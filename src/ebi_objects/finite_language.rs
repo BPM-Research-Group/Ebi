@@ -55,7 +55,6 @@ impl FiniteLanguage {
         result.set_activity_key(self.get_activity_key().clone());
         
         for trace in self.iter() {
-            println!("{:?}", trace);
             let mut state = result.get_initial_state();
 
             for activity in trace {
@@ -214,7 +213,6 @@ impl ToSemantics for FiniteLanguage {
 
     fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State>> {
         let dfa = self.get_deterministic_finite_automaton();
-        println!("{:?}", dfa);
         Arc::new(dfa).get_semantics()
     }
 

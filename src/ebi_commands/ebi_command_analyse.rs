@@ -45,11 +45,6 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
             _ => unreachable!()
         };
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
-
-        // let semantics = objects.remove(0).to_type::<EbiTraitStochasticDeterministicSemantics>()?;
-        // let at_least = objects.remove(0).to_type::<Fraction>()?;
-        // let result = semantics.analyse_minimum_probability(&at_least).context("could not analyse")?;
-        // return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     }, 
     output: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
 };
