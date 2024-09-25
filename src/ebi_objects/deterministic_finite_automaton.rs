@@ -30,6 +30,7 @@ pub struct DeterministicFiniteAutomaton {
     pub(crate) sources: Vec<usize>, //transition -> source of arc
     pub(crate) targets: Vec<usize>, //transition -> target of arc
     pub(crate) activities: Vec<Activity>, //transition -> activity of arc (every transition is labelled)
+    pub(crate) final_states: Vec<bool>,
 }
 
 impl DeterministicFiniteAutomaton {
@@ -42,6 +43,7 @@ impl DeterministicFiniteAutomaton {
             sources: vec![],
             targets: vec![],
             activities: vec![],
+            final_states: vec![false]
         }
     }
 
@@ -63,8 +65,9 @@ impl DeterministicFiniteAutomaton {
     }
 
     fn ensure_states(&mut self, new_max_state: usize) {
-        if new_max_state > self.max_state {
-            self.max_state = new_max_state;
+        while new_max_state > self.max_state {
+            self.max_state +=1 ;
+            self.final_states.push(false);
         }
     }
 
@@ -109,8 +112,13 @@ impl DeterministicFiniteAutomaton {
         self.initial_state
     }
 
+    pub fn is_final_state(&self, state: usize) -> bool {
+        self.final_states[state]
+    }
+
     pub fn add_state(&mut self) -> usize {
 		self.max_state += 1;
+        self.final_states.push(false);
 		return self.max_state;
 	}
 
@@ -198,15 +206,32 @@ impl Importable for DeterministicFiniteAutomaton {
 
         let mut result = DeterministicFiniteAutomaton::new();
 
-        result.set_initial_state(json::read_number(&json, "initialState").context("failed to read initial state")?);
-        let jtrans = json::read_list(&json, "transitions").context("failed to read list of transitions")?;
+        result.set_initial_state(json::read_field_number(&json, "initialState").context("failed to read initial state")?);
+
+        //read transitions
+        let jtrans = json::read_field_list(&json, "transitions").context("failed to read list of transitions")?;
         for jtransition in jtrans {
-            let from = json::read_number(jtransition, "from").context("could not read from")?;
-            let to = json::read_number(jtransition, "to").context("could not read to")?;
-            let label = json::read_string(jtransition, "label").context("could not read label")?;
+            let from = json::read_field_number(jtransition, "from").context("could not read from")?;
+            let to = json::read_field_number(jtransition, "to").context("could not read to")?;
+            let label = json::read_field_string(jtransition, "label").context("could not read label")?;
             let activity = result.activity_key.process_activity(label.as_str());
 
+            result.ensure_states(from);
+            result.ensure_states(to);
+
             result.add_transition(from, activity, to)?;
+        }
+
+        //read final states
+        let jfinal_states = json::read_field_list(&json, "finalStates").context("failed to read list of final states")?;
+        for jfinal_state in jfinal_states {
+            let state = json::read_number(jfinal_state).context("could not read final state")?;
+
+            if state > result.max_state {
+                result.ensure_states(state);
+            }
+
+            result.final_states[state] = true;
         }
 
         return Ok(result);
@@ -263,7 +288,11 @@ impl Dottable for DeterministicFiniteAutomaton {
 
         let mut places = vec![];
         for state in 0 ..= self.max_state {
-            places.push(<dyn Dottable>::create_place(&mut graph, &state.to_string()));
+            if self.is_final_state(state) {
+                places.push(<dyn Dottable>::create_transition(&mut graph, &state.to_string(), ""));
+            } else {
+                places.push(<dyn Dottable>::create_place(&mut graph, &state.to_string()));
+            }
         }
 
         for pos in 0..self.sources.len() {

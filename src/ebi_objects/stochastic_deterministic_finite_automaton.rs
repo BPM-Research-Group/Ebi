@@ -300,14 +300,14 @@ impl Importable for StochasticDeterministicFiniteAutomaton {
 
         let mut result = StochasticDeterministicFiniteAutomaton::new();
 
-        result.set_initial_state(json::read_number(&json, "initialState").context("failed to read initial state")?);
-        let jtrans = json::read_list(&json, "transitions").context("failed to read list of transitions")?;
+        result.set_initial_state(json::read_field_number(&json, "initialState").context("failed to read initial state")?);
+        let jtrans = json::read_field_list(&json, "transitions").context("failed to read list of transitions")?;
         for jtransition in jtrans {
-            let from = json::read_number(jtransition, "from").context("could not read from")?;
-            let to = json::read_number(jtransition, "to").context("could not read to")?;
-            let label = json::read_string(jtransition, "label").context("could not read label")?;
+            let from = json::read_field_number(jtransition, "from").context("could not read from")?;
+            let to = json::read_field_number(jtransition, "to").context("could not read to")?;
+            let label = json::read_field_string(jtransition, "label").context("could not read label")?;
             let activity = result.activity_key.process_activity(label.as_str());
-            let probability = json::read_fraction(jtransition, "prob").context("could not read probability")?;
+            let probability = json::read_field_fraction(jtransition, "prob").context("could not read probability")?;
 
             result.add_transition(from, activity, to, probability)?;
         }

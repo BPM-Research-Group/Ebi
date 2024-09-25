@@ -94,21 +94,21 @@ impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, 
 }
 
 pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(usize, FS)>, usize)> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
-    log::debug!("activity key {:?}", semantics.get_activity_key());
-    log::debug!("align trace {:?}", trace);
+    // log::debug!("activity key {:?}", semantics.get_activity_key());
+    // log::debug!("align trace {:?}", trace);
 
     let start = (0, semantics.get_initial_state());
     let successors = |(trace_index, state) : &(usize, FS)| {
 
         let mut result = vec![];
 
-        log::debug!("successors of log {} model {}", trace_index, state);
+        // log::debug!("successors of log {} model {}", trace_index, state);
         
         if trace_index < &trace.len() {
             //we can do a log move
             let new_trace_index = trace_index + 1;
             let new_state = state.clone();
-            log::debug!("\tlog move {} to {} {}", trace[*trace_index], new_trace_index, new_state);
+            // log::debug!("\tlog move {} to {} {}", trace[*trace_index], new_trace_index, new_state);
             result.push(((new_trace_index, new_state), 10000));
         }
 
@@ -121,17 +121,18 @@ pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(
             if let Some(activity) = semantics.get_transition_activity(transition) {
                 //non-silent model move
                 result.push(((*trace_index, new_state.clone()), 10000));
-                log::debug!("\tmodel move t{} {} to {} {}", transition, activity, trace_index, new_state);
+                // log::debug!("\tmodel move t{} {} to {} {}", transition, activity, trace_index, new_state);
 
                 //which may also be a synchronous move
                 if trace_index < &trace.len() && activity == trace[*trace_index] {
                     //synchronous move
                     let new_trace_index = trace_index + 1;
-                    log::debug!("\tsynchronous move t{} {} to {} {}", transition, activity, new_trace_index, new_state);
+                    // log::debug!("\tsynchronous move t{} {} to {} {}", transition, activity, new_trace_index, new_state);
                     result.push(((new_trace_index, new_state), 0));
                 }
             } else {
                 //silent move
+                // log::debug!("\tsilent move t{} to {} {}", transition, trace_index, new_state);
                 result.push(((*trace_index, new_state), 1));
             }
         }
@@ -148,7 +149,7 @@ pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(
     //function that returns whether we are in a final synchronous product state
     let success = |(trace_index, state): &(usize, FS)| {
         let result = trace_index == &trace.len() && semantics.is_final_state(&state);
-        log::debug!("state {} {} is final: {}", trace_index, state, result);
+        // log::debug!("state {} {} is final: {}", trace_index, state, result);
         result
     };
 

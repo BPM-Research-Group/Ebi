@@ -6,4 +6,5 @@
 {"from":1,"to":2,"label":"a"},
 {"from":1,"to":3,"label":"b"},
 {"from":4,"to":5,"label":"a"}
-]}
+],
+"finalStates": [2,3,5]}

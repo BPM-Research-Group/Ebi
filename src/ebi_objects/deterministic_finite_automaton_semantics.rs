@@ -81,7 +81,7 @@ impl Semantics for DeterministicFiniteAutomatonSemantics {
             i += 1;
         }
 
-        if !self.is_final_state(state) {
+        if !self.is_final_state(state) && self.dfa.is_final_state(*state) {
             result.push(self.dfa.get_number_of_transitions())
         }
 
