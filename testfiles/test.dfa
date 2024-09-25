@@ -1,6 +1,0 @@
-{
-"initialState": 0,
-"transitions": [
-{"from":0,"to":1,"label":"b"},
-{"from":1,"to":2,"label":"b"}
-]}

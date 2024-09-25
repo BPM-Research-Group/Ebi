@@ -292,6 +292,9 @@ impl Display for DeterministicFiniteAutomaton {
                 writeln!(f, ",")?;
             }
         }
+        writeln!(f, "], \"finalStates\": [")?;
+        writeln!(f, "{}", self.final_states.iter().enumerate().filter_map(
+            |(index, is)| if *is {Some(index.to_string())} else {None}).collect::<Vec<_>>().join(","))?;
         writeln!(f, "]}}")?;
         Ok(())
     }
