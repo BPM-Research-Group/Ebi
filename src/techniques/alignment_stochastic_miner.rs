@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use anyhow::Result;
 use crate::{ebi_framework::activity_key::ActivityKeyTranslator, ebi_objects::{alignments::Move, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::fraction::Fraction};
 
@@ -14,12 +12,11 @@ impl AlignmentMiner for LabelledPetriNet {
         let mut weights: Vec<Fraction> = vec![Fraction::zero(); self.get_number_of_transitions()];
     
         let translator = ActivityKeyTranslator::new(language.get_activity_key(), self.get_activity_key_mut());
-        let net = Arc::new(self);
     
         for (trace, probability) in language.iter_trace_probability() {
             let translated_trace = translator.translate_trace(trace);
     
-            let (moves, _) = Arc::clone(&net).align_trace(&translated_trace)?;
+            let (moves, _) = self.align_trace(&translated_trace)?;
             for movee in moves {
                 match movee {
                     Move::LogMove(_) => {},
@@ -30,6 +27,6 @@ impl AlignmentMiner for LabelledPetriNet {
             }
         }
     
-        Ok((Arc::into_inner(net).unwrap(), weights).into())
+        Ok((self, weights).into())
     }
 }

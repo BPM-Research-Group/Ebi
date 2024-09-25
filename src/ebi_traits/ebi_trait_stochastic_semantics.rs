@@ -1,4 +1,4 @@
-use std::{fmt::Display, hash::Hash, io::BufRead, rc::Rc, sync::Arc};
+use std::{fmt::Display, hash::Hash, io::BufRead, rc::Rc};
 use anyhow::{anyhow, Result};
 
 use crate::{ebi_framework::{activity_key::ActivityKey, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::labelled_petri_net::LPNMarking, math::fraction::Fraction};
@@ -33,13 +33,6 @@ impl EbiTraitStochasticSemantics {
 			EbiTraitStochasticSemantics::Usize(sem) => sem.get_activity_key_mut(),
 		}
 	}
-
-	pub fn get_arc(self) -> EbiTraitStochasticSemanticsArc {
-		match self {
-			EbiTraitStochasticSemantics::Marking(semantics) => EbiTraitStochasticSemanticsArc::Marking(Arc::from(semantics)),
-			EbiTraitStochasticSemantics::Usize(semantics) => EbiTraitStochasticSemanticsArc::Usize(Arc::from(semantics)),
-		}
-	}
 }
 
 pub trait StochasticSemantics: Semantics {
@@ -67,10 +60,4 @@ pub trait ToStochasticSemantics {
 	fn get_stochastic_semantics(net: Rc<Self>) -> Box<dyn StochasticSemantics<State = Self::State>>;
 
 	fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics>;
-}
-
-//in multithreaded cases, we need Arcs instead of Boxes. Normally, the overhead is not necessary.
-pub enum EbiTraitStochasticSemanticsArc {
-	Marking(Arc<dyn StochasticSemantics<State = LPNMarking>>),
-	Usize(Arc<dyn StochasticSemantics<State = usize>>)
 }

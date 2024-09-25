@@ -1,6 +1,6 @@
 use std::{borrow::Borrow, collections::{HashMap, HashSet}, fmt::{Display, Debug}, hash::Hash};
 
-#[derive(Clone,Copy)]
+#[derive(Clone,Copy,Ord)]
 pub struct Activity {
     id: usize
 }

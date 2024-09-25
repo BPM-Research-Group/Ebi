@@ -2,36 +2,36 @@ use std::{fmt::{Debug, Display}, hash::Hash, sync::Arc};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use anyhow::{anyhow, Context, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, ebi_command::EbiCommand}, ebi_objects::alignments::{Alignments, Move}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, EbiTraitSemanticsArc, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, ebi_command::EbiCommand}, ebi_objects::alignments::{Alignments, Move}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
 pub trait Align {
-    fn align_language(self: Arc<Self>, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments>;
+    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments>;
 
     /**
 	 * Please note to ensure the trace and the semantics use the same ActivityKey, or they have been translated
 	 */
-    fn align_trace(self: Arc<Self>, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)>;
+    fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)>;
 }
 
-impl EbiTraitSemantics {
-    pub fn align_language(self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
-		match self.get_arc() {
-			EbiTraitSemanticsArc::Usize(sem) => sem.align_language(log),
-			EbiTraitSemanticsArc::Marking(sem) => sem.align_language(log),
+impl Align for EbiTraitSemantics {
+    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
+		match self {
+			EbiTraitSemantics::Usize(sem) => sem.align_language(log),
+			EbiTraitSemantics::Marking(sem) => sem.align_language(log),
 		}
 	}
 
-	pub fn align_trace(self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
-		match self.get_arc() {
-			EbiTraitSemanticsArc::Usize(sem) => sem.align_trace(trace),
-			EbiTraitSemanticsArc::Marking(sem) => sem.align_trace(trace),
+	fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
+		match self {
+			EbiTraitSemantics::Usize(sem) => sem.align_trace(trace),
+			EbiTraitSemantics::Marking(sem) => sem.align_trace(trace),
 		}
 	}
 }
 
 impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
     
-    fn align_language(self: Arc<Self>, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
+    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
         let mut activity_key = self.get_activity_key().clone();
         let translator = Arc::new(ActivityKeyTranslator::new(log.get_activity_key(), &mut activity_key));
         let log = Arc::new(log);
@@ -43,7 +43,7 @@ impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, 
         let mut aligned_traces = (0..log.len()).into_par_iter().filter_map(|trace_index| {
             let log = Arc::clone(&log);
             let translator = Arc::clone(&translator);
-            let self2 = Arc::clone(&self);
+            let self2 = Arc::from(&self);
 
             let trace = log.get_trace(trace_index).unwrap();
             let trace_translated = translator.translate_trace(trace);
@@ -70,9 +70,9 @@ impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, 
     /**
 	 * Please note to ensure the trace and the semantics use the same ActivityKey, or they have been translated
 	 */
-    fn align_trace(self: Arc<Self>, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
-        if let Some((states, cost)) = align_astar(self.as_ref(), trace) {
-            Ok((transform_alignment(self.as_ref(), trace, states)?, cost))
+    fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
+        if let Some((states, cost)) = align_astar(self, trace) {
+            Ok((transform_alignment(self, trace, states)?, cost))
         } else {
             Err(anyhow!("The model has no way to terminate: it is impossible to reach a deadlock."))
         }

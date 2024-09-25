@@ -21,7 +21,7 @@ pub const EBI_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     ]
 };
 
-#[derive(Debug,PartialEq,Eq)]
+#[derive(Debug,PartialEq,Eq,Ord,PartialOrd)]
 pub enum Move {
     LogMove(Activity),
     ModelMove(Activity, TransitionIndex),
@@ -60,6 +60,10 @@ impl Alignments {
 
     pub fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
         &mut self.activity_key
+    }
+
+    pub fn sort(&mut self) {
+        self.alignments.sort();
     }
 }
 
