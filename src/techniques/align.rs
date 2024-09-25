@@ -41,7 +41,7 @@ impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, 
         let progress_bar = EbiCommand::get_progress_bar(log.len());
 
         //compute alignments multi-threadedly
-        let mut aligned_traces = (0..log.len()).into_par_iter().filter_map(|trace_index| {
+        let mut aligned_traces = (0..log.len()).into_iter().filter_map(|trace_index| {
             let log = Arc::clone(&log);
             let translator = Arc::clone(&translator);
             let self2 = Arc::from(&self);
@@ -49,9 +49,11 @@ impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, 
             let trace = log.get_trace(trace_index).unwrap();
             let trace_translated = translator.translate_trace(trace);
 
+
+            let result = self2.align_trace(&trace_translated).with_context(|| format!("Aligning trace {:?}", trace));
             progress_bar.inc(1);
 
-            match self2.align_trace(&trace_translated).with_context(|| format!("Aligning trace {:?}", trace)) {
+            match result {
                 Ok((aligned_trace, _)) => Some(aligned_trace),
                 Err(err) => {
                     let error = Arc::clone(&error);
@@ -92,7 +94,7 @@ impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, 
 }
 
 pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(usize, FS)>, usize)> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
-    log::debug!("activity key {}", semantics.get_activity_key());
+    log::debug!("activity key {:?}", semantics.get_activity_key());
     log::debug!("align trace {:?}", trace);
 
     let start = (0, semantics.get_initial_state());

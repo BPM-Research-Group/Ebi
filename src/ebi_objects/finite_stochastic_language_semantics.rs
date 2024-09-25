@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use anyhow::{Result, anyhow};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, infoable::Infoable}, ebi_traits::{ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, infoable::Infoable}, ebi_traits::{ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
 
 use super::finite_stochastic_language::FiniteStochasticLanguage;
 
@@ -13,7 +13,7 @@ pub struct FiniteStochasticLanguageSemantics {
 
 impl FiniteStochasticLanguageSemantics {
     pub fn from_language(lang: &FiniteStochasticLanguage) -> Self {
-        let activity_key = ActivityKey::new();
+        let activity_key = lang.get_activity_key().clone();
         let mut nodes: Vec<HashMap<Option<Activity>, (usize, Fraction)>> = vec![];
 
         nodes.push(HashMap::new()); //0: root

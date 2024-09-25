@@ -13,7 +13,7 @@ pub struct FiniteLanguageSemantics {
 
 impl FiniteLanguageSemantics {
     pub fn from_language(lang: &FiniteLanguage) -> Self {
-        let activity_key = ActivityKey::new();
+        let activity_key = lang.get_activity_key().clone();
         let mut nodes: Vec<HashMap<Option<Activity>, usize>> = vec![];
 
         nodes.push(HashMap::new()); //0: root
