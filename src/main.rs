@@ -46,6 +46,8 @@ pub mod ebi_objects {
     pub mod petri_net_markup_language;
     pub mod alignments;
     pub mod finite_language_semantics;
+    pub mod deterministic_finite_automaton;
+    pub mod deterministic_finite_automaton_semantics;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_stochastic_deterministic_semantics;
@@ -94,7 +96,7 @@ mod distances;
 mod tests;
 mod text;
 mod multiple_reader;
-// mod earth_movers_stochastic_conformance;
+mod json;
 
 use anyhow::{Context, Result};
 use clap::crate_version;

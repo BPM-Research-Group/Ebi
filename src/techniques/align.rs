@@ -41,7 +41,7 @@ impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, 
         let progress_bar = EbiCommand::get_progress_bar(log.len());
 
         //compute alignments multi-threadedly
-        let mut aligned_traces = (0..log.len()).into_iter().filter_map(|trace_index| {
+        let mut aligned_traces = (0..log.len()).into_par_iter().filter_map(|trace_index| {
             let log = Arc::clone(&log);
             let translator = Arc::clone(&translator);
             let self2 = Arc::from(&self);
@@ -106,28 +106,29 @@ pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(
         
         if trace_index < &trace.len() {
             //we can do a log move
-            // log::debug!("\tlog move {}", trace[*trace_index]);
-            result.push(((trace_index + 1, state.clone()), 10000));
+            let new_trace_index = trace_index + 1;
+            let new_state = state.clone();
+            log::debug!("\tlog move {} to {} {}", trace[*trace_index], new_trace_index, new_state);
+            result.push(((new_trace_index, new_state), 10000));
         }
 
         //walk through the enabled transitions in the model
         for transition in semantics.get_enabled_transitions(&state) {
 
             let mut new_state = state.clone();
-            log::debug!("\t\tnew state before {}", new_state);
             let _ = semantics.execute_transition(&mut new_state, transition);
-            log::debug!("\t\tnew state after {}", new_state);
 
             if let Some(activity) = semantics.get_transition_activity(transition) {
                 //non-silent model move
                 result.push(((*trace_index, new_state.clone()), 10000));
-                log::debug!("\tmodel move t{} {} to {}", transition, activity, new_state);
+                log::debug!("\tmodel move t{} {} to {} {}", transition, activity, trace_index, new_state);
 
                 //which may also be a synchronous move
                 if trace_index < &trace.len() && activity == trace[*trace_index] {
                     //synchronous move
-                    log::debug!("\tsynchronous move t{} {} to {}", transition, activity, new_state);
-                    result.push(((trace_index + 1, new_state), 0));
+                    let new_trace_index = trace_index + 1;
+                    log::debug!("\tsynchronous move t{} {} to {} {}", transition, activity, new_trace_index, new_state);
+                    result.push(((new_trace_index, new_state), 0));
                 }
             } else {
                 //silent move
@@ -135,7 +136,7 @@ pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(
             }
         }
 
-        log::debug!("successors of {} {}: {:?}", trace_index, state, result);
+        // log::debug!("successors of {} {}: {:?}", trace_index, state, result);
         result
     };
 
@@ -146,7 +147,9 @@ pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(
 
     //function that returns whether we are in a final synchronous product state
     let success = |(trace_index, state): &(usize, FS)| {
-        trace_index == &trace.len() && semantics.is_final_state(&state)
+        let result = trace_index == &trace.len() && semantics.is_final_state(&state);
+        log::debug!("state {} {} is final: {}", trace_index, state, result);
+        result
     };
 
     pathfinding::prelude::astar(&start, successors, heuristic, success)

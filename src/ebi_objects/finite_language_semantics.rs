@@ -17,7 +17,6 @@ impl FiniteLanguageSemantics {
         let mut nodes: Vec<HashMap<Option<Activity>, usize>> = vec![];
 
         nodes.push(HashMap::new()); //0: root
-        nodes.push(HashMap::new()); //1: dead
         
         for trace in lang.iter() {
 
@@ -98,7 +97,7 @@ impl Semantics for FiniteLanguageSemantics {
     }
 
     fn is_final_state(&self, state: &Self::State) -> bool {
-        *state == 1usize
+        self.nodes[*state].is_empty()
     }
 
     fn is_transition_silent(&self, transition: TransitionIndex) -> bool {

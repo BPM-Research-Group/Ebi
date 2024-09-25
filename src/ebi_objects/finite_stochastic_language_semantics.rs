@@ -17,7 +17,6 @@ impl FiniteStochasticLanguageSemantics {
         let mut nodes: Vec<HashMap<Option<Activity>, (usize, Fraction)>> = vec![];
 
         nodes.push(HashMap::new()); //0: root
-        nodes.push(HashMap::new()); //1: dead
         
         for (trace, trace_probability) in lang.iter_trace_probability() {
 
@@ -105,7 +104,7 @@ impl Semantics for FiniteStochasticLanguageSemantics {
     }
 
     fn is_final_state(&self, state: &Self::State) -> bool {
-        *state == 1usize
+        self.nodes[*state].is_empty()
     }
 
     fn is_transition_silent(&self, transition: TransitionIndex) -> bool {

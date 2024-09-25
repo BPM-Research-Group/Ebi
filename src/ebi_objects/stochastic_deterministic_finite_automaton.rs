@@ -2,7 +2,7 @@ use std::{cmp::{max, Ordering}, collections::HashMap, fmt, io::{self, BufRead}, 
 use anyhow::{anyhow, Context, Result, Error};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage}, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage}, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, follower_semantics::FollowerSemantics, json, math::fraction::Fraction};
 
 use super::{labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
 
@@ -203,55 +203,6 @@ impl StochasticDeterministicFiniteAutomaton {
         (false, left)
 	}
 
-    fn read_number(json: &Value, field: &str) -> Result<usize> {
-        match &json[field] {
-            Value::Null => return Err(anyhow!("field not found")),
-            Value::Bool(_) => return Err(anyhow!("field is a boolean, where number expected")),
-            Value::Number(n) => {
-                if !n.is_u64() {
-                    return Err(anyhow!("number is not an integer"))
-                }
-                return Ok(usize::try_from(n.as_u64().unwrap())?);
-            },
-            Value::String(_) => return Err(anyhow!("field is a literal, where number expected")),
-            Value::Array(_) => return Err(anyhow!("field is a list, where number expected")),
-            Value::Object(_) => return Err(anyhow!("field is an object, where number expected")),
-        }
-    }
-
-    fn read_fraction(json: &Value, field: &str) -> Result<Fraction> {
-        match &json[field] {
-            Value::Null => return Err(anyhow!("field not found")),
-            Value::Bool(_) => return Err(anyhow!("field is a boolean, where fraction expected")),
-            Value::Number(n) => return Ok(n.to_string().parse::<Fraction>()?),
-            Value::String(s) => return Ok(s.parse::<Fraction>()?),
-            Value::Array(_) => return Err(anyhow!("field is a list, where fraction expected")),
-            Value::Object(_) => return Err(anyhow!("field is an object, where fraction expected")),
-        }
-    }
-
-    fn read_list<'a>(json: &'a Value, field: &str) -> Result<&'a Vec<Value>> {
-        match &json[field] {
-            Value::Null => return Err(anyhow!("field not found")),
-            Value::Bool(_) => return Err(anyhow!("field is a boolean, where list expected")),
-            Value::Number(_) => return Err(anyhow!("field is a number, where list expected")),
-            Value::String(_) => return Err(anyhow!("field is a literal, where list expected")),
-            Value::Array(arr) => return Ok(&arr),
-            Value::Object(_) => return Err(anyhow!("field is an object, where list expected")),
-        }
-    }
-
-    fn read_string<'a>(json: &'a Value, field: &str) -> Result<String> {
-        match &json[field] {
-            Value::Null => return Err(anyhow!("field not found")),
-            Value::Bool(_) => return Err(anyhow!("field is a boolean, where literal expected")),
-            Value::Number(n) => return Ok(n.to_string()),
-            Value::String(s) => return Ok(s.to_string()),
-            Value::Array(_) => return Err(anyhow!("field is a list, where literal expected")),
-            Value::Object(_) => return Err(anyhow!("field is an object, where literal expected")),
-        }
-    }
-
     pub fn get_semantics(sdfa: Arc<Self>) -> EbiTraitSemantics {
         log::info!("convert SDFA to semantics");
         EbiTraitSemantics::Usize(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
@@ -349,14 +300,14 @@ impl Importable for StochasticDeterministicFiniteAutomaton {
 
         let mut result = StochasticDeterministicFiniteAutomaton::new();
 
-        result.set_initial_state(Self::read_number(&json, "initialState").context("failed to read initial state")?);
-        let jtrans = Self::read_list(&json, "transitions").context("failed to read list of transitions")?;
+        result.set_initial_state(json::read_number(&json, "initialState").context("failed to read initial state")?);
+        let jtrans = json::read_list(&json, "transitions").context("failed to read list of transitions")?;
         for jtransition in jtrans {
-            let from = Self::read_number(jtransition, "from").context("could not read from")?;
-            let to = Self::read_number(jtransition, "to").context("could not read to")?;
-            let label = Self::read_string(jtransition, "label").context("could not read label")?;
+            let from = json::read_number(jtransition, "from").context("could not read from")?;
+            let to = json::read_number(jtransition, "to").context("could not read to")?;
+            let label = json::read_string(jtransition, "label").context("could not read label")?;
             let activity = result.activity_key.process_activity(label.as_str());
-            let probability = Self::read_fraction(jtransition, "prob").context("could not read probability")?;
+            let probability = json::read_fraction(jtransition, "prob").context("could not read probability")?;
 
             result.add_transition(from, activity, to, probability)?;
         }

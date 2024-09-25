@@ -1,0 +1,18 @@
+finite language
+# number of traces
+3
+# trace 0
+# number of events
+2
+a
+a
+# trace 1
+# number of events
+2
+a
+b
+# trace 2
+# number of events
+2
+b
+a
