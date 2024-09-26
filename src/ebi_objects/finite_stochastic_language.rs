@@ -26,6 +26,7 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     ],
     object_exporters: &[
         EbiObjectExporter::FiniteStochasticLanguage(FiniteStochasticLanguage::export_from_object),
+        EbiObjectExporter::EventLog(FiniteStochasticLanguage::export_from_event_log),
     ],
 };
 
@@ -131,6 +132,13 @@ impl FiniteStochasticLanguage {
             }
         }
         return false;
+    }
+
+    fn export_from_event_log(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
+        match object {
+            EbiOutput::Object(EbiObject::EventLog(log)) => log.get_finite_stochastic_language().export(f),
+            _ => unreachable!()
+        }
     }
 }
 

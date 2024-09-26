@@ -23,6 +23,9 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     ],
     object_exporters: &[
         EbiObjectExporter::LabelledPetriNet(LabelledPetriNet::export_from_object),
+        EbiObjectExporter::StochasticLabelledPetriNet(LabelledPetriNet::export_from_stochastic_labelled_petri_net),
+        EbiObjectExporter::StochasticDeterministicFiniteAutomaton(LabelledPetriNet::export_from_stochastic_deterministic_finite_automaton),
+        EbiObjectExporter::DirectlyFollowsModel(LabelledPetriNet::export_from_directly_follows_model),
     ],
 };
 
@@ -139,6 +142,29 @@ impl LabelledPetriNet {
         }
         Ok(())
     }
+
+    fn export_from_stochastic_labelled_petri_net(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+        match object {
+            EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(slpn)) => <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(slpn).export(f),
+            _ => unreachable!()
+        }
+    }
+
+    fn export_from_stochastic_deterministic_finite_automaton(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+        match object {
+            EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(sdfa.get_stochastic_labelled_petri_net()).export(f),
+            _ => unreachable!()
+        }
+    }
+
+    fn export_from_directly_follows_model(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+        match object {
+            EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => dfm.get_labelled_petri_net().export(f),
+            _ => unreachable!()
+        }
+    }
+
+    
 }
 
 impl FromEbiTraitObject for LabelledPetriNet {

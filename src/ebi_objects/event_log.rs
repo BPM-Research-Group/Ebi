@@ -55,22 +55,22 @@ impl EventLog {
 
     pub fn read_as_finite_language(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitFiniteLanguage>> {
         let event_log = EventLog::import(reader)?;
-        Ok(Box::new(event_log.to_finite_language()))
+        Ok(Box::new(event_log.get_finite_language()))
     }
 
     pub fn read_as_finite_stochastic_language(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>> {
         let event_log = EventLog::import(reader)?;
-        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(event_log.to_finite_stochastic_language())))
+        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(event_log.get_finite_stochastic_language())))
     }
 
     pub fn read_as_queriable_stochastic_language(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>> {
         let event_log = EventLog::import(reader)?;
-        Ok(Box::new(event_log.to_finite_stochastic_language()))
+        Ok(Box::new(event_log.get_finite_stochastic_language()))
     }
 
     pub fn read_as_iterable_stochastic_language(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>> {
         let event_log = EventLog::import(reader)?;
-        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(event_log.to_finite_stochastic_language())))
+        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(event_log.get_finite_stochastic_language())))
     }
 
     pub fn read_as_event_log(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLog>> {
@@ -79,13 +79,13 @@ impl EventLog {
     }
 
     pub fn read_as_stochastic_deterministic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
-        let mut event_log = EventLog::import(reader)?;
+        let event_log = EventLog::import(reader)?;
         let sdfa = event_log.to_stochastic_deterministic_finite_automaton();
         let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Arc::new(sdfa))?;
         Ok(EbiTraitStochasticDeterministicSemantics::Usize(semantics))
     }
 
-    pub fn to_finite_language(&self) -> FiniteLanguage {
+    pub fn get_finite_language(&self) -> FiniteLanguage {
         log::info!("create finite language");
 
         let mut map: HashSet<Vec<String>> = HashSet::new();
@@ -97,7 +97,7 @@ impl EventLog {
         FiniteLanguage::from(map)
     }
 
-    pub fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage {
+    pub fn get_finite_stochastic_language(&self) -> FiniteStochasticLanguage {
         log::info!("create stochastic language");
         let mut map = HashMap::new();
         for t in &self.log.traces {
@@ -111,7 +111,7 @@ impl EventLog {
         map.into()
     }
 
-    pub fn to_stochastic_deterministic_finite_automaton(&mut self) -> StochasticDeterministicFiniteAutomaton {
+    pub fn to_stochastic_deterministic_finite_automaton(&self) -> StochasticDeterministicFiniteAutomaton {
         log::info!("convert event log to sdfa");
 
         let mut result = StochasticDeterministicFiniteAutomaton::new();
@@ -132,8 +132,6 @@ impl EventLog {
             }
         }
 
-        // log::debug!("SDFA has {} states", result.get_sources().len());
-
         //count
         let mut sums = final_states;
         for (source, _, _, probability) in &result {
@@ -143,15 +141,8 @@ impl EventLog {
             }
         }
 
-        // log::debug!("SDFA sources: {:?}", result.get_sources());
-        // log::debug!("SDFA activities: {:?}", result.get_activities());
-        // log::debug!("SDFA targets: {:?}", result.get_sources());
-
         //normalise
         result.scale_outgoing_probabilities(sums);
-        // for (source, _, _, probability) in &mut result {
-        //     *probability /= sums.get(source).unwrap();
-        // }
 
         result
     }
@@ -161,7 +152,7 @@ impl ToStochasticSemantics for EventLog {
     type State = <FiniteStochasticLanguageSemantics as Semantics>::State;
 
     fn get_stochastic_semantics(&self) -> Box<dyn StochasticSemantics<State = Self::State>> {
-        Box::new(FiniteStochasticLanguageSemantics::from_language((&self.to_finite_stochastic_language()).into()))
+        Box::new(FiniteStochasticLanguageSemantics::from_language((&self.get_finite_stochastic_language()).into()))
     }
 
     fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics> {
@@ -221,7 +212,7 @@ impl fmt::Display for EventLog {
 
 impl Infoable for EventLog {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
-        let lang = self.to_finite_language();
+        let lang = self.get_finite_language();
         writeln!(f, "Number of traces\t{}", self.log.traces.len())?;
         writeln!(f, "Number of events\t{}", self.log.traces.iter().map(|t| t.events.len()).sum::<usize>())?;
         writeln!(f, "Number of unique traces\t{}", lang.len())?;

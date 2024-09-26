@@ -35,22 +35,22 @@ impl CompressedEventLog {
 
     pub fn read_as_finite_language(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitFiniteLanguage>> {
         let event_log = Self::import(reader)?;
-        Ok(Box::new(event_log.log.to_finite_language()))
+        Ok(Box::new(event_log.log.get_finite_language()))
     }
 
     pub fn read_as_finite_stochastic_language(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>> {
         let event_log = Self::import(reader)?;
-        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(event_log.log.to_finite_stochastic_language())))
+        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(event_log.log.get_finite_stochastic_language())))
     }
 
     pub fn read_as_queriable_stochastic_language(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>> {
         let event_log = Self::import(reader)?;
-        Ok(Box::new(event_log.log.to_finite_stochastic_language()))
+        Ok(Box::new(event_log.log.get_finite_stochastic_language()))
     }
 
     pub fn read_as_iterable_stochastic_language(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>> {
         let event_log = Self::import(reader)?;
-        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(event_log.log.to_finite_stochastic_language())))
+        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(event_log.log.get_finite_stochastic_language())))
     }
 
     pub fn read_as_event_log(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLog>> {
@@ -59,7 +59,7 @@ impl CompressedEventLog {
     }
 
     pub fn read_as_stochastic_deterministic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
-        let mut event_log = EventLog::import(reader)?;
+        let event_log = EventLog::import(reader)?;
         let sdfa = event_log.to_stochastic_deterministic_finite_automaton();
         let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Arc::new(sdfa))?;
         Ok(EbiTraitStochasticDeterministicSemantics::Usize(semantics))

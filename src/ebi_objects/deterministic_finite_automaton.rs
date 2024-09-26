@@ -5,6 +5,8 @@ use serde_json::Value;
 
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_objects::deterministic_finite_automaton_semantics::DeterministicFiniteAutomatonSemantics, ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics}, json};
 
+use super::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton;
+
 
 pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     name: "deterministic finite automaton",
@@ -20,6 +22,7 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     object_exporters: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(DeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::FiniteLanguage(DeterministicFiniteAutomaton::export_from_finite_language),
+        EbiObjectExporter::StochasticDeterministicFiniteAutomaton(DeterministicFiniteAutomaton::export_from_stochastic_deterministic_finite_automaton)
     ]
 };
 
@@ -200,6 +203,13 @@ impl DeterministicFiniteAutomaton {
             _ => unreachable!()
         }
     }
+
+    pub fn export_from_stochastic_deterministic_finite_automaton(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+        match object {
+            EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => <StochasticDeterministicFiniteAutomaton as Into<DeterministicFiniteAutomaton>>::into(sdfa).export(f),
+            _ => unreachable!()
+        }
+    }
 }
 
 impl FromStr for DeterministicFiniteAutomaton {
@@ -322,5 +332,22 @@ impl Dottable for DeterministicFiniteAutomaton {
         }
 
         return graph;
+    }
+}
+
+impl From<StochasticDeterministicFiniteAutomaton> for DeterministicFiniteAutomaton {
+    fn from(value: StochasticDeterministicFiniteAutomaton) -> Self {
+
+        let final_states = value.terminating_probabilities.iter().map(|p| p.is_positive()).collect();
+
+        Self {
+            activity_key: value.activity_key,
+            initial_state: value.initial_state,
+            max_state: value.max_state,
+            sources: value.sources,
+            targets: value.targets,
+            activities: value.activities,
+            final_states: final_states,
+        }
     }
 }

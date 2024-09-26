@@ -23,19 +23,20 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
     object_exporters: &[
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(StochasticDeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::FiniteStochasticLanguage(StochasticDeterministicFiniteAutomaton::export_from_finite_stochastic_language),
+        EbiObjectExporter::EventLog(StochasticDeterministicFiniteAutomaton::export_from_event_log),
     ]
 };
 
 #[derive(Debug)]
 pub struct StochasticDeterministicFiniteAutomaton {
-    activity_key: ActivityKey,
-    initial_state: usize,
-    max_state: usize,
-    sources: Vec<usize>, //transition -> source of arc
-    targets: Vec<usize>, //transition -> target of arc
-    activities: Vec<Activity>, //transition -> activity of arc (every transition is labelled)
-    probabilities: Vec<Fraction>, //transition -> probability of arc
-    terminating_probabilities: Vec<Fraction> //state -> termination probability
+    pub(crate) activity_key: ActivityKey,
+    pub(crate) initial_state: usize,
+    pub(crate) max_state: usize,
+    pub(crate) sources: Vec<usize>, //transition -> source of arc
+    pub(crate) targets: Vec<usize>, //transition -> target of arc
+    pub(crate) activities: Vec<Activity>, //transition -> activity of arc (every transition is labelled)
+    pub(crate) probabilities: Vec<Fraction>, //transition -> probability of arc
+    pub(crate) terminating_probabilities: Vec<Fraction> //state -> termination probability
 }
 
 impl StochasticDeterministicFiniteAutomaton {
@@ -234,7 +235,7 @@ impl StochasticDeterministicFiniteAutomaton {
         Ok(Self::get_semantics(sdfa))
     }
     
-    pub fn to_stochastic_labelled_petri_net(&self) -> Result<StochasticLabelledPetriNet> {
+    pub fn get_stochastic_labelled_petri_net(&self) -> StochasticLabelledPetriNet {
         log::info!("convert SDFA to stochastic labelled Petri net");
 
         let mut result = LabelledPetriNet::new();
@@ -242,7 +243,7 @@ impl StochasticDeterministicFiniteAutomaton {
         let mut weights = vec![];
 
         let source = result.add_place();
-        result.get_initial_marking_mut().increase(source, 1)?;
+        result.get_initial_marking_mut().increase(source, 1).unwrap();
 
         //add places
         let mut state2place = vec![];
@@ -254,8 +255,8 @@ impl StochasticDeterministicFiniteAutomaton {
             if self.get_termination_probability(state).is_positive() {
                 let lpn_transition = result.add_transition(None);
                 weights.push(self.get_termination_probability(state).clone());
-                result.add_place_transition_arc(lpn_place, lpn_transition, 1)?;
-                result.add_transition_place_arc(lpn_transition, lpn_place, 1)?;
+                result.add_place_transition_arc(lpn_place, lpn_transition, 1).unwrap();
+                result.add_transition_place_arc(lpn_transition, lpn_place, 1).unwrap();
             }
         }
 
@@ -267,13 +268,13 @@ impl StochasticDeterministicFiniteAutomaton {
             let lpn_transition = result.add_transition(Some(lpn_activity));
             let source_place = state2place[*source];
             let target_place = state2place[*target];
-            result.add_place_transition_arc(source_place, lpn_transition, 1)?;
-            result.add_transition_place_arc(lpn_transition, target_place, 1)?;
+            result.add_place_transition_arc(source_place, lpn_transition, 1).unwrap();
+            result.add_transition_place_arc(lpn_transition, target_place, 1).unwrap();
 
             weights.push(probability.clone());
         }
 
-        Ok(StochasticLabelledPetriNet::from((result, weights)))
+        StochasticLabelledPetriNet::from((result, weights))
     }
 
     pub fn set_activity_key(&mut self, activity_key: &ActivityKey) {
@@ -283,6 +284,13 @@ impl StochasticDeterministicFiniteAutomaton {
     pub fn export_from_finite_stochastic_language(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::FiniteStochasticLanguage(slang)) => slang.get_stochastic_deterministic_finite_automaton().export(f),
+            _ => unreachable!()
+        }
+    }
+
+    pub fn export_from_event_log(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+        match object {
+            EbiOutput::Object(EbiObject::EventLog(log)) => log.to_stochastic_deterministic_finite_automaton().export(f),
             _ => unreachable!()
         }
     }

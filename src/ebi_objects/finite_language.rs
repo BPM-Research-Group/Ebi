@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result, Context, Error};
 use fnv::FnvBuildHasher;
-use std::{collections::HashSet, fmt::Display, io::{self, BufRead}, str::FromStr, sync::Arc};
+use std::{collections::HashSet, fmt::Display, io::{self, BufRead, Write}, str::FromStr, sync::Arc};
 
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}}, line_reader::LineReader};
 
@@ -23,6 +23,7 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     ],
     object_exporters: &[
         EbiObjectExporter::FiniteLanguage(FiniteLanguage::export_from_object),
+        EbiObjectExporter::EventLog(FiniteLanguage::export_from_event_log)
     ],
 };
 
@@ -65,6 +66,13 @@ impl FiniteLanguage {
         }
 
         result
+    }
+
+    fn export_from_event_log(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
+        match object {
+            EbiOutput::Object(EbiObject::EventLog(log)) => log.get_finite_language().export(f),
+            _ => unreachable!()
+        }
     }
 }
 

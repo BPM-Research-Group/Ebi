@@ -39,7 +39,7 @@ impl DirectlyFollowsModel {
 
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let dfm = Self::import(reader)?;
-        Ok(EbiObject::LabelledPetriNet(dfm.to_labelled_petri_net()?))
+        Ok(EbiObject::LabelledPetriNet(dfm.get_labelled_petri_net()))
     }
 
     pub fn get_number_of_edges(&self) -> usize {
@@ -52,12 +52,12 @@ impl DirectlyFollowsModel {
         self.node_2_activity.len()
     }
     
-    pub fn to_labelled_petri_net(&self) -> Result<LabelledPetriNet> {
+    pub fn get_labelled_petri_net(&self) -> LabelledPetriNet {
         let mut result = LabelledPetriNet::new();
         let translator = ActivityKeyTranslator::new(&self.activity_key, result.get_activity_key_mut());
         let source = result.add_place();
         let sink = result.add_place();
-        result.get_initial_marking_mut().increase(source, 1)?;
+        result.get_initial_marking_mut().increase(source, 1).unwrap();
         
 		/*
 		 * empty traces
@@ -65,8 +65,8 @@ impl DirectlyFollowsModel {
 		if self.empty_traces {
             let transition = result.add_transition(None);
             
-            result.add_place_transition_arc(source, transition, 1)?;
-            result.add_transition_place_arc(transition, sink, 1)?;
+            result.add_place_transition_arc(source, transition, 1).unwrap();
+            result.add_transition_place_arc(transition, sink, 1).unwrap();
 		}
 
 		/*
@@ -90,8 +90,8 @@ impl DirectlyFollowsModel {
                     let activity = translator.translate_activity(&self.node_2_activity[target_node]);
                     let transition = result.add_transition(Some(activity));
 
-                    result.add_place_transition_arc(from_place, transition, 1)?;
-                    result.add_transition_place_arc(transition, to_place, 1)?;
+                    result.add_place_transition_arc(from_place, transition, 1).unwrap();
+                    result.add_transition_place_arc(transition, to_place, 1).unwrap();
                 }
             }
         }
@@ -102,9 +102,9 @@ impl DirectlyFollowsModel {
         for start_node in self.start_nodes.iter() {
             let activity = translator.translate_activity(&self.node_2_activity[*start_node]);
             let transition = result.add_transition(Some(activity));
-            result.add_place_transition_arc(source, transition, 1)?;
+            result.add_place_transition_arc(source, transition, 1).unwrap();
             let target_place = node2place[*start_node];
-            result.add_transition_place_arc(transition, target_place, 1)?;
+            result.add_transition_place_arc(transition, target_place, 1).unwrap();
             
         }
 
@@ -114,11 +114,11 @@ impl DirectlyFollowsModel {
         for end_node in self.end_nodes.iter() {
             let transition = result.add_transition(None);
             let source_place = node2place[*end_node];
-            result.add_place_transition_arc(source_place, transition, 1)?;
-            result.add_transition_place_arc(transition, sink, 1)?;
+            result.add_place_transition_arc(source_place, transition, 1).unwrap();
+            result.add_transition_place_arc(transition, sink, 1).unwrap();
         }
 
-        Ok(result)
+        result
     }
 }
 
