@@ -64,7 +64,7 @@ impl FiniteStochasticLanguage {
         self.traces.retain(|_, v| {*v /= &sum;true});
     }
 
-    pub fn to_stochastic_deterministic_finite_automaton(&self) -> StochasticDeterministicFiniteAutomaton {
+    pub fn get_stochastic_deterministic_finite_automaton(&self) -> StochasticDeterministicFiniteAutomaton {
         log::info!("convert finite stochastic language to sdfa");
 
         let mut result = StochasticDeterministicFiniteAutomaton::new();
@@ -96,9 +96,6 @@ impl FiniteStochasticLanguage {
 
         //normalise
         result.scale_outgoing_probabilities(sums);
-        // for (source, _, _, probability) in &mut result {
-        //     *probability /= sums.get(source).unwrap();
-        // }
 
         result
     }
@@ -115,7 +112,7 @@ impl FiniteStochasticLanguage {
     }
 
     pub fn get_deterministic_stochastic_semantics(&self) -> Result<EbiTraitStochasticDeterministicSemantics> {
-        let sdfa = self.to_stochastic_deterministic_finite_automaton();
+        let sdfa = self.get_stochastic_deterministic_finite_automaton();
         let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Arc::new(sdfa))?;
         Ok(EbiTraitStochasticDeterministicSemantics::Usize(semantics))
     }

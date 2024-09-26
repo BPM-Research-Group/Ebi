@@ -88,7 +88,7 @@ pub const EBI_CONVERT_SDFA: EbiCommand = EbiCommand::Command {
     input_helps: &[ "Any file supported by Ebi that can be converted." ], 
     execute: |mut inputs, _| {
         let sdfa = match inputs.remove(0) {
-            EbiInput::Object(EbiObject::FiniteStochasticLanguage(slang), _) => slang.to_stochastic_deterministic_finite_automaton(),
+            EbiInput::Object(EbiObject::FiniteStochasticLanguage(slang), _) => slang.get_stochastic_deterministic_finite_automaton(),
             EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => sdfa,
             EbiInput::Object(EbiObject::EventLog(mut log), _) => log.to_stochastic_deterministic_finite_automaton(),
             _ => unreachable!()

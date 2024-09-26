@@ -21,7 +21,8 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
         EbiObjectImporter::StochasticDeterministicFiniteAutomaton(StochasticDeterministicFiniteAutomaton::import_as_object),
     ],
     object_exporters: &[
-        EbiObjectExporter::StochasticDeterministicFiniteAutomaton(StochasticDeterministicFiniteAutomaton::export_from_object)
+        EbiObjectExporter::StochasticDeterministicFiniteAutomaton(StochasticDeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::FiniteStochasticLanguage(StochasticDeterministicFiniteAutomaton::export_from_finite_stochastic_language),
     ]
 };
 
@@ -277,6 +278,13 @@ impl StochasticDeterministicFiniteAutomaton {
 
     pub fn set_activity_key(&mut self, activity_key: &ActivityKey) {
         self.activity_key = activity_key.clone();
+    }
+
+    pub fn export_from_finite_stochastic_language(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+        match object {
+            EbiOutput::Object(EbiObject::FiniteStochasticLanguage(slang)) => slang.get_stochastic_deterministic_finite_automaton().export(f),
+            _ => unreachable!()
+        }
     }
 }
 
