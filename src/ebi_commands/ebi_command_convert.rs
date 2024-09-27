@@ -14,27 +14,6 @@ pub const EBI_CONVERT: EbiCommand = EbiCommand::Group {
     ]
 };
 
-pub const EBI_CONVERT_GENERAL: EbiCommand = EbiCommand::Command { 
-    name_short: "conf", 
-    name_long: Some("convert"), 
-    explanation_short: "Convert an object. Use the -o parameter to specify the output format.", 
-    explanation_long: None, 
-    latex_link: None, 
-    cli_command: None, 
-    exact_arithmetic: true, 
-    input_types: &[ &[ &EbiInputType::AnyObject ] ], 
-    input_names: &[ "FILE" ], 
-    input_helps: &[ "any file supported by Ebi that can be converted" ], 
-    execute: |mut inputs, _| {
-        let object = match inputs.remove(0) {
-            EbiInput::Object(ebi_object, _) => ebi_object,
-            _ => unreachable!()
-        };
-        Ok(EbiOutput::Object(object))
-    }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::EventLog)
-};
-
 pub const EBI_CONVERT_LPN: EbiCommand = EbiCommand::Command { 
     name_short: "lpn", 
     name_long: Some("labelled-Petri-net"),
