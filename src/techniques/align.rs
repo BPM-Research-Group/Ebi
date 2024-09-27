@@ -2,7 +2,7 @@ use std::{fmt::{Debug, Display}, hash::Hash, sync::{Arc, Mutex}};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use anyhow::{anyhow, Context, Error, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, ebi_command::EbiCommand}, ebi_objects::alignments::{Alignments, Move}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, ebi_command::EbiCommand}, ebi_objects::{alignments::{Alignments, Move}, deterministic_finite_automaton_semantics::DeterministicFiniteAutomatonSemantics, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
 pub trait Align {
     fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments>;
@@ -141,9 +141,9 @@ pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(
         result
     };
 
-    //function that returns a heuristic on how far we are still minimally from a final state
-    let heuristic = |_ : &(usize, FS)| {
-        0
+    //function that returns a heuristic on how far we are still at least from a final state
+    let heuristic = |(trace_index, state) : &(usize, FS)| {
+        semantics.underestimate_cost_to_final_synchronous_state(trace, trace_index, state)
     };
 
     //function that returns whether we are in a final synchronous product state
@@ -245,4 +245,54 @@ pub fn find_labelled_transition<T, FS>(semantics: &T, from: &FS, to: &FS) -> Res
         }
     }
     Err(anyhow!("There is no transition with any activity enabled that brings the model from {} to {}", from, to))
+}
+
+pub trait AlignmentHeuristics {
+    type AState;
+
+    /**
+     * Return a lower bound on the cost to reach a final state in the synchronous product.
+     * If not sure: 0 is a valid return value, though better bounds will make searches more efficient.
+     */
+    fn underestimate_cost_to_final_synchronous_state(&self, trace: &Vec<Activity>, trace_index: &usize, state: &Self::AState) -> usize;
+}
+
+impl AlignmentHeuristics for DeterministicFiniteAutomatonSemantics {
+    type AState = usize;
+    
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &Self::AState) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for FiniteStochasticLanguageSemantics {
+    type AState = usize;
+
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &Self::AState) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for LabelledPetriNet {
+    type AState = LPNMarking;
+
+    fn underestimate_cost_to_final_synchronous_state(&self, trace: &Vec<Activity>, trace_index: &usize, state: &Self::AState) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for StochasticLabelledPetriNet {
+    type AState = LPNMarking;
+
+    fn underestimate_cost_to_final_synchronous_state(&self, trace: &Vec<Activity>, trace_index: &usize, state: &Self::AState) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for StochasticDeterministicFiniteAutomatonSemantics {
+    type AState = usize;
+
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>,  _: &usize, _: &Self::AState) -> usize {
+        0
+    }
 }

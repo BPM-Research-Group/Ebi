@@ -193,7 +193,7 @@ impl DeterministicFiniteAutomaton {
         Ok(EbiTraitSemantics::Usize(Box::new(DeterministicFiniteAutomatonSemantics::new(dfa))))
     }
 
-    pub fn get_semantics(self: Arc<Self>) -> Box<dyn Semantics<State = usize>> {
+    pub fn get_semantics(self: Arc<Self>) -> Box<dyn Semantics<State = usize, AState = usize>> {
         Box::new(DeterministicFiniteAutomatonSemantics::new(self))
     }
 

@@ -68,12 +68,12 @@ impl <S: Displayable> Debug for MarkovMarkings<S> {
 }
 
 pub struct DeterministicStochasticSemantics<S: Displayable> {
-    net_semantics: Rc<dyn StochasticSemantics<State = S>>
+    net_semantics: Rc<dyn StochasticSemantics<State = S, AState = S>>
 }
 
 impl <S: Displayable> DeterministicStochasticSemantics<S> {
 
-    pub fn new<'a>(net_semantics: Rc<dyn StochasticSemantics<State = S>>) -> Self {
+    pub fn new<'a>(net_semantics: Rc<dyn StochasticSemantics<State = S, AState = S>>) -> Self {
         Self{
             net_semantics: net_semantics
         }

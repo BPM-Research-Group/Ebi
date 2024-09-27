@@ -1,12 +1,12 @@
 use std::{fmt::{Debug, Display}, hash::Hash, io::BufRead};
 use anyhow::{anyhow, Result};
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::labelled_petri_net::LPNMarking};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::labelled_petri_net::LPNMarking, techniques::align::AlignmentHeuristics};
 
 use super::ebi_trait_stochastic_semantics::TransitionIndex;
 
 pub enum EbiTraitSemantics {
-	Marking(Box<dyn Semantics<State = LPNMarking>>),
-	Usize(Box<dyn Semantics<State = usize>>)
+	Marking(Box<dyn Semantics<State = LPNMarking, AState = LPNMarking>>),
+	Usize(Box<dyn Semantics<State = usize, AState = usize>>)
 }
 
 impl FromEbiTraitObject for EbiTraitSemantics {
@@ -35,7 +35,7 @@ impl EbiTraitSemantics {
 
 }
 
-pub trait Semantics : Debug + Send + Sync {
+pub trait Semantics : Debug + Send + Sync + AlignmentHeuristics<AState = <Self as Semantics>::State> {
 	type State: Eq + Hash + Clone + Display + Send + Sync;
 
 	fn get_activity_key(&self) -> &ActivityKey;
@@ -72,7 +72,7 @@ pub trait Semantics : Debug + Send + Sync {
 
 pub trait ToSemantics {
 	type State: Eq + Hash + Clone + Display;
-	fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State>>;
+	fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State, AState = Self::State>>;
 
 	fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics>;
 }

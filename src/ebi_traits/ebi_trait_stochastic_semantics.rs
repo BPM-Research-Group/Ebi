@@ -6,8 +6,8 @@ use crate::{ebi_framework::{activity_key::ActivityKey, ebi_input::EbiInput, ebi_
 use super::ebi_trait_semantics::Semantics;
 
 pub enum EbiTraitStochasticSemantics {
-	Marking(Box<dyn StochasticSemantics<State = LPNMarking>>),
-	Usize(Box<dyn StochasticSemantics<State = usize>>)
+	Marking(Box<dyn StochasticSemantics<State = LPNMarking, AState = LPNMarking>>),
+	Usize(Box<dyn StochasticSemantics<State = usize, AState = usize>>)
 }
 
 impl FromEbiTraitObject for EbiTraitStochasticSemantics {
@@ -57,7 +57,7 @@ pub type TransitionIndex = usize;
 
 pub trait ToStochasticSemantics {
 	type State: Eq + Hash + Clone + Display;
-	fn get_stochastic_semantics(&self) -> Box<dyn StochasticSemantics<State = Self::State>>;
+	fn get_stochastic_semantics(&self) -> Box<dyn StochasticSemantics<State = Self::State, AState = Self::State>>;
 
 	fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics>;
 }

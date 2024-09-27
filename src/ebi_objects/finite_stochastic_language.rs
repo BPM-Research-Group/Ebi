@@ -338,7 +338,7 @@ impl fmt::Display for FiniteStochasticLanguage {
 impl ToSemantics for FiniteStochasticLanguage {
     type State = <FiniteStochasticLanguageSemantics as Semantics>::State;
 
-    fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State>> {
+    fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State, AState = Self::State>> {
         Box::new(FiniteStochasticLanguageSemantics::from_language(self))
     }
 
@@ -351,7 +351,7 @@ impl ToSemantics for FiniteStochasticLanguage {
 impl ToStochasticSemantics for FiniteStochasticLanguage {
     type State = <FiniteStochasticLanguageSemantics as Semantics>::State;
 
-    fn get_stochastic_semantics(&self) -> Box<dyn StochasticSemantics<State = Self::State>> {
+    fn get_stochastic_semantics(&self) -> Box<dyn StochasticSemantics<State = Self::State, AState = Self::State>> {
         Box::new(FiniteStochasticLanguageSemantics::from_language(self))
     }
 

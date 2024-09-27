@@ -219,7 +219,7 @@ impl From<(ActivityKey, HashSet<Vec<Activity>, FnvBuildHasher>)> for FiniteLangu
 impl ToSemantics for FiniteLanguage {
     type State = usize;
 
-    fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State>> {
+    fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State, AState = Self::State>> {
         let dfa = self.get_deterministic_finite_automaton();
         Arc::new(dfa).get_semantics()
     }
