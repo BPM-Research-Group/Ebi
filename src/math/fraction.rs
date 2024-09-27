@@ -166,6 +166,9 @@ impl Fraction {
         }
     }
 
+    /**
+     * 1/self
+     */
     pub fn recip(&self) -> Self {
         match self {
             Fraction::Exact(f) => Fraction::Exact(f.recip()),

@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod tests {
-    use std::{fs, sync::Arc};
+    use std::{fs, ops::Neg, sync::Arc};
 
     use crate::{ebi_objects::{alignments::Move, deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::ToSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, medoid, techniques::{align::Align, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probabilistic_queries::FiniteStochasticLanguageAnalyser, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 
@@ -444,6 +444,14 @@ mod tests {
         let trace = slpn.get_activity_key_mut().process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         assert_eq!(slpn.get_probability(&trace_follower).unwrap(), Fraction::zero());
+    }
+
+    #[test]
+    fn fraction_neg() {
+        let one = Fraction::one();
+        assert!(one.is_positive());
+        let one = one.neg();
+        assert!(one.is_negative());
     }
 
     // #[test] //disabled until we can handle livelocks

@@ -3,7 +3,7 @@ use anyhow::{anyhow, Result};
 
 use crate::{ebi_framework::{activity_key::ActivityKey, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, follower_semantics::FollowerSemantics, math::fraction::Fraction};
 
-pub trait EbiTraitQueriableStochasticLanguage {
+pub trait EbiTraitQueriableStochasticLanguage: Sync {
     fn get_activity_key(&self) -> &ActivityKey;
 
     fn get_activity_key_mut(&mut self) -> &mut ActivityKey;
