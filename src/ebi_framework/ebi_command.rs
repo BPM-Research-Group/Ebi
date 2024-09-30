@@ -61,7 +61,7 @@ pub enum EbiCommand {
 }
 
 impl EbiCommand {
-    pub(crate) fn build_cli(&self) -> Command {
+    pub fn build_cli(&self) -> Command {
         let mut command;
         match self {
             EbiCommand::Group { name_short, name_long, explanation_short, explanation_long, children } => {

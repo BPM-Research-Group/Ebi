@@ -78,7 +78,7 @@ impl PartialEq for EbiFileHandler {
 
 impl PartialOrd for EbiFileHandler {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.name.partial_cmp(&other.name)
+        self.name.partial_cmp(other.name)
     }
 }
 
