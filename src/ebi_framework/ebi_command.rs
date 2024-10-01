@@ -55,7 +55,7 @@ pub enum EbiCommand {
         input_names: &'static [&'static str],
         input_helps: &'static [&'static str],
 
-        execute: fn(inputs: Vec<EbiInput>, cli_matches: &ArgMatches) -> Result<EbiOutput>,
+        execute: fn(inputs: Vec<EbiInput>, cli_matches: Option<&ArgMatches>) -> Result<EbiOutput>, //the cli_matches are provided only when cli_command is set to Some(_).
         output: &'static EbiOutputType
     }
 }
@@ -199,7 +199,7 @@ impl EbiCommand {
 
                 log::info!("Starting {}", self.long_name());
 
-                let result = (execute)(inputs, cli_matches)?;
+                let result = (execute)(inputs, Some(cli_matches))?;
 
                 if &&result.get_type() != output_type {
                     return Err(anyhow!("Output type {} does not match the declared output of {}.", result.get_type(), output_type))
@@ -223,7 +223,7 @@ impl EbiCommand {
         Err(anyhow!("command not recognised"))
     }
 
-    fn select_exporter(output_type: &EbiOutputType, to_file: Option<&PathBuf>) -> EbiExporter {
+    pub fn select_exporter(output_type: &EbiOutputType, to_file: Option<&PathBuf>) -> EbiExporter {
         let exporters = output_type.get_exporters();
         
         if exporters.len() == 1 || to_file.is_none() {
@@ -263,7 +263,7 @@ impl EbiCommand {
     /**
      * Attempt to parse an input as any of the given input types. Returns the last error if unsuccessful.
      */
-    fn attempt_parse(input_types: &[&EbiInputType], cli_matches: &ArgMatches, cli_id: &str) -> Result<EbiInput> {
+    pub fn attempt_parse(input_types: &[&EbiInputType], cli_matches: &ArgMatches, cli_id: &str) -> Result<EbiInput> {
         //an input may be of several types; go through each of them
         let mut error = None;
         for input_type in input_types.iter() {
@@ -343,6 +343,15 @@ impl EbiCommand {
     pub fn path_to_short_string(path: &Vec<&EbiCommand>) -> String {
         let result: Vec<&str> = path.iter().map(|command| command.short_name()).collect();
         result.join(" ")
+    }
+
+    pub fn find_command_with_string(&self, name: &String) -> Option<Vec<&EbiCommand>> {
+        for path in self.get_command_paths() {
+            if Self::path_to_string(&path) == *name {
+                return Some(path)
+            }
+        }
+        None
     }
 
     pub fn get_command_paths(&self) -> BTreeSet<Vec<&'static EbiCommand>> {

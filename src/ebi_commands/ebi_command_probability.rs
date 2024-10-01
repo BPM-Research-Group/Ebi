@@ -67,7 +67,7 @@ pub const EBI_PROBABILITY_TRACE: EbiCommand = EbiCommand::Command {
     input_helps: &[ "The queriable stochastic language (model)." ], 
     execute: |mut inputs, cli_matches| {
         let mut model = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
-        if let Some(x) = cli_matches.get_many::<String>("trace") {
+        if let Some(x) = cli_matches.unwrap().get_many::<String>("trace") {
             let t: Vec<&String> = x.collect();
             let trace = t.into_iter().map(|activity| activity.as_str()).collect::<Vec<_>>();
             let trace = model.get_activity_key_mut().process_trace_ref(&trace);
@@ -108,7 +108,7 @@ pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command {
     execute: |mut inputs, cli_matches| {
         let mut semantics = inputs.remove(0).to_type::<EbiTraitStochasticSemantics>()?;
         let balance = inputs.remove(0).to_type::<Fraction>()?;
-        if let Some(x) = cli_matches.get_many::<String>("trace") {
+        if let Some(x) = cli_matches.unwrap().get_many::<String>("trace") {
             let t: Vec<&String> = x.collect();
             let trace = t.into_iter().map(|activity| activity.as_str()).collect::<Vec<_>>();
             let trace = semantics.get_activity_key_mut().process_trace_ref(&trace);

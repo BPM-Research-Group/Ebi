@@ -38,8 +38,8 @@ pub const TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     execute: |mut inputs, cli_matches| {
         let event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         let attribute = inputs.remove(0).to_type::<String>()?;
-        let number_of_samples = cli_matches.get_one::<usize>("samples").unwrap();
-        let p_value = cli_matches.get_one::<FractionNotParsedYet>("pvalue").unwrap().try_into().context("Parsing p value")?;
+        let number_of_samples = cli_matches.unwrap().get_one::<usize>("samples").unwrap();
+        let p_value = cli_matches.unwrap().get_one::<FractionNotParsedYet>("pvalue").unwrap().try_into().context("Parsing p value")?;
 
         let (value, sustained)= event_log.log_categorical_attribute( *number_of_samples, &attribute, &p_value).with_context(|| format!("attribute {}", attribute))?;
 
