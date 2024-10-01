@@ -184,14 +184,18 @@ pub fn print_classes() -> Result<EbiOutput> {
                     for inputss in input_typesss.iter().multi_cartesian_product()  {
 
                     
-                        let inputs = inputss.iter().enumerate().map(|(i, input)| format!("{} input_{}", input, i)).join(", ");
+                        let inputs_header = inputss.iter().enumerate().map(|(i, input)| format!("{} input_{}", input, i)).join(", ");
+                        let inputs = inputss.iter().map(|input| format!("input_{}", input)).join(", ");
+                        let command = EbiCommand::path_to_string(&path);
+                        let output_extension = exporter.get_extension();
 
 
-                        writeln!(f, "\tpublic static {} {}({}) {{", output, java_function_name.clone() + "__as__" + &java_exporter_name, inputs)?;
+                        writeln!(f, "\tpublic static {} {}({}) {{", output, java_function_name.clone() + "__as__" + &java_exporter_name, inputs_header)?;
 
+                        writeln!(f, "\t\tString result = call_ebi({}, {}, new String[] {{{}}});", command, output_extension, inputs)?;
+                        writeln!(f, "\t\treturn {}.fromEbiString(result);", output)?;
 
-
-                       writeln!(f, "\t}}\n")?;
+                        writeln!(f, "\t}}\n")?;
                     }
                 } else {
                     writeln!(f, "\t// command leading to output {} cannot be called from Java as this output is not supported.", exporter)?;

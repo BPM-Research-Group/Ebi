@@ -183,6 +183,19 @@ impl EbiExporter {
             EbiExporter::RootLogDiv => Some("org.processmining.ebi.objects.EbiRootLogDiv"),
         }
     }
+
+    pub fn get_extension(&self) -> &str {
+        match self {
+            EbiExporter::Object(_, file_handler) => file_handler.file_extension,
+            EbiExporter::String => "txt",
+            EbiExporter::SVG => "svg",
+            EbiExporter::Usize => "int",
+            EbiExporter::Fraction => "frac",
+            EbiExporter::LogDiv => "logdiv",
+            EbiExporter::ContainsRoot => "croot",
+            EbiExporter::RootLogDiv => "rldiv",
+        }
+    }
 }
 
 impl Display for EbiExporter {
