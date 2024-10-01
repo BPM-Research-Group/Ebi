@@ -43,7 +43,7 @@ pub const ASSOCIATION_ATTRIBUTE: EbiCommand = EbiCommand::Command {
 
         Ok(EbiOutput::ContainsRoot(ass))
     }, 
-    output: &EbiOutputType::ContainsRoot
+    output_type: &EbiOutputType::ContainsRoot
 };
 
 pub const ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command { 
@@ -72,7 +72,7 @@ pub const ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command {
         }
         Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
     }, 
-    output: &EbiOutputType::String
+    output_type: &EbiOutputType::String
 };
 
 pub fn cli_number_of_samples(command: Command) -> Command {

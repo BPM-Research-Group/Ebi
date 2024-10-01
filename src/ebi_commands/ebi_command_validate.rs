@@ -40,6 +40,6 @@ pub const EBI_VALIDATE: EbiCommand = EbiCommand::Command {
             return Err(anyhow!("No input file given."))
         }
     },
-    output: &EbiOutputType::String,
+    output_type: &EbiOutputType::String,
     
 };

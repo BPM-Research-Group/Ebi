@@ -45,7 +45,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
         };
         Ok(EbiOutput::String(result))
     }, 
-    output: &EbiOutputType::String
+    output_type: &EbiOutputType::String
 };
 
 pub const EBI_VISUALISE_SVG: EbiCommand = EbiCommand::Command { 
@@ -90,5 +90,5 @@ pub const EBI_VISUALISE_SVG: EbiCommand = EbiCommand::Command {
         return Ok(EbiOutput::String(svg.finalize()));
     
     }, 
-    output: &EbiOutputType::String
+    output_type: &EbiOutputType::String
 };

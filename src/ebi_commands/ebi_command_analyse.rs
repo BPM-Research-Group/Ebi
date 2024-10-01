@@ -46,7 +46,7 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
         };
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
 };
 
 
@@ -68,7 +68,7 @@ pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
         
         return Ok(EbiOutput::Fraction(result));
     }, 
-    output: &EbiOutputType::Fraction
+    output_type: &EbiOutputType::Fraction
 };
 
 pub const EBI_ANALYSE_MINPROB: EbiCommand = EbiCommand::Command {
@@ -91,7 +91,7 @@ pub const EBI_ANALYSE_MINPROB: EbiCommand = EbiCommand::Command {
         let result = semantics.analyse_minimum_probability(&at_least).context("could not analyse")?;
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
 };
 
 pub const EBI_ANALYSE_MOSTLIKELY: EbiCommand = EbiCommand::Command {
@@ -125,7 +125,7 @@ pub const EBI_ANALYSE_MOSTLIKELY: EbiCommand = EbiCommand::Command {
         };
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
 };
 
 pub const EBI_ANALYSE_MODE: EbiCommand = EbiCommand::Command { 
@@ -158,7 +158,7 @@ pub const EBI_ANALYSE_MODE: EbiCommand = EbiCommand::Command {
         };
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
 };
 
 pub const EBI_ANALYSE_MEDOID: EbiCommand = EbiCommand::Command { 
@@ -182,6 +182,6 @@ pub const EBI_ANALYSE_MEDOID: EbiCommand = EbiCommand::Command {
         let result = medoid::medoid(language.as_ref(), &number_of_traces)?;
         return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
 };
 

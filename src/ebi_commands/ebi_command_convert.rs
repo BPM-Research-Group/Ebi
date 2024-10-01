@@ -41,7 +41,7 @@ pub const EBI_CONVERT_LPN: EbiCommand = EbiCommand::Command {
         };
         Ok(EbiOutput::Object(EbiObject::LabelledPetriNet(lpn)))
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::LabelledPetriNet) 
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::LabelledPetriNet) 
 };
 
 pub const EBI_CONVERT_SLANG: EbiCommand = EbiCommand::Command { 
@@ -67,7 +67,7 @@ pub const EBI_CONVERT_SLANG: EbiCommand = EbiCommand::Command {
         };
         Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(slang)))
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage) 
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage) 
 };
 
 pub const EBI_CONVERT_SDFA: EbiCommand = EbiCommand::Command { 
@@ -95,5 +95,5 @@ pub const EBI_CONVERT_SDFA: EbiCommand = EbiCommand::Command {
         };
         Ok(EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)))
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::StochasticDeterministicFiniteAutomaton)
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticDeterministicFiniteAutomaton)
 };

@@ -34,7 +34,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command {
         let result = language.medoid(*number_of_traces)?;
         return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
 };
 
 pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
@@ -57,7 +57,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
         let result = language.k_medoids_clustering(*number_of_clusters)?;
         return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
 };
 
 pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command {
@@ -82,5 +82,5 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command
         
         return Ok(EbiOutput::Object(EbiObject::Alignments(result)));
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::Alignments)
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::Alignments)
 };

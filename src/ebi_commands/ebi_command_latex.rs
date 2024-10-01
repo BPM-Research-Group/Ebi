@@ -30,7 +30,7 @@ pub const EBI_LATEX_MANUAL: EbiCommand = EbiCommand::Command {
     input_names: &[],
     input_helps: &[],
     execute: |_, _| Ok(manual()?), 
-    output: &EbiOutputType::String
+    output_type: &EbiOutputType::String
 };
 
 pub const EBI_LATEX_GRAPH: EbiCommand = EbiCommand::Command { 
@@ -45,7 +45,7 @@ pub const EBI_LATEX_GRAPH: EbiCommand = EbiCommand::Command {
     input_names: &[],
     input_helps: &[],
     execute: |_, _| Ok(graph()?), 
-    output: &EbiOutputType::String
+    output_type: &EbiOutputType::String
 };
 
 fn manual() -> Result<EbiOutput> {
@@ -67,7 +67,7 @@ fn manual() -> Result<EbiOutput> {
         writeln!(f, "\\subsection{{\\texttt{{{}}}}}", EbiCommand::path_to_string(&path))?;
         writeln!(f, "\\label{{command:{}}}", EbiCommand::path_to_string(&path))?;
 
-        if let EbiCommand::Command { name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_typess, input_names, input_helps, output: output_type, .. } = path[path.len()-1] {
+        if let EbiCommand::Command { name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_typess, input_names, input_helps, output_type, .. } = path[path.len()-1] {
 
             //alias
             if let Some(_) = name_long {

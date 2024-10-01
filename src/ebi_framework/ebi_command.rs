@@ -56,7 +56,7 @@ pub enum EbiCommand {
         input_helps: &'static [&'static str],
 
         execute: fn(inputs: Vec<EbiInput>, cli_matches: Option<&ArgMatches>) -> Result<EbiOutput>, //the cli_matches are provided only when cli_command is set to Some(_).
-        output: &'static EbiOutputType
+        output_type: &'static EbiOutputType
     }
 }
 
@@ -179,7 +179,7 @@ impl EbiCommand {
                     }
                 }
             },
-            EbiCommand::Command { exact_arithmetic, input_types: input_typess, execute, output: output_type, input_names, .. } => {
+            EbiCommand::Command { exact_arithmetic, input_types: input_typess, execute, output_type, input_names, .. } => {
                 //set exact arithmetic
                 if !exact_arithmetic || cli_matches.get_flag("approx") {
                     log::info!("Use approximate arithmetic");
@@ -230,7 +230,7 @@ impl EbiCommand {
             return exporters.into_iter().next().unwrap();
         }
 
-        //strategy: take the exporter with the longest extension first
+        //strategy: take the exporter with the longest extension first (to export .xes.gz before .xes)
         {
             let mut exporters = exporters.clone();
             exporters.sort_by(|a, b| {
@@ -411,7 +411,7 @@ impl PartialEq for EbiCommand {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Group { name_short: l_name_short, name_long: l_name_long, explanation_short: l_explanation_short, explanation_long: l_explanation_long, children: l_children }, Self::Group { name_short: r_name_short, name_long: r_name_long, explanation_short: r_explanation_short, explanation_long: r_explanation_long, children: r_children }) => l_name_short == r_name_short && l_name_long == r_name_long && l_explanation_short == r_explanation_short && l_explanation_long == r_explanation_long && l_children == r_children,
-            (Self::Command { name_short: l_name_short, name_long: l_name_long, explanation_short: l_explanation_short, explanation_long: l_explanation_long, latex_link: l_latex_link, cli_command: l_cli_command, exact_arithmetic: l_exact_arithmetic, input_types: l_input_types, input_names: l_input_names, input_helps: l_input_helps, execute: l_execute, output: l_output }, Self::Command { name_short: r_name_short, name_long: r_name_long, explanation_short: r_explanation_short, explanation_long: r_explanation_long, latex_link: r_latex_link, cli_command: r_cli_command, exact_arithmetic: r_exact_arithmetic, input_types: r_input_types, input_names: r_input_names, input_helps: r_input_helps, execute: r_execute, output: r_output }) => l_name_short == r_name_short && l_name_long == r_name_long && l_explanation_short == r_explanation_short && l_explanation_long == r_explanation_long && l_latex_link == r_latex_link && l_cli_command == r_cli_command && l_exact_arithmetic == r_exact_arithmetic && l_input_types == r_input_types && l_input_names == r_input_names && l_input_helps == r_input_helps && l_execute == r_execute && l_output == r_output,
+            (Self::Command { name_short: l_name_short, name_long: l_name_long, explanation_short: l_explanation_short, explanation_long: l_explanation_long, latex_link: l_latex_link, cli_command: l_cli_command, exact_arithmetic: l_exact_arithmetic, input_types: l_input_types, input_names: l_input_names, input_helps: l_input_helps, execute: l_execute, output_type: l_output }, Self::Command { name_short: r_name_short, name_long: r_name_long, explanation_short: r_explanation_short, explanation_long: r_explanation_long, latex_link: r_latex_link, cli_command: r_cli_command, exact_arithmetic: r_exact_arithmetic, input_types: r_input_types, input_names: r_input_names, input_helps: r_input_helps, execute: r_execute, output_type: r_output }) => l_name_short == r_name_short && l_name_long == r_name_long && l_explanation_short == r_explanation_short && l_explanation_long == r_explanation_long && l_latex_link == r_latex_link && l_cli_command == r_cli_command && l_exact_arithmetic == r_exact_arithmetic && l_input_types == r_input_types && l_input_names == r_input_names && l_input_helps == r_input_helps && l_execute == r_execute && l_output == r_output,
             _ => false,
         }
     }

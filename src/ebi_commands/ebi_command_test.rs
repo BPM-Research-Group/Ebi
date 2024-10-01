@@ -55,7 +55,7 @@ pub const TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
 				
         Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
     }, 
-    output: &EbiOutputType::String
+    output_type: &EbiOutputType::String
 };
 
 pub fn cli_p_value(command: Command) -> Command {

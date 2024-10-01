@@ -48,7 +48,7 @@ impl EbiOutputType {
     pub fn get_applicable_commands(&self) -> BTreeSet<Vec<&'static EbiCommand>> {
         let mut result = EBI_COMMANDS.get_command_paths();
         result.retain(|path| {
-            if let EbiCommand::Command { output, .. } = path[path.len() - 1] {
+            if let EbiCommand::Command { output_type: output, .. } = path[path.len() - 1] {
                 if output == &self {
                     return true;
                 }

@@ -1,4 +1,5 @@
-use clap::{ArgMatches, Command};
+use std::path::PathBuf;
+
 use jni::JNIEnv;
 
 // These objects are what you should use as arguments to your native
@@ -12,15 +13,9 @@ use jni::objects::{JClass, JObjectArray, JString};
 use jni::sys::jstring;
 use anyhow::{anyhow, Context, Result};
 
-use crate::ebi_objects::stochastic_labelled_petri_net::StochasticLabelledPetriNet;
-use crate::math::fraction::FractionNotParsedYet;
-use crate::multiple_reader::MultipleReader;
+use crate::{math::fraction::FractionNotParsedYet, multiple_reader::MultipleReader};
 
-use super::ebi_command::{EbiCommand, EBI_COMMANDS};
-use super::ebi_file_handler::EbiFileHandler;
-use super::ebi_input::{self, EbiInput, EbiInputType};
-use super::ebi_object::{EbiObject, EbiObjectType};
-use super::ebi_output::{self, EbiOutput, EbiOutputType};
+use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiInputType}, ebi_output::{self}};
 
 // This keeps Rust from "mangling" the name and making it unique for this
 // crate.
@@ -58,7 +53,7 @@ pub fn handle_prom_request(command_name: String, output_format: String, string_i
     let binding = EBI_COMMANDS.find_command_with_string(&command_name).ok_or(anyhow!("command not found"))?;
     let command = binding.last().ok_or(anyhow!("command not found"))?;
 
-    if let EbiCommand::Command { execute, input_types: input_typess, input_names, .. } = command {
+    if let EbiCommand::Command { execute, input_types: input_typess, input_names, output_type, .. } = command {
 
         //read the inputs
         let mut inputs = vec![];
@@ -73,10 +68,15 @@ pub fn handle_prom_request(command_name: String, output_format: String, string_i
         //call the command
         let result = (execute)(inputs, None)?;
 
-        let slpn: StochasticLabelledPetriNet;
-        let slpn = EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(slpn));
-        let exporter = EbiCommand::select_exporter(&EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet), None);
-        ebi_output::export_to_string(slpn, exporter)
+        if &&result.get_type() != output_type {
+            return Err(anyhow!("Output type {} does not match the declared output of {}.", result.get_type(), output_type))
+        }
+
+        //write result to string
+        let mut output_path = PathBuf::new();
+        output_path.push(output_format);
+        let exporter = EbiCommand::select_exporter(output_type, Some(&output_path));
+        ebi_output::export_to_string(result, exporter)
     } else {
         Err(anyhow!("Command not found"))
     }

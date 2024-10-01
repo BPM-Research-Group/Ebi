@@ -41,7 +41,7 @@ pub const EBI_PROBABILITY_MODEL: EbiCommand = EbiCommand::Command {
         }
         return Ok(EbiOutput::Fraction(sum));
     }, 
-    output: &EbiOutputType::Fraction,
+    output_type: &EbiOutputType::Fraction,
 };
 
 pub const EBI_PROBABILITY_TRACE: EbiCommand = EbiCommand::Command { 
@@ -80,7 +80,7 @@ pub const EBI_PROBABILITY_TRACE: EbiCommand = EbiCommand::Command {
             return Err(anyhow!("no trace given"));
         }
     }, 
-    output: &EbiOutputType::Fraction,
+    output_type: &EbiOutputType::Fraction,
 };
 
 pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command { 
@@ -121,5 +121,5 @@ pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command {
             return Err(anyhow!("no trace given"));
         }
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::Alignments),
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::Alignments),
 };
