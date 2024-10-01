@@ -4,7 +4,7 @@ use anyhow::Result;
 use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
-use crate::{ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, text::Joiner};
+use crate::{ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, text::Joiner};
 
 
 pub const EBI_LATEX: EbiCommand = EbiCommand::Group { 
@@ -15,6 +15,7 @@ pub const EBI_LATEX: EbiCommand = EbiCommand::Group {
     children: &[ 
         &EBI_LATEX_GRAPH,
         &EBI_LATEX_MANUAL,
+        &EBI_LATEX_JAVA,
      ]
 };
 
@@ -45,6 +46,21 @@ pub const EBI_LATEX_GRAPH: EbiCommand = EbiCommand::Command {
     input_names: &[],
     input_helps: &[],
     execute: |_, _| Ok(graph()?), 
+    output_type: &EbiOutputType::String
+};
+
+pub const EBI_LATEX_JAVA: EbiCommand = EbiCommand::Command { 
+    name_short: "java", 
+    name_long: None, 
+    explanation_short: "Print the classes for Java.", 
+    explanation_long: None, 
+    cli_command: None, 
+    latex_link: None, 
+    exact_arithmetic: false, 
+    input_types: &[], 
+    input_names: &[],
+    input_helps: &[],
+    execute: |_, _| Ok(prom_link::print_classes()?), 
     output_type: &EbiOutputType::String
 };
 

@@ -22,8 +22,8 @@ pub const EBI_DIRCTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     ],
     object_exporters: &[
         EbiObjectExporter::DirectlyFollowsModel(DirectlyFollowsModel::export_from_object)
-    ]
-    
+    ],
+    java_class_name: None,
 };
 
 pub struct DirectlyFollowsModel {

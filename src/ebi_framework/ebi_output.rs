@@ -8,6 +8,7 @@ use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileH
 pub enum EbiOutput {
     Object(EbiObject),
     String(String),
+    SVG(String),
     Usize(usize),
     Fraction(Fraction),
     LogDiv(LogDiv),
@@ -20,6 +21,7 @@ impl EbiOutput {
         match self {
             EbiOutput::Object(o) => EbiOutputType::ObjectType(o.get_type()),
             EbiOutput::String(_) => EbiOutputType::String,
+            EbiOutput::SVG(_) => EbiOutputType::SVG,
             EbiOutput::Usize(_) => EbiOutputType::Usize,
             EbiOutput::Fraction(_) => EbiOutputType::Fraction,
             EbiOutput::LogDiv(_) => EbiOutputType::LogDiv,
@@ -33,6 +35,7 @@ impl EbiOutput {
 pub enum EbiOutputType {
     ObjectType(EbiObjectType),
     String,
+    SVG,
     Usize,
     Fraction,
     LogDiv,
@@ -75,6 +78,7 @@ impl EbiOutputType {
                 result
             } ,
             EbiOutputType::String => vec![EbiExporter::String],
+            EbiOutputType::SVG => vec![EbiExporter::SVG],
             EbiOutputType::Usize => vec![EbiExporter::Usize],
             EbiOutputType::Fraction => vec![EbiExporter::Fraction],
             EbiOutputType::LogDiv => vec![EbiExporter::LogDiv],
@@ -98,6 +102,7 @@ impl Display for EbiOutputType {
         match self {
             EbiOutputType::ObjectType(t) => t.fmt(f),
             EbiOutputType::String => Display::fmt(&"text", f),
+            EbiOutputType::SVG => Display::fmt(&"svg", f),
             EbiOutputType::Usize => Display::fmt(&"integer", f),
             EbiOutputType::Fraction => Display::fmt(&"fraction", f),
             EbiOutputType::LogDiv => Display::fmt(&"logarithm", f),
@@ -107,10 +112,11 @@ impl Display for EbiOutputType {
     }
 }
 
-#[derive(Debug,Clone)]
+#[derive(Debug,Clone,Eq,PartialEq,Hash)]
 pub enum EbiExporter {
     Object(&'static EbiObjectExporter, &'static EbiFileHandler),
     String,
+    SVG,
     Usize,
     Fraction,
     LogDiv,
@@ -124,6 +130,8 @@ impl EbiExporter {
             (EbiExporter::Object(exporter, _), object) => exporter.export(object, f),
             (EbiExporter::String, EbiOutput::String(object)) => object.export(f),
             (EbiExporter::String, _) => unreachable!(),
+            (EbiExporter::SVG, EbiOutput::SVG(object)) => object.export(f),
+            (EbiExporter::SVG, _) => unreachable!(),
             (EbiExporter::Usize, EbiOutput::Usize(object)) => object.export(f),
             (EbiExporter::Usize, _) => unreachable!(),
             (EbiExporter::Fraction, EbiOutput::Fraction(object)) => object.export(f),
@@ -141,11 +149,38 @@ impl EbiExporter {
         match self {
             EbiExporter::Object(_, file_handler) => file_handler.article,
             EbiExporter::String => "",
+            EbiExporter::SVG => "an",
             EbiExporter::Usize => "an",
             EbiExporter::Fraction => "a",
             EbiExporter::LogDiv => "a",
             EbiExporter::ContainsRoot => "a",
             EbiExporter::RootLogDiv => "a",
+        }
+    }
+
+    pub fn get_name(&self) -> &str  {
+        match self {
+            EbiExporter::Object(_, file_handler) => file_handler.name,
+            EbiExporter::String => "string",
+            EbiExporter::SVG => "SVG",
+            EbiExporter::Usize => "integer",
+            EbiExporter::Fraction => "fraction",
+            EbiExporter::LogDiv => "logdiv",
+            EbiExporter::ContainsRoot => "containsroot",
+            EbiExporter::RootLogDiv => "rootlogdiv",
+        }
+    }
+
+    pub fn get_java_class(&self) -> Option<&str> {
+        match self {
+            EbiExporter::Object(_, file_hanlder) => file_hanlder.java_class_name,
+            EbiExporter::String => Some("org.processmining.ebi.objects.EbiString"),
+            EbiExporter::SVG => Some("org.processmining.ebi.objects.EbiSvg"),
+            EbiExporter::Usize => Some("org.processmining.ebi.objects.EbiUsize"),
+            EbiExporter::Fraction => Some("org.processmining.ebi.objects.EbiFraction"),
+            EbiExporter::LogDiv => Some("org.processmining.ebi.objects.EbiLogDiv"),
+            EbiExporter::ContainsRoot => Some("org.processmining.ebi.objects.EbiContainsRoot"),
+            EbiExporter::RootLogDiv => Some("org.processmining.ebi.objects.EbiRootLogDiv"),
         }
     }
 }
@@ -155,6 +190,7 @@ impl Display for EbiExporter {
         match self {
             EbiExporter::Object(_, file_handler) => Display::fmt(file_handler, f),
             EbiExporter::String => Display::fmt(&"text", f),
+            EbiExporter::SVG => Display::fmt(&"svg", f),
             EbiExporter::Usize => Display::fmt(&"integer", f),
             EbiExporter::Fraction => Display::fmt(&"fraction", f),
             EbiExporter::LogDiv => Display::fmt(&"logarithm", f),
@@ -164,7 +200,7 @@ impl Display for EbiExporter {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug,Eq,PartialEq,Hash)]
 pub enum EbiObjectExporter {
     EventLog(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     DirectlyFollowsModel(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),

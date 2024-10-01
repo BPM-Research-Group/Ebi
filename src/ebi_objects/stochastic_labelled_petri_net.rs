@@ -44,6 +44,7 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     object_exporters: &[
         EbiObjectExporter::StochasticLabelledPetriNet(StochasticLabelledPetriNet::export_from_object)
     ],
+    java_class_name: Some("org.processmining.ebi.objects.EbiStochasticLabelledPetriNet"),
 };
 
 #[derive(Clone,Debug)]

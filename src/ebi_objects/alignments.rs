@@ -18,7 +18,8 @@ pub const EBI_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     ],
     object_exporters: &[ 
         EbiObjectExporter::Alignments(Alignments::export_from_object)
-    ]
+    ],
+    java_class_name: None,
 };
 
 #[derive(Debug,PartialEq,Eq,Ord,PartialOrd)]

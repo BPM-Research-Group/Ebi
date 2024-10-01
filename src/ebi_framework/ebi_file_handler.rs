@@ -27,7 +27,8 @@ pub struct EbiFileHandler {
     pub validator: fn(&mut dyn BufRead) -> Result<()>,
     pub trait_importers: &'static [EbiTraitImporter],
     pub object_importers: &'static [EbiObjectImporter],
-    pub object_exporters: &'static [EbiObjectExporter] //the order matters, as if multiple file handlers can export an object, the one that mentions the object earliest is preferred.
+    pub object_exporters: &'static [EbiObjectExporter], //the order matters, as if multiple file handlers can export an object, the one that mentions the object earliest is preferred.
+    pub java_class_name: Option<&'static str>,
 }
 
 impl EbiFileHandler {

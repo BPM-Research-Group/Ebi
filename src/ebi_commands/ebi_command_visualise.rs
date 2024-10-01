@@ -87,8 +87,8 @@ pub const EBI_VISUALISE_SVG: EbiCommand = EbiCommand::Command {
         let mut svg = SVGWriter::new();
         result.do_it(false, false, false, &mut svg);
 
-        return Ok(EbiOutput::String(svg.finalize()));
+        return Ok(EbiOutput::SVG(svg.finalize()));
     
     }, 
-    output_type: &EbiOutputType::String
+    output_type: &EbiOutputType::SVG
 };

@@ -27,6 +27,7 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(LabelledPetriNet::export_from_stochastic_deterministic_finite_automaton),
         EbiObjectExporter::DirectlyFollowsModel(LabelledPetriNet::export_from_directly_follows_model),
     ],
+    java_class_name: None,
 };
 
 #[derive(Clone,Debug)]

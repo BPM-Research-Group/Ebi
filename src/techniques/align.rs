@@ -276,7 +276,7 @@ impl AlignmentHeuristics for FiniteStochasticLanguageSemantics {
 impl AlignmentHeuristics for LabelledPetriNet {
     type AState = LPNMarking;
 
-    fn underestimate_cost_to_final_synchronous_state(&self, trace: &Vec<Activity>, trace_index: &usize, state: &Self::AState) -> usize {
+    fn underestimate_cost_to_final_synchronous_state(&self, _trace: &Vec<Activity>, _trace_index: &usize, _state: &Self::AState) -> usize {
         0
     }
 }
@@ -284,7 +284,7 @@ impl AlignmentHeuristics for LabelledPetriNet {
 impl AlignmentHeuristics for StochasticLabelledPetriNet {
     type AState = LPNMarking;
 
-    fn underestimate_cost_to_final_synchronous_state(&self, trace: &Vec<Activity>, trace_index: &usize, state: &Self::AState) -> usize {
+    fn underestimate_cost_to_final_synchronous_state(&self, _trace: &Vec<Activity>, _trace_index: &usize, _state: &Self::AState) -> usize {
         0
     }
 }

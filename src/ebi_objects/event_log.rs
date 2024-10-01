@@ -27,7 +27,8 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     ],
     object_exporters: &[ 
         EbiObjectExporter::EventLog(EventLog::export_from_object)
-    ]
+    ],
+    java_class_name: Some("org.processmining.ebi.objects.EbiEventLog"),
 };
 
 pub struct EventLog {

@@ -36,8 +36,9 @@ indicatif = "*"
 indexmap = "*"
 rustc-hash="*"
 pathfinding="*"
-fnv ="*"
+fnv = "*"
 jni = "*"
+itertools = "*"
 
 [dependencies.num-rational]
 version = "0.4.1"
