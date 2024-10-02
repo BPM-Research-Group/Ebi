@@ -161,6 +161,19 @@ impl EbiCommand {
         }
     }
 
+    pub fn explanation_long(&self) -> &str {
+        match self {
+            EbiCommand::Group { explanation_short, explanation_long, .. } => match explanation_long {
+                Some(x) => x,
+                None => &explanation_short,
+            },
+            EbiCommand::Command { explanation_short, explanation_long, .. } => match explanation_long {
+                Some(x) => x,
+                None => &explanation_short,
+            },
+        }
+    }
+
     pub fn get_progress_bar(total_ticks: usize) -> ProgressBar {
         let pb = ProgressBar::new(total_ticks.try_into().unwrap());
         pb.set_style(ProgressStyle::with_template("[{wide_bar:.cyan/blue}] {pos:>7}/{len:7}")
