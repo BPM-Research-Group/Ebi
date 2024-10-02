@@ -194,8 +194,8 @@ pub fn print_classes() -> Result<EbiOutput> {
 
                         let java_function_inputs = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!("{} input_{}", input.java_class, i)).join(", ");
                         let inputs_in_function = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!("{}(input_{})", input.translator_java_to_ebi.unwrap(), i)).join(", ");
-                        let java_plugin_inputs = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!("{} input_{}", input.java_class, i)).join(", ");;
-                        let inputs_in_plugin = (0..inputs_java_object_handler.len()).map(|i| format!(", input_{}", i)).join("");
+                        let java_plugin_inputs = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!(", {} input_{}", input.java_class, i)).join("");
+                        let inputs_in_plugin = (0..inputs_java_object_handler.len()).map(|i| format!("input_{}", i)).join(", ");
                         let command = EbiCommand::path_to_string(&path);
                         let output_extension = exporter.get_extension();
                         let java_function_name = format!("{}__as__{}__to__{}", java_function_name, java_exporter_name, output_java_object_handler.name);
