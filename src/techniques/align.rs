@@ -97,6 +97,8 @@ pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(
     // log::debug!("activity key {:?}", semantics.get_activity_key());
     // log::debug!("align trace {:?}", trace);
 
+    let cache = semantics.initialise_alignment_heuristic_cache();
+
     let start = (0, semantics.get_initial_state());
     let successors = |(trace_index, state) : &(usize, FS)| {
 
@@ -143,7 +145,7 @@ pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(
 
     //function that returns a heuristic on how far we are still at least from a final state
     let heuristic = |(trace_index, state) : &(usize, FS)| {
-        semantics.underestimate_cost_to_final_synchronous_state(trace, trace_index, state)
+        semantics.underestimate_cost_to_final_synchronous_state(trace, trace_index, state, &cache)
     };
 
     //function that returns whether we are in a final synchronous product state
@@ -250,17 +252,23 @@ pub fn find_labelled_transition<T, FS>(semantics: &T, from: &FS, to: &FS) -> Res
 pub trait AlignmentHeuristics {
     type AState;
 
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>>;
+
     /**
      * Return a lower bound on the cost to reach a final state in the synchronous product.
      * If not sure: 0 is a valid return value, though better bounds will make searches more efficient.
      */
-    fn underestimate_cost_to_final_synchronous_state(&self, trace: &Vec<Activity>, trace_index: &usize, state: &Self::AState) -> usize;
+    fn underestimate_cost_to_final_synchronous_state(&self, trace: &Vec<Activity>, trace_index: &usize, state: &Self::AState, cache: &Vec<Vec<usize>>) -> usize;
 }
 
 impl AlignmentHeuristics for DeterministicFiniteAutomatonSemantics {
     type AState = usize;
+
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
     
-    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &Self::AState) -> usize {
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &Self::AState, _: &Vec<Vec<usize>>) -> usize {
         0
     }
 }
@@ -268,7 +276,11 @@ impl AlignmentHeuristics for DeterministicFiniteAutomatonSemantics {
 impl AlignmentHeuristics for FiniteStochasticLanguageSemantics {
     type AState = usize;
 
-    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &Self::AState) -> usize {
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &Self::AState, _: &Vec<Vec<usize>>) -> usize {
         0
     }
 }
@@ -276,23 +288,35 @@ impl AlignmentHeuristics for FiniteStochasticLanguageSemantics {
 impl AlignmentHeuristics for LabelledPetriNet {
     type AState = LPNMarking;
 
-    fn underestimate_cost_to_final_synchronous_state(&self, trace: &Vec<Activity>, trace_index: &usize, state: &Self::AState) -> usize {
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(&self, _trace: &Vec<Activity>, _trace_index: &usize, _state: &Self::AState, _cache: &Vec<Vec<usize>>) -> usize {
         0
     }
 }
 
 impl AlignmentHeuristics for StochasticLabelledPetriNet {
     type AState = LPNMarking;
+    
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
 
-    fn underestimate_cost_to_final_synchronous_state(&self, trace: &Vec<Activity>, trace_index: &usize, state: &Self::AState) -> usize {
+    fn underestimate_cost_to_final_synchronous_state(&self, _trace: &Vec<Activity>, _trace_index: &usize, _state: &Self::AState, _cache: &Vec<Vec<usize>>) -> usize {
         0
     }
 }
 
 impl AlignmentHeuristics for StochasticDeterministicFiniteAutomatonSemantics {
     type AState = usize;
+    
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
 
-    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>,  _: &usize, _: &Self::AState) -> usize {
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>,  _: &usize, _: &Self::AState, _: &Vec<Vec<usize>>) -> usize {
         0
     }
 }
