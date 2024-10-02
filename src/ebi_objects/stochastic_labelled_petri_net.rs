@@ -14,6 +14,7 @@ use crate::ebi_framework::ebi_output::{EbiObjectExporter, EbiOutput};
 use crate::ebi_framework::exportable::Exportable;
 use crate::ebi_framework::importable::Importable;
 use crate::ebi_framework::infoable::Infoable;
+use crate::ebi_framework::prom_link::JavaObjectHandler;
 use crate::ebi_traits::ebi_trait_queriable_stochastic_language;
 use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics};
 use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics;
@@ -44,7 +45,14 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     object_exporters: &[
         EbiObjectExporter::StochasticLabelledPetriNet(StochasticLabelledPetriNet::export_from_object)
     ],
-    java_class_name: Some("org.processmining.ebi.objects.EbiStochasticLabelledPetriNet"),
+    java_object_handlers: &[
+        JavaObjectHandler{ 
+            name: "StochasticLabelledPetriNet", 
+            translator_ebi_to_java: "org.processmining.ebi.objects.EbiStochasticLabelledPetriNet.EbiLabelledPetriNet2LabelledPetriNet", 
+            translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiStochasticLabelledPetriNet.LabelledPetriNet2EbiLabelledPetriNet"),
+            java_class: "org.processmining.stochasticlabelledpetrinets.StochasticLabelledPetriNet" 
+        },
+    ],
 };
 
 #[derive(Clone,Debug)]

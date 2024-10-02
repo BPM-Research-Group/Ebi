@@ -1,3 +1,4 @@
+use std::fmt::Display;
 use std::{io::Write, path::PathBuf};
 use itertools::Itertools;
 
@@ -175,31 +176,28 @@ pub fn print_classes() -> Result<EbiOutput> {
 
                 //function name
                 let java_function_name = escape(EbiCommand::path_to_string(&path));
-                let java_exporter_name = escape(exporter.get_name().replace(" ", "_"));
+                let java_exporter_name = escape(exporter.get_name().to_string());
 
                 //output
-                if let Some(output) = exporter.get_java_class() {
+                for output_java_object_handler in exporter.get_java_object_handlers() {
 
                     //inputs (create one function for each combination of inputs in the cartesian product)
                     let input_typesss = input_typess.iter().map(|arr| EbiInputType::get_possible_inputs_with_java(arr)).collect::<Vec<_>>();
-                    for inputss in input_typesss.iter().multi_cartesian_product()  {
+                    for inputs_java_object_handler in input_typesss.iter().multi_cartesian_product()  {
 
-                    
-                        let inputs_header = inputss.iter().enumerate().map(|(i, input)| format!("{} input_{}", input, i)).join(", ");
-                        let inputs = (0..inputss.len()).map(|input| format!("input_{}.toEbiString()", input)).join(", ");
+                        let inputs_header = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!("{} input_{}", input.java_class, i)).join(", ");
+                        let inputs = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!("{}(input_{})", input.translator_java_to_ebi.unwrap(), i)).join(", ");
                         let command = EbiCommand::path_to_string(&path);
                         let output_extension = exporter.get_extension();
 
 
-                        writeln!(f, "\tpublic static {} {}({}) {{", output, java_function_name.clone() + "__as__" + &java_exporter_name, inputs_header)?;
+                        writeln!(f, "\tpublic static {} {}__as__{}__to__{}({}) {{", output_java_object_handler.java_class, java_function_name, java_exporter_name, output_java_object_handler.name, inputs_header)?;
 
                         writeln!(f, "\t\tString result = CallEbi.call_ebi(\"{}\", \".{}\", new String[] {{{}}});", command, output_extension, inputs)?;
-                        writeln!(f, "\t\treturn {}.fromEbiString(result);", output)?;
+                        writeln!(f, "\t\treturn {}(result);", output_java_object_handler.translator_ebi_to_java)?;
 
                         writeln!(f, "\t}}\n")?;
                     }
-                } else {
-                    writeln!(f, "\t// command leading to output {} cannot be called from Java as this output is not supported.", exporter)?;
                 }
             }
         }
@@ -213,3 +211,74 @@ pub fn print_classes() -> Result<EbiOutput> {
 pub fn escape(str: String) -> String {
     str.replace(' ', "_").replace("-", "_")
 }
+
+#[derive(Debug, PartialEq, Eq, Hash)]
+pub struct JavaObjectHandler {
+    pub name: &'static str,
+    pub translator_ebi_to_java: &'static str,
+    pub translator_java_to_ebi: Option<&'static str>,
+    pub java_class: &'static str,
+}
+
+impl Display for JavaObjectHandler {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "{}", self.name)
+    }
+}
+
+pub const JAVA_OBJECT_HANDLERS_STRING: &[JavaObjectHandler] = &[
+    JavaObjectHandler{ 
+        name: "string_html", 
+        translator_ebi_to_java: "org.processmining.ebi.objects.EbiString.fromEbiString",
+        translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiString.toEbiString"),
+        java_class: "String" 
+    },
+];
+pub const JAVA_OBJECT_HANDLERS_USIZE: &[JavaObjectHandler] = &[
+    JavaObjectHandler{ 
+        name: "integer", 
+        translator_ebi_to_java: "org.processmining.ebi.objects.EbiInteger.fromEbiString", 
+        translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiInteger.toEbiString"),
+        java_class: "int" 
+    },
+];
+pub const JAVA_OBJECT_HANDLERS_FRACTION: &[JavaObjectHandler] = &[
+    JavaObjectHandler{ 
+        name: "fraction_html", 
+        translator_ebi_to_java: "org.processmining.ebi.objects.EbiFraction.fromEbiString", 
+        translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiFraction.toEbiString"), 
+        java_class: "org.processmining.framework.util.HTMLToString" 
+    },
+];
+pub const JAVA_OBJECT_HANDLERS_SVG: &[JavaObjectHandler] = &[
+    JavaObjectHandler{ 
+        name: "svg", 
+        translator_ebi_to_java: "org.processmining.ebi.objects.EbiSvg.fromEbiString",
+        translator_java_to_ebi: None,
+        java_class: "com.kitfox.svg.SVGDiagram" 
+    },
+];
+pub const JAVA_OBJECT_HANDLERS_LOGDIV: &[JavaObjectHandler] = &[
+    JavaObjectHandler{ 
+        name: "logdiv_html", 
+        translator_ebi_to_java: "org.processmining.ebi.objects.EbiLogDiv.fromEbiString", 
+        translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiLogDiv.toEbiString"), 
+        java_class: "org.processmining.framework.util.HTMLToString" 
+    },
+];
+pub const JAVA_OBJECT_HANDLERS_CONTAINSROOT: &[JavaObjectHandler] = &[
+    JavaObjectHandler{ 
+        name: "logdiv_html", 
+        translator_ebi_to_java: "org.processmining.ebi.objects.EbiContainsRoot.fromEbiString",
+        translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiContainsRoot.toEbiString"),
+        java_class: "org.processmining.framework.util.HTMLToString" 
+    },
+];
+pub const JAVA_OBJECT_HANDLERS_ROOTLOGDIV: &[JavaObjectHandler] = &[
+    JavaObjectHandler{ 
+        name: "logdiv_html",
+        translator_ebi_to_java: "org.processmining.ebi.objects.EbiRootLogDiv.fromEbiString", 
+        translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiRootLogDiv.toEbiString"), 
+        java_class: "org.processmining.framework.util.HTMLToString" 
+    },
+];

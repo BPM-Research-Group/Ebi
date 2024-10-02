@@ -4,7 +4,7 @@ use clap::{builder::ValueParser, value_parser, ArgMatches};
 
 use crate::{ebi_framework::ebi_file_handler::EbiFileHandler, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, ebi_validate, math::fraction::{Fraction, FractionNotParsedYet}, multiple_reader::MultipleReader, text::Joiner};
 
-use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_trait::{EbiTrait, FromEbiTraitObject}, importable::Importable};
+use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_trait::{EbiTrait, FromEbiTraitObject}, importable::Importable, prom_link::{JavaObjectHandler, JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE}};
 
 pub enum EbiInput {
     Trait(EbiTraitObject, &'static EbiFileHandler),
@@ -123,29 +123,36 @@ impl EbiInputType {
         result.into_iter().collect::<Vec<_>>()
     }
 
-    pub fn get_possible_inputs_with_java(traits: &[&'static EbiInputType]) -> Vec<String> {
+    pub fn get_possible_inputs_with_java(traits: &[&'static EbiInputType]) -> Vec<&'static JavaObjectHandler> {
         let mut result = HashSet::new();
 
         for input_type in traits {
             match input_type {
                 EbiInputType::Trait(t) => {
-                    result.extend(Self::show_file_handlers_java(t.get_file_handlers()));
+                    result.extend(Self::get_file_handlers_java(t.get_file_handlers()));
                 },
                 EbiInputType::Object(o) => {
-                    result.extend(Self::show_file_handlers_java(o.get_file_handlers()));
+                    result.extend(Self::get_file_handlers_java(o.get_file_handlers()));
                 },
                 EbiInputType::AnyObject => {
-                    result.extend(Self::show_file_handlers_java(EBI_FILE_HANDLERS.iter().collect()));
+                    result.extend(Self::get_file_handlers_java(EBI_FILE_HANDLERS.iter().collect()));
                 },
-                EbiInputType::String => {result.insert("org.processmining.ebi.objects.EbiString".to_string());},
-                EbiInputType::Usize => {result.insert("org.processmining.ebi.objects.EbiInteger".to_string());},
+                EbiInputType::String => {
+                    result.extend(JAVA_OBJECT_HANDLERS_STRING);
+                },
+                EbiInputType::Usize => {
+                    result.extend(JAVA_OBJECT_HANDLERS_USIZE);
+                },
                 EbiInputType::FileHandler => {
-                    let extensions: Vec<String> = EBI_FILE_HANDLERS.iter().map(|file_type| file_type.file_extension.to_string()).collect();
-                    result.insert("the file extension of any file type supported by Ebi (".to_owned() + &extensions.join_with(", ", " or ") + ")");
+                    //not supported in Java;
                 },
-                EbiInputType::Fraction => {result.insert("org.processmining.ebi.objects.EbiFraction".to_string());},
+                EbiInputType::Fraction => {
+                    result.extend(JAVA_OBJECT_HANDLERS_FRACTION);
+                },
             };
         }
+
+        result = result.into_iter().filter(|java_object_handler| java_object_handler.translator_java_to_ebi.is_some()).collect();
 
         result.into_iter().collect::<Vec<_>>()
     }
@@ -163,8 +170,8 @@ impl EbiInputType {
         file_handlers.iter().map(|file_handler| format!("\\hyperref[filehandler:{}]{{{}}}", file_handler.name, file_handler)).collect::<Vec<_>>()
     }
 
-    pub fn show_file_handlers_java(file_handlers: Vec<&'static EbiFileHandler>) -> Vec<String> {
-        file_handlers.iter().filter_map(|file_handler| file_handler.java_class_name.map(|s| s.to_string())).collect::<Vec<_>>()
+    pub fn get_file_handlers_java(file_handlers: Vec<&'static EbiFileHandler>) -> Vec<&JavaObjectHandler> {
+        file_handlers.iter().fold(vec![], |mut list, file_handler| {list.extend(file_handler.java_object_handlers); list})
     }
     
     pub fn get_applicable_commands(&self) -> BTreeSet<Vec<&'static EbiCommand>> {

@@ -25,7 +25,7 @@ pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     object_exporters: &[ 
         EbiObjectExporter::EventLog(CompressedEventLog::export_from_object)
     ], 
-    java_class_name: None,
+    java_object_handlers: &[],
 };
 
 pub struct CompressedEventLog {

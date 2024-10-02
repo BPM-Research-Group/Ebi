@@ -24,7 +24,7 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::FiniteLanguage(DeterministicFiniteAutomaton::export_from_finite_language),
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(DeterministicFiniteAutomaton::export_from_stochastic_deterministic_finite_automaton)
     ],
-    java_class_name: None,
+    java_object_handlers: &[],
 };
 
 #[derive(Debug)]

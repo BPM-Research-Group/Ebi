@@ -3,7 +3,7 @@ use anyhow::{Context, Result};
 
 use crate::math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv};
 
-use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_object::{EbiObject, EbiObjectType}, exportable::Exportable};
+use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_object::{EbiObject, EbiObjectType}, exportable::Exportable, prom_link::{JavaObjectHandler, JAVA_OBJECT_HANDLERS_CONTAINSROOT, JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV, JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_SVG, JAVA_OBJECT_HANDLERS_USIZE}};
 
 pub enum EbiOutput {
     Object(EbiObject),
@@ -171,16 +171,16 @@ impl EbiExporter {
         }
     }
 
-    pub fn get_java_class(&self) -> Option<&str> {
+    pub fn get_java_object_handlers(&self) -> &'static [JavaObjectHandler] {
         match self {
-            EbiExporter::Object(_, file_hanlder) => file_hanlder.java_class_name,
-            EbiExporter::String => Some("org.processmining.ebi.objects.EbiString"),
-            EbiExporter::SVG => Some("org.processmining.ebi.objects.EbiSvg"),
-            EbiExporter::Usize => Some("org.processmining.ebi.objects.EbiUsize"),
-            EbiExporter::Fraction => Some("org.processmining.ebi.objects.EbiFraction"),
-            EbiExporter::LogDiv => Some("org.processmining.ebi.objects.EbiLogDiv"),
-            EbiExporter::ContainsRoot => Some("org.processmining.ebi.objects.EbiContainsRoot"),
-            EbiExporter::RootLogDiv => Some("org.processmining.ebi.objects.EbiRootLogDiv"),
+            EbiExporter::Object(_, file_handler) => file_handler.java_object_handlers,
+            EbiExporter::String => JAVA_OBJECT_HANDLERS_STRING,
+            EbiExporter::SVG => JAVA_OBJECT_HANDLERS_SVG,
+            EbiExporter::Usize => JAVA_OBJECT_HANDLERS_USIZE,
+            EbiExporter::Fraction => JAVA_OBJECT_HANDLERS_FRACTION,
+            EbiExporter::LogDiv => JAVA_OBJECT_HANDLERS_LOGDIV,
+            EbiExporter::ContainsRoot => JAVA_OBJECT_HANDLERS_CONTAINSROOT,
+            EbiExporter::RootLogDiv => JAVA_OBJECT_HANDLERS_ROOTLOGDIV,
         }
     }
 
