@@ -171,7 +171,7 @@ pub fn print_classes() -> Result<EbiOutput> {
     writeln!(f, "public class EbiCommandPlugin {{\n")?;
 
     for path in EBI_COMMANDS.get_command_paths() {
-        if let Some(EbiCommand::Command { name_short, name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_typess, input_names, input_helps, execute, output_type }) = path.last() {
+        if let Some(EbiCommand::Command { explanation_short, cli_command, input_types: input_typess, output_type, .. }) = path.last() {
             writeln!(f, "\n\n// == command {} == \n", EbiCommand::path_to_string(&path))?;
 
             if cli_command.is_some() {
@@ -240,10 +240,11 @@ pub fn escape(str: String) -> String {
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct JavaObjectHandler {
-    pub name: &'static str,
-    pub translator_ebi_to_java: &'static str,
-    pub translator_java_to_ebi: Option<&'static str>,
-    pub java_class: &'static str,
+    pub name: &'static str, //name to be used in java function names to indicate the Ebi object that is being handled. Must be unique.
+    pub java_class: &'static str, //The full path of the java class to/from which the Ebi object is to be translated
+    pub translator_ebi_to_java: &'static str, //Full path of the java function that translates from a String returned by Ebi to the given java class
+    pub translator_java_to_ebi: Option<&'static str>, //Full paht of the java function that translates from the java class to a String that can be read by Ebi
+    pub input_gui: Option<&'static str>, //If not none, the given function will be called to create a gui for the user to input a value.
 }
 
 impl Display for JavaObjectHandler {
@@ -254,57 +255,64 @@ impl Display for JavaObjectHandler {
 
 pub const JAVA_OBJECT_HANDLERS_STRING: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
-        name: "string_html", 
+        name: "string", 
+        java_class: "String",
         translator_ebi_to_java: "org.processmining.ebi.objects.EbiString.fromEbiString",
         translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiString.toEbiString"),
-        java_class: "String" 
+        input_gui: Some("org.processmining.ebi.objects.EbiString.gui_input"),
     },
 ];
 pub const JAVA_OBJECT_HANDLERS_USIZE: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
         name: "integer", 
+        java_class: "int",
         translator_ebi_to_java: "org.processmining.ebi.objects.EbiInteger.fromEbiString", 
         translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiInteger.toEbiString"),
-        java_class: "int" 
+        input_gui: Some("org.processmining.ebi.objects.EbiInteger.gui_input"),
     },
 ];
 pub const JAVA_OBJECT_HANDLERS_FRACTION: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
-        name: "fraction_html", 
+        name: "fraction", 
+        java_class: "org.apache.commons.math3.fraction.BigFraction",
         translator_ebi_to_java: "org.processmining.ebi.objects.EbiFraction.fromEbiString", 
         translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiFraction.toEbiString"), 
-        java_class: "org.processmining.framework.util.HTMLToString" 
+        input_gui: Some("org.processmining.ebi.objects.EbiFraction.gui_input"),
     },
 ];
 pub const JAVA_OBJECT_HANDLERS_SVG: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
         name: "svg", 
+        java_class: "com.kitfox.svg.SVGDiagram",
         translator_ebi_to_java: "org.processmining.ebi.objects.EbiSvg.fromEbiString",
         translator_java_to_ebi: None,
-        java_class: "com.kitfox.svg.SVGDiagram" 
+        input_gui: None
     },
 ];
 pub const JAVA_OBJECT_HANDLERS_LOGDIV: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
         name: "logdiv_html", 
+        java_class: "org.processmining.framework.util.HTMLToString",
         translator_ebi_to_java: "org.processmining.ebi.objects.EbiLogDiv.fromEbiString", 
-        translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiLogDiv.toEbiString"), 
-        java_class: "org.processmining.framework.util.HTMLToString" 
+        translator_java_to_ebi: None, 
+        input_gui: None,
     },
 ];
 pub const JAVA_OBJECT_HANDLERS_CONTAINSROOT: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
-        name: "logdiv_html", 
+        name: "containsroot_html", 
+        java_class: "org.processmining.framework.util.HTMLToString",
         translator_ebi_to_java: "org.processmining.ebi.objects.EbiContainsRoot.fromEbiString",
-        translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiContainsRoot.toEbiString"),
-        java_class: "org.processmining.framework.util.HTMLToString" 
+        translator_java_to_ebi: None,
+        input_gui: None,
     },
 ];
 pub const JAVA_OBJECT_HANDLERS_ROOTLOGDIV: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
         name: "logdiv_html",
+        java_class: "org.processmining.framework.util.HTMLToString",
         translator_ebi_to_java: "org.processmining.ebi.objects.EbiRootLogDiv.fromEbiString", 
-        translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiRootLogDiv.toEbiString"), 
-        java_class: "org.processmining.framework.util.HTMLToString" 
+        translator_java_to_ebi: None, 
+        input_gui: None
     },
 ];
