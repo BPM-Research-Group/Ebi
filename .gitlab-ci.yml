@@ -28,9 +28,11 @@ buildlatex:
     - git add build/nightly/manual.pdf
 
     - mv target/x86_64-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-x86_64-windows.exe
+    - mv target/x86_64-pc-windows-gnu/release/ebi.dll build/nightly/Ebi-x86_64-windows.dll
     - git add build/nightly/Ebi-x86_64-windows.exe
 
     - mv target/x86_64-unknown-linux-gnu/release/ebi build/nightly/Ebi-x86_64-linux
+    - mv target/x86_64-unknown-linux-gnu/release/libebi.so build/nightly/Ebi-x86_64-linux.so
     - git add build/nightly/Ebi-x86_64-linux
 
     - git commit -m "Automatically triggered compilation [skip ci]"

@@ -5,7 +5,7 @@ edition = "2021"
 
 [lib]
 name = "ebi"
-crate_type = ["cdylib", "lib"]
+crate-type = ["cdylib", "lib"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

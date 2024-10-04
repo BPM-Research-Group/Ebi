@@ -22,8 +22,10 @@ use super::ebi_file_handler::EBI_FILE_HANDLERS;
 use super::ebi_output::EbiOutput;
 use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiInputType}, ebi_output::{self}};
 
-// This keeps Rust from "mangling" the name and making it unique for this
-// crate.
+//command line to push Ebi to the Java project:
+// cargo build ; cp target/debug/libebi.so ~/eclipse-workspace/Ebi/lib/
+
+// This keeps Rust from "mangling" the name and making it unique for this crate.
 #[no_mangle]
 pub extern "system" fn Java_org_processmining_ebi_CallEbi_call_1ebi_1internal<'local>(mut env: JNIEnv<'local>,
 // This is the class that owns our static method. It's not going to be used,
@@ -199,7 +201,7 @@ pub fn print_java_plugins() -> Result<EbiOutput> {
 
                             let inputs_java_object_handler_without_gui = inputs_java_object_handler.iter().filter(|java_object_handler| java_object_handler.input_gui.is_none()).collect::<Vec<_>>();
                             let inputs_java_object_handler_with_gui = inputs_java_object_handler.iter().enumerate().filter_map(|(i, java_object_handler)| if java_object_handler.input_gui.is_some() {Some((i,java_object_handler))} else {None}).collect::<Vec<_>>();
-                            let java_plugin_inputs = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!(", {} input_{}", input.java_class, i)).join("");
+                            // let java_plugin_inputs = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!(", {} input_{}", input.java_class, i)).join("");
                             let java_plugin_inputs_without_gui = inputs_java_object_handler_without_gui.iter().enumerate().map(|(i, input)| format!(", {} input_{}", input.java_class, i)).join("");
                             let command = EbiCommand::path_to_string(&path);
                             let output_extension = exporter.get_extension();
