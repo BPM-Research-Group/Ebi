@@ -256,7 +256,7 @@ pub fn escape_code(str: String) -> String {
 }
 
 pub fn escape_string(str: &str) -> String {
-    str.replace("\"", "\\\"").replace("-", "_")
+    str.replace("\"", "\\\"")
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
