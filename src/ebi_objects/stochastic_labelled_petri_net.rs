@@ -48,8 +48,8 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[
         JavaObjectHandler{ 
             name: "StochasticLabelledPetriNet", 
-            translator_ebi_to_java: "org.processmining.ebi.objects.EbiStochasticLabelledPetriNet.EbiLabelledPetriNet2LabelledPetriNet", 
-            translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiStochasticLabelledPetriNet.LabelledPetriNet2EbiLabelledPetriNet"),
+            translator_ebi_to_java: "org.processmining.ebi.objects.EbiStochasticLabelledPetriNet.EbiString2StochasticLabelledPetriNet", 
+            translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiStochasticLabelledPetriNet.StochasticLabelledPetriNet2EbiString"),
             java_class: "org.processmining.stochasticlabelledpetrinets.StochasticLabelledPetriNet",
             input_gui: None,
         },

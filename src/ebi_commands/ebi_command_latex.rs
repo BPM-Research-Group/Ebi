@@ -60,7 +60,7 @@ pub const EBI_LATEX_JAVA: EbiCommand = EbiCommand::Command {
     input_types: &[], 
     input_names: &[],
     input_helps: &[],
-    execute: |_, _| Ok(prom_link::print_classes()?), 
+    execute: |_, _| Ok(prom_link::print_java_plugins()?), 
     output_type: &EbiOutputType::String
 };
 
