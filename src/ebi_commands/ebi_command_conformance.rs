@@ -1,6 +1,6 @@
 use anyhow::{Context, anyhow};
 
-use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::EbiTraitObject, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, techniques::{entropic_relevance::EntropicRelvance, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::EbiTraitObject, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, techniques::{entropic_relevance::EntropicRelvance, hellinger_stochastic_conformance::HellingerStochasticConformance, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 use super::ebi_command_sample::{self, SAMPLED_OBJECT_INPUTS};
 
 pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group { 
@@ -11,6 +11,7 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
     children: &[
         &CONFORMANCE_ER,
         &CONFORMANCE_JSSC,
+        &CONFORMANCE_HELLINGER,
         &CONFORMANCE_JSSC_SAMPLE,
         &CONFORMANCE_UEMSC,
     ]
@@ -151,6 +152,36 @@ pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
         }
     },
     output: &EbiOutputType::RootLogDiv 
+};
+
+pub const CONFORMANCE_HELLINGER: EbiCommand = EbiCommand::Command { 
+    name_short: "hsc", 
+    name_long: Some("hellingersc"), 
+    explanation_short: "Compute Hellinger stochastic conformance.", 
+    explanation_long: None, 
+    latex_link: None, 
+    cli_command: None, 
+    exact_arithmetic: false, 
+    input_types: &[ 
+        &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)], 
+        &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)] 
+    ], 
+    input_names: &["FILE_1", "FILE_2"], 
+    input_helps: &["A finite stochastic language to compare.", "A queriable stochastic language to compare."],
+    execute: |mut inputs, _| {
+        let event_log = inputs.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+
+        match inputs.remove(0) {            
+            EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => {
+                Ok(EbiOutput::Fraction(event_log.hsc_log2log(slang).context("Compute Hellinger stochastic conformance.")?))
+            },
+            EbiInput::Trait(EbiTraitObject::QueriableStochasticLanguage(slang), _) => {
+                Ok(EbiOutput::Fraction(event_log.hsc_log2model(slang).context("Compute Hellinger stochastic conformance.")?))
+            }
+            _ => Err(anyhow!("wrong input given"))
+        }
+    },
+    output: &EbiOutputType::Fraction 
 };
 
 pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command { 

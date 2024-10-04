@@ -77,6 +77,7 @@ pub mod techniques {
     pub mod probabilistic_queries;
     pub mod completeness;
     pub mod jensen_shannon_stochastic_conformance;
+    pub mod hellinger_stochastic_conformance;
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
     pub mod entropic_relevance;
