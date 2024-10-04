@@ -14,9 +14,11 @@ use jni::objects::{JClass, JObjectArray, JString};
 // lifetime checker won't let us.
 use jni::sys::jstring;
 use anyhow::{anyhow, Context, Result};
+use strum::IntoEnumIterator;
 
 use crate::{math::fraction::FractionNotParsedYet, multiple_reader::MultipleReader};
 
+use super::ebi_file_handler::EBI_FILE_HANDLERS;
 use super::ebi_output::EbiOutput;
 use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiInputType}, ebi_output::{self}};
 
@@ -184,83 +186,119 @@ pub fn print_java_plugins() -> Result<EbiOutput> {
             for exporter in  output_type.get_exporters() {
 
                 //function name
-                let java_function_name = escape_code(EbiCommand::path_to_string(&path));
+                let ebi_function_name = escape_code(EbiCommand::path_to_string(&path));
                 let java_exporter_name = escape_code(exporter.get_name().to_string());
 
                 //output
                 for output_java_object_handler in exporter.get_java_object_handlers() {
+                    if let Some(output_translator) = output_java_object_handler.translator_ebi_to_java {
 
-                    //inputs (create one function for each combination of inputs in the cartesian product)
-                    let input_typesss = input_typess.iter().map(|arr| EbiInputType::get_possible_inputs_with_java(arr)).collect::<Vec<_>>();
-                    for inputs_java_object_handler in input_typesss.iter().multi_cartesian_product()  {
+                        //inputs (create one function for each combination of inputs in the cartesian product)
+                        let input_typesss = input_typess.iter().map(|arr| EbiInputType::get_possible_inputs_with_java(arr)).collect::<Vec<_>>();
+                        for inputs_java_object_handler in input_typesss.iter().multi_cartesian_product()  {
 
-                        let inputs_java_object_handler_without_gui = inputs_java_object_handler.iter().filter(|java_object_handler| java_object_handler.input_gui.is_none()).collect::<Vec<_>>();
-                        let inputs_java_object_handler_with_gui = inputs_java_object_handler.iter().enumerate().filter_map(|(i, java_object_handler)| if java_object_handler.input_gui.is_some() {Some((i,java_object_handler))} else {None}).collect::<Vec<_>>();
-                        let java_plugin_inputs = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!(", {} input_{}", input.java_class, i)).join("");
-                        let java_plugin_inputs_without_gui = inputs_java_object_handler_without_gui.iter().enumerate().map(|(i, input)| format!(", {} input_{}", input.java_class, i)).join("");
-                        let command = EbiCommand::path_to_string(&path);
-                        let output_extension = exporter.get_extension();
-                        let java_function_name = format!("{}__as__{}__to__{}", java_function_name, java_exporter_name, output_java_object_handler.name);
-                        let java_plugin_name = format!("prom_{}", java_function_name);
-                        let has_gui = inputs_java_object_handler.iter().any(|java_object_handler| java_object_handler.input_gui.is_some());
-                        let mut parameterlabels = inputs_java_object_handler_without_gui.iter().map(|java_object_handler| escape_string(java_object_handler.name));
+                            let inputs_java_object_handler_without_gui = inputs_java_object_handler.iter().filter(|java_object_handler| java_object_handler.input_gui.is_none()).collect::<Vec<_>>();
+                            let inputs_java_object_handler_with_gui = inputs_java_object_handler.iter().enumerate().filter_map(|(i, java_object_handler)| if java_object_handler.input_gui.is_some() {Some((i,java_object_handler))} else {None}).collect::<Vec<_>>();
+                            let java_plugin_inputs = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!(", {} input_{}", input.java_class, i)).join("");
+                            let java_plugin_inputs_without_gui = inputs_java_object_handler_without_gui.iter().enumerate().map(|(i, input)| format!(", {} input_{}", input.java_class, i)).join("");
+                            let command = EbiCommand::path_to_string(&path);
+                            let output_extension = exporter.get_extension();
+                            let has_gui = inputs_java_object_handler.iter().any(|java_object_handler| java_object_handler.input_gui.is_some());
+                            let mut parameterlabels = inputs_java_object_handler_without_gui.iter().map(|java_object_handler| escape_string(java_object_handler.name));
 
-                        //create function
-                        let java_function_inputs = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!(", {} input_{}", input.java_class, i)).join("");
-                        writeln!(f, "\tpublic static {} {}(PluginContext context{}) throws Exception {{", output_java_object_handler.java_class, java_function_name, java_function_inputs)?;
-                        let inputs_in_function = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!("{}(context, input_{})", input.translator_java_to_ebi.unwrap(), i)).join(", ");
-                        writeln!(f, "\t\tString result = CallEbi.call_ebi(\"{}\", \".{}\", new String[] {{{}}});", command, output_extension, inputs_in_function)?;
-                        writeln!(f, "\t\treturn {}(context, result);", output_java_object_handler.translator_ebi_to_java)?;
-                        writeln!(f, "\t}}\n")?;
+                            //create function
+                            let java_function_name = format!("{}__as__{}__to__{}", ebi_function_name, java_exporter_name, output_java_object_handler.name);
+                            let java_function_inputs = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!(", {} input_{}", input.java_class, i)).join("");
+                            writeln!(f, "\tpublic static {} {}(PluginContext context{}) throws Exception {{", output_java_object_handler.java_class, java_function_name, java_function_inputs)?;
 
-                        //create ProM plug-in
-                        writeln!(f, "\t@Plugin(")?;
-                        
-                        let abbreviated_inputs_without_gui = inputs_java_object_handler_without_gui.iter().map(|java_object_handler| java_object_handler.name).collect::<Vec<_>>();
-                        writeln!(f, "\t\tname = \"{} (input: {}; output: {})\",", escape_string(explanation_short), escape_string(&abbreviated_inputs_without_gui.join(", ")), escape_string(output_java_object_handler.name))?;
-                        writeln!(f, "\t\tlevel = PluginLevel.PeerReviewed, ")?;
-                        writeln!(f, "\t\treturnLabels = {{ \"{}\" }}, ", escape_string(output_java_object_handler.name))?;
-                        writeln!(f, "\t\treturnTypes = {{ {}.class }},", output_java_object_handler.java_class)?;
-                        writeln!(f, "\t\tparameterLabels = {{ \"{}\" }},", parameterlabels.join("\", \""))?;
-                        writeln!(f, "\t\tuserAccessible = true,")?;
-                        writeln!(f, "\t\tcategories = {{ PluginCategory.Discovery, PluginCategory.Analytics, PluginCategory.ConformanceChecking }},")?;
-                        writeln!(f, "\t\thelp = \"{} (calls Ebi)\"", path.last().unwrap().explanation_long())?;
-                        writeln!(f, "\t)")?;
-                        writeln!(f, "\t@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)")?;
-                        writeln!(f, "\t@PluginVariant(variantLabel = \"Call Ebi\", requiredParameterLabels = {{ {} }})", (0..inputs_java_object_handler_without_gui.len()).join(", "))?;
-                        if !has_gui {
-                            //non-gui plug-in
-                            writeln!(f, "\tpublic {} {}(PluginContext context{}) throws Exception {{", output_java_object_handler.java_class, java_plugin_name, java_plugin_inputs_without_gui)?;
-                        } else {
-                            //gui plug-in
-                            writeln!(f, "\tpublic {} {}(UIPluginContext context{}) throws Exception {{", output_java_object_handler.java_class, java_plugin_name, java_plugin_inputs_without_gui)?; 
-                            writeln!(f, "\t\tEbiDialog dialog = new EbiDialog();")?;
-                            for (i, java_object_handler) in &inputs_java_object_handler_with_gui {
-                                writeln!(f, "\t\tdialog.add_input({}(\"{}\"));", java_object_handler.input_gui.unwrap(), escape_string(input_helps[*i]))?;
+                            //function body
+                            let inputs_in_function = inputs_java_object_handler.iter().enumerate().map(|(i, input)| format!("{}(context, input_{})", input.translator_java_to_ebi.unwrap(), i)).join(", ");
+                            writeln!(f, "\t\tString result = CallEbi.call_ebi(\"{}\", \".{}\", new String[] {{{}}});", command, output_extension, inputs_in_function)?;
+                            writeln!(f, "\t\treturn {}(context, result);", output_translator)?;
+                            writeln!(f, "\t}}\n")?;
+
+                            //create ProM plug-in
+                            writeln!(f, "\t@Plugin(")?;
+                            let java_plugin_name = format!("prom_{}", java_function_name);
+                            let abbreviated_inputs_without_gui = inputs_java_object_handler_without_gui.iter().map(|java_object_handler| java_object_handler.name).collect::<Vec<_>>();
+                            writeln!(f, "\t\tname = \"{} (input: {}; output: {})\",", escape_string(explanation_short), escape_string(&abbreviated_inputs_without_gui.join(", ")), escape_string(output_java_object_handler.name))?;
+                            writeln!(f, "\t\tlevel = PluginLevel.PeerReviewed, ")?;
+                            writeln!(f, "\t\treturnLabels = {{ \"{}\" }}, ", escape_string(output_java_object_handler.name))?;
+                            writeln!(f, "\t\treturnTypes = {{ {}.class }},", output_java_object_handler.java_class)?;
+                            writeln!(f, "\t\tparameterLabels = {{ \"{}\" }},", parameterlabels.join("\", \""))?;
+                            writeln!(f, "\t\tuserAccessible = true,")?;
+                            writeln!(f, "\t\tcategories = {{ PluginCategory.Discovery, PluginCategory.Analytics, PluginCategory.ConformanceChecking }},")?;
+                            writeln!(f, "\t\thelp = \"{} (calls Ebi)\"", path.last().unwrap().explanation_long())?;
+                            writeln!(f, "\t)")?;
+                            writeln!(f, "\t@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)")?;
+                            writeln!(f, "\t@PluginVariant(variantLabel = \"Call Ebi\", requiredParameterLabels = {{ {} }})", (0..inputs_java_object_handler_without_gui.len()).join(", "))?;
+                            if !has_gui {
+                                //non-gui plug-in
+                                writeln!(f, "\tpublic {} {}(PluginContext context{}) throws Exception {{", output_java_object_handler.java_class, java_plugin_name, java_plugin_inputs_without_gui)?;
+                            } else {
+                                //gui plug-in
+                                writeln!(f, "\tpublic {} {}(UIPluginContext context{}) throws Exception {{", output_java_object_handler.java_class, java_plugin_name, java_plugin_inputs_without_gui)?; 
+                                writeln!(f, "\t\tEbiDialog dialog = new EbiDialog();")?;
+                                for (i, java_object_handler) in &inputs_java_object_handler_with_gui {
+                                    writeln!(f, "\t\tdialog.add_input({}(\"{}\"));", java_object_handler.input_gui.unwrap(), escape_string(input_helps[*i]))?;
+                                }
+                                writeln!(f, "\t\tInteractionResult result = context.showWizard(\"{}\", true, true, dialog);\n", escape_string(explanation_short))?;
+                                writeln!(f, "\t\tif (result != InteractionResult.FINISHED) {{")?;
+                                writeln!(f, "\t\t\tcontext.getFutureResult(0).cancel(false);")?;
+                                writeln!(f, "\t\t\treturn null;")?;
+                                writeln!(f, "}}")?;
+
+                                for (j, (i, java_object_handler)) in inputs_java_object_handler_with_gui.iter().enumerate() {
+                                    writeln!(f, "\t\t{} input_{} = dialog.get_parameter_{}({});", java_object_handler.java_class, i, escape_code(java_object_handler.java_class.to_string()), j)?;
+                                }
                             }
-                            writeln!(f, "\t\tInteractionResult result = context.showWizard(\"{}\", true, true, dialog);\n", escape_string(explanation_short))?;
-                            writeln!(f, "\t\tif (result != InteractionResult.FINISHED) {{")?;
-                            writeln!(f, "\t\t\tcontext.getFutureResult(0).cancel(false);")?;
-                            writeln!(f, "\t\t\treturn null;")?;
-                            writeln!(f, "}}")?;
 
-                            for (j, (i, java_object_handler)) in inputs_java_object_handler_with_gui.iter().enumerate() {
-                                writeln!(f, "\t\t{} input_{} = dialog.get_parameter_{}({});", java_object_handler.java_class, i, escape_code(java_object_handler.java_class.to_string()), j)?;
-                            }
+                            let inputs_to_call_function = (0..inputs_java_object_handler.len()).map(|i| format!(", input_{}", i)).join("");
+                            writeln!(f, "\t\treturn {}(context{});", java_function_name, inputs_to_call_function)?;
+                            writeln!(f, "\t}}\n")?;
                         }
-
-                        let inputs_to_call_function = (0..inputs_java_object_handler.len()).map(|i| format!(", input_{}", i)).join("");
-                        writeln!(f, "\t\treturn {}(context{});", java_function_name, inputs_to_call_function)?;
-                        writeln!(f, "\t}}\n")?;
                     }
                 }
             }
         }
     }
 
+    //It is important that every function declared in Rust is implemented in Java, even if it is not actually used (yet).
+    //Therefore, we add a function that is never called but nevertheless has every java_objec_handler interface in it.
+    //Then, the Java compiler will complain, rather than the error showing during testing or at runtime.
+    writeln!(f, "@SuppressWarnings(\"unused\")")?;
+    writeln!(f, "\n\tprivate static void call_every_ebi_to_java_translator(PluginContext context) throws Exception {{")?;
+    for file_handler in EBI_FILE_HANDLERS {
+        for java_object_handler in file_handler.java_object_handlers {
+            java_compiler_trigger(&mut f, java_object_handler)?;
+        }
+    }
+    for input_type in EbiInputType::iter() {
+        for java_object_handler in input_type.get_java_object_handlers() {
+            java_compiler_trigger(&mut f, java_object_handler)?;
+        }
+    }
+    writeln!(f, "\t}}\n")?;
+
     writeln!(f, "}}")?;
 
     Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
+}
+
+fn java_compiler_trigger(f: &mut Vec<u8>, java_object_handler: &JavaObjectHandler) -> Result<()> {
+    writeln!(f, "\t\t{{")?;
+
+    if let Some(translator_ebi_to_java) = java_object_handler.translator_ebi_to_java {
+        writeln!(f, "\t\t\t{} input = {}(context, \"\");", java_object_handler.java_class, translator_ebi_to_java)?;
+    } else {
+        writeln!(f, "\t\t\t{} input = null;", java_object_handler.java_class)?;
+    }
+
+    if let Some(translator_java_to_ebi) = java_object_handler.translator_java_to_ebi {
+        writeln!(f, "\t\t\t{}(context, input);", translator_java_to_ebi)?;
+    }
+
+    Ok(writeln!(f, "\t\t}}")?)
 }
 
 pub fn escape_code(str: String) -> String {
@@ -271,11 +309,11 @@ pub fn escape_string(str: &str) -> String {
     str.replace("\"", "\\\"")
 }
 
-#[derive(Debug, PartialEq, Eq, Hash)]
+#[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct JavaObjectHandler {
     pub name: &'static str, //name to be used in java function names to indicate the Ebi object that is being handled. Must be unique.
     pub java_class: &'static str, //The full path of the java class to/from which the Ebi object is to be translated
-    pub translator_ebi_to_java: &'static str, //Full path of the java function that translates from a String returned by Ebi to the given java class
+    pub translator_ebi_to_java: Option<&'static str>, //Full path of the java function that translates from a String returned by Ebi to the given java class
     pub translator_java_to_ebi: Option<&'static str>, //Full paht of the java function that translates from the java class to a String that can be read by Ebi
     pub input_gui: Option<&'static str>, //If not none, the given function will be called to create a gui for the user to input a value.
 }
@@ -290,16 +328,16 @@ pub const JAVA_OBJECT_HANDLERS_STRING: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
         name: "string", 
         java_class: "String",
-        translator_ebi_to_java: "org.processmining.ebi.objects.EbiString.fromEbiString",
+        translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiString.fromEbiString"),
         translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiString.toEbiString"),
         input_gui: Some("org.processmining.ebi.objects.EbiString.create_input_panel"),
     },
 ];
 pub const JAVA_OBJECT_HANDLERS_USIZE: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
-        name: "integer", 
-        java_class: "int",
-        translator_ebi_to_java: "org.processmining.ebi.objects.EbiInteger.fromEbiString", 
+        name: "usize", 
+        java_class: "Integer",
+        translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiInteger.fromEbiString"), 
         translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiInteger.toEbiString"),
         input_gui: Some("org.processmining.ebi.objects.EbiInteger.create_input_panel"),
     },
@@ -308,7 +346,7 @@ pub const JAVA_OBJECT_HANDLERS_FRACTION: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
         name: "fraction", 
         java_class: "org.apache.commons.math3.fraction.BigFraction",
-        translator_ebi_to_java: "org.processmining.ebi.objects.EbiFraction.fromEbiString", 
+        translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiFraction.fromEbiString"), 
         translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiFraction.toEbiString"), 
         input_gui: Some("org.processmining.ebi.objects.EbiFraction.create_input_panel"),
     },
@@ -317,16 +355,16 @@ pub const JAVA_OBJECT_HANDLERS_SVG: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
         name: "svg", 
         java_class: "com.kitfox.svg.SVGDiagram",
-        translator_ebi_to_java: "org.processmining.ebi.objects.EbiSvg.fromEbiString",
+        translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiSvg.fromEbiString"),
         translator_java_to_ebi: None,
         input_gui: None
     },
 ];
 pub const JAVA_OBJECT_HANDLERS_LOGDIV: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
-        name: "logdiv_html", 
-        java_class: "org.processmining.framework.util.HTMLToString",
-        translator_ebi_to_java: "org.processmining.ebi.objects.EbiLogDiv.fromEbiString", 
+        name: "logdiv", 
+        java_class: "org.processmining.ebi.objects.EbiLogDiv",
+        translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiLogDiv.fromEbiString"), 
         translator_java_to_ebi: None, 
         input_gui: None,
     },
@@ -335,16 +373,16 @@ pub const JAVA_OBJECT_HANDLERS_CONTAINSROOT: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
         name: "containsroot_html", 
         java_class: "org.processmining.framework.util.HTMLToString",
-        translator_ebi_to_java: "org.processmining.ebi.objects.EbiContainsRoot.fromEbiString",
+        translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiContainsRoot.fromEbiString"),
         translator_java_to_ebi: None,
         input_gui: None,
     },
 ];
 pub const JAVA_OBJECT_HANDLERS_ROOTLOGDIV: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
-        name: "logdiv_html",
+        name: "rootlogdiv",
         java_class: "org.processmining.framework.util.HTMLToString",
-        translator_ebi_to_java: "org.processmining.ebi.objects.EbiRootLogDiv.fromEbiString", 
+        translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiRootLogDiv.fromEbiString"), 
         translator_java_to_ebi: None, 
         input_gui: None
     },

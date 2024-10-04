@@ -4,9 +4,9 @@ use strum_macros::EnumIter;
 
 use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_input::{EbiInput, EbiInputType}};
 
-#[derive(Clone, Copy, PartialEq, Eq, EnumIter, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, EnumIter, Hash, Default)]
 pub enum EbiTrait {
-    EventLog,
+    #[default] EventLog,
     FiniteLanguage,
     FiniteStochasticLanguage,
     IterableLanguage,

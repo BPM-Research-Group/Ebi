@@ -31,8 +31,8 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[ 
         JavaObjectHandler{ 
             name: "XLog", 
-            translator_ebi_to_java: "org.processmining.ebi.objects.EbiEventLog.EbiEventLogToXLog", 
-            translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiEventLog.XLogToEbiEventLog"),
+            translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiEventLog.EbiStringToXLog"), 
+            translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiEventLog.XLogToEbiString"),
             java_class: "org.deckfour.xes.model.XLog",
             input_gui: None,
         },
