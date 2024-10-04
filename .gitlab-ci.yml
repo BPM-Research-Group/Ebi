@@ -37,8 +37,3 @@ buildlatex:
 
     - git commit -m "Automatically triggered compilation [skip ci]"
     - git push -f https://ci_token:$ACCESS_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main
-  artifacts:
-    expose_as: 'manual'
-    name: "manual"
-    paths:
-      - manual/manual.pdf
