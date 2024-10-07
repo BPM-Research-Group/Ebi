@@ -23,7 +23,7 @@ use super::ebi_output::EbiOutput;
 use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiInputType}, ebi_output::{self}};
 
 //command line to push Ebi to the Java project:
-// cargo build ; cp target/debug/libebi.so ~/eclipse-workspace/Ebi/lib/
+// cargo build ; cp target/debug/libebi.so ~/eclipse-workspace/Ebi/lib/ ; cargo run latex java -o ~/eclipse-workspace/Ebi/src/org/processmining/ebi/plugins/EbiPlugins.java 
 
 // This keeps Rust from "mangling" the name and making it unique for this crate.
 #[no_mangle]
@@ -44,13 +44,16 @@ pub extern "system" fn Java_org_processmining_ebi_CallEbi_call_1ebi_1internal<'l
         let jstring = env.get_object_array_element(&inputs, i).expect("Could not get Java array element.");
         let jstring = JString::from(jstring);
         let string: String  = unsafe { env.get_string_unchecked(&jstring).expect("Could not read Java string.").into() };
+        println!("=== Ebi received\n{}", string);
         inputss.push(string);
     }
     
-    let output = env.new_string(match handle_prom_request(command_name, output_format, inputss) {
+    let output_ebi = match handle_prom_request(command_name, output_format, inputss) {
         Ok(result) => result,
         Err(err) => "Ebi: error: ".to_string() + &err.to_string(),
-    }).expect("Couldn't create java string!");
+    };
+    println!("== Ebi sends\n{}", output_ebi);
+    let output = env.new_string(output_ebi).expect("Couldn't create java string!");
 
     // Finally, extract the raw pointer to return.
     output.into_raw()

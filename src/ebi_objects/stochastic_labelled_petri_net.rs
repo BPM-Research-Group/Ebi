@@ -50,7 +50,7 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
             name: "StochasticLabelledPetriNet", 
             translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiStochasticLabelledPetriNet.EbiString2StochasticLabelledPetriNet"), 
             translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiStochasticLabelledPetriNet.StochasticLabelledPetriNet2EbiString"),
-            java_class: "org.processmining.stochasticlabelledpetrinets.StochasticLabelledPetriNet",
+            java_class: "org.processmining.stochasticlabelledpetrinets.StochasticLabelledPetriNetSimpleWeights",
             input_gui: None,
         },
     ],
