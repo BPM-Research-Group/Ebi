@@ -31,7 +31,7 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
         JavaObjectHandler{ 
             name: "PetriNet", 
             translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiLabelledPetriNet.EbiString2Petrinet"), 
-            translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiLabelledPetriNet.PetriNet2EbiString"),
+            translator_java_to_ebi: None, //Some("org.processmining.ebi.objects.EbiLabelledPetriNet.PetriNet2EbiString"),
             java_class: "org.processmining.models.graphbased.directed.petrinet.Petrinet",
             input_gui: None,
         },
