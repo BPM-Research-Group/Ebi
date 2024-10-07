@@ -166,7 +166,7 @@ pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
         SAMPLED_OBJECT_INPUTS,
         &[ &EbiInputType::Usize ] 
     ], 
-    input_names: &["FILE_1", "FILE_2","NUMBER_OF_TRACES"], 
+    input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"], 
     input_helps: &["A queriable stochastic language to compare.", "A queriable stochastic language to compare.","Number of traces to sample."],
     execute: |mut inputs, _| {
         let object1 = inputs.remove(0);
