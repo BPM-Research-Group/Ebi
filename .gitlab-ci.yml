@@ -56,5 +56,15 @@ buildlatex:
     - cd ../../..
     - git add build/prom-rust/Rust-6.15.2-win32.zip
 
+    - cargo build --target i686-unknown-linux-gnu --release
+    - mv target/i686-unknown-linux-gnu/release/ebi build/nightly/Ebi-i686-linux
+    - git add build/nightly/Ebi-i686-linux
+    - cd target/i686-unknown-linux-gnu/release
+    - mkdir -p lib
+    - mv libebi.so lib/ 
+    - zip ../../../build/prom-rust/Rust-6.15.2-lin32.zip lib/libebi.so
+    - cd ../../..
+    - git add build/prom-rust/Rust-6.15.2-lin32.zip
+
     - git commit -m "Automatically triggered compilation [skip ci]"
     - git push -f https://ci_token:$ACCESS_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main
