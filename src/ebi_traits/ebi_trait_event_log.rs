@@ -1,6 +1,6 @@
 use std::{borrow::Borrow, collections::HashMap, fmt::{Debug, Display}, hash::Hash};
 use anyhow::{anyhow, Result};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, FixedOffset};
 use process_mining::event_log::{AttributeValue, XESEditableAttribute};
 
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::event_log::DataType, math::fraction::Fraction};
@@ -157,11 +157,11 @@ impl dyn EbiTraitEventLog {
         None
     }
     
-    pub fn get_trace_attribute_time(&self, trace_index: usize, case_attribute: &String) -> Option<(DateTime<Utc>, Vec<Activity>)> {
+    pub fn get_trace_attribute_time(&self, trace_index: usize, case_attribute: &String) -> Option<(DateTime<FixedOffset>, Vec<Activity>)> {
         if let Some(attribute) = self.get_log().traces[trace_index].attributes.get_by_key(case_attribute) {
             match &attribute.value {
                 AttributeValue::String(x) => {
-                    return Some((x.parse::<DateTime<Utc>>().expect("this should not fail"), self.get_trace(trace_index)?.to_owned()));
+                    return Some((x.parse::<DateTime<FixedOffset>>().expect("this should not fail"), self.get_trace(trace_index)?.to_owned()));
                 },
                 AttributeValue::Date(x) => {
                     return Some((*x,  self.get_trace(trace_index)?.to_owned()))

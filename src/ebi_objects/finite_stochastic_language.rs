@@ -28,6 +28,7 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::FiniteStochasticLanguage(FiniteStochasticLanguage::export_from_object),
         EbiObjectExporter::EventLog(FiniteStochasticLanguage::export_from_event_log),
     ],
+    java_object_handlers: &[],
 };
 
 #[derive(Clone,Debug)]

@@ -32,7 +32,7 @@ pub const EBI_DISCOVER_ALIGNMENTS: EbiCommand = EbiCommand::Command {
         let lpn = inputs.remove(0).to_type::<LabelledPetriNet>()?;
         Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(lpn.mine_stochastic_alignment(language)?)))
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet)
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet)
 };
 
 pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Command { 
@@ -54,7 +54,7 @@ pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Command {
         let lpn = inputs.remove(0).to_type::<LabelledPetriNet>()?;
         Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(lpn.mine_occurrences_stochastic(language))))
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet)
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet)
 };
 
 pub const EBI_DISCOVER_UNIFORM: EbiCommand = EbiCommand::Command { 
@@ -74,5 +74,5 @@ pub const EBI_DISCOVER_UNIFORM: EbiCommand = EbiCommand::Command {
         let lpn = inputs.remove(0).to_type::<LabelledPetriNet>()?;
         Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(lpn.mine_uniform_stochastic())))
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet)
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet)
 };

@@ -3,7 +3,7 @@ use anyhow::{anyhow, Context, Error, Ok, Result};
 use bitvec::vec::BitVec;
 use layout::topo::layout::VisualGraph;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, displayable::Displayable, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader, marking::Marking};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, displayable::Displayable, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader, marking::Marking};
 
 use super::stochastic_labelled_petri_net::StochasticLabelledPetriNet;
 
@@ -26,6 +26,22 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::StochasticLabelledPetriNet(LabelledPetriNet::export_from_stochastic_labelled_petri_net),
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(LabelledPetriNet::export_from_stochastic_deterministic_finite_automaton),
         EbiObjectExporter::DirectlyFollowsModel(LabelledPetriNet::export_from_directly_follows_model),
+    ],
+    java_object_handlers: &[
+        JavaObjectHandler{ 
+            name: "PetriNet", 
+            translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiLabelledPetriNet.EbiString2Petrinet"), 
+            translator_java_to_ebi: None, //Some("org.processmining.ebi.objects.EbiLabelledPetriNet.PetriNet2EbiString"),
+            java_class: "org.processmining.models.graphbased.directed.petrinet.Petrinet",
+            input_gui: None,
+        },
+        JavaObjectHandler{ 
+            name: "AcceptingPetriNet", 
+            translator_ebi_to_java: None,
+            translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiLabelledPetriNet.AcceptingPetriNet2EbiString"), 
+            java_class: "org.processmining.acceptingpetrinet.models.AcceptingPetriNet",
+            input_gui: None,
+        }
     ],
 };
 

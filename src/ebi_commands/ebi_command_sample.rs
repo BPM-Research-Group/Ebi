@@ -37,5 +37,5 @@ pub const EBI_SAMPLE: EbiCommand = EbiCommand::Command {
         let result: FiniteStochasticLanguage = get_sampled_object(object, *number_of_traces)?;
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     },
-    output: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage),
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage),
 };

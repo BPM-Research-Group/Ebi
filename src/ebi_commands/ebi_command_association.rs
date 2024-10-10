@@ -37,13 +37,13 @@ pub const ASSOCIATION_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     execute: |mut inputs, cli_matches| {
         let mut event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         let attribute = inputs.remove(0).to_type::<String>()?;
-        let number_of_samples = cli_matches.get_one::<usize>("samples").unwrap();
+        let number_of_samples = cli_matches.unwrap().get_one::<usize>("samples").unwrap();
 
         let ass = event_log.association(*number_of_samples, &attribute).with_context(|| format!("attribute {}", attribute))?;
 
         Ok(EbiOutput::ContainsRoot(ass))
     }, 
-    output: &EbiOutputType::ContainsRoot
+    output_type: &EbiOutputType::ContainsRoot
 };
 
 pub const ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command { 
@@ -55,13 +55,13 @@ pub const ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command {
     cli_command: Some(|command| cli_number_of_samples(command)), 
     exact_arithmetic: true, 
     input_types: &[ 
-        &[&EbiInputType::Trait(EbiTrait::EventLog)], 
+        &[ &EbiInputType::Trait(EbiTrait::EventLog) ], 
      ], 
     input_names: &[ "FILE" ], 
     input_helps: &[ "The event log for which association is to be computed." ], 
     execute: |mut inputs, cli_matches| {
         let mut event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
-        let number_of_samples = cli_matches.get_one::<usize>("samples").unwrap();
+        let number_of_samples = cli_matches.unwrap().get_one::<usize>("samples").unwrap();
 
         let result = event_log.associations(*number_of_samples);
 
@@ -72,7 +72,7 @@ pub const ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command {
         }
         Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
     }, 
-    output: &EbiOutputType::String
+    output_type: &EbiOutputType::String
 };
 
 pub fn cli_number_of_samples(command: Command) -> Command {

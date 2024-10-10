@@ -7,9 +7,9 @@ use crate::{ebi_objects::{alignments::Alignments, deterministic_finite_automaton
 use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_input::EbiInputType, ebi_trait::EbiTrait, infoable::Infoable};
 
 
-#[derive(PartialEq,Clone,EnumIter,Hash)]
+#[derive(PartialEq,Clone,EnumIter,Hash,Default)]
 pub enum EbiObjectType {
-    Alignments,
+    #[default] Alignments,
     DeterministicFiniteAutomaton,
     DirectlyFollowsModel,
     EventLog,

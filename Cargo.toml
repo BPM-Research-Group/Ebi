@@ -3,6 +3,10 @@ name = "ebi"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "ebi"
+crate-type = ["cdylib", "lib"]
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -32,7 +36,9 @@ indicatif = "*"
 indexmap = "*"
 rustc-hash="*"
 pathfinding="*"
-fnv="*"
+fnv = "*"
+jni = "*"
+itertools = "*"
 
 [dependencies.num-rational]
 version = "0.4.1"
@@ -40,3 +46,5 @@ version = "0.4.1"
 [profile.release]
 debug = true
 strip = false
+lto = true
+opt-level = "z"

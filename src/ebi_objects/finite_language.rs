@@ -25,6 +25,7 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::FiniteLanguage(FiniteLanguage::export_from_object),
         EbiObjectExporter::EventLog(FiniteLanguage::export_from_event_log)
     ],
+    java_object_handlers: &[],
 };
 
 pub struct FiniteLanguage {

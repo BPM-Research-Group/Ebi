@@ -1,10 +1,10 @@
 use core::fmt;
 use std::{collections::{HashMap, HashSet}, fmt::Display, io::{self, BufRead, Write}, rc::Rc, str::FromStr, sync::Arc};
 use anyhow::{anyhow, Result, Error};
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, FixedOffset};
 use process_mining::{event_log::{event_log_struct::EventLogClassifier, AttributeValue}, XESImportOptions};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, ToStochasticSemantics}}, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, ToStochasticSemantics}}, math::fraction::Fraction};
 
 use super::{finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
 
@@ -27,7 +27,16 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     ],
     object_exporters: &[ 
         EbiObjectExporter::EventLog(EventLog::export_from_object)
-    ]
+    ],
+    java_object_handlers: &[ 
+        JavaObjectHandler{ 
+            name: "XLog", 
+            translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiEventLog.EbiStringToXLog"), 
+            translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiEventLog.XLogToEbiString"),
+            java_class: "org.deckfour.xes.model.XLog",
+            input_gui: None,
+        },
+    ],
 };
 
 pub struct EventLog {
@@ -264,7 +273,7 @@ impl IndexTrace for EventLog {
 pub enum DataType {
     Categorical,
     Numerical(Fraction, Fraction), //minimum, maximum
-    Time(DateTime<Utc>, DateTime<Utc>), //minimum, maximum
+    Time(DateTime<FixedOffset>, DateTime<FixedOffset>), //minimum, maximum
     Undefined
 }
 
@@ -274,7 +283,7 @@ impl DataType {
             AttributeValue::String(x) => 
                 if let Ok(v) = x.parse::<Fraction>() {
                     Self::Numerical(v.clone(), v)
-                } else if let Ok(v) = x.parse::<DateTime<Utc>>() {
+                } else if let Ok(v) = x.parse::<DateTime<FixedOffset>>() {
                     Self::Time(v, v)
                 } else {
                     Self::Categorical
@@ -313,7 +322,7 @@ impl DataType {
             (DataType::Numerical(_, _), AttributeValue::Container(_)) => Self::Undefined,
             (DataType::Numerical(min, max), AttributeValue::None()) => Self::Numerical(min.clone(), max.clone()),
             (DataType::Time(min, max), AttributeValue::String(s)) => 
-                if let Ok(v) = s.parse::<DateTime<Utc>>() {
+                if let Ok(v) = s.parse::<DateTime<FixedOffset>>() {
                     Self::Time(v.min(*min), v.max(*max))
                 } else {
                     Self::Categorical

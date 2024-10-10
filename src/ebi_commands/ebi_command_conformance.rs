@@ -98,7 +98,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
         let model = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
         Ok(EbiOutput::Fraction(log.unit_earth_movers_stochastic_conformance(model).context("cannot compute uEMSC")?))
     },
-    output: &EbiOutputType::Fraction
+    output_type: &EbiOutputType::Fraction
 };
 
 pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command { 
@@ -120,7 +120,7 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
         let model = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
         Ok(EbiOutput::LogDiv(log.er(model).context("cannot compute uEMSC")?))
     }, 
-    output: &EbiOutputType::LogDiv
+    output_type: &EbiOutputType::LogDiv
 };
 
 pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command { 
@@ -150,7 +150,7 @@ pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
             _ => Err(anyhow!("wrong input given"))
         }
     },
-    output: &EbiOutputType::RootLogDiv 
+    output_type: &EbiOutputType::RootLogDiv 
 };
 
 pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command { 
@@ -166,7 +166,7 @@ pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
         SAMPLED_OBJECT_INPUTS,
         &[ &EbiInputType::Usize ] 
     ], 
-    input_names: &["FILE_1", "FILE_2","NUMBER_OF_TRACES"], 
+    input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"], 
     input_helps: &["A queriable stochastic language to compare.", "A queriable stochastic language to compare.","Number of traces to sample."],
     execute: |mut inputs, _| {
         let object1 = inputs.remove(0);
@@ -179,5 +179,5 @@ pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
         let lang1: Box<dyn EbiTraitFiniteStochasticLanguage> = lang1;
         Ok(EbiOutput::RootLogDiv(lang1.jssc_log2log(lang2).context("Compute JSSC by sampling.")?))
     },
-    output: &EbiOutputType::RootLogDiv 
+    output_type: &EbiOutputType::RootLogDiv 
 };

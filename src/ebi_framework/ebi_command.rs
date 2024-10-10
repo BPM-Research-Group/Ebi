@@ -55,13 +55,13 @@ pub enum EbiCommand {
         input_names: &'static [&'static str],
         input_helps: &'static [&'static str],
 
-        execute: fn(inputs: Vec<EbiInput>, cli_matches: &ArgMatches) -> Result<EbiOutput>,
-        output: &'static EbiOutputType
+        execute: fn(inputs: Vec<EbiInput>, cli_matches: Option<&ArgMatches>) -> Result<EbiOutput>, //the cli_matches are provided only when cli_command is set to Some(_).
+        output_type: &'static EbiOutputType
     }
 }
 
 impl EbiCommand {
-    pub(crate) fn build_cli(&self) -> Command {
+    pub fn build_cli(&self) -> Command {
         let mut command;
         match self {
             EbiCommand::Group { name_short, name_long, explanation_short, explanation_long, children } => {
@@ -161,6 +161,19 @@ impl EbiCommand {
         }
     }
 
+    pub fn explanation_long(&self) -> &str {
+        match self {
+            EbiCommand::Group { explanation_short, explanation_long, .. } => match explanation_long {
+                Some(x) => x,
+                None => &explanation_short,
+            },
+            EbiCommand::Command { explanation_short, explanation_long, .. } => match explanation_long {
+                Some(x) => x,
+                None => &explanation_short,
+            },
+        }
+    }
+
     pub fn get_progress_bar(total_ticks: usize) -> ProgressBar {
         let pb = ProgressBar::new(total_ticks.try_into().unwrap());
         pb.set_style(ProgressStyle::with_template("[{wide_bar:.cyan/blue}] {pos:>7}/{len:7}")
@@ -179,7 +192,7 @@ impl EbiCommand {
                     }
                 }
             },
-            EbiCommand::Command { exact_arithmetic, input_types: input_typess, execute, output: output_type, input_names, .. } => {
+            EbiCommand::Command { exact_arithmetic, input_types: input_typess, execute, output_type, input_names, .. } => {
                 //set exact arithmetic
                 if !exact_arithmetic || cli_matches.get_flag("approx") {
                     log::info!("Use approximate arithmetic");
@@ -199,7 +212,7 @@ impl EbiCommand {
 
                 log::info!("Starting {}", self.long_name());
 
-                let result = (execute)(inputs, cli_matches)?;
+                let result = (execute)(inputs, Some(cli_matches))?;
 
                 if &&result.get_type() != output_type {
                     return Err(anyhow!("Output type {} does not match the declared output of {}.", result.get_type(), output_type))
@@ -223,14 +236,14 @@ impl EbiCommand {
         Err(anyhow!("command not recognised"))
     }
 
-    fn select_exporter(output_type: &EbiOutputType, to_file: Option<&PathBuf>) -> EbiExporter {
+    pub fn select_exporter(output_type: &EbiOutputType, to_file: Option<&PathBuf>) -> EbiExporter {
         let exporters = output_type.get_exporters();
         
         if exporters.len() == 1 || to_file.is_none() {
             return exporters.into_iter().next().unwrap();
         }
 
-        //strategy: take the exporter with the longest extension first
+        //strategy: take the exporter with the longest extension first (to export .xes.gz before .xes)
         {
             let mut exporters = exporters.clone();
             exporters.sort_by(|a, b| {
@@ -263,7 +276,7 @@ impl EbiCommand {
     /**
      * Attempt to parse an input as any of the given input types. Returns the last error if unsuccessful.
      */
-    fn attempt_parse(input_types: &[&EbiInputType], cli_matches: &ArgMatches, cli_id: &str) -> Result<EbiInput> {
+    pub fn attempt_parse(input_types: &[&EbiInputType], cli_matches: &ArgMatches, cli_id: &str) -> Result<EbiInput> {
         //an input may be of several types; go through each of them
         let mut error = None;
         for input_type in input_types.iter() {
@@ -345,6 +358,15 @@ impl EbiCommand {
         result.join(" ")
     }
 
+    pub fn find_command_with_string(&self, name: &String) -> Option<Vec<&EbiCommand>> {
+        for path in self.get_command_paths() {
+            if Self::path_to_string(&path) == *name {
+                return Some(path)
+            }
+        }
+        None
+    }
+
     pub fn get_command_paths(&self) -> BTreeSet<Vec<&'static EbiCommand>> {
         let mut result = BTreeSet::new();
         self.get_paths_recursive(&EBI_COMMANDS, &mut result, vec![]);
@@ -402,7 +424,7 @@ impl PartialEq for EbiCommand {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Group { name_short: l_name_short, name_long: l_name_long, explanation_short: l_explanation_short, explanation_long: l_explanation_long, children: l_children }, Self::Group { name_short: r_name_short, name_long: r_name_long, explanation_short: r_explanation_short, explanation_long: r_explanation_long, children: r_children }) => l_name_short == r_name_short && l_name_long == r_name_long && l_explanation_short == r_explanation_short && l_explanation_long == r_explanation_long && l_children == r_children,
-            (Self::Command { name_short: l_name_short, name_long: l_name_long, explanation_short: l_explanation_short, explanation_long: l_explanation_long, latex_link: l_latex_link, cli_command: l_cli_command, exact_arithmetic: l_exact_arithmetic, input_types: l_input_types, input_names: l_input_names, input_helps: l_input_helps, execute: l_execute, output: l_output }, Self::Command { name_short: r_name_short, name_long: r_name_long, explanation_short: r_explanation_short, explanation_long: r_explanation_long, latex_link: r_latex_link, cli_command: r_cli_command, exact_arithmetic: r_exact_arithmetic, input_types: r_input_types, input_names: r_input_names, input_helps: r_input_helps, execute: r_execute, output: r_output }) => l_name_short == r_name_short && l_name_long == r_name_long && l_explanation_short == r_explanation_short && l_explanation_long == r_explanation_long && l_latex_link == r_latex_link && l_cli_command == r_cli_command && l_exact_arithmetic == r_exact_arithmetic && l_input_types == r_input_types && l_input_names == r_input_names && l_input_helps == r_input_helps && l_execute == r_execute && l_output == r_output,
+            (Self::Command { name_short: l_name_short, name_long: l_name_long, explanation_short: l_explanation_short, explanation_long: l_explanation_long, latex_link: l_latex_link, cli_command: l_cli_command, exact_arithmetic: l_exact_arithmetic, input_types: l_input_types, input_names: l_input_names, input_helps: l_input_helps, execute: l_execute, output_type: l_output }, Self::Command { name_short: r_name_short, name_long: r_name_long, explanation_short: r_explanation_short, explanation_long: r_explanation_long, latex_link: r_latex_link, cli_command: r_cli_command, exact_arithmetic: r_exact_arithmetic, input_types: r_input_types, input_names: r_input_names, input_helps: r_input_helps, execute: r_execute, output_type: r_output }) => l_name_short == r_name_short && l_name_long == r_name_long && l_explanation_short == r_explanation_short && l_explanation_long == r_explanation_long && l_latex_link == r_latex_link && l_cli_command == r_cli_command && l_exact_arithmetic == r_exact_arithmetic && l_input_types == r_input_types && l_input_names == r_input_names && l_input_helps == r_input_helps && l_execute == r_execute && l_output == r_output,
             _ => false,
         }
     }

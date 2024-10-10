@@ -3,7 +3,7 @@ use anyhow::{anyhow, Result, Error};
 
 use crate::{ebi_commands::ebi_command_validate::EBI_VALIDATE, ebi_objects::{alignments::EBI_ALIGNMENTS, compressed_event_log::EBI_COMPRESSED_EVENT_LOG, deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON, directly_follows_model::EBI_DIRCTLY_FOLLOWS_MODEL, event_log::EBI_EVENT_LOG, finite_language::EBI_FINITE_LANGUAGE, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE, labelled_petri_net::EBI_LABELLED_PETRI_NET, petri_net_markup_language::EBI_PETRI_NET_MARKUP_LANGUAGE, stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON, stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET}};
 
-use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject};
+use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, prom_link::JavaObjectHandler};
 
 pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_ALIGNMENTS,
@@ -27,7 +27,8 @@ pub struct EbiFileHandler {
     pub validator: fn(&mut dyn BufRead) -> Result<()>,
     pub trait_importers: &'static [EbiTraitImporter],
     pub object_importers: &'static [EbiObjectImporter],
-    pub object_exporters: &'static [EbiObjectExporter] //the order matters, as if multiple file handlers can export an object, the one that mentions the object earliest is preferred.
+    pub object_exporters: &'static [EbiObjectExporter], //the order matters, as if multiple file handlers can export an object, the one that mentions the object earliest is preferred.
+    pub java_object_handlers: &'static [JavaObjectHandler],
 }
 
 impl EbiFileHandler {
@@ -78,7 +79,7 @@ impl PartialEq for EbiFileHandler {
 
 impl PartialOrd for EbiFileHandler {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.name.partial_cmp(&other.name)
+        self.name.partial_cmp(other.name)
     }
 }
 

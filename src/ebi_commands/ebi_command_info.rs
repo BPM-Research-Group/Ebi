@@ -50,5 +50,5 @@ pub const EBI_INFO: EbiCommand = EbiCommand::Command {
     
         unreachable!()
     }, 
-    output: &EbiOutputType::String
+    output_type: &EbiOutputType::String
 };
