@@ -6,6 +6,7 @@ buildlatex:
   stage: compile_manual
   script:
     - echo "Hello, $GITLAB_USER_LOGIN!"
+    - cargo update
     - cargo build --target x86_64-pc-windows-gnu --release
     
     - cd manual
@@ -30,7 +31,7 @@ buildlatex:
     - mv target/x86_64-unknown-linux-gnu/release/ebi build/nightly/Ebi-x86_64-linux
     - git add build/nightly/Ebi-x86_64-linux
     - cd target/x86_64-unknown-linux-gnu/release
-    - mkdir lib
+    - mkdir -p lib
     - mv libebi.so lib/ 
     - zip build/prom-rust/Rust-6.15.2-lin64.zip lib/libebi.so
     - cd ../..
