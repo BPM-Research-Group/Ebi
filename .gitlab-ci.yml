@@ -33,7 +33,7 @@ buildlatex:
     - cd target/x86_64-unknown-linux-gnu/release
     - mkdir -p lib
     - mv libebi.so lib/ 
-    - zip build/prom-rust/Rust-6.15.2-lin64.zip lib/libebi.so
+    - zip ../../build/prom-rust/Rust-6.15.2-lin64.zip lib/libebi.so
     - cd ../..
     - git add build/prom-rust/Rust-6.15.2-lin64.zip
 
