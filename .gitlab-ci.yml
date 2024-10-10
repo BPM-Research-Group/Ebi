@@ -7,7 +7,6 @@ buildlatex:
   script:
     - echo "Hello, $GITLAB_USER_LOGIN!"
     - cargo update
-    - cargo build --target x86_64-pc-windows-gnu --release
     
     - cd manual
     - cargo run latex manual -o functions.tex
@@ -37,8 +36,15 @@ buildlatex:
     - cd ../../..
     - git add build/prom-rust/Rust-6.15.2-lin64.zip
 
+    - cargo build --target x86_64-pc-windows-gnu --release
     - mv target/x86_64-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-x86_64-windows.exe
     - git add build/nightly/Ebi-x86_64-windows.exe
+    - cd target/x86_64-pc-windows-gnu/release
+    - mkdir -p lib
+    - mv ebi.dll lib/ 
+    - zip ../../../build/prom-rust/Rust-6.15.2-win64.zip lib/ebi.dll
+    - cd ../../..
+    - git add build/prom-rust/Rust-6.15.2-win64.zip
 
     - git commit -m "Automatically triggered compilation [skip ci]"
     - git push -f https://ci_token:$ACCESS_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main
