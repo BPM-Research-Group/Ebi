@@ -34,7 +34,7 @@ buildlatex:
     - mkdir -p lib
     - mv libebi.so lib/ 
     - zip ../../../build/prom-rust/Rust-6.15.2-lin64.zip lib/libebi.so
-    - cd ../..
+    - cd ../../..
     - git add build/prom-rust/Rust-6.15.2-lin64.zip
 
     - mv target/x86_64-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-x86_64-windows.exe
