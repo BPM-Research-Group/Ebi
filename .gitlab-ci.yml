@@ -7,7 +7,6 @@ buildlatex:
   script:
     - echo "Hello, $GITLAB_USER_LOGIN!"
     - cargo build --target x86_64-pc-windows-gnu --release
-    - cargo build --target x86_64-unknown-linux-gnu --release
     
     - cd manual
     - cargo run latex manual -o functions.tex
@@ -27,13 +26,18 @@ buildlatex:
     - mv manual/manual.pdf build/nightly/manual.pdf
     - git add build/nightly/manual.pdf
 
-    - mv target/x86_64-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-x86_64-windows.exe
-    - mv target/x86_64-pc-windows-gnu/release/ebi.dll build/nightly/Ebi-x86_64-windows.dll
-    - git add build/nightly/Ebi-x86_64-windows.exe
-
+    - cargo build --target x86_64-unknown-linux-gnu --release
     - mv target/x86_64-unknown-linux-gnu/release/ebi build/nightly/Ebi-x86_64-linux
-    - mv target/x86_64-unknown-linux-gnu/release/libebi.so build/nightly/Ebi-x86_64-linux.so
     - git add build/nightly/Ebi-x86_64-linux
+    - cd target/x86_64-unknown-linux-gnu/release
+    - mkdir lib
+    - mv libebi.so lib/ 
+    - zip build/prom-rust/Rust-6.15.2-lin64.zip lib/libebi.so
+    - cd ../..
+    - git add build/prom-rust/Rust-6.15.2-lin64.zip
+
+    - mv target/x86_64-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-x86_64-windows.exe
+    - git add build/nightly/Ebi-x86_64-windows.exe
 
     - git commit -m "Automatically triggered compilation [skip ci]"
     - git push -f https://ci_token:$ACCESS_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main
