@@ -19,7 +19,7 @@ pub const EBI_COMMANDS: EbiCommand = EbiCommand::Group {
         &ebi_command_conformance::EBI_CONFORMANCE,
         &ebi_command_convert::EBI_CONVERT,
         &ebi_command_discover::EBI_DISCOVER,
-        &ebi_command_latex::EBI_LATEX,
+        &ebi_command_latex::EBI_ITSELF,
         &ebi_command_info::EBI_INFO,
         &ebi_command_probability::EBI_PROBABILITY,
         &ebi_command_sample::EBI_SAMPLE,

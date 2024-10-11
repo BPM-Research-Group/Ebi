@@ -9,8 +9,8 @@ buildlatex:
     - cargo update
     
     - cd manual
-    - cargo run latex manual -o functions.tex
-    - cargo run latex graph -o graph.svg
+    - cargo run itself manual -o functions.tex
+    - cargo run itself graph -o graph.svg
     - rsvg-convert -f pdf -o graph.pdf graph.svg
     - lualatex manual.tex
     - bibtex manual
