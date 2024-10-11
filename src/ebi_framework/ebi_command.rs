@@ -3,7 +3,7 @@ use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use anyhow::{anyhow, Context, Result};
 use indicatif::{ProgressBar, ProgressStyle};
 
-use crate::{ebi_commands::{ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association, ebi_command_conformance, ebi_command_convert, ebi_command_discover, ebi_command_info, ebi_command_latex, ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate, ebi_command_visualise}, ebi_framework::ebi_output, math::fraction::{Fraction, FractionNotParsedYet}};
+use crate::{ebi_commands::{ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association, ebi_command_conformance, ebi_command_convert, ebi_command_discover, ebi_command_info, ebi_command_itself, ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate, ebi_command_visualise}, ebi_framework::ebi_output, math::fraction::{Fraction, FractionNotParsedYet}};
 
 use super::{ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}};
 
@@ -19,7 +19,7 @@ pub const EBI_COMMANDS: EbiCommand = EbiCommand::Group {
         &ebi_command_conformance::EBI_CONFORMANCE,
         &ebi_command_convert::EBI_CONVERT,
         &ebi_command_discover::EBI_DISCOVER,
-        &ebi_command_latex::EBI_ITSELF,
+        &ebi_command_itself::EBI_ITSELF,
         &ebi_command_info::EBI_INFO,
         &ebi_command_probability::EBI_PROBABILITY,
         &ebi_command_sample::EBI_SAMPLE,

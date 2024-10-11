@@ -22,7 +22,7 @@ pub mod ebi_commands {
     pub mod ebi_command_validate;
     pub mod ebi_command_convert;
     pub mod ebi_command_analyse;
-    pub mod ebi_command_latex;
+    pub mod ebi_command_itself;
     pub mod ebi_command_association;
     pub mod ebi_command_info;
     pub mod ebi_command_sample;
