@@ -116,7 +116,7 @@ impl StochasticSemantics for StochasticLabelledPetriNet {
         for index in state.enabled_transitions.iter_ones() {
             sum += self.get_transition_weight(index);
         }
-        if sum == Fraction::zero() {
+        if sum.is_zero() {
             return Err(anyhow!("total enabled weight is 0"));
         }
         Ok(sum)

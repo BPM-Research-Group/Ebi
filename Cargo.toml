@@ -46,5 +46,3 @@ version = "0.4.1"
 [profile.release]
 debug = true
 strip = false
-lto = true
-opt-level = "z"

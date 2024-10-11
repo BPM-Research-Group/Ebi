@@ -46,7 +46,7 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
     
         for (trace, probability1) in self.iter_trace_probability() {
             let probability2 = logmodel2.get_probability(&FollowerSemantics::Trace(trace))?;
-            if probability2>Fraction::zero() {
+            if probability2.is_positive() {
                 sum4log += probability1;
                 sum4model += &probability2;
     

@@ -26,11 +26,7 @@ use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EbiFileHa
 //install the necessary toolcahins
 
 //command line to push Ebi to the Java project:
-// cargo build --target x86_64-unknown-linux-gnu --release ; cd target/x86_64-unknown-linux-gnu/release ; mkdir lib ; mv libebi.so lib/ ; zip ~/rust-workspace/rustlibrary/build/prom-rust/Rust-6.15.2-lin64.zip lib/libebi.so ; cd ../..
-// cargo build --target i686-unknown-linux-gnu --release ; cp target/i686-unknown-linux-gnu/release/libebi.so ~/eclipse-workspace/Rust/lib/lin32
-// cargo build --target x86_64-pc-windows-gnu --release ; cp target/x86_64-pc-windows-gnu/release/ebi.dll ~/eclipse-workspace/Rust/lib/win64
-// cargo build --target i686-pc-windows-gnu --release ; cp target/i686-pc-windows-gnu/release/ebi.dll ~/eclipse-workspace/Rust/lib/win32
-// cargo run latex java -o ~/eclipse-workspace/Ebi/src/org/processmining/ebi/plugins/EbiPlugins.java 
+// cargo build --release ; cp target/release/libebi.so ~/eclipse-workspace/Ebi/ ; cargo run latex java -o ~/eclipse-workspace/Ebi/src/org/processmining/ebi/plugins.EbiPlugins.java
 
 
 // This keeps Rust from "mangling" the name and making it unique for this crate.

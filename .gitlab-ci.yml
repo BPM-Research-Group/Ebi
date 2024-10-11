@@ -32,9 +32,9 @@ buildlatex:
     - cd target/x86_64-unknown-linux-gnu/release
     - mkdir -p lib
     - mv libebi.so lib/ 
-    - zip ../../../build/prom-rust/Rust-6.15.2-lin64.zip lib/libebi.so
+    - zip ../../../build/prom-rust/Rust-6.15.3-lin64.zip lib/libebi.so
     - cd ../../..
-    - git add build/prom-rust/Rust-6.15.2-lin64.zip
+    - git add build/prom-rust/Rust-6.15.3-lin64.zip
 
     - cargo build --target x86_64-pc-windows-gnu --release
     - mv target/x86_64-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-x86_64-windows.exe
@@ -42,9 +42,9 @@ buildlatex:
     - cd target/x86_64-pc-windows-gnu/release
     - mkdir -p lib
     - mv ebi.dll lib/ 
-    - zip ../../../build/prom-rust/Rust-6.15.2-win64.zip lib/ebi.dll
+    - zip ../../../build/prom-rust/Rust-6.15.3-win64.zip lib/ebi.dll
     - cd ../../..
-    - git add build/prom-rust/Rust-6.15.2-win64.zip
+    - git add build/prom-rust/Rust-6.15.3-win64.zip
 
     - cargo build --target i686-pc-windows-gnu --release
     - mv target/i686-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-i686-windows.exe
@@ -52,9 +52,9 @@ buildlatex:
     - cd target/i686-pc-windows-gnu/release
     - mkdir -p lib
     - mv ebi.dll lib/ 
-    - zip ../../../build/prom-rust/Rust-6.15.2-win32.zip lib/ebi.dll
+    - zip ../../../build/prom-rust/Rust-6.15.3-win32.zip lib/ebi.dll
     - cd ../../..
-    - git add build/prom-rust/Rust-6.15.2-win32.zip
+    - git add build/prom-rust/Rust-6.15.3-win32.zip
 
     - cargo build --target i686-unknown-linux-gnu --release
     - mv target/i686-unknown-linux-gnu/release/ebi build/nightly/Ebi-i686-linux
@@ -62,9 +62,9 @@ buildlatex:
     - cd target/i686-unknown-linux-gnu/release
     - mkdir -p lib
     - mv libebi.so lib/ 
-    - zip ../../../build/prom-rust/Rust-6.15.2-lin32.zip lib/libebi.so
+    - zip ../../../build/prom-rust/Rust-6.15.3-lin32.zip lib/libebi.so
     - cd ../../..
-    - git add build/prom-rust/Rust-6.15.2-lin32.zip
+    - git add build/prom-rust/Rust-6.15.3-lin32.zip
 
     - git commit -m "Automatically triggered compilation [skip ci]"
     - git push -f https://ci_token:$ACCESS_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main
