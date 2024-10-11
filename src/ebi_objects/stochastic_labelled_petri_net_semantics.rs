@@ -7,7 +7,7 @@ impl StochasticLabelledPetriNet {
 
 	fn compute_enabled_transition(&self, state: &mut LPNMarking, transition: TransitionIndex) -> bool {
 		for (in_place_pos, in_place) in self.transition2input_places[transition].iter().enumerate() {
-			if state.marking.place2token[*in_place] < self.transition2input_places_cardinality[transition][in_place_pos] {
+			if state.marking.place2token[*in_place] < self.transition2input_places_cardinality[transition][in_place_pos] || !self.weights[transition].is_positive(){
 				if state.enabled_transitions[transition] {
 					state.enabled_transitions.set(transition, false);
 					state.number_of_enabled_transitions -= 1;
