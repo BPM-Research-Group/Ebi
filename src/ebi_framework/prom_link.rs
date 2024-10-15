@@ -26,7 +26,7 @@ use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EbiFileHa
 //install the necessary toolcahins
 
 //command line to push Ebi to the Java project:
-// cargo build --release ; cp target/release/libebi.so ~/eclipse-workspace/Ebi/ ; cargo run itself java -o ~/eclipse-workspace/Ebi/src/org/processmining/ebi/plugins.EbiPlugins.java
+// cargo build --release ; cp target/release/libebi.so ~/eclipse-workspace/Ebi/ ; cargo run itself java -o ~/eclipse-workspace/Ebi/src/org/processmining/ebi/plugins/EbiPlugins.java
 
 
 // This keeps Rust from "mangling" the name and making it unique for this crate.
