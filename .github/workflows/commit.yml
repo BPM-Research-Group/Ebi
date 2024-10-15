@@ -28,10 +28,12 @@ jobs:
         rm README.md
         rm Cargo.toml
         rm -rf manual/*
+        rm .gitlab-ci.yml
         cp -R -a ../src/. src/
         cp ../README.md README.md
         cp ../Cargo.toml Cargo.toml
         cp -R -a ../manual/. manual/
+        cp ../.gitlab-ci.yml .gitlab-ci.yml
         git add --all
         git commit -a -m "github CI"
         git push -f https://ci_token:$GITLAB_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main

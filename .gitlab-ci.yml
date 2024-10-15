@@ -6,34 +6,92 @@ buildlatex:
   stage: compile_manual
   script:
     - echo "Hello, $GITLAB_USER_LOGIN!"
-    - cargo build --target x86_64-pc-windows-gnu --release
-    - cargo build --target x86_64-unknown-linux-gnu --release
+    - cargo update
+    - mkdir -p build
+    - mkdir -p build/nightly
+    - git config --global user.name "CI pipeline"
+    - git config --global user.email "cipipeline@example.com"
     
+    #compile manual
     - cd manual
-    - cargo run latex manual -o functions.tex
-    - cargo run latex graph -o graph.svg
+    - cargo run itself manual -o functions.tex
+    - cargo run itself graph -o graph.svg
     - rsvg-convert -f pdf -o graph.pdf graph.svg
     - lualatex manual.tex
     - bibtex manual
     - lualatex manual.tex
     - lualatex manual.tex
     - cd ..
-    
-    - mkdir -p build
-    - mkdir -p build/nightly
-    - git config --global user.name "CI pipeline"
-    - git config --global user.email "cipipeline@example.com"
-    
     - mv manual/manual.pdf build/nightly/manual.pdf
     - git add build/nightly/manual.pdf
 
-    - mv target/x86_64-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-x86_64-windows.exe
-    - mv target/x86_64-pc-windows-gnu/release/ebi.dll build/nightly/Ebi-x86_64-windows.dll
-    - git add build/nightly/Ebi-x86_64-windows.exe
-
+    #compile linux 64 bit
+    - cargo build --target x86_64-unknown-linux-gnu --release
     - mv target/x86_64-unknown-linux-gnu/release/ebi build/nightly/Ebi-x86_64-linux
     - mv target/x86_64-unknown-linux-gnu/release/libebi.so build/nightly/Ebi-x86_64-linux.so
     - git add build/nightly/Ebi-x86_64-linux
+    - cd target/x86_64-unknown-linux-gnu/release
+    - mkdir -p lib
+    - mv libebi.so lib/ 
+    - zip ../../../build/prom-rust/Rust-6.15.3-lin64.zip lib/libebi.so
+    - cd ../../..
+    - git add build/prom-rust/Rust-6.15.3-lin64.zip
 
+    #compile windows 64 bit
+    - cargo build --target x86_64-pc-windows-gnu --release
+    - mv target/x86_64-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-x86_64-windows.exe
+    - git add build/nightly/Ebi-x86_64-windows.exe
+    - cd target/x86_64-pc-windows-gnu/release
+    - mkdir -p lib
+    - mv ebi.dll lib/ 
+    - zip ../../../build/prom-rust/Rust-6.15.3-win64.zip lib/ebi.dll
+    - cd ../../..
+    - git add build/prom-rust/Rust-6.15.3-win64.zip
+
+    #compile windows 32 bit
+    - cargo build --target i686-pc-windows-gnu --release
+    - mv target/i686-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-i686-windows.exe
+    - git add build/nightly/Ebi-i686-windows.exe
+    - cd target/i686-pc-windows-gnu/release
+    - mkdir -p lib
+    - mv ebi.dll lib/ 
+    - zip ../../../build/prom-rust/Rust-6.15.3-win32.zip lib/ebi.dll
+    - cd ../../..
+    - git add build/prom-rust/Rust-6.15.3-win32.zip
+
+    #compile linux 32 bit
+    - cargo build --target i686-unknown-linux-gnu --release
+    - mv target/i686-unknown-linux-gnu/release/ebi build/nightly/Ebi-i686-linux
+    - git add build/nightly/Ebi-i686-linux
+    - cd target/i686-unknown-linux-gnu/release
+    - mkdir -p lib
+    - mv libebi.so lib/ 
+    - zip ../../../build/prom-rust/Rust-6.15.3-lin32.zip lib/libebi.so
+    - cd ../../..
+    - git add build/prom-rust/Rust-6.15.3-lin32.zip
+
+    #write packages.xml
+    - printf "<packages>\n" > build/prom-rust/packages.xml
+    
+    - printf "\t<package name=\"Rust\" version=\"6.15." >> build/prom-rust/packages.xml
+    - echo -n `date +%s` >> build/prom-rust/packages.xml
+    - printf "\" os=\"win64\" url=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/prom-rust/Rust-6.15.3-win64.zip\" desc=\"Rust\" org=\"RWTH Aachen\" license=\"GPL\" author=\"S.J.J. Leemans\" auto=\"false\" hasPlugins=\"true\" logo=\"prom_subtitle_hat_300.png\" />\n" >> build/prom-rust/packages.xml
+    
+    - printf "\t<package name=\"Rust\" version=\"6.15." >> build/prom-rust/packages.xml
+    - echo -n `date +%s` >> build/prom-rust/packages.xml
+    - printf "\" os=\"win32\" url=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/prom-rust/Rust-6.15.3-win32.zip\" desc=\"Rust\" org=\"RWTH Aachen\" license=\"GPL\" author=\"S.J.J. Leemans\" auto=\"false\" hasPlugins=\"true\" logo=\"prom_subtitle_hat_300.png\" />\n" >> build/prom-rust/packages.xml
+    
+    - printf "\t<package name=\"Rust\" version=\"6.15." >> build/prom-rust/packages.xml
+    - echo -n `date +%s` >> build/prom-rust/packages.xml
+    - printf "\" os=\"lin32\" url=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/prom-rust/Rust-6.15.3-lin32.zip\" desc=\"Rust\" org=\"RWTH Aachen\" license=\"GPL\" author=\"S.J.J. Leemans\" auto=\"false\" hasPlugins=\"true\" logo=\"prom_subtitle_hat_300.png\" />\n" >> build/prom-rust/packages.xml
+
+    - printf "\t<package name=\"Rust\" version=\"6.15." >> build/prom-rust/packages.xml
+    - echo -n `date +%s` >> build/prom-rust/packages.xml
+    - printf "\" os=\"lin64\" url=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/prom-rust/Rust-6.15.3-lin64.zip\" desc=\"Rust\" org=\"RWTH Aachen\" license=\"GPL\" author=\"S.J.J. Leemans\" auto=\"false\" hasPlugins=\"true\" logo=\"prom_subtitle_hat_300.png\" />\n" >> build/prom-rust/packages.xml
+
+    - printf "</packages>\n" >> build/prom-rust/packages.xml
+    - git add build/prom-rust/packages.xml
+
+    #push to git
     - git commit -m "Automatically triggered compilation [skip ci]"
     - git push -f https://ci_token:$ACCESS_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main
