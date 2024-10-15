@@ -12,10 +12,7 @@ pub mod ebi_framework {
     pub mod exportable;
     pub mod activity_key;
     pub mod prom_link;
-<<<<<<< HEAD
     pub mod pm4py_link;
-=======
->>>>>>> c01b13d990e5d4ec0340a2b03e944721dca72c23
 }
 pub mod ebi_commands {
     pub mod ebi_command_analyse_non_stochastic;
@@ -26,11 +23,7 @@ pub mod ebi_commands {
     pub mod ebi_command_validate;
     pub mod ebi_command_convert;
     pub mod ebi_command_analyse;
-<<<<<<< HEAD
-    pub mod ebi_command_latex;
-=======
     pub mod ebi_command_itself;
->>>>>>> c01b13d990e5d4ec0340a2b03e944721dca72c23
     pub mod ebi_command_association;
     pub mod ebi_command_info;
     pub mod ebi_command_sample;

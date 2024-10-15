@@ -22,17 +22,12 @@ use super::ebi_file_handler::EBI_FILE_HANDLERS;
 use super::ebi_output::EbiOutput;
 use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiInputType}, ebi_output::{self}};
 
-<<<<<<< HEAD
-//command line to push Ebi to the Java project:
-// cargo build ; cp target/debug/libebi.so ~/eclipse-workspace/Ebi/lib/ ; cargo run latex java -o ~/eclipse-workspace/Ebi/src/org/processmining/ebi/plugins/EbiPlugins.java 
-=======
 
 //install the necessary toolcahins
 
 //command line to push Ebi to the Java project:
 // cargo build --release ; cp target/release/libebi.so ~/eclipse-workspace/Ebi/ ; cargo run latex java -o ~/eclipse-workspace/Ebi/src/org/processmining/ebi/plugins.EbiPlugins.java
 
->>>>>>> c01b13d990e5d4ec0340a2b03e944721dca72c23
 
 // This keeps Rust from "mangling" the name and making it unique for this crate.
 #[no_mangle]
