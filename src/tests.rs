@@ -5,7 +5,7 @@ mod tests {
     use fraction::GenericFraction;
     use num_bigint::ToBigUint;
 
-    use crate::{ebi_objects::{alignments::Move, deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::ToSemantics}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}, medoid, techniques::{align::Align, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probabilistic_queries::FiniteStochasticLanguageAnalyser, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
+    use crate::{ebi_objects::{alignments::Move, deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::ToSemantics}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}, medoid, techniques::{align::Align, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probabilistic_queries::FiniteStochasticLanguageAnalyser, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 
     #[test]
     fn medoid() {
@@ -469,6 +469,15 @@ mod tests {
 
         let answer = RootLogDiv::sqrt(LogDiv::Exact(GenericFraction::from(1), 2.to_biguint().unwrap())).one_minus();
         assert_eq!(slang.jssc_log2model(Box::new(slpn)).unwrap(), answer);
+    }
+
+    #[test]
+    fn variety() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
+        let slang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(fin.parse::<FiniteStochasticLanguage>().unwrap());
+
+        assert_eq!(slang.process_variety(), Fraction::from((4, 5)));
+
     }
 
     // #[test] //disabled until we can handle livelocks

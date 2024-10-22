@@ -1,6 +1,6 @@
 use anyhow::Context;
 
-use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::fraction::Fraction, medoid, techniques::{completeness::Completeness, probabilistic_queries::FiniteStochasticLanguageAnalyser}};
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::fraction::Fraction, medoid, techniques::{completeness::Completeness, probabilistic_queries::FiniteStochasticLanguageAnalyser, process_variety::ProcessVariety}};
 
 pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
     name_short: "ana",
@@ -14,6 +14,7 @@ pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
         &EBI_ANALYSE_MINPROB,
         &EBI_ANALYSE_MODE,
         &EBI_ANALYSE_MOSTLIKELY,
+        &EBI_ANALYSE_VARIETY,
     ],
 };
 
@@ -185,3 +186,23 @@ pub const EBI_ANALYSE_MEDOID: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
 };
 
+pub const EBI_ANALYSE_VARIETY: EbiCommand = EbiCommand::Command {
+    name_short: "var", 
+    name_long: Some("variety"), 
+    explanation_short: "Compute the variety of a stochastic language.", 
+    explanation_long: None,
+    cli_command: None, 
+    latex_link: None,
+    exact_arithmetic: true,
+    input_types: &[ &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage) ] ],
+    input_names: &[ "FILE" ],
+    input_helps: &[ "An event log."],
+    execute: |mut objects, _| {
+        let log = objects.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        
+        let result = log.process_variety();
+        
+        return Ok(EbiOutput::Fraction(result));
+    }, 
+    output_type: &EbiOutputType::Fraction
+};
