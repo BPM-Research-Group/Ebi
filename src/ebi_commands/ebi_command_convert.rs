@@ -73,7 +73,7 @@ pub const EBI_CONVERT_SLANG: EbiCommand = EbiCommand::Command {
 pub const EBI_CONVERT_SDFA: EbiCommand = EbiCommand::Command { 
     name_short: "sdfa", 
     name_long: Some("stochastic-finite-deterministic-automaton"), 
-    explanation_short: "Convert an object to a finite stochastic language.", 
+    explanation_short: "Convert an object to a stochastic deterministic finite automaton.", 
     explanation_long: None, 
     latex_link: None, 
     cli_command: None, 

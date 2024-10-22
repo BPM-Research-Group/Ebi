@@ -257,7 +257,6 @@ impl StochasticDeterministicFiniteAutomaton {
                 let lpn_transition = result.add_transition(None);
                 weights.push(self.get_termination_probability(state).clone());
                 result.add_place_transition_arc(lpn_place, lpn_transition, 1).unwrap();
-                result.add_transition_place_arc(lpn_transition, lpn_place, 1).unwrap();
             }
         }
 

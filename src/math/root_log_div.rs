@@ -5,6 +5,7 @@ use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable};
 
 use super::{fraction::Fraction, log_div::LogDiv};
 
+#[derive(PartialEq, Eq, Debug)]
 pub struct RootLogDiv {
     one_minus: bool,
     log_div: LogDiv

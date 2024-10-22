@@ -6,20 +6,52 @@ use strum::IntoEnumIterator;
 
 use crate::{ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, text::Joiner};
 
+pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
+ □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
+□ □ □ □ □◦◦◦◦ □-◦◦◦◦□ □ □ □ □
+ □ □ □ □ ◦◦◦◦◦ ◦◦◦◦◦ □ □ □ □ 
+□ □ □ ◦◦□ ◦◦◦ □ ◦◦◦ □◦◦ □ □ □
+ □ □ ◦◦◦◦# □ ◦◦◦◦□ =◦◦◦◦ □ □ 
+□ □ □ ◦◦◦+□◦◦◦◦◦◦◦◦-◦◦◦ □ □ □
+ □ □ □ □ ◦◦◦◦◦◦◦◦◦◦◦ □ □ □ □ 
+□ □ □ □ =◦◦◦◦◦◦◦◦◦◦◦◦ □ □ □ □
+ □ □ □ □ ◦◦◦◦◦◦◦◦◦◦◦◦□ □ □ □ 
+□ □ □ □ □ #=□ □ □ □ □ □ □ □ □
+ □ □ □   ___| |__ (_)  □ □ □ 
+□ □ □ □ / _ \ '_ \| | □ □ □ □
+ □ □ □ |  __/ |_) | |  □ □ □ 
+□ □ □ □ \___|_.__/|_| □ □ □ □
+ □ □ □ □ □ □ □ □ □ □ □ □ □ □ ";
 
-pub const EBI_LATEX: EbiCommand = EbiCommand::Group { 
-    name_short: "latex", 
-    name_long: Some("latex-help"), 
-    explanation_short: "Print the help of Ebi in Latex format.",
+pub const EBI_ITSELF: EbiCommand = EbiCommand::Group { 
+    name_short: "it", 
+    name_long: Some("itself"), 
+    explanation_short: "Print things on Ebi.",
     explanation_long: None,
     children: &[ 
-        &EBI_LATEX_GRAPH,
-        &EBI_LATEX_MANUAL,
-        &EBI_LATEX_JAVA,
+        &EBI_ITSELF_GRAPH,
+        &EBI_ITSELF_MANUAL,
+        &EBI_ITSELF_JAVA,
+        &EBI_ITSELF_LOGO
      ]
 };
 
-pub const EBI_LATEX_MANUAL: EbiCommand = EbiCommand::Command { 
+pub const EBI_ITSELF_LOGO: EbiCommand = EbiCommand::Command {
+    name_short: "log", 
+    name_long: Some("logo"), 
+    explanation_short: "Print the logo of Ebi.", 
+    explanation_long: None, 
+    cli_command: None, 
+    latex_link: None, 
+    exact_arithmetic: false, 
+    input_types: &[], 
+    input_names: &[],
+    input_helps: &[],
+    execute: |_, _| Ok(EbiOutput::String(LOGO.to_string())), 
+    output_type: &EbiOutputType::String
+};
+
+pub const EBI_ITSELF_MANUAL: EbiCommand = EbiCommand::Command { 
     name_short: "man", 
     name_long: Some("manual"), 
     explanation_short: "Print the automatically generated parts of the manual of Ebi in Latex format.", 
@@ -34,7 +66,7 @@ pub const EBI_LATEX_MANUAL: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String
 };
 
-pub const EBI_LATEX_GRAPH: EbiCommand = EbiCommand::Command { 
+pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command { 
     name_short: "graph", 
     name_long: None, 
     explanation_short: "Print the graph of Ebi.", 
@@ -49,7 +81,7 @@ pub const EBI_LATEX_GRAPH: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String
 };
 
-pub const EBI_LATEX_JAVA: EbiCommand = EbiCommand::Command { 
+pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command { 
     name_short: "java", 
     name_long: None, 
     explanation_short: "Print the classes for Java.", 
