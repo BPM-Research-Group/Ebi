@@ -2,10 +2,12 @@ use std::{fmt::{Debug, Display}, hash::Hash};
 
 use anyhow::{anyhow, Context, Result};
 
-use crate::{ebi_framework::activity_key::{Activity, ActivityKeyTranslator}, ebi_objects::alignments::{Alignments, Move}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
+use crate::{ebi_framework::activity_key::{Activity, ActivityKeyTranslator}, ebi_objects::{alignments::{Alignments, Move}, stochastic_language_of_alignments::StochasticLanguageOfAlignments}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
 pub trait Align {
     fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments>;
+
+    fn align_stochastic_language(&mut self, log: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<StochasticLanguageOfAlignments>;
 
     /**
 	 * Please note to ensure the trace and the semantics use the same ActivityKey, or they have been translated
@@ -18,6 +20,13 @@ impl Align for EbiTraitSemantics {
 		match self {
 			EbiTraitSemantics::Usize(sem) => sem.align_language(log),
 			EbiTraitSemantics::Marking(sem) => sem.align_language(log),
+		}
+	}
+
+    fn align_stochastic_language(&mut self, log: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<StochasticLanguageOfAlignments> {
+		match self {
+			EbiTraitSemantics::Usize(sem) => sem.align_stochastic_language(log),
+			EbiTraitSemantics::Marking(sem) => sem.align_stochastic_language(log),
 		}
 	}
 
@@ -38,6 +47,18 @@ impl <T, FS> Align for T where T: Semantics<State = FS> + ?Sized, FS: Display + 
         for trace in log.iter() {
             let trace_translated = translator.translate_trace(trace);
             result.push(self.align_trace(&trace_translated)?.0);
+        }
+
+        Ok(result)
+    }
+
+    fn align_stochastic_language(&mut self, log: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<StochasticLanguageOfAlignments> {
+        let translator = ActivityKeyTranslator::new(log.get_activity_key(), self.get_activity_key_mut());
+
+        let mut result = StochasticLanguageOfAlignments::new(self.get_activity_key().clone());
+        for (trace, probability) in log.iter_trace_probability() {
+            let trace_translated = translator.translate_trace(trace);
+            result.push(self.align_trace(&trace_translated)?.0,probability.clone());
         }
 
         Ok(result)

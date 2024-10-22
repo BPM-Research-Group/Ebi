@@ -87,7 +87,7 @@ pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command {
     name_short: "exptra", 
     name_long: Some("explain-trace"), 
     explanation_short: "Compute the most likely explanation of a trace given the stochastic model.", 
-    explanation_long: None, 
+    explanation_long: Some("Compute the most likely explanation of a trace given the stochastic model. The model must be bounded and livelock-free."), 
     latex_link: None, 
     cli_command: Some(|command| {
         command.arg(Arg::new("trace")

@@ -1,4 +1,4 @@
-use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics}, techniques::{align::Align, medoid_non_stochastic::MedoidNonStochastic}};
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics}, techniques::{align::Align, medoid_non_stochastic::MedoidNonStochastic}};
 
 
 pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
@@ -69,18 +69,18 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command
     cli_command: None, 
     exact_arithmetic: true, 
     input_types: &[ 
-        &[ &EbiInputType::Trait(EbiTrait::FiniteLanguage)],
+        &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[ &EbiInputType::Trait(EbiTrait::Semantics)]
     ],
     input_names: &[ "FILE_1", "FILE_2"],
     input_helps: &[ "The finite language.", "The model."],
     execute: |mut objects, _| {
-        let log = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+        let log = objects.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let mut model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
         
-        let result = model.align_language(log)?;
+        let result = model.align_stochastic_language(log)?;
         
-        return Ok(EbiOutput::Object(EbiObject::Alignments(result)));
+        return Ok(EbiOutput::Object(EbiObject::StochasticLangaugeofAlignments(result)));
     }, 
-    output: &EbiOutputType::ObjectType(EbiObjectType::Alignments)
+    output: &EbiOutputType::ObjectType(EbiObjectType::StochasticLanguageOfAlignments)
 };
