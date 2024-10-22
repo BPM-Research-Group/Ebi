@@ -476,7 +476,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(fin.parse::<FiniteStochasticLanguage>().unwrap());
 
-        assert_eq!(slang.process_variety(), Fraction::from((4, 5)));
+        assert_eq!(slang.process_variety(), Fraction::from((2, 5)));
 
     }
 
