@@ -87,6 +87,7 @@ pub mod techniques {
     pub mod sample;
     pub mod explain_trace;
     pub mod process_variety;
+    pub mod fitness;
 }
 pub mod deterministic_semantics_for_stochastic_semantics;
 pub mod medoid;
