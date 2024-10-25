@@ -22,9 +22,10 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
     name_short: "all", 
     name_long: Some("all-traces"), 
     explanation_short: "Find all traces.", 
-    explanation_long: Some("List all traces of a stohastic language.\n
-        Models containing loops are not supported and an error will be returned.\n
-        Computation is more efficient for an object with a finite stochastic language."),
+    explanation_long: Some("List all traces of a stohastic language.
+Models containing loops are not supported and an error will be returned.
+The computation may run forever if the model is unbounded.
+Computation is more efficient for an object with a finite stochastic language."),
     cli_command: None, 
     latex_link: None,
     exact_arithmetic: true,
@@ -76,7 +77,10 @@ pub const EBI_ANALYSE_MINPROB: EbiCommand = EbiCommand::Command {
     name_short: "minprob", 
     name_long: Some("minimum-probability-traces"), 
     explanation_short: "Find all traces that have a given minimum probability.", 
-    explanation_long: Some("Find all traces that have a given minimum probability.\nWill return a finate stochastic language with the extracted traces.\nWill return an error if there are no such traces. The computation may run forever if the model is unbounded."),
+    explanation_long: Some("Find all traces that have a given minimum probability.
+Will return a finate stochastic language with the extracted traces.
+Will return an error if there are no such traces.
+The computation may run forever if the model is unbounded."),
     cli_command: None, 
     latex_link: None,
     exact_arithmetic: true,
@@ -99,10 +103,10 @@ pub const EBI_ANALYSE_MOSTLIKELY: EbiCommand = EbiCommand::Command {
     name_short: "mostlikely", 
     name_long: Some("most-likely-traces"), 
     explanation_short: "Find the traces with the highest probabilities.", 
-    explanation_long: Some("Find the given number of traces with the highest probabilities.\n
-        If there are more than one trace with the same probability, an arbitrary choice is made which one to return.\n
-        The computation may run forever if the model is unbounded.\n
-        Computation is more efficient for an object with a finite stochastic language."),
+    explanation_long: Some("Find the given number of traces with the highest probabilities.
+If there are more than one trace with the same probability, an arbitrary choice is made which one to return.
+The computation may run forever if the model is unbounded.
+Computation is more efficient for an object with a finite stochastic language."),
     cli_command: None, 
     latex_link: None,
     exact_arithmetic: true,
@@ -134,10 +138,10 @@ pub const EBI_ANALYSE_MODE: EbiCommand = EbiCommand::Command {
     name_long: None,
     explanation_short: "Find the trace with the highest probability.", 
     explanation_long: Some("Find the trace with the highest probability.
-        If there is more than one trace with the highest probability, an arbitrary choice is made which one to return.\n
-        The computation may run forever if the model is unbounded.\n
-        Equivalent to `Ebi evaluate mostlikely 1`.\n
-        Computation is more efficient for a model with a finite stochastic language."),
+If there is more than one trace with the highest probability, an arbitrary choice is made which one to return.
+The computation may run forever if the model is unbounded.
+Equivalent to `Ebi evaluate mostlikely 1`.
+Computation is more efficient for a model with a finite stochastic language."),
     latex_link: None, 
     cli_command: None, 
     exact_arithmetic: true, 
@@ -166,8 +170,8 @@ pub const EBI_ANALYSE_MEDOID: EbiCommand = EbiCommand::Command {
     name_short: "med", 
     name_long: Some("medoid"),
     explanation_short: "Find the traces with the least distance to the other traces.", 
-    explanation_long: Some("Find the traces with the lowest average normalised Levenshtein distance to the other traces.\n
-        If there are more than one such trace, an arbitrary one is returned."), 
+    explanation_long: Some("Find the traces with the lowest average normalised Levenshtein distance to the other traces.
+If there are more than one such trace, an arbitrary one is returned."), 
     latex_link: None, 
     cli_command: None, 
     exact_arithmetic: true, 
