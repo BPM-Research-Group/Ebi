@@ -45,6 +45,7 @@ pub mod ebi_objects {
     pub mod alignments;
     pub mod deterministic_finite_automaton;
     pub mod deterministic_finite_automaton_semantics;
+    pub mod stochastic_language_of_alignments;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_stochastic_deterministic_semantics;
