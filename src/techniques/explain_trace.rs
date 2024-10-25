@@ -135,9 +135,16 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
             result
         };
 
+        let cost_function = self.get_move_cost_function(trace);
+        let result1 = self.get_incidence_matrix(trace);
+        let incidence_matrix = result1.0;
+        let transition_prest = result1.1;
         //function that returns a heuristic on how far we are still minimally from a final state
         let heuristic = |_astate : &(usize, FS)| {
-            StochasticWeightedCost::zero()
+            // StochasticWeightedCost::zero()
+            let marking_vec = self.get_marking_vector(trace, &_astate.0, &_astate.1);
+            let move_cost = self.underestimate_move_cost(&marking_vec, &cost_function, &incidence_matrix, &transition_prest).unwrap();
+            StochasticWeightedCost{cost:move_cost as u32, probability:Fraction::one(), stochastic_weighted_cost:Fraction::zero()}
         };
 
         //function that returns whether we are in a final synchronous product state
