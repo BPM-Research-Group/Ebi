@@ -275,6 +275,7 @@ pub enum EbiObjectImporter {
     StochasticLabelledPetriNet(fn(&mut dyn BufRead) -> Result<EbiObject>),
     Alignments(fn(&mut dyn BufRead) -> Result<EbiObject>),
     DeterministicFiniteAutomaton(fn(&mut dyn BufRead) -> Result<EbiObject>),
+    StochasticLanguageOfAlignments(fn(&mut dyn BufRead) -> Result<EbiObject>),
 }
 
 impl EbiObjectImporter {
@@ -288,6 +289,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::StochasticDeterministicFiniteAutomaton(_) => EbiObjectType::StochasticDeterministicFiniteAutomaton,
             EbiObjectImporter::StochasticLabelledPetriNet(_) => EbiObjectType::StochasticLabelledPetriNet,
             EbiObjectImporter::Alignments(_) => EbiObjectType::Alignments,
+            EbiObjectImporter::StochasticLanguageOfAlignments(_) => EbiObjectType::StochasticLanguageOfAlignments,
             EbiObjectImporter::DeterministicFiniteAutomaton(_) => EbiObjectType::DeterministicFiniteAutomaton,
         }
     }
@@ -302,6 +304,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::StochasticDeterministicFiniteAutomaton(importer) => *importer,
             EbiObjectImporter::StochasticLabelledPetriNet(importer) => *importer,
             EbiObjectImporter::Alignments(importer) => *importer,
+            EbiObjectImporter::StochasticLanguageOfAlignments(importer) => *importer,
             EbiObjectImporter::DeterministicFiniteAutomaton(importer) => *importer,
         }
     }

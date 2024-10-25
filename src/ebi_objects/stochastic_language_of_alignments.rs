@@ -121,7 +121,7 @@ impl Display for StochasticLanguageOfAlignments {
 
 impl Importable for StochasticLanguageOfAlignments {
     fn import_as_object(reader: &mut dyn std::io::BufRead) -> Result<EbiObject> {
-        Ok(EbiObject::StochasticLangaugeofAlignments(Self::import(reader)?))
+        Ok(EbiObject::StochasticLanguageOfAlignments(Self::import(reader)?))
     }
 
     fn import(reader: &mut dyn std::io::BufRead) -> anyhow::Result<Self> where Self: Sized {
@@ -239,7 +239,7 @@ impl Infoable for StochasticLanguageOfAlignments {
 impl FromEbiTraitObject for StochasticLanguageOfAlignments {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
-            EbiInput::Object(EbiObject::StochasticLangaugeofAlignments(e), _) => Ok(Box::new(e)),
+            EbiInput::Object(EbiObject::StochasticLanguageOfAlignments(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!("cannot read {} {} as a finite language", object.get_type().get_article(), object.get_type()))
         }
     }
