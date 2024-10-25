@@ -108,7 +108,7 @@ impl StochasticLabelledPetriNet {
     }
 
     pub fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
-        self.labels[transition].is_some()
+        self.labels[transition].is_none()
     }
     
     pub fn get_transition_label(&self, transition: TransitionIndex) -> Option<Activity> {
