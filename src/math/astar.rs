@@ -7,6 +7,7 @@ use fraction::Zero;
 use indexmap::map::Entry::{Occupied, Vacant};
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
+use std::fmt::Debug;
 use std::hash::Hash;
 use std::hash::BuildHasherDefault;
 use std::ops::AddAssign;
@@ -111,7 +112,7 @@ pub fn astar<'a, N, C, FN, IN, FH, FS>(
 ) -> Option<(Vec<N>, C)>
 where
     N: Eq + Hash + Clone,
-    C: Zero + Ord + Clone + AddAssign,
+    C: Zero + Ord + Clone + AddAssign + Debug,
     FN: FnMut(&N) -> IN,
     IN: IntoIterator<Item = (N, C)>,
     FH: FnMut(&N) -> C,
@@ -125,16 +126,19 @@ where
     });
     let mut parents: FxIndexMap<N, (usize, C)> = FxIndexMap::default();
     parents.insert(start.clone(), (usize::MAX, Zero::zero()));
+    let mut count = 1;
     while let Some(SmallestCostHolder { cost, index, .. }) = to_see.pop() {
+        count += 1;
         let successors = {
             let (node, &(_, ref c)) = parents.get_index(index).unwrap(); // Cannot fail
             if success(node) {
+                println!("\nvisit {} of states and cost is:{:?}", count, cost);
                 let path = reverse_path(&parents, |&(p, _)| p, index);
                 return Some((path, cost));
             }
             // We may have inserted a node several time into the binary heap if we found
             // a better way to access it. Ensure that we are currently dealing with the
-            // best path and discard the others.
+            // best path and discard the others.    
             if &cost > c {
                 continue;
             }
@@ -164,6 +168,7 @@ where
 
             let mut estimated_cost = new_cost.clone();
             estimated_cost += h;
+
             to_see.push(SmallestCostHolder {
                 estimated_cost: estimated_cost,
                 cost: new_cost,
@@ -202,7 +207,7 @@ impl<K: Ord> PartialOrd for SmallestCostHolder<K> {
 impl<K: Ord> Ord for SmallestCostHolder<K> {
     fn cmp(&self, other: &Self) -> Ordering {
         match other.estimated_cost.cmp(&self.estimated_cost) {
-            Ordering::Equal => self.cost.cmp(&other.cost),
+            Ordering::Equal => other.cost.cmp(&self.cost),
             s => s,
         }
     }

@@ -46,22 +46,29 @@ impl AddAssign for StochasticWeightedCost{
 }
 
 impl Ord for StochasticWeightedCost{
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering{
-        let self_stochastic_cost =  &self.probability.clone().one_minus() * self.cost;
-        let other_stochastic_cost = &other.probability.clone().one_minus() * other.cost;
-        self_stochastic_cost.cmp(&other_stochastic_cost)
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        // First compare stochastic_weighted_cost (lower stochastic_weighted_cost means bigger)
+        match other.stochastic_weighted_cost.partial_cmp(&self.stochastic_weighted_cost) {
+            Some(std::cmp::Ordering::Equal) => {
+                // If stochastic_weighted_cost are equal, compare costs (lower cost means bigger)
+                self.cost.partial_cmp(&other.cost).unwrap()
+            }
+            Some(ordering) => ordering,
+            None => std::cmp::Ordering::Equal, // Handle NaN case
+        }
     }
 }
 
 impl PartialOrd for StochasticWeightedCost{
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering>{
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         Some(self.cmp(other))
     }
 }
 
 impl PartialEq for StochasticWeightedCost{
-    fn eq(&self, other: &Self) -> bool{
-        self.cmp(other) == std::cmp::Ordering::Equal
+    fn eq(&self, other: &Self) -> bool {
+        self.cost == other.cost && self.stochastic_weighted_cost == other.stochastic_weighted_cost &&
+        self.probability == other.probability
     }
 }
 
@@ -98,12 +105,11 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
                 //we can do a log move
                 // log::debug!("\tlog move {}", trace[*trace_index]);
 
-                result.push(((trace_index + 1, state.clone()), StochasticWeightedCost{cost:10000, probability:Fraction::one(), stochastic_weighted_cost:Fraction::zero()}));
+                result.push(((trace_index + 1, state.clone()), StochasticWeightedCost{cost:1, probability:Fraction::one(), stochastic_weighted_cost:Fraction::zero()}));
             }
         
             //walk through the enabled transitions in the model
             for transition in self.get_enabled_transitions(&state) {
-                let total_weight = self.get_total_weight_of_enabled_transitions(&state).unwrap();
 
                 let mut new_state = state.clone();
                 // log::debug!("\t\tnew state before {}", new_state);
@@ -111,13 +117,13 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
                 // log::debug!("\t\tnew state after {}", new_state);
 
                 let transition_weight = self.get_transition_weight(&state, transition);
+                let total_weight = self.get_total_weight_of_enabled_transitions(&state).unwrap();
                 let transition_probability = transition_weight / &total_weight;
 
                 if let Some(activity) = self.get_transition_activity(transition) {
 
                     //non-silent model move
-                    result.push(((*trace_index, new_state.clone()),StochasticWeightedCost{cost:10000, probability:transition_probability.clone(),stochastic_weighted_cost:&transition_probability.clone().one_minus()*10000}));
-                    // log::debug!("\tmodel move t{} {} to {}", transition, activity, new_state);
+                    result.push(((*trace_index, new_state.clone()),StochasticWeightedCost{cost:1, probability:transition_probability.clone(),stochastic_weighted_cost:transition_probability.clone().one_minus()}));
 
                     //which may also be a synchronous move
                     if trace_index < &trace.len() && activity == trace[*trace_index] {
@@ -127,10 +133,9 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
                     }
                 } else {
                     //silent move
-                    result.push(((*trace_index, new_state), StochasticWeightedCost{cost:1, probability:transition_probability.clone(),stochastic_weighted_cost:transition_probability.clone().one_minus()}));
+                    result.push(((*trace_index, new_state), StochasticWeightedCost{cost:0, probability:transition_probability.clone(),stochastic_weighted_cost:transition_probability.clone().one_minus()}));
                 }
             }
-
             // log::debug!("successors of {} {}: {:?}", trace_index, state, result);
             result
         };
@@ -139,12 +144,13 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
         let result1 = self.get_incidence_matrix(trace);
         let incidence_matrix = result1.0;
         let transition_prest = result1.1;
+
         //function that returns a heuristic on how far we are still minimally from a final state
         let heuristic = |_astate : &(usize, FS)| {
             // StochasticWeightedCost::zero()
             let marking_vec = self.get_marking_vector(trace, &_astate.0, &_astate.1);
             let move_cost = self.underestimate_move_cost(&marking_vec, &cost_function, &incidence_matrix, &transition_prest).unwrap();
-            StochasticWeightedCost{cost:move_cost as u32, probability:Fraction::one(), stochastic_weighted_cost:Fraction::zero()}
+            StochasticWeightedCost{cost:move_cost as u32, probability:Fraction::one(), stochastic_weighted_cost:Fraction::from(move_cost as i32)}
         };
 
         //function that returns whether we are in a final synchronous product state
