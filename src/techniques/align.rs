@@ -296,7 +296,7 @@ pub trait AlignmentHeuristics {
     The function assigns the maximum firing probability for each transition.
     Transition from trace has a probability of 1, for sync and model move, the probaility is different.
     */
-    fn get_probability_function(&self, _: &Vec<Activity>, _: &usize, _: &Self::AState, _: &Vec<Vec<usize>>) -> Vec<usize>;
+    fn get_probability_function(&self, trace: &Vec<Activity>) -> Vec<f64>;
 
     /*
     The function gets the total number of transitions in the synchronous product net
@@ -340,7 +340,7 @@ impl AlignmentHeuristics for DeterministicFiniteAutomatonSemantics {
         todo!()
     }
     
-    fn get_probability_function(&self, _: &Vec<Activity>, _: &usize, _: &Self::AState, _: &Vec<Vec<usize>>) -> Vec<usize> {
+    fn get_probability_function(&self, _trace: &Vec<Activity>) -> Vec<f64> {
         todo!()
     }
     
@@ -396,7 +396,7 @@ impl AlignmentHeuristics for FiniteStochasticLanguageSemantics {
         todo!()
     }
     
-    fn get_probability_function(&self, _: &Vec<Activity>, _: &usize, _: &Self::AState, _: &Vec<Vec<usize>>) -> Vec<usize> {
+    fn get_probability_function(&self, _trace: &Vec<Activity>) -> Vec<f64> {
         todo!()
     }
     
@@ -450,7 +450,7 @@ impl AlignmentHeuristics for LabelledPetriNet {
         todo!()
     }
     
-    fn get_probability_function(&self, _: &Vec<Activity>, _: &usize, _: &Self::AState, _: &Vec<Vec<usize>>) -> Vec<usize> {
+    fn get_probability_function(&self, _trace: &Vec<Activity>) -> Vec<f64> {
         todo!()
     }
     
@@ -568,7 +568,7 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
 
         let num_places = incidence_matrix.len();
 
-        variables!{problem: 0 <=x;}
+        variables!{problem: x>=0;}
         let solution_vec: Vec<Variable> = problem.add_vector(variable().min(0).integer(), num_transitions);
 
         // decision variables are used to check whether the deadlock marking enables any transitions
@@ -638,70 +638,92 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
         for i in 0..num_transitions {
             solution_vector.push(solution.value(solution_vec[i]) as i32);
         }
-        // println!("solution is:{}",solution.model().obj_value().round());
         // println!("solution is:{} and solution vector:{:?}\n",solution.model().obj_value().round(), solution_vector);
         Ok(solution.model().obj_value().round())
     }
     
     fn overestimate_probability_gain(&self, 
-        _current_marking: &Vec<f64>,
-        _probability_function: &Vec<f64>,
-        _incidence_matrix: &Vec<Vec<f64>>,
-        _transition_preset: &Vec<Vec<usize>>
+        current_marking: &Vec<f64>,
+        probability_gain_function: &Vec<f64>,
+        incidence_matrix: &Vec<Vec<f64>>,
+        transition_preset: &Vec<Vec<usize>>
         ) -> Result<f64> {
-            todo!()
          // create the problem variables (transition firing vector)
-        // let num_transitions = incidence_matrix[0].len();
-        // let num_places = incidence_matrix.len();
+        let num_transitions = incidence_matrix[0].len();
 
-        // variables!{problem: 0 <= x;}
-        // let solution_vec: Vec<Variable> = problem.add_vector(variable().min(0).integer(), num_transitions);
+        let num_places = incidence_matrix.len();
 
-        // // create the objective function, use the dot product of cost function and solution vector
-        // let probability_objective: Expression = probability_function.iter()
-        // .zip(solution_vec.iter())  // pairs up elements from both vectors
-        // .map(|(&a, &b)| a * b)  // multiplies paired elements
-        // .sum();
+        variables!{problem: 0 <=x;}
+        let solution_vec: Vec<Variable> = problem.add_vector(variable().min(0).integer(), num_transitions);
 
-        // // define the linear programming model
-        // let mut model = problem.maximise(probability_objective).using(default_solver);
+        // decision variables are used to check whether the deadlock marking enables any transitions
+        let decision_var_vec: Vec<Variable> = problem.add_vector(variable().binary(), num_places);
 
-        // // do not let solver printout any information in terminal
-        // model.set_parameter("log", "0");
+        // create the objective function, use the dot product of cost function and solution vector
+        let objective: Expression = solution_vec.iter().zip(probability_gain_function.iter()).map(|(&x, &y)| x * y).sum();
 
-        // // add constraints based on the marking equation
-        // let mut deadlock_marking_vec = vec![];
+        // define the linear programming model
+        let mut model = problem.maximise(objective).using(default_solver);
 
-        // for p in 0..num_places {
-        //     let mut expr = Expression::from(current_marking[p]);
-        //     for t in 0..num_transitions {
-        //         expr += incidence_matrix[p][t] * solution_vec[t];
-        //     }
-        //     deadlock_marking_vec.push(expr);
-        // }
+        // do not let solver printout any information in terminal
+        model.set_parameter("log", "0");
 
-        // for transition_idx in 0..num_transitions{
-        //     // for each transition, it should not be enabled after reaching the deadlock marking
-        //     let transition_column: &Vec<usize> = &transition_preset[transition_idx];
-        //     let mut expr: Expression = Expression::from(0);
-        //     for (place_idx, each_place) in deadlock_marking_vec.iter().enumerate(){
-        //         if transition_column.contains(&place_idx){
-        //             expr += each_place.clone();
-        //         }
-        //     }
-        //     model.add_constraint(expr.leq((transition_column.len() as f64)-1.0));
+        // add constraints based on the marking equation
+        let mut deadlock_marking_vec = vec![];
+
+        for p in 0..num_places {
+            let mut expr = Expression::from(current_marking[p]);
+            for t in 0..num_transitions {
+                expr += incidence_matrix[p][t] * solution_vec[t];
+            }
+            deadlock_marking_vec.push(expr);
+        }
+        // for each transition, at lead one of the places in its preset does not have enough tokens
+        for transition_idx in 0..num_transitions{
+            // for each transition, it should not be enabled after reaching the deadlock marking
+            let each_transition_preset: &Vec<usize> = &transition_preset[transition_idx];
+            // accumulate the decision variables for places
+            let mut expr: Expression = Expression::from(0);
             
-        // }
-        // // solve the problem
-        // let solution: solvers::coin_cbc::CoinCbcSolution = model.solve()?; 
+            for (place_idx, each_place) in deadlock_marking_vec.iter().enumerate(){
+                if each_transition_preset.contains(&place_idx){
+                    expr += each_place;
+                }
+            }
+            model.add_constraint(expr.leq((each_transition_preset.len() as f64)-1.0));
+        }
+        // for each transition, at lead one of the places in its preset does not have enough tokens
+        for transition_idx in 0..num_transitions{
+            // for each transition, it should not be enabled after reaching the deadlock marking
+            let each_transition_preset: &Vec<usize> = &transition_preset[transition_idx];
+            // accumulate the decision variables for places
+            let mut expr: Expression = Expression::from(0);
+            
+            for (place_idx, each_place) in deadlock_marking_vec.iter().enumerate(){
+                if each_transition_preset.contains(&place_idx){
+                    // use big-M method to formulate a conditional constraint
+                    let first_right_side_expr: Expression = 1 + decision_var_vec[place_idx] * 10000;
+                    model.add_constraint(each_place.clone().leq(first_right_side_expr));
+                    let second_right_side_expr: Expression = 1 - (1 - decision_var_vec[place_idx]) * 10000;
+                    model.add_constraint(each_place.clone().geq(second_right_side_expr));
+                   
+                    expr += decision_var_vec[place_idx];
+                }
+            }
+            model.add_constraint(expr.leq((each_transition_preset.len() as f64)-1.0));
+        }
 
-        // // get the solution vector
-        // let mut solution_vector = Vec::new();
-        // for i in 0..num_transitions {
-        //     solution_vector.push(solution.value(solution_vec[i]) as i32);
-        // }
+        // solve the problem
+        let solution: solvers::coin_cbc::CoinCbcSolution = model.solve()?; 
+
+        // get the solution vector
+        let mut solution_vector = Vec::new();
+        for i in 0..num_transitions {
+            solution_vector.push(solution.value(solution_vec[i]) as i32);
+        }
         // println!("solution is:{}",solution.model().obj_value().round());
-        // Ok(solution.model().obj_value().round())
+        // println!("solution is:{} and solution vector:{:?}\n",solution.model().obj_value().clone(), solution_vector);
+        Ok(solution.model().obj_value())
     }
     
 
@@ -734,42 +756,45 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
         move_cost_function
     }
     
-    fn get_probability_function(&self, _trace: &Vec<Activity>, _: &usize, _: &Self::AState, _: &Vec<Vec<usize>>) -> Vec<usize> {
-        todo!()
-        // let mut probability_function = vec![];
+    fn get_probability_function(&self, trace: &Vec<Activity>) -> Vec<f64> {
+        let mut probability_function = vec![];
         
-        // let mut result:Vec<Vec<usize>> = vec![];
-        // // for each transition, get the maximum firing probability
-        // // when a transition is enabled, get other enabled transitions
-        // for i in 0..self.get_number_of_transitions(){     
-        //     let mut weight_sum = self.get_transition_weight(i).clone();
+        // for each transition, get the maximum firing probability
+        // when a transition is enabled, get other enabled transitions
+        for i in 0..self.get_number_of_transitions(){     
+            let mut weight_sum = self.get_transition_weight(i).clone();
 
-        //     // check whether other transition has the same preset
-        //     for j in 0..self.get_number_of_transitions(){
-        //         if i != j {  
-        //         // Check if vecs[i] is a subset of vecs[j]
-        //         let is_subset = self.transition2input_places[i].iter().all(|item| self.transition2input_places[j].contains(item));
+            // check whether other transition has the same preset
+            for j in 0..self.get_number_of_transitions(){
+                if i != j {  
+                // Check if vecs[i] is a subset of vecs[j]
+                let is_subset = self.transition2input_places[i].iter().all(|item| self.transition2input_places[j].contains(item));
                 
-        //         if is_subset {
-        //                 weight_sum += self.get_transition_weight(j).clone();
-        //             }
-        //         }
-        //     }
-            
-        //     let mut firing_probability = self.get_transition_weight(i).clone();
-        //     firing_probability/=weight_sum;
-        //     probability_function[i] = LogDiv::log2(firing_probability).;
-        // }
+                if is_subset {
+                        weight_sum += self.get_transition_weight(j).clone();
+                    }
+                }
+            }
+            let mut firing_probability = self.get_transition_weight(i).clone();
 
-        // for trace_transition_idx in 0..trace.len() {
-        //     for model_transition in 0..self.get_number_of_transitions() {
-        //         if self.get_transition_activity(model_transition) == Some(trace[trace_transition_idx]) {
-        //             // assign the probability to sync move 
-        //             probability_function[self.get_number_of_transitions() + trace.len()+ trace_transition_idx] = probability_function[model_transition];
-        //         }
-        //     }
-        // }
-        // probability_function
+            firing_probability/=weight_sum;
+            probability_function.push(firing_probability.fraction_to_f64().unwrap().log2().max(f64::MIN));
+        }
+
+        // add probability gain for log move
+        for _ in 0..trace.len() {
+            probability_function.push(0.0);
+        }
+
+        for trace_transition_idx in 0..trace.len() {
+            for model_transition in 0..self.get_number_of_transitions() {
+                if self.get_transition_activity(model_transition) == Some(trace[trace_transition_idx]) {
+                    // assign the probability to sync move 
+                    probability_function.push(probability_function[model_transition]);
+                }
+            }
+        }
+        probability_function
     }
 
     fn get_transition_num(&self, trace:&Vec<Activity>) -> usize {
@@ -884,7 +909,7 @@ impl AlignmentHeuristics for StochasticDeterministicFiniteAutomatonSemantics {
         todo!()
     }
     
-    fn get_probability_function(&self, _: &Vec<Activity>, _: &usize, _: &Self::AState, _: &Vec<Vec<usize>>) -> Vec<usize> {
+    fn get_probability_function(&self, _trace: &Vec<Activity>) -> Vec<f64> {
         todo!()
     }
     

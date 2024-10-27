@@ -1,21 +1,21 @@
-use std::{fmt::{Debug, Display}, hash::Hash, ops::{Add, AddAssign}};
+use std::{cmp::Ordering, fmt::{Debug, Display}, hash::Hash, ops::{Add, AddAssign}};
 use anyhow::{anyhow, Result};
 use fraction::Zero;
 use crate::{ebi_framework::activity_key::Activity, ebi_objects::alignments::Alignments, ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}, math::{astar,fraction::Fraction}, techniques::align::transform_alignment};
 
-#[derive (Clone, Debug)]
-pub struct StochasticWeightedCost{
-    cost: u32,
-    probability: Fraction,
-    stochastic_weighted_cost: Fraction
+#[derive(Debug, Clone, Copy)]
+struct StochasticWeightedCost {
+    pub cost: f64,
+    pub probability: f64,
+    pub stochastic_weighted_cost: f64,
 }
 
 impl Zero for StochasticWeightedCost{
     fn zero() -> Self{
         StochasticWeightedCost{
-            cost: 0,
-            probability: Fraction::one(),
-            stochastic_weighted_cost: Fraction::zero()
+            cost: 0.0,
+            probability: 1.0,
+            stochastic_weighted_cost: 0.0
         }
     }
     
@@ -23,6 +23,7 @@ impl Zero for StochasticWeightedCost{
         self.stochastic_weighted_cost.is_zero()
     }
 }
+
 
 impl Add for StochasticWeightedCost{
     type Output = Self;
@@ -33,47 +34,47 @@ impl Add for StochasticWeightedCost{
         StochasticWeightedCost{
             cost: cost,
             probability: probability.clone(),
-            stochastic_weighted_cost: &probability.clone().one_minus() * cost
+            stochastic_weighted_cost: cost*(1.0-probability)
         }
     }
 }
 
-impl AddAssign for StochasticWeightedCost{
-    fn add_assign(&mut self, other: Self){
+// Implement AddAssign operation
+impl AddAssign for StochasticWeightedCost {
+    fn add_assign(&mut self, other: Self) {
         self.cost += other.cost;
         self.probability *= other.probability;
+        self.stochastic_weighted_cost = self.cost * (1.0 - self.probability);
     }
 }
 
-impl Ord for StochasticWeightedCost{
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        // First compare stochastic_weighted_cost (lower stochastic_weighted_cost means bigger)
-        match other.stochastic_weighted_cost.partial_cmp(&self.stochastic_weighted_cost) {
-            Some(std::cmp::Ordering::Equal) => {
-                // If stochastic_weighted_cost are equal, compare costs (lower cost means bigger)
-                self.cost.partial_cmp(&other.cost).unwrap()
-            }
-            Some(ordering) => ordering,
-            None => std::cmp::Ordering::Equal, // Handle NaN case
-        }
+// Implement ordering
+impl PartialEq for StochasticWeightedCost {
+    fn eq(&self, other: &Self) -> bool {
+        self.stochastic_weighted_cost == other.stochastic_weighted_cost && self.cost == other.cost
     }
 }
 
-impl PartialOrd for StochasticWeightedCost{
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+impl Eq for StochasticWeightedCost {}
+
+impl PartialOrd for StochasticWeightedCost {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         Some(self.cmp(other))
     }
 }
 
-impl PartialEq for StochasticWeightedCost{
-    fn eq(&self, other: &Self) -> bool {
-        self.cost == other.cost && self.stochastic_weighted_cost == other.stochastic_weighted_cost &&
-        self.probability == other.probability
+impl Ord for StochasticWeightedCost {
+    fn cmp(&self, other: &Self) -> Ordering {
+        // First compare by stochastic_weighted_cost
+        match self.stochastic_weighted_cost.total_cmp(&other.stochastic_weighted_cost) {
+            Ordering::Equal => {
+                // If stochastic_weighted_costs are equal, compare by cost
+                self.cost.total_cmp(&other.cost)
+            },
+            ordering => ordering
+        }
     }
 }
-
-impl Eq for StochasticWeightedCost{}
-
 
 pub trait ExplainTrace {
     fn explain_trace(&self, trace: &Vec<Activity>, balance: &Fraction) -> Result<Alignments>;
@@ -105,7 +106,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
                 //we can do a log move
                 // log::debug!("\tlog move {}", trace[*trace_index]);
 
-                result.push(((trace_index + 1, state.clone()), StochasticWeightedCost{cost:1, probability:Fraction::one(), stochastic_weighted_cost:Fraction::zero()}));
+                result.push(((trace_index + 1, state.clone()), StochasticWeightedCost{cost:1.0, probability:1.0, stochastic_weighted_cost:0.0}));
             }
         
             //walk through the enabled transitions in the model
@@ -118,22 +119,31 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
 
                 let transition_weight = self.get_transition_weight(&state, transition);
                 let total_weight = self.get_total_weight_of_enabled_transitions(&state).unwrap();
-                let transition_probability = transition_weight / &total_weight;
+                let transition_probability = (transition_weight / &total_weight).fraction_to_f64().unwrap();
 
                 if let Some(activity) = self.get_transition_activity(transition) {
 
                     //non-silent model move
-                    result.push(((*trace_index, new_state.clone()),StochasticWeightedCost{cost:1, probability:transition_probability.clone(),stochastic_weighted_cost:transition_probability.clone().one_minus()}));
+                    result.push(((*trace_index, new_state.clone()),
+                    StochasticWeightedCost{cost:1.0,
+                        probability:transition_probability,
+                        stochastic_weighted_cost: 1.0-transition_probability}));
 
                     //which may also be a synchronous move
                     if trace_index < &trace.len() && activity == trace[*trace_index] {
                         //synchronous move
                         // log::debug!("\tsynchronous move t{} {} to {}", transition, activity, new_state);
-                        result.push(((trace_index + 1, new_state), StochasticWeightedCost{cost:0, probability:transition_probability, stochastic_weighted_cost:Fraction::zero()}));
+                        result.push(((trace_index + 1, new_state), StochasticWeightedCost{
+                            cost:0.0, 
+                            probability:transition_probability, 
+                            stochastic_weighted_cost:0.0}));
                     }
                 } else {
                     //silent move
-                    result.push(((*trace_index, new_state), StochasticWeightedCost{cost:0, probability:transition_probability.clone(),stochastic_weighted_cost:transition_probability.clone().one_minus()}));
+                    result.push(((*trace_index, new_state), StochasticWeightedCost{
+                        cost:0.0, 
+                        probability:transition_probability,
+                        stochastic_weighted_cost:0.0}));
                 }
             }
             // log::debug!("successors of {} {}: {:?}", trace_index, state, result);
@@ -141,6 +151,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
         };
 
         let cost_function = self.get_move_cost_function(trace);
+        let probability_function = self.get_probability_function(trace);
         let result1 = self.get_incidence_matrix(trace);
         let incidence_matrix = result1.0;
         let transition_prest = result1.1;
@@ -150,7 +161,12 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
             // StochasticWeightedCost::zero()
             let marking_vec = self.get_marking_vector(trace, &_astate.0, &_astate.1);
             let move_cost = self.underestimate_move_cost(&marking_vec, &cost_function, &incidence_matrix, &transition_prest).unwrap();
-            StochasticWeightedCost{cost:move_cost as u32, probability:Fraction::one(), stochastic_weighted_cost:Fraction::from(move_cost as i32)}
+            let probability_gain = self.overestimate_probability_gain(&marking_vec, &probability_function, &incidence_matrix, &transition_prest).unwrap();
+
+            StochasticWeightedCost{
+                cost:move_cost, 
+                probability:2.0_f64.powf(probability_gain),
+                stochastic_weighted_cost:(1.0-probability_gain)*move_cost}
         };
 
         //function that returns whether we are in a final synchronous product state

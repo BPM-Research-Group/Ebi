@@ -23,6 +23,13 @@ pub type UInt = fraction::BigUint;
 
 impl Fraction {
 
+    pub fn fraction_to_f64(&self) -> Option<f64>{
+        match self {
+            Fraction::Exact(f) => Some(f.to_f64().unwrap()),
+            Fraction::Approx(f64) => Some(*f64),
+            Fraction::CannotCombineExactAndApprox => None,
+        }
+    }
     /**
      * Enables or disables exact arithmetic for all future calls to Fraction.
      * Exact arithmetic cannot be combined with approximate arithmetic, and if this nevertheless occurs, the results will be set to Fraction::CannotCombineExactAndApprox

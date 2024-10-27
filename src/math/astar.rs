@@ -126,15 +126,15 @@ where
     });
     let mut parents: FxIndexMap<N, (usize, C)> = FxIndexMap::default();
     parents.insert(start.clone(), (usize::MAX, Zero::zero()));
-    let mut count = 1;
-    while let Some(SmallestCostHolder { cost, index, .. }) = to_see.pop() {
+    let mut count = 0;
+    while let Some(SmallestCostHolder { estimated_cost, cost, index }) = to_see.pop() {
         count += 1;
         let successors = {
             let (node, &(_, ref c)) = parents.get_index(index).unwrap(); // Cannot fail
             if success(node) {
-                println!("\nvisit {} of states and cost is:{:?}", count, cost);
+                println!("\nvisit {} of states and cost is:{:?}", count, estimated_cost);
                 let path = reverse_path(&parents, |&(p, _)| p, index);
-                return Some((path, cost));
+                return Some((path, estimated_cost));
             }
             // We may have inserted a node several time into the binary heap if we found
             // a better way to access it. Ensure that we are currently dealing with the
@@ -144,6 +144,8 @@ where
             }
             successors(node)
         };
+        // println!("\nget {} states and estimated cost is:{:?}", index, estimated_cost);
+
         for (successor, mut move_cost) in successors {
             move_cost += cost.clone();
             let new_cost = move_cost;
@@ -168,7 +170,6 @@ where
 
             let mut estimated_cost = new_cost.clone();
             estimated_cost += h;
-
             to_see.push(SmallestCostHolder {
                 estimated_cost: estimated_cost,
                 cost: new_cost,
@@ -192,7 +193,7 @@ struct SmallestCostHolder<K> {
 
 impl<K: PartialEq> PartialEq for SmallestCostHolder<K> {
     fn eq(&self, other: &Self) -> bool {
-        self.estimated_cost.eq(&other.estimated_cost) && self.cost.eq(&other.cost)
+        self.estimated_cost.eq(&other.estimated_cost)
     }
 }
 
