@@ -1,13 +1,15 @@
 use std::{cmp::Ordering, fmt::{Debug, Display}, hash::Hash, ops::{Add, AddAssign}};
 use anyhow::{anyhow, Result};
 use fraction::Zero;
+use num_traits::Pow;
 use crate::{ebi_framework::activity_key::Activity, ebi_objects::alignments::Alignments, ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}, math::{astar,fraction::Fraction}, techniques::align::transform_alignment};
 
 #[derive(Debug, Clone, Copy)]
 struct StochasticWeightedCost {
-    pub cost: f64,
-    pub probability: f64,
-    pub stochastic_weighted_cost: f64,
+    cost: f64,
+    probability: f64,
+    balance_factor: f64,
+    stochastic_weighted_cost: f64,
 }
 
 impl Zero for StochasticWeightedCost{
@@ -15,6 +17,7 @@ impl Zero for StochasticWeightedCost{
         StochasticWeightedCost{
             cost: 0.0,
             probability: 1.0,
+            balance_factor: 1.0,
             stochastic_weighted_cost: 0.0
         }
     }
@@ -34,7 +37,8 @@ impl Add for StochasticWeightedCost{
         StochasticWeightedCost{
             cost: cost,
             probability: probability.clone(),
-            stochastic_weighted_cost: cost*(1.0-probability)
+            balance_factor: self.balance_factor,
+            stochastic_weighted_cost: (cost+1.0).powf(self.balance_factor)*(1.0-probability).powf(1.0-self.balance_factor)
         }
     }
 }
@@ -44,7 +48,7 @@ impl AddAssign for StochasticWeightedCost {
     fn add_assign(&mut self, other: Self) {
         self.cost += other.cost;
         self.probability *= other.probability;
-        self.stochastic_weighted_cost = self.cost * (1.0 - self.probability);
+        self.stochastic_weighted_cost = (self.cost+1.0).powf(self.balance_factor) * (1.0 - self.probability).powf(1.0-self.balance_factor);
     }
 }
 
@@ -108,7 +112,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
                 //we can do a log move
                 // log::debug!("\tlog move {}", trace[*trace_index]);
 
-                result.push(((trace_index + 1, state.clone()), StochasticWeightedCost{cost:1.0, probability:1.0, stochastic_weighted_cost:0.0}));
+                result.push(((trace_index + 1, state.clone()), StochasticWeightedCost{cost:1.0, probability:1.0, balance_factor: balance_to_f64,stochastic_weighted_cost:0.0}));
             }
         
             //walk through the enabled transitions in the model
@@ -129,6 +133,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
                     result.push(((*trace_index, new_state.clone()),
                     StochasticWeightedCost{cost:1.0,
                         probability:transition_probability,
+                        balance_factor: balance_to_f64,
                         stochastic_weighted_cost: 1.0-transition_probability}));
 
                     //which may also be a synchronous move
@@ -138,6 +143,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
                         result.push(((trace_index + 1, new_state), StochasticWeightedCost{
                             cost:0.0, 
                             probability:transition_probability, 
+                            balance_factor: balance_to_f64,
                             stochastic_weighted_cost:0.0}));
                     }
                 } else {
@@ -145,6 +151,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
                     result.push(((*trace_index, new_state), StochasticWeightedCost{
                         cost:0.0, 
                         probability:transition_probability,
+                        balance_factor: balance_to_f64,
                         stochastic_weighted_cost:0.0}));
                 }
             }
@@ -168,6 +175,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
             StochasticWeightedCost{
                 cost:move_cost.powf(balance_to_f64), 
                 probability:2.0_f64.powf(probability_gain).powf(1.0-balance_to_f64),
+                balance_factor: balance_to_f64,
                 stochastic_weighted_cost:(1.0-probability_gain)*move_cost}
         };
 
