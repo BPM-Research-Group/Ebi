@@ -91,7 +91,9 @@ impl ExplainTrace for EbiTraitStochasticSemantics {
 
 impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSemantics<State = FS, AState = FS> {
 
-    pub fn explain_trace(&self, trace: &Vec<Activity>, _balance: &Fraction) -> Result<Alignments> {
+    pub fn explain_trace(&self, trace: &Vec<Activity>, balance: &Fraction) -> Result<Alignments> {
+
+        let balance_to_f64 = balance.fraction_to_f64().unwrap();
 
         // get the start state
         let start = (0, self.get_initial_state());
@@ -164,8 +166,8 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
             let probability_gain = self.overestimate_probability_gain(&marking_vec, &probability_function, &incidence_matrix, &transition_prest).unwrap();
 
             StochasticWeightedCost{
-                cost:move_cost, 
-                probability:2.0_f64.powf(probability_gain),
+                cost:move_cost.powf(balance_to_f64), 
+                probability:2.0_f64.powf(probability_gain).powf(1.0-balance_to_f64),
                 stochastic_weighted_cost:(1.0-probability_gain)*move_cost}
         };
 

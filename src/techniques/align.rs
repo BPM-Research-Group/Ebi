@@ -568,7 +568,7 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
 
         let num_places = incidence_matrix.len();
 
-        variables!{problem: x>=0;}
+        variables!{problem:}
         let solution_vec: Vec<Variable> = problem.add_vector(variable().min(0).integer(), num_transitions);
 
         // decision variables are used to check whether the deadlock marking enables any transitions
@@ -653,7 +653,7 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
 
         let num_places = incidence_matrix.len();
 
-        variables!{problem: 0 <=x;}
+        variables!{problem:}
         let solution_vec: Vec<Variable> = problem.add_vector(variable().min(0).integer(), num_transitions);
 
         // decision variables are used to check whether the deadlock marking enables any transitions
