@@ -1,3 +1,4 @@
+use core::f64;
 use std::{cmp::Ordering, fmt::{Debug, Display}, hash::Hash, ops::{Add, AddAssign}};
 use anyhow::{anyhow, Result};
 use fraction::Zero;
@@ -10,6 +11,7 @@ struct StochasticWeightedCost {
     cost: f64,
     probability: f64,
     balance_factor: f64,
+    max_align_len: f64,
     stochastic_weighted_cost: f64,
 }
 
@@ -19,6 +21,7 @@ impl Zero for StochasticWeightedCost{
             cost: 0.0,
             probability: 1.0,
             balance_factor: 1.0,
+            max_align_len: f64::MAX,
             stochastic_weighted_cost: 0.0
         }
     }
@@ -39,7 +42,8 @@ impl Add for StochasticWeightedCost{
             cost: cost,
             probability: probability.clone(),
             balance_factor: self.balance_factor,
-            stochastic_weighted_cost: (cost+1.0).powf(self.balance_factor)*(1.0-probability).powf(1.0-self.balance_factor)
+            max_align_len: self.max_align_len,
+            stochastic_weighted_cost: ((self.cost+1.0)/self.max_align_len).powf(self.balance_factor)*(1.0-probability).powf(self.max_align_len/self.balance_factor)
         }
     }
 }
@@ -49,7 +53,7 @@ impl AddAssign for StochasticWeightedCost {
     fn add_assign(&mut self, other: Self) {
         self.cost += other.cost;
         self.probability *= other.probability;
-        self.stochastic_weighted_cost = (self.cost+1.0).powf(self.balance_factor) * (1.0 - self.probability).powf(1.0-self.balance_factor);
+        self.stochastic_weighted_cost = ((self.cost+1.0)/self.max_align_len).powf(self.balance_factor)*(1.0-self.probability).powf(self.max_align_len/self.balance_factor);
     }
 }
 
@@ -100,7 +104,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
 
         // get the length of the shortest path in the model
         let shortest_path = self.get_shortest_path_len()?;
-        let maximum_alignment_len = shortest_path + trace.len();
+        let maximum_alignment_len = (shortest_path + trace.len()) as f64;
 
         let balance_to_f64 = balance.fraction_to_f64().unwrap();
 
@@ -117,7 +121,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
                 //we can do a log move
                 // log::debug!("\tlog move {}", trace[*trace_index]);
 
-                result.push(((trace_index + 1, state.clone()), StochasticWeightedCost{cost:1.0, probability:1.0, balance_factor: balance_to_f64,stochastic_weighted_cost:0.0}));
+                result.push(((trace_index + 1, state.clone()), StochasticWeightedCost{cost:1.0, probability:1.0, balance_factor: balance_to_f64, max_align_len:maximum_alignment_len,stochastic_weighted_cost:0.0}));
             }
         
             //walk through the enabled transitions in the model
@@ -139,6 +143,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
                     StochasticWeightedCost{cost:1.0,
                         probability:transition_probability,
                         balance_factor: balance_to_f64,
+                        max_align_len: maximum_alignment_len,
                         stochastic_weighted_cost: 1.0-transition_probability}));
 
                     //which may also be a synchronous move
@@ -149,6 +154,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
                             cost:0.0, 
                             probability:transition_probability, 
                             balance_factor: balance_to_f64,
+                            max_align_len:maximum_alignment_len,
                             stochastic_weighted_cost:0.0}));
                     }
                 } else {
@@ -157,6 +163,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
                         cost:0.0, 
                         probability:transition_probability,
                         balance_factor: balance_to_f64,
+                        max_align_len:maximum_alignment_len,
                         stochastic_weighted_cost:0.0}));
                 }
             }
@@ -179,7 +186,8 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
 
             StochasticWeightedCost{
                 cost:move_cost.powf(balance_to_f64), 
-                probability:2.0_f64.powf(probability_gain).powf(1.0-balance_to_f64),
+                probability:2.0_f64.powf(probability_gain).powf(1.0/balance_to_f64),
+                max_align_len:maximum_alignment_len,
                 balance_factor: balance_to_f64,
                 stochastic_weighted_cost:(1.0-probability_gain)*move_cost}
         };
