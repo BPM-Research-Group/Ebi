@@ -133,6 +133,38 @@ Computation is more efficient for an object with a finite stochastic language.")
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
 };
 
+// pub const EBI_ANALYSE_SHORTESTPATH: EbiCommand = EbiCommand::Command {
+//     name_short: "shortestpath", 
+//     name_long: Some("shortest-path"), 
+//     explanation_short: "Find the shortest path.", 
+//     explanation_long: Some(""),
+//     cli_command: None, 
+//     latex_link: None,
+//     exact_arithmetic: true,
+//     input_types: &[ 
+//         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::Semantics)], 
+//         &[ &EbiInputType::Usize] 
+//     ],
+//     input_names: &[ "FILE"],
+//     input_helps: &[ "Any object with deterministic stochastic semantics."],
+//     execute: |mut objects, _| {
+//         let object = objects.remove(0);
+//         let result = match object {
+//             EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => {
+//                 slang.get_shortest_path_len().context("Analysing language.")?
+//             },
+//             EbiInput::Trait(EbiTraitObject::Semantics(semantics), _) => {
+//                 println!("start searching");
+//                 semantics.get_shortest_path_len().context("Analysing language.")?
+//             },
+//             _ => unreachable!()
+//         };
+//         Ok(EbiOutput::Fraction(Fraction::from(result)))
+//     }, 
+//     output_type: &EbiOutputType::Fraction
+// };
+
+
 pub const EBI_ANALYSE_MODE: EbiCommand = EbiCommand::Command { 
     name_short: "mode", 
     name_long: None,

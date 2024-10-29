@@ -67,7 +67,6 @@ pub trait Semantics : Debug + Send + Sync + AlignmentHeuristics<AState = <Self a
 	fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity>;
 
 	fn get_enabled_transitions(&self, state: &Self::State) -> Vec<TransitionIndex>;
-
 }
 
 pub trait ToSemantics {

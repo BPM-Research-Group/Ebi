@@ -87,4 +87,5 @@ impl Semantics for DeterministicFiniteAutomatonSemantics {
 
         return result;
     }
+
 }

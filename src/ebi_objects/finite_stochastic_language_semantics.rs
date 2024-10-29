@@ -122,7 +122,7 @@ impl Semantics for FiniteStochasticLanguageSemantics {
         }
         return result;
     }
-
+    
 }
 
 impl StochasticSemantics for FiniteStochasticLanguageSemantics {

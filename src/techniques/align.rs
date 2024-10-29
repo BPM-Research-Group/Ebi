@@ -278,11 +278,6 @@ pub trait AlignmentHeuristics {
     fn get_incidence_matrix(&self, _trace: &Vec<Activity>) -> (Vec<Vec<f64>>,Vec<Vec<usize>>);
 
     /*
-    The function returns the length of the shortest path from the initial state to the final state
-     */
-    fn get_shortest_path(&self) -> usize;
-
-    /*
     The function transforms a marking in the synchronous product net into a marking vector
      */
     fn get_marking_vector(&self, _trace: &Vec<Activity>, _trace_index: &usize, _state: &Self::AState) -> Vec<f64>;
@@ -373,12 +368,7 @@ impl AlignmentHeuristics for DeterministicFiniteAutomatonSemantics {
     _transition_preset: &Vec<Vec<usize>>) -> Result<f64> {
         todo!()
     }
-    
-    fn get_shortest_path(&self) -> usize {
-        todo!()
-    }
 
-    
 }
 
 impl AlignmentHeuristics for FiniteStochasticLanguageSemantics {
@@ -430,9 +420,6 @@ impl AlignmentHeuristics for FiniteStochasticLanguageSemantics {
         todo!()
     }
     
-    fn get_shortest_path(&self) -> usize {
-        todo!()
-    }
 }
 
 impl AlignmentHeuristics for LabelledPetriNet {
@@ -483,9 +470,6 @@ impl AlignmentHeuristics for LabelledPetriNet {
         todo!()
     }
     
-    fn get_shortest_path(&self) -> usize {
-        todo!()
-    }
 }
 
 impl AlignmentHeuristics for StochasticLabelledPetriNet {
@@ -888,10 +872,6 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
     fn underestimate_cost_to_final_synchronous_state(&self, _trace: &Vec<Activity>, _trace_index: &usize, _state: &Self::AState, _cache: &Vec<Vec<usize>>) -> usize {
         todo!()
     }
-    
-    fn get_shortest_path(&self) -> usize {
-        todo!()
-    }
 }
 
 impl AlignmentHeuristics for StochasticDeterministicFiniteAutomatonSemantics {
@@ -939,10 +919,6 @@ impl AlignmentHeuristics for StochasticDeterministicFiniteAutomatonSemantics {
     _cost_function: &Vec<f64>,
     _incidence_matrix: &Vec<Vec<f64>>,
     _transition_preset: &Vec<Vec<usize>>) -> Result<f64> {
-        todo!()
-    }
-    
-    fn get_shortest_path(&self) -> usize {
         todo!()
     }
 }

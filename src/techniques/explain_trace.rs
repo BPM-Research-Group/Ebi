@@ -1,8 +1,9 @@
 use std::{cmp::Ordering, fmt::{Debug, Display}, hash::Hash, ops::{Add, AddAssign}};
 use anyhow::{anyhow, Result};
 use fraction::Zero;
-use num_traits::Pow;
 use crate::{ebi_framework::activity_key::Activity, ebi_objects::alignments::Alignments, ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}, math::{astar,fraction::Fraction}, techniques::align::transform_alignment};
+
+use super::shortest_path::ShortestPath;
 
 #[derive(Debug, Clone, Copy)]
 struct StochasticWeightedCost {
@@ -96,6 +97,10 @@ impl ExplainTrace for EbiTraitStochasticSemantics {
 impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSemantics<State = FS, AState = FS> {
 
     pub fn explain_trace(&self, trace: &Vec<Activity>, balance: &Fraction) -> Result<Alignments> {
+
+        // get the length of the shortest path in the model
+        let shortest_path = self.get_shortest_path_len()?;
+        let maximum_alignment_len = shortest_path + trace.len();
 
         let balance_to_f64 = balance.fraction_to_f64().unwrap();
 
