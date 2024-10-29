@@ -2,9 +2,8 @@ use core::f64;
 use std::{cmp::Ordering, fmt::{Debug, Display}, hash::Hash, ops::{Add, AddAssign}};
 use anyhow::{anyhow, Result};
 use fraction::Zero;
+use num_traits::Pow;
 use crate::{ebi_framework::activity_key::Activity, ebi_objects::alignments::Alignments, ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}, math::{astar,fraction::Fraction}, techniques::align::transform_alignment};
-
-use super::shortest_path::ShortestPath;
 
 #[derive(Debug, Clone, Copy)]
 struct StochasticWeightedCost {

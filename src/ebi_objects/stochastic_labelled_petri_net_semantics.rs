@@ -104,7 +104,6 @@ impl Semantics for StochasticLabelledPetriNet {
     fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
         self.labels[transition]
     }
-    
 }
 
 impl StochasticSemantics for StochasticLabelledPetriNet {

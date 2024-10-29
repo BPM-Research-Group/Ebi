@@ -40,7 +40,6 @@ fnv = "*"
 jni = "*"
 itertools = "*"
 good_lp = "*"
-queues = "*"
 
 [dependencies.num-rational]
 version = "0.4.1"

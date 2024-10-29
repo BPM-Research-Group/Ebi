@@ -1,4 +1,4 @@
-use std::{collections::{HashMap, HashSet}, fmt::{Debug, Display}, usize};
+use std::{collections::{HashMap, HashSet}, fmt::{Debug, Display}};
 use core::hash::Hash;
 use anyhow::{anyhow, Result};
 use fraction::One;
@@ -37,7 +37,7 @@ impl FiniteStochasticLanguageAnalyser for EbiTraitStochasticDeterministicSemanti
 impl FiniteStochasticLanguageAnalyser for dyn EbiTraitFiniteStochasticLanguage {
     fn analyse_most_likely_traces(&self, number_of_traces: &usize) -> Result<FiniteStochasticLanguage> {
         if number_of_traces.is_one() {
-            let mut result: HashMap<Vec<Activity>, Fraction> = HashMap::new();
+            let mut result = HashMap::new();
 
             let (mut max_trace, mut max_probability) = self.iter_trace_probability().next().ok_or_else(|| anyhow!("Finite stochastic language is empty."))?;
 
@@ -89,11 +89,9 @@ impl FiniteStochasticLanguageAnalyser for dyn EbiTraitFiniteStochasticLanguage {
 
         Ok((result2, self.get_activity_key().clone()).into())
     }
-
 }
 
 impl <FS: Hash + Display + Debug + Clone + Eq> FiniteStochasticLanguageAnalyser for dyn StochasticDeterministicSemantics<DState = FS> {
-    
     fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
         let error_at_loop = at_least.is_zero(); //If at_least is zero, we are asked to return all traces. If there is a loop, then this is impossible.
         
@@ -176,6 +174,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq> FiniteStochasticLanguageAnalyser 
                     if !termination_proability.is_zero() {
                         queue.push(Y::Trace(prefix.clone()), &y_probability * &termination_proability);
                     }
+
                     for activity in self.get_enabled_activities(&p_state) {
                         let activity_probability = self.get_activity_probability(&p_state, activity);
         
@@ -198,13 +197,13 @@ impl <FS: Hash + Display + Debug + Clone + Eq> FiniteStochasticLanguageAnalyser 
             }
         }
 
+
         if result.is_empty() {
             return Err(anyhow!("Analysis returned an empty language; there are no traces in the model."));
         }
 
         Ok((result, self.get_activity_key().clone()).into())
     }
-    
 }
 
 struct X<FS: Hash + Display + Debug + Clone + Eq> {

@@ -93,8 +93,6 @@ impl Semantics for StochasticDeterministicFiniteAutomatonSemantics {
 
         return result;
     }
-    
-
 }
 
 impl StochasticSemantics for StochasticDeterministicFiniteAutomatonSemantics {
