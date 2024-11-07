@@ -2,7 +2,7 @@ use std::{fmt::{Debug, Display}, hash::Hash, sync::{Arc, Mutex}};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use anyhow::{anyhow, Context, Error, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, ebi_command::EbiCommand}, ebi_objects::{alignments::{Alignments, Move}, deterministic_finite_automaton_semantics::DeterministicFiniteAutomatonSemantics, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, ebi_command::EbiCommand}, ebi_objects::{alignments::{Alignments, Move}, deterministic_finite_automaton_semantics::DeterministicFiniteAutomatonSemantics, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, process_tree::ProcessTree, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
 pub trait Align {
     fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments>;
@@ -310,6 +310,18 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
 }
 
 impl AlignmentHeuristics for StochasticDeterministicFiniteAutomatonSemantics {
+    type AState = usize;
+    
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>,  _: &usize, _: &Self::AState, _: &Vec<Vec<usize>>) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for ProcessTree {
     type AState = usize;
     
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {

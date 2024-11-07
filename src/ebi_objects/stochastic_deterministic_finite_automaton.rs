@@ -2,7 +2,7 @@ use std::{cmp::{max, Ordering}, collections::HashMap, fmt, io::{self, BufRead}, 
 use anyhow::{anyhow, Context, Result, Error};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage}, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, follower_semantics::FollowerSemantics, json, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage}, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, follower_semantics::FollowerSemantics, json, math::fraction::Fraction};
 
 use super::{labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
 
@@ -19,6 +19,7 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
     ],
     object_importers: &[
         EbiObjectImporter::StochasticDeterministicFiniteAutomaton(StochasticDeterministicFiniteAutomaton::import_as_object),
+        EbiObjectImporter::LabelledPetriNet(StochasticDeterministicFiniteAutomaton::import_as_labelled_petri_net),
     ],
     object_exporters: &[
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(StochasticDeterministicFiniteAutomaton::export_from_object),
@@ -235,6 +236,11 @@ impl StochasticDeterministicFiniteAutomaton {
         let sdfa = Arc::new(Self::import(reader)?);
         Ok(Self::get_semantics(sdfa))
     }
+
+    pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let sdfa = Self::import(reader)?;
+        Ok(EbiObject::LabelledPetriNet(sdfa.get_stochastic_labelled_petri_net().into()))
+    }
     
     pub fn get_stochastic_labelled_petri_net(&self) -> StochasticLabelledPetriNet {
         log::info!("convert SDFA to stochastic labelled Petri net");
@@ -293,6 +299,15 @@ impl StochasticDeterministicFiniteAutomaton {
         match object {
             EbiOutput::Object(EbiObject::EventLog(log)) => log.to_stochastic_deterministic_finite_automaton().export(f),
             _ => unreachable!()
+        }
+    }
+}
+
+impl FromEbiTraitObject for StochasticDeterministicFiniteAutomaton {
+    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!("cannot read {} {} as a stochastic deterministic finite automaton", object.get_type().get_article(), object.get_type()))
         }
     }
 }

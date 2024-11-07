@@ -2,7 +2,7 @@ use std::{collections::BTreeSet, fmt::Display};
 use anyhow::Result;
 use strum_macros::EnumIter;
 
-use crate::{ebi_objects::{alignments::Alignments, deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}};
+use crate::{ebi_objects::{alignments::Alignments, deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}};
 
 use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_input::EbiInputType, ebi_trait::EbiTrait, infoable::Infoable};
 
@@ -18,6 +18,7 @@ pub enum EbiObjectType {
     LabelledPetriNet,
     StochasticDeterministicFiniteAutomaton,
     StochasticLabelledPetriNet,
+    ProcessTree,
 }
 
 impl EbiObjectType {
@@ -33,6 +34,7 @@ impl EbiObjectType {
             EbiObjectType::DirectlyFollowsModel => "a",
             EbiObjectType::Alignments => "an",
             EbiObjectType::DeterministicFiniteAutomaton => "a",
+            EbiObjectType::ProcessTree => "a",
         }
     }
     
@@ -81,6 +83,7 @@ impl Display for EbiObjectType {
             EbiObjectType::DirectlyFollowsModel => "directly follows model",
             EbiObjectType::Alignments => "alignment",
             EbiObjectType::DeterministicFiniteAutomaton => "deterministic finite automaton",
+            EbiObjectType::ProcessTree => "process tree",
         })
     }
 }
@@ -95,6 +98,7 @@ pub enum EbiObject {
     DirectlyFollowsModel(DirectlyFollowsModel),
     Alignments(Alignments),
     DeterministicFiniteAutomaton(DeterministicFiniteAutomaton),
+    ProcessTree(ProcessTree),
 }
 
 impl EbiObject {
@@ -109,6 +113,7 @@ impl EbiObject {
             EbiObject::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
             EbiObject::Alignments(_) => EbiObjectType::Alignments,
             EbiObject::DeterministicFiniteAutomaton(_) => EbiObjectType::DeterministicFiniteAutomaton,
+            EbiObject::ProcessTree(_) => EbiObjectType::ProcessTree,
         }
     }
 }
@@ -125,6 +130,7 @@ impl Display for EbiObject {
             EbiObject::DirectlyFollowsModel(o) => write!(f, "{}", o),
             EbiObject::Alignments(o) => write!(f, "{}", o),
             EbiObject::DeterministicFiniteAutomaton(o) => write!(f, "{}", o),
+            EbiObject::ProcessTree(o) => write!(f, "{}", o),
         }
     }
 }
@@ -141,6 +147,7 @@ impl Infoable for EbiObject {
             EbiObject::DirectlyFollowsModel(o) => o.info(f),
             EbiObject::Alignments(o) => o.info(f),
             EbiObject::DeterministicFiniteAutomaton(o) => o.info(f),
+            EbiObject::ProcessTree(o) => o.info(f),
         }
     }
 }
