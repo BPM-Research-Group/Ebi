@@ -93,6 +93,10 @@ impl Semantics for StochasticDeterministicFiniteAutomatonSemantics {
 
         return result;
     }
+
+    fn get_number_of_transitions(&self) -> usize {
+        self.sdfa.get_number_of_transitions()
+    }
 }
 
 impl StochasticSemantics for StochasticDeterministicFiniteAutomatonSemantics {

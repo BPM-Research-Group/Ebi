@@ -123,6 +123,10 @@ impl Semantics for FiniteStochasticLanguageSemantics {
         return result;
     }
 
+    fn get_number_of_transitions(&self) -> usize {
+        self.activity_key.get_number_of_activities()
+    }
+
 }
 
 impl StochasticSemantics for FiniteStochasticLanguageSemantics {

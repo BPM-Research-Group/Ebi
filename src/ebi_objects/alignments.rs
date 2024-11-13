@@ -22,14 +22,6 @@ pub const EBI_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[],
 };
 
-#[derive(Debug,PartialEq,Eq,Ord,PartialOrd)]
-pub enum Move {
-    LogMove(Activity),
-    ModelMove(Activity, TransitionIndex),
-    SynchronousMove(Activity, TransitionIndex),
-    SilentMove(TransitionIndex)
-}
-
 pub struct Alignments {
     activity_key: ActivityKey,
     alignments: Vec<Vec<Move>>
@@ -230,5 +222,22 @@ impl Infoable for Alignments {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         writeln!(f, "Number of alignments\t\t{}", self.alignments.len())?;
         Ok(write!(f, "")?)
+    }
+}
+
+#[derive(Debug,PartialEq,Eq,Ord,PartialOrd)]
+pub enum Move {
+    LogMove(Activity),
+    ModelMove(Activity, TransitionIndex),
+    SynchronousMove(Activity, TransitionIndex),
+    SilentMove(TransitionIndex)
+}
+
+impl Move {
+    pub fn get_transition(&self) -> Option<TransitionIndex> {
+        match self {
+            Move::LogMove(_) => None,
+            Move::ModelMove(_, transition) | Move::SilentMove(transition) | Move::SynchronousMove(_, transition) => Some(*transition)
+        }
     }
 }

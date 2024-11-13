@@ -99,10 +99,6 @@ impl StochasticLabelledPetriNet {
         self.place2output_transitions.len()
     }
 
-    pub fn get_number_of_transitions(&self) -> usize {
-        self.transition2input_places.len()
-    }
-
     pub fn get_initial_marking(&self) -> &Marking {
         &self.initial_marking
     }

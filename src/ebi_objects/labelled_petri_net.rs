@@ -64,10 +64,6 @@ impl LabelledPetriNet {
         Ok(EbiTraitSemantics::Marking(Box::new(net)))
     }
 
-    pub fn get_number_of_transitions(&self) -> usize {
-        self.transition2input_places.len()
-    }
-
     pub fn get_number_of_places(&self) -> usize {
         self.place2output_transitions.len()
     }

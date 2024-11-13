@@ -68,6 +68,8 @@ pub trait Semantics : Debug + Send + Sync + AlignmentHeuristics<AState = <Self a
 
 	fn get_enabled_transitions(&self, state: &Self::State) -> Vec<TransitionIndex>;
 
+	fn get_number_of_transitions(&self) -> usize;
+
 }
 
 pub trait ToSemantics {

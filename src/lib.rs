@@ -45,6 +45,7 @@ pub mod ebi_objects {
     pub mod alignments;
     pub mod deterministic_finite_automaton;
     pub mod deterministic_finite_automaton_semantics;
+    pub mod executions;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_stochastic_deterministic_semantics;
@@ -87,6 +88,7 @@ pub mod techniques {
     pub mod sample;
     pub mod explain_trace;
     pub mod process_variety;
+    pub mod executions;
 }
 pub mod deterministic_semantics_for_stochastic_semantics;
 pub mod medoid;

@@ -87,4 +87,8 @@ impl Semantics for DeterministicFiniteAutomatonSemantics {
 
         return result;
     }
+
+    fn get_number_of_transitions(&self) -> usize {
+        self.dfa.get_number_of_transitions()
+    }
 }

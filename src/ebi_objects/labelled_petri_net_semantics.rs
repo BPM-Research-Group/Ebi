@@ -102,5 +102,9 @@ impl Semantics for LabelledPetriNet {
     fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
         self.labels[transition]
     }
+
+    fn get_number_of_transitions(&self) -> usize {
+        self.transition2input_places.len()
+    }
 }
 

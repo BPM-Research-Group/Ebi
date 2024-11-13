@@ -1,4 +1,4 @@
-use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics}, techniques::{align::Align, medoid_non_stochastic::MedoidNonStochastic}};
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics}, techniques::{align::Align, executions::FindExecutions, medoid_non_stochastic::MedoidNonStochastic}};
 
 
 pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
@@ -83,4 +83,29 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command
         return Ok(EbiOutput::Object(EbiObject::Alignments(result)));
     }, 
     output_type: &EbiOutputType::ObjectType(EbiObjectType::Alignments)
+};
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Command {
+    name_short: "exe", 
+    name_long: Some("executions"),
+    explanation_short: "Compute the executions of each transition of the model in the log.", 
+    explanation_long: Some("Compute executions.\nNB 1: the model must be able to terminate and its states must be bounded.\nNB 2: the search performed is not optimised. For Petri nets, the ProM implementation may be more efficient."), 
+    latex_link: None, 
+    cli_command: None, 
+    exact_arithmetic: true, 
+    input_types: &[ 
+        &[ &EbiInputType::Trait(EbiTrait::EventLog)],
+        &[ &EbiInputType::Trait(EbiTrait::Semantics)]
+    ],
+    input_names: &[ "LOG", "MODEL"],
+    input_helps: &[ "The event log.", "The model."],
+    execute: |mut objects, _| {
+        let log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
+        let model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
+        
+        let result = model.find_executions(log)?;
+        
+        return Ok(EbiOutput::Object(EbiObject::Executions(result)));
+    }, 
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::Executions)
 };
