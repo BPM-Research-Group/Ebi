@@ -224,6 +224,7 @@ pub enum EbiObjectExporter {
     StochasticLabelledPetriNet(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     Alignments(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     DeterministicFiniteAutomaton(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
+    Executions(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
 }
 
 impl EbiObjectExporter {
@@ -238,6 +239,7 @@ impl EbiObjectExporter {
             EbiObjectExporter::StochasticLabelledPetriNet(_) => EbiObjectType::StochasticLabelledPetriNet,
             EbiObjectExporter::Alignments(_) => EbiObjectType::Alignments,
             EbiObjectExporter::DeterministicFiniteAutomaton(_) => EbiObjectType::DeterministicFiniteAutomaton,
+            EbiObjectExporter::Executions(_) => EbiObjectType::Executions,
         }
     }
 
@@ -252,6 +254,7 @@ impl EbiObjectExporter {
             EbiObjectExporter::StochasticLabelledPetriNet(exporter) => (exporter)(object, f),
             EbiObjectExporter::Alignments(exporter) => (exporter)(object, f),
             EbiObjectExporter::DeterministicFiniteAutomaton(exporter) => (exporter)(object, f),
+            EbiObjectExporter::Executions(exporter) => (exporter)(object, f),
         }
     }
 }

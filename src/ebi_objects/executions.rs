@@ -16,10 +16,10 @@ pub const EBI_EXECUTIONS: EbiFileHandler = EbiFileHandler {
         
     ],
     object_importers: &[
-        EbiObjectImporter::Alignments(Executions::import_as_object)
+        EbiObjectImporter::Executions(Executions::import_as_object)
     ],
     object_exporters: &[ 
-        EbiObjectExporter::Alignments(Executions::export_from_object)
+        EbiObjectExporter::Executions(Executions::export_from_object)
     ],
     java_object_handlers: &[],
 };

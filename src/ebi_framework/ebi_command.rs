@@ -220,12 +220,12 @@ impl EbiCommand {
 
                 if let Some(to_file) = cli_matches.get_one::<PathBuf>(ARG_ID_OUTPUT) {
                     //write result to file
-                    let exporter = Self::select_exporter(output_type, Some(to_file));
+                    let exporter = Self::select_exporter(output_type, Some(to_file))?;
                     log::info!("Writing result to {:?} as {} {}", to_file, exporter.get_article(), exporter);
                     ebi_output::export_object(to_file, result, exporter)?;
                 } else {
                     //write result to STDOUT
-                    let exporter = Self::select_exporter(output_type, None);
+                    let exporter = Self::select_exporter(output_type, None)?;
                     log::info!("Writing result as {} {}", exporter.get_article(), exporter);
                     println!("{}", ebi_output::export_to_string(result, exporter)?);
                 }
@@ -236,11 +236,11 @@ impl EbiCommand {
         Err(anyhow!("command not recognised"))
     }
 
-    pub fn select_exporter(output_type: &EbiOutputType, to_file: Option<&PathBuf>) -> EbiExporter {
+    pub fn select_exporter(output_type: &EbiOutputType, to_file: Option<&PathBuf>) -> Result<EbiExporter> {
         let exporters = output_type.get_exporters();
         
         if exporters.len() == 1 || to_file.is_none() {
-            return exporters.into_iter().next().unwrap();
+            return exporters.into_iter().next().ok_or_else(|| anyhow!("No exporter found."));
         }
 
         //strategy: take the exporter with the longest extension first (to export .xes.gz before .xes)
@@ -261,7 +261,7 @@ impl EbiCommand {
             for exporter in exporters {
                 if let EbiExporter::Object(_, file_handler) = exporter {
                     if to_file.unwrap().display().to_string().ends_with(&(".".to_string() + file_handler.file_extension)) {
-                        return exporter;
+                        return Ok(exporter);
                     }
                 } else {
                     unreachable!()
@@ -270,7 +270,7 @@ impl EbiCommand {
         }
 
         //otherwise, take the first one that was mentioned
-        return exporters.into_iter().next().unwrap();
+        return exporters.into_iter().next().ok_or_else(|| anyhow!("No exporter found."));
     }
 
     /**
