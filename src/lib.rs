@@ -89,6 +89,7 @@ pub mod techniques {
     pub mod explain_trace;
     pub mod process_variety;
     pub mod executions;
+    pub mod livelocks;
 }
 pub mod deterministic_semantics_for_stochastic_semantics;
 pub mod medoid;

@@ -176,6 +176,24 @@ impl LabelledPetriNet {
         }
     }
 
+    pub fn incidence_vector(&self, transition: TransitionIndex) -> Vec<i128> {
+        let mut vec2 = vec![0; self.get_number_of_places()];
+        for (in_place_pos, in_place) in self.transition2input_places[transition].iter().enumerate() {
+            vec2[*in_place] -= self.transition2input_places_cardinality[transition][in_place_pos] as i128;
+        }
+        for (out_place_pos, out_place) in self.transition2output_places[transition].iter().enumerate() {
+            vec2[*out_place] += self.transition2output_places_cardinality[transition][out_place_pos] as i128;
+        }
+        vec2
+    }
+
+    pub fn max_transition_input_arc_cardinality(&self) -> u64 {
+        if let Some(x) = self.transition2input_places_cardinality.iter().flatten().max() {
+            *x
+        } else {
+            0
+        }
+    }
     
 }
 

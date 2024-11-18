@@ -28,7 +28,7 @@ impl StochasticLabelledPetriNet {
         true
     }
 
-    fn compute_enabled_transitions(&self, state: &mut LPNMarking) {
+    pub(crate) fn compute_enabled_transitions(&self, state: &mut LPNMarking) {
 		state.number_of_enabled_transitions = 0;
         state.enabled_transitions.fill(false);
         for transition in 0 .. self.get_number_of_transitions() {
