@@ -90,8 +90,8 @@ pub mod techniques {
     pub mod process_variety;
     pub mod executions;
     pub mod livelocks;
+    pub mod deterministic_semantics_for_stochastic_semantics;
 }
-pub mod deterministic_semantics_for_stochastic_semantics;
 pub mod medoid;
 pub mod distances;
 pub mod tests;

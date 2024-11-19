@@ -1,10 +1,9 @@
 use std::io;
 use std::str::FromStr;
-use std::{fmt, io::BufRead, rc::Rc};
+use std::{fmt, io::BufRead};
 use anyhow::{anyhow, Result, Context, Error};
 use layout::topo::layout::VisualGraph;
 
-use crate::deterministic_semantics_for_stochastic_semantics::DeterministicStochasticSemantics;
 use crate::ebi_framework::activity_key::{Activity, ActivityKey};
 use crate::ebi_framework::dottable::Dottable;
 use crate::ebi_framework::ebi_file_handler::EbiFileHandler;
@@ -81,13 +80,9 @@ impl StochasticLabelledPetriNet {
         Ok(EbiTraitStochasticSemantics::Marking(Box::new(slpn)))
     }
 
-    pub fn get_deterministic_stochastic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::PMarking(Box::new(DeterministicStochasticSemantics::new(Rc::new(self))))
-    }
-
     pub fn import_as_deterministic_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
         let net = Self::import(reader)?;
-        Ok(net.get_deterministic_stochastic_semantics())
+        Ok(EbiTraitStochasticDeterministicSemantics::PMarking(Box::new(net)))
     }
 
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {

@@ -91,7 +91,7 @@ impl FiniteStochasticLanguageAnalyser for dyn EbiTraitFiniteStochasticLanguage {
     }
 }
 
-impl <FS: Hash + Display + Debug + Clone + Eq> FiniteStochasticLanguageAnalyser for dyn StochasticDeterministicSemantics<DState = FS> {
+impl <FS: Hash + Display + Debug + Clone + Eq> FiniteStochasticLanguageAnalyser for dyn StochasticDeterministicSemantics<DState = FS, LivelockMarking = FS> {
     fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
         let error_at_loop = at_least.is_zero(); //If at_least is zero, we are asked to return all traces. If there is a loop, then this is impossible.
         
@@ -148,7 +148,9 @@ impl <FS: Hash + Display + Debug + Clone + Eq> FiniteStochasticLanguageAnalyser 
                         p_state: new_p_state,
                     };
 
-                    queue.push(new_x);
+                    if !self.is_non_decreasing_livelock(&new_x.p_state.clone())? {
+                        queue.push(new_x);
+                    }
                 }
             }
         }

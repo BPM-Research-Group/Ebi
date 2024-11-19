@@ -58,8 +58,7 @@ mod tests {
     fn mode() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba_uni.slpn").unwrap();
         let slpn = fin.parse::<StochasticLabelledPetriNet>().unwrap();
-        let semantics = slpn.get_deterministic_stochastic_semantics();
-        let slang = semantics.analyse_most_likely_traces(&1).unwrap();
+        let slang = slpn.analyse_most_likely_traces(&1).unwrap();
         let fout = fs::read_to_string("testfiles/ba.slang").unwrap();
         assert_eq!(fout, slang.to_string())
     }

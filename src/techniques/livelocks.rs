@@ -1,19 +1,17 @@
 use anyhow::Result;
 
-use crate::{ebi_objects::{labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_semantics::Semantics};
+use crate::{techniques::deterministic_semantics_for_stochastic_semantics::PMarking, ebi_objects::{labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_semantics::Semantics};
 
 pub trait Livelock {
-    type FS;
+    type LivelockMarking;
 
-    fn is_non_decreasing_livelock(&self, state: &mut Self::FS) -> Result<bool>;
+    fn is_non_decreasing_livelock(&self, state: &Self::LivelockMarking) -> Result<bool>;
 }
 
 macro_rules! is_non_decreasing_livelock {
     ($t:ident) => {
-        impl Livelock for $t {
-            type FS = LPNMarking;
-        
-            fn is_non_decreasing_livelock(&self, state: &mut Self::FS) -> Result<bool> {
+        impl $t {
+            fn is_marking_non_decreasing_livelock(&self, state: &mut LPNMarking) -> Result<bool> {
                 let mut trace = vec![];
         
                 while !self.is_final_state(state) {
@@ -73,6 +71,20 @@ macro_rules! is_non_decreasing_livelock {
                     self.execute_transition(state, transition)?;
                 }
         
+                Ok(false)
+            }
+        }
+
+        impl Livelock for $t {
+            type LivelockMarking = PMarking<LPNMarking>;
+        
+            fn is_non_decreasing_livelock(&self, state: &Self::LivelockMarking) -> Result<bool> {
+                for (marking, _) in state.p_marking {
+                    if self.is_marking_non_decreasing_livelock(&mut marking.clone())? {
+                        return Ok(true);
+                    }
+                }
+
                 Ok(false)
             }
         

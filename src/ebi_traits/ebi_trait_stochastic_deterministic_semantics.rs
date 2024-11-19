@@ -1,11 +1,11 @@
 use anyhow::{anyhow, Result};
 
-use crate::{deterministic_semantics_for_stochastic_semantics::PMarking, ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::labelled_petri_net::LPNMarking, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::labelled_petri_net::LPNMarking, math::fraction::Fraction, techniques::{deterministic_semantics_for_stochastic_semantics::PMarking, livelocks::Livelock}};
 
 
 pub enum EbiTraitStochasticDeterministicSemantics {
-	Usize(Box<dyn StochasticDeterministicSemantics<DState = usize>>),
-    PMarking(Box<dyn StochasticDeterministicSemantics<DState = PMarking<LPNMarking>>>)
+	Usize(Box<dyn StochasticDeterministicSemantics<DState = usize, LivelockMarking = usize>>),
+    PMarking(Box<dyn StochasticDeterministicSemantics<DState = PMarking<LPNMarking>, LivelockMarking = PMarking<LPNMarking>>>)
 }
 
 impl FromEbiTraitObject for EbiTraitStochasticDeterministicSemantics {
@@ -17,7 +17,7 @@ impl FromEbiTraitObject for EbiTraitStochasticDeterministicSemantics {
     }
 }
 
-pub trait StochasticDeterministicSemantics {
+pub trait StochasticDeterministicSemantics: Livelock {
     type DState;
 
     fn get_activity_key(&self) -> &ActivityKey;

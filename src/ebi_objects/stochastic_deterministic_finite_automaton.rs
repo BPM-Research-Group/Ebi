@@ -215,7 +215,7 @@ impl StochasticDeterministicFiniteAutomaton {
         EbiTraitStochasticSemantics::Usize(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
     }
 
-    pub fn get_deterministic_semantics(sdfa: Arc<Self>) -> Result<Box<dyn StochasticDeterministicSemantics<DState = usize>>> {
+    pub fn get_deterministic_semantics(sdfa: Arc<Self>) -> Result<Box<dyn StochasticDeterministicSemantics<DState = usize, LivelockMarking = usize>>> {
         Ok(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
     }
 
