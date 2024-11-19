@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{techniques::deterministic_semantics_for_stochastic_semantics::PMarking, ebi_objects::{labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_semantics::Semantics};
+use crate::{ebi_objects::{deterministic_finite_automaton_semantics::DeterministicFiniteAutomatonSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_semantics::Semantics};
 
 pub trait Livelock {
     type LivelockMarking;
@@ -8,7 +8,7 @@ pub trait Livelock {
     fn is_non_decreasing_livelock(&self, state: &Self::LivelockMarking) -> Result<bool>;
 }
 
-macro_rules! is_non_decreasing_livelock {
+macro_rules! is_non_decreasing_livelock_lpn {
     ($t:ident) => {
         impl $t {
             fn is_marking_non_decreasing_livelock(&self, state: &mut LPNMarking) -> Result<bool> {
@@ -92,5 +92,40 @@ macro_rules! is_non_decreasing_livelock {
     };
 }
 
-is_non_decreasing_livelock!(LabelledPetriNet);
-is_non_decreasing_livelock!(StochasticLabelledPetriNet);
+macro_rules! is_non_decreasing_livelock_dfm {
+    ($t:ident) => {
+        impl Livelock for $t {
+            type FS = usize;
+
+            fn is_non_decreasing_livelock(&self, state: &mut Self::FS) -> Result<bool> {
+                let mut trace = vec![];
+                
+                while !self.is_final_state(state) {
+                    let enabled = self.get_enabled_transitions(state);
+                    if enabled.len() != 1 {
+                        return Ok(false);
+                    }
+
+                    let transition = enabled.into_iter().next().unwrap();
+
+                    if trace.contains(state) {
+                        //we are in a loop
+
+                        return Ok(true);
+                    } else {
+                        trace.push(transition);
+                    }
+
+                    self.execute_transition(state, transition)?;
+                }
+
+                Ok(false)
+            }
+        }
+    }
+}
+
+is_non_decreasing_livelock_lpn!(LabelledPetriNet);
+is_non_decreasing_livelock_lpn!(StochasticLabelledPetriNet);
+is_non_decreasing_livelock_dfm!(DeterministicFiniteAutomatonSemantics);
+is_non_decreasing_livelock_dfm!(StochasticDeterministicFiniteAutomatonSemantics);
