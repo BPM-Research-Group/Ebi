@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{ebi_objects::{deterministic_finite_automaton_semantics::DeterministicFiniteAutomatonSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_semantics::Semantics};
+use crate::{techniques::deterministic_semantics_for_stochastic_semantics::PMarking, ebi_objects::{deterministic_finite_automaton_semantics::DeterministicFiniteAutomatonSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_semantics::Semantics};
 
 pub trait Livelock {
     type LivelockMarking;
@@ -95,9 +95,9 @@ macro_rules! is_non_decreasing_livelock_lpn {
 macro_rules! is_non_decreasing_livelock_dfm {
     ($t:ident) => {
         impl Livelock for $t {
-            type FS = usize;
+            type LivelockMarking = usize;
 
-            fn is_non_decreasing_livelock(&self, state: &mut Self::FS) -> Result<bool> {
+            fn is_non_decreasing_livelock(&self, state: &mut Self::LivelockMarking) -> Result<bool> {
                 let mut trace = vec![];
                 
                 while !self.is_final_state(state) {
