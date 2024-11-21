@@ -333,7 +333,7 @@ pub fn get_reader_file(from_file: &PathBuf) -> Result<MultipleReader> {
 }
 
 pub fn get_reader(cli_matches: &ArgMatches, cli_id: &str) -> Result<MultipleReader> {
-    if let Some(from_file) = cli_matches.get_one::<PathBuf>(cli_id) {
+    if let Some(from_file) = cli_matches.try_get_one::<PathBuf>(cli_id)? {
         if from_file.as_os_str() == "-" {
             return MultipleReader::from_stdin();
         } else {

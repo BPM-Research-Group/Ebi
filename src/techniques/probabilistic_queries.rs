@@ -104,6 +104,7 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
         }
 
         let mut result = HashMap::new();
+        let mut livelock_probability = Fraction::zero();
 
         let mut queue = vec![];
         queue.push(X{
@@ -151,7 +152,11 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
                         p_state: new_p_state,
                     };
 
-                    if !self.is_non_decreasing_livelock(&mut new_x.p_state.clone())? {
+                    if self.is_non_decreasing_livelock(&mut new_x.p_state.clone())? {
+                        //we found a livelock; count its probability
+                        livelock_probability *= new_x.probability;
+                    } else {
+                        //if not a livelock, continue the search
                         queue.push(new_x);
                     }
                 }
