@@ -115,6 +115,19 @@ mod tests {
     }
 
     #[test]
+    fn slpn_minprob_livelock() {
+        let fin = fs::read_to_string("testfiles/a-b-c-livelock.slpn").unwrap();
+        let slpn = fin.parse::<StochasticLabelledPetriNet>().unwrap();
+        let x : Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = Box::new(slpn);
+        let slang1 = x.analyse_minimum_probability(&Fraction::from((1,5))).unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/a-b-c-livelock.slang").unwrap();
+        let slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+
+        assert_eq!(slang1, slang2);
+    }
+
+    #[test]
     fn slang_minprob_one_deterministic() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
@@ -481,6 +494,7 @@ mod tests {
         let trace_follower = FollowerSemantics::Trace(&trace);
         assert_eq!(slpn.get_probability(&trace_follower).unwrap(), Fraction::zero());
     }
+
 
     #[test]
     fn fraction_neg() {
