@@ -97,25 +97,20 @@ macro_rules! is_non_decreasing_livelock_dfm {
             type LivState = usize;
 
             fn is_non_decreasing_livelock(&self, state: &mut usize) -> Result<bool> {
-                let mut trace = vec![];
-                
-                while !self.is_final_state(state) {
-                    let enabled = self.get_enabled_transitions(state);
-                    if enabled.len() != 1 {
-                        return Ok(false);
-                    }
 
-                    let transition = enabled.into_iter().next().unwrap();
+                let mut trace = vec![*state];
+                
+                while !self.is_final_state(state) && self.get_enabled_transitions(state).len() == 1 {
+
+                    let transition = self.get_enabled_transitions(state).into_iter().next().unwrap();
+                    self.execute_transition(state, transition)?;
 
                     if trace.contains(state) {
-                        //we are in a loop
-
+                        //we are in a loop, and for DFM like models, that means it's a non-decreasing livelock
                         return Ok(true);
                     } else {
-                        trace.push(transition);
+                        trace.push(*state);
                     }
-
-                    self.execute_transition(state, transition)?;
                 }
 
                 Ok(false)

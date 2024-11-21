@@ -36,6 +36,7 @@ impl ProbabilityQueries for EbiTraitStochasticDeterministicSemantics {
 
 impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
     fn analyse_most_likely_traces(&self, number_of_traces: &usize) -> Result<FiniteStochasticLanguage> {
+
         if number_of_traces.is_one() {
             let mut result = HashMap::new();
 
@@ -92,7 +93,9 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
 }
 
 impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSemantics<DetState = DState, LivState = DState> {
+    
     fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
+        
         let error_at_loop = at_least.is_zero(); //If at_least is zero, we are asked to return all traces. If there is a loop, then this is impossible.
         
         let mut seen = HashSet::new();

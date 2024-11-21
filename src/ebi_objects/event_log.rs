@@ -167,7 +167,7 @@ impl ToStochasticSemantics for EventLog {
 
 impl ToStochasticDeterministicSemantics for EventLog {
     fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
-        self.get_finite_stochastic_language().get_deterministic_stochastic_semantics().unwrap()
+        self.get_finite_stochastic_language().to_stochastic_deterministic_semantics()
     }
 }
 

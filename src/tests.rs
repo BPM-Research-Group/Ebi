@@ -5,7 +5,7 @@ mod tests {
     use fraction::GenericFraction;
     use num_bigint::ToBigUint;
 
-    use crate::{ebi_framework::activity_key::HasActivityKey, ebi_objects::{alignments::Move, deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::ToSemantics, ebi_trait_stochastic_deterministic_semantics::{StochasticDeterministicSemantics, ToStochasticDeterministicSemantics}}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}, medoid, techniques::{align::Align, deterministic_semantics_for_stochastic_semantics::PMarking, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probabilistic_queries::ProbabilityQueries, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
+    use crate::{ebi_framework::activity_key::HasActivityKey, ebi_objects::{alignments::Move, deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::ToSemantics, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics, ToStochasticDeterministicSemantics}}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}, medoid, techniques::{align::Align, deterministic_semantics_for_stochastic_semantics::PMarking, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probabilistic_queries::ProbabilityQueries, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 
     #[test]
     fn medoid() {
@@ -118,7 +118,7 @@ mod tests {
     fn slang_minprob_one_deterministic() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
-        let semantics = slang.get_deterministic_stochastic_semantics().unwrap();
+        let semantics = slang.to_stochastic_deterministic_semantics();
         
         //should error
         assert!(semantics.analyse_minimum_probability(&Fraction::one()).is_err());
@@ -138,7 +138,37 @@ mod tests {
     fn slang_minprob_zero() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
-        let semantics = slang.get_deterministic_stochastic_semantics().unwrap();
+        let slang2: &dyn EbiTraitFiniteStochasticLanguage = &slang;
+        
+        //should return the same
+        let slang3 = slang2.analyse_minimum_probability(&Fraction::zero()).unwrap();
+
+        assert_eq!(slang, slang3)
+    }
+
+    #[test]
+    fn slang_minprob_zero_through_sdfa() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
+        let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
+        assert_eq!(slang.len(), 3);
+        let mut sdfa = slang.get_stochastic_deterministic_finite_automaton();
+        assert_eq!(sdfa.max_state, 5);
+        assert_eq!(sdfa.get_number_of_transitions(), 5);
+
+        //initial state
+        let state = sdfa.get_deterministic_initial_state().unwrap();
+        assert_eq!(state, 0);
+        assert_eq!(sdfa.get_deterministic_enabled_activities(&state).len(), 2);
+
+        //take a b
+        let b = sdfa.get_activity_key_mut().process_activity("a");
+        sdfa.execute_deterministic_activity(&state, b).unwrap();
+
+
+
+        let semantics = EbiTraitStochasticDeterministicSemantics::Usize(Box::new(sdfa));
+
+        // let semantics = slang.clone().to_stochastic_deterministic_semantics();
         
         //should return the same
         let slang2 = semantics.analyse_minimum_probability(&Fraction::zero()).unwrap();
