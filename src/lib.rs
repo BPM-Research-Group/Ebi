@@ -44,7 +44,6 @@ pub mod ebi_objects {
     pub mod petri_net_markup_language;
     pub mod alignments;
     pub mod deterministic_finite_automaton;
-    pub mod deterministic_finite_automaton_semantics;
     pub mod executions;
 }
 pub mod ebi_traits {
@@ -101,3 +100,6 @@ pub mod json;
 pub mod line_reader;
 pub mod follower_semantics;
 pub mod marking;
+
+#[macro_use]
+extern crate derive_activity_key; 

@@ -1,5 +1,11 @@
 use std::{borrow::Borrow, collections::{HashMap, HashSet}, fmt::{Display, Debug}, hash::Hash};
 
+pub trait HasActivityKey {
+    fn get_activity_key(&self) -> &ActivityKey;
+
+    fn get_activity_key_mut(&mut self) -> &mut ActivityKey;
+}
+
 #[derive(Clone,Copy,Ord)]
 pub struct Activity {
     id: usize

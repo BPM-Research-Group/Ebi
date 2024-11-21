@@ -10,13 +10,13 @@ use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileH
 #[derive(PartialEq,Clone,EnumIter,Hash,Default)]
 pub enum EbiObjectType {
     #[default] Alignments,
+    StochasticDeterministicFiniteAutomaton,
     DeterministicFiniteAutomaton,
     DirectlyFollowsModel,
     EventLog,
     FiniteLanguage,
     FiniteStochasticLanguage,
     LabelledPetriNet,
-    StochasticDeterministicFiniteAutomaton,
     StochasticLabelledPetriNet,
     Executions,
 }

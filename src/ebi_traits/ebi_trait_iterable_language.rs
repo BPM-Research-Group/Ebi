@@ -1,11 +1,9 @@
 use anyhow::{anyhow, Result};
 
-use crate::ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject};
+use crate::ebi_framework::{activity_key::{Activity, HasActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject};
 
 
-pub trait EbiTraitIterableLanguage {
-    fn get_activity_key(&self) -> &ActivityKey;
-
+pub trait EbiTraitIterableLanguage: HasActivityKey {
     fn iter(&self) -> Box<dyn Iterator<Item = &Vec<Activity>> + '_>;
 }
 

@@ -1,8 +1,8 @@
 use anyhow::{anyhow, Result, Context, Error};
 use fnv::FnvBuildHasher;
-use std::{collections::HashSet, fmt::Display, io::{self, BufRead, Write}, str::FromStr, sync::Arc};
+use std::{collections::HashSet, fmt::Display, io::{self, BufRead, Write}, str::FromStr};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}}, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}}, line_reader::LineReader};
 
 use super::deterministic_finite_automaton::DeterministicFiniteAutomaton;
 
@@ -28,6 +28,7 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[],
 };
 
+#[derive(ActivityKey)]
 pub struct FiniteLanguage {
     activity_key: ActivityKey,
     traces: HashSet<Vec<Activity>, FnvBuildHasher>
@@ -77,11 +78,7 @@ impl FiniteLanguage {
     }
 }
 
-impl EbiTraitIterableLanguage for FiniteLanguage {
-    fn get_activity_key(&self) -> &ActivityKey {
-        &self.activity_key
-    }
-    
+impl EbiTraitIterableLanguage for FiniteLanguage {    
     fn iter(&self) -> Box<dyn Iterator<Item = &Vec<Activity>> + '_> {
         Box::new(self.traces.iter())
     }
@@ -218,16 +215,7 @@ impl From<(ActivityKey, HashSet<Vec<Activity>, FnvBuildHasher>)> for FiniteLangu
 }
 
 impl ToSemantics for FiniteLanguage {
-    type State = usize;
-
-    fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State, AState = Self::State>> {
-        let dfa = self.get_deterministic_finite_automaton();
-        Arc::new(dfa).get_semantics()
-    }
-
-    fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
-        let lang = Self::import(reader)?;
-        let dfa = lang.get_deterministic_finite_automaton();
-        Ok(EbiTraitSemantics::Usize(Arc::new(dfa).get_semantics()))
+    fn to_semantics(self) -> EbiTraitSemantics {
+        self.get_deterministic_finite_automaton().to_semantics()
     }
 }

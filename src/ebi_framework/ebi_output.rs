@@ -1,7 +1,7 @@
 use std::{collections::BTreeSet, fmt::{self, Display}, fs::File, io::Write, path::PathBuf};
 use anyhow::{Context, Result};
 
-use crate::math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv};
+use crate::{ebi_objects::{alignments::{Alignments, EBI_ALIGNMENTS}, compressed_event_log::{CompressedEventLog, EBI_COMPRESSED_EVENT_LOG}, deterministic_finite_automaton::{DeterministicFiniteAutomaton, EBI_DETERMINISTIC_FINITE_AUTOMATON}, directly_follows_model::{DirectlyFollowsModel, EBI_DIRCTLY_FOLLOWS_MODEL}, executions::{Executions, EBI_EXECUTIONS}, finite_language::{FiniteLanguage, EBI_FINITE_LANGUAGE}, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}, stochastic_deterministic_finite_automaton::{StochasticDeterministicFiniteAutomaton, EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON}, stochastic_labelled_petri_net::{StochasticLabelledPetriNet, EBI_STOCHASTIC_LABELLED_PETRI_NET}}, math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv}};
 
 use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_object::{EbiObject, EbiObjectType}, exportable::Exportable, prom_link::{JavaObjectHandler, JAVA_OBJECT_HANDLERS_CONTAINSROOT, JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV, JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_SVG, JAVA_OBJECT_HANDLERS_USIZE}};
 
@@ -84,6 +84,28 @@ impl EbiOutputType {
             EbiOutputType::LogDiv => vec![EbiExporter::LogDiv],
             EbiOutputType::ContainsRoot => vec![EbiExporter::ContainsRoot],
             EbiOutputType::RootLogDiv => vec![EbiExporter::RootLogDiv],
+        }
+    }
+
+    pub fn get_default_exporter(&self) -> EbiExporter {
+        match self {
+            EbiOutputType::ObjectType(EbiObjectType::Alignments) => EbiExporter::Object(&EbiObjectExporter::Alignments(Alignments::export_from_object), &EBI_ALIGNMENTS),
+            EbiOutputType::ObjectType(EbiObjectType::DeterministicFiniteAutomaton) => EbiExporter::Object(&EbiObjectExporter::DeterministicFiniteAutomaton(DeterministicFiniteAutomaton::export_from_object), &EBI_DETERMINISTIC_FINITE_AUTOMATON),
+            EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsModel) => EbiExporter::Object(&EbiObjectExporter::DirectlyFollowsModel(DirectlyFollowsModel::export_from_object), &EBI_DIRCTLY_FOLLOWS_MODEL),
+            EbiOutputType::ObjectType(EbiObjectType::EventLog) => EbiExporter::Object(&EbiObjectExporter::EventLog(CompressedEventLog::export_from_object), &EBI_COMPRESSED_EVENT_LOG),
+            EbiOutputType::ObjectType(EbiObjectType::Executions) => EbiExporter::Object(&EbiObjectExporter::Executions(Executions::export_from_object), &EBI_EXECUTIONS),
+            EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage) => EbiExporter::Object(&EbiObjectExporter::FiniteLanguage(FiniteLanguage::export_from_object), &EBI_FINITE_LANGUAGE),
+            EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage) => EbiExporter::Object(&EbiObjectExporter::FiniteStochasticLanguage(FiniteStochasticLanguage::export_from_object), &EBI_FINITE_STOCHASTIC_LANGUAGE),
+            EbiOutputType::ObjectType(EbiObjectType::LabelledPetriNet) => EbiExporter::Object(&EbiObjectExporter::LabelledPetriNet(LabelledPetriNet::export_from_object), &EBI_LABELLED_PETRI_NET),
+            EbiOutputType::ObjectType(EbiObjectType::StochasticDeterministicFiniteAutomaton) => EbiExporter::Object(&&EbiObjectExporter::StochasticDeterministicFiniteAutomaton(StochasticDeterministicFiniteAutomaton::export_from_object), &EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON),
+            EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet) => EbiExporter::Object(&&EbiObjectExporter::StochasticLabelledPetriNet(StochasticLabelledPetriNet::export_from_object), &EBI_STOCHASTIC_LABELLED_PETRI_NET),
+            EbiOutputType::String => EbiExporter::String,
+            EbiOutputType::SVG => EbiExporter::SVG,
+            EbiOutputType::Usize => EbiExporter::Usize,
+            EbiOutputType::Fraction => EbiExporter::Fraction,
+            EbiOutputType::LogDiv => EbiExporter::LogDiv,
+            EbiOutputType::ContainsRoot => EbiExporter::ContainsRoot,
+            EbiOutputType::RootLogDiv => EbiExporter::RootLogDiv,
         }
     }
 

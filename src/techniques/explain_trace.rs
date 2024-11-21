@@ -1,7 +1,7 @@
-use std::{fmt::{Debug, Display}, hash::Hash, ops::{Add, AddAssign}};
+use std::ops::{Add, AddAssign};
 use anyhow::{anyhow, Result};
 use fraction::Zero;
-use crate::{ebi_framework::activity_key::Activity, ebi_objects::alignments::Alignments, ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}, math::{astar,fraction::Fraction}, techniques::align::transform_alignment};
+use crate::{ebi_framework::{activity_key::Activity, displayable::Displayable}, ebi_objects::alignments::Alignments, ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}, math::{astar,fraction::Fraction}, techniques::align::transform_alignment};
 
 #[derive (Clone, Debug)]
 pub struct StochasticWeightedCost{
@@ -81,7 +81,7 @@ impl ExplainTrace for EbiTraitStochasticSemantics {
     }
 }
 
-impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSemantics<State = FS, AState = FS> {
+impl <State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState = State, AliState = State> {
 
     pub fn explain_trace(&self, trace: &Vec<Activity>, _balance: &Fraction) -> Result<Alignments> {
 
@@ -89,9 +89,9 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
         let start = (0, self.get_initial_state());
 
         // successor relation in the model
-        let successors = |(trace_index, state) : &(usize, FS)| {
+        let successors = |(trace_index, state) : &(usize, State)| {
 
-            let mut result: Vec<((usize, FS), StochasticWeightedCost)> = vec![];
+            let mut result: Vec<((usize, State), StochasticWeightedCost)> = vec![];
 
             // log::debug!("successors of log {} model {}", trace_index, state);
             if trace_index < &trace.len() {
@@ -136,12 +136,12 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
         };
 
         //function that returns a heuristic on how far we are still minimally from a final state
-        let heuristic = |_astate : &(usize, FS)| {
+        let heuristic = |_astate : &(usize, State)| {
             StochasticWeightedCost::zero()
         };
 
         //function that returns whether we are in a final synchronous product state
-        let success = |(trace_index, state): &(usize, FS)| {
+        let success = |(trace_index, state): &(usize, State)| {
             trace_index == &trace.len() && self.is_final_state(&state)
         };
 

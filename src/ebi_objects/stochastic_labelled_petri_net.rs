@@ -4,7 +4,7 @@ use std::{fmt, io::BufRead};
 use anyhow::{anyhow, Result, Context, Error};
 use layout::topo::layout::VisualGraph;
 
-use crate::ebi_framework::activity_key::{Activity, ActivityKey};
+use crate::ebi_framework::activity_key::{Activity, ActivityKey, HasActivityKey};
 use crate::ebi_framework::dottable::Dottable;
 use crate::ebi_framework::ebi_file_handler::EbiFileHandler;
 use crate::ebi_framework::ebi_input::{self, EbiObjectImporter, EbiTraitImporter};
@@ -15,9 +15,9 @@ use crate::ebi_framework::importable::Importable;
 use crate::ebi_framework::infoable::Infoable;
 use crate::ebi_framework::prom_link::JavaObjectHandler;
 use crate::ebi_traits::ebi_trait_queriable_stochastic_language;
-use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics};
-use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics;
-use crate::ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, TransitionIndex};
+use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics};
+use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics};
+use crate::ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics, TransitionIndex};
 use crate::line_reader::LineReader;
 use crate::marking::Marking;
 use crate::math::fraction::Fraction;
@@ -33,8 +33,8 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     validator: ebi_input::validate::<StochasticLabelledPetriNet>,
     trait_importers: &[
         EbiTraitImporter::QueriableStochasticLanguage(ebi_trait_queriable_stochastic_language::import::<StochasticLabelledPetriNet>),
+        EbiTraitImporter::StochasticDeterministicSemantics(StochasticLabelledPetriNet::import_as_stochastic_deterministic_semantics),
         EbiTraitImporter::StochasticSemantics(StochasticLabelledPetriNet::import_as_stochastic_semantics),
-        EbiTraitImporter::StochasticDeterministicSemantics(StochasticLabelledPetriNet::import_as_deterministic_stochastic_semantics),
         EbiTraitImporter::Semantics(StochasticLabelledPetriNet::import_as_semantics),
     ],
     object_importers: &[
@@ -55,7 +55,7 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     ],
 };
 
-#[derive(Clone,Debug)]
+#[derive(Clone,Debug,ActivityKey)]
 pub struct StochasticLabelledPetriNet {
     pub(crate) activity_key: ActivityKey,
     pub(crate) initial_marking: Marking,
@@ -69,21 +69,6 @@ pub struct StochasticLabelledPetriNet {
 }
 
 impl StochasticLabelledPetriNet {
-
-    pub fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
-        let slpn = Self::import(reader)?;
-        Ok(EbiTraitSemantics::Marking(Box::new(slpn)))
-    }
-
-    pub fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics> {
-        let slpn = Self::import(reader)?;
-        Ok(EbiTraitStochasticSemantics::Marking(Box::new(slpn)))
-    }
-
-    pub fn import_as_deterministic_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
-        let net = Self::import(reader)?;
-        Ok(EbiTraitStochasticDeterministicSemantics::PMarking(Box::new(net)))
-    }
 
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let net = Self::import(reader)?;
@@ -148,7 +133,7 @@ impl Infoable for StochasticLabelledPetriNet {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         writeln!(f, "Number of places\t\t{}", self.get_number_of_places())?;
         writeln!(f, "Number of transitions\t\t{}", self.get_number_of_transitions())?;
-        writeln!(f, "Number of activities\t\t{}", Semantics::get_activity_key(self).get_number_of_activities())?;
+        writeln!(f, "Number of activities\t\t{}", self.get_activity_key().get_number_of_activities())?;
         writeln!(f, "Number of silent transitions\t{}", (0..self.get_number_of_transitions()).into_iter().filter(|transition| self.is_transition_silent(*transition)).count())?;
 
         Ok(write!(f, "")?)
@@ -312,6 +297,24 @@ impl Importable for StochasticLabelledPetriNet {
             transition2output_places_cardinality,
             weights,
         })
+    }
+}
+
+impl ToSemantics for StochasticLabelledPetriNet {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::Marking(Box::new(self))
+    }
+}
+
+impl ToStochasticSemantics for StochasticLabelledPetriNet {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        EbiTraitStochasticSemantics::Marking(Box::new(self))
+    }
+}
+
+impl ToStochasticDeterministicSemantics for StochasticLabelledPetriNet {
+    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+        EbiTraitStochasticDeterministicSemantics::PMarking(Box::new(self))
     }
 }
 

@@ -1,10 +1,10 @@
-use std::{io::{BufRead, BufReader, Write}, sync::Arc};
+use std::io::{BufRead, BufReader, Write};
 use anyhow::Result;
 use flate2::{bufread::GzDecoder, write::GzEncoder, Compression};
 
-use crate::{ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}};
+use crate::{ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}}};
 
-use super::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
+use super::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage};
 
 pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     name: "compressed event log",
@@ -17,7 +17,9 @@ pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
         EbiTraitImporter::QueriableStochasticLanguage(CompressedEventLog::read_as_queriable_stochastic_language),
         EbiTraitImporter::IterableStochasticLanguage(CompressedEventLog::read_as_iterable_stochastic_language),
         EbiTraitImporter::EventLog(CompressedEventLog::read_as_event_log),
-        EbiTraitImporter::StochasticDeterministicSemantics(CompressedEventLog::read_as_stochastic_deterministic_semantics)
+        EbiTraitImporter::StochasticDeterministicSemantics(CompressedEventLog::import_as_stochastic_deterministic_semantics),
+        EbiTraitImporter::StochasticSemantics(CompressedEventLog::import_as_stochastic_semantics),
+        EbiTraitImporter::Semantics(CompressedEventLog::import_as_semantics),
     ],
     object_importers: &[
         EbiObjectImporter::EventLog(CompressedEventLog::import_as_object)
@@ -58,13 +60,6 @@ impl CompressedEventLog {
         let event_log = Self::import(reader)?;
         Ok(Box::new(event_log.log))
     }
-
-    pub fn read_as_stochastic_deterministic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
-        let event_log = EventLog::import(reader)?;
-        let sdfa = event_log.to_stochastic_deterministic_finite_automaton();
-        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Arc::new(sdfa))?;
-        Ok(EbiTraitStochasticDeterministicSemantics::Usize(semantics))
-    }
 }
 
 impl Importable for CompressedEventLog {
@@ -93,5 +88,23 @@ impl Exportable for CompressedEventLog {
     fn export(&self, f: &mut dyn std::io::Write) -> Result<()> {
         let mut writer = GzEncoder::new(f, Compression::best());
         self.log.export(&mut writer)
+    }
+}
+
+impl ToSemantics for CompressedEventLog {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        self.log.to_semantics()
+    }
+}
+
+impl ToStochasticSemantics for CompressedEventLog {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        self.log.to_stochastic_semantics()
+    }
+}
+
+impl ToStochasticDeterministicSemantics for CompressedEventLog {
+    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+        self.log.to_stochastic_deterministic_semantics()
     }
 }

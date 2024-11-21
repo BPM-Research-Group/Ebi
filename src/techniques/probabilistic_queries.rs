@@ -4,9 +4,9 @@ use anyhow::{anyhow, Result};
 use fraction::One;
 use priority_queue::PriorityQueue;
 
-use crate::{ebi_framework::activity_key::Activity, ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}}, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::Activity, displayable::Displayable}, ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}}, math::fraction::Fraction};
 
-pub trait FiniteStochasticLanguageAnalyser {
+pub trait ProbabilityQueries {
     /**
      * Find all traces that have a given minimum probability.
      */
@@ -18,7 +18,7 @@ pub trait FiniteStochasticLanguageAnalyser {
     fn analyse_most_likely_traces(&self, number_of_traces: &usize) -> Result<FiniteStochasticLanguage>;
 }
 
-impl FiniteStochasticLanguageAnalyser for EbiTraitStochasticDeterministicSemantics {
+impl ProbabilityQueries for EbiTraitStochasticDeterministicSemantics {
     fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
         match self {
             EbiTraitStochasticDeterministicSemantics::Usize(sem) => sem.analyse_minimum_probability(at_least),
@@ -34,7 +34,7 @@ impl FiniteStochasticLanguageAnalyser for EbiTraitStochasticDeterministicSemanti
     }
 }
 
-impl FiniteStochasticLanguageAnalyser for dyn EbiTraitFiniteStochasticLanguage {
+impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
     fn analyse_most_likely_traces(&self, number_of_traces: &usize) -> Result<FiniteStochasticLanguage> {
         if number_of_traces.is_one() {
             let mut result = HashMap::new();
@@ -91,13 +91,13 @@ impl FiniteStochasticLanguageAnalyser for dyn EbiTraitFiniteStochasticLanguage {
     }
 }
 
-impl <FS: Hash + Display + Debug + Clone + Eq> FiniteStochasticLanguageAnalyser for dyn StochasticDeterministicSemantics<DState = FS, LivelockMarking = FS> {
+impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSemantics<DetState = DState, LivState = DState> {
     fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
         let error_at_loop = at_least.is_zero(); //If at_least is zero, we are asked to return all traces. If there is a loop, then this is impossible.
         
         let mut seen = HashSet::new();
         if error_at_loop {
-            seen.insert(self.get_initial_state()?);
+            seen.insert(self.get_deterministic_initial_state()?);
         }
 
         let mut result = HashMap::new();
@@ -106,13 +106,13 @@ impl <FS: Hash + Display + Debug + Clone + Eq> FiniteStochasticLanguageAnalyser 
         queue.push(X{
             prefix: vec![],
             probability: Fraction::one(),
-            p_state: self.get_initial_state()?,
+            p_state: self.get_deterministic_initial_state()?,
         });
 
         while let Some(x) = queue.pop() {
             // log::debug!("queue length {}, process p-state {:?}", queue.len(), x.p_state);
 
-            let mut probability_terminate_in_this_state = self.get_termination_probability(&x.p_state);
+            let mut probability_terminate_in_this_state = self.get_deterministic_termination_probability(&x.p_state);
             // log::debug!("probability termination in this state {}", probability_terminate_in_this_state);
             probability_terminate_in_this_state *= &x.probability;
 
@@ -120,17 +120,17 @@ impl <FS: Hash + Display + Debug + Clone + Eq> FiniteStochasticLanguageAnalyser 
                 result.insert(x.prefix.clone(), probability_terminate_in_this_state);
             }
 
-            let mut iff = self.get_termination_probability(&x.p_state).one_minus();
+            let mut iff = self.get_deterministic_termination_probability(&x.p_state).one_minus();
             iff *= &x.probability;
             if iff >= *at_least {
-                for activity in self.get_enabled_activities(&x.p_state) {
+                for activity in self.get_deterministic_enabled_activities(&x.p_state) {
                     // log::info!("consider activity {}", activity);
 
-                    let probability = self.get_activity_probability(&x.p_state, activity);
+                    let probability = self.get_deterministic_activity_probability(&x.p_state, activity);
 
                     // log::info!("activity has probability {}", probability);
 
-                    let new_p_state = self.execute_activity(&x.p_state, activity)?;
+                    let new_p_state = self.execute_deterministic_activity(&x.p_state, activity)?;
 
                     // log::info!("activity executed");
 
@@ -148,7 +148,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq> FiniteStochasticLanguageAnalyser 
                         p_state: new_p_state,
                     };
 
-                    if !self.is_non_decreasing_livelock(&new_x.p_state.clone())? {
+                    if !self.is_non_decreasing_livelock(&mut new_x.p_state.clone())? {
                         queue.push(new_x);
                     }
                 }
@@ -166,21 +166,21 @@ impl <FS: Hash + Display + Debug + Clone + Eq> FiniteStochasticLanguageAnalyser 
         let mut result = HashMap::new();
 
         let mut queue = PriorityQueue::new();
-        queue.push(Y::Prefix(vec![], self.get_initial_state()?), Fraction::one());
+        queue.push(Y::Prefix(vec![], self.get_deterministic_initial_state()?), Fraction::one());
 
         while let Some((y, y_probability)) = queue.pop() {
             match y {
                 Y::Prefix(prefix, p_state) => {
 
-                    let termination_proability = self.get_termination_probability(&p_state);
+                    let termination_proability = self.get_deterministic_termination_probability(&p_state);
                     if !termination_proability.is_zero() {
                         queue.push(Y::Trace(prefix.clone()), &y_probability * &termination_proability);
                     }
 
-                    for activity in self.get_enabled_activities(&p_state) {
-                        let activity_probability = self.get_activity_probability(&p_state, activity);
+                    for activity in self.get_deterministic_enabled_activities(&p_state) {
+                        let activity_probability = self.get_deterministic_activity_probability(&p_state, activity);
         
-                        let new_p_state = self.execute_activity(&p_state, activity)?;
+                        let new_p_state = self.execute_deterministic_activity(&p_state, activity)?;
                         let mut new_prefix = prefix.clone();
                         new_prefix.push(activity);
                         let new_probability = &y_probability * &activity_probability;

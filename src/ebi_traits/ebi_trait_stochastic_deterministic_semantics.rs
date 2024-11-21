@@ -1,11 +1,12 @@
+use std::io::BufRead;
+
 use anyhow::{anyhow, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::labelled_petri_net::LPNMarking, math::fraction::Fraction, techniques::{deterministic_semantics_for_stochastic_semantics::PMarking, livelocks::Livelock}};
-
+use crate::{ebi_framework::{activity_key::{Activity, HasActivityKey}, displayable::Displayable, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, ebi_objects::labelled_petri_net::LPNMarking, math::fraction::Fraction, techniques::{deterministic_semantics_for_stochastic_semantics::PMarking, livelocks::Livelock}};
 
 pub enum EbiTraitStochasticDeterministicSemantics {
-	Usize(Box<dyn StochasticDeterministicSemantics<DState = usize, LivelockMarking = usize>>),
-    PMarking(Box<dyn StochasticDeterministicSemantics<DState = PMarking<LPNMarking>, LivelockMarking = PMarking<LPNMarking>>>)
+	Usize(Box<dyn StochasticDeterministicSemantics<DetState = usize, LivState = usize>>),
+    PMarking(Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>>)
 }
 
 impl FromEbiTraitObject for EbiTraitStochasticDeterministicSemantics {
@@ -17,36 +18,42 @@ impl FromEbiTraitObject for EbiTraitStochasticDeterministicSemantics {
     }
 }
 
-pub trait StochasticDeterministicSemantics: Livelock {
-    type DState;
-
-    fn get_activity_key(&self) -> &ActivityKey;
+pub trait StochasticDeterministicSemantics: Livelock<LivState = Self::DetState> + HasActivityKey {
+    type DetState: Displayable;
 
     /**
 	 * (Re)set the semantics to the initial state.
 	 */
-    fn get_initial_state(&self) -> Result<Self::DState>;
+    fn get_deterministic_initial_state(&self) -> Result<Self::DetState>;
 
 
     /**
      * Get the state that results from executing the activity. 
      * This method should not be called on activities that are not enabled or have a zero proability in this state.
     */
-    fn execute_activity(&self, state: &Self::DState, activity: Activity) -> Result<Self::DState>;
+    fn execute_deterministic_activity(&self, state: &Self::DetState, activity: Activity) -> Result<Self::DetState>;
 
     /**
      * 
     * @return whether the current state is a final state.
     */
-    fn get_termination_probability(&self, state: &Self::DState) -> Fraction;
+    fn get_deterministic_termination_probability(&self, state: &Self::DetState) -> Fraction;
 
     /**
      * 
     * @param activity
     * @return the probability of the activity in the given state.
     */
-    fn get_activity_probability(&self, state: &Self::DState, activity: Activity) -> Fraction;
+    fn get_deterministic_activity_probability(&self, state: &Self::DetState, activity: Activity) -> Fraction;
 
-    fn get_enabled_activities(&self, state: &Self::DState) -> Vec<Activity>;
+    fn get_deterministic_enabled_activities(&self, state: &Self::DetState) -> Vec<Activity>;
 
+}
+
+pub trait ToStochasticDeterministicSemantics: Importable + Sized {
+	fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics;
+
+	fn import_as_stochastic_deterministic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
+		Ok(Self::import(reader)?.to_stochastic_deterministic_semantics())
+	}
 }

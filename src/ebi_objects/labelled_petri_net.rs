@@ -45,7 +45,7 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     ],
 };
 
-#[derive(Clone,Debug)]
+#[derive(Clone,Debug,ActivityKey)]
 pub struct LabelledPetriNet {
     pub(crate) activity_key: ActivityKey,
     pub(crate) initial_marking: Marking,
@@ -224,7 +224,7 @@ impl Infoable for LabelledPetriNet {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         writeln!(f, "Number of places\t\t{}", self.get_number_of_places())?;
         writeln!(f, "Number of transitions\t\t{}", self.get_number_of_transitions())?;
-        writeln!(f, "Number of activities\t\t{}", Semantics::get_activity_key(self).get_number_of_activities())?;
+        writeln!(f, "Number of activities\t\t{}", self.get_activity_key().get_number_of_activities())?;
         writeln!(f, "Number of silent transitions\t{}", (0..self.get_number_of_transitions()).into_iter().filter(|transition| self.is_transition_silent(*transition)).count())?;
 
         Ok(write!(f, "")?)
@@ -455,11 +455,7 @@ pub struct LPNMarking {
     pub(crate) number_of_enabled_transitions: usize,
 }
 
-impl Displayable for LPNMarking {
-    fn debug(&self) -> String {
-        return "SLPN marking".to_string();
-    }
-}
+impl Displayable for LPNMarking {}
 
 impl Eq for LPNMarking {}
 

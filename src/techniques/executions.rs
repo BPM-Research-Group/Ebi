@@ -4,7 +4,7 @@ use anyhow::{Error, Ok, Result};
 use chrono::{DateTime, FixedOffset};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
-use crate::{ebi_framework::ebi_command::EbiCommand, ebi_objects::{alignments::Move, executions::{Execution, Executions}}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, ATTRIBUTE_TIME}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, techniques::align::Align};
+use crate::{ebi_framework::{displayable::Displayable, ebi_command::EbiCommand}, ebi_objects::{alignments::Move, executions::{Execution, Executions}}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, ATTRIBUTE_TIME}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, techniques::align::Align};
 
 pub trait FindExecutions {
     fn find_executions(&self, log: Box<dyn EbiTraitEventLog>) -> Result<Executions>;
@@ -19,7 +19,7 @@ impl FindExecutions for EbiTraitSemantics {
 	}
 }
 
-impl <T, FS> FindExecutions for T where T: Semantics<State = FS> + Send + Sync + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+impl <T, State> FindExecutions for T where T: Semantics<SemState = State, AliState = State> + Send + Sync + ?Sized, State: Displayable {
     fn find_executions(&self, log: Box<dyn EbiTraitEventLog>) -> Result<Executions> {
 
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
@@ -81,7 +81,7 @@ impl C {
         }
     }
 
-    fn process_alignment<T, FS>(&self, semantics: &T, log: &Box<dyn EbiTraitEventLog>) -> Result<Vec<Execution>> where T: Semantics<State = FS> + Send + Sync + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+    fn process_alignment<T, FS>(&self, semantics: &T, log: &Box<dyn EbiTraitEventLog>) -> Result<Vec<Execution>> where T: Semantics<SemState = FS> + Send + Sync + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
         let mut state = semantics.get_initial_state();
         let mut executions = vec![];
 
@@ -131,7 +131,7 @@ impl C {
         log.get_event_attribute_time(self.trace_index, event_index, &ATTRIBUTE_TIME.to_string())
     }
 
-    fn get_enabled_transitions<T, FS>(&self, move_index: Option<usize>, semantics: &T) -> Result<Option<Vec<TransitionIndex>>> where T: Semantics<State = FS> + Send + Sync + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+    fn get_enabled_transitions<T, FS>(&self, move_index: Option<usize>, semantics: &T) -> Result<Option<Vec<TransitionIndex>>> where T: Semantics<SemState = FS> + Send + Sync + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
         let mut state = semantics.get_initial_state();
         if let Some(mi) = move_index {
             for movee in self.moves.iter().take(mi) {
@@ -159,7 +159,7 @@ impl C {
     /**
      * Get the last non-silent move that enabled the move at the given index
      */
-    fn get_enabling_move<T, FS>(&self, move_index: usize, semantics: &T) -> Option<usize> where T: Semantics<State = FS> + Send + Sync + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+    fn get_enabling_move<T, FS>(&self, move_index: usize, semantics: &T) -> Option<usize> where T: Semantics<SemState = FS> + Send + Sync + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
         let transition = self.moves.get(move_index)?.get_transition()?;
 
         //first, figure out when this move's transition was last enabled

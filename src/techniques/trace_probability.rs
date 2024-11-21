@@ -1,121 +1,131 @@
 use anyhow::{Context, Result};
 use std::{collections::{HashMap, HashSet}, fmt::{self, Display}, hash::Hash, ops::Add, rc::Rc};
 
-use crate::{ebi_framework::activity_key::ActivityKey, ebi_traits::{ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_semantics::StochasticSemantics}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, matrix::Matrix}};
+use crate::{ebi_objects::{labelled_petri_net::LPNMarking, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_semantics::StochasticSemantics, ebi_trait_semantics::Semantics}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, matrix::Matrix}};
 
 
-#[derive(Eq, PartialEq, Hash)]
-struct ABState<A: Eq + Hash + Clone> {
-    state_a: A,
-    state_b: usize
-}
-
-struct Z<A: Eq + Hash + Clone> {
-    seen: HashMap<Rc<ABState<A>>, usize>, 
-    worklist: Vec<Rc<ABState<A>>>,
-    state_counter: usize, 
-}
-
-#[derive(Debug)]
-struct Y {
-    outgoing_states: Vec<usize>,
-    outgoing_state_probabilities: Vec<Fraction>
-}
-
-impl <T, A> EbiTraitQueriableStochasticLanguage for T where T: StochasticSemantics<State = A>, A: Eq + Hash + Clone + Display {
-    fn get_activity_key(&self) -> &ActivityKey {
-        self.get_activity_key()
-    }
-
-    fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
-        self.get_activity_key_mut()
-    }
-
-    fn get_probability(&self, follower_b: &FollowerSemantics) -> anyhow::Result<Fraction> {
-        let mut result = CrossProductResultImpl::new();
-        let mut z: Z<A> = Z {
-            seen: HashMap::<Rc<ABState<A>>, usize>::new(),
-            worklist: Vec::<Rc<ABState<A>>>::new(),
-            state_counter: 0,
-        };
-
-        // log::debug!("trace probability init");
-
-        //initialise
-        {
-            let state = Rc::new(ABState::<A> { state_a: self.get_initial_state(), state_b: follower_b.get_initial_state() });
-            z.worklist.push(state.clone());
-            z.seen.insert(state, z.state_counter);
-            result.report_initial_state(z.state_counter);
-            z.state_counter += 1;
-        }
-
-        let dead_state_a = z.state_counter;
-        z.state_counter += 1;
-        result.report_dead_state(dead_state_a);
-
-        while !z.worklist.is_empty() {
-            let state_ab = z.worklist.pop().unwrap();
-            let state_ab_index: usize = *z.seen.get(&state_ab).unwrap();
-            let state_a = &state_ab.state_a;
-            let state_b = &state_ab.state_b;
-            if self.is_final_state(&state_a) {
-                if follower_b.is_final_state(&state_b) {
-                    result.report_final_state(state_ab_index);
-                } else {
-                    let next_states = vec![dead_state_a];
-                    let next_probabilities = vec![Fraction::one()];
-                    //B is not ready; report this as a dead end
-                    result.report_non_final_state(state_ab_index, next_states, next_probabilities);
-                }
-            } else {
-                let enabled_transitions = self.get_enabled_transitions(&state_a);
-
-                let total_weight = self.get_total_weight_of_enabled_transitions(&state_a).with_context(|| format!("{}", state_a))?;
-
-                let mut y = Y {
-                    outgoing_states: vec![],
-                    outgoing_state_probabilities: vec![],
+//generic implementation
+macro_rules! default_trace_probability {
+    ($t:ident, $s:ident) => {
+        impl EbiTraitQueriableStochasticLanguage for $t {
+        
+            fn get_probability(&self, follower_b: &FollowerSemantics) -> anyhow::Result<Fraction> {
+                let mut result = CrossProductResultImpl::new();
+                let mut z: Z<$s> = Z {
+                    seen: HashMap::<Rc<ABState<$s>>, usize>::new(),
+                    worklist: Vec::<Rc<ABState<$s>>>::new(),
+                    state_counter: 0,
                 };
-                
-                for transition in enabled_transitions {
-                    let mut new_state_a = state_a.clone();
-                    self.execute_transition(&mut new_state_a, transition).unwrap();
-                    if self.is_transition_silent(transition) {
-                        //silent transition; only A takes a step
-                        let new_state_b = state_ab.state_b.clone();
-                        
-                        process_new_state(self, &mut z, &mut y, &total_weight, transition, &state_a, new_state_a, new_state_b);
-                    } else {
-                        //labelled transition; both A and B need to take steps
-                        if follower_b.is_final_state(&state_ab.state_b) {
-                            //B cannot take a further step, so this is a dead end
-                            y.outgoing_states.push(dead_state_a);
-                            y.outgoing_state_probabilities
-                                    .push(self.get_transition_weight(&state_a, transition) / &total_weight);
+        
+                // log::debug!("trace probability init");
+        
+                //initialise
+                {
+                    let state = Rc::new(ABState::<$s> { state_a: self.get_initial_state(), state_b: follower_b.get_initial_state() });
+                    z.worklist.push(state.clone());
+                    z.seen.insert(state, z.state_counter);
+                    result.report_initial_state(z.state_counter);
+                    z.state_counter += 1;
+                }
+        
+                let dead_state_a = z.state_counter;
+                z.state_counter += 1;
+                result.report_dead_state(dead_state_a);
+        
+                while !z.worklist.is_empty() {
+                    let state_ab = z.worklist.pop().unwrap();
+                    let state_ab_index: usize = *z.seen.get(&state_ab).unwrap();
+                    let state_a = &state_ab.state_a;
+                    let state_b = &state_ab.state_b;
+                    if self.is_final_state(&state_a) {
+                        if follower_b.is_final_state(&state_b) {
+                            result.report_final_state(state_ab_index);
                         } else {
-                            let new_state_b = follower_b.take_step(&state_ab.state_b, &self.get_transition_activity(transition).unwrap());
-                            if new_state_b.is_some() {
-                                process_new_state(self, &mut z, &mut y, &total_weight, transition, &state_a, new_state_a, new_state_b.unwrap());
+                            let next_states = vec![dead_state_a];
+                            let next_probabilities = vec![Fraction::one()];
+                            //B is not ready; report this as a dead end
+                            result.report_non_final_state(state_ab_index, next_states, next_probabilities);
+                        }
+                    } else {
+                        let enabled_transitions = self.get_enabled_transitions(&state_a);
+        
+                        let total_weight = self.get_total_weight_of_enabled_transitions(&state_a).with_context(|| format!("{}", state_a))?;
+        
+                        let mut y = Y {
+                            outgoing_states: vec![],
+                            outgoing_state_probabilities: vec![],
+                        };
+                        
+                        for transition in enabled_transitions {
+                            let mut new_state_a = state_a.clone();
+                            self.execute_transition(&mut new_state_a, transition).unwrap();
+                            if self.is_transition_silent(transition) {
+                                //silent transition; only A takes a step
+                                let new_state_b = state_ab.state_b.clone();
+                                
+                                process_new_state(self, &mut z, &mut y, &total_weight, transition, &state_a, new_state_a, new_state_b);
                             } else {
-                                //dead state
-                                y.outgoing_states.push(dead_state_a);
-                                y.outgoing_state_probabilities
-                                        .push(self.get_transition_weight(&state_a, transition) / &total_weight);
+                                //labelled transition; both A and B need to take steps
+                                if follower_b.is_final_state(&state_ab.state_b) {
+                                    //B cannot take a further step, so this is a dead end
+                                    y.outgoing_states.push(dead_state_a);
+                                    y.outgoing_state_probabilities
+                                            .push(<$t as StochasticSemantics>::get_transition_weight(self, &state_a, transition) / &total_weight);
+                                } else {
+                                    let new_state_b = follower_b.take_step(&state_ab.state_b, &self.get_transition_activity(transition).unwrap());
+                                    if new_state_b.is_some() {
+                                        process_new_state(self, &mut z, &mut y, &total_weight, transition, &state_a, new_state_a, new_state_b.unwrap());
+                                    } else {
+                                        //dead state
+                                        y.outgoing_states.push(dead_state_a);
+                                        y.outgoing_state_probabilities
+                                                .push(<$t as StochasticSemantics>::get_transition_weight(self, &state_a, transition) / &total_weight);
+                                    }
+                                }
                             }
                         }
+                        result.report_non_final_state(state_ab_index, y.outgoing_states, y.outgoing_state_probabilities);
                     }
                 }
-                result.report_non_final_state(state_ab_index, y.outgoing_states, y.outgoing_state_probabilities);
+        
+                let trace_probability = result.solve()?;
+                Ok(trace_probability)
             }
         }
-
-        let trace_probability = result.solve()?;
-        Ok(trace_probability)
-    }
+    };
 }
 
-fn process_new_state<T: StochasticSemantics<State = A>, A: Eq + Hash + Clone + Display>(semantics: &T, 
+default_trace_probability!(StochasticLabelledPetriNet, LPNMarking);
+
+impl EbiTraitQueriableStochasticLanguage for StochasticDeterministicFiniteAutomaton {
+
+    fn get_probability(&self, follower: &FollowerSemantics) -> Result<Fraction> {
+        match follower {
+            FollowerSemantics::Trace(trace) => {
+                let mut state = self.get_initial_state();
+                let mut result = Fraction::one();
+
+                for activity in trace.iter() {
+                    let (found, pos) = self.binary_search(state, self.activity_key.get_id_from_activity(activity));
+                    if !found {
+                        return Ok(Fraction::zero());
+                    }
+                    state = self.targets[pos];
+                    result *= &self.probabilities[pos];
+                }
+
+                result *= &self.terminating_probabilities[state];
+
+                Ok(result)
+            },
+        }
+    }
+
+}
+
+
+
+fn process_new_state<T: StochasticSemantics<StoSemState = A>, A: Eq + Hash + Clone + Display>(semantics: &T, 
         z: &mut Z<A>,
         y: &mut Y, 
         total_weight: &Fraction, 
@@ -336,4 +346,22 @@ impl Display for CrossProductResultImpl {
 
 		write!(f, "")
     }
+}
+
+#[derive(Eq, PartialEq, Hash)]
+struct ABState<A: Eq + Hash + Clone> {
+    state_a: A,
+    state_b: usize
+}
+
+struct Z<A: Eq + Hash + Clone> {
+    seen: HashMap<Rc<ABState<A>>, usize>, 
+    worklist: Vec<Rc<ABState<A>>>,
+    state_counter: usize, 
+}
+
+#[derive(Debug)]
+struct Y {
+    outgoing_states: Vec<usize>,
+    outgoing_state_probabilities: Vec<Fraction>
 }

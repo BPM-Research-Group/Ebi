@@ -1,7 +1,7 @@
 use bitvec::bitvec;
 use anyhow::Context;
 
-use crate::{ebi_framework::activity_key::{Activity, ActivityKey}, ebi_objects::labelled_petri_net::LPNMarking, ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::TransitionIndex}};
+use crate::{ebi_framework::activity_key::Activity, ebi_objects::labelled_petri_net::LPNMarking, ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::TransitionIndex}};
 
 use super::labelled_petri_net::LabelledPetriNet;
 
@@ -37,15 +37,7 @@ impl LabelledPetriNet{
 }
 
 impl Semantics for LabelledPetriNet {
-	type State = LPNMarking;
-
-    fn get_activity_key(&self) -> &ActivityKey {
-        &self.activity_key
-    }
-
-    fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
-        &mut self.activity_key
-    }
+    type SemState = LPNMarking;
     
 	fn is_final_state(&self, state: &LPNMarking) -> bool {
         state.number_of_enabled_transitions == 0   

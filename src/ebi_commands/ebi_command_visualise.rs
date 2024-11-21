@@ -2,8 +2,6 @@ use layout::backends::svg::SVGWriter;
 
 use crate::ebi_framework::{dottable::Dottable, ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}};
 
-
-
 pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group { 
     name_short: "vis", 
     name_long: Some("visualise"),

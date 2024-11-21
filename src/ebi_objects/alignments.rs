@@ -22,6 +22,7 @@ pub const EBI_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[],
 };
 
+#[derive(ActivityKey)]
 pub struct Alignments {
     activity_key: ActivityKey,
     alignments: Vec<Vec<Move>>
