@@ -1,11 +1,11 @@
 #[cfg(test)]
 mod tests {
-    use std::{fs, ops::Neg};
+    use std::{fs::{self, File}, ops::Neg};
 
     use fraction::GenericFraction;
     use num_bigint::ToBigUint;
 
-    use crate::{ebi_framework::activity_key::HasActivityKey, ebi_objects::{alignments::Move, deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{Semantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics, ToStochasticDeterministicSemantics}}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}, medoid, techniques::{align::Align, deterministic_semantics_for_stochastic_semantics::PMarking, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probability_queries::ProbabilityQueries, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
+    use crate::{ebi_framework::{activity_key::HasActivityKey, ebi_file_handler::EBI_FILE_HANDLERS}, ebi_objects::{alignments::Move, deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{Semantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics, ToStochasticDeterministicSemantics}}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}, medoid, multiple_reader::MultipleReader, techniques::{align::Align, deterministic_semantics_for_stochastic_semantics::PMarking, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probability_queries::ProbabilityQueries, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 
     #[test]
     fn empty_slang() {
@@ -571,6 +571,37 @@ mod tests {
         let slang3 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
 
         assert_eq!(slpn.analyse_probability_coverage(&Fraction::from((1, 2))).unwrap(), slang3);
+    }
+
+    #[test]
+    fn importers() {
+        let files = fs::read_dir("./testfiles").unwrap();
+        for path in files {
+            let file = path.unwrap();
+            println!("file {:?}", file.file_name());
+
+            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
+
+            //look for file handlers that should accept this file
+            for file_handler in EBI_FILE_HANDLERS {
+                println!("\tfile handler {}", file_handler);
+                if !file.file_name().into_string().unwrap().contains("invalid") && file.file_name().into_string().unwrap().ends_with(&(".".to_string() + file_handler.file_extension)) {
+                    //file handler should be able to accept this file
+
+                    for importer in file_handler.object_importers {
+                        println!("\t\timporter {}", importer);
+                        assert!((importer.get_importer())(&mut reader.get().unwrap()).is_ok());
+                    }
+                } else {
+                    //file handler should not accept this file
+
+                    for importer in file_handler.object_importers {
+                        println!("\t\timporter {} (should fail)", importer);
+                        assert!((importer.get_importer())(&mut reader.get().unwrap()).is_err());
+                    }
+                }
+            }
+        }
     }
 
     // #[test] //disabled until we can handle livelocks
