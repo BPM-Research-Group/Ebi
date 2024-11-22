@@ -74,7 +74,7 @@ pub mod techniques {
     pub mod align;
     pub mod alignment_stochastic_miner;
     pub mod association;
-    pub mod probabilistic_queries;
+    pub mod probability_queries;
     pub mod completeness;
     pub mod jensen_shannon_stochastic_conformance;
     pub mod uniform_stochastic_miner;
