@@ -5,7 +5,26 @@ mod tests {
     use fraction::GenericFraction;
     use num_bigint::ToBigUint;
 
-    use crate::{ebi_framework::activity_key::HasActivityKey, ebi_objects::{alignments::Move, deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::ToSemantics, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics, ToStochasticDeterministicSemantics}}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}, medoid, techniques::{align::Align, deterministic_semantics_for_stochastic_semantics::PMarking, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probability_queries::ProbabilityQueries, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
+    use crate::{ebi_framework::activity_key::HasActivityKey, ebi_objects::{alignments::Move, deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{Semantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics, ToStochasticDeterministicSemantics}}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}, medoid, techniques::{align::Align, deterministic_semantics_for_stochastic_semantics::PMarking, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probability_queries::ProbabilityQueries, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
+
+    #[test]
+    fn empty_slang() {
+        let fin = fs::read_to_string("testfiles/empty.slang").unwrap();
+        let mut slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
+        slang.normalise();
+
+        assert_eq!(slang.len(), 0);
+        assert_eq!(slang.get_probability_sum(), Fraction::zero());
+    }
+
+    #[test]
+    fn empty_slpn() {
+        let fin = fs::read_to_string("testfiles/empty.slpn").unwrap();
+        let slpn = fin.parse::<StochasticLabelledPetriNet>().unwrap();
+
+        assert_eq!(slpn.get_number_of_places(), 0);
+        assert_eq!(slpn.get_number_of_transitions(), 0);
+    }
 
     #[test]
     fn medoid() {
@@ -89,7 +108,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
         let sdfa = fin.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
         let semantics = sdfa.to_stochastic_deterministic_semantics();
-        assert!(semantics.analyse_minimum_probability(&Fraction::one()).is_err());
+        assert_eq!(semantics.analyse_minimum_probability(&Fraction::one()).unwrap().len(), 0);
     }
 
     #[test]
@@ -133,8 +152,7 @@ mod tests {
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
         let semantics = slang.to_stochastic_deterministic_semantics();
         
-        //should error
-        assert!(semantics.analyse_minimum_probability(&Fraction::one()).is_err());
+        assert_eq!(semantics.analyse_minimum_probability(&Fraction::one()).unwrap().len(), 0);
     }
 
     #[test]
@@ -143,8 +161,7 @@ mod tests {
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
         
         let slang2: &dyn EbiTraitFiniteStochasticLanguage = &slang;
-        //should error
-        assert!(slang2.analyse_minimum_probability(&Fraction::one()).is_err());
+        assert_eq!(slang2.analyse_minimum_probability(&Fraction::one()).unwrap().len(), 0);
     }
 
     #[test]
@@ -524,8 +541,29 @@ mod tests {
         let slang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(fin.parse::<FiniteStochasticLanguage>().unwrap());
 
         assert_eq!(slang.process_variety(), Fraction::from((2, 5)));
-
     }
+
+    #[test]
+    fn slang_cover_empty() {
+        let fin = fs::read_to_string("testfiles/empty.slang").unwrap();
+        let slang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(fin.parse::<FiniteStochasticLanguage>().unwrap());
+
+        let slang2 = slang.analyse_probability_coverage(&Fraction::zero()).unwrap();
+        assert_eq!(slang2.len(), 0);
+
+        assert!(slang.analyse_probability_coverage(&Fraction::from((1, 2))).is_err());
+    }
+
+    // #[test]
+    // fn slpn_cover_empty() {
+    //     let fin = fs::read_to_string("testfiles/empty.slpn").unwrap();
+    //     let slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+        
+    //     let slang2 = slpn.analyse_probability_coverage(&Fraction::zero()).unwrap();
+    //     assert_eq!(slang2.len(), 0);
+
+    //     assert!(slpn.analyse_probability_coverage(&Fraction::from((1, 2))).is_err());
+    // }
 
     // #[test] //disabled until we can handle livelocks
     // fn sample_sdfa_no_language() {

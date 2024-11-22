@@ -16,6 +16,11 @@ pub trait ProbabilityQueries {
      * Find the traces with the highest probabilities.
      */
     fn analyse_most_likely_traces(&self, number_of_traces: &usize) -> Result<FiniteStochasticLanguage>;
+
+    /**
+     * Find the most likely traces that together have a sum probability.
+     */
+    fn analyse_probability_coverage(&self, coverage: &Fraction) -> Result<FiniteStochasticLanguage>;
 }
 
 impl ProbabilityQueries for EbiTraitStochasticDeterministicSemantics {
@@ -32,15 +37,24 @@ impl ProbabilityQueries for EbiTraitStochasticDeterministicSemantics {
             EbiTraitStochasticDeterministicSemantics::PMarking(sem) => sem.analyse_most_likely_traces(number_of_traces),
         }
     }
+
+    fn analyse_probability_coverage(&self, coverage: &Fraction) -> Result<FiniteStochasticLanguage> {
+        match self {
+            EbiTraitStochasticDeterministicSemantics::Usize(sem) => sem.analyse_probability_coverage(coverage),
+            EbiTraitStochasticDeterministicSemantics::PMarking(sem) => sem.analyse_probability_coverage(coverage),
+        }
+    }
 }
 
 impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
     fn analyse_most_likely_traces(&self, number_of_traces: &usize) -> Result<FiniteStochasticLanguage> {
 
-        if number_of_traces.is_one() {
+        if self.len() == 0 {
+            Ok((HashMap::new(), self.get_activity_key().clone()).into())
+        } else if number_of_traces.is_one() {
             let mut result = HashMap::new();
 
-            let (mut max_trace, mut max_probability) = self.iter_trace_probability().next().ok_or_else(|| anyhow!("Finite stochastic language is empty."))?;
+            let (mut max_trace, mut max_probability) = self.iter_trace_probability().next().ok_or_else(|| anyhow!("Finite stochastic language is empty where it should not."))?;
 
             for (trace, probability) in self.iter_trace_probability() {
                 if probability > max_probability {
@@ -84,8 +98,52 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
             result2.insert(trace.clone(), probability.clone());
         }
 
-        if result2.is_empty() {
-            return Err(anyhow!("Analsyis returned an empty language; there are no traces that have a probability of at least {}.", at_least));
+        Ok((result2, self.get_activity_key().clone()).into())
+    }
+
+    fn analyse_probability_coverage(&self, coverage: &Fraction) -> Result<FiniteStochasticLanguage> {
+
+        if coverage.is_zero() {
+            return Ok((HashMap::new(), self.get_activity_key().clone()).into());
+        } else if self.len() == 0 {
+            return Err(anyhow!("A coverage of {:.4} is unattainable as the stochastic language is empty.", coverage)); 
+        }
+
+        //idea: keep a list of traces sorted by probability
+
+        //insert the first trace
+        let mut result = vec![(self.get_trace(0).unwrap(), self.get_probability(0).unwrap())];
+
+        let mut sum = Fraction::zero();
+        
+        for (trace, probability) in self.iter_trace_probability().skip(1) {
+
+            if &sum < coverage || probability > result[0].1 {
+                //as the new trace has a higher probability than the trace with the lowest probability, we have to insert it
+                match result.binary_search_by(|&(_, cmp_probability): &(_, &Fraction)| cmp_probability.cmp(probability)) {
+                    Ok(index) | Err(index) => result.insert(index, (trace, probability))
+                }
+                sum += probability;
+
+                //then, remove the first trace until the sum would drop below the coverage
+                let mut new_sum = &sum - result[0].1;
+                while &new_sum > coverage {
+                    result.remove(0);
+                    sum = new_sum;
+                    
+                    new_sum = &sum - result[0].1;
+                }
+            }
+
+        }
+
+        if &sum < coverage {
+            return Err(anyhow!("A coverage of {:.4} is unattainable as the stochastic language has a sum probability of {:.4}.", coverage, sum)); 
+        }
+
+        let mut result2 = HashMap::new();
+        for (trace, probability) in result {
+            result2.insert(trace.clone(), probability.clone());
         }
 
         Ok((result2, self.get_activity_key().clone()).into())
@@ -139,7 +197,7 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
 
                     if error_at_loop {
                         if !seen.insert(new_p_state.clone()) {
-                            return Err(anyhow!("As the language is not finite, we cannot return all traces that have a minimum probability of 0."));
+                            return Err(anyhow!("As the language is not finite, Ebi cannot return all traces that have a minimum probability of 0."));
                         }
                     }
 
@@ -157,10 +215,6 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
                     }
                 }
             }
-        }
-
-        if result.is_empty() {
-            return Err(anyhow!("Analsyis returned an empty language; there are no traces that have a probability of at least {}.", at_least));
         }
 
         Ok((result, self.get_activity_key().clone()).into())
@@ -193,19 +247,91 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
                     }
                 },
                 Y::Trace(trace) => {
-                    // if trace.len() > 2 {
-                        result.insert(trace, y_probability);
-                        if result.len() >= *number_of_traces {
-                            break;
-                        }
-                    // }
+                    result.insert(trace, y_probability);
+                    if result.len() >= *number_of_traces {
+                        break;
+                    }
                 },
             }
         }
 
+        Ok((result, self.get_activity_key().clone()).into())
+    }
+    
+    fn analyse_probability_coverage(&self, coverage: &Fraction) -> Result<FiniteStochasticLanguage> {
+        
+        let mut seen = HashSet::new();
+        seen.insert(self.get_deterministic_initial_state()?);
 
-        if result.is_empty() {
-            return Err(anyhow!("Analysis returned an empty language; there are no traces in the model."));
+        let mut loop_detected = false;
+        let mut non_livelock_probability = Fraction::one();
+
+        let mut result = HashMap::new();
+        let mut result_sum = Fraction::zero();
+
+        let mut queue = vec![];
+        queue.push(X{
+            prefix: vec![],
+            probability: Fraction::one(),
+            p_state: self.get_deterministic_initial_state()?,
+        });
+
+        while let Some(x) = queue.pop() {
+            // log::debug!("queue length {}, process p-state {:?}", queue.len(), x.p_state);
+
+            let mut probability_terminate_in_this_state = self.get_deterministic_termination_probability(&x.p_state);
+            // log::debug!("probability termination in this state {}", probability_terminate_in_this_state);
+            probability_terminate_in_this_state *= &x.probability;
+
+            if !probability_terminate_in_this_state.is_zero() {
+                //we have found a trace; add it to the result
+                result_sum += &probability_terminate_in_this_state;
+                result.insert(x.prefix.clone(), probability_terminate_in_this_state);
+            }
+
+            //check whether we are done
+            if &result_sum > coverage {
+                break;
+            } else if &non_livelock_probability < coverage {
+                return Err(anyhow!("A coverage of {:.4} is unattainable as the stochastic language of the model is at most {:.4} large.", coverage, non_livelock_probability));
+            } else if loop_detected && &non_livelock_probability == coverage {
+                return Err(anyhow!("A coverage of {:.4} is unattainable as the stochastic language of the model is at most {:.4} large and contains a loop.", coverage, non_livelock_probability));
+            }
+
+            for activity in self.get_deterministic_enabled_activities(&x.p_state) {
+                // log::info!("consider activity {}", activity);
+
+                let probability = self.get_deterministic_activity_probability(&x.p_state, activity);
+
+                // log::info!("activity has probability {}", probability);
+
+                let new_p_state = self.execute_deterministic_activity(&x.p_state, activity)?;
+
+                // log::info!("activity executed");
+
+                if !loop_detected {
+                    if !seen.insert(new_p_state.clone()) {
+                        loop_detected = true;
+                        seen.clear();
+                    }
+                }
+
+                let mut new_prefix = x.prefix.clone();
+                new_prefix.push(activity);
+                let new_x = X {
+                    prefix: new_prefix,
+                    probability: &x.probability * &probability,
+                    p_state: new_p_state,
+                };
+
+                if self.is_non_decreasing_livelock(&mut new_x.p_state.clone())? { //TODO: replace with a full livelock check
+                    //if a livelock, then keep track of its likelihood
+                    non_livelock_probability -= new_x.probability;
+                } else {
+                    //if not a livelock, continue the search
+                    queue.push(new_x);
+                }
+            }
         }
 
         Ok((result, self.get_activity_key().clone()).into())

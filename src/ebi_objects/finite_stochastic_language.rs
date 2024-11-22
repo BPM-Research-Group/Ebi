@@ -55,15 +55,19 @@ impl FiniteStochasticLanguage {
     }
 
     pub fn normalise_before(traces: &mut HashMap<Vec<String>, Fraction>) {
-        let sum = traces.values().fold(Fraction::zero(), |x, y| &x + y);
-        log::info!("the extracted traces cover a sum of {}", sum);
-        traces.retain(|_, v| {*v /= &sum;true});
+        if traces.len() != 0 {
+            let sum = traces.values().fold(Fraction::zero(), |mut x, y| {x += y; x});
+            log::info!("the extracted traces cover a sum of {}", sum);
+            traces.retain(|_, v| {*v /= &sum;true});
+        }
     }
 
     pub fn normalise(&mut self) {
-        let sum = self.traces.values().fold(Fraction::zero(), |x, y| &x + y);
-        log::info!("the extracted traces cover a sum of {}", sum);
-        self.traces.retain(|_, v| {*v /= &sum;true});
+        if self.len() != 0 {
+            let sum = self.get_probability_sum();
+            log::info!("the extracted traces cover a sum of {}", sum);
+            self.traces.retain(|_, v| {*v /= &sum;true});
+        }
     }
 
     pub fn get_stochastic_deterministic_finite_automaton(&self) -> StochasticDeterministicFiniteAutomaton {
@@ -147,6 +151,10 @@ impl EbiTraitFiniteStochasticLanguage for FiniteStochasticLanguage {
     
     fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage {
         self.clone()
+    }
+
+    fn get_probability_sum(&self) -> Fraction {
+        self.traces.values().fold(Fraction::zero(), |mut x, y| {x += y; x})
     }
 }
 
@@ -232,9 +240,6 @@ impl Importable for FiniteStochasticLanguage {
         }
 
         let number_of_traces = lreader.next_line_index().context("failed to read number of places")?;
-        if number_of_traces == 0 {
-            return Err(anyhow!("language is empty"));
-        }
 
         let mut traces = HashMap::new();
         let mut sum = Fraction::zero();
@@ -266,8 +271,8 @@ impl Importable for FiniteStochasticLanguage {
             }
         }
 
-        if Fraction::is_exaxt_globally() && !sum.is_one() {
-            return Err(anyhow!("probabilities in language do not sum to 1, but to {}", sum));
+        if sum > Fraction::one() {
+            return Err(anyhow!("probabilities in stochastic language sum to {}, which is greater than 1", sum));
         }
 
         Ok(Self {
@@ -296,6 +301,7 @@ impl Infoable for FiniteStochasticLanguage {
         writeln!(f, "Number of traces\t{}", self.traces.len())?;
         writeln!(f, "Number of events\t{}", self.traces.iter().map(|t| t.0.len()).sum::<usize>())?;
         writeln!(f, "Number of activities\t{}", (self as &dyn EbiTraitFiniteStochasticLanguage).get_activity_key().get_number_of_activities())?;
+        writeln!(f, "Sum of probabilities\t{:.4}", self.get_probability_sum())?;
 
         Ok(write!(f, "")?)
     }
