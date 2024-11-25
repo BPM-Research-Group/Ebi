@@ -1,7 +1,7 @@
 use bitvec::bitvec;
 use anyhow::{anyhow, Context};
 
-use crate::{ebi_framework::activity_key::{Activity, ActivityKey}, ebi_objects::{labelled_petri_net::LPNMarking, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
+use crate::{ebi_framework::activity_key::Activity, ebi_objects::{labelled_petri_net::LPNMarking, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
 
 impl StochasticLabelledPetriNet {
 
@@ -28,7 +28,7 @@ impl StochasticLabelledPetriNet {
         true
     }
 
-    fn compute_enabled_transitions(&self, state: &mut LPNMarking) {
+    pub(crate) fn compute_enabled_transitions(&self, state: &mut LPNMarking) {
 		state.number_of_enabled_transitions = 0;
         state.enabled_transitions.fill(false);
         for transition in 0 .. self.get_number_of_transitions() {
@@ -39,15 +39,7 @@ impl StochasticLabelledPetriNet {
 }
 
 impl Semantics for StochasticLabelledPetriNet {
-	type State = LPNMarking;
-
-    fn get_activity_key(&self) -> &ActivityKey {
-        &self.activity_key
-    }
-
-    fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
-        &mut self.activity_key
-    }
+    type SemState = LPNMarking;
 
 	fn is_final_state(&self, state: &LPNMarking) -> bool {
         state.number_of_enabled_transitions == 0   
@@ -104,9 +96,15 @@ impl Semantics for StochasticLabelledPetriNet {
     fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
         self.labels[transition]
     }
+
+    fn get_number_of_transitions(&self) -> usize {
+        self.transition2input_places.len()
+    }
 }
 
 impl StochasticSemantics for StochasticLabelledPetriNet {
+    type StoSemState = LPNMarking;
+
     fn get_transition_weight(&self, _state: &LPNMarking, transition: usize) -> &Fraction {
         &self.weights[transition]
     }

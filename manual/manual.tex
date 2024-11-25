@@ -1,5 +1,5 @@
 \documentclass{article}
-\usepackage{amsmath,amsfonts,booktabs,stmaryrd,tabularx,multirow,xfrac,nicematrix}
+\usepackage{amsmath,amsfonts,booktabs,stmaryrd,tabularx,multirow,xfrac,nicematrix,listings,listings-rust}
 \usepackage{ltablex}
 \usepackage{tikz}
 \usetikzlibrary{decorations.pathmorphing,calc,positioning}
@@ -133,6 +133,7 @@ Sander J.J. Leemans, Tian Li}
             The actual input for a command gets wrapped in the \texttt{EbiInput} enum.
     
         \subsubsection{Trait}
+        \label{sec:traits}
             A ``trait" is like an interface: it provides some functions but does not say how these are implemented.
             For instance ``finite stochastic language" is a trait, which allows to iterate over traces and their probabilities, and to obtain the number of traces.
             Preferably, commands should require traits as inputs.
@@ -141,6 +142,7 @@ Sander J.J. Leemans, Tian Li}
             \ebitraitlist
     
         \subsubsection{Object type}
+        \label{sec:objecttypes}
             An object type is a struct or class.
             It is a specific implementation with a fixed data structure.
             The output of a command is an object of a specific object type.
@@ -156,8 +158,158 @@ Sander J.J. Leemans, Tian Li}
     
             Ebi has the following file handlers:
             \ebifilehandlerlist
+            
+	\subsection{Implementing a new command/algorithm/technique}
+	\label{sec:implement}
+		There are two steps to take: set up the technique (that is, the implementation), and set up the command (i.e. where \& how Ebi can call it).
+		
+		\subsubsection{Conventions and Hints}
+			\begin{itemize}
+				\item Ebi only uses floating point numbers (f32, f64) when the user asks for it.
+				Commands should use \verb=Fraction= or other numeric exact classes (see Section~\ref{sec:exact}); these perform computations with floating point numbers if possible.
+				\item It is important that errors are propagated appropriately.
+				Therefore, avoid \verb=.unwrap()= but instead propagate errors using \verb=.with_context(|| "error message")?=.
+				The \verb=anyhow= package formats the error messages nicely to the user.
+				\item For speed considerations, avoid .clone(), but use references instead, especially on heap-based structs such as \verb=Fraction=.
+				\item \verb|a += b| is usually faster than \verb|c = a + b|, as it saves a memory allocation, especially on heap-based structs such as \verb=Fraction=.
+				\item Rather than using a numeric struct, using traits such as \verb=Add= and \verb=Mul= allows code to be used regardless of the arithmetic type.
+				\item To provide debug output, avoid \verb=println= as it is rather inflexible, but use \verb=log::info= instead.
+			\end{itemize}
+		
+		\subsubsection{The technique}
+			The technique is the place where the code for the algorithm lives.
+			This should go in its own file in the \verb=techniques= folder.
+			As an example, we'll use the unit Earth Movers' Stochastic Conformance, (uEMSC) which takes a finite stochastic language (log) and a queriable stochastic language (model), and returns a fraction to indicate the conformance of the log and model.
+			
+			\begin{enumerate}
+				\item First, decide on the input and output of your technique.
+				
+				For the inputs, preferably use Ebi traits for the inputs whenever possible: as the framework expands, all new objects and files will be automatically supported by your technique.
+				See Section~\ref{sec:traits} for an overview of Ebi traits.
+				Alternatively, object types can be used as inputs; please see Section~\ref{sec:objecttypes} for an overview of available object types.
+				
+				For our example, uEMSC needs to walk through a finite set of traces (EbiTraitFiniteStochasticLanguage) and needs to ask the model for a probability of each trace (EbiTraitQueriableStochasticLanguage).
+				
+				For the output: Ebi supports only a single output.
+				Ebi deliberately does not support floating point numbers (f32, f64) as these are not exact (see Section~\ref{sec:exact}).
+				
+				For our example, the output of uEMSC is a fraction.
+				
+				\item Second, create a Rust trait that will contain the method to call.
+				The idea is that this trait will be implemented on one of the Ebi traits, such that it can be called for each Rust struct for which it is available.
+				
+				For our example, we define a Rust trait that will be implemented on the log (that is, \texttt{self} will be the log):
+\begin{lstlisting}[language=Rust, style=boxed]
+use anyhow::Result;
+
+pub trait UnitEarthMoversStochasticConformance {
+    fn unit_earth_movers_stochastic_conformance(
+    	&self, 
+    	language2: Box<dyn EbiTraitQueriableStochasticLanguage>
+    ) -> Result<Fraction>;
+}
+\end{lstlisting}				
+				
+				 \item Third, implement the new Rust trait for the appropriate struct and/or trait.
+				 
+				 For our example:
+\begin{lstlisting}[language=Rust, style=boxed]
+impl UnitEarthMoversStochasticConformance 
+for dyn EbiTraitFiniteStochasticLanguage {
+    fn unit_earth_movers_stochastic_conformance(
+    	&self, 
+    	mut language2: Box<dyn EbiTraitQueriableStochasticLanguage>
+    ) -> Result<Fraction> {   
+    	... here comes the algorithm ...
+    }
+}
+\end{lstlisting}
+
+				In case the inputs involve the Ebi traits \texttt{EbiTraitSemantics}, \texttt{EbiTraitStochasticSemantics} or \texttt{EbiTraitStochasticDeterministicSemantics} (or any other Ebi-trait-that-is-actually-an-enum), one more step is necessary: one has to implement the new Rust trait (e.g. \texttt{UnitEarthMoversStochasticConformance}) for these enums, as well as for the actual trait.
+				An example of this can be found in the file \verb=techniques\align.rs=.
+			\end{enumerate}
+			
+		\subsubsection{The command}
+			Having implemented the algorithm, Ebi needs to be made aware of the new technique, by creating commands for it.
+			
+			\begin{enumerate}
+				\item Identify the position in the command tree where your command will live.
+				This tree can be found in \verb=ebi_commands= folder.
+				By convention, first-level sub-commands (such as \verb=Ebi conformance=) get their own file, and this file contains all commands within that sub-command.
+				
+				\item Add a new command to this file.
+				Most of the fields are self-explanatory, and we explain the key ones here:
+				\begin{itemize}
+					\item \verb=latex_link= will end up in the manual, and can be used to cite a paper where the algorithm is explained.
+					
+					\item \verb=cli_command= provides access to the command line interface arguments that the user provided.
+					This should be \verb=None= for the far majority of plug-ins.
+					If it is not \verb=None=, then the command will not be callable from external libraries (such as ProM, PM4PY or Knime).
+					Furthermore, parameters defined through \verb=cli_command= are not read, parsed or imported by the Ebi framework.
+					An example of an optional attribute can be found in \verb=ebi_commands/ebi_command_association.rs=.
+					
+					\item \verb=exact_arithmetic= indicates whether your plug-in \emph{can} handle exact arithmetic. 
+					That is, even if this is \verb=true=, the user can still disable exact arithmetic (which will be handled by Ebi).
+					The far majority of plug-ins support exact arithmetic; only set this to \verb=false= if exact arithmetic is unbearably slow.
+					
+					\item \verb=input_types= gives a sequence of inputs.
+					That is, the number of inputs is fixed per command (unless through \verb=cli_command=).
+					Each input is again a list of possible traits or objects that can be accepted.
+					For each input, Ebi will try to parse the file given, and return the first trait/object type using which the file can be parsed.
+					
+					\item \verb=execute= should call the implemented algorithm.
+					As a first step, the inputs should be retrieved from the variable \verb=inputs=, and transformed into the correct types.
+					Notice that the link between \verb=input_types= and \verb=execute= cannot be verified at compile time, thus this should be tested extensively.
+					
+					The output of the algorithm should be wrapped in the appropriate \verb=EbiOutput= enum.
+					
+					\item \verb=output_type= indicates the single output type of the command.
+					Notice that the link between \verb=execute= and \verb=output_type= cannot be verified at compile time, thus this should be tested extensively.
+					
+				\end{itemize}
+				
+				For our example:
+
+\begin{lstlisting}[language=Rust, style=boxed]		
+pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
+    name_short: "uemsc",
+    name_long: ... , 
+    explanation_short: ... , 
+    explanation_long: ... , 
+    latex_link: ... , 
+    cli_command: None, 
+    exact_arithmetic: true, 
+    input_types: &[ 
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)], 
+        &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)]
+    ], 
+    input_names: &["FILE_1", "FILE_2"], 
+    input_helps: &[
+    	"A finite stochastic language (log) to compare.", 
+    	"A queriable stochastic language (model) to compare."
+    ],
+    execute: |mut inputs, _| {
+        let log = 
+        	inputs.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let model =
+        	inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
+        let uemsc =
+        	log.unit_earth_movers_stochastic_conformance(model)
+        	.context("cannot compute uEMSC")?;
+        Ok(EbiOutput::Fraction(uemsc))
+    },
+    output_type: &EbiOutputType::Fraction
+};
+\end{lstlisting}
+				
+				\item Add your command to the higher-level command.		
+				At the top of the file, there is a command declaration (e.g. \verb=EBI_CONFORMANCE=) that contains the sub-commands.
+				Add your new command here, while maintaining the alphabetical order.
+			\end{enumerate}
+		
 
     \subsection{Exact Computation}
+    \label{sec:exact}
         In Ebi, several computations are performed without rounding.
         To this end, it uses positive fractions: 
         $$\mathbb{Q} = \{ \frac{x}{y} \mid x, y \in \mathbb{N} \}$$

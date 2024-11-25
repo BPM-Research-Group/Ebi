@@ -1,13 +1,13 @@
-use std::{fmt::Display, hash::Hash, io::BufRead};
+use std::io::BufRead;
 use anyhow::{anyhow, Result};
 
-use crate::{ebi_framework::{activity_key::ActivityKey, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::labelled_petri_net::LPNMarking, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::ActivityKey, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, ebi_objects::labelled_petri_net::LPNMarking, math::fraction::Fraction};
 
 use super::ebi_trait_semantics::Semantics;
 
 pub enum EbiTraitStochasticSemantics {
-	Marking(Box<dyn StochasticSemantics<State = LPNMarking, AState = LPNMarking>>),
-	Usize(Box<dyn StochasticSemantics<State = usize, AState = usize>>)
+	Usize(Box<dyn StochasticSemantics<StoSemState = usize, SemState = usize, AliState = usize>>),
+	Marking(Box<dyn StochasticSemantics<StoSemState = LPNMarking, SemState = LPNMarking, AliState = LPNMarking>>),
 }
 
 impl FromEbiTraitObject for EbiTraitStochasticSemantics {
@@ -35,29 +35,31 @@ impl EbiTraitStochasticSemantics {
 	}
 }
 
-pub trait StochasticSemantics: Semantics {
+pub trait StochasticSemantics: Semantics<SemState = <Self as StochasticSemantics>::StoSemState> {
+	type StoSemState;
 	
     /**
 	 * 
 	 * @param transition
 	 * @return the weight of the transition. This might depend on the state.
 	 */
-    fn get_transition_weight(&self, state: &Self::State, transition: TransitionIndex) -> &Fraction;
+    fn get_transition_weight(&self, state: &<Self as StochasticSemantics>::StoSemState, transition: TransitionIndex) -> &Fraction;
 	
     /**
 	 * 
 	 * @param enabledTransitions
 	 * @return the sum of the weight of the enabled transitions
 	 */
-    fn get_total_weight_of_enabled_transitions(&self, state: &Self::State) -> anyhow::Result<Fraction>;
+    fn get_total_weight_of_enabled_transitions(&self, state: &<Self as StochasticSemantics>::StoSemState) -> anyhow::Result<Fraction>;
 
 }
 
 pub type TransitionIndex = usize;
 
-pub trait ToStochasticSemantics {
-	type State: Eq + Hash + Clone + Display;
-	fn get_stochastic_semantics(&self) -> Box<dyn StochasticSemantics<State = Self::State, AState = Self::State>>;
+pub trait ToStochasticSemantics: Importable + Sized {
+	fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics;
 
-	fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics>;
+	fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics> {
+		Ok(Self::import(reader)?.to_stochastic_semantics())
+	}
 }

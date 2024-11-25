@@ -2,7 +2,7 @@ use std::{fmt::{Debug, Display}, hash::Hash, sync::{Arc, Mutex}};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use anyhow::{anyhow, Context, Error, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, ebi_command::EbiCommand}, ebi_objects::{alignments::{Alignments, Move}, deterministic_finite_automaton_semantics::DeterministicFiniteAutomatonSemantics, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, process_tree::ProcessTree, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, displayable::Displayable, ebi_command::EbiCommand}, ebi_objects::{alignments::{Alignments, Move}, deterministic_finite_automaton::DeterministicFiniteAutomaton, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
 pub trait Align {
     fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments>;
@@ -29,7 +29,7 @@ impl Align for EbiTraitSemantics {
 	}
 }
 
-impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+impl <T, State> Align for T where T: Semantics<SemState = State> + Send + Sync + ?Sized, State: Displayable {
     
     fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
         let mut activity_key = self.get_activity_key().clone();
@@ -93,14 +93,14 @@ impl <T, FS> Align for T where T: Semantics<State = FS> + Send + Sync + ?Sized, 
 
 }
 
-pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(usize, FS)>, usize)> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+pub fn align_astar<T, State>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(usize, State)>, usize)> where T: Semantics<SemState = State> + AlignmentHeuristics<AliState = State> + ?Sized, State: Displayable {
     // log::debug!("activity key {:?}", semantics.get_activity_key());
     // log::debug!("align trace {:?}", trace);
 
     let cache = semantics.initialise_alignment_heuristic_cache();
 
     let start = (0, semantics.get_initial_state());
-    let successors = |(trace_index, state) : &(usize, FS)| {
+    let successors = |(trace_index, state) : &(usize, State)| {
 
         let mut result = vec![];
 
@@ -144,12 +144,12 @@ pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(
     };
 
     //function that returns a heuristic on how far we are still at least from a final state
-    let heuristic = |(trace_index, state) : &(usize, FS)| {
+    let heuristic = |(trace_index, state) : &(usize, State)| {
         semantics.underestimate_cost_to_final_synchronous_state(trace, trace_index, state, &cache)
     };
 
     //function that returns whether we are in a final synchronous product state
-    let success = |(trace_index, state): &(usize, FS)| {
+    let success = |(trace_index, state): &(usize, State)| {
         let result = trace_index == &trace.len() && semantics.is_final_state(&state);
         // log::debug!("state {} {} is final: {}", trace_index, state, result);
         result
@@ -164,7 +164,7 @@ pub fn align_astar<T, FS>(semantics: &T, trace: &Vec<Activity>) -> Option<(Vec<(
  * 
  * This function assumes equal costs (of 10000) for the log and model moves, and 1 for the silent moves.
  */
-pub fn transform_alignment<T, FS>(semantics: &T, trace: &Vec<Activity>, states: Vec<(usize, FS)>) -> Result<Vec<Move>> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+pub fn transform_alignment<T, State>(semantics: &T, trace: &Vec<Activity>, states: Vec<(usize, State)>) -> Result<Vec<Move>> where T: Semantics<SemState = State> + ?Sized, State: Display + Debug + Clone + Hash + Eq {
     let mut alignment = vec![];
 
     let mut it = states.into_iter();
@@ -208,7 +208,7 @@ pub fn transform_alignment<T, FS>(semantics: &T, trace: &Vec<Activity>, states: 
     Ok(alignment)
 }
 
-pub fn is_there_a_silent_transition_enabled<T, FS>(semantics: &T, from: &FS, to: &FS) -> Option<TransitionIndex> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+pub fn is_there_a_silent_transition_enabled<T, FS>(semantics: &T, from: &FS, to: &FS) -> Option<TransitionIndex> where T: Semantics<SemState = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
     for transition in semantics.get_enabled_transitions(from) {
         if semantics.is_transition_silent(transition) {
             let mut from = from.clone();
@@ -221,7 +221,7 @@ pub fn is_there_a_silent_transition_enabled<T, FS>(semantics: &T, from: &FS, to:
     None
 }
 
-pub fn find_transition_with_label<T, FS>(semantics: &T, from: &FS, to: &FS, label: Activity) -> Result<TransitionIndex> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+pub fn find_transition_with_label<T, FS>(semantics: &T, from: &FS, to: &FS, label: Activity) -> Result<TransitionIndex> where T: Semantics<SemState = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
     // log::debug!("find transition with label {}", label);
     for transition in semantics.get_enabled_transitions(from) {
         // log::debug!("transition {} is enabled", transition);
@@ -236,7 +236,7 @@ pub fn find_transition_with_label<T, FS>(semantics: &T, from: &FS, to: &FS, labe
     Err(anyhow!("There is no transition with activity {} that brings the model from {} to {}", label, from, to))
 }
 
-pub fn find_labelled_transition<T, FS>(semantics: &T, from: &FS, to: &FS) -> Result<TransitionIndex> where T: Semantics<State = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
+pub fn find_labelled_transition<T, FS>(semantics: &T, from: &FS, to: &FS) -> Result<TransitionIndex> where T: Semantics<SemState = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
     for transition in semantics.get_enabled_transitions(from) {
         if !semantics.is_transition_silent(transition) {
             let mut from = from.clone();
@@ -250,7 +250,7 @@ pub fn find_labelled_transition<T, FS>(semantics: &T, from: &FS, to: &FS) -> Res
 }
 
 pub trait AlignmentHeuristics {
-    type AState;
+    type AliState;
 
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>>;
 
@@ -258,71 +258,71 @@ pub trait AlignmentHeuristics {
      * Return a lower bound on the cost to reach a final state in the synchronous product.
      * If not sure: 0 is a valid return value, though better bounds will make searches more efficient.
      */
-    fn underestimate_cost_to_final_synchronous_state(&self, trace: &Vec<Activity>, trace_index: &usize, state: &Self::AState, cache: &Vec<Vec<usize>>) -> usize;
+    fn underestimate_cost_to_final_synchronous_state(&self, trace: &Vec<Activity>, trace_index: &usize, state: &Self::AliState, cache: &Vec<Vec<usize>>) -> usize;
 }
 
-impl AlignmentHeuristics for DeterministicFiniteAutomatonSemantics {
-    type AState = usize;
+impl AlignmentHeuristics for DeterministicFiniteAutomaton {
+    type AliState = usize;
 
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
         vec![]
     }
     
-    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &Self::AState, _: &Vec<Vec<usize>>) -> usize {
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &usize, _: &Vec<Vec<usize>>) -> usize {
         0
     }
 }
 
 impl AlignmentHeuristics for FiniteStochasticLanguageSemantics {
-    type AState = usize;
+    type AliState = usize;
 
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
         vec![]
     }
 
-    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &Self::AState, _: &Vec<Vec<usize>>) -> usize {
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &usize, _: &Vec<Vec<usize>>) -> usize {
         0
     }
 }
 
 impl AlignmentHeuristics for LabelledPetriNet {
-    type AState = LPNMarking;
+    type AliState = LPNMarking;
 
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
         vec![]
     }
 
-    fn underestimate_cost_to_final_synchronous_state(&self, _trace: &Vec<Activity>, _trace_index: &usize, _state: &Self::AState, _cache: &Vec<Vec<usize>>) -> usize {
+    fn underestimate_cost_to_final_synchronous_state(&self, _trace: &Vec<Activity>, _trace_index: &usize, _state: &LPNMarking, _cache: &Vec<Vec<usize>>) -> usize {
         0
     }
 }
 
 impl AlignmentHeuristics for StochasticLabelledPetriNet {
-    type AState = LPNMarking;
+    type AliState = LPNMarking;
     
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
         vec![]
     }
 
-    fn underestimate_cost_to_final_synchronous_state(&self, _trace: &Vec<Activity>, _trace_index: &usize, _state: &Self::AState, _cache: &Vec<Vec<usize>>) -> usize {
+    fn underestimate_cost_to_final_synchronous_state(&self, _trace: &Vec<Activity>, _trace_index: &usize, _state: &LPNMarking, _cache: &Vec<Vec<usize>>) -> usize {
         0
     }
 }
 
-impl AlignmentHeuristics for StochasticDeterministicFiniteAutomatonSemantics {
-    type AState = usize;
+impl AlignmentHeuristics for StochasticDeterministicFiniteAutomaton {
+    type AliState = usize;
     
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
         vec![]
     }
 
-    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>,  _: &usize, _: &Self::AState, _: &Vec<Vec<usize>>) -> usize {
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>,  _: &usize, _: &usize, _: &Vec<Vec<usize>>) -> usize {
         0
     }
 }
 
 impl AlignmentHeuristics for ProcessTree {
-    type AState = usize;
+    type AliState = usize;
     
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
         vec![]

@@ -96,7 +96,8 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
     execute: |mut inputs, _| {
         let log = inputs.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let model = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
-        Ok(EbiOutput::Fraction(log.unit_earth_movers_stochastic_conformance(model).context("cannot compute uEMSC")?))
+        let uemsc = log.unit_earth_movers_stochastic_conformance(model).context("cannot compute uEMSC")?;
+        Ok(EbiOutput::Fraction(uemsc))
     },
     output_type: &EbiOutputType::Fraction
 };

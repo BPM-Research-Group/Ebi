@@ -25,11 +25,13 @@ jobs:
         git config user.name "Github auto committer"
         git config user.email "cipipeline@example.com"
         rm -rf src/*
+        rm -rf lib/*
         rm README.md
         rm Cargo.toml
         rm -rf manual/*
         rm .gitlab-ci.yml
         cp -R -a ../src/. src/
+        cp -R -a ../lib/. lib/
         cp ../README.md README.md
         cp ../Cargo.toml Cargo.toml
         cp -R -a ../manual/. manual/

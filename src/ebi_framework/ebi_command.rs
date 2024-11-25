@@ -238,39 +238,33 @@ impl EbiCommand {
 
     pub fn select_exporter(output_type: &EbiOutputType, to_file: Option<&PathBuf>) -> EbiExporter {
         let exporters = output_type.get_exporters();
-        
-        if exporters.len() == 1 || to_file.is_none() {
-            return exporters.into_iter().next().unwrap();
-        }
 
-        //strategy: take the exporter with the longest extension first (to export .xes.gz before .xes)
-        {
-            let mut exporters = exporters.clone();
-            exporters.sort_by(|a, b| {
-                if let EbiExporter::Object(_, file_handler_a) = a {
-                    if let EbiExporter::Object(_, file_handler_b) = b {
-                        file_handler_b.file_extension.len().cmp(&file_handler_a.file_extension.len())
-                    } else {
-                        unreachable!()
+        match to_file {
+            Some(file) => {
+                //strategy: take the exporter with the longest extension first (to export .xes.gz before .xes)
+                {
+                    let mut exporters = exporters.clone();
+                    exporters.sort_by(|a, b| {
+                        a.get_extension().len().cmp(&b.get_extension().len())
+                    });
+
+                    //see whether an output extension matches the requested file
+                    for exporter in exporters {
+                        if let EbiExporter::Object(_, file_handler) = exporter {
+                            if file.display().to_string().ends_with(&(".".to_string() + file_handler.file_extension)) {
+                                return exporter;
+                            }
+                        }
                     }
-                } else {
-                    unreachable!()
                 }
-            });
 
-            for exporter in exporters {
-                if let EbiExporter::Object(_, file_handler) = exporter {
-                    if to_file.unwrap().display().to_string().ends_with(&(".".to_string() + file_handler.file_extension)) {
-                        return exporter;
-                    }
-                } else {
-                    unreachable!()
-                }
-            }
+                //otherwise, take the default one
+                return output_type.get_default_exporter();
+            },
+            None => {
+                return output_type.get_default_exporter();
+            },
         }
-
-        //otherwise, take the first one that was mentioned
-        return exporters.into_iter().next().unwrap();
     }
 
     /**
@@ -279,44 +273,40 @@ impl EbiCommand {
     pub fn attempt_parse(input_types: &[&EbiInputType], cli_matches: &ArgMatches, cli_id: &str) -> Result<EbiInput> {
         //an input may be of several types; go through each of them
         let mut error = None;
+        let mut reader = match ebi_input::get_reader(cli_matches, cli_id).context("Getting reader.") {
+            Ok(x) => Some(x),
+            Err(e) => {error = Some(e); None},
+        };
+
         for input_type in input_types.iter() {
             //try to parse the input as this type
             match input_type {
                 EbiInputType::Trait(etrait) => {
                     
                     //try to parse a trait
-                    match ebi_input::get_reader(cli_matches, cli_id).context("Getting reader.") {
-                        Ok(mut reader) => {
-                            match ebi_input::read_as_trait(etrait, &mut reader).with_context(|| format!("Parsing as the trait `{}`.", etrait)) {
-                                Ok((object, file_handler)) => return Ok(EbiInput::Trait(object, file_handler)),
-                                Err(e) => error = Some(e)
-                            }
-                        },
-                        Err(e) => error = Some(e)
+                    if let Some(ref mut reader) = reader {
+                        match ebi_input::read_as_trait(etrait, reader).with_context(|| format!("Parsing as the trait `{}`.", etrait)) {
+                            Ok((object, file_handler)) => return Ok(EbiInput::Trait(object, file_handler)),
+                            Err(e) => error = Some(e)
+                        }
                     }
                 },
                 EbiInputType::Object(etype) => {
                     
                     //try to parse a specific object
-                    match ebi_input::get_reader(cli_matches, cli_id).context("Getting reader.") {
-                        Ok(mut reader) => {
-                            match ebi_input::read_as_object(etype, &mut reader).with_context(|| format!("Parsing as the object type `{}`.", etype)) {
-                                Ok((object, file_handler)) => return Ok(EbiInput::Object(object, file_handler)),
-                                Err(e) => error = Some(e)
-                            }
-                        },
-                        Err(e) => error = Some(e)
+                    if let Some(ref mut reader) = reader {
+                        match ebi_input::read_as_object(etype, reader).with_context(|| format!("Parsing as the object type `{}`.", etype)) {
+                            Ok((object, file_handler)) => return Ok(EbiInput::Object(object, file_handler)),
+                            Err(e) => error = Some(e)
+                        }
                     }
                 },
                 EbiInputType::AnyObject => {
-                    match ebi_input::get_reader(cli_matches, cli_id).context("Getting reader.") {
-                        Ok(mut reader) => {
-                            match ebi_input::read_as_any_object(&mut reader).context("Parsing as any object.") {
-                                Ok((object, file_handler)) => return Ok(EbiInput::Object(object, file_handler)),
-                                Err(e) => error = Some(e)
-                            }
-                        },
-                        Err(e) => error = Some(e)
+                    if let Some(ref mut reader) = reader {
+                        match ebi_input::read_as_any_object(reader).context("Parsing as any object.") {
+                            Ok((object, file_handler)) => return Ok(EbiInput::Object(object, file_handler)),
+                            Err(e) => error = Some(e)
+                        }
                     }
                 },
                 EbiInputType::FileHandler => {

@@ -276,6 +276,7 @@ pub enum EbiObjectImporter {
     Alignments(fn(&mut dyn BufRead) -> Result<EbiObject>),
     DeterministicFiniteAutomaton(fn(&mut dyn BufRead) -> Result<EbiObject>),
     ProcessTree(fn(&mut dyn BufRead) -> Result<EbiObject>),
+    Executions(fn(&mut dyn BufRead) -> Result<EbiObject>),
 }
 
 impl EbiObjectImporter {
@@ -291,6 +292,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::Alignments(_) => EbiObjectType::Alignments,
             EbiObjectImporter::DeterministicFiniteAutomaton(_) => EbiObjectType::DeterministicFiniteAutomaton,
             EbiObjectImporter::ProcessTree(_) => EbiObjectType::ProcessTree,
+            EbiObjectImporter::Executions(_) => EbiObjectType::Executions,
         }
     }
     
@@ -306,6 +308,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::Alignments(importer) => *importer,
             EbiObjectImporter::DeterministicFiniteAutomaton(importer) => *importer,
             EbiObjectImporter::ProcessTree(importer) => *importer,
+            EbiObjectImporter::Executions(importer) => *importer,
         }
     }
 }
@@ -333,7 +336,7 @@ pub fn get_reader_file(from_file: &PathBuf) -> Result<MultipleReader> {
 }
 
 pub fn get_reader(cli_matches: &ArgMatches, cli_id: &str) -> Result<MultipleReader> {
-    if let Some(from_file) = cli_matches.get_one::<PathBuf>(cli_id) {
+    if let Some(from_file) = cli_matches.try_get_one::<PathBuf>(cli_id)? {
         if from_file.as_os_str() == "-" {
             return MultipleReader::from_stdin();
         } else {

@@ -44,8 +44,8 @@ pub mod ebi_objects {
     pub mod petri_net_markup_language;
     pub mod alignments;
     pub mod deterministic_finite_automaton;
-    pub mod deterministic_finite_automaton_semantics;
     pub mod process_tree;
+    pub mod executions;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_stochastic_deterministic_semantics;
@@ -75,7 +75,7 @@ pub mod techniques {
     pub mod align;
     pub mod alignment_stochastic_miner;
     pub mod association;
-    pub mod probabilistic_queries;
+    pub mod probability_queries;
     pub mod completeness;
     pub mod jensen_shannon_stochastic_conformance;
     pub mod uniform_stochastic_miner;
@@ -88,8 +88,10 @@ pub mod techniques {
     pub mod sample;
     pub mod explain_trace;
     pub mod process_variety;
+    pub mod executions;
+    pub mod livelocks;
+    pub mod deterministic_semantics_for_stochastic_semantics;
 }
-pub mod deterministic_semantics_for_stochastic_semantics;
 pub mod medoid;
 pub mod distances;
 pub mod tests;
@@ -99,3 +101,6 @@ pub mod json;
 pub mod line_reader;
 pub mod follower_semantics;
 pub mod marking;
+
+#[macro_use]
+extern crate derive_activity_key; 

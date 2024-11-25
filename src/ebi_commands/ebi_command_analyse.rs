@@ -1,6 +1,6 @@
 use anyhow::Context;
 
-use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::fraction::Fraction, medoid, techniques::{completeness::Completeness, probabilistic_queries::FiniteStochasticLanguageAnalyser, process_variety::ProcessVariety}};
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::fraction::Fraction, medoid, techniques::{completeness::Completeness, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}};
 
 pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
     name_short: "ana",
@@ -10,6 +10,7 @@ pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
     children: &[
         &EBI_ANALYSE_ALL,
         &EBI_ANALYSE_COMPLETENESS,
+        &EBI_ANALYSE_COVERAGE,
         &EBI_ANALYSE_MEDOID,
         &EBI_ANALYSE_MINPROB,
         &EBI_ANALYSE_MODE,
@@ -24,8 +25,7 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
     explanation_short: "Find all traces.", 
     explanation_long: Some("List all traces of a stohastic language.
 Models containing loops are not supported and an error will be returned.
-The computation may run forever if the model is unbounded.
-Computation is more efficient for an object with a finite stochastic language."),
+The computation may run forever if the model is unbounded."),
     cli_command: None, 
     latex_link: None,
     exact_arithmetic: true,
@@ -73,6 +73,40 @@ pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction
 };
 
+pub const EBI_ANALYSE_COVERAGE: EbiCommand = EbiCommand::Command {
+    name_short: "cov", 
+    name_long: Some("coverage"), 
+    explanation_short: "Find the most-likely traces that together cover a minimum probability.", 
+    explanation_long: Some("Find the most-likely traces that together cover the given minimum probability.
+Will return a finate stochastic language with the extracted traces.
+The computation may not terminate if the model has non-decreasing livelocks, or if the model is unbounded and this unboundedness can be triggered using silent transitions."),
+    cli_command: None, 
+    latex_link: None,
+    exact_arithmetic: true,
+    input_types: &[ 
+        &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics) ], 
+        &[ &EbiInputType::Fraction]
+    ],
+    input_names: &[ "FILE", "MINIMUM_COVERAGE"],
+    input_helps: &[ "Any object with deterministic stochastic semantics.", "The minimum probability that a trace should have to be included."],
+    execute: |mut objects, _| {
+        let model = objects.remove(0);
+        let coverage = objects.remove(0).to_type::<Fraction>()?;
+
+        let result = match model {
+            EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => {
+                slang.analyse_probability_coverage(&coverage).context("Analysing language.")?
+            },
+            EbiInput::Trait(EbiTraitObject::StochasticDeterministicSemantics(semantics), _) => {
+                semantics.analyse_probability_coverage(&coverage).context("Analysing language.")?
+            },
+            _ => unreachable!()
+        };
+        return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
+    }, 
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
+};
+
 pub const EBI_ANALYSE_MINPROB: EbiCommand = EbiCommand::Command {
     name_short: "minprob", 
     name_long: Some("minimum-probability-traces"), 
@@ -80,7 +114,7 @@ pub const EBI_ANALYSE_MINPROB: EbiCommand = EbiCommand::Command {
     explanation_long: Some("Find all traces that have a given minimum probability.
 Will return a finate stochastic language with the extracted traces.
 Will return an error if there are no such traces.
-The computation may run forever if the model is unbounded."),
+The computation may not terminate if the model is unbounded and this unboundedness can be triggered using silent transitions."),
     cli_command: None, 
     latex_link: None,
     exact_arithmetic: true,

@@ -2,8 +2,6 @@ use layout::backends::svg::SVGWriter;
 
 use crate::ebi_framework::{dottable::Dottable, ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}};
 
-
-
 pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group { 
     name_short: "vis", 
     name_long: Some("visualise"),
@@ -38,6 +36,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
                 EbiInput::Object(EbiObject::Alignments(a), _) => a.to_string(),
                 EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(s), _) => s.to_string(),
                 EbiInput::Object(EbiObject::ProcessTree(pt), _) => pt.to_string(),
+                EbiInput::Object(EbiObject::Executions(s), _) => s.to_string(),
                 EbiInput::FileHandler(_) => unreachable!(),
                 EbiInput::Trait(_, _) => unreachable!(),
                 EbiInput::String(_) => unreachable!(),
@@ -80,6 +79,7 @@ pub const EBI_VISUALISE_SVG: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::Alignments(_), _) => unreachable!(),
             EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(dfa), _) => dfa.to_dot(),
             EbiInput::Object(EbiObject::ProcessTree(pt), _) => pt.to_dot(),
+            EbiInput::Object(EbiObject::Executions(_), _) => unreachable!(),
             EbiInput::FileHandler(_) => unreachable!(),
             EbiInput::Trait(_, _) => unreachable!(),
             EbiInput::String(_) => unreachable!(),
