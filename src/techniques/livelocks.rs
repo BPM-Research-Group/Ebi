@@ -1,6 +1,6 @@
 use anyhow::Result;
 
-use crate::{ebi_framework::displayable::Displayable, ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_semantics::Semantics, techniques::deterministic_semantics_for_stochastic_semantics::PMarking};
+use crate::{ebi_framework::displayable::Displayable, ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, labelled_petri_net::{LPNMarking, LabelledPetriNet}, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_semantics::Semantics, techniques::deterministic_semantics_for_stochastic_semantics::PMarking};
 
 pub trait Livelock {
     type LivState: Displayable;
@@ -123,3 +123,11 @@ is_non_decreasing_livelock_lpn!(LabelledPetriNet);
 is_non_decreasing_livelock_lpn!(StochasticLabelledPetriNet);
 is_non_decreasing_livelock_dfm!(DeterministicFiniteAutomaton);
 is_non_decreasing_livelock_dfm!(StochasticDeterministicFiniteAutomaton);
+
+impl Livelock for ProcessTree {
+    type LivState = usize;
+
+    fn is_non_decreasing_livelock(&self, _state: &mut Self::LivState) -> Result<bool> {
+        Ok(false)
+    }
+}

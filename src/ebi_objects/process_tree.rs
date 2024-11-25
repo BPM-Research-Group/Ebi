@@ -5,7 +5,7 @@ use layout::{adt::dag::NodeHandle, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader};
 
 use super::labelled_petri_net::LabelledPetriNet;
 
@@ -17,7 +17,7 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     file_extension: "tree",
     validator: ebi_input::validate::<ProcessTree>,
     trait_importers: &[
-        // EbiTraitImporter::Semantics(ProcessTree::import_as_semantics),
+        EbiTraitImporter::Semantics(ProcessTree::import_as_semantics),
     ],
     object_importers: &[
         EbiObjectImporter::ProcessTree(ProcessTree::import_as_object),
@@ -31,48 +31,7 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     ],
 };
 
-pub enum Node {
-    Tau,
-    Activity(Activity),
-    Operator(Operator, usize) //type, number of children
-}
-
-#[derive(EnumIter)]
-pub enum Operator {
-    Xor,
-    Sequence,
-    Interleaved,
-    Concurrent,
-    Or,
-    Loop
-}
-
-impl Operator {
-    fn to_string(&self) -> &str {
-        match self {
-            Operator::Xor => "xor",
-            Operator::Sequence => "sequence",
-            Operator::Interleaved => "interleaved",
-            Operator::Concurrent => "concurrent",
-            Operator::Or => "or",
-            Operator::Loop => "loop",
-        }
-    }
-}
-
-impl FromStr for Operator {
-    type Err = Error;
-
-    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        for op in Operator::iter() {
-            if s == op.to_string() {
-                return Ok(op);
-            }
-        }
-        return Err(anyhow!("operator not recognised"));
-    }
-}
-
+#[derive(Debug,ActivityKey)]
 pub struct ProcessTree {
     activity_key: ActivityKey,
     tree: Vec<Node>
@@ -492,5 +451,86 @@ impl Dottable for ProcessTree {
         let sink = <dyn Dottable>::create_place(&mut graph, "");
         ProcessTree::node_to_dot(&self, &mut graph,0, &source, &sink);
         graph
+    }
+}
+
+impl ToSemantics for ProcessTree {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::Usize(Box::new(self))
+    }
+}
+
+impl Semantics for ProcessTree {
+    type SemState = usize;
+
+    fn get_initial_state(&self) -> <Self as Semantics>::SemState {
+        todo!()
+    }
+
+    fn execute_transition(&self, state: &mut <Self as Semantics>::SemState, transition: TransitionIndex) -> Result<()> {
+        todo!()
+    }
+
+    fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool {
+        todo!()
+    }
+
+    fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
+        todo!()
+    }
+
+    fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
+        todo!()
+    }
+
+    fn get_enabled_transitions(&self, state: &<Self as Semantics>::SemState) -> Vec<TransitionIndex> {
+        todo!()
+    }
+
+    fn get_number_of_transitions(&self) -> usize {
+        todo!()
+    }
+}
+
+#[derive(Debug,Clone)]
+pub enum Node {
+    Tau,
+    Activity(Activity),
+    Operator(Operator, usize) //type, number of children
+}
+
+#[derive(EnumIter,Debug,Clone)]
+pub enum Operator {
+    Xor,
+    Sequence,
+    Interleaved,
+    Concurrent,
+    Or,
+    Loop
+}
+
+impl Operator {
+    fn to_string(&self) -> &str {
+        match self {
+            Operator::Xor => "xor",
+            Operator::Sequence => "sequence",
+            Operator::Interleaved => "interleaved",
+            Operator::Concurrent => "concurrent",
+            Operator::Or => "or",
+            Operator::Loop => "loop",
+        }
+    }
+}
+
+impl FromStr for Operator {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        for op in Operator::iter() {
+            if s == op.to_string() {
+                return Ok(op);
+            }
+        }
+        return Err(anyhow!("operator not recognised"));
     }
 }
