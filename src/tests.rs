@@ -19,7 +19,7 @@ mod tests {
 
     #[test]
     fn empty_slpn() {
-        let fin = fs::read_to_string("testfiles/empty.slpn").unwrap();
+        let fin = fs::read_to_string("testfiles/empty_net.slpn").unwrap();
         let slpn = fin.parse::<StochasticLabelledPetriNet>().unwrap();
 
         assert_eq!(slpn.get_number_of_places(), 0);
@@ -551,12 +551,23 @@ mod tests {
         let slang2 = slang.analyse_probability_coverage(&Fraction::zero()).unwrap();
         assert_eq!(slang2.len(), 0);
 
+        let slang3 = slang.analyse_probability_coverage(&Fraction::one());
+        assert!(slang3.is_err());
+
         assert!(slang.analyse_probability_coverage(&Fraction::from((1, 2))).is_err());
     }
 
     #[test]
-    fn slpn_cover_empty() {
-        let fin = fs::read_to_string("testfiles/empty.slpn").unwrap();
+    fn slpn_empty() {
+        let fin = fs::read_to_string("testfiles/empty_lang_labelled.slpn").unwrap();
+        let slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+        let slang2 = slpn.analyse_probability_coverage(&Fraction::zero()).unwrap();
+        assert_eq!(slang2.len(), 0);
+    }
+
+    #[test]
+    fn slpn_cover_empty_net() {
+        let fin = fs::read_to_string("testfiles/empty_net.slpn").unwrap();
         
         let slpn = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
         let state = slpn.get_deterministic_initial_state().unwrap();
@@ -574,7 +585,26 @@ mod tests {
     }
 
     #[test]
-    fn importers() {
+    fn slpn_cover_empty_lang() {
+        let fin = fs::read_to_string("testfiles/empty_net.slpn").unwrap();
+        
+        let slpn = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+        let state = slpn.get_deterministic_initial_state().unwrap();
+        assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 0);
+        assert_eq!(slpn.get_deterministic_termination_probability(&state), Fraction::one());
+
+        let slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+        let slang2 = slpn.analyse_probability_coverage(&Fraction::zero()).unwrap();
+        assert_eq!(slang2.len(), 1);
+
+        let fin2 = fs::read_to_string("testfiles/empty_trace.slang").unwrap();
+        let slang3 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+
+        assert_eq!(slpn.analyse_probability_coverage(&Fraction::from((1, 2))).unwrap(), slang3);
+    }
+
+    #[test]
+    fn all_importers() {
         let files = fs::read_dir("./testfiles").unwrap();
         for path in files {
             let file = path.unwrap();

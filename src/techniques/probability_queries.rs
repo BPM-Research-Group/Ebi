@@ -277,10 +277,10 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
         });
 
         while let Some(x) = queue.pop() {
-            println!("queue length {}, process p-state {:?}", queue.len(), x.p_state);
+            log::debug!("queue length {}, process p-state {:?}", queue.len(), x.p_state);
 
             let mut probability_terminate_in_this_state = self.get_deterministic_termination_probability(&x.p_state);
-            println!("probability termination in this state {}", probability_terminate_in_this_state);
+            log::debug!("probability termination in this state {}", probability_terminate_in_this_state);
             probability_terminate_in_this_state *= &x.probability;
 
             if !probability_terminate_in_this_state.is_zero() {
