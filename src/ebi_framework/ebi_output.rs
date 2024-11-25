@@ -293,3 +293,9 @@ pub fn export_to_string(object: EbiOutput, exporter: EbiExporter) -> Result<Stri
     exporter.export_from_object(object, &mut f)?;
     Ok(String::from_utf8(f)?)
 }
+
+impl Display for EbiObjectExporter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.get_type().to_string())
+    }
+}
