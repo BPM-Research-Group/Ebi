@@ -2,7 +2,7 @@ use std::{cmp::{max, Ordering}, collections::HashMap, fmt, io::{self, BufRead}, 
 use anyhow::{anyhow, Context, Result, Error};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_queriable_stochastic_language::{self}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}}, json, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_queriable_stochastic_language::{self}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}}, json, math::fraction::Fraction};
 
 use super::{labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
 
@@ -210,7 +210,12 @@ impl StochasticDeterministicFiniteAutomaton {
         assert!(left <= self.sources.len());
         (false, left)
 	}
-   
+
+    pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let sdfa = Self::import(reader)?;
+        Ok(EbiObject::LabelledPetriNet(sdfa.get_stochastic_labelled_petri_net().into()))
+    }
+    
     pub fn get_stochastic_labelled_petri_net(&self) -> StochasticLabelledPetriNet {
         log::info!("convert SDFA to stochastic labelled Petri net");
 

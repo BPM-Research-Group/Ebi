@@ -92,6 +92,16 @@ impl EventLog {
         Ok(Box::new(event_log))
     }
 
+    pub fn import_as_finite_stochastic_language(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let log = Self::import(reader)?;
+        Ok(EbiObject::FiniteStochasticLanguage(log.get_finite_stochastic_language()))
+    }
+
+    pub fn import_as_stochastic_deterministic_finite_automaton(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let log = Self::import(reader)?;
+        Ok(EbiObject::StochasticDeterministicFiniteAutomaton(log.to_stochastic_deterministic_finite_automaton()))
+    }
+
     pub fn get_finite_language(&self) -> FiniteLanguage {
         log::info!("create finite language");
 
