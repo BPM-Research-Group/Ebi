@@ -13,13 +13,16 @@ macro_rules! is_non_decreasing_livelock_lpn {
         impl Livelock for $t {
             type LivState = PMarking<LPNMarking>;
 
+            /**
+             * A q-state is in a livelock if all if its markings are in a livelock.
+             */
             fn is_non_decreasing_livelock(&self, state: &mut PMarking<LPNMarking>) -> Result<bool> {
                 for (marking, _) in &state.p_marking {
-                    if $t::is_non_decreasing_livelock(self, &mut marking.clone())? {
-                        return Ok(true);
+                    if !$t::is_non_decreasing_livelock(self, &mut marking.clone())? {
+                        return Ok(false);
                     }
                 }
-                return Ok(false);
+                return Ok(true);
             }
         }
 

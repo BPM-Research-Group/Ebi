@@ -69,6 +69,7 @@ pub mod math {
     pub mod root_log_div;
     pub mod correlation;
     pub mod levenshtein;
+    pub mod markov_model;
 }
 pub mod techniques {
     pub mod align;

@@ -259,9 +259,15 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
     }
     
     fn analyse_probability_coverage(&self, coverage: &Fraction) -> Result<FiniteStochasticLanguage> {
+
+        if !coverage.is_positive() {
+            return Ok(HashMap::new().into());
+        }
         
+        let initial_state = self.get_deterministic_initial_state()?;
+
         let mut seen = HashSet::new();
-        seen.insert(self.get_deterministic_initial_state()?);
+        seen.insert(initial_state.clone());
 
         let mut loop_detected = false;
         let mut non_livelock_probability = Fraction::one();
@@ -273,7 +279,7 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
         queue.push(X{
             prefix: vec![],
             probability: Fraction::one(),
-            p_state: self.get_deterministic_initial_state()?,
+            p_state: initial_state,
         });
 
         while let Some(x) = queue.pop() {
