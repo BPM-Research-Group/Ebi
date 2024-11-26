@@ -9,7 +9,7 @@ pub struct MarkovModel<S> {
     initial_vector: Vec<Fraction>,
 }
 
-impl <S: PartialEq> MarkovModel<S> {
+impl <S: PartialEq + Clone> MarkovModel<S> {
     pub fn new() -> Self {
         Self {
             edges: Matrix::new(),
@@ -64,6 +64,44 @@ impl <S: PartialEq> MarkovModel<S> {
         }
     }
 
+    pub fn set_states(&mut self, states: &Vec<bool>, state: S) {
+        for (index, maybe) in states.iter().enumerate() {
+            if *maybe {
+                self.states[index] = state.clone();
+            }
+        }
+    }
+
+    /**
+     * Remove all outgoing transitions of this state, and make the state absorbing.
+     */
+    pub fn make_states_absorbing(&mut self, states: Vec<bool>) {
+        for (state, maybe) in states.into_iter().enumerate() {
+            if maybe {
+                self.edges[state] = vec![Fraction::zero(); self.states.len()];
+                self.edges[state][state] = Fraction::one();
+            }
+        }
+    }
+
+    pub fn get_states_that_cannot_reach(&self, mut states_to_reach: Vec<usize>) -> Vec<bool> {
+        let mut seen = vec![false; self.states.len()];
+        states_to_reach.iter().for_each(|x| seen[*x] = true);
+
+        while let Some(state) = states_to_reach.pop() {
+            for state2 in 0..self.states.len() {
+                if !seen[state2] && self.edges[state2][state].is_positive() {
+                    seen[state2] = true;
+                    states_to_reach.push(state2);
+                }
+            }
+        }
+        seen
+    }   
+
+    /**
+     * Raise the edge matrix to infinity / solve the Markov chain.
+     */
     pub fn pow_infty(&mut self) -> Result<Vec<Fraction>> {
         // log::debug!("solve Markov model {}", self.edges);
 
