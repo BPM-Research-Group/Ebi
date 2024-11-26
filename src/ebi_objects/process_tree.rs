@@ -3,7 +3,7 @@ use std::{fmt::Display, io::{self, BufRead}, str::FromStr};
 use anyhow::{anyhow, Context, Error, Result};
 use layout::{adt::dag::NodeHandle, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
-use strum_macros::EnumIter;
+use strum_macros::{Display, EnumIter};
 
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader};
 
@@ -456,12 +456,12 @@ impl Dottable for ProcessTree {
 
 impl ToSemantics for ProcessTree {
     fn to_semantics(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::Usize(Box::new(self))
+        EbiTraitSemantics::NodeStates(Box::new(self))
     }
 }
 
 impl Semantics for ProcessTree {
-    type SemState = usize;
+    type SemState = NodeStates;
 
     fn get_initial_state(&self) -> <Self as Semantics>::SemState {
         todo!()
@@ -488,7 +488,7 @@ impl Semantics for ProcessTree {
     }
 
     fn get_number_of_transitions(&self) -> usize {
-        todo!()
+        self.tree.iter().filter(|node| node.is_leaf()).count()
     }
 }
 
@@ -497,6 +497,15 @@ pub enum Node {
     Tau,
     Activity(Activity),
     Operator(Operator, usize) //type, number of children
+}
+
+impl Node {
+    pub fn is_leaf(&self) -> bool {
+        match self {
+            Self::Tau | Self::Activity(_) => true,
+            Self::Operator(_, _) => false
+        }
+    }
 }
 
 #[derive(EnumIter,Debug,Clone)]
@@ -532,5 +541,23 @@ impl FromStr for Operator {
             }
         }
         return Err(anyhow!("operator not recognised"));
+    }
+}
+
+#[derive(Clone,Display,Debug,Eq,PartialEq,Hash)]
+pub enum NodeState {
+    Enabled,
+    Started,
+    Completed,
+}
+
+#[derive(Clone,Debug,Eq,PartialEq,Hash)]
+pub struct NodeStates {
+    states: Vec<NodeStates>
+}
+
+impl Display for NodeStates {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{:?}", self.states)
     }
 }

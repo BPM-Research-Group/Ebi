@@ -2,7 +2,7 @@ use std::{fmt::{Debug, Display}, hash::Hash, sync::{Arc, Mutex}};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use anyhow::{anyhow, Context, Error, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, displayable::Displayable, ebi_command::EbiCommand}, ebi_objects::{alignments::{Alignments, Move}, deterministic_finite_automaton::DeterministicFiniteAutomaton, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, displayable::Displayable, ebi_command::EbiCommand}, ebi_objects::{alignments::{Alignments, Move}, deterministic_finite_automaton::DeterministicFiniteAutomaton, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, process_tree::{NodeStates, ProcessTree}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
 pub trait Align {
     fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments>;
@@ -18,6 +18,7 @@ impl Align for EbiTraitSemantics {
 		match self {
 			EbiTraitSemantics::Usize(sem) => sem.align_language(log),
 			EbiTraitSemantics::Marking(sem) => sem.align_language(log),
+            EbiTraitSemantics::NodeStates(sem) => sem.align_language(log),
 		}
 	}
 
@@ -25,6 +26,7 @@ impl Align for EbiTraitSemantics {
 		match self {
 			EbiTraitSemantics::Usize(sem) => sem.align_trace(trace),
 			EbiTraitSemantics::Marking(sem) => sem.align_trace(trace),
+            EbiTraitSemantics::NodeStates(sem) => sem.align_trace(trace),
 		}
 	}
 }
@@ -322,7 +324,7 @@ impl AlignmentHeuristics for StochasticDeterministicFiniteAutomaton {
 }
 
 impl AlignmentHeuristics for ProcessTree {
-    type AliState = usize;
+    type AliState = NodeStates;
     
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
         vec![]
