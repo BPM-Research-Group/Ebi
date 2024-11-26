@@ -8,7 +8,7 @@ use super::{labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net:
 
 pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     name: "stochastic deterministic finite automaton",
-    article: "an",
+    article: "a",
     file_extension: "sdfa",
     validator: ebi_input::validate::<StochasticDeterministicFiniteAutomaton>,
     trait_importers: &[

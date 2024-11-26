@@ -1,11 +1,11 @@
 #[cfg(test)]
 mod tests {
-    use std::{fs::{self, File}, ops::Neg};
+    use std::{fs::{self, File}, io::Cursor, ops::Neg};
 
     use fraction::GenericFraction;
     use num_bigint::ToBigUint;
 
-    use crate::{ebi_framework::{activity_key::HasActivityKey, ebi_file_handler::EBI_FILE_HANDLERS}, ebi_objects::{alignments::Move, deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{Semantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics, ToStochasticDeterministicSemantics}}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, matrix::Matrix, root_log_div::RootLogDiv}, medoid, multiple_reader::MultipleReader, techniques::{align::Align, deterministic_semantics_for_stochastic_semantics::PMarking, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probability_queries::ProbabilityQueries, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
+    use crate::{ebi_framework::{activity_key::HasActivityKey, ebi_file_handler::EBI_FILE_HANDLERS, ebi_output::EbiOutput}, ebi_objects::{alignments::Move, deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{Semantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics, ToStochasticDeterministicSemantics}}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, matrix::Matrix, root_log_div::RootLogDiv}, medoid, multiple_reader::MultipleReader, techniques::{align::Align, deterministic_semantics_for_stochastic_semantics::PMarking, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probability_queries::ProbabilityQueries, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 
     #[test]
     fn empty_slang() {
@@ -679,6 +679,43 @@ mod tests {
                     for importer in file_handler.object_importers {
                         println!("\t\timporter {} (should fail)", importer);
                         assert!((importer.get_importer())(&mut reader.get().unwrap()).is_err());
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn all_exporters() {
+        let files = fs::read_dir("./testfiles").unwrap();
+        for path in files {
+            let file = path.unwrap();
+            println!("file {:?}", file.file_name());
+
+            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
+
+            //look for file handlers that should accept this file
+            for file_handler in EBI_FILE_HANDLERS {
+                if !file.file_name().into_string().unwrap().contains("invalid") && file.file_name().into_string().unwrap().ends_with(&(".".to_string() + file_handler.file_extension)) {
+                    //file handler should be able to accept this file
+
+                    println!("\tfile handler import {}", file_handler);
+
+                    for importer in file_handler.object_importers {
+
+                        for file_handler2 in EBI_FILE_HANDLERS {
+                            for exporter in file_handler2.object_exporters {
+                                if exporter.get_type() == importer.get_type() {
+
+                                    println!("\t\timporter {}, exporter {}", importer, exporter);
+
+                                    let object = (importer.get_importer())(&mut reader.get().unwrap()).unwrap();
+                                    let mut c = Cursor::new(Vec::new());
+                                    // let mut f = File::open("/dev/null").unwrap();
+                                    exporter.export(EbiOutput::Object(object), &mut c).unwrap();
+                                }
+                            }
+                        }
                     }
                 }
             }

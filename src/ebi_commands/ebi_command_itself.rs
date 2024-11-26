@@ -199,7 +199,7 @@ fn manual() -> Result<EbiOutput> {
             writeln!(f, "\\end{{tabularx}}")?;
 
             //output
-            writeln!(f, "Output: {}.", output_type)?;
+            writeln!(f, "Output: {}, which can be written as {}.", output_type, output_type.exporters_as_strings_with_articles("or"))?;
         }
     }
     writeln!(f, "}}")?;
