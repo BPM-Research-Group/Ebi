@@ -29,6 +29,7 @@ use crate::math::matrix::Matrix;
                     hash: 0,
                     p_marking: HashMap::new(),
                     termination_probability: Fraction::zero(),
+                    silent_livelock_probability: Fraction::zero(),
                     activity_2_p_markings: HashMap::new(),
                     activity_2_probability: HashMap::new(),
                 };
@@ -49,6 +50,7 @@ use crate::math::matrix::Matrix;
                     hash: 0,
                     p_marking: state.activity_2_p_markings.get(&activity).unwrap().clone(),
                     termination_probability: Fraction::zero(),
+                    silent_livelock_probability: Fraction::zero(),
                     activity_2_p_markings: HashMap::new(),
                     activity_2_probability: HashMap::new(),
                 };
@@ -59,6 +61,10 @@ use crate::math::matrix::Matrix;
         
             fn get_deterministic_termination_probability(&self, state: &Self::DetState) -> Fraction {
                 state.termination_probability.clone()
+            }
+
+            fn get_deterministic_silent_livelock_probability(&self, state: &Self::DetState) -> Fraction {
+                state.silent_livelock_probability.clone()
             }
         
             fn get_deterministic_activity_probability(&self, state: &Self::DetState, activity: Activity) -> Fraction {
@@ -81,23 +87,30 @@ use crate::math::matrix::Matrix;
                 //create the extended matrix
                 let mut markov_model = self.create_markov_model(&q_state)?;
 
-                log::debug!("T {:?}", markov_model);
+                log::debug!("T {}", markov_model);
 
+                //replace livelock states by absorbing states
+                let progress_states = Self::get_progress_states(&markov_model);
+                log::debug!("progress states {:?}", progress_states);
+                let silent_livelock_states = markov_model.get_states_that_cannot_reach(progress_states);
+                log::debug!("states that cannot reach a progress state {:?}", silent_livelock_states);
+                markov_model.make_states_absorbing(&silent_livelock_states);
+                markov_model.set_states(&silent_livelock_states, MarkovMarking::SilentLiveLock());
+
+                log::debug!("T made absorbing {}", markov_model);
+                log::debug!("T made absorbing {:?}", markov_model);
+
+                //if there are no states at all, we are in a final state (final states were filtered out in the creation of the Markov model)
                 if markov_model.get_states().is_empty() {
-                    //if there are no states at all, we are in a final state (final states were filtered out in the creation of the Markov model)
                     q_state.termination_probability = Fraction::one();
-                    return Ok(());
-                } else if !Self::contains_next_states(&markov_model) {
-                    log::debug!("livelock detected for q-state {:?}", q_state);
-                    q_state.termination_probability = Fraction::zero();
                     return Ok(());
                 }
 
-                //normalise the current state we are in
+                //remove the previous final states by normalising the initial vector
                 markov_model.normalise_initial_vector()?;
 
                 let new_state_vector = markov_model.pow_infty()?;
-                log::debug!("new state vector{}", Matrix::into(new_state_vector.clone()));
+                log::debug!("new state vector {}", Matrix::into(new_state_vector.clone()));
 
                 //create the next q-states
                 for (probability, state) in new_state_vector.into_iter().zip(markov_model.get_states_owned()) {
@@ -105,11 +118,10 @@ use crate::math::matrix::Matrix;
                         match state {
                             MarkovMarking::ReachableWithSilentTransitions(_) => {
                                 /*
-                                    This is a marking that can be reached by executing only silent transitions.
-                                    By construction of the Markov chain, this also means that we cannot get to a final state or a labelled transition from here.
-                                    Hence, it is a livelock state.
+                                    This is a marking that can be reached by executing only silent transitions, and has a positive probability.
+                                    This should have been classified as a SilentLiveLock, and hence reaching this case is a bug.
                                  */
-                                todo!()
+                                unreachable!()
                             },
                             MarkovMarking::AfterExecutingAcrivity(marking, activity) => {
                                 match q_state.activity_2_probability.entry(activity) {
@@ -132,6 +144,9 @@ use crate::math::matrix::Matrix;
                             MarkovMarking::Final(_) => {
                                 q_state.termination_probability += probability;
                             },
+                            MarkovMarking::SilentLiveLock() => {
+                                q_state.silent_livelock_probability += probability;
+                            }
                         };
                     }
                 }
@@ -153,15 +168,13 @@ use crate::math::matrix::Matrix;
                 Ok(())
             }
 
-            fn contains_next_states<X: Displayable>(markov_model: &MarkovModel<MarkovMarking<X>>) -> bool {
-                for state in markov_model.get_states() {
-                    match state {
-                        MarkovMarking::ReachableWithSilentTransitions(_) => {},
-                        MarkovMarking::AfterExecutingAcrivity(_, _) => return true,
-                        MarkovMarking::Final(_) => return true,
-                    }
-                }
-                false
+            fn get_progress_states<X: Displayable>(markov_model: &MarkovModel<MarkovMarking<X>>) -> Vec<usize> {
+                markov_model.get_states().iter().enumerate().filter_map(|(i, state)| match state {
+                    MarkovMarking::ReachableWithSilentTransitions(_) => None,
+                    MarkovMarking::AfterExecutingAcrivity(_, _) => Some(i),
+                    MarkovMarking::Final(_) => Some(i),
+                    MarkovMarking::SilentLiveLock() => None,
+                }).collect()
             }
 
             fn create_markov_model(&self, q_state: &PMarking<LPNMarking>) -> Result<MarkovModel<MarkovMarking<LPNMarking>>> {
@@ -234,6 +247,7 @@ pub struct PMarking<S> where S: Displayable {
     hash: u64,
     pub p_marking: HashMap<S, Fraction>,
     pub termination_probability: Fraction,
+    pub silent_livelock_probability: Fraction,
     pub activity_2_p_markings: HashMap<Activity, HashMap<S, Fraction>>,
     pub activity_2_probability: HashMap<Activity, Fraction>
 }
@@ -300,6 +314,7 @@ enum MarkovMarking<S: Displayable> {
     ReachableWithSilentTransitions(S),
     AfterExecutingAcrivity(S, Activity),
     Final(S),
+    SilentLiveLock(),
 }
 
 impl <S: Displayable> Displayable for MarkovMarking<S> {}

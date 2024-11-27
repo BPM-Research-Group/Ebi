@@ -75,9 +75,9 @@ impl <S: PartialEq + Clone> MarkovModel<S> {
     /**
      * Remove all outgoing transitions of this state, and make the state absorbing.
      */
-    pub fn make_states_absorbing(&mut self, states: Vec<bool>) {
-        for (state, maybe) in states.into_iter().enumerate() {
-            if maybe {
+    pub fn make_states_absorbing(&mut self, states: &Vec<bool>) {
+        for (state, maybe) in states.iter().enumerate() {
+            if *maybe {
                 self.edges[state] = vec![Fraction::zero(); self.states.len()];
                 self.edges[state][state] = Fraction::one();
             }
@@ -85,18 +85,18 @@ impl <S: PartialEq + Clone> MarkovModel<S> {
     }
 
     pub fn get_states_that_cannot_reach(&self, mut states_to_reach: Vec<usize>) -> Vec<bool> {
-        let mut seen = vec![false; self.states.len()];
-        states_to_reach.iter().for_each(|x| seen[*x] = true);
+        let mut notseen = vec![true; self.states.len()];
+        states_to_reach.iter().for_each(|x| notseen[*x] = false);
 
         while let Some(state) = states_to_reach.pop() {
             for state2 in 0..self.states.len() {
-                if !seen[state2] && self.edges[state2][state].is_positive() {
-                    seen[state2] = true;
+                if notseen[state2] && self.edges[state2][state].is_positive() {
+                    notseen[state2] = false;
                     states_to_reach.push(state2);
                 }
             }
         }
-        seen
+        notseen
     }   
 
     /**

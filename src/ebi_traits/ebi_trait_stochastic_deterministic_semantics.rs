@@ -36,15 +36,20 @@ pub trait StochasticDeterministicSemantics: Livelock<LivState = Self::DetState> 
     /**
      * 
     * @return the probability of terminating in this state.
-    * Note that the sum of termination and the probability of all enabled activities may be smaller than 1. The raminder is a livelock.
+    * Note that the sum of termination and the probability of all enabled activities may be smaller than 1. The reminder is a silent livelock.
     */
     fn get_deterministic_termination_probability(&self, state: &Self::DetState) -> Fraction;
+
+    /**
+     * The probability that from the given state, the model will never leave a livelock of silent activities.
+     */
+    fn get_deterministic_silent_livelock_probability(&self, state: &Self::DetState) -> Fraction;
 
     /**
      * 
     * @param activity
     * @return the probability of executing the activity in the given state.
-    * Note that the sum of termination and the probability of all enabled activities may be smaller than 1. The remainder is a livelock.
+    * Note that the sum of termination and the probability of all enabled activities may be smaller than 1. The remainder is a silent livelock.
     */
     fn get_deterministic_activity_probability(&self, state: &Self::DetState, activity: Activity) -> Fraction;
 
