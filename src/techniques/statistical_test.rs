@@ -44,7 +44,7 @@ impl StatisticalTests for dyn EbiTraitEventLog {
         let err = AtomicUsize::new(0);
 
         log::info!("Perform the test");
-        let progress_bar = EbiCommand::get_progress_bar(number_of_samples);
+        let progress_bar = EbiCommand::get_progress_bar_ticks(number_of_samples);
 
         let e: usize = (0..number_of_samples).into_iter().map(|_| {
 

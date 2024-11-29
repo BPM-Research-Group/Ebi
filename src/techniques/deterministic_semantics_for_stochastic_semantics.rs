@@ -15,7 +15,6 @@ use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticD
 use crate::ebi_traits::ebi_trait_stochastic_semantics::StochasticSemantics;
 use crate::math::fraction::Fraction;
 use crate::math::markov_model::MarkovModel;
-use crate::math::matrix::Matrix;
 
 // macro_rules! default_stochastic_deterministic_semantics {
     // ($t:ident, $s:ident) => {
@@ -82,23 +81,23 @@ use crate::math::matrix::Matrix;
              * Compute the next q-state.
              */
             fn compute_next(&self, q_state: &mut PMarking<LPNMarking>) -> Result<()> {
-                log::debug!("compute next q-states for {:?}", q_state);
+                // log::debug!("compute next q-states for {:?}", q_state);
 
                 //create the extended matrix
                 let mut markov_model = self.create_markov_model(&q_state)?;
 
-                log::debug!("T {}", markov_model);
+                // log::debug!("T {}", markov_model);
 
                 //replace livelock states by absorbing states
                 let progress_states = Self::get_progress_states(&markov_model);
-                log::debug!("progress states {:?}", progress_states);
+                // log::debug!("progress states {:?}", progress_states);
                 let silent_livelock_states = markov_model.get_states_that_cannot_reach(progress_states);
-                log::debug!("states that cannot reach a progress state {:?}", silent_livelock_states);
+                // log::debug!("states that cannot reach a progress state {:?}", silent_livelock_states);
                 markov_model.make_states_absorbing(&silent_livelock_states);
                 markov_model.set_states(&silent_livelock_states, MarkovMarking::SilentLiveLock());
 
-                log::debug!("T made absorbing {}", markov_model);
-                log::debug!("T made absorbing {:?}", markov_model);
+                // log::debug!("T made absorbing {}", markov_model);
+                // log::debug!("T made absorbing {:?}", markov_model);
 
                 //if there are no states at all, we are in a final state (final states were filtered out in the creation of the Markov model)
                 if markov_model.get_states().is_empty() {
@@ -110,7 +109,7 @@ use crate::math::matrix::Matrix;
                 markov_model.normalise_initial_vector()?;
 
                 let new_state_vector = markov_model.pow_infty()?;
-                log::debug!("new state vector {}", Matrix::into(new_state_vector.clone()));
+                // log::debug!("new state vector {}", Matrix::into(new_state_vector.clone()));
 
                 //create the next q-states
                 for (probability, state) in new_state_vector.into_iter().zip(markov_model.get_states_owned()) {

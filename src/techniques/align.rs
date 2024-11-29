@@ -38,7 +38,7 @@ impl <T, State> Align for T where T: Semantics<SemState = State> + Send + Sync +
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
 
         log::info!("Compute alignments");
-        let progress_bar = EbiCommand::get_progress_bar(log.len());
+        let progress_bar = EbiCommand::get_progress_bar_ticks(log.len());
 
         //compute alignments multi-threadedly
         let mut aligned_traces = (0..log.len()).into_par_iter().filter_map(|trace_index| {

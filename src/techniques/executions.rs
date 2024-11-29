@@ -24,7 +24,7 @@ impl <T, State> FindExecutions for T where T: Semantics<SemState = State, AliSta
 
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
         log::info!("Compute alignments");
-        let progress_bar = EbiCommand::get_progress_bar(log.len());
+        let progress_bar = EbiCommand::get_progress_bar_ticks(log.len());
         
         let result = (0..log.len()).into_par_iter().filter_map(|trace_index| {
             let trace = log.read_trace_with_activity_key(&mut self.get_activity_key().clone(), &trace_index);
