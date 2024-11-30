@@ -294,14 +294,14 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
             // log::debug!("probability termination in this state {}", probability_terminate_in_this_state);
             probability_terminate_in_this_state *= &x.probability;
 
-            if !probability_terminate_in_this_state.is_zero() {
+            if probability_terminate_in_this_state.is_positive() {
                 //we have found a trace; add it to the result
                 result_sum += &probability_terminate_in_this_state;
                 result.insert(x.prefix.clone(), probability_terminate_in_this_state);
                 progress_bar.set_message(format!("found {} traces which cover {:.8}", result.len(), result_sum));
                 // log::debug!("add trace {}; coverage now {:.4}", result.len(), result_sum);
             }
-
+            
             //check whether we are done
             if &result_sum > coverage {
                 break;
