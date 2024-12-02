@@ -234,7 +234,7 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
                 Y::Prefix(prefix, p_state) => {
 
                     let termination_proability = self.get_deterministic_termination_probability(&p_state);
-                    if !termination_proability.is_zero() {
+                    if termination_proability.is_positive() {
                         queue.push(Y::Trace(prefix.clone()), &y_probability * &termination_proability);
                     }
 
@@ -294,6 +294,8 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
             // log::debug!("probability termination in this state {}", probability_terminate_in_this_state);
             probability_terminate_in_this_state *= &x.probability;
 
+            non_livelock_probability -= self.get_deterministic_silent_livelock_probability(&x.p_state);
+            
             if probability_terminate_in_this_state.is_positive() {
                 //we have found a trace; add it to the result
                 result_sum += &probability_terminate_in_this_state;
