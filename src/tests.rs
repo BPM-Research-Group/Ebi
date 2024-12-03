@@ -631,7 +631,7 @@ mod tests {
         let fin2 = fs::read_to_string("testfiles/empty.slang").unwrap();
         let slang3 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
 
-        assert_eq!(slpn.analyse_probability_coverage(&Fraction::from((1, 2))).unwrap(), slang3);
+        assert_eq!(slpn.analyse_probability_coverage(&Fraction::zero()).unwrap(), slang3);
     }
 
     #[test]
@@ -649,7 +649,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/empty_lang_multiple_silent.slpn").unwrap();
         let slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
 
-        let slang2 = slpn.analyse_probability_coverage(&Fraction::from((1, 10))).unwrap();
+        let slang2 = slpn.analyse_probability_coverage(&Fraction::zero()).unwrap();
 
         assert_eq!(slang2.len(), 0);
     }
