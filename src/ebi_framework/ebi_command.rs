@@ -2,6 +2,7 @@ use std::{collections::BTreeSet, fmt::{Debug, Display}, hash::Hash, path::PathBu
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use anyhow::{anyhow, Context, Result};
 use indicatif::{ProgressBar, ProgressStyle};
+use logging_timer::timer;
 
 use crate::{ebi_commands::{ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association, ebi_command_conformance, ebi_command_convert, ebi_command_discover, ebi_command_info, ebi_command_itself, ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate, ebi_command_visualise}, ebi_framework::ebi_output, math::fraction::{Fraction, FractionNotParsedYet}};
 
@@ -221,8 +222,11 @@ impl EbiCommand {
                 }
 
                 log::info!("Starting {}", self.long_name());
+                let result = {
+                    let _tmr = timer!(self.long_name());
 
-                let result = (execute)(inputs, Some(cli_matches))?;
+                    (execute)(inputs, Some(cli_matches))?
+                };
 
                 if &&result.get_type() != output_type {
                     return Err(anyhow!("Output type {} does not match the declared output of {}.", result.get_type(), output_type))

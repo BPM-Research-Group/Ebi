@@ -41,6 +41,7 @@ jni = "*"
 itertools = "*"
 serde = "*"
 derive_activity_key = {path = "lib/derive_activity_key"}
+logging_timer = "*"
 
 [dependencies.num-rational]
 version = "0.4.1"
