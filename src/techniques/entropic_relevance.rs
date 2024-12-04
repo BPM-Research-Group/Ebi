@@ -2,7 +2,7 @@ use std::collections::HashSet;
 
 use anyhow::{Result, Context};
 use num_traits::Zero;
-use crate::{ebi_framework::activity_key::Activity, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv}};
+use crate::{ebi_framework::activity_key::{Activity, ActivityKeyTranslator}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv}};
 
 pub trait EntropicRelvance {
     fn er(&self, model: Box<dyn EbiTraitQueriableStochasticLanguage>) -> Result<LogDiv>;
@@ -25,9 +25,11 @@ impl EntropicRelvance for dyn EbiTraitFiniteStochasticLanguage {
         };
 
         let sum_j = self.j(&mut model, number_of_activities_in_log)?;
+        let translator = ActivityKeyTranslator::new(self.get_activity_key(), model.get_activity_key_mut());
 
         for (trace, log_probability) in self.iter_trace_probability() {
-            let follower = FollowerSemantics::Trace(trace);
+            let translated_trace = translator.translate_trace(trace);
+            let follower = FollowerSemantics::Trace(&translated_trace);
             let model_probability = model.get_probability(&follower).with_context(|| format!("could not compute the probability of trace `{:?}`", trace))?;
             if model_probability > Fraction::zero() {
                 rho += log_probability;
