@@ -29,20 +29,27 @@ pub trait StochasticDeterministicSemantics: Livelock<LivState = Self::DetState> 
 
     /**
      * Get the state that results from executing the activity. 
-     * This method should not be called on activities that are not enabled or have a zero proability in this state.
+     * Returns whether the execution was successful.
     */
     fn execute_deterministic_activity(&self, state: &Self::DetState, activity: Activity) -> Result<Self::DetState>;
 
     /**
      * 
-    * @return whether the current state is a final state.
+    * @return the probability of terminating in this state.
+    * Note that the sum of termination and the probability of all enabled activities may be smaller than 1. The reminder is a silent livelock.
     */
     fn get_deterministic_termination_probability(&self, state: &Self::DetState) -> Fraction;
 
     /**
+     * The probability that from the given state, the model will never leave a livelock of silent activities.
+     */
+    fn get_deterministic_silent_livelock_probability(&self, state: &Self::DetState) -> Fraction;
+
+    /**
      * 
     * @param activity
-    * @return the probability of the activity in the given state.
+    * @return the probability of executing the activity in the given state.
+    * Note that the sum of termination and the probability of all enabled activities may be smaller than 1. The remainder is a silent livelock.
     */
     fn get_deterministic_activity_probability(&self, state: &Self::DetState, activity: Activity) -> Fraction;
 

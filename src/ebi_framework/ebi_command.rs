@@ -1,7 +1,8 @@
-use std::{collections::BTreeSet, fmt::{Debug, Display}, hash::Hash, path::PathBuf};
+use std::{collections::BTreeSet, fmt::{Debug, Display}, hash::Hash, path::PathBuf, time::Duration};
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use anyhow::{anyhow, Context, Result};
 use indicatif::{ProgressBar, ProgressStyle};
+use logging_timer::timer;
 
 use crate::{ebi_commands::{ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association, ebi_command_conformance, ebi_command_convert, ebi_command_discover, ebi_command_info, ebi_command_itself, ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate, ebi_command_visualise}, ebi_framework::ebi_output, math::fraction::{Fraction, FractionNotParsedYet}};
 
@@ -174,13 +175,23 @@ impl EbiCommand {
         }
     }
 
-    pub fn get_progress_bar(total_ticks: usize) -> ProgressBar {
+    pub fn get_progress_bar_ticks(total_ticks: usize) -> ProgressBar {
         let pb = ProgressBar::new(total_ticks.try_into().unwrap());
-        pb.set_style(ProgressStyle::with_template("[{wide_bar:.cyan/blue}] {pos:>7}/{len:7}")
+        pb.set_style(ProgressStyle::with_template(&("[{wide_bar:.cyan/blue}] {pos:>7}/{len:7}".to_owned()))
             .unwrap()
             .progress_chars("#>-"));
         pb.set_position(0);
-        return pb
+        pb
+    }
+
+    pub fn get_progress_bar_message(message: String) -> ProgressBar {
+        let pb = ProgressBar::new_spinner();
+        pb.set_style(ProgressStyle::with_template(&("{spinner} {wide_msg}"))
+            .unwrap());
+        pb.enable_steady_tick(Duration::from_millis(100));
+        pb.set_message(message);
+        pb.tick();
+        pb
     }
 
     pub fn execute(&self, cli_matches: &ArgMatches) -> Result<()> {
@@ -211,8 +222,11 @@ impl EbiCommand {
                 }
 
                 log::info!("Starting {}", self.long_name());
+                let result = {
+                    let _tmr = timer!(self.long_name());
 
-                let result = (execute)(inputs, Some(cli_matches))?;
+                    (execute)(inputs, Some(cli_matches))?
+                };
 
                 if &&result.get_type() != output_type {
                     return Err(anyhow!("Output type {} does not match the declared output of {}.", result.get_type(), output_type))

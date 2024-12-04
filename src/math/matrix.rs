@@ -11,25 +11,29 @@ use super::fraction::Fraction;
  * Hence, we have to do with these probably sub-optimal implementations.
  */
 pub struct Matrix {
-    rows: Vec<Vec<Fraction>>
+    rows: Vec<Vec<Fraction>>,
+    number_of_columns: usize, //keep track of the number of columns, even if there are no rows
 }
 
 impl Matrix {
     pub fn new() -> Matrix {
         Matrix {
-            rows: vec![]
+            rows: vec![],
+            number_of_columns: 0,
         }
     }
 
     pub fn new_sized(rows: usize, columns: usize, value: Fraction) -> Self {
         Matrix {
-            rows: vec![vec![value; columns]; rows]
+            rows: vec![vec![value; columns]; rows],
+            number_of_columns: columns,
         }
     }
 
     pub fn new_squared(size: usize, value: Fraction) -> Self {
         Matrix {
-            rows: vec![vec![value; size]; size]
+            rows: vec![vec![value; size]; size],
+            number_of_columns: size,
         }
     }
 
@@ -43,14 +47,23 @@ impl Matrix {
 
     pub fn ensure_capacity(&mut self, rows: usize, columns: usize, value: &Fraction) {
         //first, increase the number of columns
-        let i = self.get_number_of_columns();
-        if i < columns {
-            for row in self.rows.iter_mut() {
-                row.extend(vec![value.clone(); columns - i]);
+        if self.rows.len() == 0 {
+            //if there are no rows yet, then we just increase the column counter
+            self.number_of_columns = columns;
+        } else {
+            let i = self.rows[0].len();
+            if i < columns {
+                for row in self.rows.iter_mut() {
+                    row.extend(vec![value.clone(); columns - i]);
+                }
+                self.number_of_columns = columns;
             }
         }
+
         //second, increase the number of rows
-        self.rows.extend(vec![vec![value.clone(); columns]; rows - self.get_number_of_rows()]);
+        if rows > self.rows.len() {
+            self.rows.extend(vec![vec![value.clone(); self.number_of_columns]; rows - self.rows.len()]);
+        }
     }
 
     pub fn element_add(&mut self, row: &usize, column: &usize, value: &Fraction) {
@@ -141,10 +154,7 @@ impl Matrix {
     }
 
     pub fn get_number_of_columns(&self) -> usize {
-        if self.rows.len() == 0 {
-            return 0;
-        }
-        self.rows[0].len()
+        self.number_of_columns
     }
 
     pub fn get_number_of_rows(&self) -> usize {
@@ -232,6 +242,33 @@ impl Matrix {
         });
     }
 
+    pub fn into(column_vector: Vec<Fraction>) -> Matrix {
+        column_vector.into()
+    }
+
+    pub fn multiply_vector_matrix(&self, lhs: &Vec<Fraction>) -> Vec<Fraction> {
+        assert!(self.get_number_of_rows() == lhs.len());
+
+        let mut result = vec![Fraction::zero(); self.get_number_of_rows()];
+        for row in 0..self.get_number_of_rows() {
+            for column in 0..self.get_number_of_columns() {
+                result[column] += &self.rows[row][column] * &lhs[row];
+            }
+        }
+
+        result
+    }
+
+    pub fn display_vector(f: &mut std::fmt::Formatter<'_>, vector: &Vec<Fraction>) -> std::fmt::Result {
+        write!(f, "{{")?;        
+        for (j, fraction) in vector.iter().enumerate() {
+            write!(f, "{}", fraction.to_string())?;
+            if j < vector.len() - 1 {
+                write!(f, ", ")?;
+            }
+        }
+        write!(f, "}}")
+    }
 }
 
 impl Index<usize> for Matrix {
@@ -281,7 +318,8 @@ impl Mul for Matrix {
         // log::debug!("multiplication done");
         
         Self {
-            rows: rows
+            rows: rows,
+            number_of_columns: p,
         }
     }
 }
@@ -307,5 +345,41 @@ impl std::fmt::Display for Matrix {
 impl std::fmt::Debug for Matrix {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{}x{} matrix", self.get_number_of_rows(), self.get_number_of_columns())
+    }
+}
+
+impl From<Vec<Fraction>> for Matrix {
+    fn from(value: Vec<Fraction>) -> Self {
+        Self {
+            rows: vec![value],
+            number_of_columns: 1,
+        }
+    }
+}
+
+impl From<Vec<Vec<Fraction>>> for Matrix {
+    fn from(value: Vec<Vec<Fraction>>) -> Self {
+        let columns = if value.len() == 0 {0} else {value[0].len()};
+        Self {
+            rows: value,
+            number_of_columns: columns,
+        }
+    }
+}
+
+impl Mul<Vec<Fraction>> for Matrix {
+    type Output = Vec<Fraction>;
+
+    fn mul(self, rhs: Vec<Fraction>) -> Self::Output {
+        assert!(self.get_number_of_columns() == rhs.len());
+
+        let mut result = vec![Fraction::zero(); self.get_number_of_rows()];
+        for row in 0..self.get_number_of_rows() {
+            for column in 0..self.get_number_of_columns() {
+                result[row] += &self.rows[row][column] * &rhs[column];
+            }
+        }
+
+        result
     }
 }

@@ -1,0 +1,37 @@
+stochastic labelled Petri net
+# number of places
+2
+# initial marking
+1
+0
+# number of transitions
+2
+# transition 0
+silent
+# weight
+1
+# number of input places
+1
+0
+# number of output places
+1
+1
+# transition 1
+silent
+# weight
+1
+# number of input places
+1
+1
+# number of output places
+1
+0
+# transition 2
+silent
+# weight
+1
+# number of input places
+1
+0
+# number of output places
+0

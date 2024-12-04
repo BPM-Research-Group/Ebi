@@ -123,6 +123,10 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         self.get_termination_probability(*state).clone()
     }
 
+    fn get_deterministic_silent_livelock_probability(&self, _state: &Self::DetState) -> Fraction {
+        Fraction::zero()
+    }
+
     fn get_deterministic_activity_probability(&self, state: &usize, activity: Activity) -> Fraction {
         let (found, i) = self.binary_search(*state, self.get_activity_key().get_id_from_activity(activity));
         match found {

@@ -2,10 +2,10 @@
 mod tests {
     use std::{fs::{self, File}, io::Cursor, ops::Neg};
 
-    use fraction::GenericFraction;
+    use fraction::{GenericFraction, Zero};
     use num_bigint::ToBigUint;
 
-    use crate::{ebi_framework::{activity_key::HasActivityKey, ebi_file_handler::EBI_FILE_HANDLERS, ebi_output::EbiOutput}, ebi_objects::{alignments::Move, deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{Semantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics, ToStochasticDeterministicSemantics}}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv}, medoid, multiple_reader::MultipleReader, techniques::{align::Align, deterministic_semantics_for_stochastic_semantics::PMarking, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probability_queries::ProbabilityQueries, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
+    use crate::{ebi_framework::{activity_key::HasActivityKey, ebi_file_handler::EBI_FILE_HANDLERS, ebi_output::EbiOutput}, ebi_objects::{alignments::Move, deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{Semantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics, ToStochasticDeterministicSemantics}}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, matrix::Matrix, root_log_div::RootLogDiv}, medoid, multiple_reader::MultipleReader, techniques::{align::Align, deterministic_semantics_for_stochastic_semantics::PMarking, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probability_queries::ProbabilityQueries, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 
     #[test]
     fn empty_slang() {
@@ -91,6 +91,18 @@ mod tests {
         let zero = Fraction::one().one_minus();
 
         assert!(zero.is_zero());
+    }
+
+    #[test]
+    fn matrix_vector_multiplication() {
+        let m: Matrix = vec![vec![6.into(), 2.into() , 4.into()], vec![(-1).into(), 4.into(), 3.into()], vec![(-2).into(), 9.into(), 3.into()]].into();
+        let v: Vec<Fraction> = vec![4.into(), (-2).into(), 1.into()];
+
+        let x = m * v;
+
+        let t = vec![24.into(), (-9).into(), (-23).into()];
+
+        assert_eq!(x, t);
     }
 
     //test disabled due to inconsistent output order (which is within spec)
@@ -363,6 +375,24 @@ mod tests {
     }
 
     #[test]
+    fn jssc_activity_key() {
+        let fin1 = fs::read_to_string("testfiles/aa.slang").unwrap();
+        let slang1 = fin1.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/aa.slang").unwrap();
+        let slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let slang1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang1);
+
+        let jssc = slang1.jssc_log2log(Box::new(slang2)).unwrap();
+
+        let mut right_side =LogDiv::zero();
+        right_side/=2usize;
+        assert_eq!(jssc, RootLogDiv::sqrt(right_side).one_minus())
+    }
+
+
+    #[test]
     fn align_sdfa_trace() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
         let sdfa = fin.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
@@ -576,7 +606,7 @@ mod tests {
 
         let slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
         let slang2 = slpn.analyse_probability_coverage(&Fraction::zero()).unwrap();
-        assert_eq!(slang2.len(), 1);
+        assert_eq!(slang2.len(), 0);
 
         let fin2 = fs::read_to_string("testfiles/empty_trace.slang").unwrap();
         let slang3 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
@@ -585,22 +615,61 @@ mod tests {
     }
 
     #[test]
-    fn slpn_cover_empty_lang() {
-        let fin = fs::read_to_string("testfiles/empty_net.slpn").unwrap();
+    fn slpn_empty_lang_labelled_cover() {
+        let fin = fs::read_to_string("testfiles/empty_lang_labelled.slpn").unwrap();
+        
+        let slpn = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+        let state = slpn.get_deterministic_initial_state().unwrap();
+        assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
+        assert_eq!(slpn.get_deterministic_termination_probability(&state), Fraction::zero());
+
+        let slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = slpn;
+        let slang2 = slpn.analyse_probability_coverage(&Fraction::zero()).unwrap();
+        assert_eq!(slang2.len(), 0);
+
+        let fin2 = fs::read_to_string("testfiles/empty.slang").unwrap();
+        let slang3 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+
+        assert_eq!(slpn.analyse_probability_coverage(&Fraction::from((1, 2))).unwrap(), slang3);
+    }
+
+    #[test]
+    fn slpn_empty_lang_silent_cover() {
+        let fin = fs::read_to_string("testfiles/empty_lang_silent.slpn").unwrap();
         
         let slpn = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
         let state = slpn.get_deterministic_initial_state().unwrap();
         assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 0);
-        assert_eq!(slpn.get_deterministic_termination_probability(&state), Fraction::one());
+        assert_eq!(slpn.get_deterministic_termination_probability(&state), Fraction::zero());
 
-        let slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+        let slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = slpn;
         let slang2 = slpn.analyse_probability_coverage(&Fraction::zero()).unwrap();
-        assert_eq!(slang2.len(), 1);
+        assert_eq!(slang2.len(), 0);
 
-        let fin2 = fs::read_to_string("testfiles/empty_trace.slang").unwrap();
+        let fin2 = fs::read_to_string("testfiles/empty.slang").unwrap();
         let slang3 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
 
-        assert_eq!(slpn.analyse_probability_coverage(&Fraction::from((1, 2))).unwrap(), slang3);
+        assert_eq!(slpn.analyse_probability_coverage(&Fraction::zero()).unwrap(), slang3);
+    }
+
+    #[test]
+    fn slpn_cover_nothing() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba_ali.slpn").unwrap();
+        let slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+
+        let slang2 = slpn.analyse_probability_coverage(&Fraction::zero()).unwrap();
+
+        assert_eq!(slang2.len(), 0);
+    }
+
+    #[test]
+    fn slpn_cover_silent_livelock() {
+        let fin = fs::read_to_string("testfiles/empty_lang_multiple_silent.slpn").unwrap();
+        let slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+
+        let slang2 = slpn.analyse_probability_coverage(&Fraction::zero()).unwrap();
+
+        assert_eq!(slang2.len(), 0);
     }
 
     #[test]

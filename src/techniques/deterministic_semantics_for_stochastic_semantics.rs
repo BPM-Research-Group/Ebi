@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::fmt::{self, Debug};
 use std::hash::{Hash, Hasher};
 use anyhow::Result;
+use strum_macros::Display;
 use std::collections::hash_map::Entry;
 
 use crate::ebi_framework::activity_key::Activity;
@@ -13,26 +14,30 @@ use crate::ebi_traits::ebi_trait_semantics::Semantics;
 use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics;
 use crate::ebi_traits::ebi_trait_stochastic_semantics::StochasticSemantics;
 use crate::math::fraction::Fraction;
-use crate::math::matrix::Matrix;
+use crate::math::markov_model::MarkovModel;
 
-macro_rules! default_stochastic_deterministic_semantics {
-    ($t:ident, $s:ident) => {
-        impl StochasticDeterministicSemantics for $t {
-            type DetState = PMarking<$s>;
+// macro_rules! default_stochastic_deterministic_semantics {
+    // ($t:ident, $s:ident) => {
+        // impl StochasticDeterministicSemantics for $t {
+            // type DetState = PMarking<$s>;
+    impl StochasticDeterministicSemantics for StochasticLabelledPetriNet {
+        type DetState = PMarking<LPNMarking>;
 
             fn get_deterministic_initial_state(&self) -> Result<Self::DetState> {
                 let mut result = Self::DetState {
                     hash: 0,
                     p_marking: HashMap::new(),
-                    termination_probability: Fraction::one(),
+                    termination_probability: Fraction::zero(),
+                    silent_livelock_probability: Fraction::zero(),
                     activity_2_p_markings: HashMap::new(),
                     activity_2_probability: HashMap::new(),
                 };
-                let initial_state = <$t as Semantics>::get_initial_state(self).clone();
-                if <$t as Semantics>::is_final_state(self, &initial_state) {
+                let initial_state = <StochasticLabelledPetriNet as Semantics>::get_initial_state(self).clone();
+                if <StochasticLabelledPetriNet as Semantics>::is_final_state(self, &initial_state) {
                     result.termination_probability = Fraction::one();
                 }
                 result.p_marking.insert(initial_state, Fraction::one());
+                
                 self.compute_next(&mut result)?;
                 return Ok(result);
             }
@@ -43,16 +48,22 @@ macro_rules! default_stochastic_deterministic_semantics {
                 let mut result = Self::DetState {
                     hash: 0,
                     p_marking: state.activity_2_p_markings.get(&activity).unwrap().clone(),
-                    termination_probability: Fraction::one(),
+                    termination_probability: Fraction::zero(),
+                    silent_livelock_probability: Fraction::zero(),
                     activity_2_p_markings: HashMap::new(),
                     activity_2_probability: HashMap::new(),
                 };
+                
                 self.compute_next(&mut result)?;
                 return Ok(result);
             }
         
             fn get_deterministic_termination_probability(&self, state: &Self::DetState) -> Fraction {
                 state.termination_probability.clone()
+            }
+
+            fn get_deterministic_silent_livelock_probability(&self, state: &Self::DetState) -> Fraction {
+                state.silent_livelock_probability.clone()
             }
         
             fn get_deterministic_activity_probability(&self, state: &Self::DetState, activity: Activity) -> Fraction {
@@ -64,205 +75,167 @@ macro_rules! default_stochastic_deterministic_semantics {
             }
         }
 
-        impl $t {
+        // impl $t {
+        impl StochasticLabelledPetriNet {
             /**
-             * Compute the next p-state.
+             * Compute the next q-state.
              */
-            fn compute_next(&self, p_state: &mut PMarking<$s>) -> Result<()> {
-                // log::debug!("compute next p-states for {:?}", p_state);
-        
-                //first, gather the markings we can reach
-                let (markov_markings, f) = self.markov_markings(p_state)?;
-        
-                // log::debug!("markov markings {:?}", markov_markings);
-                // log::debug!("f {}", f);
-                
-                //construct the A and B matrices
-                let (a, mut b) = self.markov_matrices(&markov_markings)?;
-        
-                // log::debug!("A is a {}", a);
-                // log::debug!("B is a {}", b);
-        
-                //solve Markov chain
-                let p;
-                {
-                    b.identity_minus();
-        
-                    // log::debug!("matrix I - B = {}", b);
-        
-                    b.inverse()?;
-        
-                    // log::debug!("matrix F = inv(I-B) = {}", b);
-        
-                    let fundamental = b;
-        
-                    p = fundamental * a;
-        
-                    // log::debug!("matrix P = F * A = {:?}", p);
+            fn compute_next(&self, q_state: &mut PMarking<LPNMarking>) -> Result<()> {
+                // log::debug!("compute next q-states for {:?}", q_state);
+
+                //create the extended matrix
+                let mut markov_model = self.create_markov_model(&q_state)?;
+
+                // log::debug!("T {}", markov_model);
+
+                //replace livelock states by absorbing states
+                let progress_states = Self::get_progress_states(&markov_model);
+                // log::debug!("progress states {:?}", progress_states);
+                let silent_livelock_states = markov_model.get_states_that_cannot_reach(progress_states);
+                // log::debug!("states that cannot reach a progress state {:?}", silent_livelock_states);
+                markov_model.make_states_absorbing(&silent_livelock_states);
+                markov_model.set_states(&silent_livelock_states, MarkovMarking::SilentLiveLock());
+
+                // log::debug!("T made absorbing {}", markov_model);
+                // log::debug!("T made absorbing {:?}", markov_model);
+
+                //if there are no states at all, we are in a final state (final states were filtered out in the creation of the Markov model)
+                if markov_model.get_states().is_empty() {
+                    q_state.termination_probability = Fraction::one();
+                    return Ok(());
                 }
-                let x = f * p;
-        
-                // log::debug!("vector f' = f * P = {}", x);
-        
-                //construct the next states
-                for (markov_marking, row) in &markov_markings.markings {
-                    match markov_marking {
-                        MarkovMarking::Transient(_) => (),
-                        MarkovMarking::AbsorbingActivity(marking, activity) =>  {
-                            let probability = x[0][*row].clone();
-        
-                            // log::debug!("next activity {} with weight {:.5}", activity, probability);
-        
-                            p_state.termination_probability -= &probability;
-                            match p_state.activity_2_probability.entry(*activity) {
-                                Entry::Occupied(mut x) => *x.get_mut() += &probability,
-                                Entry::Vacant(x) => {x.insert(probability.clone());()},
-                            };
-                            match p_state.activity_2_p_markings.entry(*activity) {
-                                Entry::Occupied(mut x) => {
-                                    x.get_mut().insert(marking.clone(), probability);
-                                    ()
-                                },
-                                Entry::Vacant(x) => {
-                                    let mut map = HashMap::new();
-                                    map.insert(marking.clone(), probability);
-                                    x.insert(map);
-                                    ()
-                                },
+
+                //remove the previous final states by normalising the initial vector
+                markov_model.normalise_initial_vector()?;
+
+                let new_state_vector = markov_model.pow_infty()?;
+                // log::debug!("new state vector {}", Matrix::into(new_state_vector.clone()));
+
+                //create the next q-states
+                for (probability, state) in new_state_vector.into_iter().zip(markov_model.get_states_owned()) {
+                    if probability.is_positive() {
+                        match state {
+                            MarkovMarking::ReachableWithSilentTransitions(_) => {
+                                /*
+                                    This is a marking that can be reached by executing only silent transitions, and has a positive probability.
+                                    This should have been classified as a SilentLiveLock, and hence reaching this case is a bug.
+                                 */
+                                unreachable!()
+                            },
+                            MarkovMarking::AfterExecutingAcrivity(marking, activity) => {
+                                match q_state.activity_2_probability.entry(activity) {
+                                    Entry::Occupied(mut x) => *x.get_mut() += &probability,
+                                    Entry::Vacant(x) => {x.insert(probability.clone());()},
+                                };
+                                match q_state.activity_2_p_markings.entry(activity) {
+                                    Entry::Occupied(mut x) => {
+                                        x.get_mut().insert(marking, probability);
+                                        ()
+                                    },
+                                    Entry::Vacant(x) => {
+                                        let mut map = HashMap::new();
+                                        map.insert(marking, probability);
+                                        x.insert(map);
+                                        ()
+                                    },
+                                }
+                            },
+                            MarkovMarking::Final(_) => {
+                                q_state.termination_probability += probability;
+                            },
+                            MarkovMarking::SilentLiveLock() => {
+                                q_state.silent_livelock_probability += probability;
                             }
-                        },
-                        MarkovMarking::AbsorbingFinal(_) => (),
-                    };
+                        };
+                    }
                 }
         
                 // log::debug!("markov marking complete");
         
                 //normalise the activities
-                p_state.activity_2_p_markings.retain(|activity, distribution| {
+                q_state.activity_2_p_markings.retain(|activity, distribution| {
                     let sum = distribution.values().fold(Fraction::zero(), |sum, probability| &sum + probability);
-                    let mut s = format!("for activity {}, resulting p-marking [", activity);
+                    let mut s = format!("for activity {}, resulting q-marking [", activity);
                     distribution.retain(|marking, value| {*value /= &sum; s += format!("{}: {}, ", marking, value).as_str(); true});
                     // log::debug!("{}]", s.strip_suffix(", ").unwrap());
                     true
                 });
         
-                // log::debug!("normalisation complete");
-        
                 //update the hash
-                p_state.compute_hash();
+                q_state.compute_hash();
         
                 Ok(())
             }
-        
-            /**
-             * Result: list of Markov states (markings), a matrix with the Markov model, and the probability to terminate
-             */
-            fn markov_markings(&self, p_state: &PMarking<$s>) -> Result<(MarkovMarkings<$s>, Matrix)> {
-                let mut f = Matrix::new();
-                let mut markov_markings = MarkovMarkings {
-                    markings: HashMap::new(),
-                    number_of_transient: 0,
-                    number_of_absorbing: 0,
-                };
-                
+
+            fn get_progress_states<X: Displayable>(markov_model: &MarkovModel<MarkovMarking<X>>) -> Vec<usize> {
+                markov_model.get_states().iter().enumerate().filter_map(|(i, state)| match state {
+                    MarkovMarking::ReachableWithSilentTransitions(_) => None,
+                    MarkovMarking::AfterExecutingAcrivity(_, _) => Some(i),
+                    MarkovMarking::Final(_) => Some(i),
+                    MarkovMarking::SilentLiveLock() => None,
+                }).collect()
+            }
+
+            fn create_markov_model(&self, q_state: &PMarking<LPNMarking>) -> Result<MarkovModel<MarkovMarking<LPNMarking>>> {
+                let mut markov: MarkovModel<MarkovMarking<LPNMarking>> = MarkovModel::new();
+
                 let mut queue = vec![];
                 {
-                    for (marking, probability) in &p_state.p_marking {
-                        if !self.is_final_state(marking) { //Final states cannot progress further, so we do not include them in the computation.
-                            let markov_marking = MarkovMarking::Transient(marking.clone());
-                            let row = markov_markings.add(markov_marking.clone());
-                            queue.push(markov_marking);
-        
-                            //put the marking in F
-                            f.ensure_capacity(1, &row + 1, &Fraction::zero());
-                            f.element_add(&0, &row, probability);
+                    for (marking, probability) in &q_state.p_marking {
+                        if self.is_final_state(marking) { 
+                            //Final states of the previous q-state are not part of the next q-state
+                        } else {
+                            let markov_marking = MarkovMarking::ReachableWithSilentTransitions(marking.clone());
+                            let (markov_index, _) = markov.add_or_find_state(markov_marking, probability.clone());
+                            queue.push((marking.clone(), markov_index));
                         }
                     }
                 }
+
+                //create the states and transitions
+                while let Some((marking, markov_index)) = queue.pop() {
+                    let total_weight = self.get_total_weight_of_enabled_transitions(&marking)?;
+
+                    for transition in self.get_enabled_transitions(&marking) {
+                        let probability = self.get_transition_weight(transition) / &total_weight;
         
-                //second, gather all other markings
-                while let Some(MarkovMarking::Transient(transient_marking)) = queue.pop() {
-        
-                    for transition in self.get_enabled_transitions(&transient_marking) {
-        
-                        let mut new_marking = transient_marking.clone();
+                        let mut new_marking = marking.clone();
                         self.execute_transition(&mut new_marking, transition)?;
         
                         if self.is_transition_silent(transition) {
                             //we follow a silent transition   
         
                             if self.is_final_state(&new_marking) {
-                                //final marking (absorbing)
-                                markov_markings.add(MarkovMarking::AbsorbingFinal(new_marking));
+                                //we end up in a new marking that is final
+                                let (new_markov_index, _) = markov.add_or_find_state(MarkovMarking::Final(new_marking), Fraction::zero());
+                                markov.set_flow(markov_index, new_markov_index, &probability);
+
                             } else {
-                                //non-final marking (transient)
-                                if let Some(markov_marking) = markov_markings.add_keep_copy(MarkovMarking::Transient(new_marking)) {
-                                    queue.push(markov_marking);
-        
-                                    //f must provide a value (zero) for transient states that are not initial states
-                                    f.ensure_capacity(1, f.get_number_of_columns() + 1, &Fraction::zero());
+                                //we end up in a new marking that is not final
+                                let new_markov_marking = MarkovMarking::ReachableWithSilentTransitions(new_marking.clone());
+                                let (new_markov_index, added) = markov.add_or_find_state(new_markov_marking, Fraction::zero());
+                                markov.set_flow(markov_index, new_markov_index, &probability);
+
+                                if added {
+                                    queue.push((new_marking, new_markov_index));
                                 }
                             }
                         } else {
                             //we follow a labelled transition, and then we end up in an absorbing state
                             let activity = self.get_transition_activity(transition).unwrap();
-        
-                            markov_markings.add(MarkovMarking::AbsorbingActivity(new_marking, activity.clone()));
+                            let (new_markov_index, _) = markov.add_or_find_state(MarkovMarking::AfterExecutingAcrivity(new_marking, activity), Fraction::zero());
+                            markov.set_flow(markov_index, new_markov_index, &probability);
                         }
                     }
                 }
-        
-                Ok((markov_markings, f))
-            }
-        
-            fn markov_matrices(&self, markov_markings: &MarkovMarkings<$s>) -> Result<(Matrix, Matrix)> {
-                let mut a = Matrix::new_sized(markov_markings.number_of_transient, markov_markings.number_of_absorbing, Fraction::zero());
-                let mut b = Matrix::new_squared(markov_markings.number_of_transient, Fraction::zero());
-        
-                for (markov_marking, row) in &markov_markings.markings {
-                    match markov_marking {
-                        MarkovMarking::Transient(marking) => { //a transient marking goes to B
-                            let total_weight = self.get_total_weight_of_enabled_transitions(marking)?;
-                            for transition in self.get_enabled_transitions(marking) {
-                                let mut new_marking = marking.clone();
-                                self.execute_transition(&mut new_marking, transition)?;
-        
-                                let probability = <$t as StochasticSemantics>::get_transition_weight(self, marking, transition) / &total_weight;
-        
-                                if self.is_transition_silent(transition) {
-                                    if self.is_final_state(&new_marking) {
-                                        // transient -> silent -> final (goes in A)
-                                        let new_markov_marking = MarkovMarking::AbsorbingFinal(new_marking);
-                                        let column = markov_markings.get(&new_markov_marking).expect("this should not happen");
-        
-                                        a.element_add(row, column, &probability);
-                                    } else {
-                                        // transient -> silent -> transient (goes in B)
-                                        let new_markov_marking = MarkovMarking::Transient(new_marking);
-                                        let column = markov_markings.get(&new_markov_marking).expect("this should not happen");
-        
-                                        b.element_add(row, column, &probability);
-                                    }
-                                } else { //transient -> label -> absorbing (goes in A)
-                                    let activity = self.get_transition_activity(transition).unwrap();
-                                    let new_markov_marking = MarkovMarking::AbsorbingActivity(new_marking, activity);
-                                    let column = markov_markings.get(&new_markov_marking).expect("this should not happen");
-        
-                                    a.element_add(row, column, &probability);
-                                }
-                             }        
-                        },
-                        MarkovMarking::AbsorbingActivity(_, _) => (),
-                        MarkovMarking::AbsorbingFinal(_) => (),
-                    }
-                }
-                Ok((a, b))
+
+                Ok(markov)
             }
         }
-    }
-}
+    // }
+// }
 
-default_stochastic_deterministic_semantics!(StochasticLabelledPetriNet, LPNMarking);
+// default_stochastic_deterministic_semantics!(StochasticLabelledPetriNet, LPNMarking);
 
 /**
  * Idea: as the computation of next p-states is expensive, it is performed once, and stored in this p-marking struct.
@@ -273,6 +246,7 @@ pub struct PMarking<S> where S: Displayable {
     hash: u64,
     pub p_marking: HashMap<S, Fraction>,
     pub termination_probability: Fraction,
+    pub silent_livelock_probability: Fraction,
     pub activity_2_p_markings: HashMap<Activity, HashMap<S, Fraction>>,
     pub activity_2_probability: HashMap<Activity, Fraction>
 }
@@ -329,56 +303,17 @@ impl<S: Displayable> Debug for PMarking<S> {
     }
 }
 
+
+
 impl <S: Displayable> Displayable for PMarking<S> {}
 
-#[derive(Clone,Hash,Eq,PartialEq,Debug)]
+
+#[derive(Clone,Hash,Eq,PartialEq,Debug,Display)]
 enum MarkovMarking<S: Displayable> {
-    Transient(S),
-    AbsorbingActivity(S, Activity),
-    AbsorbingFinal(S)
+    ReachableWithSilentTransitions(S),
+    AfterExecutingAcrivity(S, Activity),
+    Final(S),
+    SilentLiveLock(),
 }
 
-struct MarkovMarkings<S: Displayable> {
-    markings: HashMap<MarkovMarking<S>, usize>, //marking to row number
-    number_of_transient: usize,
-    number_of_absorbing: usize
-}
-
-impl <S: Displayable> MarkovMarkings<S> {
-    pub fn add(&mut self, markov_marking: MarkovMarking<S>) -> usize {
-        let row = self.markings.entry(markov_marking).or_insert_with_key(|key| {
-            match key {
-                MarkovMarking::Transient(_) => {self.number_of_transient += 1; self.number_of_transient-1},
-                MarkovMarking::AbsorbingActivity(_, _) => {self.number_of_absorbing += 1; self.number_of_absorbing-1},
-                MarkovMarking::AbsorbingFinal(_) => {self.number_of_absorbing += 1; self.number_of_absorbing-1},
-            }
-        });
-        *row
-    }
-
-    /**
-     * Return a clone of the inserted marking if it was not there yet.
-     */
-    pub fn add_keep_copy(&mut self, markov_marking: MarkovMarking<S>) -> Option<MarkovMarking<S>> {
-        let mut inserted = None;
-        self.markings.entry(markov_marking).or_insert_with_key(|key| {
-            inserted = Some(key.clone());
-            match key {
-                MarkovMarking::Transient(_) => {self.number_of_transient += 1; self.number_of_transient-1},
-                MarkovMarking::AbsorbingActivity(_, _) => {self.number_of_absorbing += 1; self.number_of_absorbing-1},
-                MarkovMarking::AbsorbingFinal(_) => {self.number_of_absorbing += 1; self.number_of_absorbing-1},
-            }
-        });
-        inserted
-    }
-
-    fn get(&self, markov_marking: &MarkovMarking<S>) -> Option<&usize> {
-        self.markings.get(markov_marking)
-    }
-}
-
-impl <S: Displayable> Debug for MarkovMarkings<S> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self.markings)
-    }
-}
+impl <S: Displayable> Displayable for MarkovMarking<S> {}

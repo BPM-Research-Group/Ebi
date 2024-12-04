@@ -4,7 +4,7 @@ use anyhow::{anyhow, Result};
 use fraction::One;
 use priority_queue::PriorityQueue;
 
-use crate::{ebi_framework::{activity_key::Activity, displayable::Displayable}, ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}}, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::Activity, displayable::Displayable, ebi_command::EbiCommand}, ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}}, math::fraction::Fraction};
 
 pub trait ProbabilityQueries {
     /**
@@ -221,6 +221,9 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
     }
 
     fn analyse_most_likely_traces(&self, number_of_traces: &usize) -> Result<FiniteStochasticLanguage> {
+        log::info!("Compute most-likely traces");
+        let progress_bar = EbiCommand::get_progress_bar_ticks(*number_of_traces);
+
         let mut result = HashMap::new();
 
         let mut queue = PriorityQueue::new();
@@ -231,7 +234,7 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
                 Y::Prefix(prefix, p_state) => {
 
                     let termination_proability = self.get_deterministic_termination_probability(&p_state);
-                    if !termination_proability.is_zero() {
+                    if termination_proability.is_positive() {
                         queue.push(Y::Trace(prefix.clone()), &y_probability * &termination_proability);
                     }
 
@@ -248,6 +251,7 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
                 },
                 Y::Trace(trace) => {
                     result.insert(trace, y_probability);
+                    progress_bar.inc(1);
                     if result.len() >= *number_of_traces {
                         break;
                     }
@@ -259,9 +263,16 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
     }
     
     fn analyse_probability_coverage(&self, coverage: &Fraction) -> Result<FiniteStochasticLanguage> {
+        let progress_bar = EbiCommand::get_progress_bar_message("found 0 traces which cover 0.0000006".to_owned());
+
+        if !coverage.is_positive() {
+            return Ok(HashMap::new().into());
+        }
         
+        let initial_state = self.get_deterministic_initial_state()?;
+
         let mut seen = HashSet::new();
-        seen.insert(self.get_deterministic_initial_state()?);
+        seen.insert(initial_state.clone());
 
         let mut loop_detected = false;
         let mut non_livelock_probability = Fraction::one();
@@ -273,22 +284,26 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
         queue.push(X{
             prefix: vec![],
             probability: Fraction::one(),
-            p_state: self.get_deterministic_initial_state()?,
+            p_state: initial_state,
         });
 
         while let Some(x) = queue.pop() {
-            log::debug!("queue length {}, process p-state {:?}", queue.len(), x.p_state);
+            // log::debug!("queue length {}, process p-state {:?}", queue.len(), x.p_state);
 
             let mut probability_terminate_in_this_state = self.get_deterministic_termination_probability(&x.p_state);
-            log::debug!("probability termination in this state {}", probability_terminate_in_this_state);
+            // log::debug!("probability termination in this state {}", probability_terminate_in_this_state);
             probability_terminate_in_this_state *= &x.probability;
 
-            if !probability_terminate_in_this_state.is_zero() {
+            non_livelock_probability -= self.get_deterministic_silent_livelock_probability(&x.p_state);
+            
+            if probability_terminate_in_this_state.is_positive() {
                 //we have found a trace; add it to the result
                 result_sum += &probability_terminate_in_this_state;
                 result.insert(x.prefix.clone(), probability_terminate_in_this_state);
+                progress_bar.set_message(format!("found {} traces which cover {:.8}", result.len(), result_sum));
+                // log::debug!("add trace {}; coverage now {:.4}", result.len(), result_sum);
             }
-
+            
             //check whether we are done
             if &result_sum > coverage {
                 break;
@@ -334,6 +349,7 @@ impl <DState: Displayable> ProbabilityQueries for dyn StochasticDeterministicSem
             }
         }
 
+        progress_bar.finish();
         Ok((result, self.get_activity_key().clone()).into())
     }
 }
