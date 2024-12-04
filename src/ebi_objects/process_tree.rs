@@ -1,11 +1,11 @@
-use std::{fmt::Display, io::{self, BufRead}, str::FromStr};
+use std::{fmt::Display, io::{self, BufRead}, ops::Index, str::FromStr};
 
 use anyhow::{anyhow, Context, Error, Result};
 use layout::{adt::dag::NodeHandle, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 use strum_macros::{Display, EnumIter};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader};
 
 use super::labelled_petri_net::LabelledPetriNet;
 
@@ -34,10 +34,30 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
 #[derive(Debug,ActivityKey)]
 pub struct ProcessTree {
     activity_key: ActivityKey,
-    tree: Vec<Node>
+    tree: Vec<Node>,
+    transition2node: Vec<usize>
 }
 
 impl ProcessTree {
+
+    pub fn new(activity_key: ActivityKey, tree: Vec<Node>) -> Self {
+        let mut transition2node = vec![];
+        for (node_index, node) in tree.iter().enumerate() {
+            match node {
+                Node::Tau |  Node::Activity(_) => {
+                    transition2node.push(node_index)
+                },
+                Node::Operator(operator, _) => {},
+            }
+        }
+
+        Self {
+            activity_key: activity_key,
+            tree: tree,
+            transition2node: transition2node
+        }
+    }
+
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let dfm = Self::import(reader)?;
         Ok(EbiObject::LabelledPetriNet(dfm.get_labelled_petri_net()))
@@ -51,13 +71,93 @@ impl ProcessTree {
         self.tree.get(node)
     }
 
-    pub fn get_activity_key(&self) -> &ActivityKey {
-        &self.activity_key
+    pub fn get_root(&self) -> usize {
+        0
     }
-    
-    pub fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
-        &mut self.activity_key
+
+    pub fn get_node_of_transition(&self, transition: TransitionIndex) -> Result<&Node> {
+        self.tree.get(*self.transition2node.get(transition).ok_or_else(|| anyhow!("Transition does not exist."))?).ok_or_else(|| anyhow!("Node does not exist."))
     }
+
+    /**
+	 * Returns the parent of node. Notice that
+	 * this is an expensive operation; avoid if possible.
+	 * 
+	 * @param node
+	 * @return The parent of node, and the rank of the child
+	 */
+	pub fn get_parent(&self, node: usize) -> Option<(usize, usize)> {
+        if node == 0 {
+            return None;
+        }
+
+		let mut potential_parent = node - 1;
+		while self.traverse(potential_parent) <= node {
+			potential_parent -= 1;
+		}
+
+        let child_rank = self.get_child_rank_with(potential_parent, node)?;
+
+		Some((potential_parent, child_rank))
+	}
+
+    /**
+	 * 
+	 * @param parent
+	 * @param grandChild
+	 * @return The number of the child within parent that contains grandChild.
+	 *         If grandChild is not a child of parent, will return -1.
+	 */
+	pub fn get_child_rank_with(&self, parent: usize, grand_child: usize) -> Option<usize> {
+		let mut childNumber = 0;
+		for child in self.getChildren(parent) {
+			if self.is_parent_of(child, grand_child) {
+				return Some(childNumber);
+			}
+			childNumber += 1;
+		}
+		None
+	}
+
+
+    /**
+	 * 
+	 * @param parent
+	 * @param child
+	 * @return Whether the child is a direct or indirect child of parent.
+	 */
+	pub fn is_parent_of(&self, parent: usize, child: usize) -> bool {
+		if parent > child {
+			return false;
+		}
+		return self.traverse(parent) > child;
+	}
+
+    /**
+     * Find the next node of this node: the next sibling, and if that is not available, the next sibling up the tree.
+     * May return a non-existing node if there is no sibling.
+     */
+    pub fn traverse(&self, node: usize)  -> usize {
+        match self.tree[node] {
+            Node::Tau => node + 1,
+            Node::Activity(_) => node + 1,
+            Node::Operator(_, number_of_children) => {
+                let mut n = node + 1;
+                for _ in 0..number_of_children {
+                    n = self.traverse(n);
+                }
+                n
+            },
+        }
+	}
+
+	pub fn get_child(&self, parent: usize, child_rank: usize) -> usize {
+		let mut i = parent + 1;
+		for j in 0..child_rank {
+			i = self.traverse(i);
+		}
+		return i;
+	}
 
     fn node_to_string(&self, indent: usize, node: usize, f: &mut std::fmt::Formatter<'_>) -> Result<usize> {
         let id = "\t".repeat(indent);
@@ -396,10 +496,7 @@ impl Importable for ProcessTree {
         let mut tree = vec![];
         Self::string_to_tree(&mut lreader, &mut tree, &mut activity_key)?;
         
-        Ok(ProcessTree {
-            activity_key,
-            tree
-        })
+        Ok(ProcessTree::new(activity_key, tree))
     }
 }
 
@@ -464,11 +561,14 @@ impl Semantics for ProcessTree {
     type SemState = NodeStates;
 
     fn get_initial_state(&self) -> <Self as Semantics>::SemState {
-        todo!()
+        let mut state = NodeStates { states: vec![NodeState::Closed; self.get_number_of_nodes()] };
+        self.progress_state(&mut state);
+        state
     }
 
     fn execute_transition(&self, state: &mut <Self as Semantics>::SemState, transition: TransitionIndex) -> Result<()> {
-        todo!()
+        let node = self.transition2node.get(transition).ok_or_else(|| anyhow!("Transition does not exist."))?;
+        self.close_node(state, node);
     }
 
     fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool {
@@ -492,6 +592,39 @@ impl Semantics for ProcessTree {
     }
 }
 
+impl ProcessTree {
+    /**
+     * A state can be progressed without 
+     */
+    fn progress_state(&self, state: &mut <Self as Semantics>::SemState) {
+
+    }
+
+    fn close_node(&self, state: &mut <Self as Semantics>::SemState, node: usize) {
+        //close this node
+        state[node] = NodeState::Closed;
+
+        //this may open another node, based on the operator of its parent
+        if let Some((parent, child_rank)) = self.get_parent(node) {
+            match self.tree[parent] {
+                Node::Tau => unreachable!(),
+                Node::Activity(activity) => unreachable!(),
+                Node::Operator(Operator::Sequence, number_of_children) => {
+                    //for a sequence, we enable the next child
+                    if child_rank < number_of_children - 1 {
+                        let next_child = self.get_child(parent, child_rank + 1);
+                        state[next_child] = NodeState::Enabled
+                    } else {
+                        //if there is no next child, we recurse on the parent
+                        self.close_node(state, parent);
+                    }
+                },
+            }
+        }
+
+    }
+}
+
 #[derive(Debug,Clone)]
 pub enum Node {
     Tau,
@@ -508,7 +641,7 @@ impl Node {
     }
 }
 
-#[derive(EnumIter,Debug,Clone)]
+#[derive(EnumIter,Debug,Clone,Copy)]
 pub enum Operator {
     Xor,
     Sequence,
@@ -546,18 +679,25 @@ impl FromStr for Operator {
 
 #[derive(Clone,Display,Debug,Eq,PartialEq,Hash)]
 pub enum NodeState {
-    Enabled,
-    Started,
-    Completed,
+    Closed,
+    Enabled
 }
 
 #[derive(Clone,Debug,Eq,PartialEq,Hash)]
 pub struct NodeStates {
-    states: Vec<NodeStates>
+    states: Vec<NodeState>
 }
 
 impl Display for NodeStates {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{:?}", self.states)
+    }
+}
+
+impl Index<usize> for NodeStates {
+    type Output = NodeState;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        self.states.index(index)
     }
 }
