@@ -386,9 +386,15 @@ mod tests {
 
         let jssc = slang1.jssc_log2log(Box::new(slang2)).unwrap();
 
-        let mut right_side =LogDiv::zero();
-        right_side/=2usize;
+        let right_side =LogDiv::zero();
         assert_eq!(jssc, RootLogDiv::sqrt(right_side).one_minus())
+    }
+
+    #[test]
+    fn zero_log_div() {
+        let mut zero = LogDiv::zero();
+        zero /= 2;
+        assert_eq!(zero, LogDiv::zero());
     }
 
 
