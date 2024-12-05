@@ -386,9 +386,15 @@ mod tests {
 
         let jssc = slang1.jssc_log2log(Box::new(slang2)).unwrap();
 
-        let mut right_side =LogDiv::zero();
-        right_side/=2usize;
+        let right_side =LogDiv::zero();
         assert_eq!(jssc, RootLogDiv::sqrt(right_side).one_minus())
+    }
+
+    #[test]
+    fn zero_log_div() {
+        let mut zero = LogDiv::zero();
+        zero /= 2;
+        assert_eq!(zero, LogDiv::zero());
     }
 
 
@@ -561,7 +567,8 @@ mod tests {
 
         let slang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(log.get_finite_stochastic_language());
 
-        let answer = RootLogDiv::sqrt(LogDiv::Exact(GenericFraction::from(1), 2.to_biguint().unwrap())).one_minus();
+        let answer = RootLogDiv::sqrt(LogDiv::Exact(GenericFraction::from(4), 2.to_biguint().unwrap())).one_minus();
+
         assert_eq!(slang.jssc_log2model(Box::new(slpn)).unwrap(), answer);
     }
 

@@ -43,6 +43,7 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
         let mut sum4model = Fraction::zero();
         let mut sum4log = Fraction::zero();
         let translator = ActivityKeyTranslator::new(self.get_activity_key(), language2.get_activity_key_mut());
+
         for (trace, probability1) in self.iter_trace_probability() {
             let probability2 = language2.get_probability(&FollowerSemantics::Trace(&translator.translate_trace(trace)))?;
             if probability2.is_positive() {
@@ -54,6 +55,9 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
                 sum += LogDiv::from(probability1 + &probability2);
             }
         }
+        sum4log = sum4log.one_minus();
+        sum4log += sum4model.one_minus();
+        sum += LogDiv::from(sum4log);
         sum /= 2usize;
         return Ok(RootLogDiv::sqrt(sum).one_minus());
     }
