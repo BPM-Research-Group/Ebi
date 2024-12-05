@@ -568,11 +568,12 @@ impl Semantics for ProcessTree {
 
     fn execute_transition(&self, state: &mut <Self as Semantics>::SemState, transition: TransitionIndex) -> Result<()> {
         let node = self.transition2node.get(transition).ok_or_else(|| anyhow!("Transition does not exist."))?;
-        self.close_node(state, node);
+        self.close_node(state, *node);
+        Ok(())
     }
 
     fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool {
-        todo!()
+        
     }
 
     fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
@@ -601,8 +602,11 @@ impl ProcessTree {
     }
 
     fn close_node(&self, state: &mut <Self as Semantics>::SemState, node: usize) {
-        //close this node
-        state[node] = NodeState::Closed;
+        
+        //close this node and all of its children
+        for grandchild in node..self.traverse(node) {
+            state[grandchild] = NodeState::Closed;
+        }
 
         //this may open another node, based on the operator of its parent
         if let Some((parent, child_rank)) = self.get_parent(node) {
@@ -610,18 +614,112 @@ impl ProcessTree {
                 Node::Tau => unreachable!(),
                 Node::Activity(activity) => unreachable!(),
                 Node::Operator(Operator::Sequence, number_of_children) => {
-                    //for a sequence, we enable the next child
+                    //for a sequence parent, we open the next child
                     if child_rank < number_of_children - 1 {
                         let next_child = self.get_child(parent, child_rank + 1);
-                        state[next_child] = NodeState::Enabled
+                        self.enable_node(state, next_child);
                     } else {
                         //if there is no next child, we recurse on the parent
                         self.close_node(state, parent);
                     }
                 },
+                Node::Operator(Operator::Concurrent, _) | Node::Operator(Operator::Or, _) | Node::Operator(Operator::Interleaved, _) => {
+                    //for a concurrent, or, or interleaved parent, the parent can be closed if all of its children have been closed
+                    if self.is_node_closed(state, parent) {
+                        self.close_node(state, parent);
+                    } 
+                },
+                Node::Operator(Operator::Xor, number_of_children) => {
+                    //for a xor parent, the parent can be closed as we executed one of its children
+                    self.close_node(state, parent);
+                },
+                Node::Operator(Operator::Loop, number_of_children) => {
+                    //for a loop parent, we open the next child(ren)
+                    if child_rank == 0 {
+                        //enable the siblings
+                        for child_rank in 1..number_of_children {
+                            self.enable_node(state, self.get_child(parent, child_rank));
+                        }
+                    } else {
+                        //enable the first child
+                        self.enable_node(state, self.get_child(parent, 0));
+                        self.enable_next(state, parent);
+                    }
+                },
             }
         }
+    }
 
+    fn enable_node(&self, state: &mut <Self as Semantics>::SemState, node: usize) {
+        state[node] = NodeState::Enabled;
+
+        todo!()
+    }
+
+    /**
+     * Enable the next node in the tree.
+     */
+    fn enable_next(&self, state: &mut <Self as Semantics>::SemState, node: usize) {
+        todo!()
+    }
+
+    /**
+     * Returns whether it is possible to withdraw the enablement. If the node is not enabled in the first place, returns true.
+     */
+    fn can_withdraw_enablement(&self, state: &mut <Self as Semantics>::SemState, node: usize) -> bool {
+        todo!()
+    }
+
+    fn can_terminate(&self, state: &mut <Self as Semantics>::SemState, node: usize) -> bool {
+        match self.tree[node] {
+            Node::Tau => state[node] == NodeState::Closed,
+            Node::Activity(_) => state[node] == NodeState::Closed,
+            Node::Operator(Operator::Loop, number_of_children) => {
+                let body_child = self.get_child(node, 0);
+                if state[node] == NodeState::Closed {
+                    //if the loop is closed, it can terminate
+                    return true;
+                }
+                if state[body_child] != NodeState::Closed {
+                    //the first child is enabled, which means that the loop cannot terminate in this state
+                    return false;
+                }
+
+                for child_rank in 1..number_of_children {
+                    let redo_child = self.get_child(node, child_rank);
+                    //all the redo children must be able to withdraw enablement
+                    if !self.can_withdraw_enablement(state, redo_child) {
+                        return false;
+                    }
+                }
+
+                return true;
+            },
+        }
+    }
+
+    /**
+     * Return whether a node was closed.
+     */
+    fn is_node_closed(&self, state: &mut <Self as Semantics>::SemState, node: usize) -> bool {
+        match self.tree[node] {
+            Node::Tau => state[node] == NodeState::Closed,
+            Node::Activity(activity) => matches!(state[node], NodeState::Closed),
+            Node::Operator(operator, number_of_children) => {
+                //an operator node is closed if all of its children are closed
+                let mut child = self.get_child(node, 0);
+                if state[child] != NodeState::Closed {
+                    return false;
+                }
+                for _ in 1..number_of_children {
+                    child = self.traverse(child);
+                    if state[child] != NodeState::Closed {
+                        return false;
+                    }
+                }
+                return true;
+            },
+        }
     }
 }
 
