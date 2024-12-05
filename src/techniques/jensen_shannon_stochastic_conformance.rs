@@ -55,11 +55,6 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
                 sum += LogDiv::from(probability1 + &probability2);
             }
         }
-        sum4log = sum4log.one_minus();
-        sum4log += sum4model.one_minus();
-        sum += LogDiv::from(sum4log);
-
-        sum /= 2usize;
         return Ok(RootLogDiv::sqrt(sum).one_minus());
     }
 }

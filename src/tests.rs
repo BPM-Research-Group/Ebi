@@ -561,7 +561,8 @@ mod tests {
 
         let slang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(log.get_finite_stochastic_language());
 
-        let answer = RootLogDiv::sqrt(LogDiv::Exact(GenericFraction::from(1), 2.to_biguint().unwrap())).one_minus();
+        let answer = RootLogDiv::sqrt(LogDiv::Exact(GenericFraction::from(4), 2.to_biguint().unwrap())).one_minus();
+
         assert_eq!(slang.jssc_log2model(Box::new(slpn)).unwrap(), answer);
     }
 
