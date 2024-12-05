@@ -312,7 +312,7 @@ pub const EBI_PROBABILITY_EXPLAIN_LOG: EbiCommand = EbiCommand::Command {
             println!("Elapsed: {:.5?} and trace length:{}", elapsed, trace.len());
             time_vec.push(elapsed.as_secs_f64().to_string());
         }
-        save_vectors_to_csv(&trace_len_vec, &time_vec, &mem_vec, &states_vec, balance.fraction_to_f64().unwrap(),"data/road_df09_a=0.5_reuse.csv");
+        save_vectors_to_csv(&trace_len_vec, &time_vec, &mem_vec, &states_vec, balance.fraction_to_f64().unwrap(),"data/request_df09_a=0.9_reuse.csv");
         Ok(EbiOutput::Fraction(Fraction::zero()))
     }, 
     output_type: &EbiOutputType::Fraction
