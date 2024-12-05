@@ -1,0 +1,288 @@
+stochastic labelled Petri net
+# number of places
+22
+# initial marking
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+0
+1
+# number of transitions
+26
+# transition 0
+label a
+# weight
+3602879701896397/36028797018963968
+# number of input places
+1
+21
+# number of output places
+1
+0
+# transition 1
+label b
+# weight
+1
+# number of input places
+1
+0
+# number of output places
+1
+1
+# transition 2
+label c
+# weight
+1
+# number of input places
+1
+1
+# number of output places
+1
+20
+# transition 3
+label a
+# weight
+5404319552844595/36028797018963968
+# number of input places
+1
+21
+# number of output places
+1
+2
+# transition 4
+label c
+# weight
+1
+# number of input places
+1
+2
+# number of output places
+1
+3
+# transition 5
+label b
+# weight
+1
+# number of input places
+1
+3
+# number of output places
+1
+20
+# transition 6
+label a
+# weight
+3602879701896397/72057594037927936
+# number of input places
+1
+21
+# number of output places
+1
+4
+# transition 7
+label d
+# weight
+1
+# number of input places
+1
+4
+# number of output places
+1
+5
+# transition 8
+label e
+# weight
+1
+# number of input places
+1
+5
+# number of output places
+1
+6
+# transition 9
+label d
+# weight
+1
+# number of input places
+1
+6
+# number of output places
+1
+7
+# transition 10
+label e
+# weight
+1
+# number of input places
+1
+7
+# number of output places
+1
+8
+# transition 11
+label d
+# weight
+1
+# number of input places
+1
+8
+# number of output places
+1
+9
+# transition 12
+label e
+# weight
+1
+# number of input places
+1
+9
+# number of output places
+1
+10
+# transition 13
+label d
+# weight
+1
+# number of input places
+1
+10
+# number of output places
+1
+20
+# transition 14
+label a
+# weight
+3602879701896397/36028797018963968
+# number of input places
+1
+21
+# number of output places
+1
+11
+# transition 15
+label d
+# weight
+1
+# number of input places
+1
+11
+# number of output places
+1
+12
+# transition 16
+label e
+# weight
+1
+# number of input places
+1
+12
+# number of output places
+1
+13
+# transition 17
+label d
+# weight
+1
+# number of input places
+1
+13
+# number of output places
+1
+14
+# transition 18
+label e
+# weight
+1
+# number of input places
+1
+14
+# number of output places
+1
+15
+# transition 19
+label d
+# weight
+1
+# number of input places
+1
+15
+# number of output places
+1
+20
+# transition 20
+label a
+# weight
+3602879701896397/18014398509481984
+# number of input places
+1
+21
+# number of output places
+1
+16
+# transition 21
+label d
+# weight
+1
+# number of input places
+1
+16
+# number of output places
+1
+17
+# transition 22
+label e
+# weight
+1
+# number of input places
+1
+17
+# number of output places
+1
+18
+# transition 23
+label d
+# weight
+1
+# number of input places
+1
+18
+# number of output places
+1
+20
+# transition 24
+label a
+# weight
+3602879701896397/9007199254740992
+# number of input places
+1
+21
+# number of output places
+1
+19
+# transition 25
+label d
+# weight
+1
+# number of input places
+1
+19
+# number of output places
+1
+20
