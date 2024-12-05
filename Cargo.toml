@@ -40,6 +40,8 @@ fnv = "*"
 jni = "*"
 itertools = "*"
 good_lp = "*"
+csv = "*"
+peak_alloc = "*"
 
 [dependencies.num-rational]
 version = "0.4.1"

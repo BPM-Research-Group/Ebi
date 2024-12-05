@@ -30,6 +30,7 @@ pub enum Move {
     SilentMove(TransitionIndex)
 }
 
+#[derive(Debug)]
 pub struct Alignments {
     activity_key: ActivityKey,
     alignments: Vec<Vec<Move>>

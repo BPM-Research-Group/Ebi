@@ -14,7 +14,7 @@ impl UnitEarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLangua
         let translator = ActivityKeyTranslator::new(self.get_activity_key(), language2.get_activity_key_mut());
         let error = Arc::new(Mutex::new(None));
 
-        let mut sum = (0..self.len()).into_par_iter().filter_map(|trace_index| {
+        let mut sum: Fraction = (0..self.len()).into_par_iter().filter_map(|trace_index| {
             let trace = self.get_trace(trace_index).unwrap();
             let probability = self.get_probability(trace_index).unwrap();
 
