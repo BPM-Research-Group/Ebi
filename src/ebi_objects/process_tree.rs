@@ -1,11 +1,11 @@
-use std::{fmt::Display, io::{self, BufRead}, ops::Index, str::FromStr};
+use std::{fmt::Display, io::{self, BufRead}, str::FromStr};
 
 use anyhow::{anyhow, Context, Error, Result};
 use layout::{adt::dag::NodeHandle, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
-use strum_macros::{Display, EnumIter};
+use strum_macros::EnumIter;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader};
 
 use super::labelled_petri_net::LabelledPetriNet;
 
@@ -34,27 +34,32 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
 #[derive(Debug,ActivityKey)]
 pub struct ProcessTree {
     activity_key: ActivityKey,
-    tree: Vec<Node>,
-    transition2node: Vec<usize>
+    pub(crate) tree: Vec<Node>,
+    pub(crate) transition2node: Vec<usize>,
+    pub(crate) node2transition: Vec<Option<usize>>,
 }
 
 impl ProcessTree {
 
     pub fn new(activity_key: ActivityKey, tree: Vec<Node>) -> Self {
         let mut transition2node = vec![];
+        let mut node2transition = vec![None; tree.len()];
         for (node_index, node) in tree.iter().enumerate() {
             match node {
                 Node::Tau |  Node::Activity(_) => {
-                    transition2node.push(node_index)
+                    let transitionindex = transition2node.len();
+                    transition2node.push(node_index);
+                    node2transition[node_index] = Some(transitionindex);
                 },
-                Node::Operator(operator, _) => {},
+                Node::Operator(_, _) => {},
             }
         }
 
         Self {
             activity_key: activity_key,
             tree: tree,
-            transition2node: transition2node
+            transition2node: transition2node,
+            node2transition: node2transition
         }
     }
 
@@ -109,16 +114,19 @@ impl ProcessTree {
 	 *         If grandChild is not a child of parent, will return -1.
 	 */
 	pub fn get_child_rank_with(&self, parent: usize, grand_child: usize) -> Option<usize> {
-		let mut childNumber = 0;
-		for child in self.getChildren(parent) {
+		let mut child_rank = 0;
+		for child in self.get_children(parent) {
 			if self.is_parent_of(child, grand_child) {
-				return Some(childNumber);
+				return Some(child_rank);
 			}
-			childNumber += 1;
+			child_rank += 1;
 		}
 		None
 	}
 
+    pub fn get_children(&self, node: usize) -> ChildrenIterator {
+        ChildrenIterator::new(self, node)
+	}
 
     /**
 	 * 
@@ -153,11 +161,19 @@ impl ProcessTree {
 
 	pub fn get_child(&self, parent: usize, child_rank: usize) -> usize {
 		let mut i = parent + 1;
-		for j in 0..child_rank {
+		for _ in 0..child_rank {
 			i = self.traverse(i);
 		}
 		return i;
 	}
+
+    pub fn get_number_of_children(&self, parent: usize) -> Option<usize> {
+        match self.tree.get(parent)? {
+            Node::Tau => Some(0),
+            Node::Activity(_) => Some(0),
+            Node::Operator(_, number_of_children) => Some(*number_of_children),
+        }
+    }
 
     fn node_to_string(&self, indent: usize, node: usize, f: &mut std::fmt::Formatter<'_>) -> Result<usize> {
         let id = "\t".repeat(indent);
@@ -291,7 +307,7 @@ impl ProcessTree {
                 Self::string_to_tree(lreader, tree, activity_key)?;
             }
         } else {
-            return Err(anyhow!("could not read node {} at line {}", tree.len(), lreader.get_last_line_number()));
+            return Err(anyhow!("Could not parse type of node {} at line {}. Expected `tau`, `activity`, `concurrent`, `interleaved`, `or`, `sequence` or `xor`.", tree.len(), lreader.get_last_line_number()));
         }
 
         Ok(())
@@ -557,171 +573,7 @@ impl ToSemantics for ProcessTree {
     }
 }
 
-impl Semantics for ProcessTree {
-    type SemState = NodeStates;
 
-    fn get_initial_state(&self) -> <Self as Semantics>::SemState {
-        let mut state = NodeStates { states: vec![NodeState::Closed; self.get_number_of_nodes()] };
-        self.progress_state(&mut state);
-        state
-    }
-
-    fn execute_transition(&self, state: &mut <Self as Semantics>::SemState, transition: TransitionIndex) -> Result<()> {
-        let node = self.transition2node.get(transition).ok_or_else(|| anyhow!("Transition does not exist."))?;
-        self.close_node(state, *node);
-        Ok(())
-    }
-
-    fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool {
-        
-    }
-
-    fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
-        todo!()
-    }
-
-    fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
-        todo!()
-    }
-
-    fn get_enabled_transitions(&self, state: &<Self as Semantics>::SemState) -> Vec<TransitionIndex> {
-        todo!()
-    }
-
-    fn get_number_of_transitions(&self) -> usize {
-        self.tree.iter().filter(|node| node.is_leaf()).count()
-    }
-}
-
-impl ProcessTree {
-    /**
-     * A state can be progressed without 
-     */
-    fn progress_state(&self, state: &mut <Self as Semantics>::SemState) {
-
-    }
-
-    fn close_node(&self, state: &mut <Self as Semantics>::SemState, node: usize) {
-        
-        //close this node and all of its children
-        for grandchild in node..self.traverse(node) {
-            state[grandchild] = NodeState::Closed;
-        }
-
-        //this may open another node, based on the operator of its parent
-        if let Some((parent, child_rank)) = self.get_parent(node) {
-            match self.tree[parent] {
-                Node::Tau => unreachable!(),
-                Node::Activity(activity) => unreachable!(),
-                Node::Operator(Operator::Sequence, number_of_children) => {
-                    //for a sequence parent, we open the next child
-                    if child_rank < number_of_children - 1 {
-                        let next_child = self.get_child(parent, child_rank + 1);
-                        self.enable_node(state, next_child);
-                    } else {
-                        //if there is no next child, we recurse on the parent
-                        self.close_node(state, parent);
-                    }
-                },
-                Node::Operator(Operator::Concurrent, _) | Node::Operator(Operator::Or, _) | Node::Operator(Operator::Interleaved, _) => {
-                    //for a concurrent, or, or interleaved parent, the parent can be closed if all of its children have been closed
-                    if self.is_node_closed(state, parent) {
-                        self.close_node(state, parent);
-                    } 
-                },
-                Node::Operator(Operator::Xor, number_of_children) => {
-                    //for a xor parent, the parent can be closed as we executed one of its children
-                    self.close_node(state, parent);
-                },
-                Node::Operator(Operator::Loop, number_of_children) => {
-                    //for a loop parent, we open the next child(ren)
-                    if child_rank == 0 {
-                        //enable the siblings
-                        for child_rank in 1..number_of_children {
-                            self.enable_node(state, self.get_child(parent, child_rank));
-                        }
-                    } else {
-                        //enable the first child
-                        self.enable_node(state, self.get_child(parent, 0));
-                        self.enable_next(state, parent);
-                    }
-                },
-            }
-        }
-    }
-
-    fn enable_node(&self, state: &mut <Self as Semantics>::SemState, node: usize) {
-        state[node] = NodeState::Enabled;
-
-        todo!()
-    }
-
-    /**
-     * Enable the next node in the tree.
-     */
-    fn enable_next(&self, state: &mut <Self as Semantics>::SemState, node: usize) {
-        todo!()
-    }
-
-    /**
-     * Returns whether it is possible to withdraw the enablement. If the node is not enabled in the first place, returns true.
-     */
-    fn can_withdraw_enablement(&self, state: &mut <Self as Semantics>::SemState, node: usize) -> bool {
-        todo!()
-    }
-
-    fn can_terminate(&self, state: &mut <Self as Semantics>::SemState, node: usize) -> bool {
-        match self.tree[node] {
-            Node::Tau => state[node] == NodeState::Closed,
-            Node::Activity(_) => state[node] == NodeState::Closed,
-            Node::Operator(Operator::Loop, number_of_children) => {
-                let body_child = self.get_child(node, 0);
-                if state[node] == NodeState::Closed {
-                    //if the loop is closed, it can terminate
-                    return true;
-                }
-                if state[body_child] != NodeState::Closed {
-                    //the first child is enabled, which means that the loop cannot terminate in this state
-                    return false;
-                }
-
-                for child_rank in 1..number_of_children {
-                    let redo_child = self.get_child(node, child_rank);
-                    //all the redo children must be able to withdraw enablement
-                    if !self.can_withdraw_enablement(state, redo_child) {
-                        return false;
-                    }
-                }
-
-                return true;
-            },
-        }
-    }
-
-    /**
-     * Return whether a node was closed.
-     */
-    fn is_node_closed(&self, state: &mut <Self as Semantics>::SemState, node: usize) -> bool {
-        match self.tree[node] {
-            Node::Tau => state[node] == NodeState::Closed,
-            Node::Activity(activity) => matches!(state[node], NodeState::Closed),
-            Node::Operator(operator, number_of_children) => {
-                //an operator node is closed if all of its children are closed
-                let mut child = self.get_child(node, 0);
-                if state[child] != NodeState::Closed {
-                    return false;
-                }
-                for _ in 1..number_of_children {
-                    child = self.traverse(child);
-                    if state[child] != NodeState::Closed {
-                        return false;
-                    }
-                }
-                return true;
-            },
-        }
-    }
-}
 
 #[derive(Debug,Clone)]
 pub enum Node {
@@ -775,27 +627,36 @@ impl FromStr for Operator {
     }
 }
 
-#[derive(Clone,Display,Debug,Eq,PartialEq,Hash)]
-pub enum NodeState {
-    Closed,
-    Enabled
+pub struct ChildrenIterator<'a> {
+    tree: &'a ProcessTree,
+    node: usize,
+    now: Option<usize>,
+    next: usize,
+    count: usize
 }
 
-#[derive(Clone,Debug,Eq,PartialEq,Hash)]
-pub struct NodeStates {
-    states: Vec<NodeState>
-}
-
-impl Display for NodeStates {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?}", self.states)
+impl <'a> ChildrenIterator<'a> {
+    fn new(tree: &'a ProcessTree, node: usize) -> Self {
+        Self{
+            tree: tree,
+            node: node,
+            now: None,
+            next: node + 1,
+            count: 0
+        }
     }
 }
 
-impl Index<usize> for NodeStates {
-    type Output = NodeState;
+impl <'a> Iterator for ChildrenIterator<'a> {
+    type Item = usize;
 
-    fn index(&self, index: usize) -> &Self::Output {
-        self.states.index(index)
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.count >= self.tree.get_number_of_children(self.node)? {
+            return None;
+        }
+        self.count += 1;
+        self.now = Some(self.next);
+        self.next = self.tree.traverse(self.now.unwrap());
+        Some(self.now.unwrap())
     }
 }

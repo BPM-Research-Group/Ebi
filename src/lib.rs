@@ -45,6 +45,7 @@ pub mod ebi_objects {
     pub mod alignments;
     pub mod deterministic_finite_automaton;
     pub mod process_tree;
+    pub mod process_tree_semantics;
     pub mod executions;
 }
 pub mod ebi_traits {
