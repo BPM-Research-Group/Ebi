@@ -36,20 +36,16 @@ pub struct ProcessTree {
     activity_key: ActivityKey,
     pub(crate) tree: Vec<Node>,
     pub(crate) transition2node: Vec<usize>,
-    pub(crate) node2transition: Vec<Option<usize>>,
 }
 
 impl ProcessTree {
 
     pub fn new(activity_key: ActivityKey, tree: Vec<Node>) -> Self {
         let mut transition2node = vec![];
-        let mut node2transition = vec![None; tree.len()];
         for (node_index, node) in tree.iter().enumerate() {
             match node {
                 Node::Tau |  Node::Activity(_) => {
-                    let transitionindex = transition2node.len();
                     transition2node.push(node_index);
-                    node2transition[node_index] = Some(transitionindex);
                 },
                 Node::Operator(_, _) => {},
             }
@@ -59,7 +55,6 @@ impl ProcessTree {
             activity_key: activity_key,
             tree: tree,
             transition2node: transition2node,
-            node2transition: node2transition
         }
     }
 
@@ -126,6 +121,10 @@ impl ProcessTree {
 
     pub fn get_children(&self, node: usize) -> ChildrenIterator {
         ChildrenIterator::new(self, node)
+	}
+
+    pub fn get_parents(&self, node: usize) -> ParentsIterator {
+        ParentsIterator::new(self, node)
 	}
 
     /**
@@ -658,5 +657,33 @@ impl <'a> Iterator for ChildrenIterator<'a> {
         self.now = Some(self.next);
         self.next = self.tree.traverse(self.now.unwrap());
         Some(self.now.unwrap())
+    }
+}
+
+pub struct ParentsIterator<'a> {
+    tree: &'a ProcessTree,
+    node: Option<(usize, usize)>
+}
+
+impl <'a> ParentsIterator<'a> {
+    fn new(tree: &'a ProcessTree, node: usize) -> Self {
+        Self{
+            tree: tree,
+            node: tree.get_parent(node),
+        }
+    }
+}
+
+impl <'a> Iterator for ParentsIterator<'a> {
+    type Item = (usize, usize);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if let Some((node, child_rank)) = self.node {
+            self.node = self.tree.get_parent(node);
+
+            Some((node, child_rank))
+        } else {
+            None
+        }
     }
 }
