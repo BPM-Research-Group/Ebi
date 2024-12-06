@@ -1,7 +1,7 @@
 use std::ops::{Add, AddAssign};
 use anyhow::{anyhow, Result};
 use fraction::Zero;
-use crate::{ebi_framework::{activity_key::Activity, displayable::Displayable}, ebi_objects::alignments::Alignments, ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}, math::{astar,fraction::Fraction}, techniques::align::transform_alignment};
+use crate::{ebi_framework::{activity_key::Activity, displayable::Displayable}, ebi_objects::language_of_alignments::LanguageOfAlignments, ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}, math::{astar,fraction::Fraction}, techniques::align::transform_alignment};
 
 #[derive (Clone, Debug)]
 pub struct StochasticWeightedCost{
@@ -69,11 +69,11 @@ impl Eq for StochasticWeightedCost{}
 
 
 pub trait ExplainTrace {
-    fn explain_trace(&self, trace: &Vec<Activity>, balance: &Fraction) -> Result<Alignments>;
+    fn explain_trace(&self, trace: &Vec<Activity>, balance: &Fraction) -> Result<LanguageOfAlignments>;
 }
 
 impl ExplainTrace for EbiTraitStochasticSemantics {
-    fn explain_trace(&self, trace: &Vec<Activity>, balance: &Fraction) -> Result<Alignments> {
+    fn explain_trace(&self, trace: &Vec<Activity>, balance: &Fraction) -> Result<LanguageOfAlignments> {
         match self {
             EbiTraitStochasticSemantics::Usize(sem) => sem.explain_trace(trace, balance),
             EbiTraitStochasticSemantics::Marking(sem) => sem.explain_trace(trace, balance),
@@ -83,7 +83,7 @@ impl ExplainTrace for EbiTraitStochasticSemantics {
 
 impl <State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState = State, AliState = State> {
 
-    pub fn explain_trace(&self, trace: &Vec<Activity>, _balance: &Fraction) -> Result<Alignments> {
+    pub fn explain_trace(&self, trace: &Vec<Activity>, _balance: &Fraction) -> Result<LanguageOfAlignments> {
 
         // get the start state
         let start = (0, self.get_initial_state());
@@ -148,7 +148,7 @@ impl <State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState 
         match astar::astar(&start, successors, heuristic, success){
             Some((path, _cost)) => {
                 let moves = transform_alignment(self, &trace,path)?;
-                let mut alignments = Alignments::new(self.get_activity_key().clone());
+                let mut alignments = LanguageOfAlignments::new(self.get_activity_key().clone());
                 alignments.push(moves);
                 // println!("cost:{:.4},", cost, prefix_cost, prefix_probability);
                 Ok(alignments)
