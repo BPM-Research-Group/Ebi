@@ -7,11 +7,25 @@ use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, dottable::Dot
 
 use super::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton;
 
+pub const FORMAT_SPECIFICATION: &str = "A deterministic finite automaton is a JSON structure with the top level being an object.
+    This object contains the following key-value pairs:
+    \\begin{itemize}
+    \\item \\texttt{initialState} being the index of the initial state.
+    \\item \\texttt{finalStates} being a list of indices of the final states.
+    A final state is not necessarily a deadlock state.
+    \\item \\texttt{transitions} being a list of transitions. 
+    Each transition is an object with \\texttt{from} being the source state index of the transition, \\texttt{to} being the target state index of the transition, and \texttt{{label}} being the activity of the transition. 
+    Silent transitions are not supported.
+    The file format supports deadlocks and livelocks.
+    \\end{itemize}
+    For instance:
+    \\lstinputlisting[language=json, style=boxed]{../testfiles/aa-ab-ba.dfa}";
 
 pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     name: "deterministic finite automaton",
     article: "a",
     file_extension: "dfa",
+    format_specification: FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<DeterministicFiniteAutomaton>,
     trait_importers: &[
         EbiTraitImporter::Semantics(DeterministicFiniteAutomaton::import_as_semantics),

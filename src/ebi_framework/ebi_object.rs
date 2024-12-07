@@ -84,7 +84,7 @@ impl Display for EbiObjectType {
             EbiObjectType::FiniteLanguage => "finite language",
             EbiObjectType::DirectlyFollowsModel => "directly follows model",
             EbiObjectType::LanguageOfAlignments => "alignments",
-            EbiObjectType::StochasticLanguageOfAlignments => "stochastic langauge of alignments",
+            EbiObjectType::StochasticLanguageOfAlignments => "stochastic language of alignments",
             EbiObjectType::DeterministicFiniteAutomaton => "deterministic finite automaton",
             EbiObjectType::Executions => "executions",
         })

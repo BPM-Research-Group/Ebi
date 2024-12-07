@@ -2,19 +2,32 @@ use std::{collections::HashSet, fmt::Display, io::{self, BufRead, Write}, str::F
 use anyhow::{anyhow, Context, Result, Error};
 use layout::topo::layout::VisualGraph;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, line_reader::LineReader};
 
 use super::labelled_petri_net::LabelledPetriNet;
 
 pub const HEADER: &str = "directly follows model";
 
+pub const FORMAT_SPECIFICATION: &str = "A directly follows model is a line-based structure. Lines starting with a \\# are ignored.
+    This first line is exactly `directly follows model`.
+    The second line is a boolean indicating whether the model supports empty traces.
+    The third line is the number of activities in the model. Duplicated labels are accepted. 
+    The following lines each contain an activity.
+    The next line contains the number of start activities, followed by, for each start activity, a line with the index of the start activity.
+    The next line contains the number of end activities, followed by, for each end activity, a line with the index of the end activity.
+    The next line contains the number of edges, followed by, for each edge, a line with first the index of the source activity, then the `>` symbol, then the index of the target activity.
+    
+    For instance:
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/a-b_star.dfm}";
+
 pub const EBI_DIRCTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "directly follows model",
     article: "a",
     file_extension: "dfm",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<DirectlyFollowsModel>,
     trait_importers: &[
-        
+        EbiTraitImporter::Semantics(DirectlyFollowsModel::import_as_semantics),
     ],
     object_importers: &[
         EbiObjectImporter::DirectlyFollowsModel(DirectlyFollowsModel::import_as_object),
@@ -26,13 +39,14 @@ pub const EBI_DIRCTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[],
 };
 
+#[derive(ActivityKey,Debug)]
 pub struct DirectlyFollowsModel {
-    empty_traces: bool,
-	edges: Vec<Vec<bool>>, //matrix of edges
-	activity_key: ActivityKey,
-    node_2_activity: Vec<Activity>,
-    start_nodes: HashSet<usize>,
-    end_nodes: HashSet<usize>
+    activity_key: ActivityKey,
+    pub(crate) empty_traces: bool,
+	pub(crate) edges: Vec<Vec<bool>>, //matrix of edges
+    pub(crate) node_2_activity: Vec<Activity>,
+    pub(crate) start_nodes: HashSet<usize>,
+    pub(crate) end_nodes: HashSet<usize>
 }
 
 impl DirectlyFollowsModel {
@@ -172,11 +186,11 @@ impl Importable for DirectlyFollowsModel {
 
             let mut arr = edge_line.split('>');
             let source = match arr.next() {
-                Some(s) => s.parse::<usize>()?,
+                Some(s) => s.parse::<usize>().with_context(|| format!("could not read source of edge {}", e))?,
                 None => return Err(anyhow!("could not read source of edge {}", e)),
             };
             let target = match arr.next() {
-                Some(t) => t.parse::<usize>()?,
+                Some(t) => t.parse::<usize>().with_context(|| format!("could not read target of edge {}", e))?,
                 None => return Err(anyhow!("could not read target of edge {}", e)),
             };
             
@@ -200,6 +214,12 @@ impl FromStr for DirectlyFollowsModel {
     fn from_str(s: &str) -> std::prelude::v1::Result<Self, Self::Err> {
         let mut reader = io::Cursor::new(s);
         Self::import(&mut reader)
+    }
+}
+
+impl ToSemantics for DirectlyFollowsModel {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::Usize(Box::new(self))
     }
 }
 

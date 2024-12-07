@@ -205,15 +205,19 @@ fn manual() -> Result<EbiOutput> {
     writeln!(f, "}}")?;
 
     //file handlers
-    writeln!(f, "\\def\\ebifilehandlers{{")?;
+    writeln!(f, "\\long\\def\\ebifilehandlers{{")?;
     for file_handler in EBI_FILE_HANDLERS {
         writeln!(f, "\\subsection{{{} (.{})}}", file_handler.name, file_handler.file_extension)?;
         writeln!(f, "\\label{{filehandler:{}}}", file_handler.name)?;
-        writeln!(f, "Import as objects: {}.", file_handler.object_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", "))?;
-        writeln!(f, "\\\\Import as traits: {}.", file_handler.trait_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", "))?;
-        writeln!(f, "\\\\Input to commands:{}.\n", file_handler.get_applicable_commands().iter().map(
+        writeln!(f, "Import as objects: {}.", or_none(&file_handler.object_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
+        writeln!(f, "\\\\Import as traits: {}.", or_none(&file_handler.trait_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
+        writeln!(f, "\\\\Input to commands: {}.", or_none(&file_handler.get_applicable_commands().iter().map(
             |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (Section~\\ref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
-            .collect::<Vec<_>>().join(""))?;
+            .collect::<Vec<_>>().join("")))?;
+        writeln!(f, "\\\\Output of commands: {}.", or_none(&file_handler.get_producing_commands().iter().map(
+            |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (Section~\\ref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
+            .collect::<Vec<_>>().join("")))?;
+        writeln!(f, "\\\\File format specification:\n{}", file_handler.format_specification)?;
     }
     writeln!(f, "}}")?;
 
@@ -239,6 +243,13 @@ fn manual() -> Result<EbiOutput> {
     writeln!(f, "\\end{{itemize}}}}")?;
 
     Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
+}
+
+pub fn or_none(string: &str) -> &str {
+    if string.is_empty() {
+        return "none";
+    }
+    string
 }
 
 pub fn graph() -> Result<EbiOutput> {

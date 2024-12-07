@@ -5,12 +5,13 @@ use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_hand
 
 use super::stochastic_language_of_alignments::StochasticLanguageOfAlignments;
 
-pub const HEADER: &str = "alignments";
+pub const HEADER: &str = "language of alignments";
 
 pub const EBI_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     name: "language of alignments",
     article: "a",
     file_extension: "ali",
+    format_specification: "",
     validator: ebi_input::validate::<LanguageOfAlignments>,
     trait_importers: &[
         

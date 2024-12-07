@@ -3,7 +3,7 @@ use anyhow::{anyhow, Result, Error};
 
 use crate::{ebi_commands::ebi_command_validate::EBI_VALIDATE, ebi_objects::{language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS, compressed_event_log::EBI_COMPRESSED_EVENT_LOG, deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON, directly_follows_model::EBI_DIRCTLY_FOLLOWS_MODEL, event_log::EBI_EVENT_LOG, executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE, labelled_petri_net::EBI_LABELLED_PETRI_NET, petri_net_markup_language::EBI_PETRI_NET_MARKUP_LANGUAGE, stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON, stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET, stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS}};
 
-use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, prom_link::JavaObjectHandler};
+use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::{EbiObjectExporter, EbiOutputType}, ebi_trait::FromEbiTraitObject, prom_link::JavaObjectHandler};
 
 pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_COMPRESSED_EVENT_LOG,
@@ -26,6 +26,7 @@ pub struct EbiFileHandler {
     pub name: &'static str,
     pub article: &'static str, //a or an
     pub file_extension: &'static str,
+    pub format_specification: &'static str,
     pub validator: fn(&mut dyn BufRead) -> Result<()>,
     pub trait_importers: &'static [EbiTraitImporter],
     pub object_importers: &'static [EbiObjectImporter],
@@ -44,6 +45,28 @@ impl EbiFileHandler {
             result.extend(importer.get_type().get_applicable_commands());
         }
         result.insert(vec![&EBI_COMMANDS, &EBI_VALIDATE]);
+
+        result
+    }
+
+    pub fn get_producing_commands(&self) -> BTreeSet<Vec<&'static EbiCommand>> {
+        //get objects that can export to this file handler
+        let mut objects = vec![];
+        for exporter in self.object_exporters {
+            objects.push(exporter.get_type());
+        }
+
+        //get commands that can output any of the objects
+        let mut result = BTreeSet::new();
+        for command_path in EBI_COMMANDS.get_command_paths() {
+            if let Some(EbiCommand::Command { output_type , .. }) = command_path.last() {
+                if let EbiOutputType::ObjectType(x) = output_type {
+                    if objects.contains(x) {
+                        result.insert(command_path);
+                   }
+                }
+            }
+        }
 
         result
     }
