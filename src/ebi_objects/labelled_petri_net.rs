@@ -14,6 +14,7 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "labelled Petri net",
     article: "a",
     file_extension: "lpn",
+    format_specification: "",
     validator: ebi_input::validate::<LabelledPetriNet>,
     trait_importers: &[
         EbiTraitImporter::Semantics(LabelledPetriNet::import_as_semantics),

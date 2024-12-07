@@ -273,10 +273,11 @@ pub enum EbiObjectImporter {
     LabelledPetriNet(fn(&mut dyn BufRead) -> Result<EbiObject>),
     StochasticDeterministicFiniteAutomaton(fn(&mut dyn BufRead) -> Result<EbiObject>),
     StochasticLabelledPetriNet(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    Alignments(fn(&mut dyn BufRead) -> Result<EbiObject>),
+    LanguageOfAlignments(fn(&mut dyn BufRead) -> Result<EbiObject>),
     DeterministicFiniteAutomaton(fn(&mut dyn BufRead) -> Result<EbiObject>),
     ProcessTree(fn(&mut dyn BufRead) -> Result<EbiObject>),
     Executions(fn(&mut dyn BufRead) -> Result<EbiObject>),
+    StochasticLanguageOfAlignments(fn(&mut dyn BufRead) -> Result<EbiObject>),
 }
 
 impl EbiObjectImporter {
@@ -289,7 +290,8 @@ impl EbiObjectImporter {
             EbiObjectImporter::LabelledPetriNet(_) => EbiObjectType::LabelledPetriNet,
             EbiObjectImporter::StochasticDeterministicFiniteAutomaton(_) => EbiObjectType::StochasticDeterministicFiniteAutomaton,
             EbiObjectImporter::StochasticLabelledPetriNet(_) => EbiObjectType::StochasticLabelledPetriNet,
-            EbiObjectImporter::Alignments(_) => EbiObjectType::Alignments,
+            EbiObjectImporter::LanguageOfAlignments(_) => EbiObjectType::LanguageOfAlignments,
+            EbiObjectImporter::StochasticLanguageOfAlignments(_) => EbiObjectType::StochasticLanguageOfAlignments,
             EbiObjectImporter::DeterministicFiniteAutomaton(_) => EbiObjectType::DeterministicFiniteAutomaton,
             EbiObjectImporter::ProcessTree(_) => EbiObjectType::ProcessTree,
             EbiObjectImporter::Executions(_) => EbiObjectType::Executions,
@@ -305,7 +307,8 @@ impl EbiObjectImporter {
             EbiObjectImporter::LabelledPetriNet(importer) => *importer,
             EbiObjectImporter::StochasticDeterministicFiniteAutomaton(importer) => *importer,
             EbiObjectImporter::StochasticLabelledPetriNet(importer) => *importer,
-            EbiObjectImporter::Alignments(importer) => *importer,
+            EbiObjectImporter::LanguageOfAlignments(importer) => *importer,
+            EbiObjectImporter::StochasticLanguageOfAlignments(importer) => *importer,
             EbiObjectImporter::DeterministicFiniteAutomaton(importer) => *importer,
             EbiObjectImporter::ProcessTree(importer) => *importer,
             EbiObjectImporter::Executions(importer) => *importer,

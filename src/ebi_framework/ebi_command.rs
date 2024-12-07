@@ -35,14 +35,14 @@ pub const ARG_SHORT_APPROX: char = 'a';
 pub const ARG_ID_OUTPUT: &str = "output";
 
 pub enum EbiCommand {
-    Group{
+    Group {
         name_short: &'static str,
         name_long: Option<&'static str>,
         explanation_short: &'static str,
         explanation_long: Option<&'static str>,
         children: &'static [&'static EbiCommand]
     },
-    Command{
+    Command {
         name_short: &'static str,
         name_long: Option<&'static str>,
         explanation_short: &'static str,

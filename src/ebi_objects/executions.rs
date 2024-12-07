@@ -7,10 +7,13 @@ use crate::ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_input::{self, E
 
 pub const HEADER: &str = "executions";
 
+pub const FORMAT_SPECIFICATION: &str = "not yet finalised.";
+
 pub const EBI_EXECUTIONS: EbiFileHandler = EbiFileHandler {
     name: "executions",
     article: "",
     file_extension: "exs",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<Executions>,
     trait_importers: &[
         

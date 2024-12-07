@@ -1,5 +1,5 @@
-use anyhow::Result;
-use crate::{ebi_framework::activity_key::ActivityKeyTranslator, ebi_objects::{alignments::Move, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::Semantics}, math::fraction::Fraction};
+use anyhow::{anyhow, Result};
+use crate::{ebi_objects::{language_of_alignments::Move, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::Semantics}, math::fraction::Fraction};
 
 use super::align::Align;
 
@@ -10,18 +10,16 @@ pub trait AlignmentMiner {
 impl AlignmentMiner for LabelledPetriNet {
     fn mine_stochastic_alignment(mut self, language: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<StochasticLabelledPetriNet> {
         let mut weights: Vec<Fraction> = vec![Fraction::zero(); self.get_number_of_transitions()];
-    
-        let translator = ActivityKeyTranslator::new(language.get_activity_key(), self.get_activity_key_mut());
-    
-        for (trace, probability) in language.iter_trace_probability() {
-            let translated_trace = translator.translate_trace(trace);
-    
-            let (moves, _) = self.align_trace(&translated_trace)?;
-            for movee in moves {
+
+        let alignments = self.align_stochastic_language(language)?;
+        for index in 0..alignments.len() {
+            let weight = alignments.get_weight(index).ok_or_else(|| anyhow!("should not happen"))?;
+            
+            for movee in alignments.get(index).ok_or_else(|| anyhow!("should not happen"))? {
                 match movee {
                     Move::LogMove(_) => {},
                     Move::ModelMove(_, transition) |  Move::SynchronousMove(_, transition) | Move::SilentMove(transition) => {
-                        weights[transition] += probability;
+                        weights[*transition] += weight;
                     },
                 }
             }

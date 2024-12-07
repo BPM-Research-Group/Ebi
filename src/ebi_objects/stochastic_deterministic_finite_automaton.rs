@@ -6,10 +6,27 @@ use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTra
 
 use super::{labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
 
+pub const FORMAT_SPECIFICATION: &str = "A stochastic deterministic finite automaton is a JSON structure with the top level being an object.
+    This object contains the following key-value pairs:
+    \\begin{itemize}
+    \\item \\texttt{initialState} being the index of the initial state.
+    \\item \\texttt{transitions} being a list of transitions. 
+    Each transition is an object with \\texttt{from} being the source state index of the transition, 
+    \\texttt{to} being the target state index of the transition, 
+    \\texttt{label} being the activity of the transition, and
+    \\texttt{prob} being the probability of the transition (may be given as a fraction in a string or a float value. Must be $\\leq 1$). 
+    Silent transitions are not supported.
+    The file format supports deadlocks and livelocks.
+    The probability that a trace terminates in a state is 1 - the sum probability of the outgoing transitions of the state.
+    \\end{itemize}
+    For instance:
+    \\lstinputlisting[language=json, style=boxed]{../testfiles/aa-ab-ba.sdfa}";
+
 pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     name: "stochastic deterministic finite automaton",
     article: "a",
     file_extension: "sdfa",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<StochasticDeterministicFiniteAutomaton>,
     trait_importers: &[
         EbiTraitImporter::QueriableStochasticLanguage(ebi_trait_queriable_stochastic_language::import::<StochasticDeterministicFiniteAutomaton>),

@@ -2,10 +2,12 @@ use std::{fmt::{Debug, Display}, hash::Hash, sync::{Arc, Mutex}};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use anyhow::{anyhow, Context, Error, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, displayable::Displayable, ebi_command::EbiCommand}, ebi_objects::{alignments::{Alignments, Move}, deterministic_finite_automaton::DeterministicFiniteAutomaton, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, process_tree::ProcessTree, process_tree_semantics::NodeStates, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, displayable::Displayable, ebi_command::EbiCommand}, ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, language_of_alignments::{LanguageOfAlignments, Move}, process_tree::ProcessTree, process_tree_semantics::NodeStates, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
 pub trait Align {
-    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments>;
+    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<LanguageOfAlignments>;
+
+    fn align_stochastic_language(&mut self, log: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<StochasticLanguageOfAlignments>;
 
     /**
 	 * Please note to ensure the trace and the semantics use the same ActivityKey, or they have been translated
@@ -14,11 +16,19 @@ pub trait Align {
 }
 
 impl Align for EbiTraitSemantics {
-    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
+    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<LanguageOfAlignments> {
 		match self {
 			EbiTraitSemantics::Usize(sem) => sem.align_language(log),
 			EbiTraitSemantics::Marking(sem) => sem.align_language(log),
             EbiTraitSemantics::NodeStates(sem) => sem.align_language(log),
+		}
+	}
+
+    fn align_stochastic_language(&mut self, log: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<StochasticLanguageOfAlignments> {
+		match self {
+			EbiTraitSemantics::Usize(sem) => sem.align_stochastic_language(log),
+			EbiTraitSemantics::Marking(sem) => sem.align_stochastic_language(log),
+            EbiTraitSemantics::NodeStates(sem) => sem.align_stochastic_language(log),
 		}
 	}
 
@@ -33,7 +43,7 @@ impl Align for EbiTraitSemantics {
 
 impl <T, State> Align for T where T: Semantics<SemState = State> + Send + Sync + ?Sized, State: Displayable {
     
-    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<Alignments> {
+    fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<LanguageOfAlignments> {
         let mut activity_key = self.get_activity_key().clone();
         let translator = Arc::new(ActivityKeyTranslator::new(log.get_activity_key(), &mut activity_key));
         let log = Arc::new(log);
@@ -77,8 +87,61 @@ impl <T, State> Align for T where T: Semantics<SemState = State> + Send + Sync +
             return Err(anyhow!("Something went wrong when computing alignments."));
         }
 
-        let mut result = Alignments::new(activity_key);
+        progress_bar.finish_and_clear();
+
+        let mut result = LanguageOfAlignments::new(activity_key);
         result.append(&mut aligned_traces);
+        Ok(result)
+    }
+
+    fn align_stochastic_language(&mut self, log: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<StochasticLanguageOfAlignments> {
+        let mut activity_key = self.get_activity_key().clone();
+        let translator = Arc::new(ActivityKeyTranslator::new(log.get_activity_key(), &mut activity_key));
+        let log = Arc::new(log);
+        let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
+
+        log::info!("Compute alignments");
+        let progress_bar = EbiCommand::get_progress_bar_ticks(log.len());
+
+        //compute alignments multi-threadedly
+        let aligned_traces = (0..log.len()).into_par_iter().filter_map(|trace_index| {
+            let log = Arc::clone(&log);
+            let translator = Arc::clone(&translator);
+            let self2 = Arc::from(&self);
+
+            let trace = log.get_trace(trace_index).unwrap();
+            let trace_translated = translator.translate_trace(trace);
+            let probability = log.get_probability(trace_index).unwrap().clone();
+
+            let result = self2.align_trace(&trace_translated).with_context(|| format!("Aligning trace {:?}", trace));
+            progress_bar.inc(1);
+
+            match result {
+                Ok((aligned_trace, _)) => Some((aligned_trace, probability)),
+                Err(err) => {
+                    let error = Arc::clone(&error);
+                *error.lock().unwrap() = Some(err);
+                None
+                },
+            }
+        }).collect::<Vec<_>>();// end parallel execution
+
+        if aligned_traces.len() != log.len() {
+            //something went wrong
+            if let Ok(mutex) = Arc::try_unwrap(error) {
+                if let Ok(err) = mutex.into_inner() {
+                    if let Some(err) = err {
+                        return Err(err);
+                    }
+                }
+            }
+            return Err(anyhow!("Something went wrong when computing alignments."));
+        }
+
+        progress_bar.finish_and_clear();
+
+        let mut result = StochasticLanguageOfAlignments::new(activity_key);
+        result.append(aligned_traces);
         Ok(result)
     }
 
@@ -325,12 +388,25 @@ impl AlignmentHeuristics for StochasticDeterministicFiniteAutomaton {
 
 impl AlignmentHeuristics for ProcessTree {
     type AliState = NodeStates;
-    
+
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
         vec![]
     }
 
     fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>,  _: &usize, _: &Self::AliState, _: &Vec<Vec<usize>>) -> usize {
+        0
+    }
+}
+
+    
+impl AlignmentHeuristics for DirectlyFollowsModel {
+    type AliState = usize;
+
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+    
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &Self::AliState, _: &Vec<Vec<usize>>) -> usize {
         0
     }
 }

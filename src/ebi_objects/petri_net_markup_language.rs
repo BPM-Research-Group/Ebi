@@ -13,6 +13,7 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "Petri net markup language",
     article: "a",
     file_extension: "pnml",
+    format_specification: "",
     validator: PetriNetMarkupLanguage::validate,
     trait_importers: &[
         EbiTraitImporter::Semantics(PetriNetMarkupLanguage::import_as_semantics),
