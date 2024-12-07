@@ -15,6 +15,7 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     name: "process tree",
     article: "a",
     file_extension: "tree",
+    format_specification: "",
     validator: ebi_input::validate::<ProcessTree>,
     trait_importers: &[
         EbiTraitImporter::Semantics(ProcessTree::import_as_semantics),
