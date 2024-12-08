@@ -43,7 +43,6 @@ impl Semantics for DirectlyFollowsModel {
     fn get_enabled_transitions(&self, state: &<Self as Semantics>::SemState) -> Vec<TransitionIndex> {
 
         if state == &self.get_initial_state() {
-            println!("state {} initial state", state);
             //initial state
 
             //start in start node
@@ -56,7 +55,6 @@ impl Semantics for DirectlyFollowsModel {
 
             result
         } else if state < &self.get_number_of_nodes() {
-            println!("state {} node state", state);
             //non-initial state
 
             //outgoing edges
@@ -69,7 +67,6 @@ impl Semantics for DirectlyFollowsModel {
 
             result
         } else {
-            println!("state {} final state", state);
             //final state
             vec![]
         }

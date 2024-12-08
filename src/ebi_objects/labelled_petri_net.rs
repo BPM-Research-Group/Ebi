@@ -3,21 +3,35 @@ use anyhow::{anyhow, Context, Error, Ok, Result};
 use bitvec::vec::BitVec;
 use layout::topo::layout::VisualGraph;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, displayable::Displayable, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader, marking::Marking};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, displayable::Displayable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader, marking::Marking};
 
 use super::stochastic_labelled_petri_net::StochasticLabelledPetriNet;
 
 
 pub const HEADER: &str = "labelled Petri net";
 
+pub const FORMAT_SPECIFICATION: &str = "A labelled Petri net is a line-based structure. Lines starting with a \\# are ignored.
+    This first line is exactly `labelled Petri net'.
+    The second line is the number of places in the net.
+    The lines thereafter contain the initial marking: each place has its own line with the number of tokens on that place in the initial marking.
+    The next line is the number of transitions in the net.
+    Then, for each transition, the following lines are next: 
+    (i) the word `silent' or the word `label' followed by a space and the name of the activity with which the transition is labelled;
+    (ii) the number of input places, followed by a line for each input place with the index of the place;
+    (iii) the number of output places, followed by a line for each output place with the index of the place.
+    
+    For instance:
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba.lpn}";
+
 pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "labelled Petri net",
     article: "a",
     file_extension: "lpn",
-    format_specification: "",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<LabelledPetriNet>,
     trait_importers: &[
         EbiTraitImporter::Semantics(LabelledPetriNet::import_as_semantics),
+        EbiTraitImporter::Graphable(ebi_trait_graphable::import::<LabelledPetriNet>),
     ],
     object_importers: &[
         EbiObjectImporter::LabelledPetriNet(LabelledPetriNet::import_as_object),
@@ -382,7 +396,7 @@ impl Importable for LabelledPetriNet {
     }
 }
 
-impl Dottable for LabelledPetriNet {
+impl EbiTraitGraphable for LabelledPetriNet {
     fn to_dot(&self) -> VisualGraph {
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
@@ -399,33 +413,33 @@ impl Dottable for LabelledPetriNet {
                 "".to_string()
             };
 
-            places.push(<dyn Dottable>::create_place(&mut graph, &label));
+            places.push(<dyn EbiTraitGraphable>::create_place(&mut graph, &label));
         }
 
         for transition in 0..self.get_number_of_transitions() {
 
             let node = if let Some(activity) = self.get_transition_label(transition) {
-                <dyn Dottable>::create_transition(&mut graph, self.activity_key.get_activity_label(&activity), "")
+                <dyn EbiTraitGraphable>::create_transition(&mut graph, self.activity_key.get_activity_label(&activity), "")
             } else {
-                <dyn Dottable>::create_silent_transition(&mut graph, "")
+                <dyn EbiTraitGraphable>::create_silent_transition(&mut graph, "")
             };
 
 
             for (pos, inplace) in self.transition2input_places[transition].iter().enumerate() {
                 let place_node = places.get(*inplace).unwrap();
                 if self.transition2input_places_cardinality[transition][pos] > 1 {
-                    <dyn Dottable>::create_edge(&mut graph, place_node, &node, &format!("{}", self.transition2input_places_cardinality[transition][pos]));
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, place_node, &node, &format!("{}", self.transition2input_places_cardinality[transition][pos]));
                 } else {
-                    <dyn Dottable>::create_edge(&mut graph, place_node, &node, "");
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, place_node, &node, "");
                 }
             }
 
             for (pos, outplace) in self.transition2output_places[transition].iter().enumerate() {
                 let place_node = places.get(*outplace).unwrap();
                 if self.transition2output_places_cardinality[transition][pos] > 1 {
-                    <dyn Dottable>::create_edge(&mut graph, &node, place_node, &format!("{}", self.transition2output_places_cardinality[transition][pos]));
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, &node, place_node, &format!("{}", self.transition2output_places_cardinality[transition][pos]));
                 } else {
-                    <dyn Dottable>::create_edge(&mut graph, &node, place_node, "");
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, &node, place_node, "");
                 }
             }
         }

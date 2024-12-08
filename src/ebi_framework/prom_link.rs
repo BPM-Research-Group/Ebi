@@ -369,6 +369,9 @@ pub const JAVA_OBJECT_HANDLERS_SVG: &[JavaObjectHandler] = &[
         input_gui: None
     },
 ];
+pub const JAVA_OBJECT_HANDLERS_PDF: &[JavaObjectHandler] = &[
+
+];
 pub const JAVA_OBJECT_HANDLERS_LOGDIV: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
         name: "logdiv", 

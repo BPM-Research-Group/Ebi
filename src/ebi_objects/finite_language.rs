@@ -8,11 +8,20 @@ use super::deterministic_finite_automaton::DeterministicFiniteAutomaton;
 
 pub const HEADER: &str = "finite language";
 
+pub const FORMAT_SPECIFICATION: &str = "A finite language is a line-based structure. Lines starting with a \\# are ignored.
+    This first line is exactly `finite language'.
+    The second line is the number of traces in the language.
+    For each trace, the first line contains the number of events in the trace.
+    Then, each subsequent line contains the activity name of one event.
+    
+    For instance:
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba.lang}";
+
 pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "finite language",
     article: "a",
     file_extension: "lang",
-    format_specification: "",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<FiniteLanguage>,
     trait_importers: &[
         EbiTraitImporter::FiniteLanguage(ebi_trait_finite_language::import::<FiniteLanguage>),
