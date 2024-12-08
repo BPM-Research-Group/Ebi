@@ -9,6 +9,7 @@ use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey
 use super::{finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
 
 pub const FORMAT_SPECIFICATION: &str = "An event log file follows the IEEE XES format~\\cite{DBLP:journals/cim/AcamporaVSAGV17}. 
+Parsing is performed by the Rust4PM crate~\\cite{DBLP:conf/bpm/KustersA24}.
 For instance:
     \\lstinputlisting[language=xml, style=boxed]{../testfiles/a-b.xes}";
 

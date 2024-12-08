@@ -3,7 +3,7 @@ use anyhow::{anyhow, Result, Error,Context};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}, json};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}}, json};
 
 use super::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton;
 
@@ -29,6 +29,7 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     validator: ebi_input::validate::<DeterministicFiniteAutomaton>,
     trait_importers: &[
         EbiTraitImporter::Semantics(DeterministicFiniteAutomaton::import_as_semantics),
+        EbiTraitImporter::Graphable(ebi_trait_graphable::import::<DeterministicFiniteAutomaton>),
     ],
     object_importers: &[
         EbiObjectImporter::DeterministicFiniteAutomaton(DeterministicFiniteAutomaton::import_as_object),
@@ -300,16 +301,16 @@ impl Display for DeterministicFiniteAutomaton {
     }
 }
 
-impl Dottable for DeterministicFiniteAutomaton {
+impl EbiTraitGraphable for DeterministicFiniteAutomaton {
     fn to_dot(&self) -> layout::topo::layout::VisualGraph {
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
         let mut places = vec![];
         for state in 0 ..= self.max_state {
             if self.can_terminate_in_state(state) {
-                places.push(<dyn Dottable>::create_transition(&mut graph, &state.to_string(), ""));
+                places.push(<dyn EbiTraitGraphable>::create_transition(&mut graph, &state.to_string(), ""));
             } else {
-                places.push(<dyn Dottable>::create_place(&mut graph, &state.to_string()));
+                places.push(<dyn EbiTraitGraphable>::create_place(&mut graph, &state.to_string()));
             }
         }
 
@@ -318,7 +319,7 @@ impl Dottable for DeterministicFiniteAutomaton {
             let target = places[self.targets[pos]];
             let activity = self.activity_key.get_activity_label(&self.activities[pos]);
             
-            <dyn Dottable>::create_edge(&mut graph, &source, &target, activity);
+            <dyn EbiTraitGraphable>::create_edge(&mut graph, &source, &target, activity);
         }
 
         return graph;

@@ -9,11 +9,17 @@ use crate::{ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_input::{EbiObj
 
 use super::{labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
 
+pub const FORMAT_SPECIFICATION: &str = "A Petri net markup language file follows the ISO 15909-2:2011 format~\\cite{pnml}. 
+Parsing is performed by the Rust4PM crate~\\cite{DBLP:conf/bpm/KustersA24}.
+For instance:
+    \\lstinputlisting[language=xml, style=boxed]{../testfiles/a.pnml}";
+
+
 pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "Petri net markup language",
     article: "a",
     file_extension: "pnml",
-    format_specification: "",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: PetriNetMarkupLanguage::validate,
     trait_importers: &[
         EbiTraitImporter::Semantics(PetriNetMarkupLanguage::import_as_semantics),

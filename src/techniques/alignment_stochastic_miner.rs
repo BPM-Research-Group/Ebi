@@ -9,22 +9,22 @@ pub trait AlignmentMiner {
 
 impl AlignmentMiner for LabelledPetriNet {
     fn mine_stochastic_alignment(mut self, language: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<StochasticLabelledPetriNet> {
-        let mut weights: Vec<Fraction> = vec![Fraction::zero(); self.get_number_of_transitions()];
+        let mut probabilities: Vec<Fraction> = vec![Fraction::zero(); self.get_number_of_transitions()];
 
         let alignments = self.align_stochastic_language(language)?;
         for index in 0..alignments.len() {
-            let weight = alignments.get_weight(index).ok_or_else(|| anyhow!("should not happen"))?;
+            let probability = alignments.get_probability(index).ok_or_else(|| anyhow!("should not happen"))?;
             
             for movee in alignments.get(index).ok_or_else(|| anyhow!("should not happen"))? {
                 match movee {
                     Move::LogMove(_) => {},
                     Move::ModelMove(_, transition) |  Move::SynchronousMove(_, transition) | Move::SilentMove(transition) => {
-                        weights[*transition] += weight;
+                        probabilities[*transition] += probability;
                     },
                 }
             }
         }
     
-        Ok((self, weights).into())
+        Ok((self, probabilities).into())
     }
 }

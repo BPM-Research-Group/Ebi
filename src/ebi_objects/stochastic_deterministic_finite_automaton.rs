@@ -2,7 +2,7 @@ use std::{cmp::{max, Ordering}, collections::HashMap, fmt, io::{self, BufRead}, 
 use anyhow::{anyhow, Context, Result, Error};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_queriable_stochastic_language::{self}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}}, json, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_queriable_stochastic_language::{self}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}}, json, math::fraction::Fraction};
 
 use super::{labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
 
@@ -33,6 +33,7 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
         EbiTraitImporter::StochasticDeterministicSemantics(StochasticDeterministicFiniteAutomaton::import_as_stochastic_deterministic_semantics),
         EbiTraitImporter::StochasticSemantics(StochasticDeterministicFiniteAutomaton::import_as_stochastic_semantics),
         EbiTraitImporter::Semantics(StochasticDeterministicFiniteAutomaton::import_as_semantics),
+        EbiTraitImporter::Graphable(ebi_trait_graphable::import::<StochasticDeterministicFiniteAutomaton>),
     ],
     object_importers: &[
         EbiObjectImporter::StochasticDeterministicFiniteAutomaton(StochasticDeterministicFiniteAutomaton::import_as_object),
@@ -369,14 +370,14 @@ impl fmt::Display for StochasticDeterministicFiniteAutomaton {
     }
 }
 
-impl Dottable for StochasticDeterministicFiniteAutomaton {
+impl EbiTraitGraphable for StochasticDeterministicFiniteAutomaton {
     fn to_dot(&self) -> layout::topo::layout::VisualGraph {
         log::info!("to_dot for StochasticDeterministicFiniteAutomaton");
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
         let mut places = vec![];
         for state in 0 ..= self.max_state {
-            places.push(<dyn Dottable>::create_place(&mut graph, &format!("{}", self.terminating_probabilities[state])));
+            places.push(<dyn EbiTraitGraphable>::create_place(&mut graph, &format!("{}", self.terminating_probabilities[state])));
             // places.push(<dyn Dottable>::create_place(&mut graph, ""));
         }
 
@@ -386,7 +387,7 @@ impl Dottable for StochasticDeterministicFiniteAutomaton {
             let probability = &self.probabilities[pos];
             let activity = self.activity_key.get_activity_label(&self.activities[pos]);
             
-            <dyn Dottable>::create_edge(&mut graph, &source, &target, &format!("{}, {}", activity, probability.to_string()));
+            <dyn EbiTraitGraphable>::create_edge(&mut graph, &source, &target, &format!("{}, {}", activity, probability.to_string()));
         }
 
         return graph;

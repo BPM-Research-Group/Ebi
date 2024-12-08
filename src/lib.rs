@@ -5,7 +5,6 @@ pub mod ebi_framework {
     pub mod ebi_object;
     pub mod ebi_command;
     pub mod ebi_trait;
-    pub mod dottable;
     pub mod displayable;
     pub mod infoable;
     pub mod importable;
@@ -58,6 +57,7 @@ pub mod ebi_traits {
     pub mod ebi_trait_event_log;
     pub mod ebi_trait_stochastic_semantics;
     pub mod ebi_trait_semantics;
+    pub mod ebi_trait_graphable;
 }
 pub mod math {
     pub mod astar;

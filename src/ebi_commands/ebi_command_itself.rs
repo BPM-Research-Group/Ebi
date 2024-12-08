@@ -4,7 +4,7 @@ use anyhow::Result;
 use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
-use crate::{ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, text::Joiner};
+use crate::{ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, text::Joiner};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
  □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
@@ -185,7 +185,7 @@ fn manual() -> Result<EbiOutput> {
                 let exporter = output_type.get_exporters().remove(0);
                 writeln!(f, "The {} file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\\\", exporter)?;
             } else {
-                writeln!(f, "The file to which the results must be written. Based on the file extension, Ebi will output either {}.", output_type.exporters_as_strings_with_articles("or"))?;
+                writeln!(f, "The file to which the results must be written. Based on the file extension, Ebi will output either {}.", output_types(output_type))?;
                 writeln!(f, "If the parameter is not given, the results will be written to STDOUT as {} {}.\\\\", output_type.get_exporters()[0].get_article(), output_type.get_exporters()[0])?;
             }
             writeln!(f, "&\\textit{{Mandatory:}} \\quad no\\\\")?;
@@ -199,7 +199,7 @@ fn manual() -> Result<EbiOutput> {
             writeln!(f, "\\end{{tabularx}}")?;
 
             //output
-            writeln!(f, "Output: {}, which can be written as {}.", output_type, output_type.exporters_as_strings_with_articles("or"))?;
+            writeln!(f, "Output: {}, which can be written as {}.", output_type, output_types(output_type))?;
         }
     }
     writeln!(f, "}}")?;
@@ -250,6 +250,22 @@ pub fn or_none(string: &str) -> &str {
         return "none";
     }
     string
+}
+
+pub fn output_types(output_type: &EbiOutputType) -> String {
+    let mut list = output_type.get_exporters().into_iter().map(
+        |exp| exp.get_article().to_string() 
+        + " " 
+        + &match exp {
+            EbiExporter::Object(_, file_handler) => format!("{} (.{} -- Section~\\ref{{filehandler:{}}})", file_handler.name, file_handler.file_extension, file_handler.name),
+            _ => exp.to_string()
+        }
+    ).collect::<Vec<_>>();
+    if list.len() == 1 {
+        return list.remove(0)
+    }
+    let (last, list) = list.split_last().unwrap();
+    format!("{} {} {}", list.join(", "), "or", last)
 }
 
 pub fn graph() -> Result<EbiOutput> {

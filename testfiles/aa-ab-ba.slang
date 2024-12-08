@@ -10,7 +10,7 @@ a
 a
 # trace 1
 # probability
-1/5
+0.2
 # number of events
 2
 a
