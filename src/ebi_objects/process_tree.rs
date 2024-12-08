@@ -5,7 +5,7 @@ use layout::{adt::dag::NodeHandle, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader};
 
 use super::labelled_petri_net::LabelledPetriNet;
 
@@ -19,6 +19,7 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     validator: ebi_input::validate::<ProcessTree>,
     trait_importers: &[
         EbiTraitImporter::Semantics(ProcessTree::import_as_semantics),
+        EbiTraitImporter::Graphable(ebi_trait_graphable::import::<ProcessTree>)
     ],
     object_importers: &[
         EbiObjectImporter::ProcessTree(ProcessTree::import_as_object),
@@ -201,13 +202,13 @@ impl ProcessTree {
     fn node_to_dot(&self, graph: &mut VisualGraph, node: usize, entry: &NodeHandle, exit: &NodeHandle) -> usize {
         match self.tree[node] {
             Node::Tau => {
-                <dyn Dottable>::create_edge(graph, entry, exit, "");
+                <dyn EbiTraitGraphable>::create_edge(graph, entry, exit, "");
                 node + 1
             },
             Node::Activity(activity) => {
-                let transition = <dyn Dottable>::create_transition(graph, self.activity_key.get_activity_label(&activity), "");
-                <dyn Dottable>::create_edge(graph, entry, &transition, "");
-                <dyn Dottable>::create_edge(graph, &transition, exit, "");
+                let transition = <dyn EbiTraitGraphable>::create_transition(graph, self.activity_key.get_activity_label(&activity), "");
+                <dyn EbiTraitGraphable>::create_edge(graph, entry, &transition, "");
+                <dyn EbiTraitGraphable>::create_edge(graph, &transition, exit, "");
                 node + 1
             },
             Node::Operator(Operator::Xor, number_of_children) => {
@@ -218,7 +219,7 @@ impl ProcessTree {
                 child
             },
             Node::Operator(Operator::Sequence, number_of_children) => {
-                let intermediate_nodes = (0..(number_of_children-1)).map(|_| <dyn Dottable>::create_dot(graph)).collect::<Vec<_>>();
+                let intermediate_nodes = (0..(number_of_children-1)).map(|_| <dyn EbiTraitGraphable>::create_dot(graph)).collect::<Vec<_>>();
 
                 let mut child = node + 1;
                 for i in 0..number_of_children {
@@ -230,10 +231,10 @@ impl ProcessTree {
                 child
             },
             Node::Operator(Operator::Concurrent, number_of_children) => {
-                let split = <dyn Dottable>::create_gateway(graph, "+");
-                <dyn Dottable>::create_edge(graph, entry, &split, "");
-                let join = <dyn Dottable>::create_gateway(graph, "+");
-                <dyn Dottable>::create_edge(graph, &join, exit, "");
+                let split = <dyn EbiTraitGraphable>::create_gateway(graph, "+");
+                <dyn EbiTraitGraphable>::create_edge(graph, entry, &split, "");
+                let join = <dyn EbiTraitGraphable>::create_gateway(graph, "+");
+                <dyn EbiTraitGraphable>::create_edge(graph, &join, exit, "");
 
                 let mut child = node + 1;
                 for _ in 0..number_of_children {
@@ -242,10 +243,10 @@ impl ProcessTree {
                 child
             },
             Node::Operator(Operator::Or, number_of_children) => {
-                let split = <dyn Dottable>::create_gateway(graph, "o");
-                <dyn Dottable>::create_edge(graph, entry, &split, "");
-                let join = <dyn Dottable>::create_gateway(graph, "o");
-                <dyn Dottable>::create_edge(graph, &join, exit, "");
+                let split = <dyn EbiTraitGraphable>::create_gateway(graph, "o");
+                <dyn EbiTraitGraphable>::create_edge(graph, entry, &split, "");
+                let join = <dyn EbiTraitGraphable>::create_gateway(graph, "o");
+                <dyn EbiTraitGraphable>::create_edge(graph, &join, exit, "");
 
                 let mut child = node + 1;
                 for _ in 0..number_of_children {
@@ -254,10 +255,10 @@ impl ProcessTree {
                 child
             },
             Node::Operator(Operator::Interleaved, number_of_children) => {
-                let split = <dyn Dottable>::create_gateway(graph, "↔");
-                <dyn Dottable>::create_edge(graph, entry, &split, "");
-                let join = <dyn Dottable>::create_gateway(graph, "↔");
-                <dyn Dottable>::create_edge(graph, &join, exit, "");
+                let split = <dyn EbiTraitGraphable>::create_gateway(graph, "↔");
+                <dyn EbiTraitGraphable>::create_edge(graph, entry, &split, "");
+                let join = <dyn EbiTraitGraphable>::create_gateway(graph, "↔");
+                <dyn EbiTraitGraphable>::create_edge(graph, &join, exit, "");
 
                 let mut child = node + 1;
                 for _ in 0..number_of_children {
@@ -266,17 +267,17 @@ impl ProcessTree {
                 child
             },
             Node::Operator(Operator::Loop, number_of_children) => {
-                let split = <dyn Dottable>::create_dot(graph);
-                <dyn Dottable>::create_edge(graph, entry, &split, "");
-                let join = <dyn Dottable>::create_dot(graph);
-                <dyn Dottable>::create_edge(graph, &join, exit, "");
+                let split = <dyn EbiTraitGraphable>::create_dot(graph);
+                <dyn EbiTraitGraphable>::create_edge(graph, entry, &split, "");
+                let join = <dyn EbiTraitGraphable>::create_dot(graph);
+                <dyn EbiTraitGraphable>::create_edge(graph, &join, exit, "");
 
                 let mut child = node + 1;
 
                 child = ProcessTree::node_to_dot(&self, graph, child, &split, &join);
 
                 if number_of_children == 1 {
-                    <dyn Dottable>::create_edge(graph, &join, &split, "");
+                    <dyn EbiTraitGraphable>::create_edge(graph, &join, &split, "");
                 } else {
                     for _ in 1..number_of_children {
                         child = ProcessTree::node_to_dot(&self, graph, child, &join, &split);
@@ -557,11 +558,11 @@ impl Infoable for ProcessTree {
     }
 }
 
-impl Dottable for ProcessTree {
+impl EbiTraitGraphable for ProcessTree {
     fn to_dot(&self) -> layout::topo::layout::VisualGraph {
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
-        let source = <dyn Dottable>::create_place(&mut graph, "");
-        let sink = <dyn Dottable>::create_place(&mut graph, "");
+        let source = <dyn EbiTraitGraphable>::create_place(&mut graph, "");
+        let sink = <dyn EbiTraitGraphable>::create_place(&mut graph, "");
         ProcessTree::node_to_dot(&self, &mut graph,0, &source, &sink);
         graph
     }
