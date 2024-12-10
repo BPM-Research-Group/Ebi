@@ -1,4 +1,4 @@
-use std::{collections::BTreeSet, fmt::{Debug, Display}, hash::Hash, path::PathBuf, time::Duration};
+use std::{collections::BTreeSet, fmt::{Debug, Display}, hash::Hash, io::Write, path::PathBuf, time::Duration};
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use anyhow::{anyhow, Context, Result};
 use indicatif::{ProgressBar, ProgressStyle};
@@ -35,14 +35,14 @@ pub const ARG_SHORT_APPROX: char = 'a';
 pub const ARG_ID_OUTPUT: &str = "output";
 
 pub enum EbiCommand {
-    Group{
+    Group {
         name_short: &'static str,
         name_long: Option<&'static str>,
         explanation_short: &'static str,
         explanation_long: Option<&'static str>,
         children: &'static [&'static EbiCommand]
     },
-    Command{
+    Command {
         name_short: &'static str,
         name_long: Option<&'static str>,
         explanation_short: &'static str,
@@ -241,7 +241,13 @@ impl EbiCommand {
                     //write result to STDOUT
                     let exporter = Self::select_exporter(output_type, None);
                     log::info!("Writing result as {} {}", exporter.get_article(), exporter);
-                    println!("{}", ebi_output::export_to_string(result, exporter)?);
+                    if exporter.is_binary() {
+                        let mut out = std::io::stdout();
+                        out.write_all(&ebi_output::export_to_bytes(result, exporter)?)?;
+                        out.flush()?;
+                    } else {
+                        println!("{}", ebi_output::export_to_string(result, exporter)?);
+                    }
                 }
 
                 return Ok(());

@@ -7,10 +7,23 @@ use super::{finite_language::FiniteLanguage, finite_stochastic_language_semantic
 
 pub const HEADER: &str = "finite stochastic language";
 
+pub const FORMAT_SPECIFICATION: &str = "A finite language is a line-based structure. Lines starting with a \\# are ignored.
+    This first line is exactly `finite stochastic language'.
+    The second line is the number of traces in the language.
+    For each trace, the first line is the probability of the trace as a positive fraction or a decimal value.
+    The second line contains the number of events in the trace.
+    Then, each subsequent line contains the activity name of one event.
+
+    The sum of the probabilities of the traces in the language needs to be $\\leq$ 1.
+    
+    For instance:
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba.slang}";
+
 pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "finite stochastic language",
     article: "a",
     file_extension: "slang",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<FiniteStochasticLanguage>,
     trait_importers: &[
         EbiTraitImporter::FiniteLanguage(FiniteStochasticLanguage::import_as_finite_language),

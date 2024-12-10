@@ -6,10 +6,14 @@ use crate::{ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_input::{self, 
 
 use super::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage};
 
+pub const FORMAT_SPECIFICATION: &str = "A compressed event log is a gzipped event log file in the IEEE XES format~\\cite{DBLP:journals/cim/AcamporaVSAGV17}.
+Parsing is performed by the Rust4PM crate~\\cite{DBLP:conf/bpm/KustersA24}.";
+
 pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     name: "compressed event log",
     article: "a",
     file_extension: "xes.gz",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<CompressedEventLog>,
     trait_importers: &[
         EbiTraitImporter::FiniteLanguage(CompressedEventLog::read_as_finite_language),

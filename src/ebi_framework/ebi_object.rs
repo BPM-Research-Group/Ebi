@@ -2,7 +2,7 @@ use std::{collections::BTreeSet, fmt::Display};
 use anyhow::Result;
 use strum_macros::EnumIter;
 
-use crate::{ebi_objects::{language_of_alignments::LanguageOfAlignments, deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, executions::Executions, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}};
+use crate::{ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, executions::Executions, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, language_of_alignments::LanguageOfAlignments, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_graphable::EbiTraitGraphable, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}};
 
 use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_input::EbiInputType, ebi_trait::EbiTrait, infoable::Infoable};
 
@@ -84,7 +84,7 @@ impl Display for EbiObjectType {
             EbiObjectType::FiniteLanguage => "finite language",
             EbiObjectType::DirectlyFollowsModel => "directly follows model",
             EbiObjectType::LanguageOfAlignments => "alignments",
-            EbiObjectType::StochasticLanguageOfAlignments => "stochastic langauge of alignments",
+            EbiObjectType::StochasticLanguageOfAlignments => "stochastic language of alignments",
             EbiObjectType::DeterministicFiniteAutomaton => "deterministic finite automaton",
             EbiObjectType::Executions => "executions",
         })
@@ -169,6 +169,7 @@ pub enum EbiTraitObject {
     StochasticDeterministicSemantics(EbiTraitStochasticDeterministicSemantics),
     StochasticSemantics(EbiTraitStochasticSemantics),
     Semantics(EbiTraitSemantics),
+    Graphable(Box<dyn EbiTraitGraphable>),
 }
 
 impl EbiTraitObject {
@@ -183,6 +184,8 @@ impl EbiTraitObject {
             EbiTraitObject::StochasticDeterministicSemantics(_) => EbiTrait::StochasticDeterministicSemantics,
             EbiTraitObject::StochasticSemantics(_) => EbiTrait::StochasticSemantics,
             EbiTraitObject::Semantics(_) => EbiTrait::Semantics,
+            EbiTraitObject::Graphable(_) => EbiTrait::Graphable,
+            
         }
     }
 }

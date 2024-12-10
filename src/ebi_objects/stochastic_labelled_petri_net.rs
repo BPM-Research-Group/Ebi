@@ -5,7 +5,6 @@ use anyhow::{anyhow, Result, Context, Error};
 use layout::topo::layout::VisualGraph;
 
 use crate::ebi_framework::activity_key::{Activity, ActivityKey, HasActivityKey};
-use crate::ebi_framework::dottable::Dottable;
 use crate::ebi_framework::ebi_file_handler::EbiFileHandler;
 use crate::ebi_framework::ebi_input::{self, EbiObjectImporter, EbiTraitImporter};
 use crate::ebi_framework::ebi_object::EbiObject;
@@ -14,6 +13,7 @@ use crate::ebi_framework::exportable::Exportable;
 use crate::ebi_framework::importable::Importable;
 use crate::ebi_framework::infoable::Infoable;
 use crate::ebi_framework::prom_link::JavaObjectHandler;
+use crate::ebi_traits::ebi_trait_graphable::{self, EbiTraitGraphable};
 use crate::ebi_traits::ebi_trait_queriable_stochastic_language;
 use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics};
 use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics};
@@ -26,16 +26,32 @@ use super::labelled_petri_net::LabelledPetriNet;
 
 pub const HEADER: &str = "stochastic labelled Petri net";
 
+pub const FORMAT_SPECIFICATION: &str = "A stochastic labelled Petri net is a line-based structure. Lines starting with a \\# are ignored.
+    This first line is exactly `stochastic labelled Petri net'.
+    The second line is the number of places in the net.
+    The lines thereafter contain the initial marking: each place has its own line with the number of tokens on that place in the initial marking.
+    The next line is the number of transitions in the net.
+    Then, for each transition, the following lines are next: 
+    (i) the word `silent' or the word `label' followed by a space and the name of the activity with which the transition is labelled;
+    (ii) the weight of the transition, which may be any fraction or decimal number, even 0 or negative;
+    (iii) the number of input places, followed by a line for each input place with the index of the place;
+    (iiii) the number of output places, followed by a line for each output place with the index of the place.
+    
+    For instance:
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba_ali.slpn}";
+
 pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "stochastic labelled Petri net",
     article: "a",
     file_extension: "slpn",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<StochasticLabelledPetriNet>,
     trait_importers: &[
         EbiTraitImporter::QueriableStochasticLanguage(ebi_trait_queriable_stochastic_language::import::<StochasticLabelledPetriNet>),
         EbiTraitImporter::StochasticDeterministicSemantics(StochasticLabelledPetriNet::import_as_stochastic_deterministic_semantics),
         EbiTraitImporter::StochasticSemantics(StochasticLabelledPetriNet::import_as_stochastic_semantics),
         EbiTraitImporter::Semantics(StochasticLabelledPetriNet::import_as_semantics),
+        EbiTraitImporter::Graphable(ebi_trait_graphable::import::<StochasticLabelledPetriNet>),
     ],
     object_importers: &[
         EbiObjectImporter::StochasticLabelledPetriNet(StochasticLabelledPetriNet::import_as_object),
@@ -334,7 +350,7 @@ impl From<(LabelledPetriNet, Vec<Fraction>)> for StochasticLabelledPetriNet {
     }
 }
 
-impl Dottable for StochasticLabelledPetriNet {
+impl EbiTraitGraphable for StochasticLabelledPetriNet {
     fn to_dot(&self) -> VisualGraph {
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
@@ -351,32 +367,32 @@ impl Dottable for StochasticLabelledPetriNet {
                 "".to_string()
             };
 
-            places.push(<dyn Dottable>::create_place(&mut graph, &label));
+            places.push(<dyn EbiTraitGraphable>::create_place(&mut graph, &label));
         }
 
         for transition in 0..self.get_number_of_transitions() {
 
             let node = if let Some(activity) = self.get_transition_label(transition) {
-                <dyn Dottable>::create_transition(&mut graph, self.activity_key.get_activity_label(&activity), &self.get_transition_weight(transition).to_string())
+                <dyn EbiTraitGraphable>::create_transition(&mut graph, self.activity_key.get_activity_label(&activity), &self.get_transition_weight(transition).to_string())
             } else {
-                <dyn Dottable>::create_silent_transition(&mut graph, &self.get_transition_weight(transition).to_string())
+                <dyn EbiTraitGraphable>::create_silent_transition(&mut graph, &self.get_transition_weight(transition).to_string())
             };
 
             for (pos, inplace) in self.transition2input_places[transition].iter().enumerate() {
                 let place_node = places.get(*inplace).unwrap();
                 if self.transition2input_places_cardinality[transition][pos] > 1 {
-                    <dyn Dottable>::create_edge(&mut graph, place_node, &node, &format!("{}", self.transition2input_places_cardinality[transition][pos]));
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, place_node, &node, &format!("{}", self.transition2input_places_cardinality[transition][pos]));
                 } else {
-                    <dyn Dottable>::create_edge(&mut graph, place_node, &node, "");
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, place_node, &node, "");
                 }
             }
 
             for (pos, outplace) in self.transition2output_places[transition].iter().enumerate() {
                 let place_node = places.get(*outplace).unwrap();
                 if self.transition2output_places_cardinality[transition][pos] > 1 {
-                    <dyn Dottable>::create_edge(&mut graph, &node, place_node, &format!("{}", self.transition2output_places_cardinality[transition][pos]));
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, &node, place_node, &format!("{}", self.transition2output_places_cardinality[transition][pos]));
                 } else {
-                    <dyn Dottable>::create_edge(&mut graph, &node, place_node, "");
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, &node, place_node, "");
                 }
             }
         }

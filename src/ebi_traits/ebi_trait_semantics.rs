@@ -46,7 +46,7 @@ pub trait Semantics : Debug + Send + Sync + AlignmentHeuristics<AliState = Self:
 
     /**
 	 * Update the state to reflect execution of the transition. This alters the state to avoid repeated memory allocations in simple walkthroughs.
-	 * Will return an error when the transition is not enabled, or when the marking cannot be represented (unbounded).
+	 * May return an error when the transition is not enabled, or when the marking cannot be represented (unbounded).
 	 * 
 	 * @param transition
 	 */

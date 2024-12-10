@@ -5,7 +5,6 @@ pub mod ebi_framework {
     pub mod ebi_object;
     pub mod ebi_command;
     pub mod ebi_trait;
-    pub mod dottable;
     pub mod displayable;
     pub mod infoable;
     pub mod importable;
@@ -41,6 +40,7 @@ pub mod ebi_objects {
     pub mod stochastic_labelled_petri_net_semantics;
     pub mod finite_stochastic_language;
     pub mod directly_follows_model;
+    pub mod directly_follows_model_semantics;
     pub mod petri_net_markup_language;
     pub mod language_of_alignments;
     pub mod deterministic_finite_automaton;
@@ -57,6 +57,7 @@ pub mod ebi_traits {
     pub mod ebi_trait_event_log;
     pub mod ebi_trait_stochastic_semantics;
     pub mod ebi_trait_semantics;
+    pub mod ebi_trait_graphable;
 }
 pub mod math {
     pub mod astar;

@@ -3,18 +3,33 @@ use anyhow::{anyhow, Result, Error,Context};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}, json};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}}, json};
 
 use super::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton;
 
+pub const FORMAT_SPECIFICATION: &str = "A deterministic finite automaton is a JSON structure with the top level being an object.
+    This object contains the following key-value pairs:
+    \\begin{itemize}
+    \\item \\texttt{initialState} being the index of the initial state.
+    \\item \\texttt{finalStates} being a list of indices of the final states.
+    A final state is not necessarily a deadlock state.
+    \\item \\texttt{transitions} being a list of transitions. 
+    Each transition is an object with \\texttt{from} being the source state index of the transition, \\texttt{to} being the target state index of the transition, and \texttt{{label}} being the activity of the transition. 
+    Silent transitions are not supported.
+    The file format supports deadlocks and livelocks.
+    \\end{itemize}
+    For instance:
+    \\lstinputlisting[language=json, style=boxed]{../testfiles/aa-ab-ba.dfa}";
 
 pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     name: "deterministic finite automaton",
     article: "a",
     file_extension: "dfa",
+    format_specification: FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<DeterministicFiniteAutomaton>,
     trait_importers: &[
         EbiTraitImporter::Semantics(DeterministicFiniteAutomaton::import_as_semantics),
+        EbiTraitImporter::Graphable(ebi_trait_graphable::import::<DeterministicFiniteAutomaton>),
     ],
     object_importers: &[
         EbiObjectImporter::DeterministicFiniteAutomaton(DeterministicFiniteAutomaton::import_as_object),
@@ -286,16 +301,16 @@ impl Display for DeterministicFiniteAutomaton {
     }
 }
 
-impl Dottable for DeterministicFiniteAutomaton {
+impl EbiTraitGraphable for DeterministicFiniteAutomaton {
     fn to_dot(&self) -> layout::topo::layout::VisualGraph {
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
         let mut places = vec![];
         for state in 0 ..= self.max_state {
             if self.can_terminate_in_state(state) {
-                places.push(<dyn Dottable>::create_transition(&mut graph, &state.to_string(), ""));
+                places.push(<dyn EbiTraitGraphable>::create_transition(&mut graph, &state.to_string(), ""));
             } else {
-                places.push(<dyn Dottable>::create_place(&mut graph, &state.to_string()));
+                places.push(<dyn EbiTraitGraphable>::create_place(&mut graph, &state.to_string()));
             }
         }
 
@@ -304,7 +319,7 @@ impl Dottable for DeterministicFiniteAutomaton {
             let target = places[self.targets[pos]];
             let activity = self.activity_key.get_activity_label(&self.activities[pos]);
             
-            <dyn Dottable>::create_edge(&mut graph, &source, &target, activity);
+            <dyn EbiTraitGraphable>::create_edge(&mut graph, &source, &target, activity);
         }
 
         return graph;

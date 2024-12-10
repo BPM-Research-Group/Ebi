@@ -2,7 +2,7 @@ use std::{fmt::{Debug, Display}, hash::Hash, sync::{Arc, Mutex}};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use anyhow::{anyhow, Context, Error, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, displayable::Displayable, ebi_command::EbiCommand}, ebi_objects::{language_of_alignments::{LanguageOfAlignments, Move}, deterministic_finite_automaton::DeterministicFiniteAutomaton, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, displayable::Displayable, ebi_command::EbiCommand}, ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, language_of_alignments::{LanguageOfAlignments, Move}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
 pub trait Align {
     fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<LanguageOfAlignments>;
@@ -379,6 +379,18 @@ impl AlignmentHeuristics for StochasticDeterministicFiniteAutomaton {
     }
 
     fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>,  _: &usize, _: &usize, _: &Vec<Vec<usize>>) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for DirectlyFollowsModel {
+    type AliState = usize;
+
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &Self::AliState, _: &Vec<Vec<usize>>) -> usize {
         0
     }
 }
