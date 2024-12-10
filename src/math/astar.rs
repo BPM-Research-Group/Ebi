@@ -5,11 +5,9 @@
 
 use fraction::Zero;
 use indexmap::map::Entry::{Occupied, Vacant};
-use core::num;
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
 use std::fmt::Debug;
-use std::fmt::Display;
 use std::hash::Hash;
 use std::hash::BuildHasherDefault;
 use std::ops::AddAssign;
@@ -296,7 +294,7 @@ where
             successors(node)
         };
 
-        for (successor, pre_transition, mut current_cost) in successors {
+        for (successor, _pre_transition, mut current_cost) in successors {
             current_cost += cost.clone();
             let new_cost = current_cost;
             let h; // heuristic(&successor)
@@ -440,7 +438,7 @@ where
     let mut parents: FxIndexMap<N, (usize, C)> = FxIndexMap::default();
     parents.insert(start.clone(), (usize::MAX, Zero::zero()));
     let mut count = 0;
-    while let Some(SmallestCostHolder4SLPN {state, estimated_loss, cost, index, mut heuristic4cost_is_valid, mut heuristic4probability_is_valid,
+    while let Some(SmallestCostHolder4SLPN {state, estimated_loss, cost, index, heuristic4cost_is_valid, heuristic4probability_is_valid,
         mut estimated_remaining_move_cost, mut estimated_remaining_probability, mut move_cost_vec, mut  probability_vec }) = to_see.pop() {
         count += 1;
         let successors = {
@@ -456,7 +454,6 @@ where
                 let cost_h = cost_heuristic(&state);
                 estimated_remaining_move_cost = cost_h.0;
                 move_cost_vec = cost_h.1;
-                heuristic4cost_is_valid = cost_h.2;
                 number_lp += 1;
                 
             }
@@ -465,7 +462,6 @@ where
                 let probability_h = probability_heuristic(&state);
                 estimated_remaining_probability = probability_h.0;
                 probability_vec = probability_h.1;
-                heuristic4probability_is_valid = probability_h.2;
                 number_lp += 1;
             }
             // We may have inserted a node several time into the binary heap if we found
@@ -486,14 +482,14 @@ where
                 Vacant(e) => {
                     h = heuristic_estimated(&e.key().clone(), pre_transition, estimated_remaining_move_cost, estimated_remaining_probability, move_cost_vec.clone(), probability_vec.clone());
 
-                    let aState = e.key().clone();
+                    let a_state = e.key().clone();
                     n = e.index().clone();
                     e.insert((index, new_cost.clone()));
                     let mut estimated_loss = new_cost.clone();
                     estimated_loss += h.0;
         
                     to_see.push(SmallestCostHolder4SLPN {
-                        state: aState,
+                        state: a_state,
                         estimated_loss: estimated_loss,
                         cost: new_cost,
                         index: n,
@@ -560,7 +556,6 @@ where
         cost: Zero::zero(),
         index: 0
     });
-    let mut number_lp:usize = 0;
     let mut parents: FxIndexMap<N, (usize, C)> = FxIndexMap::default();
     parents.insert(start.clone(), (usize::MAX, Zero::zero()));
     let mut count = 0;
@@ -572,7 +567,7 @@ where
             if success(node) {
                 let path = reverse_path(&parents, |&(p, _)| p, index);
 
-                println!("get total {} states and computes {} lp", count, number_lp);
+                println!("get total {} states", count);
                 println!("cost:{:?}", cost);
                 return Some((path, estimated_loss, count));
             }

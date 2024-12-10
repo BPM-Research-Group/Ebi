@@ -330,6 +330,8 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
         let result_probability_function = self.get_probability_function(trace);
         let probability_function = result_probability_function.0;
 
+        println!("cost function:{:?}", cost_function);
+        println!("probability function:{:?}", probability_function);
         let result1 = self.get_incidence_matrix(trace);
         let incidence_matrix = result1.0;
         let transition_prest = result1.1;
@@ -353,6 +355,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
             
             // if the solution vector for move cost can be reused
             if previous_estimated_move_cost_solution[transition_idx] >= 1.0{
+                println!("reuse mc");
                 move_cost = previous_estimated_move_cost - cost_function[transition_idx];
                 move_cost_solution_vector = previous_estimated_move_cost_solution.clone();
                 move_cost_solution_vector[transition_idx] -= 1.0;
@@ -362,6 +365,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
 
             // if the solution vector for the probability can be reused
             if previous_estimated_probability_gain_solution[transition_idx] >= 1.0{
+                println!("reuse pg");
                 probability_gain = previous_estimated_probability_gain - probability_function[transition_idx];
                 probability_gain_solution_vector = previous_estimated_probability_gain_solution.clone();
                 probability_gain_solution_vector[transition_idx] -= 1.0;
@@ -413,7 +417,7 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
                     Ok((probability_gain, probability_gain_solution_vector)) => {
                         heuristic4probability_is_valid = true;
                         (probability_gain, probability_gain_solution_vector)},
-                    Err(_) => {
+                    Err(_) => {println!("prob failed lp");
                     (0.0, vec![0.0; probability_function.len()])}
                 };
                 let probability_gain = result.0;

@@ -566,9 +566,10 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
         transition_preset: &Vec<Vec<usize>>
         ) -> Result<(f64,Vec<f64>)> {
          // create the problem variables (transition firing vector)
+
+        // println!("start estimate move cost");
         let num_transitions = incidence_matrix[0].len();
         let num_places = incidence_matrix.len();
-
         variables!{problem:}
         let solution_vec: Vec<Variable> = problem.add_vector(variable().min(0).integer(), num_transitions);
 
@@ -608,12 +609,12 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
             for (place_idx, each_place) in deadlock_marking_vec.iter().enumerate(){
                 if each_transition_preset.contains(&place_idx){
                     // use big-M method to formulate a conditional constraint
-                    let mut first_right_side_expr: Expression = decision_var_vec[transition_idx*num_places + place_idx] * 100000;
+                    let mut first_right_side_expr: Expression = decision_var_vec[transition_idx*num_places + place_idx] * 1000;
                     first_right_side_expr += each_place;
                     model.add_constraint(Expression::from(1).leq(first_right_side_expr));
-                    let mut second_right_side_expr: Expression = -100000 * (1 - decision_var_vec[transition_idx*num_places+place_idx]);
+                    let mut second_right_side_expr: Expression = -1000 * (1 - decision_var_vec[transition_idx*num_places+place_idx]);
                     second_right_side_expr += each_place;
-                    second_right_side_expr += 0.0001; 
+                    second_right_side_expr += 0.01; 
                     model.add_constraint(Expression::from(1).geq(second_right_side_expr));
                     num_place_without_enough_token += decision_var_vec[transition_idx*num_places+place_idx];
                 }
@@ -633,6 +634,8 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
         for i in 0..num_transitions {
             solution_vector.push(solution.value(solution_vec[i]) as f64);
         }
+
+        // println!("move cost solution is:{} and solution vector:{:?}\n",solution.model().obj_value(), solution_vector);
         Ok((solution.model().obj_value(), solution_vector))
         // let mut decision_var_vector:Vec<f64> = Vec::new();
         // for i in 0..num_places*num_transitions {
@@ -674,6 +677,9 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
         incidence_matrix: &Vec<Vec<f64>>,
         transition_preset: &Vec<Vec<usize>>
         ) -> Result<(f64, Vec<f64>)> {
+
+            // println!("start estimate probability gain");
+
             // create the problem variables (transition firing vector)
             let num_transitions = incidence_matrix[0].len();
             let num_places = incidence_matrix.len();
@@ -717,12 +723,12 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
                 for (place_idx, each_place) in deadlock_marking_vec.iter().enumerate(){
                     if each_transition_preset.contains(&place_idx){
                         // use big-M method to formulate a conditional constraint
-                        let mut first_right_side_expr: Expression = decision_var_vec[transition_idx*num_places + place_idx] * 1000;
+                        let mut first_right_side_expr: Expression = decision_var_vec[transition_idx*num_places + place_idx] * 100;
                         first_right_side_expr += each_place;
                         model.add_constraint(Expression::from(1).leq(first_right_side_expr));
-                        let mut second_right_side_expr: Expression = -1000 * (1 - decision_var_vec[transition_idx*num_places+place_idx]);
+                        let mut second_right_side_expr: Expression = -100 * (1 - decision_var_vec[transition_idx*num_places+place_idx]);
                         second_right_side_expr += each_place;
-                        second_right_side_expr += 0.00001; 
+                        second_right_side_expr += 0.01; 
                         model.add_constraint(Expression::from(1).geq(second_right_side_expr));
                         num_place_without_enough_token += decision_var_vec[transition_idx*num_places+place_idx];
                     }
@@ -741,6 +747,8 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
             for i in 0..num_transitions {
                 solution_vector.push(solution.value(solution_vec[i]) as f64);
             }
+            // println!("prob solution is:{} and solution vector:{:?}\n",solution.model().obj_value(), solution_vector);
+
             Ok((solution.model().obj_value(), solution_vector))
 
     }
