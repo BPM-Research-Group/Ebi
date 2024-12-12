@@ -12,6 +12,9 @@ use std::hash::BuildHasherDefault;
 use std::ops::AddAssign;
 use indexmap::IndexMap;
 use rustc_hash::FxHasher;
+use std::fmt::Debug;
+
+use crate::ebi_traits::ebi_trait_stochastic_semantics::TransitionIndex;
 
 type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 
@@ -205,5 +208,160 @@ impl<K: Ord> Ord for SmallestCostHolder<K> {
             Ordering::Equal => self.cost.cmp(&other.cost),
             s => s,
         }
+    }
+}
+
+#[allow(clippy::missing_panics_doc)]
+#[allow(clippy::missing_panics_doc)]
+pub fn astar_with_reuse<N, FN, IN, FH, FS, FR>(
+    start: &N,
+    mut successors: FN,
+    mut heuristic_reuse: FR,
+    mut heuristic: FH,
+    mut success: FS,
+) -> Option<(Vec<N>, f64)>
+where
+    N: Eq + Hash + Clone + Debug,
+    FN: FnMut(&N) -> IN,
+    IN: IntoIterator<Item = (N, (usize,TransitionIndex), f64)>,
+    FR: FnMut((usize, TransitionIndex), f64, Vec<f64>) -> (f64, Vec<f64>, bool),
+    FH: FnMut(&N) -> (f64, Vec<f64>),
+    FS: FnMut(&N) -> bool,
+{
+    let mut to_see = BinaryHeap::new();
+    to_see.push(SmallestCostHolder4LPN {
+        state: start.clone(),
+        index: 0,
+        cost_f: 0.0,
+        cost_g: 0.0,
+        cost_h: 0.0,
+        cost_vec: Vec::new(),
+        h_is_valid: false,
+    });
+    let mut parents: FxIndexMap<N, (usize, f64)> = FxIndexMap::default();
+    parents.insert(start.clone(), (usize::MAX, 0.0));
+
+    let mut lp_num = 0;
+    let mut reuse_num = 0;
+    let mut state_num =0;
+    while let Some(SmallestCostHolder4LPN {state, index, cost_f, cost_g, mut cost_h, mut cost_vec, h_is_valid}) = to_see.pop() {
+        state_num += 1;
+        println!("new state, cost f is:{}, cost_g is: {} and cost_h is: {}, and h is valid:{}", cost_f, cost_g, cost_h, h_is_valid);
+        let successors = {
+            let (node, &(_, c)) = parents.get_index(index).unwrap(); // Cannot fail
+            println!("cost g is:{}", c);
+            if success(node) {
+                println!("cost is:{} and lp number is: {} and reuse number is: {} and state number is:{}", c, lp_num, reuse_num, state_num);
+                let path = reverse_path(&parents, |&(p, _)| p, index);
+                return Some((path, cost_f));
+            }
+            // We may have inserted a node several time into the binary heap if we found
+            // a better way to access it. Ensure that we are currently dealing with the
+            // best path and discard the others.
+            if cost_g > c {
+                continue;
+            }
+
+            if !h_is_valid{
+                //recompute heuristic for cost
+                let cost_heuristic = heuristic(&state);
+                cost_h = cost_heuristic.0;
+                cost_vec = cost_heuristic.1;    
+                lp_num += 1;          
+            }
+            successors(node)
+        };
+
+        for (successor, pre_transition, mut move_cost) in successors {
+            move_cost += cost_g;
+            println!("move cost is:{}", move_cost);
+
+            let h: (f64, Vec<f64>, bool); // heuristic(&successor)
+            let n; // index for successor
+            match parents.entry(successor.clone()) {
+                Vacant(e) => {
+                    h = heuristic_reuse(
+                        pre_transition, 
+                        cost_h, 
+                        cost_vec.clone());
+
+                    if h.2 {
+                        reuse_num += 1;
+                    }
+                    n = e.index().clone();
+                    e.insert((index, move_cost));
+                }
+                Occupied(mut e) => {
+                    if e.get().1 > move_cost {
+                        h = heuristic_reuse(
+                            pre_transition, 
+                            cost_h, 
+                            cost_vec.clone());
+                        if h.2 {
+                            reuse_num += 1;
+                        }
+                        n = e.index().clone();
+                        e.insert((index, move_cost));
+                    } else {
+                        continue;
+                    }
+                }
+            }
+            println!("cost h is:{}\n", h.0);
+            to_see.push(SmallestCostHolder4LPN {
+                state: successor,
+                index: n,
+                cost_f: move_cost + h.0,
+                cost_g: move_cost,
+                cost_h: h.0,
+                cost_vec: h.1,
+                h_is_valid: h.2,
+            });
+        }
+    }
+    None
+}
+
+struct SmallestCostHolder4LPN<FS> {
+    state: FS,
+    index: usize,
+    cost_f: f64,
+    cost_g: f64,
+    cost_h: f64,
+    cost_vec: Vec<f64>,
+    h_is_valid: bool,
+}
+
+// Implement PartialOrd for floating point comparison
+impl<FS: Eq + Hash + Clone + Debug> PartialOrd for SmallestCostHolder4LPN<FS> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        // First compare cost_f (smaller cost_f means bigger)
+        match self.cost_f.partial_cmp(&other.cost_f) {
+            Some(Ordering::Equal) => {
+                // If cost_f is equal, compare cost_g (larger cost_g means bigger)
+                other.cost_g.partial_cmp(&self.cost_g)
+            }
+            Some(ordering) => {
+                // Reverse the ordering for cost_f since smaller means bigger
+                Some(ordering.reverse())
+            }
+            None => None
+        }
+    }
+}
+
+impl<FS: Eq + Hash + Clone + Debug> PartialEq for SmallestCostHolder4LPN<FS> {
+    fn eq(&self, other: &Self) -> bool {
+        self.cost_f.eq(&other.cost_f) && self.cost_g.eq(&other.cost_g) && self.h_is_valid.eq(&other.h_is_valid)
+    }
+}
+
+impl<FS: Eq + Hash + Clone + Debug> Eq for SmallestCostHolder4LPN<FS> {}
+
+impl<FS: Eq + Hash + Clone + Debug> Ord for SmallestCostHolder4LPN<FS> {
+    fn cmp(&self, other: &Self) -> Ordering {
+        // Convert partial_cmp to cmp by handling NaN cases
+        self.partial_cmp(other)
+            .unwrap_or(Ordering::Less)  // You might want different NaN handling
     }
 }
