@@ -17,10 +17,10 @@ buildlatex:
     - cargo run itself manual -o functions.tex
     - cargo run itself graph -o graph.svg
     - rsvg-convert -f pdf -o graph.pdf graph.svg
-    - lualatex manual.tex
+    - lualatex -shell-escape manual.tex
     - bibtex manual
-    - lualatex manual.tex
-    - lualatex manual.tex
+    - lualatex -shell-escape manual.tex
+    - lualatex -shell-escape manual.tex
     - cd ..
     - mv manual/manual.pdf build/nightly/manual.pdf
     - git add build/nightly/manual.pdf
