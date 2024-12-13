@@ -1,6 +1,7 @@
 use std::{io::Write, collections::HashMap};
 use clap::Command;
 use anyhow::Result;
+use inflector::Inflector;
 use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
@@ -231,7 +232,20 @@ fn manual() -> Result<EbiOutput> {
     //trait list
     writeln!(f, "\\def\\ebitraitlist{{\\begin{{itemize}}")?;
     for etrait in EbiTrait::iter() {
-        writeln!(f, "\\item {}", etrait)?;
+        writeln!(f, "\\item {}.", etrait.to_string().to_sentence_case())?;
+
+        writeln!(f, "\\\\File types that can be imported as {} {}: {}.", 
+            etrait.get_article(), 
+            etrait, 
+            or_none(
+                    &etrait.get_file_handlers().iter().map(|file_handler| 
+                        format!("\\\\\\null\\qquad\\hyperref[filehandler:{}]{{{}}} (.{} -- Section~\\ref{{filehandler:{}}})", file_handler.name, file_handler.name, file_handler.file_extension, file_handler.name)
+                    ).collect::<Vec<_>>().join(", "))
+            )?;
+
+        writeln!(f, "\\\\Commands that accept {} {} as input: {}", etrait.get_article(), etrait, or_none(&etrait.get_applicable_commands().iter().map(
+            |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (Section~\\ref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
+            .collect::<Vec<_>>().join("")))?;
     }
     writeln!(f, "\\end{{itemize}}}}")?;
 

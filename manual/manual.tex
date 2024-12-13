@@ -1,6 +1,6 @@
 \documentclass{article}
 \usepackage{amsmath,amsfonts,booktabs,stmaryrd,tabularx,multirow,xfrac,nicematrix,listings,listings-rust}
-\usepackage{ltablex}
+\usepackage{ltablex,comment}
 \usepackage{tikz}
 \usetikzlibrary{decorations.pathmorphing,calc,positioning}
 \usepackage{imakeidx}
@@ -147,7 +147,7 @@ Sander J.J. Leemans, Tian Li}
         	\includegraphics[width=0.5\linewidth]{graph}
         \restoregeometry
     
-        \subsubsection{Command}
+        \subsubsection{Commands}
             A command is a function of Ebi that users can call.
             A command declares what types of inputs it needs and what type of output it generates. 
             Preferably, commands take traits as inputs rather than object types.
@@ -164,7 +164,7 @@ Sander J.J. Leemans, Tian Li}
             Ebi has the following commands:
             \ebicommandlist
     
-        \subsubsection{Input type}
+        \subsubsection{Input types}
             An input type is a declaration of what a command needs as input.
             An input type can be:
             \begin{itemize}
@@ -177,7 +177,7 @@ Sander J.J. Leemans, Tian Li}
     
             The actual input for a command gets wrapped in the \texttt{EbiInput} enum.
     
-        \subsubsection{Trait}
+        \subsubsection{Traits}
         \label{sec:traits}
             A ``trait" is like an interface: it provides some functions but does not say how these are implemented.
             For instance ``finite stochastic language" is a trait, which allows to iterate over traces and their probabilities, and to obtain the number of traces.
@@ -186,7 +186,7 @@ Sander J.J. Leemans, Tian Li}
             Ebi has the following traits:
             \ebitraitlist
     
-        \subsubsection{Object type}
+        \subsubsection{Object types}
         \label{sec:objecttypes}
             An object type is a struct or class.
             It is a specific implementation with a fixed data structure.
@@ -197,7 +197,7 @@ Sander J.J. Leemans, Tian Li}
             Ebi has the following object types:
             \ebiobjecttypelist
     
-        \subsubsection{File handler}
+        \subsubsection{File handlers}
             A file handler is an importer for a particular file format.
             In Ebi, a file handler defines how a file type is to be handled, and as which objects and traits it can be imported, and which objects can be exported to it.
     
