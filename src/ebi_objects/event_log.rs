@@ -33,6 +33,8 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     ],
     object_importers: &[
         EbiObjectImporter::EventLog(EventLog::import_as_object),
+        EbiObjectImporter::FiniteStochasticLanguage(EventLog::import_as_finite_stochastic_language),
+        EbiObjectImporter::StochasticDeterministicFiniteAutomaton(EventLog::import_as_stochastic_deterministic_finite_automaton),
     ],
     object_exporters: &[ 
         EbiObjectExporter::EventLog(EventLog::export_from_object)
@@ -100,6 +102,16 @@ impl EventLog {
     pub fn read_as_event_log(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLog>> {
         let event_log = EventLog::import(reader)?;
         Ok(Box::new(event_log))
+    }
+
+    pub fn import_as_finite_stochastic_language(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let log = Self::import(reader)?;
+        Ok(EbiObject::FiniteStochasticLanguage(log.get_finite_stochastic_language()))
+    }
+
+    pub fn import_as_stochastic_deterministic_finite_automaton(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let log = Self::import(reader)?;
+        Ok(EbiObject::StochasticDeterministicFiniteAutomaton(log.to_stochastic_deterministic_finite_automaton()))
     }
 
     pub fn get_finite_language(&self) -> FiniteLanguage {

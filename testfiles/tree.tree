@@ -1,0 +1,9 @@
+process tree
+sequence
+# number of children
+2
+	xor 
+	2
+		activity a
+        activity b
+        activity c
