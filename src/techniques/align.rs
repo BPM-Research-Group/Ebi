@@ -253,7 +253,6 @@ pub fn align_astar<T, State>(semantics: &T, trace: &Vec<Activity>) -> Option<(Ve
         };
         let move_cost = result.0;
         let move_cost_solution_vector = result.1;
-        println!("heuristic computation:{}", move_cost);
         (move_cost, move_cost_solution_vector)    
         // (0.0, vec![0.0; cost_function.len()])
         // semantics.underestimate_cost_to_final_synchronous_state(trace, trace_index, state, &cache)

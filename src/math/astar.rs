@@ -246,10 +246,8 @@ where
     let mut state_num =0;
     while let Some(SmallestCostHolder4LPN {state, index, cost_f, cost_g, mut cost_h, mut cost_vec, h_is_valid}) = to_see.pop() {
         state_num += 1;
-        println!("new state, cost f is:{}, cost_g is: {} and cost_h is: {}, and h is valid:{}", cost_f, cost_g, cost_h, h_is_valid);
         let successors = {
             let (node, &(_, c)) = parents.get_index(index).unwrap(); // Cannot fail
-            println!("cost g is:{}", c);
             if success(node) {
                 println!("cost is:{} and lp number is: {} and reuse number is: {} and state number is:{}", c, lp_num, reuse_num, state_num);
                 let path = reverse_path(&parents, |&(p, _)| p, index);
@@ -274,8 +272,6 @@ where
 
         for (successor, pre_transition, mut move_cost) in successors {
             move_cost += cost_g;
-            println!("move cost is:{}", move_cost);
-
             let h: (f64, Vec<f64>, bool); // heuristic(&successor)
             let n; // index for successor
             match parents.entry(successor.clone()) {
@@ -307,7 +303,6 @@ where
                     }
                 }
             }
-            println!("cost h is:{}\n", h.0);
             to_see.push(SmallestCostHolder4LPN {
                 state: successor,
                 index: n,
