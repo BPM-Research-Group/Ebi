@@ -11,11 +11,27 @@ use super::labelled_petri_net::LabelledPetriNet;
 
 pub const HEADER: &str = "process tree";
 
+pub const FORMAT_SPECIFICATION: &str = "A process tree is a line-based structure. Lines starting with a \\# are ignored.
+    This first line is exactly `process tree'.
+    The subsequent lines contain the nodes:
+    Each node is either:
+    \\begin{itemize}
+        \\item A line with the word `activity' followed on the same line by a space and the label of the activity leaf;
+        \\item The word `tau';
+        \\item The name of an operator (`sequence', `xor', `concurrent', `loop', `interleaved', or `or') on its own line.
+        The line thereafter contains the number of children of the node, after which the nodes are given.
+        An operator node must have at least one child.
+    \\end{itemize}
+    Indentation of nodes is allowed, but not mandatory.
+    
+    For instance:
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/all_operators.tree}";
+
 pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     name: "process tree",
     article: "a",
     file_extension: "tree",
-    format_specification: "",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<ProcessTree>,
     trait_importers: &[
         EbiTraitImporter::Semantics(ProcessTree::import_as_semantics),
