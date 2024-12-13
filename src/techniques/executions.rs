@@ -15,6 +15,7 @@ impl FindExecutions for EbiTraitSemantics {
 		match self {
 			EbiTraitSemantics::Usize(sem) => sem.find_executions(log),
 			EbiTraitSemantics::Marking(sem) => sem.find_executions(log),
+            EbiTraitSemantics::NodeStates(sem) => sem.find_executions(log),
 		}
 	}
 }

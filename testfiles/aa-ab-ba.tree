@@ -1,0 +1,14 @@
+process tree
+xor
+2
+	sequence
+	2
+		activity b
+		activity a
+	sequence
+	2
+		activity a
+		xor
+		2
+			activity a
+			activity b

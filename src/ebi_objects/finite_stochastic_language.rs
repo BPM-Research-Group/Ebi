@@ -1,7 +1,7 @@
 use std::{collections::{hash_map::Entry, HashMap}, fmt, io::{self, BufRead, Write}, str::FromStr};
 use anyhow::{anyhow, Context, Error, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::{self, EbiTraitFiniteStochasticLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::{self, EbiTraitIterableStochasticLanguage}, ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}}, follower_semantics::FollowerSemantics, line_reader::LineReader, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::{self, EbiTraitFiniteStochasticLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::{self, EbiTraitIterableStochasticLanguage}, ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}}, follower_semantics::FollowerSemantics, line_reader::LineReader, math::fraction::Fraction};
 
 use super::{finite_language::FiniteLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
 
@@ -36,6 +36,7 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     ],
     object_importers: &[
         EbiObjectImporter::FiniteStochasticLanguage(FiniteStochasticLanguage::import_as_object),
+        EbiObjectImporter::StochasticDeterministicFiniteAutomaton(FiniteStochasticLanguage::import_as_stochastic_deterministic_finite_automaton),
     ],
     object_exporters: &[
         EbiObjectExporter::FiniteStochasticLanguage(FiniteStochasticLanguage::export_from_object),
@@ -145,6 +146,20 @@ impl FiniteStochasticLanguage {
         match object {
             EbiOutput::Object(EbiObject::EventLog(log)) => log.get_finite_stochastic_language().export(f),
             _ => unreachable!()
+        }
+    }
+
+    pub fn import_as_stochastic_deterministic_finite_automaton(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let slang = Self::import(reader)?;
+        Ok(EbiObject::StochasticDeterministicFiniteAutomaton(slang.get_stochastic_deterministic_finite_automaton()))
+    }
+}
+
+impl FromEbiTraitObject for FiniteStochasticLanguage {
+    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::FiniteStochasticLanguage(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!("cannot read {} {} as a finite language", object.get_type().get_article(), object.get_type()))
         }
     }
 }

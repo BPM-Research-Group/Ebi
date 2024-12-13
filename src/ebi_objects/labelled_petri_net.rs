@@ -208,7 +208,7 @@ impl FromEbiTraitObject for LabelledPetriNet {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
             EbiInput::Object(EbiObject::LabelledPetriNet(e), _) => Ok(Box::new(e)),
-            _ => Err(anyhow!("cannot read {} {} as a finite language", object.get_type().get_article(), object.get_type()))
+            _ => Err(anyhow!("cannot read {} {} as a labelled Petri net", object.get_type().get_article(), object.get_type()))
         }
     }
 }

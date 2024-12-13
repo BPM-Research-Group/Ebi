@@ -38,6 +38,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
                 EbiInput::Object(EbiObject::LanguageOfAlignments(a), _) => a.to_string(),
                 EbiInput::Object(EbiObject::StochasticLanguageOfAlignments(a), _) => a.to_string(),
                 EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(s), _) => s.to_string(),
+                EbiInput::Object(EbiObject::ProcessTree(pt), _) => pt.to_string(),
                 EbiInput::Object(EbiObject::Executions(s), _) => s.to_string(),
                 EbiInput::FileHandler(_) => unreachable!(),
                 EbiInput::Trait(_, _) => unreachable!(),
