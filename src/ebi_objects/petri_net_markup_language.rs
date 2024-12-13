@@ -5,7 +5,7 @@ use bitvec::bitvec;
 use fraction::ToPrimitive;
 use process_mining::{petri_net::petri_net_struct::{self, ArcType}, PetriNet};
 
-use crate::{ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_input::{EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable}, ebi_objects::labelled_petri_net::LPNMarking, ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics}, marking::Marking};
+use crate::{ebi_framework::{activity_key::HasActivityKey, ebi_file_handler::EbiFileHandler, ebi_input::{EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable}, ebi_objects::labelled_petri_net::LPNMarking, ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics}, marking::Marking};
 
 use super::{labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
 
