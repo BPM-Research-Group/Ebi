@@ -227,7 +227,7 @@ If there are more than one such trace, an arbitrary one is returned."),
 pub const EBI_ANALYSE_VARIETY: EbiCommand = EbiCommand::Command {
     name_short: "var", 
     name_long: Some("variety"), 
-    explanation_short: "Compute the variety of a stochastic language.", 
+    explanation_short: "Compute the variety of a stochastic language. That is, the average distance between two arbitrary traces in the language.", 
     explanation_long: None,
     cli_command: None, 
     latex_link: None,
