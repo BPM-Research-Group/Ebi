@@ -13,6 +13,7 @@
 
 \usepackage{todonotes}
 \setuptodonotes{inline}
+\usepackage[british]{babel}
 
 \definecolor{eclipseStrings}{RGB}{42,0.0,255}
 \definecolor{eclipseKeywords}{RGB}{127,0,85}
@@ -80,18 +81,57 @@ Sander J.J. Leemans, Tian Li}
 
 \tableofcontents
 
+\clearpage
+\section{Ebi: introduction}
+	Ebi is a process mining tool and library, focused on stochastic process mining algorithms.
+	Ebi is a stand-alone command-line application; Ebi works completely offline and installation is not necessary.
+		
+	A command is an algorithm in Ebi that a user can call.
+	Ebi has \numberofcommands{} commands; for an overview of commands please refer to Section~\ref{sec:commands} or give the command-line parameter \verb=--help=.
+	\numberoffilehandlers{} different types of files are supported; Section~\ref{sec:filehandlers} contains an overview of the files that Ebi supports.
+	
+	The architecture of Ebi and how to develop new commands can be found in Section~\ref{sec:architecture}.
+	
+	\subsection{Installation}
+		Installation is not necessary.
+		
+		On Windows, simply download the executable from \url{http://ebitools.org} and run it from a console.
+		
+		On Linux, simply download the executable from \url{http://ebitools.org}, give it execution permissions, and run it from a console.
+		
+		On Mac OS X, self-compilation is required. 
+		Please refer to \url{http://ebitools.org} and click through to the source code for a getting-started of 5 easy steps.
+	
+	\subsection{Speed tricks}
+		\begin{itemize}
+			\item If Ebi uses all CPU cores and runs out of RAM, one can try to reduce the CPU cores that Ebi will use by setting the environment variable \verb!RAYON_NUM_THREADS=1! or some other desired number of cores.
+			This will trade run time for RAM in multi-threaded algorithms.
+			\item By default, Ebi uses exact arithmetic for most commands.
+			To disable this, provide the \verb=-a= parameter.
+			The results are then not guaranteed, but it may be faster.
+		\end{itemize}
+
 \section{Commands}
+\label{sec:commands}
+
+	This section lists the commands supported by Ebi.
 
     \ebicommands
 
+\clearpage
 \section{Supported files}
+\label{sec:filehandlers}
+	This section lists the file types that are supported by Ebi, and for each file type which commands can use it as input or produce it as output.
+	
     Please note that Ebi does not consider input file extensions.
     Instead, it will attempt to parse the input file in all of the formats that are supported by the called command.
     For plug-ins with multiple output file formats, the file extension is used to determine the output format.
     
     \ebifilehandlers
 
+\clearpage
 \section{Architecture}
+\label{sec:architecture}
 
     \subsection{Files and objects}
         Figure~\ref{fig:traits} shows the main architectural concepts of Ebi with regards to files and objects.
@@ -504,26 +544,6 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
             \end{align*}
 
             There is an option to perform the 1- operation on a RootLogDiv.
-        
-    \section{Entropic Relevance}
-    \label{sec:er}
-        Entropic relevance is computed as follows:
-        
-        \begin{definition}[Entropic Relevance~\cite{DBLP:journals/is/AlkhammashPMG22}]
-            \label{def:ER}
-                Let $L$ be a finite stochastic language and let $M$ be a queriable stochastic langauge.
-                Let $\Lambda$ be the set of all activities appearing in the traces of $L$.
-                Then, the \emph{entropic relevance ($\entrel$) of $M$ to $L$} is defined as follows: 
-                \begin{align*}
-                    \entrel(L, M) ={}& H_0\left(\sum_{\sigma \in \bar{L},\, M(\sigma)>0}{L(\sigma)}\right) + 
-                    \sum_{\sigma \in \bar{L}}L(\sigma) J(\sigma, M)\\
-                    J(\sigma, M) ={}& \begin{cases}
-                    -\log_2 M(\sigma) & M(\sigma) > 0\\
-                    (1+|\sigma|) \log_2 (1 + |\Lambda|)) & \text{otherwise}
-                    \end{cases}\\
-                    H_0(x) ={}& -x \log_2{x} - (1-x) \log_2{(1-x)} \text{ with } H_0(0) = H_0(1) = 0 &\\
-                \end{align*}       
-            \end{definition}
             
     \bibliographystyle{plain}
     \bibliography{bibliography}

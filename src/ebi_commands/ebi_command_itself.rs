@@ -103,6 +103,11 @@ fn manual() -> Result<EbiOutput> {
     //version
     writeln!(f, "\\def\\version{{{}}}", env!("CARGO_PKG_VERSION"))?;
 
+    //statistics
+    writeln!(f, "\\def\\numberofcommands{{{}}}", EBI_COMMANDS.get_command_paths().len())?;
+    writeln!(f, "\\def\\numberoftraits{{{}}}", EbiTrait::iter().len())?;
+    writeln!(f, "\\def\\numberoffilehandlers{{{}}}", EBI_FILE_HANDLERS.len())?;
+
     //command list
     writeln!(f, "\\def\\ebicommandlist{{\\begin{{itemize}}")?;
     for path in EBI_COMMANDS.get_command_paths() {
@@ -207,8 +212,11 @@ fn manual() -> Result<EbiOutput> {
 
     //file handlers
     writeln!(f, "\\long\\def\\ebifilehandlers{{")?;
-    for file_handler in EBI_FILE_HANDLERS {
-        writeln!(f, "\\subsection{{{} (.{})}}", file_handler.name, file_handler.file_extension)?;
+    for (i, file_handler) in EBI_FILE_HANDLERS.iter().enumerate() {
+        if i != 0 {
+            writeln!(f, "\\clearpage")?;
+        }
+        writeln!(f, "\\subsection{{{} (.{})}}", file_handler.name.to_sentence_case(), file_handler.file_extension)?;
         writeln!(f, "\\label{{filehandler:{}}}", file_handler.name)?;
         writeln!(f, "Import as objects: {}.", or_none(&file_handler.object_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
         writeln!(f, "\\\\Import as traits: {}.", or_none(&file_handler.trait_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
