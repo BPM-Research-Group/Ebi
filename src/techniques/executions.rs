@@ -19,7 +19,7 @@ impl FindExecutions for EbiTraitSemantics {
 	}
 }
 
-impl <T, State> FindExecutions for T where T: Semantics<SemState = State, AliState = State> + Send + Sync + ?Sized, State: Displayable {
+impl <T, State> FindExecutions for T where T: Semantics<SemState = State> + Send + Sync + ?Sized, State: Displayable {
     fn find_executions(&self, log: Box<dyn EbiTraitEventLog>) -> Result<Executions> {
 
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));

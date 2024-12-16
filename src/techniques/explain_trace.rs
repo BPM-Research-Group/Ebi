@@ -1,7 +1,9 @@
 use std::ops::{Add, AddAssign};
 use anyhow::{anyhow, Result};
 use fraction::Zero;
-use crate::{ebi_framework::{activity_key::Activity, displayable::Displayable}, ebi_objects::language_of_alignments::LanguageOfAlignments, ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}, math::{astar,fraction::Fraction}, techniques::align::transform_alignment};
+use crate::{ebi_framework::{activity_key::Activity, displayable::Displayable}, ebi_objects::language_of_alignments::LanguageOfAlignments, ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}, math::{astar,fraction::Fraction}};
+
+use super::align::transform_alignment;
 
 #[derive (Clone, Debug)]
 pub struct StochasticWeightedCost{
@@ -81,7 +83,7 @@ impl ExplainTrace for EbiTraitStochasticSemantics {
     }
 }
 
-impl <State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState = State, AliState = State> {
+impl <State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState = State> {
 
     pub fn explain_trace(&self, trace: &Vec<Activity>, _balance: &Fraction) -> Result<LanguageOfAlignments> {
 

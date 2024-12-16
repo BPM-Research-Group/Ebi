@@ -249,7 +249,6 @@ where
         let successors = {
             let (node, &(_, c)) = parents.get_index(index).unwrap(); // Cannot fail
             if success(node) {
-                println!("cost is:{} and lp number is: {} and reuse number is: {} and state number is:{}", c, lp_num, reuse_num, state_num);
                 let path = reverse_path(&parents, |&(p, _)| p, index);
                 return Some((path, cost_f));
             }

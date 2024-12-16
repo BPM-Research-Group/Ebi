@@ -1,12 +1,12 @@
 use std::{fmt::Debug, io::BufRead};
 use anyhow::{anyhow, Result};
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, displayable::Displayable, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, ebi_objects::labelled_petri_net::LPNMarking, techniques::align::AlignmentHeuristics};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, displayable::Displayable, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, ebi_objects::labelled_petri_net::LPNMarking, techniques::align::{Align}};
 
 use super::ebi_trait_stochastic_semantics::TransitionIndex;
 
 pub enum EbiTraitSemantics {
-	Usize(Box<dyn Semantics<SemState = usize, AliState = usize>>),
-	Marking(Box<dyn Semantics<SemState = LPNMarking, AliState = LPNMarking>>)
+	Usize(Box<dyn Semantics<SemState = usize>>),
+	Marking(Box<dyn Semantics<SemState = LPNMarking>>)
 }
 
 impl FromEbiTraitObject for EbiTraitSemantics {
@@ -35,7 +35,7 @@ impl EbiTraitSemantics {
 
 }
 
-pub trait Semantics : Debug + Send + Sync + AlignmentHeuristics<AliState = Self::SemState> + HasActivityKey {
+pub trait Semantics : Debug + Send + Sync + Align + HasActivityKey {
 	type SemState: Displayable;
 
     /**
