@@ -1,7 +1,8 @@
-use std::{collections::BTreeSet, fmt::{Debug, Display}, hash::Hash, path::PathBuf};
+use std::{collections::BTreeSet, fmt::{Debug, Display}, hash::Hash, io::Write, path::PathBuf, time::Duration};
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use anyhow::{anyhow, Context, Result};
 use indicatif::{ProgressBar, ProgressStyle};
+use logging_timer::timer;
 
 use crate::{ebi_commands::{ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association, ebi_command_conformance, ebi_command_convert, ebi_command_discover, ebi_command_info, ebi_command_itself, ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate, ebi_command_visualise}, ebi_framework::ebi_output, math::fraction::{Fraction, FractionNotParsedYet}};
 
@@ -34,14 +35,14 @@ pub const ARG_SHORT_APPROX: char = 'a';
 pub const ARG_ID_OUTPUT: &str = "output";
 
 pub enum EbiCommand {
-    Group{
+    Group {
         name_short: &'static str,
         name_long: Option<&'static str>,
         explanation_short: &'static str,
         explanation_long: Option<&'static str>,
         children: &'static [&'static EbiCommand]
     },
-    Command{
+    Command {
         name_short: &'static str,
         name_long: Option<&'static str>,
         explanation_short: &'static str,
@@ -174,13 +175,23 @@ impl EbiCommand {
         }
     }
 
-    pub fn get_progress_bar(total_ticks: usize) -> ProgressBar {
+    pub fn get_progress_bar_ticks(total_ticks: usize) -> ProgressBar {
         let pb = ProgressBar::new(total_ticks.try_into().unwrap());
-        pb.set_style(ProgressStyle::with_template("[{wide_bar:.cyan/blue}] {pos:>7}/{len:7}")
+        pb.set_style(ProgressStyle::with_template(&("[{wide_bar:.cyan/blue}] {pos:>7}/{len:7}".to_owned()))
             .unwrap()
             .progress_chars("#>-"));
         pb.set_position(0);
-        return pb
+        pb
+    }
+
+    pub fn get_progress_bar_message(message: String) -> ProgressBar {
+        let pb = ProgressBar::new_spinner();
+        pb.set_style(ProgressStyle::with_template(&("{spinner} {wide_msg}"))
+            .unwrap());
+        pb.enable_steady_tick(Duration::from_millis(100));
+        pb.set_message(message);
+        pb.tick();
+        pb
     }
 
     pub fn execute(&self, cli_matches: &ArgMatches) -> Result<()> {
@@ -211,8 +222,11 @@ impl EbiCommand {
                 }
 
                 log::info!("Starting {}", self.long_name());
+                let result = {
+                    let _tmr = timer!(self.long_name());
 
-                let result = (execute)(inputs, Some(cli_matches))?;
+                    (execute)(inputs, Some(cli_matches))?
+                };
 
                 if &&result.get_type() != output_type {
                     return Err(anyhow!("Output type {} does not match the declared output of {}.", result.get_type(), output_type))
@@ -227,7 +241,13 @@ impl EbiCommand {
                     //write result to STDOUT
                     let exporter = Self::select_exporter(output_type, None);
                     log::info!("Writing result as {} {}", exporter.get_article(), exporter);
-                    println!("{}", ebi_output::export_to_string(result, exporter)?);
+                    if exporter.is_binary() {
+                        let mut out = std::io::stdout();
+                        out.write_all(&ebi_output::export_to_bytes(result, exporter)?)?;
+                        out.flush()?;
+                    } else {
+                        println!("{}", ebi_output::export_to_string(result, exporter)?);
+                    }
                 }
 
                 return Ok(());
@@ -238,39 +258,33 @@ impl EbiCommand {
 
     pub fn select_exporter(output_type: &EbiOutputType, to_file: Option<&PathBuf>) -> EbiExporter {
         let exporters = output_type.get_exporters();
-        
-        if exporters.len() == 1 || to_file.is_none() {
-            return exporters.into_iter().next().unwrap();
-        }
 
-        //strategy: take the exporter with the longest extension first (to export .xes.gz before .xes)
-        {
-            let mut exporters = exporters.clone();
-            exporters.sort_by(|a, b| {
-                if let EbiExporter::Object(_, file_handler_a) = a {
-                    if let EbiExporter::Object(_, file_handler_b) = b {
-                        file_handler_b.file_extension.len().cmp(&file_handler_a.file_extension.len())
-                    } else {
-                        unreachable!()
+        match to_file {
+            Some(file) => {
+                //strategy: take the exporter with the longest extension first (to export .xes.gz before .xes)
+                {
+                    let mut exporters = exporters.clone();
+                    exporters.sort_by(|a, b| {
+                        a.get_extension().len().cmp(&b.get_extension().len())
+                    });
+
+                    //see whether an output extension matches the requested file
+                    for exporter in exporters {
+                        if let EbiExporter::Object(_, file_handler) = exporter {
+                            if file.display().to_string().ends_with(&(".".to_string() + file_handler.file_extension)) {
+                                return exporter;
+                            }
+                        }
                     }
-                } else {
-                    unreachable!()
                 }
-            });
 
-            for exporter in exporters {
-                if let EbiExporter::Object(_, file_handler) = exporter {
-                    if to_file.unwrap().display().to_string().ends_with(&(".".to_string() + file_handler.file_extension)) {
-                        return exporter;
-                    }
-                } else {
-                    unreachable!()
-                }
-            }
+                //otherwise, take the default one
+                return output_type.get_default_exporter();
+            },
+            None => {
+                return output_type.get_default_exporter();
+            },
         }
-
-        //otherwise, take the first one that was mentioned
-        return exporters.into_iter().next().unwrap();
     }
 
     /**
@@ -279,44 +293,40 @@ impl EbiCommand {
     pub fn attempt_parse(input_types: &[&EbiInputType], cli_matches: &ArgMatches, cli_id: &str) -> Result<EbiInput> {
         //an input may be of several types; go through each of them
         let mut error = None;
+        let mut reader = match ebi_input::get_reader(cli_matches, cli_id).context("Getting reader.") {
+            Ok(x) => Some(x),
+            Err(e) => {error = Some(e); None},
+        };
+
         for input_type in input_types.iter() {
             //try to parse the input as this type
             match input_type {
                 EbiInputType::Trait(etrait) => {
                     
                     //try to parse a trait
-                    match ebi_input::get_reader(cli_matches, cli_id).context("Getting reader.") {
-                        Ok(mut reader) => {
-                            match ebi_input::read_as_trait(etrait, &mut reader).with_context(|| format!("Parsing as the trait `{}`.", etrait)) {
-                                Ok((object, file_handler)) => return Ok(EbiInput::Trait(object, file_handler)),
-                                Err(e) => error = Some(e)
-                            }
-                        },
-                        Err(e) => error = Some(e)
+                    if let Some(ref mut reader) = reader {
+                        match ebi_input::read_as_trait(etrait, reader).with_context(|| format!("Parsing as the trait `{}`.", etrait)) {
+                            Ok((object, file_handler)) => return Ok(EbiInput::Trait(object, file_handler)),
+                            Err(e) => error = Some(e)
+                        }
                     }
                 },
                 EbiInputType::Object(etype) => {
                     
                     //try to parse a specific object
-                    match ebi_input::get_reader(cli_matches, cli_id).context("Getting reader.") {
-                        Ok(mut reader) => {
-                            match ebi_input::read_as_object(etype, &mut reader).with_context(|| format!("Parsing as the object type `{}`.", etype)) {
-                                Ok((object, file_handler)) => return Ok(EbiInput::Object(object, file_handler)),
-                                Err(e) => error = Some(e)
-                            }
-                        },
-                        Err(e) => error = Some(e)
+                    if let Some(ref mut reader) = reader {
+                        match ebi_input::read_as_object(etype, reader).with_context(|| format!("Parsing as the object type `{}`.", etype)) {
+                            Ok((object, file_handler)) => return Ok(EbiInput::Object(object, file_handler)),
+                            Err(e) => error = Some(e)
+                        }
                     }
                 },
                 EbiInputType::AnyObject => {
-                    match ebi_input::get_reader(cli_matches, cli_id).context("Getting reader.") {
-                        Ok(mut reader) => {
-                            match ebi_input::read_as_any_object(&mut reader).context("Parsing as any object.") {
-                                Ok((object, file_handler)) => return Ok(EbiInput::Object(object, file_handler)),
-                                Err(e) => error = Some(e)
-                            }
-                        },
-                        Err(e) => error = Some(e)
+                    if let Some(ref mut reader) = reader {
+                        match ebi_input::read_as_any_object(reader).context("Parsing as any object.") {
+                            Ok((object, file_handler)) => return Ok(EbiInput::Object(object, file_handler)),
+                            Err(e) => error = Some(e)
+                        }
                     }
                 },
                 EbiInputType::FileHandler => {

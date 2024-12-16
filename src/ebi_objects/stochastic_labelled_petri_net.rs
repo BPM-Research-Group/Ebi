@@ -1,12 +1,10 @@
 use std::io;
 use std::str::FromStr;
-use std::{fmt, io::BufRead, rc::Rc};
+use std::{fmt, io::BufRead};
 use anyhow::{anyhow, Result, Context, Error};
 use layout::topo::layout::VisualGraph;
 
-use crate::deterministic_semantics_for_stochastic_semantics::DeterministicStochasticSemantics;
-use crate::ebi_framework::activity_key::{Activity, ActivityKey};
-use crate::ebi_framework::dottable::Dottable;
+use crate::ebi_framework::activity_key::{Activity, ActivityKey, HasActivityKey};
 use crate::ebi_framework::ebi_file_handler::EbiFileHandler;
 use crate::ebi_framework::ebi_input::{self, EbiObjectImporter, EbiTraitImporter};
 use crate::ebi_framework::ebi_object::EbiObject;
@@ -15,10 +13,11 @@ use crate::ebi_framework::exportable::Exportable;
 use crate::ebi_framework::importable::Importable;
 use crate::ebi_framework::infoable::Infoable;
 use crate::ebi_framework::prom_link::JavaObjectHandler;
+use crate::ebi_traits::ebi_trait_graphable::{self, EbiTraitGraphable};
 use crate::ebi_traits::ebi_trait_queriable_stochastic_language;
-use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics};
-use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics;
-use crate::ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, TransitionIndex};
+use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics};
+use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics};
+use crate::ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics, TransitionIndex};
 use crate::line_reader::LineReader;
 use crate::marking::Marking;
 use crate::math::fraction::Fraction;
@@ -27,16 +26,32 @@ use super::labelled_petri_net::LabelledPetriNet;
 
 pub const HEADER: &str = "stochastic labelled Petri net";
 
+pub const FORMAT_SPECIFICATION: &str = "A stochastic labelled Petri net is a line-based structure. Lines starting with a \\# are ignored.
+    This first line is exactly `stochastic labelled Petri net'.
+    The second line is the number of places in the net.
+    The lines thereafter contain the initial marking: each place has its own line with the number of tokens on that place in the initial marking.
+    The next line is the number of transitions in the net.
+    Then, for each transition, the following lines are next: 
+    (i) the word `silent' or the word `label' followed by a space and the name of the activity with which the transition is labelled;
+    (ii) the weight of the transition, which may be any fraction or decimal number, even 0 or negative;
+    (iii) the number of input places, followed by a line for each input place with the index of the place;
+    (iiii) the number of output places, followed by a line for each output place with the index of the place.
+    
+    For instance:
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba_ali.slpn}";
+
 pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "stochastic labelled Petri net",
     article: "a",
     file_extension: "slpn",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<StochasticLabelledPetriNet>,
     trait_importers: &[
         EbiTraitImporter::QueriableStochasticLanguage(ebi_trait_queriable_stochastic_language::import::<StochasticLabelledPetriNet>),
+        EbiTraitImporter::StochasticDeterministicSemantics(StochasticLabelledPetriNet::import_as_stochastic_deterministic_semantics),
         EbiTraitImporter::StochasticSemantics(StochasticLabelledPetriNet::import_as_stochastic_semantics),
-        EbiTraitImporter::StochasticDeterministicSemantics(StochasticLabelledPetriNet::import_as_deterministic_stochastic_semantics),
         EbiTraitImporter::Semantics(StochasticLabelledPetriNet::import_as_semantics),
+        EbiTraitImporter::Graphable(ebi_trait_graphable::import::<StochasticLabelledPetriNet>),
     ],
     object_importers: &[
         EbiObjectImporter::StochasticLabelledPetriNet(StochasticLabelledPetriNet::import_as_object),
@@ -56,7 +71,7 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     ],
 };
 
-#[derive(Clone,Debug)]
+#[derive(Clone,Debug,ActivityKey)]
 pub struct StochasticLabelledPetriNet {
     pub(crate) activity_key: ActivityKey,
     pub(crate) initial_marking: Marking,
@@ -71,25 +86,6 @@ pub struct StochasticLabelledPetriNet {
 
 impl StochasticLabelledPetriNet {
 
-    pub fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
-        let slpn = Self::import(reader)?;
-        Ok(EbiTraitSemantics::Marking(Box::new(slpn)))
-    }
-
-    pub fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics> {
-        let slpn = Self::import(reader)?;
-        Ok(EbiTraitStochasticSemantics::Marking(Box::new(slpn)))
-    }
-
-    pub fn get_deterministic_stochastic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::PMarking(Box::new(DeterministicStochasticSemantics::new(Rc::new(self))))
-    }
-
-    pub fn import_as_deterministic_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
-        let net = Self::import(reader)?;
-        Ok(net.get_deterministic_stochastic_semantics())
-    }
-
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let net = Self::import(reader)?;
         Ok(EbiObject::LabelledPetriNet(net.into()))
@@ -99,16 +95,12 @@ impl StochasticLabelledPetriNet {
         self.place2output_transitions.len()
     }
 
-    pub fn get_number_of_transitions(&self) -> usize {
-        self.transition2input_places.len()
-    }
-
     pub fn get_initial_marking(&self) -> &Marking {
         &self.initial_marking
     }
 
     pub fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
-        self.labels[transition].is_some()
+        self.labels[transition].is_none()
     }
     
     pub fn get_transition_label(&self, transition: TransitionIndex) -> Option<Activity> {
@@ -117,6 +109,25 @@ impl StochasticLabelledPetriNet {
 
     pub fn get_transition_weight(&self, transition: TransitionIndex) -> &Fraction {
         &self.weights[transition]
+    }
+
+    pub fn incidence_vector(&self, transition: TransitionIndex) -> Vec<i128> {
+        let mut vec2 = vec![0; self.get_number_of_places()];
+        for (in_place_pos, in_place) in self.transition2input_places[transition].iter().enumerate() {
+            vec2[*in_place] -= self.transition2input_places_cardinality[transition][in_place_pos] as i128;
+        }
+        for (out_place_pos, out_place) in self.transition2output_places[transition].iter().enumerate() {
+            vec2[*out_place] += self.transition2output_places_cardinality[transition][out_place_pos] as i128;
+        }
+        vec2
+    }
+
+    pub fn max_transition_input_arc_cardinality(&self) -> u64 {
+        if let Some(x) = self.transition2input_places_cardinality.iter().flatten().max() {
+            *x
+        } else {
+            0
+        }
     }
 }
 
@@ -138,7 +149,7 @@ impl Infoable for StochasticLabelledPetriNet {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         writeln!(f, "Number of places\t\t{}", self.get_number_of_places())?;
         writeln!(f, "Number of transitions\t\t{}", self.get_number_of_transitions())?;
-        writeln!(f, "Number of activities\t\t{}", Semantics::get_activity_key(self).get_number_of_activities())?;
+        writeln!(f, "Number of activities\t\t{}", self.get_activity_key().get_number_of_activities())?;
         writeln!(f, "Number of silent transitions\t{}", (0..self.get_number_of_transitions()).into_iter().filter(|transition| self.is_transition_silent(*transition)).count())?;
 
         Ok(write!(f, "")?)
@@ -305,6 +316,24 @@ impl Importable for StochasticLabelledPetriNet {
     }
 }
 
+impl ToSemantics for StochasticLabelledPetriNet {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::Marking(Box::new(self))
+    }
+}
+
+impl ToStochasticSemantics for StochasticLabelledPetriNet {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        EbiTraitStochasticSemantics::Marking(Box::new(self))
+    }
+}
+
+impl ToStochasticDeterministicSemantics for StochasticLabelledPetriNet {
+    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+        EbiTraitStochasticDeterministicSemantics::PMarking(Box::new(self))
+    }
+}
+
 impl From<(LabelledPetriNet, Vec<Fraction>)> for StochasticLabelledPetriNet {
     fn from(value: (LabelledPetriNet, Vec<Fraction>)) -> Self {
         Self {
@@ -321,7 +350,7 @@ impl From<(LabelledPetriNet, Vec<Fraction>)> for StochasticLabelledPetriNet {
     }
 }
 
-impl Dottable for StochasticLabelledPetriNet {
+impl EbiTraitGraphable for StochasticLabelledPetriNet {
     fn to_dot(&self) -> VisualGraph {
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
@@ -338,32 +367,32 @@ impl Dottable for StochasticLabelledPetriNet {
                 "".to_string()
             };
 
-            places.push(<dyn Dottable>::create_place(&mut graph, &label));
+            places.push(<dyn EbiTraitGraphable>::create_place(&mut graph, &label));
         }
 
         for transition in 0..self.get_number_of_transitions() {
 
             let node = if let Some(activity) = self.get_transition_label(transition) {
-                <dyn Dottable>::create_transition(&mut graph, self.activity_key.get_activity_label(&activity), &self.get_transition_weight(transition).to_string())
+                <dyn EbiTraitGraphable>::create_transition(&mut graph, self.activity_key.get_activity_label(&activity), &self.get_transition_weight(transition).to_string())
             } else {
-                <dyn Dottable>::create_silent_transition(&mut graph, &self.get_transition_weight(transition).to_string())
+                <dyn EbiTraitGraphable>::create_silent_transition(&mut graph, &self.get_transition_weight(transition).to_string())
             };
 
             for (pos, inplace) in self.transition2input_places[transition].iter().enumerate() {
                 let place_node = places.get(*inplace).unwrap();
                 if self.transition2input_places_cardinality[transition][pos] > 1 {
-                    <dyn Dottable>::create_edge(&mut graph, place_node, &node, &format!("{}", self.transition2input_places_cardinality[transition][pos]));
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, place_node, &node, &format!("{}", self.transition2input_places_cardinality[transition][pos]));
                 } else {
-                    <dyn Dottable>::create_edge(&mut graph, place_node, &node, "");
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, place_node, &node, "");
                 }
             }
 
             for (pos, outplace) in self.transition2output_places[transition].iter().enumerate() {
                 let place_node = places.get(*outplace).unwrap();
                 if self.transition2output_places_cardinality[transition][pos] > 1 {
-                    <dyn Dottable>::create_edge(&mut graph, &node, place_node, &format!("{}", self.transition2output_places_cardinality[transition][pos]));
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, &node, place_node, &format!("{}", self.transition2output_places_cardinality[transition][pos]));
                 } else {
-                    <dyn Dottable>::create_edge(&mut graph, &node, place_node, "");
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, &node, place_node, "");
                 }
             }
         }

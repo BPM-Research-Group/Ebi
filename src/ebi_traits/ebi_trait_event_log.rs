@@ -1,10 +1,11 @@
 use std::{borrow::Borrow, collections::HashMap, fmt::{Debug, Display}, hash::Hash};
 use anyhow::{anyhow, Result};
 use chrono::{DateTime, FixedOffset};
-use process_mining::event_log::{AttributeValue, XESEditableAttribute};
+use process_mining::event_log::{AttributeValue, Event, XESEditableAttribute};
 
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::event_log::DataType, math::fraction::Fraction};
 
+pub const ATTRIBUTE_TIME: &str = "time:timestamp";
 
 pub trait EbiTraitEventLog: IndexTrace {
     /**
@@ -177,6 +178,23 @@ impl dyn EbiTraitEventLog {
         }
         None
     }
+
+    fn get_event(&self, trace_index: usize, event_index: usize) -> Option<&Event> {
+        self.get_log().traces.get(trace_index)?.events.get(event_index)
+    }
+
+    pub fn get_event_attribute_time(&self, trace_index: usize, event_index: usize, case_attribute: &String) -> Option<DateTime<FixedOffset>> {
+        if let Some(attribute) = self.get_event(trace_index, event_index)?.attributes.get_by_key(case_attribute) {
+            match &attribute.value {
+                AttributeValue::String(x) => x.parse::<DateTime<FixedOffset>>().ok(),
+                AttributeValue::Date(x) => Some(*x),
+                _ => None
+            }
+        } else {
+            None
+        }
+    }
+
 }
 
 impl FromEbiTraitObject for dyn EbiTraitEventLog {

@@ -1,7 +1,7 @@
-use std::{fmt::{Debug, Display}, hash::Hash, ops::{Add, AddAssign}};
+use std::ops::{Add, AddAssign};
 use anyhow::{anyhow, Result};
 use fraction::Zero;
-use crate::{ebi_framework::activity_key::Activity, ebi_objects::alignments::Alignments, ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}, math::{astar,fraction::Fraction}, techniques::align::transform_alignment};
+use crate::{ebi_framework::{activity_key::Activity, displayable::Displayable}, ebi_objects::language_of_alignments::LanguageOfAlignments, ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}, math::{astar,fraction::Fraction}, techniques::align::transform_alignment};
 
 #[derive (Clone, Debug)]
 pub struct StochasticWeightedCost{
@@ -69,11 +69,11 @@ impl Eq for StochasticWeightedCost{}
 
 
 pub trait ExplainTrace {
-    fn explain_trace(&self, trace: &Vec<Activity>, balance: &Fraction) -> Result<Alignments>;
+    fn explain_trace(&self, trace: &Vec<Activity>, balance: &Fraction) -> Result<LanguageOfAlignments>;
 }
 
 impl ExplainTrace for EbiTraitStochasticSemantics {
-    fn explain_trace(&self, trace: &Vec<Activity>, balance: &Fraction) -> Result<Alignments> {
+    fn explain_trace(&self, trace: &Vec<Activity>, balance: &Fraction) -> Result<LanguageOfAlignments> {
         match self {
             EbiTraitStochasticSemantics::Usize(sem) => sem.explain_trace(trace, balance),
             EbiTraitStochasticSemantics::Marking(sem) => sem.explain_trace(trace, balance),
@@ -81,17 +81,17 @@ impl ExplainTrace for EbiTraitStochasticSemantics {
     }
 }
 
-impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSemantics<State = FS, AState = FS> {
+impl <State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState = State, AliState = State> {
 
-    pub fn explain_trace(&self, trace: &Vec<Activity>, _balance: &Fraction) -> Result<Alignments> {
+    pub fn explain_trace(&self, trace: &Vec<Activity>, _balance: &Fraction) -> Result<LanguageOfAlignments> {
 
         // get the start state
         let start = (0, self.get_initial_state());
 
         // successor relation in the model
-        let successors = |(trace_index, state) : &(usize, FS)| {
+        let successors = |(trace_index, state) : &(usize, State)| {
 
-            let mut result: Vec<((usize, FS), StochasticWeightedCost)> = vec![];
+            let mut result: Vec<((usize, State), StochasticWeightedCost)> = vec![];
 
             // log::debug!("successors of log {} model {}", trace_index, state);
             if trace_index < &trace.len() {
@@ -136,19 +136,19 @@ impl <FS: Hash + Display + Debug + Clone + Eq + Send + Sync> dyn StochasticSeman
         };
 
         //function that returns a heuristic on how far we are still minimally from a final state
-        let heuristic = |_astate : &(usize, FS)| {
+        let heuristic = |_astate : &(usize, State)| {
             StochasticWeightedCost::zero()
         };
 
         //function that returns whether we are in a final synchronous product state
-        let success = |(trace_index, state): &(usize, FS)| {
+        let success = |(trace_index, state): &(usize, State)| {
             trace_index == &trace.len() && self.is_final_state(&state)
         };
 
         match astar::astar(&start, successors, heuristic, success){
             Some((path, _cost)) => {
                 let moves = transform_alignment(self, &trace,path)?;
-                let mut alignments = Alignments::new(self.get_activity_key().clone());
+                let mut alignments = LanguageOfAlignments::new(self.get_activity_key().clone());
                 alignments.push(moves);
                 // println!("cost:{:.4},", cost, prefix_cost, prefix_probability);
                 Ok(alignments)

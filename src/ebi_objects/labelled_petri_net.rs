@@ -3,20 +3,35 @@ use anyhow::{anyhow, Context, Error, Ok, Result};
 use bitvec::vec::BitVec;
 use layout::topo::layout::VisualGraph;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, displayable::Displayable, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader, marking::Marking};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, displayable::Displayable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader, marking::Marking};
 
 use super::stochastic_labelled_petri_net::StochasticLabelledPetriNet;
 
 
 pub const HEADER: &str = "labelled Petri net";
 
+pub const FORMAT_SPECIFICATION: &str = "A labelled Petri net is a line-based structure. Lines starting with a \\# are ignored.
+    This first line is exactly `labelled Petri net'.
+    The second line is the number of places in the net.
+    The lines thereafter contain the initial marking: each place has its own line with the number of tokens on that place in the initial marking.
+    The next line is the number of transitions in the net.
+    Then, for each transition, the following lines are next: 
+    (i) the word `silent' or the word `label' followed by a space and the name of the activity with which the transition is labelled;
+    (ii) the number of input places, followed by a line for each input place with the index of the place;
+    (iii) the number of output places, followed by a line for each output place with the index of the place.
+    
+    For instance:
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba.lpn}";
+
 pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "labelled Petri net",
     article: "a",
     file_extension: "lpn",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<LabelledPetriNet>,
     trait_importers: &[
         EbiTraitImporter::Semantics(LabelledPetriNet::import_as_semantics),
+        EbiTraitImporter::Graphable(ebi_trait_graphable::import::<LabelledPetriNet>),
     ],
     object_importers: &[
         EbiObjectImporter::LabelledPetriNet(LabelledPetriNet::import_as_object),
@@ -45,7 +60,7 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     ],
 };
 
-#[derive(Clone,Debug)]
+#[derive(Clone,Debug,ActivityKey)]
 pub struct LabelledPetriNet {
     pub(crate) activity_key: ActivityKey,
     pub(crate) initial_marking: Marking,
@@ -64,10 +79,6 @@ impl LabelledPetriNet {
         Ok(EbiTraitSemantics::Marking(Box::new(net)))
     }
 
-    pub fn get_number_of_transitions(&self) -> usize {
-        self.transition2input_places.len()
-    }
-
     pub fn get_number_of_places(&self) -> usize {
         self.place2output_transitions.len()
     }
@@ -76,16 +87,8 @@ impl LabelledPetriNet {
         &self.initial_marking
     }
 
-    pub fn get_activity_key(&self) -> &ActivityKey {
-        &self.activity_key
-    }
-    
-    pub fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
-        &mut self.activity_key
-    }
-    
     pub fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
-        self.labels[transition].is_some()
+        self.labels[transition].is_none()
     }
     
     pub fn get_transition_label(&self, transition: TransitionIndex) -> Option<Activity> {
@@ -180,6 +183,24 @@ impl LabelledPetriNet {
         }
     }
 
+    pub fn incidence_vector(&self, transition: TransitionIndex) -> Vec<i128> {
+        let mut vec2 = vec![0; self.get_number_of_places()];
+        for (in_place_pos, in_place) in self.transition2input_places[transition].iter().enumerate() {
+            vec2[*in_place] -= self.transition2input_places_cardinality[transition][in_place_pos] as i128;
+        }
+        for (out_place_pos, out_place) in self.transition2output_places[transition].iter().enumerate() {
+            vec2[*out_place] += self.transition2output_places_cardinality[transition][out_place_pos] as i128;
+        }
+        vec2
+    }
+
+    pub fn max_transition_input_arc_cardinality(&self) -> u64 {
+        if let Some(x) = self.transition2input_places_cardinality.iter().flatten().max() {
+            *x
+        } else {
+            0
+        }
+    }
     
 }
 
@@ -187,7 +208,7 @@ impl FromEbiTraitObject for LabelledPetriNet {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
             EbiInput::Object(EbiObject::LabelledPetriNet(e), _) => Ok(Box::new(e)),
-            _ => Err(anyhow!("cannot read {} {} as a finite language", object.get_type().get_article(), object.get_type()))
+            _ => Err(anyhow!("cannot read {} {} as a labelled Petri net", object.get_type().get_article(), object.get_type()))
         }
     }
 }
@@ -210,7 +231,7 @@ impl Infoable for LabelledPetriNet {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         writeln!(f, "Number of places\t\t{}", self.get_number_of_places())?;
         writeln!(f, "Number of transitions\t\t{}", self.get_number_of_transitions())?;
-        writeln!(f, "Number of activities\t\t{}", Semantics::get_activity_key(self).get_number_of_activities())?;
+        writeln!(f, "Number of activities\t\t{}", self.get_activity_key().get_number_of_activities())?;
         writeln!(f, "Number of silent transitions\t{}", (0..self.get_number_of_transitions()).into_iter().filter(|transition| self.is_transition_silent(*transition)).count())?;
 
         Ok(write!(f, "")?)
@@ -367,7 +388,7 @@ impl Importable for LabelledPetriNet {
     }
 }
 
-impl Dottable for LabelledPetriNet {
+impl EbiTraitGraphable for LabelledPetriNet {
     fn to_dot(&self) -> VisualGraph {
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
@@ -384,33 +405,33 @@ impl Dottable for LabelledPetriNet {
                 "".to_string()
             };
 
-            places.push(<dyn Dottable>::create_place(&mut graph, &label));
+            places.push(<dyn EbiTraitGraphable>::create_place(&mut graph, &label));
         }
 
         for transition in 0..self.get_number_of_transitions() {
 
             let node = if let Some(activity) = self.get_transition_label(transition) {
-                <dyn Dottable>::create_transition(&mut graph, self.activity_key.get_activity_label(&activity), "")
+                <dyn EbiTraitGraphable>::create_transition(&mut graph, self.activity_key.get_activity_label(&activity), "")
             } else {
-                <dyn Dottable>::create_silent_transition(&mut graph, "")
+                <dyn EbiTraitGraphable>::create_silent_transition(&mut graph, "")
             };
 
 
             for (pos, inplace) in self.transition2input_places[transition].iter().enumerate() {
                 let place_node = places.get(*inplace).unwrap();
                 if self.transition2input_places_cardinality[transition][pos] > 1 {
-                    <dyn Dottable>::create_edge(&mut graph, place_node, &node, &format!("{}", self.transition2input_places_cardinality[transition][pos]));
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, place_node, &node, &format!("{}", self.transition2input_places_cardinality[transition][pos]));
                 } else {
-                    <dyn Dottable>::create_edge(&mut graph, place_node, &node, "");
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, place_node, &node, "");
                 }
             }
 
             for (pos, outplace) in self.transition2output_places[transition].iter().enumerate() {
                 let place_node = places.get(*outplace).unwrap();
                 if self.transition2output_places_cardinality[transition][pos] > 1 {
-                    <dyn Dottable>::create_edge(&mut graph, &node, place_node, &format!("{}", self.transition2output_places_cardinality[transition][pos]));
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, &node, place_node, &format!("{}", self.transition2output_places_cardinality[transition][pos]));
                 } else {
-                    <dyn Dottable>::create_edge(&mut graph, &node, place_node, "");
+                    <dyn EbiTraitGraphable>::create_edge(&mut graph, &node, place_node, "");
                 }
             }
         }
@@ -441,11 +462,7 @@ pub struct LPNMarking {
     pub(crate) number_of_enabled_transitions: usize,
 }
 
-impl Displayable for LPNMarking {
-    fn debug(&self) -> String {
-        return "SLPN marking".to_string();
-    }
-}
+impl Displayable for LPNMarking {}
 
 impl Eq for LPNMarking {}
 

@@ -1,24 +1,43 @@
-use std::{cmp::{max, Ordering}, collections::HashMap, fmt, io::{self, BufRead}, str::FromStr, sync::Arc};
+use std::{cmp::{max, Ordering}, collections::HashMap, fmt, io::{self, BufRead}, str::FromStr};
 use anyhow::{anyhow, Context, Result, Error};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator}, dottable::Dottable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_queriable_stochastic_language::{self, EbiTraitQueriableStochasticLanguage}, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, follower_semantics::FollowerSemantics, json, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_queriable_stochastic_language::{self}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}}, json, math::fraction::Fraction};
 
-use super::{labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton_semantics::StochasticDeterministicFiniteAutomatonSemantics, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
+use super::{labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
+
+pub const FORMAT_SPECIFICATION: &str = "A stochastic deterministic finite automaton is a JSON structure with the top level being an object.
+    This object contains the following key-value pairs:
+    \\begin{itemize}
+    \\item \\texttt{initialState} being the index of the initial state.
+    \\item \\texttt{transitions} being a list of transitions. 
+    Each transition is an object with \\texttt{from} being the source state index of the transition, 
+    \\texttt{to} being the target state index of the transition, 
+    \\texttt{label} being the activity of the transition, and
+    \\texttt{prob} being the probability of the transition (may be given as a fraction in a string or a float value. Must be $\\leq 1$). 
+    Silent transitions are not supported.
+    The file format supports deadlocks and livelocks.
+    The probability that a trace terminates in a state is 1 - the sum probability of the outgoing transitions of the state.
+    \\end{itemize}
+    For instance:
+    \\lstinputlisting[language=json, style=boxed]{../testfiles/aa-ab-ba.sdfa}";
 
 pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     name: "stochastic deterministic finite automaton",
-    article: "an",
+    article: "a",
     file_extension: "sdfa",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<StochasticDeterministicFiniteAutomaton>,
     trait_importers: &[
         EbiTraitImporter::QueriableStochasticLanguage(ebi_trait_queriable_stochastic_language::import::<StochasticDeterministicFiniteAutomaton>),
         EbiTraitImporter::StochasticDeterministicSemantics(StochasticDeterministicFiniteAutomaton::import_as_stochastic_deterministic_semantics),
         EbiTraitImporter::StochasticSemantics(StochasticDeterministicFiniteAutomaton::import_as_stochastic_semantics),
         EbiTraitImporter::Semantics(StochasticDeterministicFiniteAutomaton::import_as_semantics),
+        EbiTraitImporter::Graphable(ebi_trait_graphable::import::<StochasticDeterministicFiniteAutomaton>),
     ],
     object_importers: &[
         EbiObjectImporter::StochasticDeterministicFiniteAutomaton(StochasticDeterministicFiniteAutomaton::import_as_object),
+        EbiObjectImporter::LabelledPetriNet(StochasticDeterministicFiniteAutomaton::import_as_labelled_petri_net),
     ],
     object_exporters: &[
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(StochasticDeterministicFiniteAutomaton::export_from_object),
@@ -28,7 +47,7 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
     java_object_handlers: &[],
 };
 
-#[derive(Debug)]
+#[derive(Debug,ActivityKey)]
 pub struct StochasticDeterministicFiniteAutomaton {
     pub(crate) activity_key: ActivityKey,
     pub(crate) initial_state: usize,
@@ -74,6 +93,10 @@ impl StochasticDeterministicFiniteAutomaton {
     pub fn set_initial_state(&mut self, state: usize) {
         self.ensure_states(state);
         self.initial_state = state;
+    }
+
+    pub fn can_terminate_in_state(&self, state: usize) -> bool {
+        self.get_termination_probability(state).is_positive()
     }
 
     fn ensure_states(&mut self, new_max_state: usize) {
@@ -206,34 +229,9 @@ impl StochasticDeterministicFiniteAutomaton {
         (false, left)
 	}
 
-    pub fn get_semantics(sdfa: Arc<Self>) -> EbiTraitSemantics {
-        log::info!("convert SDFA to semantics");
-        EbiTraitSemantics::Usize(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
-    }
-
-    pub fn get_stochastic_semantics(sdfa: Arc<Self>) -> EbiTraitStochasticSemantics {
-        EbiTraitStochasticSemantics::Usize(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
-    }
-
-    pub fn get_deterministic_semantics(sdfa: Arc<Self>) -> Result<Box<dyn StochasticDeterministicSemantics<DState = usize>>> {
-        Ok(Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(sdfa)))
-    }
-
-    pub fn import_as_stochastic_deterministic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
-        log::info!("convert SDFA to stochastic deterministic semantics");
-        let sdfa = StochasticDeterministicFiniteAutomaton::import(reader)?;
-        let s = Arc::new(sdfa);
-        Ok(EbiTraitStochasticDeterministicSemantics::Usize(Self::get_deterministic_semantics(s)?))
-    }
-
-    pub fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics> {
-        let sdfa = Arc::new(Self::import(reader)?);
-        Ok(Self::get_stochastic_semantics(sdfa))
-    }
-
-    pub fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
-        let sdfa = Arc::new(Self::import(reader)?);
-        Ok(Self::get_semantics(sdfa))
+    pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let sdfa = Self::import(reader)?;
+        Ok(EbiObject::LabelledPetriNet(sdfa.get_stochastic_labelled_petri_net().into()))
     }
     
     pub fn get_stochastic_labelled_petri_net(&self) -> StochasticLabelledPetriNet {
@@ -296,6 +294,15 @@ impl StochasticDeterministicFiniteAutomaton {
     }
 }
 
+impl FromEbiTraitObject for StochasticDeterministicFiniteAutomaton {
+    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!("cannot read {} {} as a stochastic deterministic finite automaton", object.get_type().get_article(), object.get_type()))
+        }
+    }
+}
+
 impl FromStr for StochasticDeterministicFiniteAutomaton {
     type Err = Error;
 
@@ -329,39 +336,6 @@ impl Importable for StochasticDeterministicFiniteAutomaton {
         }
 
         return Ok(result);
-    }
-}
-
-impl EbiTraitQueriableStochasticLanguage for StochasticDeterministicFiniteAutomaton {
-
-    fn get_probability(&self, follower: &FollowerSemantics) -> Result<Fraction> {
-        match follower {
-            FollowerSemantics::Trace(trace) => {
-                let mut state = self.get_initial_state();
-                let mut result = Fraction::one();
-
-                for activity in trace.iter() {
-                    let (found, pos) = self.binary_search(state, self.activity_key.get_id_from_activity(activity));
-                    if !found {
-                        return Ok(Fraction::zero());
-                    }
-                    state = self.targets[pos];
-                    result *= &self.probabilities[pos];
-                }
-
-                result *= &self.terminating_probabilities[state];
-
-                Ok(result)
-            },
-        }
-    }
-    
-    fn get_activity_key(&self) -> &ActivityKey {
-        &self.activity_key
-    }
-    
-    fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
-        &mut self.activity_key
     }
 }
 
@@ -410,13 +384,14 @@ impl fmt::Display for StochasticDeterministicFiniteAutomaton {
     }
 }
 
-impl Dottable for StochasticDeterministicFiniteAutomaton {
+impl EbiTraitGraphable for StochasticDeterministicFiniteAutomaton {
     fn to_dot(&self) -> layout::topo::layout::VisualGraph {
+        log::info!("to_dot for StochasticDeterministicFiniteAutomaton");
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
         let mut places = vec![];
         for state in 0 ..= self.max_state {
-            places.push(<dyn Dottable>::create_place(&mut graph, &format!("{}", self.terminating_probabilities[state])));
+            places.push(<dyn EbiTraitGraphable>::create_place(&mut graph, &format!("{}", self.terminating_probabilities[state])));
             // places.push(<dyn Dottable>::create_place(&mut graph, ""));
         }
 
@@ -426,7 +401,7 @@ impl Dottable for StochasticDeterministicFiniteAutomaton {
             let probability = &self.probabilities[pos];
             let activity = self.activity_key.get_activity_label(&self.activities[pos]);
             
-            <dyn Dottable>::create_edge(&mut graph, &source, &target, &format!("{}, {}", activity, probability.to_string()));
+            <dyn EbiTraitGraphable>::create_edge(&mut graph, &source, &target, &format!("{}, {}", activity, probability.to_string()));
         }
 
         return graph;
@@ -506,5 +481,23 @@ impl<'a> Iterator for StochasticDeterministicFiniteAutomatonMutIterator<'a> {
         } else {
             None
         }
+    }
+}
+
+impl ToSemantics for StochasticDeterministicFiniteAutomaton {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::Usize(Box::new(self))
+    }
+}
+
+impl ToStochasticSemantics for StochasticDeterministicFiniteAutomaton {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        EbiTraitStochasticSemantics::Usize(Box::new(self))
+    }
+}
+
+impl ToStochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton {
+    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+        EbiTraitStochasticDeterministicSemantics::Usize(Box::new(self))
     }
 }

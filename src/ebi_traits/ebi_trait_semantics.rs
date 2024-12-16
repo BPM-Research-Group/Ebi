@@ -1,12 +1,13 @@
-use std::{fmt::{Debug, Display}, hash::Hash, io::BufRead};
+use std::{fmt::Debug, io::BufRead};
 use anyhow::{anyhow, Result};
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::labelled_petri_net::LPNMarking, techniques::align::AlignmentHeuristics};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, displayable::Displayable, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, ebi_objects::{labelled_petri_net::LPNMarking, process_tree_semantics::NodeStates}, techniques::align::AlignmentHeuristics};
 
 use super::ebi_trait_stochastic_semantics::TransitionIndex;
 
 pub enum EbiTraitSemantics {
-	Marking(Box<dyn Semantics<State = LPNMarking, AState = LPNMarking>>),
-	Usize(Box<dyn Semantics<State = usize, AState = usize>>)
+	Usize(Box<dyn Semantics<SemState = usize, AliState = usize>>),
+	Marking(Box<dyn Semantics<SemState = LPNMarking, AliState = LPNMarking>>),
+	NodeStates(Box<dyn Semantics<SemState = NodeStates, AliState = NodeStates>>),
 }
 
 impl FromEbiTraitObject for EbiTraitSemantics {
@@ -23,6 +24,7 @@ impl EbiTraitSemantics {
 		match self {
 			EbiTraitSemantics::Marking(semantics) => semantics.get_activity_key(),
 			EbiTraitSemantics::Usize(semantics) => semantics.get_activity_key(),
+			EbiTraitSemantics::NodeStates(semantics) => semantics.get_activity_key(),
 		}
 	}
 
@@ -30,49 +32,49 @@ impl EbiTraitSemantics {
 		match self {
 			EbiTraitSemantics::Marking(semantics) => semantics.get_activity_key_mut(),
 			EbiTraitSemantics::Usize(semantics) => semantics.get_activity_key_mut(),
+			EbiTraitSemantics::NodeStates(semantics) => semantics.get_activity_key_mut(),
 		}
 	}
 
 }
 
-pub trait Semantics : Debug + Send + Sync + AlignmentHeuristics<AState = <Self as Semantics>::State> {
-	type State: Eq + Hash + Clone + Display + Send + Sync;
-
-	fn get_activity_key(&self) -> &ActivityKey;
-
-	fn get_activity_key_mut(&mut self) -> &mut ActivityKey;
+pub trait Semantics : Debug + Send + Sync + AlignmentHeuristics<AliState = Self::SemState> + HasActivityKey {
+	type SemState: Displayable;
 
     /**
 	 * (Re)set the semantics to the initial state.
 	 */
-    fn get_initial_state(&self) -> Self::State;
+    fn get_initial_state(&self) -> <Self as Semantics>::SemState;
 
 
     /**
 	 * Update the state to reflect execution of the transition. This alters the state to avoid repeated memory allocations in simple walkthroughs.
-	 * Will return an error when the transition is not enabled, or when the marking cannot be represented (unbounded).
+	 * May return an error when the transition is not enabled, or when the marking cannot be represented (unbounded).
 	 * 
 	 * @param transition
 	 */
-    fn execute_transition(&self, state: &mut Self::State, transition: TransitionIndex) -> Result<()>;
+    fn execute_transition(&self, state: &mut <Self as Semantics>::SemState, transition: TransitionIndex) -> Result<()>;
 
     /**
 	 * 
 	 * @return whether the current state is a final state. In a final state, no other transitions may be enabled.
 	 */
-    fn is_final_state(&self, state: &Self::State) -> bool;
+    fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool;
 
 	fn is_transition_silent(&self, transition: TransitionIndex) -> bool;
 
 	fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity>;
 
-	fn get_enabled_transitions(&self, state: &Self::State) -> Vec<TransitionIndex>;
+	fn get_enabled_transitions(&self, state: &<Self as Semantics>::SemState) -> Vec<TransitionIndex>;
+
+	fn get_number_of_transitions(&self) -> usize;
 
 }
 
-pub trait ToSemantics {
-	type State: Eq + Hash + Clone + Display;
-	fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State, AState = Self::State>>;
+pub trait ToSemantics: Importable + Sized {
+	fn to_semantics(self) -> EbiTraitSemantics;
 
-	fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics>;
+	fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
+		Ok(Self::import(reader)?.to_semantics())
+	}
 }

@@ -2,22 +2,25 @@ use std::{collections::BTreeSet, fmt::Display};
 use anyhow::Result;
 use strum_macros::EnumIter;
 
-use crate::{ebi_objects::{alignments::Alignments, deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}};
+use crate::{ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, executions::Executions, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, language_of_alignments::LanguageOfAlignments, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_graphable::EbiTraitGraphable, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}};
 
 use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_input::EbiInputType, ebi_trait::EbiTrait, infoable::Infoable};
 
 
 #[derive(PartialEq,Clone,EnumIter,Hash,Default)]
 pub enum EbiObjectType {
-    #[default] Alignments,
+    #[default] LanguageOfAlignments,
+    StochasticLanguageOfAlignments,
+    StochasticDeterministicFiniteAutomaton,
     DeterministicFiniteAutomaton,
     DirectlyFollowsModel,
     EventLog,
     FiniteLanguage,
     FiniteStochasticLanguage,
     LabelledPetriNet,
-    StochasticDeterministicFiniteAutomaton,
     StochasticLabelledPetriNet,
+    ProcessTree,
+    Executions,
 }
 
 impl EbiObjectType {
@@ -31,8 +34,11 @@ impl EbiObjectType {
             EbiObjectType::EventLog => "an",
             EbiObjectType::FiniteLanguage => "a",
             EbiObjectType::DirectlyFollowsModel => "a",
-            EbiObjectType::Alignments => "an",
+            EbiObjectType::LanguageOfAlignments => "",
+            EbiObjectType::StochasticLanguageOfAlignments => "an",
             EbiObjectType::DeterministicFiniteAutomaton => "a",
+            EbiObjectType::ProcessTree => "a",
+            EbiObjectType::Executions => "",
         }
     }
     
@@ -79,8 +85,11 @@ impl Display for EbiObjectType {
             EbiObjectType::EventLog => "event log",
             EbiObjectType::FiniteLanguage => "finite language",
             EbiObjectType::DirectlyFollowsModel => "directly follows model",
-            EbiObjectType::Alignments => "alignment",
+            EbiObjectType::LanguageOfAlignments => "alignments",
+            EbiObjectType::StochasticLanguageOfAlignments => "stochastic language of alignments",
             EbiObjectType::DeterministicFiniteAutomaton => "deterministic finite automaton",
+            EbiObjectType::ProcessTree => "process tree",
+            EbiObjectType::Executions => "executions",
         })
     }
 }
@@ -93,8 +102,11 @@ pub enum EbiObject {
     EventLog(EventLog),
     FiniteLanguage(FiniteLanguage),
     DirectlyFollowsModel(DirectlyFollowsModel),
-    Alignments(Alignments),
+    LanguageOfAlignments(LanguageOfAlignments),
+    StochasticLanguageOfAlignments(StochasticLanguageOfAlignments),
     DeterministicFiniteAutomaton(DeterministicFiniteAutomaton),
+    ProcessTree(ProcessTree),
+    Executions(Executions),
 }
 
 impl EbiObject {
@@ -107,8 +119,11 @@ impl EbiObject {
             EbiObject::EventLog(_) => EbiObjectType::EventLog,
             EbiObject::FiniteLanguage(_) => EbiObjectType::FiniteLanguage,
             EbiObject::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
-            EbiObject::Alignments(_) => EbiObjectType::Alignments,
+            EbiObject::LanguageOfAlignments(_) => EbiObjectType::LanguageOfAlignments,
+            EbiObject::StochasticLanguageOfAlignments(_) => EbiObjectType::StochasticLanguageOfAlignments,
             EbiObject::DeterministicFiniteAutomaton(_) => EbiObjectType::DeterministicFiniteAutomaton,
+            EbiObject::ProcessTree(_) => EbiObjectType::ProcessTree,
+            EbiObject::Executions(_) => EbiObjectType::Executions,
         }
     }
 }
@@ -123,8 +138,11 @@ impl Display for EbiObject {
             EbiObject::EventLog(o) => write!(f, "{}", o),
             EbiObject::FiniteLanguage(o) => write!(f, "{}", o),
             EbiObject::DirectlyFollowsModel(o) => write!(f, "{}", o),
-            EbiObject::Alignments(o) => write!(f, "{}", o),
+            EbiObject::LanguageOfAlignments(o) => write!(f, "{}", o),
+            EbiObject::StochasticLanguageOfAlignments(o) => write!(f, "{}", o),
             EbiObject::DeterministicFiniteAutomaton(o) => write!(f, "{}", o),
+            EbiObject::ProcessTree(o) => write!(f, "{}", o),
+            EbiObject::Executions(o) => write!(f, "{}", o),
         }
     }
 }
@@ -139,8 +157,11 @@ impl Infoable for EbiObject {
             EbiObject::EventLog(o) => o.info(f),
             EbiObject::FiniteLanguage(o) => o.info(f),
             EbiObject::DirectlyFollowsModel(o) => o.info(f),
-            EbiObject::Alignments(o) => o.info(f),
+            EbiObject::LanguageOfAlignments(o) => o.info(f),
+            EbiObject::StochasticLanguageOfAlignments(o) => o.info(f),
             EbiObject::DeterministicFiniteAutomaton(o) => o.info(f),
+            EbiObject::ProcessTree(o) => o.info(f),
+            EbiObject::Executions(o) => o.info(f),
         }
     }
 }
@@ -155,6 +176,7 @@ pub enum EbiTraitObject {
     StochasticDeterministicSemantics(EbiTraitStochasticDeterministicSemantics),
     StochasticSemantics(EbiTraitStochasticSemantics),
     Semantics(EbiTraitSemantics),
+    Graphable(Box<dyn EbiTraitGraphable>),
 }
 
 impl EbiTraitObject {
@@ -169,6 +191,8 @@ impl EbiTraitObject {
             EbiTraitObject::StochasticDeterministicSemantics(_) => EbiTrait::StochasticDeterministicSemantics,
             EbiTraitObject::StochasticSemantics(_) => EbiTrait::StochasticSemantics,
             EbiTraitObject::Semantics(_) => EbiTrait::Semantics,
+            EbiTraitObject::Graphable(_) => EbiTrait::Graphable,
+            
         }
     }
 }

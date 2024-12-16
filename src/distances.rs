@@ -17,7 +17,7 @@ pub struct TriangularDistanceMatrix {
 impl TriangularDistanceMatrix {
     pub fn new<T>(log: &T) -> Self where T: IndexTrace + ?Sized {
         log::info!("Compute distances");
-        let progress_bar = EbiCommand::get_progress_bar(Self::get_number_of_distances(log.len()).try_into().unwrap());
+        let progress_bar = EbiCommand::get_progress_bar_ticks(Self::get_number_of_distances(log.len()));
 
         let len = log.len();
         let log = Arc::new(log);

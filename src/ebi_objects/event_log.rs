@@ -1,29 +1,40 @@
 use core::fmt;
-use std::{collections::{HashMap, HashSet}, fmt::Display, io::{self, BufRead, Write}, rc::Rc, str::FromStr, sync::Arc};
+use std::{collections::{HashMap, HashSet}, fmt::Display, io::{self, BufRead, Write}, str::FromStr};
 use anyhow::{anyhow, Result, Error};
 use chrono::{DateTime, FixedOffset};
 use process_mining::{event_log::{event_log_struct::EventLogClassifier, AttributeValue}, XESImportOptions};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics, ToStochasticSemantics}}, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}}, math::fraction::Fraction};
 
-use super::{finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
+use super::{finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
+
+pub const FORMAT_SPECIFICATION: &str = "An event log file follows the IEEE XES format~\\cite{DBLP:journals/cim/AcamporaVSAGV17}. 
+Parsing is performed by the Rust4PM crate~\\cite{DBLP:conf/bpm/KustersA24}.
+For instance:
+    \\lstinputlisting[language=xml, style=boxed]{../testfiles/a-b.xes}";
 
 pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     name: "event log",
     article: "an",
     file_extension: "xes",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<EventLog>,
     trait_importers: &[
+        EbiTraitImporter::IterableLanguage(EventLog::read_as_iterable_language),
         EbiTraitImporter::FiniteLanguage(EventLog::read_as_finite_language),
         EbiTraitImporter::FiniteStochasticLanguage(EventLog::read_as_finite_stochastic_language),
         EbiTraitImporter::QueriableStochasticLanguage(EventLog::read_as_queriable_stochastic_language),
         EbiTraitImporter::IterableStochasticLanguage(EventLog::read_as_iterable_stochastic_language),
         EbiTraitImporter::EventLog(EventLog::read_as_event_log),
         EbiTraitImporter::StochasticSemantics(EventLog::import_as_stochastic_semantics),
-        EbiTraitImporter::StochasticDeterministicSemantics(EventLog::read_as_stochastic_deterministic_semantics)
+        EbiTraitImporter::StochasticDeterministicSemantics(EventLog::import_as_stochastic_deterministic_semantics),
+        EbiTraitImporter::StochasticSemantics(EventLog::import_as_stochastic_semantics),
+        EbiTraitImporter::Semantics(EventLog::import_as_semantics),
     ],
     object_importers: &[
         EbiObjectImporter::EventLog(EventLog::import_as_object),
+        EbiObjectImporter::FiniteStochasticLanguage(EventLog::import_as_finite_stochastic_language),
+        EbiObjectImporter::StochasticDeterministicFiniteAutomaton(EventLog::import_as_stochastic_deterministic_finite_automaton),
     ],
     object_exporters: &[ 
         EbiObjectExporter::EventLog(EventLog::export_from_object)
@@ -39,6 +50,7 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     ],
 };
 
+#[derive(ActivityKey)]
 pub struct EventLog {
     classifier: EventLogClassifier,
     log: process_mining::EventLog,
@@ -77,6 +89,11 @@ impl EventLog {
         Ok(Box::new(event_log.get_finite_stochastic_language()))
     }
 
+    pub fn read_as_iterable_language(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitIterableLanguage>> {
+        let event_log = EventLog::import(reader)?;
+        Ok(Box::new(Into::<FiniteLanguage>::into(event_log.get_finite_language())))
+    }
+
     pub fn read_as_iterable_stochastic_language(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>> {
         let event_log = EventLog::import(reader)?;
         Ok(Box::new(Into::<FiniteStochasticLanguage>::into(event_log.get_finite_stochastic_language())))
@@ -87,11 +104,14 @@ impl EventLog {
         Ok(Box::new(event_log))
     }
 
-    pub fn read_as_stochastic_deterministic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics> {
-        let event_log = EventLog::import(reader)?;
-        let sdfa = event_log.to_stochastic_deterministic_finite_automaton();
-        let semantics = StochasticDeterministicFiniteAutomaton::get_deterministic_semantics(Arc::new(sdfa))?;
-        Ok(EbiTraitStochasticDeterministicSemantics::Usize(semantics))
+    pub fn import_as_finite_stochastic_language(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let log = Self::import(reader)?;
+        Ok(EbiObject::FiniteStochasticLanguage(log.get_finite_stochastic_language()))
+    }
+
+    pub fn import_as_stochastic_deterministic_finite_automaton(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let log = Self::import(reader)?;
+        Ok(EbiObject::StochasticDeterministicFiniteAutomaton(log.to_stochastic_deterministic_finite_automaton()))
     }
 
     pub fn get_finite_language(&self) -> FiniteLanguage {
@@ -157,17 +177,21 @@ impl EventLog {
     }
 }
 
-impl ToStochasticSemantics for EventLog {
-    type State = usize;
-
-    fn get_stochastic_semantics(&self) -> Box<dyn StochasticSemantics<State = usize, AState = usize>> {
-        Box::new(FiniteStochasticLanguageSemantics::from_language((&self.get_finite_stochastic_language()).into()))
+impl ToSemantics for EventLog {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        self.get_finite_stochastic_language().to_semantics()
     }
+}
 
-    fn import_as_stochastic_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitStochasticSemantics> {
-        let log = Self::import(reader)?;
-        let s = Rc::new(log);
-        Ok(EbiTraitStochasticSemantics::Usize(s.get_stochastic_semantics()))
+impl ToStochasticSemantics for EventLog {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        self.get_finite_stochastic_language().to_stochastic_semantics()
+    }
+}
+
+impl ToStochasticDeterministicSemantics for EventLog {
+    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+        self.get_finite_stochastic_language().to_stochastic_deterministic_semantics()
     }
 }
 

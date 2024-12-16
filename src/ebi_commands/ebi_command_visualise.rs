@@ -1,8 +1,7 @@
 use layout::backends::svg::SVGWriter;
+use svg2pdf::{ConversionOptions, PageOptions};
 
-use crate::ebi_framework::{dottable::Dottable, ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}};
-
-
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::EbiObject, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::ebi_trait_graphable::EbiTraitGraphable};
 
 pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group { 
     name_short: "vis", 
@@ -10,6 +9,7 @@ pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
     explanation_short: "Visualse an object.", 
     explanation_long: None,
     children: &[
+        &EBI_VISUALISE_PDF,
         &EBI_VISUALISE_SVG,
         &EBI_VISUALISE_TEXT
     ]
@@ -35,8 +35,11 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
                 EbiInput::Object(EbiObject::EventLog(log), _) => log.to_string(),
                 EbiInput::Object(EbiObject::FiniteLanguage(language), _) => language.to_string(),
                 EbiInput::Object(EbiObject::DirectlyFollowsModel(d), _) => d.to_string(),
-                EbiInput::Object(EbiObject::Alignments(a), _) => a.to_string(),
+                EbiInput::Object(EbiObject::LanguageOfAlignments(a), _) => a.to_string(),
+                EbiInput::Object(EbiObject::StochasticLanguageOfAlignments(a), _) => a.to_string(),
                 EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(s), _) => s.to_string(),
+                EbiInput::Object(EbiObject::ProcessTree(pt), _) => pt.to_string(),
+                EbiInput::Object(EbiObject::Executions(s), _) => s.to_string(),
                 EbiInput::FileHandler(_) => unreachable!(),
                 EbiInput::Trait(_, _) => unreachable!(),
                 EbiInput::String(_) => unreachable!(),
@@ -56,39 +59,45 @@ pub const EBI_VISUALISE_SVG: EbiCommand = EbiCommand::Command {
     latex_link: None, 
     cli_command: None, 
     exact_arithmetic: true, 
-    input_types: &[ 
-        &[
-            &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
-            &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
-            &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
-            &EbiInputType::Object(EbiObjectType::DirectlyFollowsModel),
-            &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
-        ] ], 
+    input_types: &[ &[ &EbiInputType::Trait(EbiTrait::Graphable), ] ], 
     input_names: &[ "FILE" ], 
     input_helps: &[ "Any file that can be visualised as a graph." ], 
     execute: |mut inputs, _| {
-        let mut result = match inputs.remove(0) {
-            EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn.to_dot(),
-            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => slpn.to_dot(),
-            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => sdfa.to_dot(),
-            EbiInput::Object(EbiObject::DirectlyFollowsModel(dfm), _) => dfm.to_dot(),
-            EbiInput::Object(EbiObject::EventLog(_), _) => unreachable!(),
-            EbiInput::Object(EbiObject::FiniteLanguage(_), _) => unreachable!(),
-            EbiInput::Object(EbiObject::FiniteStochasticLanguage(_), _) => unreachable!(),
-            EbiInput::Object(EbiObject::Alignments(_), _) => unreachable!(),
-            EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(dfa), _) => dfa.to_dot(),
-            EbiInput::FileHandler(_) => unreachable!(),
-            EbiInput::Trait(_, _) => unreachable!(),
-            EbiInput::String(_) => unreachable!(),
-            EbiInput::Usize(_) => unreachable!(),
-            EbiInput::Fraction(_) => unreachable!(),
-        };
+        let result = inputs.remove(0).to_type::<dyn EbiTraitGraphable>()?;
 
         let mut svg = SVGWriter::new();
-        result.do_it(false, false, false, &mut svg);
+        result.to_dot().do_it(false, false, false, &mut svg);
 
         return Ok(EbiOutput::SVG(svg.finalize()));
-    
     }, 
     output_type: &EbiOutputType::SVG
+};
+
+pub const EBI_VISUALISE_PDF: EbiCommand = EbiCommand::Command { 
+    name_short: "pdf", 
+    name_long: None, 
+    explanation_short: "Visualise an object as portable document format.",
+    explanation_long: None, 
+    latex_link: None, 
+    cli_command: None, 
+    exact_arithmetic: true, 
+    input_types: &[ &[ &EbiInputType::Trait(EbiTrait::Graphable), ] ], 
+    input_names: &[ "FILE" ], 
+    input_helps: &[ "Any file that can be visualised as a graph." ], 
+    execute: |mut inputs, _| {
+        let result = inputs.remove(0).to_type::<dyn EbiTraitGraphable>()?;
+
+        let mut svg = SVGWriter::new();
+        result.to_dot().do_it(false, false, false, &mut svg);
+        let svg_string = svg.finalize();
+
+        let mut options = svg2pdf::usvg::Options::default();
+        options.fontdb_mut().load_system_fonts();
+        let tree = svg2pdf::usvg::Tree::from_str(&svg_string, &options)?;
+        let pdf = svg2pdf::to_pdf(&tree, ConversionOptions::default(), PageOptions::default()).unwrap();
+
+        return Ok(EbiOutput::PDF(pdf));
+    
+    }, 
+    output_type: &EbiOutputType::PDF
 };

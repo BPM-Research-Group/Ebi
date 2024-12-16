@@ -5,14 +5,21 @@ use bitvec::bitvec;
 use fraction::ToPrimitive;
 use process_mining::{petri_net::petri_net_struct::{self, ArcType}, PetriNet};
 
-use crate::{ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_input::{EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable}, ebi_objects::labelled_petri_net::LPNMarking, ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics}, marking::Marking};
+use crate::{ebi_framework::{activity_key::HasActivityKey, ebi_file_handler::EbiFileHandler, ebi_input::{EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable}, ebi_objects::labelled_petri_net::LPNMarking, ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics}, marking::Marking};
 
-use super::labelled_petri_net::LabelledPetriNet;
+use super::{labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
+
+pub const FORMAT_SPECIFICATION: &str = "A Petri net markup language file follows the ISO 15909-2:2011 format~\\cite{pnml}. 
+Parsing is performed by the Rust4PM crate~\\cite{DBLP:conf/bpm/KustersA24}.
+For instance:
+    \\lstinputlisting[language=xml, style=boxed]{../testfiles/a.pnml}";
+
 
 pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "Petri net markup language",
     article: "a",
     file_extension: "pnml",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: PetriNetMarkupLanguage::validate,
     trait_importers: &[
         EbiTraitImporter::Semantics(PetriNetMarkupLanguage::import_as_semantics),
@@ -22,6 +29,9 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     ],
     object_exporters: &[
         EbiObjectExporter::LabelledPetriNet(PetriNetMarkupLanguage::export_from_object),
+        EbiObjectExporter::StochasticLabelledPetriNet(PetriNetMarkupLanguage::export_from_stochastic_labelled_petri_net),
+        EbiObjectExporter::StochasticDeterministicFiniteAutomaton(PetriNetMarkupLanguage::export_from_stochastic_deterministic_finite_automaton),
+        EbiObjectExporter::DirectlyFollowsModel(PetriNetMarkupLanguage::export_from_directly_follows_model),
     ],
     java_object_handlers: &[], //java translations covered by LabelledPetrinet
 };
@@ -51,6 +61,36 @@ impl PetriNetMarkupLanguage {
         let pnml = Self::import(reader)?;
         let lpn = LabelledPetriNet::try_from(pnml)?;
         Ok(EbiTraitSemantics::Marking(Box::new(lpn)))
+    }
+
+    fn export_from_stochastic_labelled_petri_net(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+        match object {
+            EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(slpn)) => {
+                let lpn = <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(slpn);
+                PetriNetMarkupLanguage::try_from(lpn)?.export(f)
+            },
+            _ => unreachable!()
+        }
+    }
+
+    fn export_from_stochastic_deterministic_finite_automaton(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+        match object {
+            EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => {
+                let lpn = <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(sdfa.get_stochastic_labelled_petri_net());
+                PetriNetMarkupLanguage::try_from(lpn)?.export(f)
+            },
+            _ => unreachable!()
+        }
+    }
+
+    fn export_from_directly_follows_model(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+        match object {
+            EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => {
+                let lpn = dfm.get_labelled_petri_net();
+                PetriNetMarkupLanguage::try_from(lpn)?.export(f)
+            },
+            _ => unreachable!()
+        }
     }
 }
 
@@ -217,7 +257,7 @@ impl TryFrom<LabelledPetriNet> for PetriNetMarkupLanguage {
         let mut new_initial_marking = petri_net_struct::Marking::new();
         for (place, cardinality) in lpn.initial_marking.get_place2token().into_iter().enumerate() {
             if cardinality > &0u64 {
-                let new_place = place2new_place.get(&place).ok_or(anyhow!("non-existing place referenced"))?;
+                let new_place = place2new_place.get(&place).ok_or(anyhow!("Non-existing place referenced."))?;
                 new_initial_marking.insert(*new_place, *cardinality);
             }
         }

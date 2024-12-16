@@ -1,4 +1,9 @@
 use std::{fmt::{Debug, Display}, hash::Hash};
-pub trait Displayable: Hash + Clone + Eq + Display + Debug + Send + Sync {
-    fn debug(&self) -> String;
-}
+
+use crate::ebi_objects::process_tree_semantics::NodeStates;
+
+pub trait Displayable: Hash + Clone + Eq + Display + Debug + Send + Sync {}
+
+impl Displayable for usize {}
+
+impl Displayable for NodeStates {}

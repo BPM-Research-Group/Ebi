@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::{ebi_framework::activity_key::ActivityKeyTranslator, ebi_objects::{labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::fraction::Fraction};
+use crate::{ebi_framework::activity_key::{ActivityKeyTranslator, HasActivityKey}, ebi_objects::{labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::Semantics}, math::fraction::Fraction};
 
 pub trait OccurrencesStochasticMiner {
     fn mine_occurrences_stochastic(self, language: Box<dyn EbiTraitFiniteStochasticLanguage>) -> StochasticLabelledPetriNet;

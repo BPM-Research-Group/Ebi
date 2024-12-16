@@ -1,77 +1,93 @@
 use std::{fmt::Display, str::FromStr};
 use anyhow::{anyhow, Context, Error, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::ebi_trait_stochastic_semantics::TransitionIndex, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::ActivityKey, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, line_reader::LineReader, math::fraction::Fraction};
 
-pub const HEADER: &str = "alignments";
+use super::language_of_alignments::Move;
 
-pub const EBI_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
-    name: "alignments",
-    article: "",
-    file_extension: "ali",
-    validator: ebi_input::validate::<Alignments>,
+pub const HEADER: &str = "stochastic language of alignments";
+
+pub const FORMAT_SPECIFICATION: &str = "A stochastic language of alignments is a line-based structure. Lines starting with a \\# are ignored.
+    This first line is exactly `stochastic language of alignments'.
+    The second line is the number of alignments in the language.
+    For each alignment, the first line contains the probability of the alignment in the language, which is either a positive fraction or a decimal value.
+    The second line contains the number of moves in the alignment.
+    Then, each move is given as either 
+    \\begin{itemize}
+        \\item `synchronous move', followed by a line with the word `label' followed by a space and the activity label, which is followed with a line with the index of the involved transition.
+        \\item `silent move', followed by a line with the index of the silent transition.
+        \\item `log move', followed by a line with the word `label', then a space, and then the activity label.
+        \\item `model move', followed by a line with the word `label' followed by a space and the activity label, which is followed with a line with the index of the involved ransition.
+    \\end{itemize}
+    Note that the Semantics trait of Ebi, which is what most alignment computations use, requires that every final marking is a deadlock.
+    Consequently, an implicit silent transition may be added by the Semantics trait that is not in the model.
+    
+    For instance:
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba.sali}";
+
+pub const EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
+    name: "stochastic language of alignments",
+    article: "a",
+    file_extension: "sali",
+    format_specification: &FORMAT_SPECIFICATION,
+    validator: ebi_input::validate::<StochasticLanguageOfAlignments>,
     trait_importers: &[
         
     ],
     object_importers: &[
-        EbiObjectImporter::Alignments(Alignments::import_as_object)
+        EbiObjectImporter::StochasticLanguageOfAlignments(StochasticLanguageOfAlignments::import_as_object)
     ],
     object_exporters: &[ 
-        EbiObjectExporter::Alignments(Alignments::export_from_object)
+        EbiObjectExporter::StochasticLanguageOfAlignments(StochasticLanguageOfAlignments::export_from_object)
     ],
-    java_object_handlers: &[],
+    java_object_handlers: &[]
 };
 
-#[derive(Debug,PartialEq,Eq,Ord,PartialOrd)]
-pub enum Move {
-    LogMove(Activity),
-    ModelMove(Activity, TransitionIndex),
-    SynchronousMove(Activity, TransitionIndex),
-    SilentMove(TransitionIndex)
+#[derive(ActivityKey)]
+pub struct StochasticLanguageOfAlignments {
+    pub(crate) activity_key: ActivityKey,
+    pub(crate) alignments: Vec<Vec<Move>>,
+    pub(crate) probabilities: Vec<Fraction>
 }
 
-pub struct Alignments {
-    activity_key: ActivityKey,
-    alignments: Vec<Vec<Move>>
-}
-
-impl Alignments {
+impl StochasticLanguageOfAlignments {
     pub fn new(activity_key: ActivityKey) -> Self {
         Self {
             activity_key: activity_key,
-            alignments: vec![]
+            alignments: vec![],
+            probabilities: vec![],
         }
     }
 
-    pub fn push(&mut self, alignment: Vec<Move>) {
+    pub fn push(&mut self, alignment: Vec<Move>, weight: Fraction) {
         self.alignments.push(alignment);
+        self.probabilities.push(weight);
     }
 
-    pub fn append(&mut self, alignments: &mut Vec<Vec<Move>>) {
-        self.alignments.append(alignments);
+    pub fn append(&mut self, alignments: Vec<(Vec<Move>, Fraction)>) {
+        let (mut alignments, mut probabilities) = alignments.into_iter().unzip();
+        self.alignments.append(&mut alignments);
+        self.probabilities.append(&mut probabilities);
+    }
+
+    pub fn len(&self) -> usize {
+        self.alignments.len()
     }
 
     pub fn get(&self, index: usize) -> Option<&Vec<Move>> {
         self.alignments.get(index)
     }
 
-    pub fn get_activity_key(&self) -> &ActivityKey {
-        &self.activity_key
+    pub fn get_probability(&self, index: usize) -> Option<&Fraction> {
+        self.probabilities.get(index)
     }
 
-    pub fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
-        &mut self.activity_key
-    }
-
-    pub fn sort(&mut self) {
-        self.alignments.sort();
-    }
 }
 
-impl Exportable for Alignments {
+impl Exportable for StochasticLanguageOfAlignments {
     fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
         match object {
-            EbiOutput::Object(EbiObject::Alignments(alignments)) => alignments.export(f),
+            EbiOutput::Object(EbiObject::StochasticLanguageOfAlignments(alignments)) => alignments.export(f),
             _ => unreachable!()
         }
     }
@@ -81,7 +97,7 @@ impl Exportable for Alignments {
     }
 }
 
-impl Display for Alignments {
+impl Display for StochasticLanguageOfAlignments {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "{}", HEADER)?;
         
@@ -89,6 +105,7 @@ impl Display for Alignments {
 
         for (i, moves) in self.alignments.iter().enumerate() {
             writeln!(f, "# alignment {}", i)?;
+            writeln!(f, "# probability\n{}", self.probabilities[i])?;
             writeln!(f, "# number of moves\n{}", moves.len())?;
 
             for (j, movee) in moves.iter().enumerate() {
@@ -121,9 +138,9 @@ impl Display for Alignments {
     }
 }
 
-impl Importable for Alignments {
+impl Importable for StochasticLanguageOfAlignments {
     fn import_as_object(reader: &mut dyn std::io::BufRead) -> Result<EbiObject> {
-        Ok(EbiObject::Alignments(Self::import(reader)?))
+        Ok(EbiObject::StochasticLanguageOfAlignments(Self::import(reader)?))
     }
 
     fn import(reader: &mut dyn std::io::BufRead) -> anyhow::Result<Self> where Self: Sized {
@@ -137,10 +154,19 @@ impl Importable for Alignments {
 
         let number_of_alignments = lreader.next_line_index().context("failed to read number of alignments")?;
 
-        let mut alignments = Vec::new();
+        let mut alignments = vec![];
+        let mut probabilities = vec![];
         for alignment_number in 0 .. number_of_alignments {
 
             let mut moves = vec![];
+
+            let probability = lreader.next_line_weight().with_context(|| format!("failed to read weight of alignment {}", alignment_number))?;
+            if !probability.is_positive() {
+                return Err(anyhow!("alignment {} at line {} has non-positive probability", alignment_number, lreader.get_last_line_number()));
+            } else if probability > Fraction::one() {
+                return Err(anyhow!("alignment {} at line {} has a probability higher than 1", alignment_number, lreader.get_last_line_number()));
+            }
+            probabilities.push(probability);
 
             let number_of_moves = lreader.next_line_index().with_context(|| format!("failed to read number of moves in alignemnt {}", alignment_number))?;
 
@@ -212,12 +238,13 @@ impl Importable for Alignments {
 
         Ok(Self {
             activity_key: activity_key,
-            alignments: alignments
+            alignments: alignments,
+            probabilities
         })
     }
 }
 
-impl FromStr for Alignments {
+impl FromStr for StochasticLanguageOfAlignments {
     type Err = Error;
 
     fn from_str(s: &str) -> Result<Self, Self::Err> {
@@ -226,9 +253,18 @@ impl FromStr for Alignments {
     }
 }
 
-impl Infoable for Alignments {
+impl Infoable for StochasticLanguageOfAlignments {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         writeln!(f, "Number of alignments\t\t{}", self.alignments.len())?;
         Ok(write!(f, "")?)
+    }
+}
+
+impl FromEbiTraitObject for StochasticLanguageOfAlignments {
+    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::StochasticLanguageOfAlignments(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!("cannot read {} {} as a finite language", object.get_type().get_article(), object.get_type()))
+        }
     }
 }

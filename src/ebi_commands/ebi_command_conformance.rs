@@ -96,7 +96,8 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
     execute: |mut inputs, _| {
         let log = inputs.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let model = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
-        Ok(EbiOutput::Fraction(log.unit_earth_movers_stochastic_conformance(model).context("cannot compute uEMSC")?))
+        let uemsc = log.unit_earth_movers_stochastic_conformance(model).context("cannot compute uEMSC")?;
+        Ok(EbiOutput::Fraction(uemsc))
     },
     output_type: &EbiOutputType::Fraction
 };
@@ -106,7 +107,23 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
     name_long: Some("entropic-relevance"), 
     explanation_short: "Compute entropic relevance (uniform).", 
     explanation_long: None, 
-    latex_link: Some("Section~\\ref{sec:er}"), 
+    latex_link: Some(r"Entropic relevance is computed as follows:
+        
+        \begin{definition}[Entropic Relevance~\cite{DBLP:journals/is/AlkhammashPMG22}]
+            \label{def:ER}
+                Let $L$ be a finite stochastic language and let $M$ be a queriable stochastic langauge.
+                Let $\Lambda$ be the set of all activities appearing in the traces of $L$.
+                Then, the \emph{entropic relevance ($\entrel$) of $M$ to $L$} is defined as follows: 
+                \begin{align*}
+                    \entrel(L, M) ={}& H_0\left(\sum_{\sigma \in \bar{L},\, M(\sigma)>0}{L(\sigma)}\right) + 
+                    \sum_{\sigma \in \bar{L}}L(\sigma) J(\sigma, M)\\
+                    J(\sigma, M) ={}& \begin{cases}
+                    -\log_2 M(\sigma) & M(\sigma) > 0\\
+                    (1+|\sigma|) \log_2 (1 + |\Lambda|)) & \text{otherwise}
+                    \end{cases}\\
+                    H_0(x) ={}& -x \log_2{x} - (1-x) \log_2{(1-x)} \text{ with } H_0(0) = H_0(1) = 0 &\\
+                \end{align*}       
+            \end{definition}"), 
     cli_command: None, 
     exact_arithmetic: true,
     input_types: &[ 

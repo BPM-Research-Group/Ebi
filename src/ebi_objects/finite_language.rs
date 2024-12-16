@@ -1,19 +1,30 @@
 use anyhow::{anyhow, Result, Context, Error};
 use fnv::FnvBuildHasher;
-use std::{collections::HashSet, fmt::Display, io::{self, BufRead, Write}, str::FromStr, sync::Arc};
+use std::{collections::HashSet, fmt::Display, io::{self, BufRead, Write}, str::FromStr};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}}, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::{self, EbiTraitIterableLanguage}, ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}}, line_reader::LineReader};
 
 use super::deterministic_finite_automaton::DeterministicFiniteAutomaton;
 
 pub const HEADER: &str = "finite language";
 
+pub const FORMAT_SPECIFICATION: &str = "A finite language is a line-based structure. Lines starting with a \\# are ignored.
+    This first line is exactly `finite language'.
+    The second line is the number of traces in the language.
+    For each trace, the first line contains the number of events in the trace.
+    Then, each subsequent line contains the activity name of one event.
+    
+    For instance:
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba.lang}";
+
 pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "finite language",
     article: "a",
     file_extension: "lang",
+    format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<FiniteLanguage>,
     trait_importers: &[
+        EbiTraitImporter::IterableLanguage(ebi_trait_iterable_language::import::<FiniteLanguage>),
         EbiTraitImporter::FiniteLanguage(ebi_trait_finite_language::import::<FiniteLanguage>),
         EbiTraitImporter::Semantics(FiniteLanguage::import_as_semantics),
     ],
@@ -28,6 +39,7 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[],
 };
 
+#[derive(ActivityKey)]
 pub struct FiniteLanguage {
     activity_key: ActivityKey,
     traces: HashSet<Vec<Activity>, FnvBuildHasher>
@@ -77,11 +89,7 @@ impl FiniteLanguage {
     }
 }
 
-impl EbiTraitIterableLanguage for FiniteLanguage {
-    fn get_activity_key(&self) -> &ActivityKey {
-        &self.activity_key
-    }
-    
+impl EbiTraitIterableLanguage for FiniteLanguage {    
     fn iter(&self) -> Box<dyn Iterator<Item = &Vec<Activity>> + '_> {
         Box::new(self.traces.iter())
     }
@@ -218,16 +226,7 @@ impl From<(ActivityKey, HashSet<Vec<Activity>, FnvBuildHasher>)> for FiniteLangu
 }
 
 impl ToSemantics for FiniteLanguage {
-    type State = usize;
-
-    fn get_semantics(&self) -> Box<dyn Semantics<State = Self::State, AState = Self::State>> {
-        let dfa = self.get_deterministic_finite_automaton();
-        Arc::new(dfa).get_semantics()
-    }
-
-    fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
-        let lang = Self::import(reader)?;
-        let dfa = lang.get_deterministic_finite_automaton();
-        Ok(EbiTraitSemantics::Usize(Arc::new(dfa).get_semantics()))
+    fn to_semantics(self) -> EbiTraitSemantics {
+        self.get_deterministic_finite_automaton().to_semantics()
     }
 }

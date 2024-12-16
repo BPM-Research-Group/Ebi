@@ -116,10 +116,10 @@ pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command {
             log::trace!("explain the trace {:?} given the model", trace);
         
             let result = semantics.explain_trace(&trace, &balance).with_context(|| format!("cannot explain the trace {:?}", trace))?;
-            return Ok(EbiOutput::Object(EbiObject::Alignments(result)));
+            return Ok(EbiOutput::Object(EbiObject::LanguageOfAlignments(result)));
         } else {
             return Err(anyhow!("no trace given"));
         }
     }, 
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::Alignments),
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::LanguageOfAlignments),
 };

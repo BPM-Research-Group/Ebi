@@ -1,14 +1,17 @@
 use std::{collections::BTreeSet, fmt::{self, Display}, fs::File, io::Write, path::PathBuf};
 use anyhow::{Context, Result};
+use strum_macros::Display;
 
-use crate::math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv};
+use crate::{ebi_objects::{compressed_event_log::{CompressedEventLog, EBI_COMPRESSED_EVENT_LOG}, deterministic_finite_automaton::{DeterministicFiniteAutomaton, EBI_DETERMINISTIC_FINITE_AUTOMATON}, directly_follows_model::{DirectlyFollowsModel, EBI_DIRCTLY_FOLLOWS_MODEL}, executions::{Executions, EBI_EXECUTIONS}, finite_language::{FiniteLanguage, EBI_FINITE_LANGUAGE}, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}, language_of_alignments::{LanguageOfAlignments, EBI_LANGUAGE_OF_ALIGNMENTS}, process_tree::{ProcessTree, EBI_PROCESS_TREE}, stochastic_deterministic_finite_automaton::{StochasticDeterministicFiniteAutomaton, EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON}, stochastic_labelled_petri_net::{StochasticLabelledPetriNet, EBI_STOCHASTIC_LABELLED_PETRI_NET}, stochastic_language_of_alignments::{StochasticLanguageOfAlignments, EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS}}, math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv}};
 
-use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_object::{EbiObject, EbiObjectType}, exportable::Exportable, prom_link::{JavaObjectHandler, JAVA_OBJECT_HANDLERS_CONTAINSROOT, JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV, JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_SVG, JAVA_OBJECT_HANDLERS_USIZE}};
+use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_object::{EbiObject, EbiObjectType}, exportable::Exportable, prom_link::{JavaObjectHandler, JAVA_OBJECT_HANDLERS_CONTAINSROOT, JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV, JAVA_OBJECT_HANDLERS_PDF, JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_SVG, JAVA_OBJECT_HANDLERS_USIZE}};
 
+#[derive(Display)]
 pub enum EbiOutput {
     Object(EbiObject),
     String(String),
     SVG(String),
+    PDF(Vec<u8>),
     Usize(usize),
     Fraction(Fraction),
     LogDiv(LogDiv),
@@ -22,6 +25,7 @@ impl EbiOutput {
             EbiOutput::Object(o) => EbiOutputType::ObjectType(o.get_type()),
             EbiOutput::String(_) => EbiOutputType::String,
             EbiOutput::SVG(_) => EbiOutputType::SVG,
+            EbiOutput::PDF(_) => EbiOutputType::PDF,
             EbiOutput::Usize(_) => EbiOutputType::Usize,
             EbiOutput::Fraction(_) => EbiOutputType::Fraction,
             EbiOutput::LogDiv(_) => EbiOutputType::LogDiv,
@@ -36,6 +40,7 @@ pub enum EbiOutputType {
     ObjectType(EbiObjectType),
     String,
     SVG,
+    PDF,
     Usize,
     Fraction,
     LogDiv,
@@ -79,6 +84,7 @@ impl EbiOutputType {
             } ,
             EbiOutputType::String => vec![EbiExporter::String],
             EbiOutputType::SVG => vec![EbiExporter::SVG],
+            EbiOutputType::PDF => vec![EbiExporter::PDF],
             EbiOutputType::Usize => vec![EbiExporter::Usize],
             EbiOutputType::Fraction => vec![EbiExporter::Fraction],
             EbiOutputType::LogDiv => vec![EbiExporter::LogDiv],
@@ -87,13 +93,29 @@ impl EbiOutputType {
         }
     }
 
-    pub fn exporters_as_strings_with_articles(&self, last_connector: &str) -> String {
-        let mut list = self.get_exporters().into_iter().map(|exp| exp.get_article().to_string() + " " + &exp.to_string()).collect::<Vec<_>>();
-        if list.len() == 1 {
-            return list.remove(0)
+    pub fn get_default_exporter(&self) -> EbiExporter {
+        match self {
+            EbiOutputType::ObjectType(EbiObjectType::LanguageOfAlignments) => EbiExporter::Object(&EbiObjectExporter::LanguageOfAlignments(LanguageOfAlignments::export_from_object), &EBI_LANGUAGE_OF_ALIGNMENTS),
+            EbiOutputType::ObjectType(EbiObjectType::StochasticLanguageOfAlignments) => EbiExporter::Object(&EbiObjectExporter::StochasticLanguageOfAlignments(StochasticLanguageOfAlignments::export_from_object), &EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS),
+            EbiOutputType::ObjectType(EbiObjectType::DeterministicFiniteAutomaton) => EbiExporter::Object(&EbiObjectExporter::DeterministicFiniteAutomaton(DeterministicFiniteAutomaton::export_from_object), &EBI_DETERMINISTIC_FINITE_AUTOMATON),
+            EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsModel) => EbiExporter::Object(&EbiObjectExporter::DirectlyFollowsModel(DirectlyFollowsModel::export_from_object), &EBI_DIRCTLY_FOLLOWS_MODEL),
+            EbiOutputType::ObjectType(EbiObjectType::EventLog) => EbiExporter::Object(&EbiObjectExporter::EventLog(CompressedEventLog::export_from_object), &EBI_COMPRESSED_EVENT_LOG),
+            EbiOutputType::ObjectType(EbiObjectType::Executions) => EbiExporter::Object(&EbiObjectExporter::Executions(Executions::export_from_object), &EBI_EXECUTIONS),
+            EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage) => EbiExporter::Object(&EbiObjectExporter::FiniteLanguage(FiniteLanguage::export_from_object), &EBI_FINITE_LANGUAGE),
+            EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage) => EbiExporter::Object(&EbiObjectExporter::FiniteStochasticLanguage(FiniteStochasticLanguage::export_from_object), &EBI_FINITE_STOCHASTIC_LANGUAGE),
+            EbiOutputType::ObjectType(EbiObjectType::LabelledPetriNet) => EbiExporter::Object(&EbiObjectExporter::LabelledPetriNet(LabelledPetriNet::export_from_object), &EBI_LABELLED_PETRI_NET),
+            EbiOutputType::ObjectType(EbiObjectType::StochasticDeterministicFiniteAutomaton) => EbiExporter::Object(&&EbiObjectExporter::StochasticDeterministicFiniteAutomaton(StochasticDeterministicFiniteAutomaton::export_from_object), &EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON),
+            EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet) => EbiExporter::Object(&&EbiObjectExporter::StochasticLabelledPetriNet(StochasticLabelledPetriNet::export_from_object), &EBI_STOCHASTIC_LABELLED_PETRI_NET),
+            EbiOutputType::ObjectType(EbiObjectType::ProcessTree) => EbiExporter::Object(&&EbiObjectExporter::ProcessTree(ProcessTree::export_from_object), &EBI_PROCESS_TREE),
+            EbiOutputType::String => EbiExporter::String,
+            EbiOutputType::SVG => EbiExporter::SVG,
+            EbiOutputType::PDF => EbiExporter::PDF,
+            EbiOutputType::Usize => EbiExporter::Usize,
+            EbiOutputType::Fraction => EbiExporter::Fraction,
+            EbiOutputType::LogDiv => EbiExporter::LogDiv,
+            EbiOutputType::ContainsRoot => EbiExporter::ContainsRoot,
+            EbiOutputType::RootLogDiv => EbiExporter::RootLogDiv,
         }
-        let (last, list) = list.split_last().unwrap();
-        format!("{} {} {}", list.join(", "), last_connector, last)
     }
 }
 
@@ -103,6 +125,7 @@ impl Display for EbiOutputType {
             EbiOutputType::ObjectType(t) => t.fmt(f),
             EbiOutputType::String => Display::fmt(&"text", f),
             EbiOutputType::SVG => Display::fmt(&"svg", f),
+            EbiOutputType::PDF => Display::fmt(&"pdf", f),
             EbiOutputType::Usize => Display::fmt(&"integer", f),
             EbiOutputType::Fraction => Display::fmt(&"fraction", f),
             EbiOutputType::LogDiv => Display::fmt(&"logarithm", f),
@@ -117,6 +140,7 @@ pub enum EbiExporter {
     Object(&'static EbiObjectExporter, &'static EbiFileHandler),
     String,
     SVG,
+    PDF,
     Usize,
     Fraction,
     LogDiv,
@@ -132,6 +156,8 @@ impl EbiExporter {
             (EbiExporter::String, _) => unreachable!(),
             (EbiExporter::SVG, EbiOutput::SVG(object)) => object.export(f),
             (EbiExporter::SVG, _) => unreachable!(),
+            (EbiExporter::PDF, EbiOutput::PDF(object)) => Ok(f.write_all(&object)?),
+            (EbiExporter::PDF, _) => unreachable!(),
             (EbiExporter::Usize, EbiOutput::Usize(object)) => object.export(f),
             (EbiExporter::Usize, _) => unreachable!(),
             (EbiExporter::Fraction, EbiOutput::Fraction(object)) => object.export(f),
@@ -150,6 +176,7 @@ impl EbiExporter {
             EbiExporter::Object(_, file_handler) => file_handler.article,
             EbiExporter::String => "",
             EbiExporter::SVG => "an",
+            EbiExporter::PDF => "a",
             EbiExporter::Usize => "an",
             EbiExporter::Fraction => "a",
             EbiExporter::LogDiv => "a",
@@ -163,6 +190,7 @@ impl EbiExporter {
             EbiExporter::Object(_, file_handler) => file_handler.name,
             EbiExporter::String => "string",
             EbiExporter::SVG => "SVG",
+            EbiExporter::PDF => "PDF",
             EbiExporter::Usize => "integer",
             EbiExporter::Fraction => "fraction",
             EbiExporter::LogDiv => "logdiv",
@@ -176,6 +204,7 @@ impl EbiExporter {
             EbiExporter::Object(_, file_handler) => file_handler.java_object_handlers,
             EbiExporter::String => JAVA_OBJECT_HANDLERS_STRING,
             EbiExporter::SVG => JAVA_OBJECT_HANDLERS_SVG,
+            EbiExporter::PDF => JAVA_OBJECT_HANDLERS_PDF,
             EbiExporter::Usize => JAVA_OBJECT_HANDLERS_USIZE,
             EbiExporter::Fraction => JAVA_OBJECT_HANDLERS_FRACTION,
             EbiExporter::LogDiv => JAVA_OBJECT_HANDLERS_LOGDIV,
@@ -189,11 +218,26 @@ impl EbiExporter {
             EbiExporter::Object(_, file_handler) => file_handler.file_extension,
             EbiExporter::String => "txt",
             EbiExporter::SVG => "svg",
+            EbiExporter::PDF => "pdf",
             EbiExporter::Usize => "int",
             EbiExporter::Fraction => "frac",
             EbiExporter::LogDiv => "logdiv",
             EbiExporter::ContainsRoot => "croot",
             EbiExporter::RootLogDiv => "rldiv",
+        }
+    }
+
+    pub fn is_binary(&self) -> bool {
+        match self {
+            EbiExporter::Object(_, _) => false,
+            EbiExporter::String => false,
+            EbiExporter::SVG => false,
+            EbiExporter::PDF => true,
+            EbiExporter::Usize => false,
+            EbiExporter::Fraction => false,
+            EbiExporter::LogDiv => false,
+            EbiExporter::ContainsRoot => false,
+            EbiExporter::RootLogDiv => false,
         }
     }
 }
@@ -204,6 +248,7 @@ impl Display for EbiExporter {
             EbiExporter::Object(_, file_handler) => Display::fmt(file_handler, f),
             EbiExporter::String => Display::fmt(&"text", f),
             EbiExporter::SVG => Display::fmt(&"svg", f),
+            EbiExporter::PDF => Display::fmt(&"pdf", f),
             EbiExporter::Usize => Display::fmt(&"integer", f),
             EbiExporter::Fraction => Display::fmt(&"fraction", f),
             EbiExporter::LogDiv => Display::fmt(&"logarithm", f),
@@ -222,8 +267,11 @@ pub enum EbiObjectExporter {
     LabelledPetriNet(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     StochasticDeterministicFiniteAutomaton(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     StochasticLabelledPetriNet(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
-    Alignments(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
+    LanguageOfAlignments(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
+    StochasticLanguageOfAlignments(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     DeterministicFiniteAutomaton(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
+    ProcessTree(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
+    Executions(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
 }
 
 impl EbiObjectExporter {
@@ -236,8 +284,11 @@ impl EbiObjectExporter {
             EbiObjectExporter::LabelledPetriNet(_) => EbiObjectType::LabelledPetriNet,
             EbiObjectExporter::StochasticDeterministicFiniteAutomaton(_) => EbiObjectType::StochasticDeterministicFiniteAutomaton,
             EbiObjectExporter::StochasticLabelledPetriNet(_) => EbiObjectType::StochasticLabelledPetriNet,
-            EbiObjectExporter::Alignments(_) => EbiObjectType::Alignments,
+            EbiObjectExporter::LanguageOfAlignments(_) => EbiObjectType::LanguageOfAlignments,
+            EbiObjectExporter::StochasticLanguageOfAlignments(_) => EbiObjectType::StochasticLanguageOfAlignments,
             EbiObjectExporter::DeterministicFiniteAutomaton(_) => EbiObjectType::DeterministicFiniteAutomaton,
+            EbiObjectExporter::ProcessTree(_) => EbiObjectType::ProcessTree,
+            EbiObjectExporter::Executions(_) => EbiObjectType::Executions,
         }
     }
 
@@ -250,8 +301,11 @@ impl EbiObjectExporter {
             EbiObjectExporter::LabelledPetriNet(exporter) => (exporter)(object, f),
             EbiObjectExporter::StochasticDeterministicFiniteAutomaton(exporter) => (exporter)(object, f),
             EbiObjectExporter::StochasticLabelledPetriNet(exporter) => (exporter)(object, f),
-            EbiObjectExporter::Alignments(exporter) => (exporter)(object, f),
+            EbiObjectExporter::LanguageOfAlignments(exporter) => (exporter)(object, f),
+            EbiObjectExporter::StochasticLanguageOfAlignments(exporter) => (exporter)(object, f),
             EbiObjectExporter::DeterministicFiniteAutomaton(exporter) => (exporter)(object, f),
+            EbiObjectExporter::ProcessTree(exporter) => (exporter)(object, f),
+            EbiObjectExporter::Executions(exporter) => (exporter)(object, f),
         }
     }
 }
@@ -267,4 +321,16 @@ pub fn export_to_string(object: EbiOutput, exporter: EbiExporter) -> Result<Stri
     let mut f = vec![];
     exporter.export_from_object(object, &mut f)?;
     Ok(String::from_utf8(f)?)
+}
+
+pub fn export_to_bytes(object: EbiOutput, exporter: EbiExporter) -> Result<Vec<u8>> {
+    let mut f = vec![];
+    exporter.export_from_object(object, &mut f)?;
+    Ok(f)
+}
+
+impl Display for EbiObjectExporter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.get_type().to_string())
+    }
 }

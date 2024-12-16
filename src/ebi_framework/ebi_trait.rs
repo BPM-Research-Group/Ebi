@@ -15,6 +15,7 @@ pub enum EbiTrait {
     Semantics,
     StochasticDeterministicSemantics,
     StochasticSemantics,
+    Graphable,
 }
 
 impl EbiTrait {
@@ -47,6 +48,7 @@ impl EbiTrait {
             EbiTrait::StochasticDeterministicSemantics => "a",
             EbiTrait::StochasticSemantics => "a",
             EbiTrait::Semantics => "a",
+            EbiTrait::Graphable => "a",
         }
     }
     
@@ -80,6 +82,7 @@ impl Display for EbiTrait {
             EbiTrait::StochasticDeterministicSemantics => "stochastic deterministic semantics",
             EbiTrait::StochasticSemantics => "stochastic semantics",
             EbiTrait::Semantics => "semantics",
+            EbiTrait::Graphable => "graphable",
         })
     }
 }

@@ -1,11 +1,11 @@
 use std::collections::HashMap;
 use anyhow::{Result, anyhow};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, infoable::Infoable}, ebi_traits::{ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, infoable::Infoable}, ebi_traits::{ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
 
 use super::finite_stochastic_language::FiniteStochasticLanguage;
 
-#[derive(Debug)]
+#[derive(Debug,ActivityKey)]
 pub struct FiniteStochasticLanguageSemantics {
     activity_key: ActivityKey,
     nodes: Vec<HashMap<Option<Activity>, (usize, Fraction)>> //state -> activity or silent -> (state, probability)
@@ -79,21 +79,13 @@ impl FiniteStochasticLanguageSemantics {
 }
 
 impl Semantics for FiniteStochasticLanguageSemantics {
-    type State = usize;
+    type SemState = usize;
 
-    fn get_activity_key(&self) -> &ActivityKey {
-        &self.activity_key
-    }
-
-    fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
-        &mut self.activity_key
-    }
-
-    fn get_initial_state(&self) -> Self::State {
+    fn get_initial_state(&self) -> usize {
         0
     }
 
-    fn execute_transition(&self, state: &mut Self::State, transition: TransitionIndex) -> Result<()> {
+    fn execute_transition(&self, state: &mut usize, transition: TransitionIndex) -> Result<()> {
         let activity = self.transition_index_to_activity(transition);
         
         if let Some((new_state, _)) = self.nodes[*state].get(&activity) {
@@ -103,7 +95,7 @@ impl Semantics for FiniteStochasticLanguageSemantics {
         return Err(anyhow!("transition cannot be executed as it is not enabled in state {}", state));
     }
 
-    fn is_final_state(&self, state: &Self::State) -> bool {
+    fn is_final_state(&self, state: &usize) -> bool {
         self.nodes[*state].is_empty()
     }
 
@@ -115,7 +107,7 @@ impl Semantics for FiniteStochasticLanguageSemantics {
         self.transition_index_to_activity(transition)
     }
 
-    fn get_enabled_transitions(&self, state: &Self::State) -> Vec<TransitionIndex> {
+    fn get_enabled_transitions(&self, state: &usize) -> Vec<TransitionIndex> {
         let mut result = vec![];
         for (activity, _) in &self.nodes[*state] {
             result.push(self.activity_to_transition_index(activity));
@@ -123,16 +115,22 @@ impl Semantics for FiniteStochasticLanguageSemantics {
         return result;
     }
 
+    fn get_number_of_transitions(&self) -> usize {
+        self.activity_key.get_number_of_activities()
+    }
+
 }
 
 impl StochasticSemantics for FiniteStochasticLanguageSemantics {
-    fn get_transition_weight(&self, state: &Self::State, transition: TransitionIndex) -> &Fraction {
+    type StoSemState = usize;
+
+    fn get_transition_weight(&self, state: &usize, transition: TransitionIndex) -> &Fraction {
         let activity = self.transition_index_to_activity(transition);
 
         &self.nodes[*state].get(&activity).unwrap().1
     }
 
-    fn get_total_weight_of_enabled_transitions(&self, state: &Self::State) -> Result<Fraction> {
+    fn get_total_weight_of_enabled_transitions(&self, state: &usize) -> Result<Fraction> {
         let mut sum = Fraction::zero();
         for (_, (_, probability)) in &self.nodes[*state] {
             sum += probability;

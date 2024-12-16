@@ -10,6 +10,8 @@ pub trait EbiTraitFiniteStochasticLanguage : EbiTraitIterableStochasticLanguage 
     fn get_trace_proability(&self, trace_index: usize) -> Option<&Fraction>;
 
     fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage;
+
+    fn get_probability_sum(&self) -> Fraction;
 }
 
 impl FromEbiTraitObject for dyn EbiTraitFiniteStochasticLanguage {

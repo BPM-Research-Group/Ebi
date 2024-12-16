@@ -1,9 +1,9 @@
-use std::{collections::{hash_map::Entry, HashMap}, fmt::Display, hash::Hash};
+use std::collections::{hash_map::Entry, HashMap};
 
 use anyhow::{anyhow, Result};
 use rand::Rng;
 
-use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}}, math::fraction::Fraction};
+use crate::{ebi_framework::displayable::Displayable, ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}}, math::fraction::Fraction};
 
 pub trait Sampler {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage>;
@@ -35,7 +35,7 @@ impl Sampler for dyn EbiTraitFiniteStochasticLanguage {
     }
 }
 
-impl <T, A> Sampler for T where T: StochasticSemantics<State = A> + ?Sized, A: Display + Clone + Hash + Eq {
+impl <T, State> Sampler for T where T: StochasticSemantics<StoSemState = State> + ?Sized, State: Displayable {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage> {
         let mut result = HashMap::new();
 

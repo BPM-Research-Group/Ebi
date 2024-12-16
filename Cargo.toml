@@ -17,7 +17,7 @@ num-bigint = { version = "*", features = ["rand"] }
 clap = { version = "*", features = ["derive", "cargo", "string"] }
 anyhow = "*"
 clap-verbosity-flag = "*"
-log = "*"
+log = { version = "*", features = ["release_max_level_off"] }
 env_logger = "*"
 layout-rs = "*"
 fraction = { version = "*", features = ["with-approx"] }
@@ -39,6 +39,10 @@ pathfinding="*"
 fnv = "*"
 jni = "*"
 itertools = "*"
+serde = "*"
+derive_activity_key = {path = "lib/derive_activity_key"}
+logging_timer = "*"
+svg2pdf = "*"
 
 [dependencies.num-rational]
 version = "0.4.1"
@@ -48,7 +52,9 @@ version = "0.20.0"
 features = ["extension-module"]
 
 [profile.release]
-debug = true
-strip = false
+debug = false
+strip = true
+panic = 'abort'
+opt-level = 3
 lto = true
-opt-level = "z"
+codegen-units = 1

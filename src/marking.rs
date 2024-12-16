@@ -1,4 +1,4 @@
-use std::fmt::{Formatter, Display, Debug};
+use std::{fmt::{Debug, Display, Formatter}, ops::MulAssign};
 use anyhow::{anyhow, Result};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
@@ -84,5 +84,11 @@ impl Debug for Marking {
             }
         }
         write!(f, "}}")
+    }
+}
+
+impl MulAssign<u64> for Marking {
+    fn mul_assign(&mut self, rhs: u64) {
+        self.place2token.iter_mut().for_each(|x| *x *= rhs);
     }
 }
