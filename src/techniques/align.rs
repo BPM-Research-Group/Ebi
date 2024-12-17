@@ -224,7 +224,6 @@ macro_rules! align_for_lpn {
                         move_cost_solution_vector = previous_estimated_move_cost_solution;
                         move_cost_solution_vector[transition_idx] -= 1.0;
                         heuristic4cost_is_valid = true;
-                        // println!("\nestimated move cost:{}", move_cost);
                     }
                     (move_cost, move_cost_solution_vector, heuristic4cost_is_valid)
                 };
@@ -241,10 +240,8 @@ macro_rules! align_for_lpn {
                         Ok((move_cost,move_cost_solution_vector)) => {
                             (move_cost, move_cost_solution_vector)
                         },
-                        Err(_) => {
-                            // println!("heuristic computation failed");
-                            (f64::MAX, vec![0.0; cost_function.len()])
-                        }
+                        Err(_) =>
+                            (f64::MAX, vec![0.0; cost_function.len()])    
                     };
                     let move_cost = result.0;
                     let move_cost_solution_vector = result.1;
@@ -256,9 +253,7 @@ macro_rules! align_for_lpn {
                     let result = trace_index == &trace.len() && self.is_final_state(&state);
                     // log::debug!("state {} {} is final: {}", trace_index, state, result);
                     result
-                };
-                // println!("trace len: {}", trace.len());
-            
+                };            
                 math::astar::astar_with_reuse(&start, successors, heuristic_reuse, heuristic, success)
                 // pathfinding::prelude::astar(&start, successors,heuristic, success)
             }         
@@ -396,8 +391,6 @@ macro_rules! align_for_lpn {
                     transition_preset: &Vec<Vec<usize>>
                     ) -> Result<(f64,Vec<f64>)> {
                     // create the problem variables (transition firing vector)
-
-                    // println!("start estimate move cost");
                     let num_transitions = incidence_matrix[0].len();
                     let num_places = incidence_matrix.len();
                     variables!{problem:}
@@ -428,7 +421,6 @@ macro_rules! align_for_lpn {
                         deadlock_marking_vec.push(expr);
                     }
 
-                    // println!("deadlock marking is:{:?}",deadlock_marking_vec);
                     // for each transition, at lead one of the places in its preset does not have enough tokens
                     for transition_idx in 0..num_transitions{
                         // for each transition, it should not be enabled after reaching the deadlock marking
@@ -462,7 +454,6 @@ macro_rules! align_for_lpn {
                     for i in 0..num_transitions {
                         solution_vector.push(solution.value(solution_vec[i]) as f64);
                     }
-                    // println!("move cost solution is:{} and solution vector:{:?}\n",solution.model().obj_value(), solution_vector);
                     Ok((solution.model().obj_value(), solution_vector))
                 }   
         }
@@ -903,7 +894,6 @@ pub fn find_transition_with_label<T, FS>(semantics: &T, from: &FS, to: &FS, labe
 }
 
 pub fn find_labelled_transition<T, FS>(semantics: &T, from: &FS, to: &FS) -> Result<TransitionIndex> where T: Semantics<SemState = FS> + ?Sized, FS: Display + Debug + Clone + Hash + Eq {
-    println!("enabled transitions {:?}", semantics.get_enabled_transitions(from));
     for transition in semantics.get_enabled_transitions(from) {
         if !semantics.is_transition_silent(transition) {
             let mut from = from.clone();
