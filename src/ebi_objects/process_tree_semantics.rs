@@ -34,7 +34,9 @@ impl Semantics for ProcessTree {
     }
 
     fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
-        if let Some(node ) = self.transition2node.get(transition) {
+        if transition >= self.transition2node.len() {
+            true
+        } else if let Some(node ) = self.transition2node.get(transition) {
             match self.tree.get(*node) {
                 Some(Node::Tau) => true,
                 _ => false,

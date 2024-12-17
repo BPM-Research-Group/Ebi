@@ -241,11 +241,7 @@ where
     let mut parents: FxIndexMap<N, (usize, f64)> = FxIndexMap::default();
     parents.insert(start.clone(), (usize::MAX, 0.0));
 
-    let mut lp_num = 0;
-    let mut reuse_num = 0;
-    let mut state_num =0;
     while let Some(SmallestCostHolder4LPN {state, index, cost_f, cost_g, mut cost_h, mut cost_vec, h_is_valid}) = to_see.pop() {
-        state_num += 1;
         let successors = {
             let (node, &(_, c)) = parents.get_index(index).unwrap(); // Cannot fail
             if success(node) {
@@ -264,7 +260,6 @@ where
                 let cost_heuristic = heuristic(&state);
                 cost_h = cost_heuristic.0;
                 cost_vec = cost_heuristic.1;    
-                lp_num += 1;          
             }
             successors(node)
         };
@@ -279,10 +274,6 @@ where
                         pre_transition, 
                         cost_h, 
                         cost_vec.clone());
-
-                    if h.2 {
-                        reuse_num += 1;
-                    }
                     n = e.index().clone();
                     e.insert((index, move_cost));
                 }
@@ -292,9 +283,6 @@ where
                             pre_transition, 
                             cost_h, 
                             cost_vec.clone());
-                        if h.2 {
-                            reuse_num += 1;
-                        }
                         n = e.index().clone();
                         e.insert((index, move_cost));
                     } else {
