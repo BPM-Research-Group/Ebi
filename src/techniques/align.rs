@@ -3,7 +3,7 @@ use good_lp::*;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use anyhow::{anyhow, Context, Error, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator, HasActivityKey}, displayable::Displayable, ebi_command::EbiCommand}, ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, language_of_alignments::{LanguageOfAlignments, Move}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, math};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator, HasActivityKey}, ebi_command::EbiCommand}, ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, language_of_alignments::{LanguageOfAlignments, Move}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, math};
 
 pub trait Align {
     fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<LanguageOfAlignments>;
@@ -743,3 +743,4 @@ align_for_semantics!(DeterministicFiniteAutomaton, usize);
 align_for_semantics!(StochasticDeterministicFiniteAutomaton, usize);
 align_for_semantics!(DirectlyFollowsModel, usize);
 align_for_semantics!(FiniteStochasticLanguageSemantics, usize);
+align_for_semantics!(ProcessTree, usize);
