@@ -23,7 +23,6 @@ impl Semantics for ProcessTree {
         } else {
             let node = self.transition2node.get(transition).ok_or_else(|| anyhow!("Transition does not exist."))?;
             self.start_node(state, *node, None);
-            println!("execute node {}", node);
             self.close_node(state, *node);
         }
         Ok(())
@@ -34,7 +33,9 @@ impl Semantics for ProcessTree {
     }
 
     fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
-        if let Some(node ) = self.transition2node.get(transition) {
+        if transition >= self.transition2node.len() {
+            true
+        } else if let Some(node ) = self.transition2node.get(transition) {
             match self.tree.get(*node) {
                 Some(Node::Tau) => true,
                 _ => false,
@@ -81,7 +82,6 @@ impl ProcessTree {
      */
     fn start_node(&self, state: &mut <Self as Semantics>::SemState, node: usize, child: Option<usize>) {
         if state[node] != NodeState::Started {
-            println!("start node {} from child {:?}", node, child);
             state[node] = NodeState::Started;
 
            match self.tree[node] {
@@ -112,16 +112,12 @@ impl ProcessTree {
     }
 
     fn withdraw_enablement(&self, state: &mut <Self as Semantics>::SemState, node: usize) {
-        println!("withdraw enablement of node {}", node);
         for grandchild in node..self.traverse(node) {
             state[grandchild] = NodeState::Closed;
         }
     }
 
-    fn close_node(&self, state: &mut <Self as Semantics>::SemState, node: usize) {
-
-        println!("close node {}", node);
-        
+    fn close_node(&self, state: &mut <Self as Semantics>::SemState, node: usize) {        
         //close this node and all of its children
         for grandchild in node..self.traverse(node) {
             state[grandchild] = NodeState::Closed;
@@ -134,7 +130,6 @@ impl ProcessTree {
                 Node::Activity(_) => unreachable!(),
                 Node::Operator(Operator::Sequence, number_of_children) => {
                     //for a sequence parent, we enable the next child
-                    println!("close node {}, parent is sequence node {}", node, parent);
                     if child_rank < number_of_children - 1 {
                         let next_child = self.get_child(parent, child_rank + 1);
                         self.enable_node(state, next_child);
