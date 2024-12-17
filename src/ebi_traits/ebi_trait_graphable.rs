@@ -39,6 +39,25 @@ impl dyn EbiTraitGraphable {
         return graph.add_node(node);
     }
 
+    pub fn create_gateway(graph: &mut VisualGraph, label: &str) -> NodeHandle {
+        let shape = layout::std_shapes::shapes::ShapeKind::Box(label.to_string());
+        let mut look = StyleAttr::simple();
+        look.fill_color = Some(Color::new(0xa1cff3));
+        let orientation = Orientation::LeftToRight;
+        let size = Point::new(20., 20.);
+        let node = Element::create(shape, look, orientation, size);
+        return graph.add_node(node);
+    }
+
+    pub fn create_dot(graph: &mut VisualGraph) -> NodeHandle {
+        let shape = layout::std_shapes::shapes::ShapeKind::Circle("".to_string());
+        let look = StyleAttr::simple();
+        let orientation = Orientation::LeftToRight;
+        let size = Point::new(5., 5.);
+        let node = Element::create(shape, look, orientation, size);
+        return graph.add_node(node);
+    }
+
     pub fn create_edge(graph: &mut VisualGraph, from: &NodeHandle, to: &NodeHandle, label: &str) {
         let arrow = Arrow::simple(label);
         return graph.add_edge(arrow, *from, *to);

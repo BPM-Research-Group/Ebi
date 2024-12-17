@@ -1,12 +1,13 @@
 use std::{fmt::Debug, io::BufRead};
 use anyhow::{anyhow, Result};
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, displayable::Displayable, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, ebi_objects::labelled_petri_net::LPNMarking, techniques::align::{Align}};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, displayable::Displayable, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, ebi_objects::{labelled_petri_net::LPNMarking, process_tree_semantics::NodeStates}, techniques::align::{Align}};
 
 use super::ebi_trait_stochastic_semantics::TransitionIndex;
 
 pub enum EbiTraitSemantics {
 	Usize(Box<dyn Semantics<SemState = usize>>),
-	Marking(Box<dyn Semantics<SemState = LPNMarking>>)
+	Marking(Box<dyn Semantics<SemState = LPNMarking>>),
+	NodeStates(Box<dyn Semantics<SemState = NodeStates>>),
 }
 
 impl FromEbiTraitObject for EbiTraitSemantics {
@@ -23,6 +24,7 @@ impl EbiTraitSemantics {
 		match self {
 			EbiTraitSemantics::Marking(semantics) => semantics.get_activity_key(),
 			EbiTraitSemantics::Usize(semantics) => semantics.get_activity_key(),
+			EbiTraitSemantics::NodeStates(semantics) => semantics.get_activity_key(),
 		}
 	}
 
@@ -30,6 +32,7 @@ impl EbiTraitSemantics {
 		match self {
 			EbiTraitSemantics::Marking(semantics) => semantics.get_activity_key_mut(),
 			EbiTraitSemantics::Usize(semantics) => semantics.get_activity_key_mut(),
+			EbiTraitSemantics::NodeStates(semantics) => semantics.get_activity_key_mut(),
 		}
 	}
 

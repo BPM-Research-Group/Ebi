@@ -4,6 +4,7 @@ use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use anyhow::{anyhow, Context, Error, Result};
 
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator, HasActivityKey}, ebi_command::EbiCommand}, ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, language_of_alignments::{LanguageOfAlignments, Move}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, math};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKeyTranslator}, displayable::Displayable, ebi_command::EbiCommand}, ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics, labelled_petri_net::{LPNMarking, LabelledPetriNet}, language_of_alignments::{LanguageOfAlignments, Move}, process_tree::ProcessTree, process_tree_semantics::NodeStates, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
 pub trait Align {
     fn align_language(&mut self, log: Box<dyn EbiTraitFiniteLanguage>) -> Result<LanguageOfAlignments>;
@@ -21,6 +22,7 @@ impl Align for EbiTraitSemantics {
         match self {
             EbiTraitSemantics::Usize(semantics) => semantics.align_language(log),
             EbiTraitSemantics::Marking(semantics) => semantics.align_language(log),
+            EbiTraitSemantics::NodeStates(semantics) => semantics.align_language(log),
         }
     }
 
@@ -28,6 +30,7 @@ impl Align for EbiTraitSemantics {
 		match self {
 			EbiTraitSemantics::Usize(sem) => sem.align_stochastic_language(log),
 			EbiTraitSemantics::Marking(sem) => sem.align_stochastic_language(log),
+            EbiTraitSemantics::NodeStates(sem) => sem.align_stochastic_language(log),
 		}
 	}
 
@@ -35,6 +38,7 @@ impl Align for EbiTraitSemantics {
 		match self {
 			EbiTraitSemantics::Usize(sem) => sem.align_trace(trace),
 			EbiTraitSemantics::Marking(sem) => sem.align_trace(trace),
+            EbiTraitSemantics::NodeStates(sem) => sem.align_trace(trace),
 		}
 	}
 }
@@ -736,11 +740,86 @@ pub fn find_labelled_transition<T, FS>(semantics: &T, from: &FS, to: &FS) -> Res
     Err(anyhow!("There is no transition with any activity enabled that brings the model from {} to {}", from, to))
 }
 
+pub trait AlignmentHeuristics {
+    type AliState;
 
-align_for_lpn!(LabelledPetriNet);
-align_for_lpn!(StochasticLabelledPetriNet);
-align_for_semantics!(DeterministicFiniteAutomaton, usize);
-align_for_semantics!(StochasticDeterministicFiniteAutomaton, usize);
-align_for_semantics!(DirectlyFollowsModel, usize);
-align_for_semantics!(FiniteStochasticLanguageSemantics, usize);
-align_for_semantics!(ProcessTree, usize);
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>>;
+
+    /**
+     * Return a lower bound on the cost to reach a final state in the synchronous product.
+     * If not sure: 0 is a valid return value, though better bounds will make searches more efficient.
+     */
+    fn underestimate_cost_to_final_synchronous_state(&self, trace: &Vec<Activity>, trace_index: &usize, state: &Self::AliState, cache: &Vec<Vec<usize>>) -> usize;
+}
+
+impl AlignmentHeuristics for DeterministicFiniteAutomaton {
+    type AliState = usize;
+
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+    
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &usize, _: &Vec<Vec<usize>>) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for FiniteStochasticLanguageSemantics {
+    type AliState = usize;
+
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &usize, _: &Vec<Vec<usize>>) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for LabelledPetriNet {
+    type AliState = LPNMarking;
+
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(&self, _trace: &Vec<Activity>, _trace_index: &usize, _state: &LPNMarking, _cache: &Vec<Vec<usize>>) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for StochasticLabelledPetriNet {
+    type AliState = LPNMarking;
+    
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(&self, _trace: &Vec<Activity>, _trace_index: &usize, _state: &LPNMarking, _cache: &Vec<Vec<usize>>) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for StochasticDeterministicFiniteAutomaton {
+    type AliState = usize;
+    
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>,  _: &usize, _: &usize, _: &Vec<Vec<usize>>) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for DirectlyFollowsModel {
+    type AliState = usize;
+
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(&self, _: &Vec<Activity>, _: &usize, _: &Self::AliState, _: &Vec<Vec<usize>>) -> usize {
+        0
+    }
+}

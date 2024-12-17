@@ -3,7 +3,7 @@ use anyhow::{anyhow, Context, Result};
 use clap::{builder::ValueParser, value_parser, ArgMatches};
 use strum_macros::EnumIter;
 
-use crate::{ebi_framework::ebi_file_handler::EbiFileHandler, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_graphable::EbiTraitGraphable, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, ebi_validate, math::fraction::{Fraction, FractionNotParsedYet}, multiple_reader::MultipleReader, text::Joiner};
+use crate::{ebi_framework::ebi_file_handler::EbiFileHandler, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_graphable::EbiTraitGraphable, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, ebi_validate, math::fraction::{Fraction, FractionNotParsedYet}, multiple_reader::MultipleReader, text::Joiner};
 
 use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_trait::{EbiTrait, FromEbiTraitObject}, importable::Importable, prom_link::{JavaObjectHandler, JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE}};
 
@@ -223,6 +223,7 @@ pub enum EbiTraitImporter {
     FiniteLanguage(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitFiniteLanguage>>), //finite set of traces
     FiniteStochasticLanguage(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>>), //finite number of traces
     QueriableStochasticLanguage(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>>), //can query for the probability of a trace
+    IterableLanguage(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitIterableLanguage>>), //can walk over the traces, potentially forever
     IterableStochasticLanguage(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>>), //can walk over the traces, potentially forever
     EventLog(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLog>>), //full XES; access to traces and attributes
     Semantics(fn(&mut dyn BufRead) -> Result<EbiTraitSemantics>), //can walk over states using transitions, potentially forever
@@ -237,6 +238,7 @@ impl EbiTraitImporter {
             EbiTraitImporter::FiniteLanguage(_) => EbiTrait::FiniteLanguage,
             EbiTraitImporter::FiniteStochasticLanguage(_) => EbiTrait::FiniteStochasticLanguage,
             EbiTraitImporter::QueriableStochasticLanguage(_) => EbiTrait::QueriableStochasticLanguage,
+            EbiTraitImporter::IterableLanguage(_) => EbiTrait::IterableLanguage,
             EbiTraitImporter::IterableStochasticLanguage(_) => EbiTrait::IterableStochasticLanguage,
             EbiTraitImporter::EventLog(_) => EbiTrait::EventLog,
             EbiTraitImporter::Semantics(_) => EbiTrait::Semantics,
@@ -251,6 +253,7 @@ impl EbiTraitImporter {
             EbiTraitImporter::FiniteLanguage(f) => EbiTraitObject::FiniteLanguage((f)(reader)?),
             EbiTraitImporter::FiniteStochasticLanguage(f) => EbiTraitObject::FiniteStochasticLanguage((f)(reader)?),
             EbiTraitImporter::QueriableStochasticLanguage(f) => EbiTraitObject::QueriableStochasticLanguage((f)(reader)?),
+            EbiTraitImporter::IterableLanguage(f) => EbiTraitObject::IterableLanguage((f)(reader)?),
             EbiTraitImporter::IterableStochasticLanguage(f) => EbiTraitObject::IterableStochasticLanguage((f)(reader)?),
             EbiTraitImporter::EventLog(f) => EbiTraitObject::EventLog((f)(reader)?),
             EbiTraitImporter::Semantics(f) => EbiTraitObject::Semantics((f)(reader)?),
@@ -278,6 +281,7 @@ pub enum EbiObjectImporter {
     StochasticLabelledPetriNet(fn(&mut dyn BufRead) -> Result<EbiObject>),
     LanguageOfAlignments(fn(&mut dyn BufRead) -> Result<EbiObject>),
     DeterministicFiniteAutomaton(fn(&mut dyn BufRead) -> Result<EbiObject>),
+    ProcessTree(fn(&mut dyn BufRead) -> Result<EbiObject>),
     Executions(fn(&mut dyn BufRead) -> Result<EbiObject>),
     StochasticLanguageOfAlignments(fn(&mut dyn BufRead) -> Result<EbiObject>),
 }
@@ -295,6 +299,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::LanguageOfAlignments(_) => EbiObjectType::LanguageOfAlignments,
             EbiObjectImporter::StochasticLanguageOfAlignments(_) => EbiObjectType::StochasticLanguageOfAlignments,
             EbiObjectImporter::DeterministicFiniteAutomaton(_) => EbiObjectType::DeterministicFiniteAutomaton,
+            EbiObjectImporter::ProcessTree(_) => EbiObjectType::ProcessTree,
             EbiObjectImporter::Executions(_) => EbiObjectType::Executions,
         }
     }
@@ -311,6 +316,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::LanguageOfAlignments(importer) => *importer,
             EbiObjectImporter::StochasticLanguageOfAlignments(importer) => *importer,
             EbiObjectImporter::DeterministicFiniteAutomaton(importer) => *importer,
+            EbiObjectImporter::ProcessTree(importer) => *importer,
             EbiObjectImporter::Executions(importer) => *importer,
         }
     }

@@ -3,7 +3,7 @@ use anyhow::{anyhow, Context, Error, Ok, Result};
 use bitvec::vec::BitVec;
 use layout::topo::layout::VisualGraph;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, displayable::Displayable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader, marking::Marking};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, displayable::Displayable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader, marking::Marking};
 
 use super::stochastic_labelled_petri_net::StochasticLabelledPetriNet;
 
@@ -87,14 +87,6 @@ impl LabelledPetriNet {
         &self.initial_marking
     }
 
-    pub fn get_activity_key(&self) -> &ActivityKey {
-        &self.activity_key
-    }
-    
-    pub fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
-        &mut self.activity_key
-    }
-    
     pub fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
         self.labels[transition].is_none()
     }
@@ -216,7 +208,7 @@ impl FromEbiTraitObject for LabelledPetriNet {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
             EbiInput::Object(EbiObject::LabelledPetriNet(e), _) => Ok(Box::new(e)),
-            _ => Err(anyhow!("cannot read {} {} as a finite language", object.get_type().get_article(), object.get_type()))
+            _ => Err(anyhow!("cannot read {} {} as a labelled Petri net", object.get_type().get_article(), object.get_type()))
         }
     }
 }

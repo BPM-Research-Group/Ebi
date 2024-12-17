@@ -1,6 +1,7 @@
 use std::{io::Write, collections::HashMap};
 use clap::Command;
 use anyhow::Result;
+use inflector::Inflector;
 use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
@@ -101,6 +102,11 @@ fn manual() -> Result<EbiOutput> {
 
     //version
     writeln!(f, "\\def\\version{{{}}}", env!("CARGO_PKG_VERSION"))?;
+
+    //statistics
+    writeln!(f, "\\def\\numberofcommands{{{}}}", EBI_COMMANDS.get_command_paths().len())?;
+    writeln!(f, "\\def\\numberoftraits{{{}}}", EbiTrait::iter().len())?;
+    writeln!(f, "\\def\\numberoffilehandlers{{{}}}", EBI_FILE_HANDLERS.len())?;
 
     //command list
     writeln!(f, "\\def\\ebicommandlist{{\\begin{{itemize}}")?;
@@ -206,8 +212,11 @@ fn manual() -> Result<EbiOutput> {
 
     //file handlers
     writeln!(f, "\\long\\def\\ebifilehandlers{{")?;
-    for file_handler in EBI_FILE_HANDLERS {
-        writeln!(f, "\\subsection{{{} (.{})}}", file_handler.name, file_handler.file_extension)?;
+    for (i, file_handler) in EBI_FILE_HANDLERS.iter().enumerate() {
+        if i != 0 {
+            writeln!(f, "\\clearpage")?;
+        }
+        writeln!(f, "\\subsection{{{} (.{})}}", file_handler.name.to_sentence_case(), file_handler.file_extension)?;
         writeln!(f, "\\label{{filehandler:{}}}", file_handler.name)?;
         writeln!(f, "Import as objects: {}.", or_none(&file_handler.object_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
         writeln!(f, "\\\\Import as traits: {}.", or_none(&file_handler.trait_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
@@ -231,7 +240,20 @@ fn manual() -> Result<EbiOutput> {
     //trait list
     writeln!(f, "\\def\\ebitraitlist{{\\begin{{itemize}}")?;
     for etrait in EbiTrait::iter() {
-        writeln!(f, "\\item {}", etrait)?;
+        writeln!(f, "\\item {}.", etrait.to_string().to_sentence_case())?;
+
+        writeln!(f, "\\\\File types that can be imported as {} {}: {}.", 
+            etrait.get_article(), 
+            etrait, 
+            or_none(
+                    &etrait.get_file_handlers().iter().map(|file_handler| 
+                        format!("\\\\\\null\\qquad\\hyperref[filehandler:{}]{{{}}} (.{} -- Section~\\ref{{filehandler:{}}})", file_handler.name, file_handler.name, file_handler.file_extension, file_handler.name)
+                    ).collect::<Vec<_>>().join(", "))
+            )?;
+
+        writeln!(f, "\\\\Commands that accept {} {} as input: {}", etrait.get_article(), etrait, or_none(&etrait.get_applicable_commands().iter().map(
+            |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (Section~\\ref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
+            .collect::<Vec<_>>().join("")))?;
     }
     writeln!(f, "\\end{{itemize}}}}")?;
 

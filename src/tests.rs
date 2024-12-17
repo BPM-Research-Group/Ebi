@@ -5,7 +5,7 @@ mod tests {
     use fraction::{GenericFraction, Zero};
     use num_bigint::ToBigUint;
 
-    use crate::{ebi_framework::{activity_key::HasActivityKey, ebi_file_handler::EBI_FILE_HANDLERS, ebi_output::EbiOutput}, ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, language_of_alignments::Move, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{Semantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics, ToStochasticDeterministicSemantics}}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, matrix::Matrix, root_log_div::RootLogDiv}, medoid, multiple_reader::MultipleReader, techniques::{align::Align, deterministic_semantics_for_stochastic_semantics::PMarking, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probability_queries::ProbabilityQueries, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
+    use crate::{ebi_framework::{activity_key::HasActivityKey, ebi_file_handler::EBI_FILE_HANDLERS, ebi_output::EbiOutput}, ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, language_of_alignments::Move, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{Semantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics, ToStochasticDeterministicSemantics}}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, matrix::Matrix, root_log_div::RootLogDiv}, medoid, multiple_reader::MultipleReader, techniques::{align::Align, deterministic_semantics_for_stochastic_semantics::PMarking, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probability_queries::ProbabilityQueries, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 
     #[test]
     fn empty_slang() {
@@ -680,6 +680,121 @@ mod tests {
     }
 
     #[test]
+    fn tree_semantics() {
+        let fin = fs::read_to_string("testfiles/aa.tree").unwrap();
+        let tree = fin.parse::<ProcessTree>().unwrap();
+        let mut state = tree.get_initial_state();
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![0]);
+
+        tree.execute_transition(&mut state, 0).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![1]);
+
+        tree.execute_transition(&mut state, 1).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![2]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 2).unwrap();
+
+        assert_eq!(tree.get_enabled_transitions(&state), Vec::<usize>::new());
+        assert!(tree.is_final_state(&state));
+    }
+
+    #[test]
+    fn tree_semantics_2() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.tree").unwrap();
+        let tree = fin.parse::<ProcessTree>().unwrap();
+        let mut state = tree.get_initial_state();
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![0,2]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 2).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![3, 4]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 3).unwrap();
+        println!("{}", state);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 5).unwrap();
+
+        assert_eq!(tree.get_enabled_transitions(&state), Vec::<usize>::new());
+        assert!(tree.is_final_state(&state));
+    }
+
+
+    #[test]
+    fn tree_semantics_3() {
+        let fin = fs::read_to_string("testfiles/all_operators.tree").unwrap();
+        let tree = fin.parse::<ProcessTree>().unwrap();
+
+        let mut state = tree.get_initial_state();
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![0,2,3,5,6,8,9]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 2).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![3,5,6,8,9]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 3).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![4,5,6,8,9]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 6).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![4,7,8,9]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 8).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![4,7,9]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 7).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![4,5,9]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 5).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![4,9,10]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 4).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![3,9]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 3).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![4,9,10]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 10).unwrap();
+
+        assert_eq!(tree.get_enabled_transitions(&state), Vec::<usize>::new());
+        assert!(tree.is_final_state(&state));
+    }
+
+    #[test]
     fn dfm_semantics() {
         let fin = fs::read_to_string("testfiles/a-b_star.dfm").unwrap();
         let dfm = fin.parse::<DirectlyFollowsModel>().unwrap();
@@ -730,6 +845,37 @@ mod tests {
                     for importer in file_handler.object_importers {
                         println!("\t\timporter {} (should fail)", importer);
                         assert!((importer.get_importer())(&mut reader.get().unwrap()).is_err());
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn all_trait_importers() {
+        let files = fs::read_dir("./testfiles").unwrap();
+        for path in files {
+            let file = path.unwrap();
+            println!("file {:?}", file.file_name());
+
+            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
+
+            //look for file handlers that should accept this file
+            for file_handler in EBI_FILE_HANDLERS {
+                println!("\tfile handler {}", file_handler);
+                if !file.file_name().into_string().unwrap().contains("invalid") && file.file_name().into_string().unwrap().ends_with(&(".".to_string() + file_handler.file_extension)) {
+                    //file handler should be able to accept this file
+
+                    for importer in file_handler.trait_importers {
+                        println!("\t\timporter {}", importer);
+                        assert!(importer.import(&mut reader.get().unwrap()).is_ok());
+                    }
+                } else {
+                    //file handler should not accept this file
+
+                    for importer in file_handler.trait_importers {
+                        println!("\t\timporter {} (should fail)", importer);
+                        assert!(importer.import(&mut reader.get().unwrap()).is_err());
                     }
                 }
             }

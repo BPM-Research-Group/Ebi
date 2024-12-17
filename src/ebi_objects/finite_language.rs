@@ -2,7 +2,7 @@ use anyhow::{anyhow, Result, Context, Error};
 use fnv::FnvBuildHasher;
 use std::{collections::HashSet, fmt::Display, io::{self, BufRead, Write}, str::FromStr};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}}, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::{self, EbiTraitIterableLanguage}, ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}}, line_reader::LineReader};
 
 use super::deterministic_finite_automaton::DeterministicFiniteAutomaton;
 
@@ -24,6 +24,7 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<FiniteLanguage>,
     trait_importers: &[
+        EbiTraitImporter::IterableLanguage(ebi_trait_iterable_language::import::<FiniteLanguage>),
         EbiTraitImporter::FiniteLanguage(ebi_trait_finite_language::import::<FiniteLanguage>),
         EbiTraitImporter::Semantics(FiniteLanguage::import_as_semantics),
     ],

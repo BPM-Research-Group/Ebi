@@ -2,7 +2,7 @@ use std::{collections::BTreeSet, fmt::{self, Display}, fs::File, io::Write, path
 use anyhow::{Context, Result};
 use strum_macros::Display;
 
-use crate::{ebi_objects::{compressed_event_log::{CompressedEventLog, EBI_COMPRESSED_EVENT_LOG}, deterministic_finite_automaton::{DeterministicFiniteAutomaton, EBI_DETERMINISTIC_FINITE_AUTOMATON}, directly_follows_model::{DirectlyFollowsModel, EBI_DIRCTLY_FOLLOWS_MODEL}, executions::{Executions, EBI_EXECUTIONS}, finite_language::{FiniteLanguage, EBI_FINITE_LANGUAGE}, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}, language_of_alignments::{LanguageOfAlignments, EBI_LANGUAGE_OF_ALIGNMENTS}, stochastic_deterministic_finite_automaton::{StochasticDeterministicFiniteAutomaton, EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON}, stochastic_labelled_petri_net::{StochasticLabelledPetriNet, EBI_STOCHASTIC_LABELLED_PETRI_NET}, stochastic_language_of_alignments::{StochasticLanguageOfAlignments, EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS}}, math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv}};
+use crate::{ebi_objects::{compressed_event_log::{CompressedEventLog, EBI_COMPRESSED_EVENT_LOG}, deterministic_finite_automaton::{DeterministicFiniteAutomaton, EBI_DETERMINISTIC_FINITE_AUTOMATON}, directly_follows_model::{DirectlyFollowsModel, EBI_DIRCTLY_FOLLOWS_MODEL}, executions::{Executions, EBI_EXECUTIONS}, finite_language::{FiniteLanguage, EBI_FINITE_LANGUAGE}, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}, language_of_alignments::{LanguageOfAlignments, EBI_LANGUAGE_OF_ALIGNMENTS}, process_tree::{ProcessTree, EBI_PROCESS_TREE}, stochastic_deterministic_finite_automaton::{StochasticDeterministicFiniteAutomaton, EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON}, stochastic_labelled_petri_net::{StochasticLabelledPetriNet, EBI_STOCHASTIC_LABELLED_PETRI_NET}, stochastic_language_of_alignments::{StochasticLanguageOfAlignments, EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS}}, math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv}};
 
 use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_object::{EbiObject, EbiObjectType}, exportable::Exportable, prom_link::{JavaObjectHandler, JAVA_OBJECT_HANDLERS_CONTAINSROOT, JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV, JAVA_OBJECT_HANDLERS_PDF, JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_SVG, JAVA_OBJECT_HANDLERS_USIZE}};
 
@@ -106,6 +106,7 @@ impl EbiOutputType {
             EbiOutputType::ObjectType(EbiObjectType::LabelledPetriNet) => EbiExporter::Object(&EbiObjectExporter::LabelledPetriNet(LabelledPetriNet::export_from_object), &EBI_LABELLED_PETRI_NET),
             EbiOutputType::ObjectType(EbiObjectType::StochasticDeterministicFiniteAutomaton) => EbiExporter::Object(&&EbiObjectExporter::StochasticDeterministicFiniteAutomaton(StochasticDeterministicFiniteAutomaton::export_from_object), &EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON),
             EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet) => EbiExporter::Object(&&EbiObjectExporter::StochasticLabelledPetriNet(StochasticLabelledPetriNet::export_from_object), &EBI_STOCHASTIC_LABELLED_PETRI_NET),
+            EbiOutputType::ObjectType(EbiObjectType::ProcessTree) => EbiExporter::Object(&&EbiObjectExporter::ProcessTree(ProcessTree::export_from_object), &EBI_PROCESS_TREE),
             EbiOutputType::String => EbiExporter::String,
             EbiOutputType::SVG => EbiExporter::SVG,
             EbiOutputType::PDF => EbiExporter::PDF,
@@ -269,6 +270,7 @@ pub enum EbiObjectExporter {
     LanguageOfAlignments(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     StochasticLanguageOfAlignments(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     DeterministicFiniteAutomaton(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
+    ProcessTree(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     Executions(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
 }
 
@@ -285,6 +287,7 @@ impl EbiObjectExporter {
             EbiObjectExporter::LanguageOfAlignments(_) => EbiObjectType::LanguageOfAlignments,
             EbiObjectExporter::StochasticLanguageOfAlignments(_) => EbiObjectType::StochasticLanguageOfAlignments,
             EbiObjectExporter::DeterministicFiniteAutomaton(_) => EbiObjectType::DeterministicFiniteAutomaton,
+            EbiObjectExporter::ProcessTree(_) => EbiObjectType::ProcessTree,
             EbiObjectExporter::Executions(_) => EbiObjectType::Executions,
         }
     }
@@ -301,6 +304,7 @@ impl EbiObjectExporter {
             EbiObjectExporter::LanguageOfAlignments(exporter) => (exporter)(object, f),
             EbiObjectExporter::StochasticLanguageOfAlignments(exporter) => (exporter)(object, f),
             EbiObjectExporter::DeterministicFiniteAutomaton(exporter) => (exporter)(object, f),
+            EbiObjectExporter::ProcessTree(exporter) => (exporter)(object, f),
             EbiObjectExporter::Executions(exporter) => (exporter)(object, f),
         }
     }
