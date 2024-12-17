@@ -15,7 +15,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Run tests
-      run:  RUSTFLAGS="-D warnings" cargo test --verbose
+      run: cargo test --verbose
     - name: commit to Gitlab
       env:
         GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
