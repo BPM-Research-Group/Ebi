@@ -101,5 +101,5 @@ buildlatex:
     - cd Ebi
     - git add src/org/processmining/ebi/plugins/EbiPlugins.java
     - git commit -m "update Ebi plugins"
-    - git push -f https://ci_token:$PROM_GIT_TOKEN@https://github.com/promworkbench/Ebi HEAD:main
+    - git push -f https://ci_token:$PROM_GIT_TOKEN@github.com/promworkbench/Ebi HEAD:main
     - cd ..
