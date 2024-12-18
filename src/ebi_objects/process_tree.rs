@@ -5,7 +5,7 @@ use layout::{adt::dag::NodeHandle, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader};
 
 use super::labelled_petri_net::LabelledPetriNet;
 
@@ -45,7 +45,13 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::ProcessTree(ProcessTree::export_from_object),
     ],
     java_object_handlers: &[
-        
+        JavaObjectHandler {
+            name: "process tree",
+            java_class: "org.processmining.ebi.objects",
+            translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiProcessTRee.EbiString2EfficientTree"),
+            translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiProcessTRee.EfficientTree2EbiString"),
+            input_gui: None,
+        }
     ],
 };
 
@@ -205,7 +211,7 @@ impl ProcessTree {
             },
             Node::Operator(operator, number_of_children) => {
                 writeln!(f, "{}{}", id, operator.to_string())?;
-                writeln!(f, "# number of children\n{}", number_of_children)?;
+                writeln!(f, "{}# number of children\n{}{}", id, id, number_of_children)?;
                 let mut child = node + 1;
                 for _ in 0..*number_of_children {
                     child = self.node_to_string(indent + 1, child, f)?;
