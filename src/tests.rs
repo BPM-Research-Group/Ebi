@@ -681,7 +681,7 @@ mod tests {
 
     #[test]
     fn tree_semantics() {
-        let fin = fs::read_to_string("testfiles/aa.tree").unwrap();
+        let fin = fs::read_to_string("testfiles/aa.ptree").unwrap();
         let tree = fin.parse::<ProcessTree>().unwrap();
         let mut state = tree.get_initial_state();
         println!("{}", state);
@@ -706,7 +706,7 @@ mod tests {
 
     #[test]
     fn tree_semantics_2() {
-        let fin = fs::read_to_string("testfiles/aa-ab-ba.tree").unwrap();
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.ptree").unwrap();
         let tree = fin.parse::<ProcessTree>().unwrap();
         let mut state = tree.get_initial_state();
         println!("{}", state);
@@ -732,7 +732,7 @@ mod tests {
 
     #[test]
     fn tree_semantics_3() {
-        let fin = fs::read_to_string("testfiles/all_operators.tree").unwrap();
+        let fin = fs::read_to_string("testfiles/all_operators.ptree").unwrap();
         let tree = fin.parse::<ProcessTree>().unwrap();
 
         let mut state = tree.get_initial_state();

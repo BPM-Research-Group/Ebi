@@ -30,7 +30,7 @@ pub const FORMAT_SPECIFICATION: &str = "A process tree is a line-based structure
 pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     name: "process tree",
     article: "a",
-    file_extension: "tree",
+    file_extension: "ptree",
     format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<ProcessTree>,
     trait_importers: &[
