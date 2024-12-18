@@ -56,7 +56,7 @@ impl StatisticalTests for dyn EbiTraitEventLog {
             let attribute_indices = Arc::clone(&attribute_indices);
 
             let mut sample = vec![0; self.len()];
-            sample::sample_indices(self.len(), &mut sample);
+            sample::sample_indices(trace_indices.len(), &mut sample);
 
             // log::debug!("sample {:?}", sample);
 
