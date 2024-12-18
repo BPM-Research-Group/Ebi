@@ -182,7 +182,7 @@ impl EbiInputType {
         file_handlers.iter().map(|file_handler| format!("\\hyperref[filehandler:{}]{{{}}}", file_handler.name, file_handler)).collect::<Vec<_>>()
     }
 
-    pub fn get_file_handlers_java(file_handlers: Vec<&'static EbiFileHandler>) -> Vec<&JavaObjectHandler> {
+    pub fn get_file_handlers_java(file_handlers: Vec<&'static EbiFileHandler>) -> Vec<&'static JavaObjectHandler> {
         file_handlers.iter().fold(vec![], |mut list, file_handler| {list.extend(file_handler.java_object_handlers); list})
     }
     
