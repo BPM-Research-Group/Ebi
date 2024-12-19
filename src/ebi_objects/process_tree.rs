@@ -48,8 +48,8 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
         JavaObjectHandler {
             name: "process tree",
             java_class: "org.processmining.ebi.objects",
-            translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiProcessTRee.EbiString2EfficientTree"),
-            translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiProcessTRee.EfficientTree2EbiString"),
+            translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiProcessTree.EbiString2EfficientTree"),
+            translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiProcessTree.EfficientTree2EbiString"),
             input_gui: None,
         }
     ],
