@@ -25,7 +25,7 @@ pub const FORMAT_SPECIFICATION: &str = "A process tree is a line-based structure
     Indentation of nodes is allowed, but not mandatory.
     
     For instance:
-    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/all_operators.tree}";
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/all_operators.ptree}";
 
 pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     name: "process tree",
