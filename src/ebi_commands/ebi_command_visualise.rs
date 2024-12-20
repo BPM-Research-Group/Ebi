@@ -1,4 +1,5 @@
 use layout::backends::svg::SVGWriter;
+use anyhow::Result;
 use svg2pdf::{ConversionOptions, PageOptions};
 
 use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::EbiObject, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::ebi_trait_graphable::EbiTraitGraphable};
@@ -91,13 +92,17 @@ pub const EBI_VISUALISE_PDF: EbiCommand = EbiCommand::Command {
         result.to_dot().do_it(false, false, false, &mut svg);
         let svg_string = svg.finalize();
 
-        let mut options = svg2pdf::usvg::Options::default();
-        options.fontdb_mut().load_system_fonts();
-        let tree = svg2pdf::usvg::Tree::from_str(&svg_string, &options)?;
-        let pdf = svg2pdf::to_pdf(&tree, ConversionOptions::default(), PageOptions::default()).unwrap();
+        let pdf = svg_to_pdf(&svg_string)?;
 
         return Ok(EbiOutput::PDF(pdf));
     
     }, 
     output_type: &EbiOutputType::PDF
 };
+
+pub fn svg_to_pdf(svg: &str) -> Result<Vec<u8>> {
+    let mut options = svg2pdf::usvg::Options::default();
+    options.fontdb_mut().load_system_fonts();
+    let tree = svg2pdf::usvg::Tree::from_str(svg, &options)?;
+    Ok(svg2pdf::to_pdf(&tree, ConversionOptions::default(), PageOptions::default()).unwrap())
+}

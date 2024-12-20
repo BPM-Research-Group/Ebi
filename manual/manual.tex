@@ -83,8 +83,8 @@ Sander J.J. Leemans, Tian Li}
 
 \clearpage
 \section{Ebi: introduction}
-	Ebi is a process mining tool and library, focused on stochastic process mining algorithms.
-	Ebi is a stand-alone command-line application; Ebi works completely offline and installation is not necessary.
+	Ebi is a process mining tool, ProM plug-in and library, and is focused on stochastic process mining algorithms.
+	Ebi works completely offline and installation is in most cases not necessary.
 		
 	A command is an algorithm in Ebi that a user can call.
 	Ebi has \numberofcommands{} commands; for an overview of commands please refer to Section~\ref{sec:commands} or give the command-line parameter \verb=--help=.
@@ -92,24 +92,34 @@ Sander J.J. Leemans, Tian Li}
 	
 	The architecture of Ebi and how to develop new commands can be found in Section~\ref{sec:architecture}.
 	
-	\subsection{Installation}
-		Installation is not necessary.
+	\subsection{Command-line application}
+		Ebi can be used as a stand-alone command-line application; installation is not necessary.
 		
 		On Windows, simply download the executable from \url{http://ebitools.org} and run it from a console.
 		
-		On Linux, simply download the executable from \url{http://ebitools.org}, give it execution permissions, and run it from a console.
+		On Linux, simply download the executable from \url{http://ebitools.org}, give the file execution permissions, and run it from a console.
 		
 		On Mac OS X, self-compilation is required. 
 		Please refer to \url{http://ebitools.org} and click through to the source code for a getting-started of 5 easy steps.
+		
+	\subsection{ProM plug-in}
+		Ebi can be used as a plug-in of the ProM framework~\cite{DBLP:conf/bpm/VerbeekBDA10} (\url{https://promtools.org}) on Windows and Linux. 
+		ProM does not support Mac OS X.
+		
+		To install, open the ProM Package Manager and install the \verb=Ebi= package.
+		Then, a selection of Ebi commands can be ran, just as any other ProM plug-in.
 	
 	\subsection{Speed tricks}
-		\begin{itemize}
-			\item If Ebi uses all CPU cores and runs out of RAM, one can try to reduce the CPU cores that Ebi will use by setting the environment variable \verb!RAYON_NUM_THREADS=1! or some other desired number of cores.
+	\label{sec:speedtricks}
+		\begin{enumerate}
+			\item
+			\label{speedtrick:multithreaded}
+			If Ebi uses all CPU cores and runs out of RAM, one can try to reduce the CPU cores that Ebi will use by setting the environment variable \verb!RAYON_NUM_THREADS=1! or some other desired number of cores.
 			This will trade run time for RAM in multi-threaded algorithms.
 			\item By default, Ebi uses exact arithmetic for most commands.
 			To disable this, provide the \verb=-a= parameter.
 			The results are then not guaranteed, but it may be faster.
-		\end{itemize}
+		\end{enumerate}
 
 \section{Commands}
 \label{sec:commands}
@@ -243,6 +253,19 @@ Sander J.J. Leemans, Tian Li}
     
             Ebi has the following file handlers:
             \ebifilehandlerlist
+            
+		\subsubsection{ProM support}
+			Ebi automatically exports the commands it supports to ProM.
+			A command is automatically supported if:
+			\begin{enumerate}
+				\item The command does not access the command line directly.
+				That is, \verb=cli_command= of the command must be \verb=None=.
+				\item There is a combination of inputs to the command that are all supported by ProM.
+				\item The output of the command is supported by ProM.
+				The following output types are supported by ProM:
+				\ebipromoutput
+			\end{enumerate}
+			For each combination of input parameter types and output types, one plug-in is added to ProM automatically.
             
 	\subsection{Implementing a new command/algorithm/technique}
 	\label{sec:implement}

@@ -1,10 +1,10 @@
-use std::{collections::BTreeSet, fmt::Display};
+use std::{collections::{BTreeSet, HashSet}, fmt::Display};
 use anyhow::Result;
 use strum_macros::EnumIter;
 
 use crate::{ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, executions::Executions, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, language_of_alignments::LanguageOfAlignments, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_graphable::EbiTraitGraphable, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}};
 
-use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_input::EbiInputType, ebi_trait::EbiTrait, infoable::Infoable};
+use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_input::EbiInputType, ebi_output::EbiOutputType, ebi_trait::EbiTrait, infoable::Infoable, prom_link::JavaObjectHandler};
 
 
 #[derive(PartialEq,Clone,EnumIter,Hash,Default)]
@@ -71,6 +71,11 @@ impl EbiObjectType {
         }
         result
     }
+
+    pub fn get_java_object_handlers_that_can_export(&self) -> HashSet<JavaObjectHandler> {
+        EbiOutputType::ObjectType(self.clone()).get_java_object_handlers_that_can_export()
+    }
+
 }
 
 impl Eq for EbiObjectType {}

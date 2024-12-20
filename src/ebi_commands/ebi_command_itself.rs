@@ -1,4 +1,4 @@
-use std::{io::Write, collections::HashMap};
+use std::{collections::HashMap, io::Write};
 use clap::Command;
 use anyhow::Result;
 use inflector::Inflector;
@@ -6,6 +6,8 @@ use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, g
 use strum::IntoEnumIterator;
 
 use crate::{ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, text::Joiner};
+
+use super::ebi_command_visualise;
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
  □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
@@ -78,8 +80,14 @@ pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command {
     input_types: &[], 
     input_names: &[],
     input_helps: &[],
-    execute: |_, _| Ok(graph()?), 
-    output_type: &EbiOutputType::String
+    execute: |_, _| {
+        let mut graph = graph()?;
+        let mut svg = SVGWriter::new();
+        graph.do_it(false, false, false, &mut svg);
+        let svg_string = svg.finalize();
+        Ok(EbiOutput::PDF(ebi_command_visualise::svg_to_pdf(&svg_string)?))
+    }, 
+    output_type: &EbiOutputType::PDF
 };
 
 pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command { 
@@ -285,6 +293,28 @@ fn manual() -> Result<EbiOutput> {
     }
     writeln!(f, "\\end{{itemize}}}}")?;
 
+    //prom output list
+    writeln!(f, "\\def\\ebipromoutput{{\\begin{{itemize}}")?;
+    for object_type in EbiObjectType::iter() {
+        let java_object_handlers = object_type.get_java_object_handlers_that_can_export();
+        if !java_object_handlers.is_empty() {
+            writeln!(f, "\\item {}.\\\\Java class: {}.", 
+                object_type.to_string().to_sentence_case(), 
+                java_object_handlers.into_iter().map(|java_object_handler| java_object_handler.java_class).collect::<Vec<_>>().join(", ")
+            )?;
+        }
+    }
+    for output_type in EbiOutputType::iter() {
+        let java_object_handlers = output_type.get_java_object_handlers_that_can_export();
+        if !java_object_handlers.is_empty() {
+            writeln!(f, "\\item {}.\\\\Java class: {}.", 
+                output_type.to_string().to_sentence_case(), 
+                java_object_handlers.into_iter().map(|java_object_handler| java_object_handler.java_class).collect::<Vec<_>>().join(", ")
+            )?;
+        }
+    }
+    writeln!(f, "\\end{{itemize}}}}")?;
+
     Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
 }
 
@@ -311,7 +341,7 @@ pub fn output_types(output_type: &EbiOutputType) -> String {
     format!("{} {} {}", list.join(", "), "or", last)
 }
 
-pub fn graph() -> Result<EbiOutput> {
+pub fn graph() -> Result<VisualGraph> {
     let mut graph = VisualGraph::new(Orientation::LeftToRight);
 
     //traits
@@ -410,9 +440,7 @@ pub fn graph() -> Result<EbiOutput> {
         }
     }
 
-    let mut svg = SVGWriter::new();
-    graph.do_it(false, false, false, &mut svg);
-    return Ok(EbiOutput::String(svg.finalize()));
+    return Ok(graph)
 }
 
 pub fn scale(point: &mut Point) {

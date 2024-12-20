@@ -1,6 +1,6 @@
-use std::{collections::BTreeSet, fmt::{self, Display}, fs::File, io::Write, path::PathBuf};
+use std::{collections::{BTreeSet, HashSet}, fmt::{self, Display}, fs::File, io::Write, path::PathBuf};
 use anyhow::{Context, Result};
-use strum_macros::Display;
+use strum_macros::{Display, EnumIter};
 
 use crate::{ebi_objects::{compressed_event_log::{CompressedEventLog, EBI_COMPRESSED_EVENT_LOG}, deterministic_finite_automaton::{DeterministicFiniteAutomaton, EBI_DETERMINISTIC_FINITE_AUTOMATON}, directly_follows_model::{DirectlyFollowsModel, EBI_DIRCTLY_FOLLOWS_MODEL}, executions::{Executions, EBI_EXECUTIONS}, finite_language::{FiniteLanguage, EBI_FINITE_LANGUAGE}, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}, language_of_alignments::{LanguageOfAlignments, EBI_LANGUAGE_OF_ALIGNMENTS}, process_tree::{ProcessTree, EBI_PROCESS_TREE}, stochastic_deterministic_finite_automaton::{StochasticDeterministicFiniteAutomaton, EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON}, stochastic_labelled_petri_net::{StochasticLabelledPetriNet, EBI_STOCHASTIC_LABELLED_PETRI_NET}, stochastic_language_of_alignments::{StochasticLanguageOfAlignments, EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS}}, math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv}};
 
@@ -35,7 +35,7 @@ impl EbiOutput {
     }
 }
 
-#[derive(PartialEq,Eq)]
+#[derive(PartialEq,Eq,EnumIter,Hash,Clone)]
 pub enum EbiOutputType {
     ObjectType(EbiObjectType),
     String,
@@ -117,6 +117,19 @@ impl EbiOutputType {
             EbiOutputType::RootLogDiv => EbiExporter::RootLogDiv,
         }
     }
+
+    pub fn get_java_object_handlers_that_can_export(&self) -> HashSet<JavaObjectHandler> {
+        let mut result = HashSet::new();
+        for exporter in self.get_exporters() {
+            for java_object_handler in exporter.get_java_object_handlers() {
+                if java_object_handler.translator_ebi_to_java.is_some() {
+                    result.insert(java_object_handler.to_owned());
+                }
+            }
+        }
+        result
+    }
+
 }
 
 impl Display for EbiOutputType {
