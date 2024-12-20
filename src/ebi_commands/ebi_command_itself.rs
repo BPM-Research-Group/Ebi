@@ -226,6 +226,27 @@ fn manual() -> Result<EbiOutput> {
         writeln!(f, "\\\\Output of commands: {}.", or_none(&file_handler.get_producing_commands().iter().map(
             |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (Section~\\ref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
             .collect::<Vec<_>>().join("")))?;
+
+        {
+            let mut to_java = false;
+            let mut from_java = false;
+            for java in file_handler.java_object_handlers {
+                if java.translator_ebi_to_java.is_some() {
+                    to_java = true;
+                }
+                if java.translator_java_to_ebi.is_some() {
+                    from_java = true;
+                }
+            }
+            if to_java && from_java {
+                writeln!(f, "\\\\{} {} can be imported and exported between Ebi, and ProM and Java.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
+            } else if to_java {
+                writeln!(f, "\\\\{} {} can be exported from Ebi to ProM and Java.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
+            } else if from_java {
+                writeln!(f, "\\\\{} {} can be imported from ProM and Java to Ebi.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
+            }
+        }
+
         writeln!(f, "\\\\File format specification:\n{}", file_handler.format_specification)?;
     }
     writeln!(f, "}}")?;
