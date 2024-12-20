@@ -293,6 +293,37 @@ fn manual() -> Result<EbiOutput> {
     }
     writeln!(f, "\\end{{itemize}}}}")?;
 
+    //prom input list
+    writeln!(f, "\\def\\ebiprominput{{\\begin{{itemize}}")?;
+    for r#trait in EbiTrait::iter() {
+        let java_object_handlers = r#trait.get_java_object_handlers_that_can_import();
+        if !java_object_handlers.is_empty() {
+            writeln!(f, "\\item {} (trait).\\\\Java class: {}.", 
+                r#trait.to_string().to_sentence_case(), 
+                java_object_handlers.into_iter().map(|java_object_handler| java_object_handler.java_class).collect::<Vec<_>>().join(", ")
+            )?;
+        }
+    }
+    for object_type in EbiObjectType::iter() {
+        let java_object_handlers = object_type.get_java_object_handlers_that_can_import();
+        if !java_object_handlers.is_empty() {
+            writeln!(f, "\\item {}.\\\\Java class: {}.", 
+                object_type.to_string().to_sentence_case(), 
+                java_object_handlers.into_iter().map(|java_object_handler| java_object_handler.java_class).collect::<Vec<_>>().join(", ")
+            )?;
+        }
+    }
+    for output_type in EbiInputType::iter() {
+        let java_object_handlers = output_type.get_java_object_handlers_that_can_import();
+        if !java_object_handlers.is_empty() {
+            writeln!(f, "\\item {}.\\\\Java class: {}.", 
+                output_type.to_string().to_sentence_case(), 
+                java_object_handlers.into_iter().map(|java_object_handler| java_object_handler.java_class).collect::<Vec<_>>().join(", ")
+            )?;
+        }
+    }
+    writeln!(f, "\\end{{itemize}}}}")?;
+
     //prom output list
     writeln!(f, "\\def\\ebipromoutput{{\\begin{{itemize}}")?;
     for object_type in EbiObjectType::iter() {

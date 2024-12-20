@@ -76,6 +76,10 @@ impl EbiObjectType {
         EbiOutputType::ObjectType(self.clone()).get_java_object_handlers_that_can_export()
     }
 
+    pub fn get_java_object_handlers_that_can_import(&self) -> HashSet<JavaObjectHandler> {
+        EbiInputType::Object(self.clone()).get_java_object_handlers_that_can_import()
+    }
+
 }
 
 impl Eq for EbiObjectType {}

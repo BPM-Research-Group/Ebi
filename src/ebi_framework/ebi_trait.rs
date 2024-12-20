@@ -2,7 +2,7 @@ use std::{collections::{BTreeSet, HashSet}, fmt::{Debug, Display}};
 use anyhow::{anyhow, Result};
 use strum_macros::EnumIter;
 
-use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_input::{EbiInput, EbiInputType}};
+use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_input::{EbiInput, EbiInputType}, prom_link::JavaObjectHandler};
 
 #[derive(Clone, Copy, PartialEq, Eq, EnumIter, Hash, Default)]
 pub enum EbiTrait {
@@ -67,6 +67,10 @@ impl EbiTrait {
             false
         });
         result
+    }
+
+    pub fn get_java_object_handlers_that_can_import(&self) -> HashSet<JavaObjectHandler> {
+        EbiInputType::Trait(self.clone()).get_java_object_handlers_that_can_import()
     }
 }
 

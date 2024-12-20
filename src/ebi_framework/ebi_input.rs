@@ -103,6 +103,16 @@ impl EbiInputType {
         }
     }
 
+    pub fn get_java_object_handlers_that_can_import(&self) -> HashSet<JavaObjectHandler> {
+        let mut result = HashSet::new();
+        for java_object_handler in self.get_java_object_handlers() {
+            if java_object_handler.translator_java_to_ebi.is_some() {
+                result.insert(java_object_handler.to_owned());
+            }
+        }
+        result
+    }
+
     pub fn get_possible_inputs(traits: &[&'static EbiInputType]) -> Vec<String> {
         let mut result = HashSet::new();
 
