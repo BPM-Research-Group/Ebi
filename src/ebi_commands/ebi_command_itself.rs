@@ -293,6 +293,19 @@ fn manual() -> Result<EbiOutput> {
     }
     writeln!(f, "\\end{{itemize}}}}")?;
 
+    //prom commands
+    writeln!(f, "\\def\\promcommands{{{}}}", 
+        EBI_COMMANDS.get_command_paths().iter().filter_map(
+            |path| 
+            {
+                if path.last().unwrap().is_in_java() {
+                    Some(format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (Section~\\ref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
+                } else {
+                    None
+                }
+            }).collect::<Vec<_>>().join("")
+        )?;
+
     //prom input list
     writeln!(f, "\\def\\ebiprominput{{\\begin{{itemize}}")?;
     for r#trait in EbiTrait::iter() {

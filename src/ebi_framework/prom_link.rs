@@ -273,7 +273,7 @@ pub fn print_java_plugins() -> Result<EbiOutput> {
     }
 
     //It is important that every function declared in Rust is implemented in Java, even if it is not actually used (yet).
-    //Therefore, we add a function that is never called but nevertheless has every java_objec_handler interface in it.
+    //Therefore, we add a function that is never called but nevertheless has every java_object_handler interface in it.
     //Then, the Java compiler will complain, rather than the error showing during testing or at runtime.
     writeln!(f, "@SuppressWarnings(\"unused\")")?;
     writeln!(f, "\n\tprivate static void call_every_ebi_to_java_translator(PluginContext context) throws Exception {{")?;
