@@ -213,7 +213,14 @@ fn manual() -> Result<EbiOutput> {
             writeln!(f, "\\end{{tabularx}}")?;
 
             //output
-            writeln!(f, "Output: {}, which can be written as {}.", output_type, output_types(output_type))?;
+            writeln!(f, "\\noindent Output: {}, which can be written as {}.", output_type, output_types(output_type))?;
+
+            //ProM
+            if path.last().unwrap().is_in_java() {
+                writeln!(f, "\\\\This command is available in Java and ProM.")?;
+            } else {
+                writeln!(f, "\\\\This command is not available in Java and ProM.")?;
+            }
         }
     }
     writeln!(f, "}}")?;
@@ -252,6 +259,8 @@ fn manual() -> Result<EbiOutput> {
                 writeln!(f, "\\\\{} {} can be exported from Ebi to ProM and Java.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
             } else if from_java {
                 writeln!(f, "\\\\{} {} can be imported from ProM and Java to Ebi.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
+            } else {
+                writeln!(f, "\\\\{} {} can be neither imported nor exported between Ebi, and ProM and Java.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
             }
         }
 
