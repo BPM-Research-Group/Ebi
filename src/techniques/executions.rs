@@ -4,7 +4,7 @@ use anyhow::{Error, Ok, Result};
 use chrono::{DateTime, FixedOffset};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
-use crate::{ebi_framework::{displayable::Displayable, ebi_command::EbiCommand}, ebi_objects::{language_of_alignments::Move, executions::{Execution, Executions}}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, ATTRIBUTE_TIME}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, techniques::align::Align};
+use crate::{ebi_framework::{displayable::Displayable, ebi_command::EbiCommand}, ebi_objects::{language_of_alignments::Move, executions::{Execution, Executions}}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, ATTRIBUTE_TIME}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}};
 
 pub trait FindExecutions {
     fn find_executions(&self, log: Box<dyn EbiTraitEventLog>) -> Result<Executions>;
@@ -20,7 +20,7 @@ impl FindExecutions for EbiTraitSemantics {
 	}
 }
 
-impl <T, State> FindExecutions for T where T: Semantics<SemState = State, AliState = State> + Send + Sync + ?Sized, State: Displayable {
+impl <T, State> FindExecutions for T where T: Semantics<SemState = State> + Send + Sync + ?Sized, State: Displayable {
     fn find_executions(&self, log: Box<dyn EbiTraitEventLog>) -> Result<Executions> {
 
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
