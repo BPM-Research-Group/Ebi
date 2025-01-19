@@ -8,7 +8,7 @@ use rand::Rng;
 
 use crate::ebi_framework::{ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait::FromEbiTraitObject, exportable::Exportable, infoable::Infoable};
 
-use super::{fraction::{FractionNotParsedYet, EXACT}, fraction_raw::FractionRaw};
+use super::{fraction::{FractionNotParsedYet, UInt, EXACT}, fraction_raw::FractionRaw};
 
 #[derive(Clone)]
 pub enum FractionEnum {

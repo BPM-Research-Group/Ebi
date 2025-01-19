@@ -35,7 +35,7 @@ impl FractionMatched {
     }
 
     pub fn zero() -> Self {
-        if Fraction::is_exaxt_globally() {
+        if crate::math::fraction::is_exaxt_globally() {
             Self::Exact(BigUint::zero())
         } else {
             Self::Approximate(0.0)

@@ -69,9 +69,13 @@ pub mod math {
 
     #[cfg(all(feature = "exact", feature = "approximate"))]
     pub mod fraction_enum;
-    
     #[cfg(all(not(feature = "exact"), feature = "approximate"))]
     pub mod fraction_f64;
+
+    #[cfg(all(feature = "exact", feature = "approximate"))]
+    pub mod log_div_enum;
+    #[cfg(all(not(feature = "exact"), feature = "approximate"))]
+    pub mod log_div_f64;
     
     pub mod fraction_matched;
     pub mod fraction_raw;

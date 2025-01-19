@@ -5,7 +5,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
 use logging_timer::timer;
 
-use crate::{ebi_commands::{ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association, ebi_command_conformance, ebi_command_convert, ebi_command_discover, ebi_command_info, ebi_command_itself, ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate, ebi_command_visualise}, ebi_framework::ebi_output, math::fraction::{Fraction, FractionNotParsedYet}};
+use crate::{ebi_commands::{ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association, ebi_command_conformance, ebi_command_convert, ebi_command_discover, ebi_command_info, ebi_command_itself, ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate, ebi_command_visualise}, ebi_framework::ebi_output, math::fraction::FractionNotParsedYet};
 
 use super::{ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}};
 
