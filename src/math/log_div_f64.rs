@@ -1,5 +1,5 @@
 use anyhow::Result;
-use num_bigint::{ToBigInt, ToBigUint};
+use num_bigint::ToBigInt;
 use num_traits::Pow;
 use std::{fmt::Display, io::Write, ops::{Add, AddAssign, DivAssign, MulAssign, Sub, SubAssign, Neg}};
 
@@ -12,20 +12,6 @@ use super::{fraction::UInt, fraction_f64::FractionF64};
 pub struct LogDivF64(FractionF64);
 
 impl LogDivF64 {
-
-    /**
-     * Returns whether the two given logdivs are either both exact or both approximate
-     */
-    pub(crate) fn matches(&self, _rhs: &Self) -> bool {
-        true
-    }
-
-     /**
-     * Returns whether the two given logdivs are either both exact or both approximate
-     */
-    pub(crate) fn matches_f(&self, _rhs: &FractionF64) -> bool {
-        true
-    }
 
     pub fn log2_div(log_of: FractionF64, divide_by: u64) -> Self {
         if log_of.is_sign_negative() {

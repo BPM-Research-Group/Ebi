@@ -224,14 +224,14 @@ pub(crate) fn find_best_swap(distances: &TriangularDistanceMatrix, removal_loss:
 		let distance_o_j = distances.get(o, j);
 		// New medoid is closest:
 		if distance_o_j < &reco.near.distance {
-			acc += distance_o_j;
+			acc += distance_o_j.clone();
             acc -= reco.near.distance.clone();
 			// loss already includes ds - dn, remove
 			ploss[reco.near.index] += reco.near.distance.clone();
             ploss[reco.near.index] -= reco.seco.distance.clone();
 		} else if distance_o_j < &reco.seco.distance {
 			// loss already includes ds - dn, adjust to d(xo) - dn
-			ploss[reco.near.index] += distance_o_j;
+			ploss[reco.near.index] += distance_o_j.clone();
             ploss[reco.near.index] -= reco.seco.distance.clone();
 		}
 	}
@@ -362,7 +362,7 @@ pub(crate) fn choose_medoid_within_partition(distances: &TriangularDistanceMatri
 	let mut sumb = Fraction::zero();
 	for (i, &a) in assi.iter().enumerate() {
 		if first != i && a == m {
-			sumb += distances.get(first, i);
+			sumb += distances.get(first, i).clone();
 		}
 	}
 	for (j, &aj) in assi.iter().enumerate() {
@@ -370,7 +370,7 @@ pub(crate) fn choose_medoid_within_partition(distances: &TriangularDistanceMatri
 			let mut sumj = Fraction::zero();
 			for (i, &ai) in assi.iter().enumerate() {
 				if i != j && ai == m {
-					sumj += distances.get(j, i);
+					sumj += distances.get(j, i).clone();
 				}
 			}
 			if sumj < sumb {

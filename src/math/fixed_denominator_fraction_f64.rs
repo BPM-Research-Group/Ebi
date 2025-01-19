@@ -1,7 +1,6 @@
 use std::{borrow::Borrow, ops::{AddAssign, Mul}, sync::Arc};
 
-use fraction::{BigUint, GenericFraction, Integer, Ratio, Sign};
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 
 use super::{fraction::Fraction, fraction_f64::FractionF64};
 
@@ -16,13 +15,6 @@ impl FixedDenominatorFractionF64 {
 
     pub fn zero() -> Self {
         Self(0.0)
-    }
-
-    /**
-     * Returns whether the two given fractions are either both exact or both approximate
-     */
-    pub(crate) fn matches(&self, rhs: &Self) -> bool {
-        true
     }
 
     pub fn to_fraction(self) -> Fraction {

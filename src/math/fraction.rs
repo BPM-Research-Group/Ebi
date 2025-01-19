@@ -1,13 +1,10 @@
 use anyhow::Error;
 use std::{str::FromStr, sync::atomic::AtomicBool};
 
-#[cfg(not(any(feature = "exact", feature = "approximate")))]
-compile_error!("At least one of the features \"exact\" and \"approximate\" must be enabled.");
-
-#[cfg(all(feature = "exact", feature = "approximate"))]
+#[cfg(not(feature = "withoutexactarithmetic"))]
 pub type Fraction = super::fraction_enum::FractionEnum;
 
-#[cfg(all(not(feature = "exact"), feature = "approximate"))]
+#[cfg(feature = "withoutexactarithmetic")]
 pub type Fraction = super::fraction_f64::FractionF64;
 
 //======================== exactness tools ========================//
@@ -24,7 +21,7 @@ pub fn set_exact_globally(exact: bool) {
 }
 
 pub fn is_exaxt_globally() -> bool {
-    if cfg!(feature = "exact") {
+    if !cfg!(feature = "withoutexactarithmetic") {
         EXACT.load(std::sync::atomic::Ordering::Relaxed)
     } else {
         false

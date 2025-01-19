@@ -57,6 +57,5 @@ lto = true
 codegen-units = 1
 
 [features]
-default = ["approximate"]
-exact = []
-approximate = []
+default = []
+withoutexactarithmetic = []

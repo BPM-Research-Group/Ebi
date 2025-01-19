@@ -67,25 +67,24 @@ pub mod math {
     pub mod average;
 
     pub mod fraction;
-    #[cfg(all(feature = "exact", feature = "approximate"))]
+    #[cfg(not(feature = "withoutexactarithmetic"))]
     pub mod fraction_enum;
-    #[cfg(all(not(feature = "exact"), feature = "approximate"))]
+    #[cfg(feature = "withoutexactarithmetic")]
     pub mod fraction_f64;
 
     pub mod log_div;
-    #[cfg(all(feature = "exact", feature = "approximate"))]
+    #[cfg(not(feature = "withoutexactarithmetic"))]
     pub mod log_div_enum;
-    #[cfg(all(not(feature = "exact"), feature = "approximate"))]
+    #[cfg(feature = "withoutexactarithmetic")]
     pub mod log_div_f64;
     
 
     pub mod fixed_denominator_fraction;
-    #[cfg(all(feature = "exact", feature = "approximate"))]
+    #[cfg(not(feature = "withoutexactarithmetic"))]
     pub mod fixed_denominator_fraction_enum;
-    #[cfg(all(not(feature = "exact"), feature = "approximate"))]
+    #[cfg(feature = "withoutexactarithmetic")]
     pub mod fixed_denominator_fraction_f64;
 
-    pub mod fraction_raw;
     pub mod matrix;
     pub mod root;
     pub mod root_log_div;

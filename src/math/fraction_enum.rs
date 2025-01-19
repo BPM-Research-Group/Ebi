@@ -8,7 +8,7 @@ use rand::Rng;
 
 use crate::ebi_framework::{ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait::FromEbiTraitObject, exportable::Exportable, infoable::Infoable};
 
-use super::{fraction::{FractionNotParsedYet, UInt, EXACT}, fraction_raw::FractionRaw};
+use super::fraction::{FractionNotParsedYet, UInt, EXACT};
 
 #[derive(Clone)]
 pub enum FractionEnum {
@@ -329,12 +329,6 @@ impl From<&Arc<FractionEnum>> for FractionEnum {
             FractionEnum::Approx(f) => FractionEnum::Approx(f.clone()),
             FractionEnum::CannotCombineExactAndApprox => FractionEnum::CannotCombineExactAndApprox,
         }
-    }
-}
-
-impl From<FractionRaw> for FractionEnum {
-    fn from(value: FractionRaw) -> Self {
-        FractionEnum::Exact(GenericFraction::Rational(value.sign, Ratio::new(value.a, value.b)))
     }
 }
 
