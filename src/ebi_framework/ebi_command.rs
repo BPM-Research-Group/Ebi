@@ -208,7 +208,7 @@ impl EbiCommand {
                 //set exact arithmetic
                 if !exact_arithmetic || cli_matches.get_flag("approx") {
                     log::info!("Use approximate arithmetic");
-                    Fraction::set_exact_globally(false);
+                    crate::math::fraction::set_exact_globally(false);
                 }
 
                 //read the inputs

@@ -467,6 +467,7 @@ dependencies = [
  "Inflector",
  "anyhow",
  "bitvec",
+ "cfg-if",
  "chrono",
  "clap",
  "clap-verbosity-flag",

@@ -74,7 +74,7 @@ pub enum MatchedDistances {
 impl MatchedDistances {
 
     pub fn new(matrix: TriangularDistanceMatrix) -> Result<Self> {
-        if Fraction::is_exaxt_globally() {
+        if crate::math::fraction::is_exaxt_globally() {
             let (matched_fractions, lcm) = FractionMatched::create(&matrix.distances)?;
             Ok(Self::Exact {
                 distances: matched_fractions,

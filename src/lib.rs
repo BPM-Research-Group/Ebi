@@ -66,6 +66,13 @@ pub mod math {
     pub mod astar;
     pub mod average;
     pub mod fraction;
+
+    #[cfg(all(feature = "exact", feature = "approximate"))]
+    pub mod fraction_enum;
+    
+    #[cfg(all(not(feature = "exact"), feature = "approximate"))]
+    pub mod fraction_f64;
+    
     pub mod fraction_matched;
     pub mod fraction_raw;
     pub mod log_div;

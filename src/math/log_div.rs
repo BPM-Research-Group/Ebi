@@ -34,9 +34,9 @@ impl LogDiv {
      * Returns whether the two given logdivs are either both exact or both approximate
      */
     pub(crate) fn matches_f(&self, rhs: &Fraction) -> bool {
-        match (self, rhs) {
-            (Self::Exact(_, _), Fraction::Exact(_)) => true,
-            (Self::Approx(_), Fraction::Approx(_)) => true,
+        match (self, rhs.is_exact()) {
+            (Self::Exact(_, _), true) => true,
+            (Self::Approx(_), false) => true,
             _ => false
         }
     }
