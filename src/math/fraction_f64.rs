@@ -8,7 +8,7 @@ use crate::ebi_framework::{ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait
 use super::fraction::FractionNotParsedYet;
 
 #[derive(Debug,Clone,PartialEq)]
-pub struct FractionF64(f64);
+pub struct FractionF64(pub f64);
 
 impl FractionF64 {
     pub fn is_exact(&self) -> bool {
