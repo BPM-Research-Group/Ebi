@@ -1,3 +1,4 @@
+use core::f64;
 use std::{borrow::Borrow, cmp::Ordering, fmt::Display, hash::Hash, iter::Sum, ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign}, str::FromStr, sync::Arc};
 
 use anyhow::{anyhow, Result, Error};
@@ -7,7 +8,7 @@ use crate::ebi_framework::{ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait
 
 use super::fraction::FractionNotParsedYet;
 
-#[derive(Debug,Clone,PartialEq)]
+#[derive(Debug,Clone,PartialEq,Copy)]
 pub struct FractionF64(pub f64);
 
 impl FractionF64 {
@@ -48,6 +49,14 @@ impl FractionF64 {
         self.0 != 0f64 && self.0.is_sign_negative()
     }
 
+    pub fn is_sign_negative(&self) -> bool {
+        self.0.is_sign_negative()
+    }
+
+    pub fn is_sign_positive(&self) -> bool {
+        self.0.is_sign_positive()
+    }
+
     /// Returns true if the value is Infinity (does not matter positive or negative)
     pub fn is_infinite(&self) -> bool {
         self.0.is_infinite()
@@ -55,6 +64,18 @@ impl FractionF64 {
 
     pub fn is_nan(&self) -> bool {
         self.0.is_nan()
+    }
+
+    pub fn infinity() -> Self {
+        Self(f64::INFINITY)
+    }
+
+    pub fn neg_infinity() -> Self {
+        Self(f64::NEG_INFINITY)
+    }
+
+    pub fn nan() -> Self {
+        Self(f64::NAN)  
     }
 
     pub fn abs(&self) -> Self {

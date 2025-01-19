@@ -1,6 +1,9 @@
-use std::{fmt::Display, io::Write, ops::{Add, AddAssign, DivAssign, MulAssign, Sub, SubAssign}};
+use anyhow::Result;
+use num_bigint::{ToBigInt, ToBigUint};
+use num_traits::Pow;
+use std::{fmt::Display, io::Write, ops::{Add, AddAssign, DivAssign, MulAssign, Sub, SubAssign, Neg}};
 
-use fraction::{BigFraction, BigUint, GenericFraction, Zero};
+use fraction::{BigFraction, BigUint, GenericFraction, Integer, Zero};
 
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
@@ -13,14 +16,14 @@ impl LogDivF64 {
     /**
      * Returns whether the two given logdivs are either both exact or both approximate
      */
-    pub(crate) fn matches(&self, rhs: &Self) -> bool {
+    pub(crate) fn matches(&self, _rhs: &Self) -> bool {
         true
     }
 
      /**
      * Returns whether the two given logdivs are either both exact or both approximate
      */
-    pub(crate) fn matches_f(&self, rhs: &FractionF64) -> bool {
+    pub(crate) fn matches_f(&self, _rhs: &FractionF64) -> bool {
         true
     }
 
@@ -29,7 +32,7 @@ impl LogDivF64 {
             return Self::nan(&log_of);
         }
         
-        Self(log_of.log2() / divide_by as f64)
+        Self(FractionF64(log_of.0.log2() / divide_by as f64))
     }
 
     pub fn log2(log_of: FractionF64) -> Self {
@@ -37,7 +40,7 @@ impl LogDivF64 {
             return Self::nan(&log_of);
         }
 
-        Self(log_of.log2())
+        Self(FractionF64(log_of.0.log2()))
     }
 
     pub fn approximate(&self) -> Result<FractionF64> {
@@ -49,7 +52,7 @@ impl LogDivF64 {
             return Ok(FractionF64::nan());
         }
 
-        Ok(FractionF64(self.0))
+        Ok(self.0)
     }
 
     pub fn n_log_n(n: &FractionF64) -> Self {
@@ -63,15 +66,15 @@ impl LogDivF64 {
             return Self::nan(n);
         }
 
-        Self(n * n.log2())
+        Self(FractionF64(n.0 * n.0.log2()))
     }
 
     fn nan(f: &FractionF64) -> Self {
         Self::nan_b(f.is_exact())
     }
 
-    fn nan_b(exact: bool) -> Self {
-        Self(f64::NAN)
+    fn nan_b(_exact: bool) -> Self {
+        Self(FractionF64(f64::NAN))
     }
 
     pub fn is_nan(&self) -> bool {
@@ -79,11 +82,11 @@ impl LogDivF64 {
     }
 
     pub fn neg_infinity() -> Self {
-        Self(f64::NEG_INFINITY)
+        Self(FractionF64(f64::NEG_INFINITY))
     }
 
     pub fn infinity() -> Self {
-        Self(f64::INFINITY)
+        Self(FractionF64(f64::INFINITY))
     }
 
     pub fn is_infinite(&self) -> bool {
@@ -130,7 +133,7 @@ impl LogDivF64 {
 
 impl Zero for LogDivF64 {
     fn zero() -> Self {
-        Self(0.0)
+        Self(0.0.into())
     }
 
     fn is_zero(&self) -> bool {
@@ -140,18 +143,7 @@ impl Zero for LogDivF64 {
 
 impl PartialEq for LogDivF64 {
     fn eq(&self, other: &Self) -> bool {
-        match (self, other) {
-            (Self::Exact(l0, l1), Self::Exact(r0, r1)) => {
-                if self.is_zero() && other.is_zero() {
-                    return true;
-                }
-                l0 == r0 && l1 == r1
-            },
-            (Self::Approx(l0), Self::Approx(r0)) => {
-                l0 - f64::EPSILON <= *r0 && *r0 <= l0 + f64::EPSILON
-            },
-            _ => false,
-        }
+        self.0.0 - f64::EPSILON <= other.0.0 && other.0.0 <= self.0.0 + f64::EPSILON
     }
 }
 
@@ -167,7 +159,7 @@ impl Add for LogDivF64 {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Self(self.0.add(rhs.0))
+        Self(self.0.add(&rhs.0))
     }
 }
 
@@ -181,18 +173,7 @@ impl Add<FractionF64> for LogDivF64 {
 
 impl AddAssign for LogDivF64 {
     fn add_assign(&mut self, rhs: Self) {
-        if !self.matches(&rhs) {
-            *self = LogDivF64::CannotCombineExactAndApprox
-        } else {
-            match (self, rhs) {
-                (LogDivF64::Exact(ab_log, c_denom), LogDivF64::Exact(rhs_ab_log, rhs_c_denom)) => {
-                    *ab_log = Self::power_f_u(&ab_log, &rhs_c_denom) * Self::power_f_u(&rhs_ab_log, &c_denom);
-                    *c_denom *= &rhs_c_denom;
-                },
-                (LogDivF64::Approx(f), LogDivF64::Approx(g)) => f.add_assign(g),
-                _ => {}
-            }
-        }
+        self.0.add_assign(rhs.0)
     }
 }
 
@@ -200,101 +181,54 @@ impl Sub for LogDivF64 {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output { 
-        match (self, rhs) {
-            (LogDivF64::Exact(ab_log, c_denom), LogDivF64::Exact(rhs_ab_log, rhs_c_denom)) => 
-                Self::Exact(
-                    Self::power_f_u(&ab_log, &rhs_c_denom) / Self::power_f_u(&rhs_ab_log, &c_denom), 
-                    c_denom * rhs_c_denom),
-            (LogDivF64::Approx(f), LogDivF64::Approx(g)) => Self::Approx(f.sub(g)),
-            _ => LogDivF64::CannotCombineExactAndApprox
-        }
+        Self(self.0.sub(&rhs.0))
     }
 }
 
 impl SubAssign for LogDivF64 {
     fn sub_assign(&mut self, rhs: Self) {
-        if !self.matches(&rhs) {
-            *self = LogDivF64::CannotCombineExactAndApprox
-        } else {
-            match (self, rhs) {
-                (LogDivF64::Exact(ab_log, c_denom), LogDivF64::Exact(rhs_ab_log, rhs_c_denom)) => {
-                    *ab_log = Self::power_f_u(&ab_log, &rhs_c_denom) / Self::power_f_u(&rhs_ab_log, &c_denom);
-                    *c_denom *= &rhs_c_denom;
-                },
-                (LogDivF64::Approx(f), LogDivF64::Approx(g)) => f.sub_assign(g),
-                _ => {}
-            }
-        }
+        self.0.sub_assign(rhs.0)
     }
 }
 
-impl MulAssign<Fraction> for LogDivF64 {
-    fn mul_assign(&mut self, rhs: Fraction) {
-        if !self.matches_f(&rhs) {
-            *self = LogDivF64::CannotCombineExactAndApprox
-        } else {
-            match (self, rhs) {
-                (LogDivF64::Exact(ab_log, c), Fraction::Exact(f)) => {
-                    *ab_log = Self::power_f_u(&ab_log, &f.numer().unwrap());
-                    *c *= f.denom().unwrap()
-                },
-                (LogDivF64::Approx(f), Fraction::Approx(g)) => *f *= g,
-                _ => {}
-            }
-        }
+impl MulAssign<FractionF64> for LogDivF64 {
+    fn mul_assign(&mut self, rhs: FractionF64) {
+        self.0 *= rhs
     }
 }
 
-impl MulAssign<&Fraction> for LogDivF64 {
-    fn mul_assign(&mut self, rhs: &Fraction) {
-        if !self.matches_f(rhs) {
-            *self = Self::CannotCombineExactAndApprox
-        }
-        match (self, rhs) {
-            (LogDivF64::Exact(ab_log, c), Fraction::Exact(f)) => {
-                *ab_log = Self::power_f_u(&ab_log, &f.numer().unwrap());
-                *c *= f.denom().unwrap()
-            },
-            (LogDivF64::Approx(f), Fraction::Approx(g)) => *f *= g,
-            _ => {}
-        }
+impl MulAssign<&FractionF64> for LogDivF64 {
+    fn mul_assign(&mut self, rhs: &FractionF64) {
+        self.0 *= rhs
     }
 }
 
 impl MulAssign<usize> for LogDivF64 {
     fn mul_assign(&mut self, rhs: usize) {
-        match self {
-            LogDivF64::Exact(ab_log, _) => *ab_log = Self::power_f_u(&ab_log, &rhs.to_biguint().unwrap()),
-            LogDivF64::Approx(f) => *f *= rhs as f64,
-            _ => {}
-        }
+        self.0 *= rhs
     }
 }
 
 impl MulAssign<u64> for LogDivF64 {
     fn mul_assign(&mut self, rhs: u64) {
-        match self {
-            LogDivF64::Exact(ab_log, _) => *ab_log = Self::power_f_u(&ab_log, &rhs.to_biguint().unwrap()),
-            LogDivF64::Approx(f) => *f *= rhs as f64,
-            _ => {}
-        }
+        self.0 *= rhs
     }
 }
 
 impl DivAssign<usize> for LogDivF64 {
     fn div_assign(&mut self, rhs: usize) {
-        self.mul_assign(Fraction::from(rhs).recip())
+        self.mul_assign(FractionF64::from(rhs).recip())
     }
 }
 
-impl DivAssign<Fraction> for LogDivF64 {
-    fn div_assign(&mut self, rhs: Fraction) {
+impl DivAssign<FractionF64> for LogDivF64 {
+    fn div_assign(&mut self, rhs: FractionF64) {
         self.mul_assign(rhs.recip())
     }
 }
 
-impl DivAssign<&Fraction> for LogDivF64 {
-    fn div_assign(&mut self, rhs: &Fraction) {
+impl DivAssign<&FractionF64> for LogDivF64 {
+    fn div_assign(&mut self, rhs: &FractionF64) {
         self.mul_assign(rhs.recip())
     }
 }
@@ -321,45 +255,19 @@ impl Exportable for LogDivF64 {
 
 impl Infoable for LogDivF64 {
     fn info(&self, f: &mut impl Write) -> Result<()> {
-        match self {
-            LogDivF64::Exact(ab_log, c_denom) => {
-                write!(f, "log(")?;
-                ab_log.info(f)?;
-                writeln!(f, ") / {} bits", c_denom.bits())?;
-            },
-            LogDivF64::Approx(fr) => 
-                writeln!(f, "logdiv with value {}", fr)?,
-            LogDivF64::CannotCombineExactAndApprox => 
-                writeln!(f, "cannot combine exact and approximate arithmetic")?
-        };
-
+        writeln!(f, "logdiv with value {}", self.0)?;
         Ok(write!(f, "")?)
     }
 }
 
 impl Display for LogDivF64 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            LogDivF64::Exact(ab_log, c_denom) => 
-                write!(f, "log({})/{}", ab_log, c_denom),
-            LogDivF64::Approx(fr) => 
-                write!(f, "{}", fr),
-            LogDivF64::CannotCombineExactAndApprox => 
-                write!(f, "cannot combine exact and approximate arithmetic")
-        }
+        write!(f, "{}", self.0)
     }
 }
 
 impl std::fmt::Debug for LogDivF64 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            LogDivF64::Exact(ab_log, c_denom) => 
-                write!(f, "logdiv of ({:?}/{}) bits", ab_log, c_denom.bits()),
-            LogDivF64::Approx(fr) => 
-                write!(f, "logdiv approx {}", fr),
-            LogDivF64::CannotCombineExactAndApprox => 
-                write!(f, "cannot combine exact and approximate arithmetic")
-        }
-        
+        write!(f, "logdiv approx {}", self.0)
     }
 }

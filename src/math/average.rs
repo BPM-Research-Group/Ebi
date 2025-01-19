@@ -1,10 +1,9 @@
-use std::{borrow::Borrow, sync::Arc, fmt::Debug};
+use std::{sync::Arc, fmt::Debug};
 use anyhow::{anyhow, Result};
-use fraction::{BigUint, GenericFraction, Ratio, Sign};
 
 use crate::distances::TriangularDistanceMatrix;
 
-use super::{fraction::Fraction, fraction_matched::FractionMatched};
+use super::{fixed_denominator_fraction::FixedDenominatorFraction, fraction::Fraction};
 
 /**
  * Class to compute the weighted average distance over distances, where these weights are integers and all distances are not negative.
@@ -39,7 +38,7 @@ impl Average {
 
     pub fn average(self) -> Result<Fraction> {
         let mut count = 0;
-        let mut sum = FractionMatched::zero();
+        let mut sum = FixedDenominatorFraction::zero();
 
         for i in 0..self.distances.len() {
             for j in 0..self.distances.len() {
@@ -53,7 +52,7 @@ impl Average {
         if count == 0 {
             Err(anyhow!("Cannot take the average over no values."))
         } else {
-            let result = &self.distances.to_fraction(sum) / count;
+            let result = &sum.to_fraction() / count;
             // log::debug!("average {}", result);
             Ok(result)
         }
@@ -66,44 +65,27 @@ impl Debug for Average {
     }
 }
 
-pub enum MatchedDistances {
-    Exact{distances: Vec<Arc<FractionMatched>>, zero: Arc<FractionMatched>, denominator: BigUint, len: usize},
-    Approximate{distances: Vec<Arc<FractionMatched>>, zero: Arc<FractionMatched>, len: usize},
+pub struct MatchedDistances {
+    distances: Vec<Arc<FixedDenominatorFraction>>, 
+    zero: Arc<FixedDenominatorFraction>,
+    len: usize
 }
 
 impl MatchedDistances {
 
     pub fn new(matrix: TriangularDistanceMatrix) -> Result<Self> {
-        if crate::math::fraction::is_exaxt_globally() {
-            let (matched_fractions, lcm) = FractionMatched::create(&matrix.distances)?;
-            Ok(Self::Exact {
-                distances: matched_fractions,
-                zero: Arc::new(FractionMatched::zero()),
-                denominator: lcm,
-                len: matrix.len()
-            })
-        } else {
-            let len = matrix.len();
-            Ok(Self::Approximate {
-                distances : matrix.distances.into_iter().map(|f| {
-                    match f.borrow() {
-                        Fraction::Approx(g) => Arc::new(FractionMatched::Approximate(*g)),
-                        _ => unreachable!()
-                    }}).collect::<Vec<_>>(),
-                zero: Arc::new(FractionMatched::zero()),
-                len: len
-            })
-        }
+        Ok(Self {
+            distances: FixedDenominatorFraction::create(&matrix.distances)?,
+            zero: Arc::new(FixedDenominatorFraction::zero()),
+            len: matrix.len()
+        })
     }
 
     /**
      * Return the lenghth of one side of the matrix
      */
     pub fn len(&self) -> usize {
-        match self {
-            MatchedDistances::Exact { len, .. } => *len,
-            MatchedDistances::Approximate { len, .. } => *len,
-        }
+        self.len
     }
 
 
@@ -111,32 +93,12 @@ impl MatchedDistances {
         (i * (i-1)) / 2 + j
     }
 
-    pub fn get(&self, i: usize, j: usize) -> &Arc<FractionMatched> {
+    pub fn get(&self, i: usize, j: usize) -> &Arc<FixedDenominatorFraction> {
         if i == j {
-            &self.zero()
+            &self.zero
         } else {
             let index = if i > j { Self::get_index(i, j) } else { Self::get_index(j, i)};
-            match self {
-                MatchedDistances::Exact { distances, .. } => &distances[index],
-                MatchedDistances::Approximate { distances, .. } => &distances[index]
-            }
-        }
-    }
-
-    fn zero(&self) -> &Arc<FractionMatched> {
-        match self {
-            MatchedDistances::Exact { zero, .. } => zero,
-            MatchedDistances::Approximate { zero, ..} => zero
-        }
-    }
-
-    pub fn to_fraction(&self, matched_fraction: FractionMatched) -> Fraction {
-        match (self, matched_fraction) {
-            (MatchedDistances::Exact { denominator, .. }, FractionMatched::Exact(numerator)) => 
-                Fraction::Exact(GenericFraction::Rational(Sign::Plus, Ratio::new(numerator, denominator.clone()))),
-            (MatchedDistances::Approximate { .. }, FractionMatched::Approximate(f)) 
-                => Fraction::Approx(f),
-            _ => Fraction::CannotCombineExactAndApprox
+            &self.distances[index]
         }
     }
 }

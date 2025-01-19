@@ -2,8 +2,7 @@
 mod tests {
     use std::{fs::{self, File}, io::Cursor, ops::Neg};
 
-    use fraction::{GenericFraction, Zero};
-    use num_bigint::ToBigUint;
+    use fraction::Zero;
 
     use crate::{ebi_framework::{activity_key::HasActivityKey, ebi_file_handler::EBI_FILE_HANDLERS, ebi_output::EbiOutput}, ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, language_of_alignments::Move, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{Semantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics, ToStochasticDeterministicSemantics}}, follower_semantics::FollowerSemantics, math::{fraction::Fraction, log_div::LogDiv, matrix::Matrix, root_log_div::RootLogDiv}, medoid, multiple_reader::MultipleReader, techniques::{align::Align, deterministic_semantics_for_stochastic_semantics::PMarking, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, medoid_non_stochastic::MedoidNonStochastic, occurrences_stochastic_miner::OccurrencesStochasticMiner, probability_queries::ProbabilityQueries, process_variety::ProcessVariety, statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance}};
 
@@ -567,7 +566,9 @@ mod tests {
 
         let slang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(log.get_finite_stochastic_language());
 
-        let answer = RootLogDiv::sqrt(LogDiv::Exact(GenericFraction::from(4), 2.to_biguint().unwrap())).one_minus();
+        let mut x = LogDiv::from(Fraction::from(2));
+        x /= 2;
+        let answer = RootLogDiv::sqrt(x).one_minus();
 
         assert_eq!(slang.jssc_log2model(Box::new(slpn)).unwrap(), answer);
     }
