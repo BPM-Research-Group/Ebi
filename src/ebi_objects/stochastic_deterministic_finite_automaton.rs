@@ -123,7 +123,7 @@ impl StochasticDeterministicFiniteAutomaton {
             self.probabilities.insert(from, probability);
 
             if self.terminating_probabilities[source].is_negative() {
-                Err(anyhow!("tried to insert edge from {} to {} with probability {}, which brings the sum outgoing probability of the source state (1-{}) above 1", source, target, probability, self.terminating_probabilities[source]))
+                Err(anyhow!("tried to insert edge from {} to {}, which brings the sum outgoing probability of the source state (1-{}) above 1", source, target, self.terminating_probabilities[source]))
             } else {
                 Ok(())
             }
