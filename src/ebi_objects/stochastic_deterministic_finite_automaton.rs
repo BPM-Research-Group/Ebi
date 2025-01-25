@@ -114,7 +114,7 @@ impl StochasticDeterministicFiniteAutomaton {
         let (found, from) = self.binary_search(source, self.activity_key.get_id_from_activity(activity));
         if found {
             //edge already present
-            Err(anyhow!("tried to insert an edge that would violate the determinism of the SDFA"))
+            Err(anyhow!("tried to insert edge from {} to {}, which would violate the determinism of the SDFA", source, target))
         } else {
             self.sources.insert(from, source);
             self.targets.insert(from, target);
@@ -123,7 +123,7 @@ impl StochasticDeterministicFiniteAutomaton {
             self.probabilities.insert(from, probability);
 
             if self.terminating_probabilities[source].is_negative() {
-                Err(anyhow!("tried to insert an edge that brings the sum outgoing probability of the source state above 1"))
+                Err(anyhow!("tried to insert edge from {} to {} with probability {}, which brings the sum outgoing probability of the source state (1-{}) above 1", source, target, probability, self.terminating_probabilities[source]))
             } else {
                 Ok(())
             }
@@ -325,12 +325,12 @@ impl Importable for StochasticDeterministicFiniteAutomaton {
 
         result.set_initial_state(json::read_field_number(&json, "initialState").context("failed to read initial state")?);
         let jtrans = json::read_field_list(&json, "transitions").context("failed to read list of transitions")?;
-        for jtransition in jtrans {
-            let from = json::read_field_number(jtransition, "from").context("could not read from")?;
-            let to = json::read_field_number(jtransition, "to").context("could not read to")?;
-            let label = json::read_field_string(jtransition, "label").context("could not read label")?;
+        for (i, jtransition) in jtrans.iter().enumerate() {
+            let from = json::read_field_number(jtransition, "from").with_context(|| format!("could not read source of transition {}", i))?;
+            let to = json::read_field_number(jtransition, "to").with_context(|| format!("could not read destination of transition {}", i))?;
+            let label = json::read_field_string(jtransition, "label").with_context(|| format!("could not read label of transition {}", i))?;
             let activity = result.activity_key.process_activity(label.as_str());
-            let probability = json::read_field_fraction(jtransition, "prob").context("could not read probability")?;
+            let probability = json::read_field_fraction(jtransition, "prob").with_context(|| format!("could not read probability on transition {}", i))?;
 
             result.add_transition(from, activity, to, probability)?;
         }

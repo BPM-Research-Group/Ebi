@@ -46,7 +46,7 @@ impl FractionF64 {
 
     /// Returns true if the number is negative and false if the number is zero or positive.
     pub fn is_negative(&self) -> bool {
-        self.0 != 0f64 && self.0.is_sign_negative()
+        self.0 < -f64::EPSILON && self.0.is_sign_negative()
     }
 
     pub fn is_sign_negative(&self) -> bool {
@@ -195,7 +195,17 @@ impl FromStr for FractionF64 {
     type Err = Error;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
-        Ok(Self(f64::from_str(s)?))
+        match f64::from_str(s) {
+            Ok(f) => Ok(Self(f)),
+            Err(_) => {
+                match fraction::Fraction::from_str(s) {
+                    Ok(f) => {
+                        Ok(Self(format!("{:.20}", f).parse::<f64>()?))
+                    },
+                    Err(e) => Err(e.into()),
+                }
+            },
+        }
     }
 }
 
