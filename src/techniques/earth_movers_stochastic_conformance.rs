@@ -4,7 +4,7 @@ use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::fraction::Fraction,
 };
-use anyhow::Result;
+use anyhow::{Context, Result};
 use fraction::BigInt;
 use num_bigint::ToBigInt;
 use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
@@ -212,7 +212,8 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
                 let ns_result = ns
                     .get_result()
-                    .expect("NetworkSimplex did not return a result, cannot calculate EMSC");
+                    .context("NetworkSimplex did not return a result, cannot calculate EMSC")?;
+
                 log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // (i64) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
@@ -279,7 +280,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
                 let ns_result = ns
                     .get_result()
-                    .expect("NetworkSimplex did not return a result, cannot calculate EMSC");
+                    .context("NetworkSimplex did not return a result, cannot calculate EMSC")?;
                 log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // (i128) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
@@ -344,7 +345,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
                 let ns_result = ns
                     .get_result()
-                    .expect("NetworkSimplex did not return a result, cannot calculate EMSC");
+                    .context("NetworkSimplex did not return a result, cannot calculate EMSC")?;
                 log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
@@ -417,7 +418,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
                     retry_ns
                         .get_result()
-                        .expect("NetworkSimplex failed even after retrying, cannot calculate EMSC")
+                        .context("NetworkSimplex did not return a result, cannot calculate EMSC")?
                 }
             };
 
