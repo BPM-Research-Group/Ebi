@@ -4,7 +4,7 @@ use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::fraction::Fraction,
 };
-use anyhow::Result;
+use anyhow::{Context, Result};
 use fraction::BigInt;
 use num_bigint::ToBigInt;
 use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
@@ -212,13 +212,16 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
                 let ns_result = ns
                     .get_result()
-                    .expect("NetworkSimplex did not return a result, cannot calculate EMSC");
+                    .context("NetworkSimplex did not return a result, cannot calculate EMSC")?;
+
                 log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // (i64) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
-                let result = Fraction::from(1)
-                    - Fraction::from(ns_result)
-                        / Fraction::from(&lcm_distances * &lcm_probabilities);
+                let mut result = Fraction::from(1);
+                let mut distance = Fraction::from(ns_result);
+                distance /= Fraction::from(lcm_distances);
+                distance /= Fraction::from(lcm_probabilities);
+                result -= distance;
 
                 return Ok(result);
             } else if lcm_probabilities <= BigInt::from(i128::MAX)
@@ -279,13 +282,15 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
                 let ns_result = ns
                     .get_result()
-                    .expect("NetworkSimplex did not return a result, cannot calculate EMSC");
+                    .context("NetworkSimplex did not return a result, cannot calculate EMSC")?;
                 log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // (i128) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
-                let result = Fraction::from(1)
-                    - Fraction::from(ns_result)
-                        / Fraction::from(&lcm_distances * &lcm_probabilities);
+                let mut result = Fraction::from(1);
+                let mut distance = Fraction::from(ns_result);
+                distance /= Fraction::from(lcm_distances);
+                distance /= Fraction::from(lcm_probabilities);
+                result -= distance;
 
                 return Ok(result);
             } else {
@@ -344,13 +349,15 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
                 let ns_result = ns
                     .get_result()
-                    .expect("NetworkSimplex did not return a result, cannot calculate EMSC");
+                    .context("NetworkSimplex did not return a result, cannot calculate EMSC")?;
                 log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
-                let result = Fraction::from(1)
-                    - Fraction::from(ns_result)
-                        / Fraction::from(&lcm_distances * &lcm_probabilities);
+                let mut result = Fraction::from(1);
+                let mut distance = Fraction::from(ns_result);
+                distance /= Fraction::from(lcm_distances);
+                distance /= Fraction::from(lcm_probabilities);
+                result -= distance;
 
                 return Ok(result);
             }
@@ -417,13 +424,13 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
                     retry_ns
                         .get_result()
-                        .expect("NetworkSimplex failed even after retrying, cannot calculate EMSC")
+                        .context("NetworkSimplex did not return a result, cannot calculate EMSC")?
                 }
             };
 
             log::debug!("NetworkSimplex result: {:?}", ns_result);
             // 3c. Calculate the EMSC value as 1 - result.
-            let result = Fraction::Approx(1.0) - Fraction::Approx(ns_result);
+            let result = Fraction::Approx(1.0 - ns_result);
 
             Ok(result)
         }

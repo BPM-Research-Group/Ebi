@@ -571,16 +571,16 @@ where
             cost -= &self.pi[self.target[e]];
             cost *= self.state[e].value();
 
-            // log::trace!(
-            //     "{}-->{}, cost: {} = {} * ({} + {} - {})",
-            //     self.source[e],
-            //     self.target[e],
-            //     cost,
-            //     self.state[e].value(),
-            //     self.cost[e],
-            //     self.pi[self.source[e]],
-            //     self.pi[self.target[e]]
-            // );
+            log::trace!(
+                "{}-->{}, cost: {} = {} * ({} + {} - {})",
+                self.source[e],
+                self.target[e],
+                cost,
+                self.state[e].value(),
+                self.cost[e],
+                self.pi[self.source[e]],
+                self.pi[self.target[e]]
+            );
             if cost < min_cost {
                 min_cost = cost;
                 self.in_arc = e;
@@ -624,16 +624,16 @@ where
             cost += &self.pi[self.source[e]];
             cost -= &self.pi[self.target[e]];
             cost *= self.state[e].value();
-            // log::trace!(
-            //     "{}-->{}, cost: {} = {} * ({} + {} - {})",
-            //     self.source[e],
-            //     self.target[e],
-            //     cost,
-            //     self.state[e].value(),
-            //     self.cost[e],
-            //     self.pi[self.source[e]],
-            //     self.pi[self.target[e]]
-            // );
+            log::trace!(
+                "{}-->{}, cost: {} = {} * ({} + {} - {})",
+                self.source[e],
+                self.target[e],
+                cost,
+                self.state[e].value(),
+                self.cost[e],
+                self.pi[self.source[e]],
+                self.pi[self.target[e]]
+            );
             if cost < min_cost {
                 min_cost = cost;
                 self.in_arc = e;

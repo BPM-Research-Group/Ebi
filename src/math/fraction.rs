@@ -572,18 +572,6 @@ impl Sub<&Fraction> for &Fraction {
     }
 }
 
-impl Sub for Fraction {
-    type Output = Fraction;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        match (self, rhs) {
-            (Fraction::Exact(x), Fraction::Exact(y)) => Fraction::Exact(x - y),
-            (Fraction::Approx(x), Fraction::Approx(y)) => Fraction::Approx(x - y),
-            _ => Fraction::CannotCombineExactAndApprox,
-        }
-    }
-}
-
 impl<T> SubAssign<T> for Fraction
 where
     T: Borrow<Fraction>,
@@ -636,18 +624,6 @@ impl Div<&Fraction> for &Fraction {
     type Output = Fraction;
 
     fn div(self, rhs: &Fraction) -> Self::Output {
-        match (self, rhs) {
-            (Fraction::Exact(x), Fraction::Exact(y)) => Fraction::Exact(x.div(y)),
-            (Fraction::Approx(x), Fraction::Approx(y)) => Fraction::Approx(x.div(y)),
-            _ => Fraction::CannotCombineExactAndApprox,
-        }
-    }
-}
-
-impl Div for Fraction {
-    type Output = Fraction;
-
-    fn div(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
             (Fraction::Exact(x), Fraction::Exact(y)) => Fraction::Exact(x.div(y)),
             (Fraction::Approx(x), Fraction::Approx(y)) => Fraction::Approx(x.div(y)),

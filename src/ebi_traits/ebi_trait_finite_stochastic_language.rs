@@ -3,8 +3,8 @@ use std::io::BufRead;
 
 use crate::{
     ebi_framework::{
-        activity_key::ActivityKey, ebi_input::EbiInput, ebi_object::EbiTraitObject,
-        ebi_trait::FromEbiTraitObject, importable::Importable,
+        ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject,
+        importable::Importable,
     },
     ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
     math::fraction::Fraction,
@@ -23,8 +23,6 @@ pub trait EbiTraitFiniteStochasticLanguage:
     fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage;
 
     fn get_probability_sum(&self) -> Fraction;
-
-    fn translate(&mut self, target_activity_key: &mut ActivityKey);
 }
 
 impl FromEbiTraitObject for dyn EbiTraitFiniteStochasticLanguage {
