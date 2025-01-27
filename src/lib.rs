@@ -77,7 +77,6 @@ pub mod math {
     pub mod log_div_enum;
     #[cfg(feature = "withoutexactarithmetic")]
     pub mod log_div_f64;
-    
 
     pub mod fixed_denominator_fraction;
     #[cfg(not(feature = "withoutexactarithmetic"))]
@@ -88,6 +87,9 @@ pub mod math {
     pub mod matrix;
     pub mod root;
     pub mod root_log_div;
+    pub mod correlation;
+    pub mod levenshtein;
+    pub mod markov_model;
 }
 pub mod techniques {
     pub mod align;

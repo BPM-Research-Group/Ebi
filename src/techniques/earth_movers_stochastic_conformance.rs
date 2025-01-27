@@ -83,7 +83,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
             .collect();
 
         // 2. Is exact arithmetic required?
-        if Fraction::is_exaxt_globally() {
+        if crate::math::fraction::is_exaxt_globally() {
             log::info!("Calculating exact EMSC value");
             // 2a. Calculate the Least Common Multiple (LCM) of all denominators of distances (i.e. the elements in the DistanceMatrix).
             let denominators: Vec<BigInt> = distances
