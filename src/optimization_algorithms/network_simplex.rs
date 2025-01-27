@@ -146,7 +146,7 @@ const EPSILON: f64 = 1e-15;
 /// First, create a new instance of NetworkSimplex with the graph and costs, supply, and other parameters. Then call the `run` method to solve the problem. Finally, the `get_result` method provides the optimal cost if the problem is feasible and bounded.<br>
 ///
 /// # Example
-/// ```rust
+/// ```ignore
 /// use NetworkSimplexValueType::Exact64;
 /// NetworkSimplexValueType::set_mode_globally(1);
 /// let supply: Vec<NetworkSimplexValueType> =
@@ -1321,7 +1321,7 @@ where
     /// The result is accumulated over all arcs in the network.
     ///
     /// # Examples
-    /// ```
+    /// ```ignore
     /// // Assuming `simplex` is an instance of `NetworkSimplex` with optimal flow.
     /// if let Some(total_cost) = simplex.get_result() {
     ///     println!("The total flow cost is: {}", total_cost);

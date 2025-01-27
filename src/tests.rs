@@ -43,7 +43,6 @@ mod tests {
         optimization_algorithms::network_simplex::NetworkSimplex,
         techniques::{
             align::Align, deterministic_semantics_for_stochastic_semantics::PMarking,
-            earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
             jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
             medoid_non_stochastic::MedoidNonStochastic,
             occurrences_stochastic_miner::OccurrencesStochasticMiner,

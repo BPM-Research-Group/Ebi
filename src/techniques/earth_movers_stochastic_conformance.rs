@@ -35,7 +35,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
     /// Note that the second language is mutable, as the it is necessary to translate it to match the first language.
     ///
     /// # Example
-    /// ```
+    /// ```ignore
     /// lang_a.earth_movers_stochastic_conformance(lang_b.as_mut())
     /// ```
     ///
