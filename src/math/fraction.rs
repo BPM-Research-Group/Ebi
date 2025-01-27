@@ -1,8 +1,23 @@
-use anyhow::Error;
-use std::{str::FromStr, sync::atomic::AtomicBool};
+use anyhow::{anyhow, Error, Result};
+use fraction::{BigFraction, BigInt, BigUint, GenericFraction, One, Sign, Zero};
+use num_bigint::{RandBigInt, ToBigInt, ToBigUint};
+use num_rational::Ratio;
+use num_traits::{Signed, ToPrimitive};
+use rand::Rng;
+use std::{
+    borrow::Borrow,
+    cmp::Ordering,
+    hash::Hash,
+    iter::Sum,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
+    str::FromStr,
+    sync::{atomic::AtomicBool, Arc},
+};
 
-#[cfg(not(feature = "withoutexactarithmetic"))]
-pub type Fraction = super::fraction_enum::FractionEnum;
+use crate::ebi_framework::{
+    ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait::FromEbiTraitObject,
+    exportable::Exportable, infoable::Infoable,
+};
 
 #[cfg(feature = "withoutexactarithmetic")]
 pub type Fraction = super::fraction_f64::FractionF64;
@@ -25,6 +40,14 @@ pub fn is_exaxt_globally() -> bool {
         EXACT.load(std::sync::atomic::Ordering::Relaxed)
     } else {
         false
+    }
+
+    pub fn denom(&self) -> Option<&BigUint> {
+        match self {
+            Fraction::Exact(fraction) => fraction.denom(), // Returns the denominator for BigFraction
+            Fraction::Approx(_) => None,                   // No meaningful denominator for Approx
+            Fraction::CannotCombineExactAndApprox => None, // No meaningful denominator here either
+        }
     }
 }
 
