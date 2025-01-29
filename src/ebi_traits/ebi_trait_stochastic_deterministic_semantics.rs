@@ -41,11 +41,6 @@ pub trait StochasticDeterministicSemantics: Livelock<LivState = Self::DetState> 
     fn get_deterministic_termination_probability(&self, state: &Self::DetState) -> Fraction;
 
     /**
-     * The probability that from the given state, the model will never leave a livelock of silent activities.
-     */
-    fn get_deterministic_silent_livelock_probability(&self, state: &Self::DetState) -> Fraction;
-
-    /**
      * 
     * @param activity
     * @return the probability of executing the activity in the given state.
@@ -54,6 +49,17 @@ pub trait StochasticDeterministicSemantics: Livelock<LivState = Self::DetState> 
     fn get_deterministic_activity_probability(&self, state: &Self::DetState, activity: Activity) -> Fraction;
 
     fn get_deterministic_enabled_activities(&self, state: &Self::DetState) -> Vec<Activity>;
+
+     /**
+     * The probability that from the given state, the model will never leave a livelock of silent activities.
+     */
+    fn get_deterministic_silent_livelock_probability(&self, state: &Self::DetState) -> Fraction;
+
+    /**
+     * The probability that from the given state, the model will never leave a livelock. Note that this is not the probability to -end up- in a livelock, but the probability that the state is -in- a livelock.
+     * May return none if there is no livelock, which is equivalent to Fraction::zero()
+     */
+    fn get_deterministic_non_decreasing_livelock_probability(&self, state: &mut Self::DetState) -> Result<Fraction>;
 
 }
 

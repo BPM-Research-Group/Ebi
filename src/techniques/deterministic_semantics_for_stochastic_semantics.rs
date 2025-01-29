@@ -61,10 +61,6 @@ use crate::math::markov_model::MarkovModel;
             fn get_deterministic_termination_probability(&self, state: &Self::DetState) -> Fraction {
                 state.termination_probability.clone()
             }
-
-            fn get_deterministic_silent_livelock_probability(&self, state: &Self::DetState) -> Fraction {
-                state.silent_livelock_probability.clone()
-            }
         
             fn get_deterministic_activity_probability(&self, state: &Self::DetState, activity: Activity) -> Fraction {
                 state.activity_2_probability.get(&activity).unwrap().clone()
@@ -72,6 +68,20 @@ use crate::math::markov_model::MarkovModel;
         
             fn get_deterministic_enabled_activities(&self, state: &Self::DetState) -> Vec<Activity> {
                 state.activity_2_probability.keys().cloned().collect()
+            }
+
+            fn get_deterministic_silent_livelock_probability(&self, state: &Self::DetState) -> Fraction {
+                state.silent_livelock_probability.clone()
+            }
+
+            fn get_deterministic_non_decreasing_livelock_probability(&self, state: &mut Self::DetState) -> Result<Fraction> {
+                let mut sum = Fraction::zero();
+                for (sub_state, probability) in state.p_marking.iter_mut() {
+                    if self.is_non_decreasing_livelock(&mut sub_state.clone())? {
+                        sum += probability;
+                    }
+                }
+                Ok(sum)
             }
         }
 
@@ -81,12 +91,13 @@ use crate::math::markov_model::MarkovModel;
              * Compute the next q-state.
              */
             fn compute_next(&self, q_state: &mut PMarking<LPNMarking>) -> Result<()> {
-                // log::debug!("compute next q-states for {:?}", q_state);
+                log::debug!("compute next q-states for {:?}", q_state);
 
                 //create the extended matrix
                 let mut markov_model = self.create_markov_model(&q_state)?;
 
-                // log::debug!("T {}", markov_model);
+                log::debug!("T {}", markov_model);
+                // log::debug!("T {:?}", markov_model);
 
                 //replace livelock states by absorbing states
                 let progress_states = Self::get_progress_states(&markov_model);
@@ -104,9 +115,6 @@ use crate::math::markov_model::MarkovModel;
                     q_state.termination_probability = Fraction::one();
                     return Ok(());
                 }
-
-                //remove the previous final states by normalising the initial vector
-                markov_model.normalise_initial_vector()?;
 
                 let new_state_vector = markov_model.pow_infty()?;
                 // log::debug!("new state vector {}", Matrix::into(new_state_vector.clone()));
@@ -183,7 +191,7 @@ use crate::math::markov_model::MarkovModel;
                 {
                     for (marking, probability) in &q_state.p_marking {
                         if self.is_final_state(marking) { 
-                            //Final states of the previous q-state are not part of the next q-state
+                            markov.add_or_find_state(MarkovMarking::Final(marking.clone()), probability.clone());
                         } else {
                             let markov_marking = MarkovMarking::ReachableWithSilentTransitions(marking.clone());
                             let (markov_index, _) = markov.add_or_find_state(markov_marking, probability.clone());
@@ -209,7 +217,6 @@ use crate::math::markov_model::MarkovModel;
                                 //we end up in a new marking that is final
                                 let (new_markov_index, _) = markov.add_or_find_state(MarkovMarking::Final(new_marking), Fraction::zero());
                                 markov.set_flow(markov_index, new_markov_index, &probability);
-
                             } else {
                                 //we end up in a new marking that is not final
                                 let new_markov_marking = MarkovMarking::ReachableWithSilentTransitions(new_marking.clone());

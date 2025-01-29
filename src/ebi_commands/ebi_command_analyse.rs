@@ -78,8 +78,8 @@ pub const EBI_ANALYSE_COVERAGE: EbiCommand = EbiCommand::Command {
     name_long: Some("coverage"), 
     explanation_short: "Find the most-likely traces that together cover a minimum probability.", 
     explanation_long: Some("Find the most-likely traces that together cover the given minimum probability.
-Will return a finate stochastic language with the extracted traces.
-The computation may not terminate if the model has non-decreasing livelocks, or if the model is unbounded and this unboundedness can be triggered using silent transitions."),
+Will return a finite stochastic language with the extracted traces.
+The computation may not terminate if the model has non-decreasing livelocks, or if the model is unbounded and this unboundedness can be triggered using silent transitions, or if the model has livelocks."),
     cli_command: None, 
     latex_link: None,
     exact_arithmetic: true,
@@ -238,7 +238,7 @@ pub const EBI_ANALYSE_VARIETY: EbiCommand = EbiCommand::Command {
     execute: |mut objects, _| {
         let log = objects.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         
-        let result = log.process_variety();
+        let result = log.rao_stirling_diversity();
         
         return Ok(EbiOutput::Fraction(result));
     }, 
