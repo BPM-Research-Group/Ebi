@@ -36,69 +36,6 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
     ],
 };
 
-// pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
-//     name_short: "emsc",
-//     name_long: Some("earth-movers-stochastic-conformance"),
-//     explanation_short: "Compute earth movers' stochastic conformance.",
-//     explanation_long: None,
-//     latex_link: Some("\\cite{DBLP:conf/bpm/LeemansSA19}"),
-//     cli_command: None,
-//     exact_arithmetic: true,
-//     input_types: &[
-//         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
-//         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)]
-//     ],
-//     input_names: &["FILE_1", "FILE_2"],
-//     input_helps: &["A finite stochastic language (log) to compare.", "A finite stochastic language (log) to compare."],
-//     execute: |mut inputs, _| {
-//         let log = inputs.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-//         let model = inputs.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-//         Ok(EbiOutput::Fraction(earth_movers_stochastic_conformance::emsc(log.as_ref(), model.as_ref()).context("Computing EMSC.")?))
-//     },
-//     output: &EbiOutputType::Fraction
-// };
-
-// pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
-//     name_short: "emsc-sample",
-//     name_long: Some("earth-movers-stochastic-conformance-sample"),
-//     explanation_short: "Compute earth movers' stochastic conformance with sampling.",
-//     explanation_long: None,
-//     latex_link: Some("\\cite{DBLP:conf/bpm/LeemansSA19}"),
-//     cli_command: None,
-//     exact_arithmetic: false,
-//     input_types: &[
-//         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticSemantics) ],
-//         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticSemantics) ],
-//         &[ &EbiInputType::Usize ]
-//     ],
-//     input_names: &["FILE_1", "FILE_2","NUMBER_OF_TRACES"],
-//     input_helps: &["A sampleable stochastic language to compare.", "A sampleabe stochastic language to compare.","Number of traces to sample."],
-//     execute: |mut inputs, _| {
-//         let object1 = inputs.remove(0);
-//         let object2 = inputs.remove(0);
-//         let number_of_traces = inputs.remove(0).to_type::<usize>()?;
-
-//         let lang1 = match object1 {
-//             EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => slang,
-//             EbiInput::Trait(EbiTraitObject::StochasticSemantics(semantics), _) => {
-//                 Box::new(semantics.sample(*number_of_traces).context("Sample semantics.")?)
-//             },
-//             _ => unreachable!()
-//         };
-
-//         let lang2 = match object2 {
-//             EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => slang,
-//             EbiInput::Trait(EbiTraitObject::StochasticSemantics(semantics), _) => {
-//                 Box::new(semantics.sample(*number_of_traces).context("Sample semantics.")?)
-//             },
-//             _ => unreachable!()
-//         };
-
-//         Ok(EbiOutput::Fraction(earth_movers_stochastic_conformance::emsc(lang1.as_ref(), lang2.as_ref()).context("Compute JSSC by sampling.")?))
-//     },
-//     output: &EbiOutputType::Fraction
-// };
-
 pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
     name_short: "uemsc",
     name_long: Some("unit-earth-movers-stochastic-conformance"),
@@ -263,10 +200,10 @@ pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
 
 pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
     name_short: "emsc",
-    name_long: Some("earth-mover"),
-    explanation_short: "Compute Earth Mover's stochastic conformance.",
+    name_long: Some("earth-movers-stochastic-conformance"),
+    explanation_short: "Compute Earth mover's stochastic conformance.",
     explanation_long: None,
-    latex_link: None,
+    latex_link: Some("\\cite{DBLP:journals/is/LeemansABP21}"),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
@@ -299,10 +236,10 @@ pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
 
 pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "emsc-sample",
-    name_long: Some("earth-mover-sample"),
-    explanation_short: "Compute Earth Mover's stochastic conformance with sampling.",
+    name_long: Some("earth-movers-stochastic-conformance-sample"),
+    explanation_short: "Compute Earth mover's stochastic conformance with sampling.",
     explanation_long: None,
-    latex_link: None,
+    latex_link: Some("\\cite{DBLP:journals/is/LeemansABP21}"),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
