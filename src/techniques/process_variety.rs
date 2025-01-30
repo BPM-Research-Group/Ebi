@@ -1,6 +1,9 @@
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
-use crate::{ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{fraction::Fraction, levenshtein}};
+use crate::{
+    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    math::{fraction::Fraction, levenshtein},
+};
 
 pub trait ProcessVariety {
     fn rao_stirling_diversity(&self) -> Fraction;
