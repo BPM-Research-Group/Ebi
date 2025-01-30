@@ -25,7 +25,7 @@ fraction = { version = "*", features = ["with-approx"] }
 serde_json = "*"
 priority-queue = "*"
 process_mining = { version = "*", features = ["graphviz-export"] }
-rand = "*"
+rand = "0.8.0"
 chrono = "*"
 flate2 = "*"
 rayon = "*"
