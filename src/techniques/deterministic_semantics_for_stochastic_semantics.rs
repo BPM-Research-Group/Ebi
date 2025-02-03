@@ -91,12 +91,12 @@ use crate::math::markov_model::MarkovModel;
              * Compute the next q-state.
              */
             fn compute_next(&self, q_state: &mut PMarking<LPNMarking>) -> Result<()> {
-                log::debug!("compute next q-states for {:?}", q_state);
+                // log::debug!("compute next q-states for {:?}", q_state);
 
                 //create the extended matrix
                 let mut markov_model = self.create_markov_model(&q_state)?;
 
-                log::debug!("T {}", markov_model);
+                // log::debug!("T {}", markov_model);
                 // log::debug!("T {:?}", markov_model);
 
                 //replace livelock states by absorbing states
