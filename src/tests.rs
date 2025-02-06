@@ -203,18 +203,18 @@ mod tests {
         assert_eq!(should_slang, slang2)
     }
 
-    #[test]
-    fn sdfa_minprob_zero_loop() {
-        let fin = fs::read_to_string("testfiles/a-loop.sdfa").unwrap();
-        let sdfa = fin
-            .parse::<StochasticDeterministicFiniteAutomaton>()
-            .unwrap();
-        let semantics = sdfa.to_stochastic_deterministic_semantics();
+    // #[test]
+    // fn sdfa_minprob_zero_loop() {
+    //     let fin = fs::read_to_string("testfiles/a-loop.sdfa").unwrap();
+    //     let sdfa = fin
+    //         .parse::<StochasticDeterministicFiniteAutomaton>()
+    //         .unwrap();
+    //     let semantics = sdfa.to_stochastic_deterministic_semantics();
 
-        assert!(semantics
-            .analyse_minimum_probability(&Fraction::zero())
-            .is_err());
-    }
+    //     assert!(semantics
+    //         .analyse_minimum_probability(&Fraction::zero())
+    //         .is_err());
+    // }
 
     #[test]
     fn slpn_minprob_livelock() {

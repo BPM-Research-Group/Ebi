@@ -4,7 +4,7 @@ use fraction::One;
 use priority_queue::PriorityQueue;
 use std::{
     cmp::Ordering,
-    collections::{HashMap, HashSet},
+    collections::HashMap,
     fmt::{Debug, Display},
     ops::{AddAssign, SubAssign},
 };
@@ -235,10 +235,6 @@ impl<DState: Displayable>
         let mut s = vec![];
 
         while let Some((z, priority)) = queue.pop() {
-            //see whether we are done
-            if stop(&s, &priority, &sum, &total_non_livelock_probability)? {
-                return Ok(s);
-            }
 
             match z {
                 Z::Prefix(prefix_probability, prefix, q_state) => {
@@ -246,6 +242,11 @@ impl<DState: Displayable>
                     //     "queue length: {}, queue head: prefix {:?}, q-state {:?}, priority {:.4}",
                     //     queue.len(), prefix, q_state, priority
                     // );
+
+                    //see whether we are done
+                    if stop(&s, &prefix_probability, &sum, &total_non_livelock_probability)? {
+                        return Ok(s);
+                    }
 
                     //check whether we can terminate
                     let termination_probability =
@@ -297,6 +298,12 @@ impl<DState: Displayable>
                     }
                 }
                 Z::Trace(trace) => {
+
+                    //see whether we are done
+                    if stop(&s, &priority, &sum, &total_non_livelock_probability)? {
+                        return Ok(s);
+                    }
+
                     sum += &priority;
                     s.push((trace, priority));
                 }
@@ -404,76 +411,30 @@ impl<DState: Displayable> ProbabilityQueries
     for dyn StochasticDeterministicSemantics<DetState = DState, LivState = DState>
 {
     fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
-        let error_at_loop = at_least.is_zero(); //If at_least is zero, we are asked to return all traces. If there is a loop, then this is impossible.
 
-        let mut seen = HashSet::new();
-        if error_at_loop {
-            seen.insert(self.get_deterministic_initial_state()?);
-        }
+        let progress_bar = EbiCommand::get_progress_bar_message(
+            "found 0 traces; lowest considered prefix probability 0.0000000".to_owned(),
+        );
 
-        let mut result = HashMap::new();
+        let s = self.iterate_most_likely_traces(
+            |s, prefix_probability, _, _| {
 
-        let mut queue = vec![];
-        queue.push(X {
-            prefix: vec![],
-            probability: Fraction::one(),
-            p_state: self.get_deterministic_initial_state()?,
-        });
+                //update progress bar
+                progress_bar.set_message(format!(
+                    "found {} traces; lowest considered prefix probability {:.8}",
+                    s.len(),
+                    prefix_probability
+                ));
+                   
+                Ok(prefix_probability < at_least)
+            },
+            MaybeConstant::none_zero(),
+            MaybeConstant::none_one(),
+        )?;
+        progress_bar.finish_and_clear();
 
-        while let Some(x) = queue.pop() {
-            // log::debug!("queue length {}, process p-state {:?}", queue.len(), x.p_state);
-
-            let mut probability_terminate_in_this_state =
-                self.get_deterministic_termination_probability(&x.p_state);
-            // log::debug!("probability termination in this state {}", probability_terminate_in_this_state);
-            probability_terminate_in_this_state *= &x.probability;
-
-            if !probability_terminate_in_this_state.is_zero()
-                && probability_terminate_in_this_state >= *at_least
-            {
-                result.insert(x.prefix.clone(), probability_terminate_in_this_state);
-            }
-
-            let mut iff = self
-                .get_deterministic_termination_probability(&x.p_state)
-                .one_minus();
-            iff *= &x.probability;
-            if iff >= *at_least {
-                for activity in self.get_deterministic_enabled_activities(&x.p_state) {
-                    // log::info!("consider activity {}", activity);
-
-                    let probability =
-                        self.get_deterministic_activity_probability(&x.p_state, activity);
-
-                    // log::info!("activity has probability {}", probability);
-
-                    let new_p_state = self.execute_deterministic_activity(&x.p_state, activity)?;
-
-                    // log::info!("activity executed");
-
-                    if error_at_loop {
-                        if !seen.insert(new_p_state.clone()) {
-                            return Err(anyhow!("As the language is not finite, Ebi cannot return all traces that have a minimum probability of 0."));
-                        }
-                    }
-
-                    let mut new_prefix = x.prefix.clone();
-                    new_prefix.push(activity);
-                    let new_x = X {
-                        prefix: new_prefix,
-                        probability: &x.probability * &probability,
-                        p_state: new_p_state,
-                    };
-
-                    if !self.is_non_decreasing_livelock(&mut new_x.p_state.clone())? {
-                        //if not a livelock, continue the search
-                        queue.push(new_x);
-                    }
-                }
-            }
-        }
-
-        Ok((result, self.get_activity_key().clone()).into())
+        let map: HashMap<_, _> = s.into_iter().collect();
+        Ok((map, self.get_activity_key().clone()).into())
     }
 
     fn analyse_most_likely_traces(
@@ -526,10 +487,9 @@ impl<DState: Displayable> ProbabilityQueries
                 //update progress bar
                 if last_number_of_traces != s.len() {
                     progress_bar.set_message(format!(
-                        "found {} traces, which cover {:.8}, non-livelock {:.8}",
+                        "found {} traces, which cover {:.8}",
                         s.len(),
-                        sum.fraction(),
-                        total_non_livelock_probability.fraction()
+                        sum.fraction()
                     ));
                     last_number_of_traces = s.len();
                 }
@@ -548,10 +508,4 @@ impl<DState: Displayable> ProbabilityQueries
         let map: HashMap<_, _> = s.into_iter().collect();
         Ok((map, self.get_activity_key().clone()).into())
     }
-}
-
-struct X<FS: Hash + Display + Debug + Clone + Eq> {
-    prefix: Vec<Activity>,
-    probability: Fraction,
-    p_state: FS,
 }
