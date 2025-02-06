@@ -57,7 +57,6 @@ pub trait StochasticDeterministicSemantics: Livelock<LivState = Self::DetState> 
 
     /**
      * The probability that from the given state, the model will never leave a livelock. Note that this is not the probability to -end up- in a livelock, but the probability that the state is -in- a livelock.
-     * May return none if there is no livelock, which is equivalent to Fraction::zero()
      */
     fn get_deterministic_non_decreasing_livelock_probability(&self, state: &mut Self::DetState) -> Result<Fraction>;
 

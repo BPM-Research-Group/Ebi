@@ -819,7 +819,12 @@ mod tests {
     #[test]
     fn slpn_cover_infinite_bs() {
         let fin = fs::read_to_string("testfiles/infinite_bs.slpn").unwrap();
-        let slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+        let slpn: Box<
+            dyn StochasticDeterministicSemantics<
+                DetState = PMarking<LPNMarking>,
+                LivState = PMarking<LPNMarking>,
+            >,
+        > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
 
         let state1 = slpn.get_deterministic_initial_state().unwrap();
         let enabled1 = slpn.get_deterministic_enabled_activities(&state1);
@@ -930,21 +935,46 @@ mod tests {
     #[test]
     fn slpn_minprob_bs() {
         let fin = fs::read_to_string("testfiles/infinite_bs.slpn").unwrap();
-        let slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
-        assert_eq!(slpn.analyse_minimum_probability(&Fraction::from((51, 100))).unwrap().len(), 0);
+        let slpn: Box<
+            dyn StochasticDeterministicSemantics<
+                DetState = PMarking<LPNMarking>,
+                LivState = PMarking<LPNMarking>,
+            >,
+        > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+        assert_eq!(
+            slpn.analyse_minimum_probability(&Fraction::from((51, 100)))
+                .unwrap()
+                .len(),
+            0
+        );
     }
 
     #[test]
     fn slpn_cover_bs() {
         let fin = fs::read_to_string("testfiles/infinite_bs.slpn").unwrap();
-        let slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
-        assert_eq!(slpn.analyse_probability_coverage(&Fraction::from((4, 10))).unwrap().len(), 1);
+        let slpn: Box<
+            dyn StochasticDeterministicSemantics<
+                DetState = PMarking<LPNMarking>,
+                LivState = PMarking<LPNMarking>,
+            >,
+        > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+        assert_eq!(
+            slpn.analyse_probability_coverage(&Fraction::from((4, 10)))
+                .unwrap()
+                .len(),
+            1
+        );
     }
 
     #[test]
     fn slpn_cover_prefix() {
         let fin = fs::read_to_string("testfiles/aa-aaa-bb.slpn").unwrap();
-        let mut slpn: Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>, LivState = PMarking<LPNMarking>>> = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+        let mut slpn: Box<
+            dyn StochasticDeterministicSemantics<
+                DetState = PMarking<LPNMarking>,
+                LivState = PMarking<LPNMarking>,
+            >,
+        > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
 
         let state1 = slpn.get_deterministic_initial_state().unwrap();
         let enabled1 = slpn.get_deterministic_enabled_activities(&state1);
@@ -960,10 +990,18 @@ mod tests {
         assert_eq!(state3.p_marking.len(), 2);
 
         //after doing <a, a>, the model should be able to terminate with probability 1/10
-        assert_eq!(slpn.get_deterministic_termination_probability(&state3), Fraction::from((1,10)));
+        assert_eq!(
+            slpn.get_deterministic_termination_probability(&state3),
+            Fraction::from((1, 10))
+        );
 
         //all traces must be found
-        assert_eq!(slpn.analyse_probability_coverage(&Fraction::from((1, 1))).unwrap().len(), 3);
+        assert_eq!(
+            slpn.analyse_probability_coverage(&Fraction::from((1, 1)))
+                .unwrap()
+                .len(),
+            3
+        );
     }
 
     #[test]
@@ -1230,13 +1268,12 @@ mod tests {
     // fn sample_sdfa_no_language() {
     //     let fin1 = fs::read_to_string("testfiles/a-livelock-zeroweight.sdfa").unwrap();
     //     let sdfa = fin1.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
-    //     let semantics: Box<dyn StochasticSemantics<State = usize>> = Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(Rc::new(sdfa)));
 
-    //     let sample = semantics.sample(1);
+    //     let sample = sdfa.sample(1).unwrap();
 
     //     //the language of this model is empty, so it should not have any traces in the sample
     //     println!("{:?}", sample);
-    //     assert!(sample.is_err())
+    //     // assert!(sample.is_err())
     // }
 
     // //#[test] //disabled until we can handle livelocks
