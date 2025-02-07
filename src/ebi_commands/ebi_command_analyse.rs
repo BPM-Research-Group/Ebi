@@ -1,4 +1,5 @@
 use anyhow::Context;
+use num::Zero;
 
 use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::fraction::Fraction, medoid, techniques::{completeness::Completeness, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}};
 

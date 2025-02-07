@@ -1,5 +1,6 @@
 use std::{fmt::Display, str::FromStr};
 use anyhow::{anyhow, Context, Error, Result};
+use num::{One, Signed};
 
 use crate::{ebi_framework::{activity_key::ActivityKey, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable}, line_reader::LineReader, math::fraction::Fraction};
 

@@ -91,13 +91,20 @@ pub mod math {
     pub mod levenshtein;
     pub mod markov_model;
 }
+
 pub mod techniques {
     pub mod align;
     pub mod alignment_stochastic_miner;
     pub mod association;
     pub mod completeness;
     pub mod deterministic_semantics_for_stochastic_semantics;
+
     pub mod earth_movers_stochastic_conformance;
+    #[cfg(not(feature = "withoutexactarithmetic"))]
+    pub mod earth_movers_stochastic_conformance_enum;
+    #[cfg(feature = "withoutexactarithmetic")]
+    pub mod earth_movers_stochastic_conformance_f64;
+
     pub mod entropic_relevance;
     pub mod executions;
     pub mod explain_trace;

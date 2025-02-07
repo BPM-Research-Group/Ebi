@@ -1,6 +1,7 @@
 use std::sync::Arc;
 use anyhow::{anyhow, Result};
 use fraction::One;
+use num::{Signed, Zero};
 
 use crate::{distances::TriangularDistanceMatrix, ebi_objects::finite_language::FiniteLanguage, ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage, math::fraction::Fraction};
 

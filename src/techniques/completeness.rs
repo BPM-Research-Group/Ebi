@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+use num::{One, Zero};
+
 use crate::math::fraction::Fraction;
 
 pub trait Completeness {

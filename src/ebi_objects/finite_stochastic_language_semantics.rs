@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use anyhow::{Result, anyhow};
+use num::Zero;
 
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, infoable::Infoable}, ebi_traits::{ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
 

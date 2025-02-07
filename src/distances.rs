@@ -2,6 +2,7 @@ use std::fmt;
 use std::fmt::Debug;
 use std::{iter::FusedIterator, sync::Arc};
 
+use num::Zero;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::ebi_framework::ebi_command::EbiCommand;

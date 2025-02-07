@@ -1,14 +1,31 @@
 use core::f64;
-use std::{borrow::Borrow, cmp::Ordering, fmt::Display, hash::Hash, iter::Sum, ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign}, str::FromStr, sync::Arc};
+use std::{
+    borrow::Borrow,
+    cmp::Ordering,
+    fmt::Display,
+    hash::Hash,
+    iter::Sum,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign},
+    str::FromStr,
+    sync::Arc,
+};
 
-use anyhow::{anyhow, Result, Error};
+use anyhow::{anyhow, Error, Result};
+use num::{Num, One, Signed, Zero};
+use num_traits::ParseFloatError;
 use rand::Rng;
 
-use crate::ebi_framework::{ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait::FromEbiTraitObject, exportable::Exportable, infoable::Infoable};
+use crate::{
+    ebi_framework::{
+        ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait::FromEbiTraitObject,
+        exportable::Exportable, infoable::Infoable,
+    },
+    optimization_algorithms::network_simplex_value_type::{IsFloat, MulWithFloat},
+};
 
 use super::fraction::FractionNotParsedYet;
 
-#[derive(Debug,Clone,PartialEq,Copy)]
+#[derive(Debug, Clone, PartialEq, Copy)]
 pub struct FractionF64(pub f64);
 
 impl FractionF64 {
@@ -16,20 +33,8 @@ impl FractionF64 {
         false
     }
 
-    pub fn zero() -> Self {
-        Self(0.0)
-    }
-
-    pub fn is_zero(&self) -> bool {
-        self.0.abs() - &f64::EPSILON < 0.0
-    }
-    
-    pub fn one() -> Self {
-        Self(1.0)
-    }
-
     pub fn is_one(&self) -> bool {
-        (self.0-1.0).abs() - &f64::EPSILON < 0.0
+        (self.0 - 1.0).abs() - &f64::EPSILON < 0.0
     }
 
     pub fn two() -> Self {
@@ -38,15 +43,6 @@ impl FractionF64 {
 
     pub fn one_minus(self) -> Self {
         Self(1.0 - self.0)
-    }
-
-    pub fn is_positive(&self) -> bool {
-       self.0 != 0f64 && self.0.is_sign_positive()
-    }
-
-    /// Returns true if the number is negative and false if the number is zero or positive.
-    pub fn is_negative(&self) -> bool {
-        self.0 < -f64::EPSILON && self.0.is_sign_negative()
     }
 
     pub fn is_sign_negative(&self) -> bool {
@@ -75,11 +71,7 @@ impl FractionF64 {
     }
 
     pub fn nan() -> Self {
-        Self(f64::NAN)  
-    }
-
-    pub fn abs(&self) -> Self {
-        Self(self.0.abs())
+        Self(f64::NAN)
     }
 
     pub fn sqrt_abs(&self, _decimal_places: u32) -> FractionF64 {
@@ -87,9 +79,9 @@ impl FractionF64 {
     }
 
     /**
-     * Return a random index from 0 (inclusive) to the length of the list (exclusive). 
+     * Return a random index from 0 (inclusive) to the length of the list (exclusive).
      * The likelihood of each index to be returned is proportional to the value of the fraction at that index.
-     * 
+     *
      * The fractions do not need to sum to 1.
      */
     pub fn choose_randomly(fractions: &Vec<FractionF64>) -> Result<usize> {
@@ -99,14 +91,19 @@ impl FractionF64 {
 
         //normalise the probabilities
         let mut probabilities: Vec<FractionF64> = fractions.iter().cloned().collect();
-        let sum = probabilities.iter().fold(FractionF64::zero(), |x, y| &x + y);
-        probabilities.retain_mut(|v| {*v /= &sum;true});
-        
+        let sum = probabilities
+            .iter()
+            .fold(FractionF64::zero(), |x, y| &x + y);
+        probabilities.retain_mut(|v| {
+            *v /= &sum;
+            true
+        });
+
         //select a random value
         let mut rng = rand::thread_rng();
         let rand_val = FractionF64(rng.gen_range(0.0..=1.0));
-            
-        let mut cum_prob= FractionF64::zero();
+
+        let mut cum_prob = FractionF64::zero();
         for (index, value) in probabilities.iter().enumerate() {
             cum_prob += value;
             if rand_val < cum_prob {
@@ -121,6 +118,100 @@ impl FractionF64 {
      */
     pub fn recip(&self) -> Self {
         Self(self.0.recip())
+    }
+}
+
+impl Add for FractionF64 {
+    type Output = Self;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        Self(self.0.add(rhs.0))
+    }
+}
+
+impl Div for FractionF64 {
+    type Output = Self;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        Self(self.0.div(rhs.0))
+    }
+}
+
+impl<'a> Mul<&'a FractionF64> for FractionF64 {
+    type Output = Self;
+
+    fn mul(self, rhs: &'a FractionF64) -> Self::Output {
+        Self(self.0.mul(rhs.0))
+    }
+}
+
+impl Sub for FractionF64 {
+    type Output = Self;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self(self.0.sub(rhs.0))
+    }
+}
+
+impl Mul for FractionF64 {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        Self(self.0.mul(rhs.0))
+    }
+}
+
+impl One for FractionF64 {
+    fn one() -> Self {
+        Self(1.0)
+    }
+}
+
+impl Zero for FractionF64 {
+    fn zero() -> Self {
+        Self(0.0)
+    }
+
+    fn is_zero(&self) -> bool {
+        self.0.abs() - &f64::EPSILON < 0.0
+    }
+}
+
+impl Num for FractionF64 {
+    type FromStrRadixErr = ParseFloatError;
+
+    fn from_str_radix(str: &str, radix: u32) -> std::result::Result<Self, Self::FromStrRadixErr> {
+        Ok(Self(f64::from_str_radix(str, radix)?))
+    }
+}
+
+impl Rem for FractionF64 {
+    type Output = Self;
+
+    fn rem(self, rhs: Self) -> Self::Output {
+        Self(self.0.rem(rhs.0))
+    }
+}
+
+impl Signed for FractionF64 {
+    fn abs(&self) -> Self {
+        Self(self.0.abs())
+    }
+
+    fn abs_sub(&self, other: &Self) -> Self {
+        Self((self.0 - other.0).abs())
+    }
+
+    fn signum(&self) -> Self {
+        Self(self.0.signum())
+    }
+
+    fn is_positive(&self) -> bool {
+        self.0 > f64::EPSILON && self.0.is_sign_positive()
+    }
+
+    fn is_negative(&self) -> bool {
+        self.0 < -f64::EPSILON && self.0.is_sign_negative()
     }
 }
 
@@ -164,7 +255,11 @@ impl FromEbiTraitObject for FractionF64 {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
             EbiInput::Fraction(e) => Ok(Box::new(e)),
-            _ => Err(anyhow!("cannot read {} {} as a fraction", object.get_type().get_article(), object.get_type()))
+            _ => Err(anyhow!(
+                "cannot read {} {} as a fraction",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
         }
     }
 }
@@ -173,7 +268,7 @@ impl Exportable for FractionF64 {
     fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
         match object {
             EbiOutput::Fraction(fr) => fr.export(f),
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -197,13 +292,9 @@ impl FromStr for FractionF64 {
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match f64::from_str(s) {
             Ok(f) => Ok(Self(f)),
-            Err(_) => {
-                match fraction::Fraction::from_str(s) {
-                    Ok(f) => {
-                        Ok(Self(format!("{:.20}", f).parse::<f64>()?))
-                    },
-                    Err(e) => Err(e.into()),
-                }
+            Err(_) => match fraction::Fraction::from_str(s) {
+                Ok(f) => Ok(Self(format!("{:.20}", f).parse::<f64>()?)),
+                Err(e) => Err(e.into()),
             },
         }
     }
@@ -226,7 +317,6 @@ impl Hash for FractionF64 {
         unsafe { std::mem::transmute::<f64, u64>(self.0).hash(state) }
     }
 }
-
 
 impl Ord for FractionF64 {
     fn cmp(&self, other: &Self) -> Ordering {
@@ -294,7 +384,10 @@ impl Add<&FractionF64> for &FractionF64 {
     }
 }
 
-impl <T> AddAssign<T> for FractionF64 where T: Borrow<FractionF64> {
+impl<T> AddAssign<T> for FractionF64
+where
+    T: Borrow<FractionF64>,
+{
     fn add_assign(&mut self, rhs: T) {
         let rhs = rhs.borrow();
         self.0.add_assign(rhs.0)
@@ -309,7 +402,10 @@ impl Sub<&FractionF64> for &FractionF64 {
     }
 }
 
-impl <T> SubAssign<T> for FractionF64 where T: Borrow<FractionF64> {
+impl<T> SubAssign<T> for FractionF64
+where
+    T: Borrow<FractionF64>,
+{
     fn sub_assign(&mut self, rhs: T) {
         let rhs = rhs.borrow();
         self.0.sub_assign(rhs.0)
@@ -324,7 +420,10 @@ impl Mul<&FractionF64> for &FractionF64 {
     }
 }
 
-impl <T> MulAssign<T> for FractionF64 where T: Borrow<FractionF64> {
+impl<T> MulAssign<T> for FractionF64
+where
+    T: Borrow<FractionF64>,
+{
     fn mul_assign(&mut self, rhs: T) {
         let rhs = rhs.borrow();
         self.0.mul_assign(rhs.0)
@@ -339,10 +438,25 @@ impl Div<&FractionF64> for &FractionF64 {
     }
 }
 
-impl <T> DivAssign<T> for FractionF64 where T: Borrow<FractionF64> {
+impl<T> DivAssign<T> for FractionF64
+where
+    T: Borrow<FractionF64>,
+{
     fn div_assign(&mut self, rhs: T) {
         let rhs = rhs.borrow();
         self.0.div_assign(rhs.0)
+    }
+}
+
+impl IsFloat for FractionF64 {
+    fn is_float(&self) -> bool {
+        true
+    }
+}
+
+impl MulWithFloat for FractionF64 {
+    fn mul_with_float(self, rhs: &f64) -> Self {
+        Self(self.0 * rhs)
     }
 }
 
@@ -374,7 +488,7 @@ macro_rules! from_tuple_u_u {
             fn from(value: ($t, $tt)) -> Self {
                 Self(value.0 as f64 / value.1 as f64)
             }
-        }       
+        }
     };
 }
 
@@ -384,7 +498,7 @@ macro_rules! from_tuple_u_i {
             fn from(value: ($t, $tt)) -> Self {
                 Self(value.0 as f64 / value.1 as f64)
             }
-        }       
+        }
     };
 }
 
@@ -394,7 +508,7 @@ macro_rules! from_tuple_i_u {
             fn from(value: ($t, $tt)) -> Self {
                 Self(value.0 as f64 / value.1 as f64)
             }
-        }       
+        }
     };
 }
 
@@ -404,7 +518,7 @@ macro_rules! from_tuple_i_i {
             fn from(value: ($t, $tt)) -> Self {
                 Self(value.0 as f64 / value.1 as f64)
             }
-        }       
+        }
     };
 }
 
@@ -412,7 +526,7 @@ macro_rules! add {
     ($t:ident) => {
         impl<'a> Add<$t> for &'a FractionF64 {
             type Output = FractionF64;
-        
+
             fn add(self, rhs: $t) -> Self::Output {
                 let rhs: FractionF64 = rhs.into();
                 self.add(&rhs)
@@ -436,7 +550,7 @@ macro_rules! sub {
     ($t:ident) => {
         impl<'a> Sub<$t> for &'a FractionF64 {
             type Output = FractionF64;
-        
+
             fn sub(self, rhs: $t) -> Self::Output {
                 let rhs: FractionF64 = rhs.into();
                 self.sub(&rhs)
@@ -460,7 +574,7 @@ macro_rules! mul {
     ($t:ident) => {
         impl<'a> Mul<$t> for &'a FractionF64 {
             type Output = FractionF64;
-        
+
             fn mul(self, rhs: $t) -> Self::Output {
                 let rhs: FractionF64 = rhs.into();
                 self.mul(&rhs)
@@ -468,7 +582,6 @@ macro_rules! mul {
         }
     };
 }
-
 
 macro_rules! mul_assign {
     ($t:ident) => {
@@ -485,7 +598,7 @@ macro_rules! div {
     ($t:ident) => {
         impl<'a> Div<$t> for &'a FractionF64 {
             type Output = FractionF64;
-        
+
             fn div(self, rhs: $t) -> Self::Output {
                 let rhs: FractionF64 = rhs.into();
                 self.div(&rhs)
@@ -548,7 +661,7 @@ macro_rules! ttype {
         mul_assign!($t);
         div!($t);
         div_assign!($t);
-    }
+    };
 }
 
 macro_rules! ttype_signed {
@@ -563,7 +676,7 @@ macro_rules! ttype_signed {
         mul_assign!($t);
         div!($t);
         div_assign!($t);
-    }
+    };
 }
 
 ttype!(usize);

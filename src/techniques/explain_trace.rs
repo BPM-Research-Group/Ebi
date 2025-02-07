@@ -1,6 +1,7 @@
 use std::ops::{Add, AddAssign};
 use anyhow::{anyhow, Result};
 use fraction::Zero;
+use num::One;
 use crate::{ebi_framework::{activity_key::Activity, displayable::Displayable}, ebi_objects::language_of_alignments::LanguageOfAlignments, ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics}, math::{astar,fraction::Fraction}, techniques::align::transform_alignment};
 
 #[derive (Clone, Debug)]

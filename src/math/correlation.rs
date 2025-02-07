@@ -1,4 +1,5 @@
 use anyhow::{anyhow, Result};
+use num::Zero;
 
 use super::{fraction::Fraction, root::Root};
 

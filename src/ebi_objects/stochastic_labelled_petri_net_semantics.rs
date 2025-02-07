@@ -1,5 +1,6 @@
 use bitvec::bitvec;
 use anyhow::{anyhow, Context};
+use num::{Signed, Zero};
 
 use crate::{ebi_framework::activity_key::Activity, ebi_objects::{labelled_petri_net::LPNMarking, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
 

@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use std::fmt::{self, Debug};
 use std::hash::{Hash, Hasher};
 use anyhow::Result;
+use num::{One, Signed, Zero};
 use strum_macros::Display;
 use std::collections::hash_map::Entry;
 

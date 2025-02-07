@@ -145,7 +145,7 @@ impl Add for LogDivF64 {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Self(self.0.add(&rhs.0))
+        Self(self.0.add(rhs.0))
     }
 }
 
@@ -167,7 +167,7 @@ impl Sub for LogDivF64 {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output { 
-        Self(self.0.sub(&rhs.0))
+        Self(self.0.sub(rhs.0))
     }
 }
 

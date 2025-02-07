@@ -1,4 +1,5 @@
 use anyhow::{anyhow, Result};
+use num::Zero;
 use crate::{ebi_objects::{language_of_alignments::Move, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::Semantics}, math::fraction::Fraction};
 
 use super::align::Align;

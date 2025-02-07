@@ -1,6 +1,7 @@
 use std::{fmt::{Debug, Display}, io::Write, ops::{Div, Mul, Neg}};
 use anyhow::Result;
 use fraction::Sign;
+use num::{Signed, Zero};
 
 
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};

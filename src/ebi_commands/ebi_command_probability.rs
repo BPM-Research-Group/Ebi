@@ -1,5 +1,6 @@
 use anyhow::{anyhow, Context};
 use clap::{value_parser, Arg, ArgAction};
+use num::Zero;
 
 use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, techniques::explain_trace::ExplainTrace};
 

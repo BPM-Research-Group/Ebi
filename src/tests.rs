@@ -7,6 +7,7 @@ mod tests {
     };
 
     use fraction::Zero;
+    use num::{One, Signed};
 
     use crate::{
         ebi_framework::{

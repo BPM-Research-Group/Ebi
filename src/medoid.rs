@@ -1,5 +1,6 @@
 use anyhow::{anyhow, Result};
 use fraction::One;
+use num::Zero;
 
 use crate::{distances::TriangularDistanceMatrix, ebi_objects::finite_language::FiniteLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::fraction::Fraction};
 
