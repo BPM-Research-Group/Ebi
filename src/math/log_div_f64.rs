@@ -1,23 +1,26 @@
 use anyhow::Result;
 use num_bigint::ToBigInt;
 use num_traits::Pow;
-use std::{fmt::Display, io::Write, ops::{Add, AddAssign, DivAssign, MulAssign, Sub, SubAssign, Neg}};
+use std::{
+    fmt::Display,
+    io::Write,
+    ops::{Add, AddAssign, DivAssign, MulAssign, Neg, Sub, SubAssign},
+};
 
-use fraction::{BigFraction, BigUint, GenericFraction, Integer, Zero};
+use fraction::{BigFraction, BigUint, GenericFraction, Integer};
 
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
-use super::{fraction::UInt, fraction_f64::FractionF64};
+use super::{fraction::UInt, fraction_f64::FractionF64, traits::Zero};
 
 pub struct LogDivF64(FractionF64);
 
 impl LogDivF64 {
-
     pub fn log2_div(log_of: FractionF64, divide_by: u64) -> Self {
         if log_of.is_sign_negative() {
             return Self::nan(&log_of);
         }
-        
+
         Self(FractionF64(log_of.0.log2() / divide_by as f64))
     }
 
@@ -78,11 +81,11 @@ impl LogDivF64 {
     pub fn is_infinite(&self) -> bool {
         self.0.is_infinite()
     }
-    
+
     pub fn power_s_u(base: usize, power: &UInt) -> BigUint {
         base.to_bigint().unwrap().pow(power).to_biguint().unwrap()
     }
-    
+
     /**
      * Internally uses i32 powers for approximate arithmetic
      */
@@ -91,10 +94,10 @@ impl LogDivF64 {
             GenericFraction::Rational(sign, ratio) => {
                 let numer = ratio.numer().to_bigint().unwrap();
                 let numer_pow = numer.pow(power).to_biguint().unwrap();
-    
+
                 let denom = ratio.denom().to_bigint().unwrap();
                 let denom_pow = denom.pow(power).to_biguint().unwrap();
-    
+
                 let frac = BigFraction::new(numer_pow, denom_pow);
                 if sign.is_positive() || (sign.is_negative() && power.is_even()) {
                     //result is positive
@@ -103,12 +106,12 @@ impl LogDivF64 {
                     //result is negative
                     frac.neg()
                 }
-            },
+            }
             GenericFraction::Infinity(x) => match x {
                 fraction::Sign::Plus => BigFraction::infinity(),
                 fraction::Sign::Minus => BigFraction::neg_infinity(),
             },
-            GenericFraction::NaN => BigFraction::nan()
+            GenericFraction::NaN => BigFraction::nan(),
         }
     }
 
@@ -129,7 +132,7 @@ impl Zero for LogDivF64 {
 
 impl PartialEq for LogDivF64 {
     fn eq(&self, other: &Self) -> bool {
-        self.0.0 - f64::EPSILON <= other.0.0 && other.0.0 <= self.0.0 + f64::EPSILON
+        self.0 .0 - f64::EPSILON <= other.0 .0 && other.0 .0 <= self.0 .0 + f64::EPSILON
     }
 }
 
@@ -145,7 +148,7 @@ impl Add for LogDivF64 {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Self(self.0.add(rhs.0))
+        Self(self.0.add(&rhs.0))
     }
 }
 
@@ -166,8 +169,8 @@ impl AddAssign for LogDivF64 {
 impl Sub for LogDivF64 {
     type Output = Self;
 
-    fn sub(self, rhs: Self) -> Self::Output { 
-        Self(self.0.sub(rhs.0))
+    fn sub(self, rhs: Self) -> Self::Output {
+        Self(self.0.sub(&rhs.0))
     }
 }
 
@@ -223,7 +226,7 @@ impl Exportable for LogDivF64 {
     fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
             EbiOutput::LogDiv(fr) => fr.export(f),
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 

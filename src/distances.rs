@@ -2,7 +2,6 @@ use std::fmt;
 use std::fmt::Debug;
 use std::{iter::FusedIterator, sync::Arc};
 
-use num::Zero;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::ebi_framework::ebi_command::EbiCommand;
@@ -12,6 +11,7 @@ use crate::ebi_traits::{
 };
 use crate::math::fraction::Fraction;
 use crate::math::levenshtein;
+use crate::math::traits::Zero;
 
 pub struct TriangularDistanceMatrix {
     len: usize, //lenght of one side of the matrix

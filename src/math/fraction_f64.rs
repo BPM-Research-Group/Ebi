@@ -5,14 +5,12 @@ use std::{
     fmt::Display,
     hash::Hash,
     iter::Sum,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Rem, Sub, SubAssign},
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
     str::FromStr,
     sync::Arc,
 };
 
 use anyhow::{anyhow, Error, Result};
-use num::{Num, One, Signed, Zero};
-use num_traits::ParseFloatError;
 use rand::Rng;
 
 use crate::{
@@ -23,7 +21,7 @@ use crate::{
     optimization_algorithms::network_simplex_value_type::{IsFloat, MulWithFloat},
 };
 
-use super::fraction::FractionNotParsedYet;
+use super::{fraction::FractionNotParsedYet, traits::{One, Signed, Zero}};
 
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub struct FractionF64(pub f64);
@@ -121,49 +119,13 @@ impl FractionF64 {
     }
 }
 
-impl Add for FractionF64 {
-    type Output = Self;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        Self(self.0.add(rhs.0))
-    }
-}
-
-impl Div for FractionF64 {
-    type Output = Self;
-
-    fn div(self, rhs: Self) -> Self::Output {
-        Self(self.0.div(rhs.0))
-    }
-}
-
-impl<'a> Mul<&'a FractionF64> for FractionF64 {
-    type Output = Self;
-
-    fn mul(self, rhs: &'a FractionF64) -> Self::Output {
-        Self(self.0.mul(rhs.0))
-    }
-}
-
-impl Sub for FractionF64 {
-    type Output = Self;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        Self(self.0.sub(rhs.0))
-    }
-}
-
-impl Mul for FractionF64 {
-    type Output = Self;
-
-    fn mul(self, rhs: Self) -> Self::Output {
-        Self(self.0.mul(rhs.0))
-    }
-}
-
 impl One for FractionF64 {
     fn one() -> Self {
         Self(1.0)
+    }
+
+    fn is_one(&self) -> bool {
+        (self.0 - 1.0).abs() - &f64::EPSILON < 0.0
     }
 }
 
@@ -177,41 +139,17 @@ impl Zero for FractionF64 {
     }
 }
 
-impl Num for FractionF64 {
-    type FromStrRadixErr = ParseFloatError;
-
-    fn from_str_radix(str: &str, radix: u32) -> std::result::Result<Self, Self::FromStrRadixErr> {
-        Ok(Self(f64::from_str_radix(str, radix)?))
-    }
-}
-
-impl Rem for FractionF64 {
-    type Output = Self;
-
-    fn rem(self, rhs: Self) -> Self::Output {
-        Self(self.0.rem(rhs.0))
-    }
-}
-
 impl Signed for FractionF64 {
     fn abs(&self) -> Self {
         Self(self.0.abs())
     }
 
-    fn abs_sub(&self, other: &Self) -> Self {
-        Self((self.0 - other.0).abs())
-    }
-
-    fn signum(&self) -> Self {
-        Self(self.0.signum())
-    }
-
     fn is_positive(&self) -> bool {
-        self.0 > f64::EPSILON && self.0.is_sign_positive()
+        self.0 > f64::EPSILON
     }
 
     fn is_negative(&self) -> bool {
-        self.0 < -f64::EPSILON && self.0.is_sign_negative()
+        self.0 < -f64::EPSILON
     }
 }
 

@@ -1,5 +1,4 @@
 use anyhow::{anyhow, Context, Error, Result};
-use num::{One, Signed, Zero};
 use std::{
     collections::{hash_map::Entry, HashMap},
     fmt,
@@ -34,7 +33,7 @@ use crate::{
     },
     follower_semantics::FollowerSemantics,
     line_reader::LineReader,
-    math::fraction::Fraction,
+    math::{fraction::Fraction, traits::{One, Signed, Zero}},
 };
 
 use super::{

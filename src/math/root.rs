@@ -1,30 +1,32 @@
-use std::{fmt::{Debug, Display}, io::Write, ops::{Div, Mul, Neg}};
 use anyhow::Result;
 use fraction::Sign;
-use num::{Signed, Zero};
+use std::{
+    fmt::{Debug, Display},
+    io::Write,
+    ops::{Div, Mul, Neg},
+};
 
+use crate::{ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable}, math::traits::Signed};
 
-use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
-
-use super::fraction::Fraction;
+use super::{fraction::Fraction, traits::Zero};
 
 pub struct ContainsRoot {
     root: Root,
-    one_minus: bool
+    one_minus: bool,
 }
 
 impl ContainsRoot {
     pub fn of(root: Root) -> Self {
         Self {
             root: root,
-            one_minus: false
+            one_minus: false,
         }
     }
 
     pub fn one_minus(root: Root) -> Self {
         Self {
             root: root,
-            one_minus: true
+            one_minus: true,
         }
     }
 
@@ -42,11 +44,10 @@ impl ContainsRoot {
 }
 
 impl Exportable for ContainsRoot {
-
     fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
             EbiOutput::ContainsRoot(fr) => fr.export(f),
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -95,7 +96,7 @@ impl Root {
         assert!(!r.is_negative());
         Self {
             sign: Sign::Plus,
-            r: r
+            r: r,
         }
     }
 
@@ -116,8 +117,12 @@ impl Root {
 impl From<Fraction> for Root {
     fn from(value: Fraction) -> Self {
         Self {
-            sign: if value.is_negative() {Sign::Minus} else {Sign::Plus},
-            r: &value * &value
+            sign: if value.is_negative() {
+                Sign::Minus
+            } else {
+                Sign::Plus
+            },
+            r: &value * &value,
         }
     }
 }
@@ -138,7 +143,7 @@ impl Neg for Root {
     fn neg(self) -> Self::Output {
         Self {
             sign: -self.sign,
-            r: self.r
+            r: self.r,
         }
     }
 }
@@ -149,7 +154,7 @@ impl Mul for Root {
     fn mul(self, rhs: Self) -> Self::Output {
         Self {
             sign: self.sign * rhs.sign,
-            r: &self.r * &rhs.r
+            r: &self.r * &rhs.r,
         }
     }
 }
@@ -160,7 +165,7 @@ impl Div for Root {
     fn div(self, rhs: Self) -> Self::Output {
         Self {
             sign: self.sign * rhs.sign,
-            r: &self.r / &rhs.r
+            r: &self.r / &rhs.r,
         }
     }
 }

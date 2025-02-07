@@ -1,7 +1,7 @@
 use super::network_simplex_value_type::MulWithFloat;
+use crate::math::traits::{One, Signed, Zero};
 use crate::optimization_algorithms::network_simplex_value_type::IsFloat;
 use core::convert::From;
-use num::{One, Signed, Zero};
 use rand::{seq::SliceRandom, thread_rng};
 use rayon::ThreadPool;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -229,9 +229,7 @@ where
         + for<'a> AddAssign<&'a T>
         + for<'a> SubAssign<&'a T>
         + for<'a> MulAssign<&'a T>
-        + Neg
-        + Mul<T, Output = T>
-        + for<'a> Mul<&'a T, Output = T>
+        + Neg<Output = T>
         + Signed
         + PartialEq
         + PartialOrd
@@ -929,7 +927,9 @@ where
         }
 
         let max_cost = self.find_max_cost();
-        let art_cost: T = (max_cost + T::one()) * T::from(self.node_num as i32);
+        let mut art_cost = max_cost;
+        art_cost += &T::one();
+        art_cost *= &T::from(self.node_num as i32);
 
         log::debug!("art_cost identified as: {}", art_cost);
 

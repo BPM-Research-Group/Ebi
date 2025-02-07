@@ -1,12 +1,13 @@
 use std::{fmt::Display, io::Write, mem, ops::{Add, AddAssign, DivAssign, MulAssign, Neg, Sub, SubAssign}};
 use anyhow::{anyhow, Error, Result};
-use fraction::{BigFraction, BigUint, GenericFraction, Integer, One, Sign, Zero};
+use fraction::{BigFraction, BigUint, GenericFraction, Integer, Sign};
+use num::{One as NumOne, Zero as NumZero};
 use num_bigint::{ToBigInt, ToBigUint};
 use num_traits::Pow;
 
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
-use super::fraction::{Fraction, UInt, APPROX_DIGITS};
+use super::fraction::{Fraction, One, UInt, Zero, APPROX_DIGITS};
 
 #[derive(Clone)]
 pub enum LogDivEnum {

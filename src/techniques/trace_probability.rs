@@ -1,5 +1,4 @@
 use anyhow::{Context, Result};
-use num::{One, Zero};
 use std::{
     collections::{HashMap, HashSet},
     fmt::{self, Display},
@@ -19,7 +18,7 @@ use crate::{
         ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::StochasticSemantics,
     },
     follower_semantics::FollowerSemantics,
-    math::{fraction::Fraction, matrix::Matrix},
+    math::{fraction::Fraction, matrix::Matrix, traits::{One, Zero}},
 };
 
 //generic implementation

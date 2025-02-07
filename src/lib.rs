@@ -90,6 +90,7 @@ pub mod math {
     pub mod correlation;
     pub mod levenshtein;
     pub mod markov_model;
+    pub mod traits;
 }
 
 pub mod techniques {

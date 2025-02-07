@@ -1,11 +1,11 @@
 use crate::distances::DistanceMatrix;
+use crate::math::traits::Zero;
 use crate::optimization_algorithms::network_simplex::NetworkSimplex;
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::fraction::Fraction,
 };
 use anyhow::{Context, Result};
-use num::Zero;
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use rayon::prelude::*;
 use std::sync::Arc;

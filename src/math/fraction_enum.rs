@@ -1,24 +1,35 @@
-use std::{borrow::Borrow, cmp::Ordering, hash::Hash, iter::Sum, ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign}, str::FromStr, sync::Arc};
 use anyhow::{anyhow, Error, Result};
-use fraction::{BigFraction, BigUint, GenericFraction, One, Sign, Zero};
-use num_bigint::{ToBigUint, RandBigInt};
+use fraction::{BigFraction, BigUint, GenericFraction, Sign};
+use num::{One as NumOne, Zero as NumZero};
+use num_bigint::{RandBigInt, ToBigUint};
 use num_rational::Ratio;
 use num_traits::{Signed, ToPrimitive};
 use rand::Rng;
+use std::{
+    borrow::Borrow,
+    cmp::Ordering,
+    hash::Hash,
+    iter::Sum,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
+    str::FromStr,
+    sync::Arc,
+};
 
-use crate::ebi_framework::{ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait::FromEbiTraitObject, exportable::Exportable, infoable::Infoable};
+use crate::ebi_framework::{
+    ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait::FromEbiTraitObject,
+    exportable::Exportable, infoable::Infoable,
+};
 
-use super::fraction::{FractionNotParsedYet, UInt, EXACT};
+use super::fraction::{FractionNotParsedYet, One, UInt, Zero, EXACT};
 
 #[derive(Clone)]
 pub enum FractionEnum {
     Exact(fraction::BigFraction),
     Approx(f64),
-    CannotCombineExactAndApprox
+    CannotCombineExactAndApprox,
 }
 
 impl FractionEnum {
-
     pub(crate) fn create_exact() -> bool {
         EXACT.load(std::sync::atomic::Ordering::Relaxed)
     }
@@ -38,7 +49,7 @@ impl FractionEnum {
         match (self, rhs) {
             (FractionEnum::Exact(_), FractionEnum::Exact(_)) => true,
             (FractionEnum::Approx(_), FractionEnum::Approx(_)) => true,
-            _ => false
+            _ => false,
         }
     }
 
@@ -46,7 +57,7 @@ impl FractionEnum {
         match self {
             FractionEnum::Exact(f) => FractionEnum::Exact(f.sqrt_abs(decimal_places)),
             FractionEnum::Approx(f) => FractionEnum::Approx(f.abs().sqrt()),
-            FractionEnum::CannotCombineExactAndApprox => self.clone()
+            FractionEnum::CannotCombineExactAndApprox => self.clone(),
         }
     }
 
@@ -121,7 +132,7 @@ impl FractionEnum {
             FractionEnum::Exact(BigFraction::nan())
         } else {
             FractionEnum::Approx(f64::NAN)
-        }    
+        }
     }
 
     pub fn abs(&self) -> Self {
@@ -145,7 +156,7 @@ impl FractionEnum {
                 } else {
                     Some(Sign::Minus)
                 }
-            },
+            }
             FractionEnum::CannotCombineExactAndApprox => None,
         }
     }
@@ -162,9 +173,9 @@ impl FractionEnum {
     }
 
     /**
-     * Return a random index from 0 (inclusive) to the length of the list (exclusive). 
+     * Return a random index from 0 (inclusive) to the length of the list (exclusive).
      * The likelihood of each index to be returned is proportional to the value of the fraction at that index.
-     * 
+     *
      * The fractions do not need to sum to 1.
      */
     pub fn choose_randomly(fractions: &Vec<FractionEnum>) -> Result<usize> {
@@ -174,35 +185,45 @@ impl FractionEnum {
 
         //normalise the probabilities
         let mut probabilities: Vec<FractionEnum> = fractions.iter().cloned().collect();
-        let sum = probabilities.iter().fold(FractionEnum::zero(), |x, y| &x + y);
+        let sum = probabilities
+            .iter()
+            .fold(FractionEnum::zero(), |x, y| &x + y);
         if sum == FractionEnum::CannotCombineExactAndApprox {
             return Err(anyhow!("cannot combine exact and approximate arithmetic"));
         }
-        probabilities.retain_mut(|v| {*v /= &sum;true});
-        
+        probabilities.retain_mut(|v| {
+            *v /= &sum;
+            true
+        });
+
         //select a random value
         let mut rng = rand::thread_rng();
         let rand_val = if sum.is_exact() {
-                //strategy: the highest denominator determines how much precision we need
-                let temp_zero = BigUint::zero();
-                let max_denom = probabilities.iter().map(|f| 
+            //strategy: the highest denominator determines how much precision we need
+            let temp_zero = BigUint::zero();
+            let max_denom = probabilities
+                .iter()
+                .map(|f| {
                     if let FractionEnum::Exact(e) = f {
                         e.denom().unwrap()
                     } else {
                         &temp_zero
-                    }).max().unwrap();
-                //Generate a random value with the number of bits of the highest denominator. Repeat until this value is <= the max denominator.
-                let mut rand_val = rng.gen_biguint(max_denom.bits());
-                while &rand_val > max_denom {
-                    rand_val = rng.gen_biguint(max_denom.bits());
-                }
-                //create the fraction from the random nominator and the max denominator
-                FractionEnum::try_from((rand_val, max_denom.clone())).unwrap()
+                    }
+                })
+                .max()
+                .unwrap();
+            //Generate a random value with the number of bits of the highest denominator. Repeat until this value is <= the max denominator.
+            let mut rand_val = rng.gen_biguint(max_denom.bits());
+            while &rand_val > max_denom {
+                rand_val = rng.gen_biguint(max_denom.bits());
+            }
+            //create the fraction from the random nominator and the max denominator
+            FractionEnum::try_from((rand_val, max_denom.clone())).unwrap()
         } else {
             FractionEnum::Approx(rng.gen_range(0.0..=1.0))
         };
-            
-        let mut cum_prob= FractionEnum::zero();
+
+        let mut cum_prob = FractionEnum::zero();
         for (index, value) in probabilities.iter().enumerate() {
             cum_prob += value;
             if rand_val < cum_prob {
@@ -212,7 +233,58 @@ impl FractionEnum {
         Ok(probabilities.len() - 1)
     }
 
-    pub fn zero() -> Self {
+    pub fn one_minus(self) -> Self {
+        match self {
+            FractionEnum::Exact(mut f) => {
+                f = f.neg();
+                f.add_assign(1.to_biguint().unwrap());
+                FractionEnum::Exact(f)
+            }
+            FractionEnum::Approx(f) => FractionEnum::Approx(1.0 - f),
+            Self::CannotCombineExactAndApprox => self,
+        }
+    }
+
+    pub fn is_one(&self) -> bool {
+        match self {
+            FractionEnum::Exact(f) => f.is_one(),
+            FractionEnum::Approx(f) => (f - 1.0).abs() - &f64::EPSILON < 0.0,
+            Self::CannotCombineExactAndApprox => false,
+        }
+    }
+
+    pub fn two() -> FractionEnum {
+        if Self::create_exact() {
+            FractionEnum::Exact(GenericFraction::Rational(
+                Sign::Plus,
+                Ratio::new_raw(UInt::from(2u32), UInt::from(1u32)),
+            ))
+        } else {
+            FractionEnum::Approx(2.0)
+        }
+    }
+}
+
+impl One for FractionEnum {
+    fn one() -> Self {
+        if Self::create_exact() {
+            FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, Ratio::one()))
+        } else {
+            FractionEnum::Approx(1.0)
+        }
+    }
+    
+    fn is_one(&self) -> bool {
+        match self {
+            FractionEnum::Exact(f) => fraction::One::is_one(f),
+            FractionEnum::Approx(f) => (f - 1.0).abs() < f64::EPSILON,
+            Self::CannotCombineExactAndApprox => false,
+        }
+    }
+}
+
+impl Zero for FractionEnum {
+    fn zero() -> Self {
         if Self::create_exact() {
             FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, Ratio::zero()))
         } else {
@@ -220,47 +292,11 @@ impl FractionEnum {
         }
     }
 
-    pub fn is_zero(&self) -> bool {
+    fn is_zero(&self) -> bool {
         match self {
-            FractionEnum::Exact(f) => f.is_zero(),
-            FractionEnum::Approx(f) => {f.abs() - &f64::EPSILON < 0.0},
-            Self::CannotCombineExactAndApprox => false
-        }
-    }
-
-    pub fn one_minus(self) -> Self {
-        match self {
-            FractionEnum::Exact(mut f) => {
-                f = f.neg();
-                f.add_assign(1.to_biguint().unwrap());
-                FractionEnum::Exact(f)
-            },
-            FractionEnum::Approx(f) => FractionEnum::Approx(1.0 - f),
-            Self::CannotCombineExactAndApprox => self
-        }
-    }
-
-    pub fn one() -> Self {
-        if Self::create_exact() {
-            FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, Ratio::one()))
-        } else {
-            FractionEnum::Approx(1.0)
-        }
-    }
-
-    pub fn is_one(&self) -> bool {
-        match self {
-            FractionEnum::Exact(f) => f.is_one(),
-            FractionEnum::Approx(f) => {(f-1.0).abs() - &f64::EPSILON < 0.0},
-            Self::CannotCombineExactAndApprox => false
-        }
-    }
-
-    pub fn two() -> FractionEnum {
-        if Self::create_exact() {
-            FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, Ratio::new_raw(UInt::from(2u32), UInt::from(1u32))))
-        } else {
-            FractionEnum::Approx(2.0)
+            FractionEnum::Exact(f) => fraction::Zero::is_zero(f),
+            FractionEnum::Approx(f) => f.abs() - &f64::EPSILON < 0.0,
+            Self::CannotCombineExactAndApprox => false,
         }
     }
 }
@@ -297,7 +333,11 @@ impl FromEbiTraitObject for FractionEnum {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
             EbiInput::Fraction(e) => Ok(Box::new(e)),
-            _ => Err(anyhow!("cannot read {} {} as a fraction", object.get_type().get_article(), object.get_type()))
+            _ => Err(anyhow!(
+                "cannot read {} {} as a fraction",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
         }
     }
 }
@@ -337,7 +377,10 @@ impl TryFrom<BigUint> for FractionEnum {
 
     fn try_from(value: BigUint) -> std::prelude::v1::Result<Self, Self::Error> {
         if Self::create_exact() {
-            Ok(FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, Ratio::new(value, UInt::from(1u32)))))
+            Ok(FractionEnum::Exact(GenericFraction::Rational(
+                Sign::Plus,
+                Ratio::new(value, UInt::from(1u32)),
+            )))
         } else {
             if value < u64::MAX.to_biguint().unwrap() {
                 Ok(FractionEnum::Approx(value.to_f64().unwrap()))
@@ -353,7 +396,10 @@ impl TryFrom<&BigUint> for FractionEnum {
 
     fn try_from(value: &BigUint) -> std::prelude::v1::Result<Self, Self::Error> {
         if Self::create_exact() {
-            Ok(FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, Ratio::new(value.clone(), UInt::from(1u32)))))
+            Ok(FractionEnum::Exact(GenericFraction::Rational(
+                Sign::Plus,
+                Ratio::new(value.clone(), UInt::from(1u32)),
+            )))
         } else {
             if value < &u64::MAX.to_biguint().unwrap() {
                 Ok(FractionEnum::Approx(value.to_f64().unwrap()))
@@ -369,10 +415,13 @@ impl TryFrom<(BigUint, BigUint)> for FractionEnum {
 
     fn try_from(value: (BigUint, BigUint)) -> std::prelude::v1::Result<Self, Self::Error> {
         if Self::create_exact() {
-            Ok(FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, Ratio::new(value.0, value.1))))
+            Ok(FractionEnum::Exact(GenericFraction::Rational(
+                Sign::Plus,
+                Ratio::new(value.0, value.1),
+            )))
         } else {
             if let (Some(numer), Some(denom)) = (value.0.to_u64(), value.1.to_u64()) {
-                Ok(FractionEnum::Approx(numer as f64 / denom as f64))    
+                Ok(FractionEnum::Approx(numer as f64 / denom as f64))
             } else {
                 Err(anyhow!("numbers too large for approximate arithmetic"))
             }
@@ -384,7 +433,7 @@ impl Exportable for FractionEnum {
     fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
         match object {
             EbiOutput::Fraction(fr) => fr.export(f),
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -411,7 +460,9 @@ impl std::fmt::Display for FractionEnum {
         match self {
             FractionEnum::Exact(fr) => std::fmt::Display::fmt(&fr, f),
             FractionEnum::Approx(fr) => std::fmt::Display::fmt(&fr, f),
-            FractionEnum::CannotCombineExactAndApprox => write!(f, "cannot combine exact and approximate arithmatic"),
+            FractionEnum::CannotCombineExactAndApprox => {
+                write!(f, "cannot combine exact and approximate arithmatic")
+            }
         }
     }
 }
@@ -421,7 +472,9 @@ impl std::fmt::Debug for FractionEnum {
         match self {
             Self::Exact(arg0) => f.debug_tuple("Exact ").field(arg0).finish(),
             Self::Approx(arg0) => f.debug_tuple("Approx ").field(arg0).finish(),
-            Self::CannotCombineExactAndApprox => write!(f, "cannot combine exact and approximate arithmatic"),
+            Self::CannotCombineExactAndApprox => {
+                write!(f, "cannot combine exact and approximate arithmatic")
+            }
         }
     }
 }
@@ -433,16 +486,18 @@ impl Add<&FractionEnum> for &FractionEnum {
         match (self, rhs) {
             (FractionEnum::Exact(x), FractionEnum::Exact(y)) => FractionEnum::Exact(x.add(y)),
             (FractionEnum::Approx(x), FractionEnum::Approx(y)) => FractionEnum::Approx(x.add(y)),
-            _ => FractionEnum::CannotCombineExactAndApprox
-            
+            _ => FractionEnum::CannotCombineExactAndApprox,
         }
     }
 }
 
-impl <T> AddAssign<T> for FractionEnum where T: Borrow<FractionEnum> {
+impl<T> AddAssign<T> for FractionEnum
+where
+    T: Borrow<FractionEnum>,
+{
     fn add_assign(&mut self, rhs: T) {
         let rhs = rhs.borrow();
-        
+
         if self.matches(&rhs) {
             match (self, rhs) {
                 (FractionEnum::Exact(x), FractionEnum::Exact(y)) => x.add_assign(y),
@@ -458,7 +513,7 @@ impl <T> AddAssign<T> for FractionEnum where T: Borrow<FractionEnum> {
 impl AddAssign<&Arc<FractionEnum>> for FractionEnum {
     fn add_assign(&mut self, rhs: &Arc<FractionEnum>) {
         let rhs = rhs.borrow();
-        
+
         if self.matches(&rhs) {
             match (self, rhs) {
                 (FractionEnum::Exact(x), FractionEnum::Exact(y)) => x.add_assign(y),
@@ -478,13 +533,15 @@ impl Sub<&FractionEnum> for &FractionEnum {
         match (self, rhs) {
             (FractionEnum::Exact(x), FractionEnum::Exact(y)) => FractionEnum::Exact(x.sub(y)),
             (FractionEnum::Approx(x), FractionEnum::Approx(y)) => FractionEnum::Approx(x.sub(y)),
-            _ => FractionEnum::CannotCombineExactAndApprox
-            
+            _ => FractionEnum::CannotCombineExactAndApprox,
         }
     }
 }
 
-impl <T> SubAssign<T> for FractionEnum where T: Borrow<FractionEnum> {
+impl<T> SubAssign<T> for FractionEnum
+where
+    T: Borrow<FractionEnum>,
+{
     fn sub_assign(&mut self, rhs: T) {
         let rhs = rhs.borrow();
         if self.matches(&rhs) {
@@ -506,13 +563,15 @@ impl Mul<&FractionEnum> for &FractionEnum {
         match (self, rhs) {
             (FractionEnum::Exact(x), FractionEnum::Exact(y)) => FractionEnum::Exact(x.mul(y)),
             (FractionEnum::Approx(x), FractionEnum::Approx(y)) => FractionEnum::Approx(x.mul(y)),
-            _ => FractionEnum::CannotCombineExactAndApprox
-            
+            _ => FractionEnum::CannotCombineExactAndApprox,
         }
     }
 }
 
-impl<T> MulAssign<T> for FractionEnum where T: Borrow<FractionEnum> {
+impl<T> MulAssign<T> for FractionEnum
+where
+    T: Borrow<FractionEnum>,
+{
     fn mul_assign(&mut self, rhs: T) {
         let rhs = rhs.borrow();
         if self.matches(&rhs) {
@@ -534,13 +593,15 @@ impl Div<&FractionEnum> for &FractionEnum {
         match (self, rhs) {
             (FractionEnum::Exact(x), FractionEnum::Exact(y)) => FractionEnum::Exact(x.div(y)),
             (FractionEnum::Approx(x), FractionEnum::Approx(y)) => FractionEnum::Approx(x.div(y)),
-            _ => FractionEnum::CannotCombineExactAndApprox
-            
+            _ => FractionEnum::CannotCombineExactAndApprox,
         }
     }
 }
 
-impl<T> DivAssign<T> for FractionEnum where T: Borrow<FractionEnum> {
+impl<T> DivAssign<T> for FractionEnum
+where
+    T: Borrow<FractionEnum>,
+{
     fn div_assign(&mut self, rhs: T) {
         let rhs = rhs.borrow();
         if self.matches(&rhs) {
@@ -549,7 +610,7 @@ impl<T> DivAssign<T> for FractionEnum where T: Borrow<FractionEnum> {
                 (FractionEnum::Approx(x), FractionEnum::Approx(y)) => x.div_assign(y),
                 _ => {}
             }
-        } else{
+        } else {
             *self = FractionEnum::CannotCombineExactAndApprox
         }
     }
@@ -562,7 +623,7 @@ impl Neg for FractionEnum {
         match self {
             FractionEnum::Exact(f) => FractionEnum::Exact(f.neg()),
             FractionEnum::Approx(f) => FractionEnum::Approx(f.neg()),
-            Self::CannotCombineExactAndApprox => self.clone()
+            Self::CannotCombineExactAndApprox => self.clone(),
         }
     }
 }
@@ -574,7 +635,7 @@ impl<'a> Neg for &'a FractionEnum {
         match self {
             FractionEnum::Exact(f) => FractionEnum::Exact(f.neg()),
             FractionEnum::Approx(f) => FractionEnum::Approx(f.neg()),
-            FractionEnum::CannotCombineExactAndApprox => self.clone()
+            FractionEnum::CannotCombineExactAndApprox => self.clone(),
         }
     }
 }
@@ -585,7 +646,7 @@ impl PartialEq for FractionEnum {
             (Self::Exact(l0), Self::Exact(r0)) => l0 == r0,
             (Self::Approx(l0), Self::Approx(r0)) => {
                 l0 - f64::EPSILON <= *r0 && *r0 <= l0 + f64::EPSILON
-            },
+            }
             _ => false,
         }
     }
@@ -594,7 +655,6 @@ impl PartialEq for FractionEnum {
 impl Eq for FractionEnum {}
 
 impl PartialOrd for FractionEnum {
-
     /**
      * Note that exact and approximate should not be compared.
      */
@@ -605,13 +665,12 @@ impl PartialOrd for FractionEnum {
         match (self, other) {
             (FractionEnum::Exact(x), FractionEnum::Exact(y)) => x.partial_cmp(y),
             (FractionEnum::Approx(x), FractionEnum::Approx(y)) => x.partial_cmp(y),
-            _ => None
+            _ => None,
         }
     }
 }
 
 impl Ord for FractionEnum {
-
     /**
      * Note that exact and approximate should not be compared.
      */
@@ -647,14 +706,21 @@ impl Ord for FractionEnum {
                 } else {
                     x.partial_cmp(y).unwrap()
                 }
-            },
+            }
             (FractionEnum::Exact(_), FractionEnum::Approx(_)) => Ordering::Greater,
-            (FractionEnum::Exact(_), FractionEnum::CannotCombineExactAndApprox) => Ordering::Greater,
+            (FractionEnum::Exact(_), FractionEnum::CannotCombineExactAndApprox) => {
+                Ordering::Greater
+            }
             (FractionEnum::Approx(_), FractionEnum::Exact(_)) => Ordering::Less,
-            (FractionEnum::Approx(_), FractionEnum::CannotCombineExactAndApprox) => Ordering::Greater,
+            (FractionEnum::Approx(_), FractionEnum::CannotCombineExactAndApprox) => {
+                Ordering::Greater
+            }
             (FractionEnum::CannotCombineExactAndApprox, FractionEnum::Exact(_)) => Ordering::Less,
             (FractionEnum::CannotCombineExactAndApprox, FractionEnum::Approx(_)) => Ordering::Less,
-            (FractionEnum::CannotCombineExactAndApprox, FractionEnum::CannotCombineExactAndApprox) => Ordering::Less,
+            (
+                FractionEnum::CannotCombineExactAndApprox,
+                FractionEnum::CannotCombineExactAndApprox,
+            ) => Ordering::Less,
         }
     }
 }
@@ -668,7 +734,7 @@ impl Hash for FractionEnum {
         match self {
             FractionEnum::Exact(f) => f.hash(state),
             FractionEnum::Approx(f) => unsafe { std::mem::transmute::<f64, u64>(*f).hash(state) },
-            Self::CannotCombineExactAndApprox => "cceaa".hash(state)
+            Self::CannotCombineExactAndApprox => "cceaa".hash(state),
         }
     }
 }
@@ -692,7 +758,10 @@ macro_rules! from {
         impl From<$t> for FractionEnum {
             fn from(value: $t) -> Self {
                 if Self::create_exact() {
-                    FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, Ratio::new(value.to_biguint().unwrap(), UInt::from(1u32))))
+                    FractionEnum::Exact(GenericFraction::Rational(
+                        Sign::Plus,
+                        Ratio::new(value.to_biguint().unwrap(), UInt::from(1u32)),
+                    ))
                 } else {
                     FractionEnum::Approx(value as f64)
                 }
@@ -706,7 +775,14 @@ macro_rules! from_signed {
         impl From<$t> for FractionEnum {
             fn from(value: $t) -> Self {
                 if Self::create_exact() {
-                    FractionEnum::Exact(GenericFraction::Rational(if value.is_negative() {Sign::Minus} else {Sign::Plus}, Ratio::new(value.abs().to_biguint().unwrap(), UInt::from(1u32))))
+                    FractionEnum::Exact(GenericFraction::Rational(
+                        if value.is_negative() {
+                            Sign::Minus
+                        } else {
+                            Sign::Plus
+                        },
+                        Ratio::new(value.abs().to_biguint().unwrap(), UInt::from(1u32)),
+                    ))
                 } else {
                     FractionEnum::Approx(value as f64)
                 }
@@ -720,12 +796,15 @@ macro_rules! from_tuple_u_u {
         impl From<($t, $tt)> for FractionEnum {
             fn from(value: ($t, $tt)) -> Self {
                 if Self::create_exact() {
-                    FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, Ratio::new(UInt::from(value.0), UInt::from(value.1))))
+                    FractionEnum::Exact(GenericFraction::Rational(
+                        Sign::Plus,
+                        Ratio::new(UInt::from(value.0), UInt::from(value.1)),
+                    ))
                 } else {
                     FractionEnum::Approx(value.0 as f64 / value.1 as f64)
                 }
             }
-        }       
+        }
     };
 }
 
@@ -734,13 +813,20 @@ macro_rules! from_tuple_u_i {
         impl From<($t, $tt)> for FractionEnum {
             fn from(value: ($t, $tt)) -> Self {
                 if Self::create_exact() {
-                    let s1 = if value.1.is_negative() {Sign::Minus} else {Sign::Plus};
-                    FractionEnum::Exact(GenericFraction::Rational(s1, Ratio::new(UInt::from(value.0), UInt::from(value.1.abs() as u128))))
+                    let s1 = if value.1.is_negative() {
+                        Sign::Minus
+                    } else {
+                        Sign::Plus
+                    };
+                    FractionEnum::Exact(GenericFraction::Rational(
+                        s1,
+                        Ratio::new(UInt::from(value.0), UInt::from(value.1.abs() as u128)),
+                    ))
                 } else {
                     FractionEnum::Approx(value.0 as f64 / value.1 as f64)
                 }
             }
-        }       
+        }
     };
 }
 
@@ -749,13 +835,20 @@ macro_rules! from_tuple_i_u {
         impl From<($t, $tt)> for FractionEnum {
             fn from(value: ($t, $tt)) -> Self {
                 if Self::create_exact() {
-                    let s1 = if value.0.is_negative() {Sign::Minus} else {Sign::Plus};
-                    FractionEnum::Exact(GenericFraction::Rational(s1, Ratio::new(UInt::from(value.0.abs() as u128), UInt::from(value.1))))
+                    let s1 = if value.0.is_negative() {
+                        Sign::Minus
+                    } else {
+                        Sign::Plus
+                    };
+                    FractionEnum::Exact(GenericFraction::Rational(
+                        s1,
+                        Ratio::new(UInt::from(value.0.abs() as u128), UInt::from(value.1)),
+                    ))
                 } else {
                     FractionEnum::Approx(value.0 as f64 / value.1 as f64)
                 }
             }
-        }       
+        }
     };
 }
 
@@ -764,14 +857,28 @@ macro_rules! from_tuple_i_i {
         impl From<($t, $tt)> for FractionEnum {
             fn from(value: ($t, $tt)) -> Self {
                 if Self::create_exact() {
-                    let s0 = if value.0.is_negative() {Sign::Minus} else {Sign::Plus};
-                    let s1 = if value.1.is_negative() {Sign::Minus} else {Sign::Plus};
-                    FractionEnum::Exact(GenericFraction::Rational(s0 * s1, Ratio::new(UInt::from(value.0.abs() as u128), UInt::from(value.1.abs() as u128))))
+                    let s0 = if value.0.is_negative() {
+                        Sign::Minus
+                    } else {
+                        Sign::Plus
+                    };
+                    let s1 = if value.1.is_negative() {
+                        Sign::Minus
+                    } else {
+                        Sign::Plus
+                    };
+                    FractionEnum::Exact(GenericFraction::Rational(
+                        s0 * s1,
+                        Ratio::new(
+                            UInt::from(value.0.abs() as u128),
+                            UInt::from(value.1.abs() as u128),
+                        ),
+                    ))
                 } else {
                     FractionEnum::Approx(value.0 as f64 / value.1 as f64)
                 }
             }
-        }       
+        }
     };
 }
 
@@ -779,13 +886,17 @@ macro_rules! add {
     ($t:ident) => {
         impl<'a> Add<$t> for &'a FractionEnum {
             type Output = FractionEnum;
-        
+
             fn add(self, rhs: $t) -> Self::Output {
                 let rhs = rhs.into();
                 match (self, rhs) {
-                    (FractionEnum::Exact(x), FractionEnum::Exact(y)) => FractionEnum::Exact(x.add(y)),
-                    (FractionEnum::Approx(x), FractionEnum::Approx(y)) => FractionEnum::Approx(x.add(y)),
-                    _ => FractionEnum::CannotCombineExactAndApprox
+                    (FractionEnum::Exact(x), FractionEnum::Exact(y)) => {
+                        FractionEnum::Exact(x.add(y))
+                    }
+                    (FractionEnum::Approx(x), FractionEnum::Approx(y)) => {
+                        FractionEnum::Approx(x.add(y))
+                    }
+                    _ => FractionEnum::CannotCombineExactAndApprox,
                 }
             }
         }
@@ -815,13 +926,17 @@ macro_rules! sub {
     ($t:ident) => {
         impl<'a> Sub<$t> for &'a FractionEnum {
             type Output = FractionEnum;
-        
+
             fn sub(self, rhs: $t) -> Self::Output {
                 let rhs = rhs.into();
                 match (self, rhs) {
-                    (FractionEnum::Exact(x), FractionEnum::Exact(y)) => FractionEnum::Exact(x.sub(y)),
-                    (FractionEnum::Approx(x), FractionEnum::Approx(y)) => FractionEnum::Approx(x.sub(y)),
-                    _ => FractionEnum::CannotCombineExactAndApprox
+                    (FractionEnum::Exact(x), FractionEnum::Exact(y)) => {
+                        FractionEnum::Exact(x.sub(y))
+                    }
+                    (FractionEnum::Approx(x), FractionEnum::Approx(y)) => {
+                        FractionEnum::Approx(x.sub(y))
+                    }
+                    _ => FractionEnum::CannotCombineExactAndApprox,
                 }
             }
         }
@@ -851,19 +966,22 @@ macro_rules! mul {
     ($t:ident) => {
         impl<'a> Mul<$t> for &'a FractionEnum {
             type Output = FractionEnum;
-        
+
             fn mul(self, rhs: $t) -> Self::Output {
                 let rhs = rhs.into();
                 match (self, rhs) {
-                    (FractionEnum::Exact(x), FractionEnum::Exact(y)) => FractionEnum::Exact(x.mul(y)),
-                    (FractionEnum::Approx(x), FractionEnum::Approx(y)) => FractionEnum::Approx(x.mul(y)),
-                    _ => FractionEnum::CannotCombineExactAndApprox
+                    (FractionEnum::Exact(x), FractionEnum::Exact(y)) => {
+                        FractionEnum::Exact(x.mul(y))
+                    }
+                    (FractionEnum::Approx(x), FractionEnum::Approx(y)) => {
+                        FractionEnum::Approx(x.mul(y))
+                    }
+                    _ => FractionEnum::CannotCombineExactAndApprox,
                 }
             }
         }
     };
 }
-
 
 macro_rules! mul_assign {
     ($t:ident) => {
@@ -888,13 +1006,17 @@ macro_rules! div {
     ($t:ident) => {
         impl<'a> Div<$t> for &'a FractionEnum {
             type Output = FractionEnum;
-        
+
             fn div(self, rhs: $t) -> Self::Output {
                 let rhs = rhs.into();
                 match (self, rhs) {
-                    (FractionEnum::Exact(x), FractionEnum::Exact(y)) => FractionEnum::Exact(x.div(y)),
-                    (FractionEnum::Approx(x), FractionEnum::Approx(y)) => FractionEnum::Approx(x.div(y)),
-                    _ => FractionEnum::CannotCombineExactAndApprox
+                    (FractionEnum::Exact(x), FractionEnum::Exact(y)) => {
+                        FractionEnum::Exact(x.div(y))
+                    }
+                    (FractionEnum::Approx(x), FractionEnum::Approx(y)) => {
+                        FractionEnum::Approx(x.div(y))
+                    }
+                    _ => FractionEnum::CannotCombineExactAndApprox,
                 }
             }
         }
@@ -963,7 +1085,7 @@ macro_rules! ttype {
         mul_assign!($t);
         div!($t);
         div_assign!($t);
-    }
+    };
 }
 
 macro_rules! ttype_signed {
@@ -978,7 +1100,7 @@ macro_rules! ttype_signed {
         mul_assign!($t);
         div!($t);
         div_assign!($t);
-    }
+    };
 }
 
 ttype!(usize);
