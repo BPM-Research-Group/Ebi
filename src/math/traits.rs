@@ -59,11 +59,45 @@ impl Signed for i64 {
     }
 
     fn is_positive(&self) -> bool {
-        todo!()
+        NumSigned::is_positive(self)
     }
 
     fn is_negative(&self) -> bool {
-        todo!()
+        NumSigned::is_negative(self)
+    }
+}
+
+impl Zero for i128 {
+    fn zero() -> Self {
+        0
+    }
+
+    fn is_zero(&self) -> bool {
+        self == &0i128
+    }
+}
+
+impl One for i128 {
+    fn one() -> Self {
+        1
+    }
+
+    fn is_one(&self) -> bool {
+        self == &1i128
+    }
+}
+
+impl Signed for i128 {
+    fn abs(&self) -> Self {
+        NumSigned::abs(&self)
+    }
+
+    fn is_positive(&self) -> bool {
+        NumSigned::is_positive(self)
+    }
+
+    fn is_negative(&self) -> bool {
+        NumSigned::is_negative(self)
     }
 }
 

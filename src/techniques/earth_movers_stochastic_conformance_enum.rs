@@ -1,11 +1,12 @@
 use crate::distances::DistanceMatrix;
+use crate::math::traits::One;
 use crate::optimization_algorithms::network_simplex::NetworkSimplex;
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::fraction::Fraction,
 };
 use anyhow::{Context, Result};
-use fraction::BigInt;
+use fraction::{BigInt, ToPrimitive};
 use num_bigint::ToBigInt;
 use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
 use rayon::prelude::*;
@@ -86,8 +87,10 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 .flat_map(|row| {
                     row.par_iter().map(|value| {
                         value
+                            .extract_exact()
+                            .unwrap()
                             .denom()
-                            .expect("Denominator required")
+                            .unwrap()
                             .to_bigint()
                             .unwrap()
                     })
@@ -116,8 +119,10 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
             let self_denominators: Vec<BigInt> = self_probs
                 .par_iter()
                 .map(|frac| {
-                    frac.denom()
-                        .expect("Cannot combine Approximate and Exact")
+                    frac.extract_exact()
+                        .unwrap()
+                        .denom()
+                        .unwrap()
                         .to_bigint()
                         .unwrap()
                 })
@@ -126,8 +131,10 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
             let lang_b_denominators: Vec<BigInt> = lang_b_probs
                 .par_iter()
                 .map(|frac| {
-                    frac.denom()
-                        .expect("Cannot combine Approximate and Exact")
+                    frac.extract_exact()
+                        .unwrap()
+                        .denom()
+                        .unwrap()
                         .to_bigint()
                         .unwrap()
                 })
@@ -139,8 +146,8 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 .chain(lang_b_denominators)
                 .reduce(|| BigInt::from(1), |a, b| num::integer::lcm(a, b));
 
-            let lcm_distance_fraction = Fraction::from(lcm_distances.clone());
-            let lcm_probability_fraction = Fraction::from(lcm_probabilities.clone());
+            let lcm_distance_fraction = Fraction::try_from(lcm_distances.clone())?;
+            let lcm_probability_fraction = Fraction::try_from(lcm_probabilities.clone())?;
 
             log::debug!(
                 "LCM of distances: {:?} \n LCM of probabilities {:?}",
@@ -161,7 +168,13 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                         row.par_iter()
                             .map(|frac| {
                                 let product = frac * &lcm_distance_fraction;
-                                product.to_i64().unwrap()
+                                product
+                                    .extract_exact()
+                                    .unwrap()
+                                    .numer()
+                                    .unwrap()
+                                    .to_i64()
+                                    .unwrap()
                             })
                             .collect()
                     })
@@ -179,10 +192,18 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                             let idx = chunk_idx * 1024 + i;
                             *s = if idx < n {
                                 (&self_probs[idx] * &lcm_probability_fraction)
+                                    .extract_exact()
+                                    .unwrap()
+                                    .numer()
+                                    .unwrap()
                                     .to_i64()
                                     .unwrap()
                             } else if idx < n + m {
                                 -(&lang_b_probs[idx - n] * &lcm_probability_fraction)
+                                    .extract_exact()
+                                    .unwrap()
+                                    .numer()
+                                    .unwrap()
                                     .to_i64()
                                     .unwrap()
                             } else {
@@ -214,8 +235,8 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 // (i64) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
                 let mut result = Fraction::from(1);
                 let mut distance = Fraction::from(ns_result);
-                distance /= Fraction::from(lcm_distances);
-                distance /= Fraction::from(lcm_probabilities);
+                distance /= Fraction::try_from(lcm_distances)?;
+                distance /= Fraction::try_from(lcm_probabilities)?;
                 result -= distance;
 
                 return Ok(result);
@@ -231,7 +252,13 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                         row.par_iter()
                             .map(|frac| {
                                 let product = frac * &lcm_distance_fraction;
-                                product.to_i128().unwrap()
+                                product
+                                    .extract_exact()
+                                    .unwrap()
+                                    .numer()
+                                    .unwrap()
+                                    .to_i128()
+                                    .unwrap()
                             })
                             .collect()
                     })
@@ -249,10 +276,18 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                             let idx = chunk_idx * 1024 + i;
                             *s = if idx < n {
                                 (&self_probs[idx] * &lcm_probability_fraction)
+                                    .extract_exact()
+                                    .unwrap()
+                                    .numer()
+                                    .unwrap()
                                     .to_i128()
                                     .unwrap()
                             } else if idx < n + m {
                                 -(&lang_b_probs[idx - n] * &lcm_probability_fraction)
+                                    .extract_exact()
+                                    .unwrap()
+                                    .numer()
+                                    .unwrap()
                                     .to_i128()
                                     .unwrap()
                             } else {
@@ -283,8 +318,8 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 // (i128) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
                 let mut result = Fraction::from(1);
                 let mut distance = Fraction::from(ns_result);
-                distance /= Fraction::from(lcm_distances);
-                distance /= Fraction::from(lcm_probabilities);
+                distance /= Fraction::try_from(lcm_distances)?;
+                distance /= Fraction::try_from(lcm_probabilities)?;
                 result -= distance;
 
                 return Ok(result);
@@ -298,7 +333,12 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                         row.par_iter()
                             .map(|frac| {
                                 let product = frac * &lcm_distance_fraction;
-                                product.to_bigint().unwrap()
+                                product
+                                .extract_exact()
+                                .unwrap()
+                                .numer()
+                                .unwrap()
+                                .to_bigint().unwrap()
                             })
                             .collect()
                     })
@@ -316,10 +356,18 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                             let idx = chunk_idx * 1024 + i;
                             *s = if idx < n {
                                 (&self_probs[idx] * &lcm_probability_fraction)
+                                    .extract_exact()
+                                    .unwrap()
+                                    .numer()
+                                    .unwrap()
                                     .to_bigint()
                                     .unwrap()
                             } else if idx < n + m {
                                 -(&lang_b_probs[idx - n] * &lcm_probability_fraction)
+                                    .extract_exact()
+                                    .unwrap()
+                                    .numer()
+                                    .unwrap()
                                     .to_bigint()
                                     .unwrap()
                             } else {
@@ -348,10 +396,10 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
-                let mut result = Fraction::from(1);
-                let mut distance = Fraction::from(ns_result);
-                distance /= Fraction::from(lcm_distances);
-                distance /= Fraction::from(lcm_probabilities);
+                let mut result = Fraction::one();
+                let mut distance = Fraction::try_from(ns_result)?;
+                distance /= Fraction::try_from(lcm_distances)?;
+                distance /= Fraction::try_from(lcm_probabilities)?;
                 result -= distance;
 
                 return Ok(result);
@@ -364,7 +412,11 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
             let float_distances: Vec<Vec<f64>> = distances
                 .into_iter()
-                .map(|row| row.into_iter().map(|frac| frac.to_f64().unwrap()).collect())
+                .map(|row| {
+                    row.into_iter()
+                        .map(|frac| frac.extract_approx().unwrap())
+                        .collect()
+                })
                 .collect();
 
             // 3a. Create a network graph with the scaled distances and probabilities:
@@ -378,7 +430,11 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 .enumerate()
                 .take(n)
                 .for_each(|(i, supply)| {
-                    *supply = self.get_trace_probability(i).unwrap().to_f64().unwrap();
+                    *supply = self
+                        .get_trace_probability(i)
+                        .unwrap()
+                        .extract_approx()
+                        .unwrap();
                 });
             // 3a(ii). For each trace in the second language, create a demand node with the corresponding trace probability as demand (i.e. negative supply).
             supply
@@ -390,7 +446,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                     *supply = -lang_b
                         .get_trace_probability(i - n)
                         .unwrap()
-                        .to_f64()
+                        .extract_approx()
                         .unwrap();
                 });
 

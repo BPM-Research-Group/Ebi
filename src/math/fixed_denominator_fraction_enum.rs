@@ -3,7 +3,7 @@ use std::{borrow::Borrow, ops::{AddAssign, Mul}, sync::Arc};
 use fraction::{BigUint, GenericFraction, Integer, Ratio, Sign};
 use anyhow::{anyhow, Result};
 
-use super::fraction::{Fraction, Zero};
+use super::{fraction::Fraction, traits::Zero};
 
 #[derive(Clone)]
 pub enum FixedDenominatorFractionEnum {
