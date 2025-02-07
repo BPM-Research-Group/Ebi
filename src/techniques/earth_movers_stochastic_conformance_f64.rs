@@ -129,7 +129,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
         log::debug!("NetworkSimplex result: {:?}", ns_result);
         // 3c. Calculate the EMSC value as 1 - result.
-        let result = Fraction::from(1.0) - ns_result;
+        let result = ns_result.one_minus();
 
         Ok(result)
     }

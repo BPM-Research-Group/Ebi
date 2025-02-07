@@ -1,4 +1,4 @@
-use num::{BigInt, Zero as NumZero, One as NumOne, Signed as NumSigned};
+use num::{BigInt, Float, One as NumOne, Signed as NumSigned, Zero as NumZero};
 
 pub trait One: Sized {
     fn one() -> Self;
@@ -98,5 +98,39 @@ impl Signed for BigInt {
 
     fn is_negative(&self) -> bool {
         <BigInt as NumSigned>::is_negative(&self)
+    }
+}
+
+impl One for f64 {
+    fn one() -> Self {
+        1.0
+    }
+
+    fn is_one(&self) -> bool {
+        (self - 1.0).abs() - &f64::EPSILON < 0.0
+    }
+}
+
+impl Zero for f64 {
+    fn zero() -> Self {
+        0.0
+    }
+
+    fn is_zero(&self) -> bool {
+        <f64 as Signed>::abs(&self) - &f64::EPSILON < 0.0
+    }
+}
+
+impl Signed for f64 {
+    fn abs(&self) -> Self {
+        <f64 as Float>::abs(*self)
+    }
+
+    fn is_positive(&self) -> bool {
+        self > &f64::EPSILON
+    }
+
+    fn is_negative(&self) -> bool {
+        self < &-f64::EPSILON
     }
 }

@@ -10,7 +10,7 @@ use std::{
     cmp::{PartialEq, PartialOrd},
     fmt::{Debug, Display},
     iter::Sum,
-    ops::{AddAssign, Mul, MulAssign, Neg, SubAssign},
+    ops::{AddAssign, MulAssign, Neg, SubAssign},
 };
 
 // Enums for representing various problem types, supply types, and arc states

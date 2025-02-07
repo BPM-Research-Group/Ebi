@@ -2,7 +2,8 @@
 mod tests {
     use std::{
         fs::{self, File},
-        io::Cursor, ops::Neg,
+        io::Cursor,
+        ops::Neg,
     };
 
     use crate::{
@@ -33,7 +34,13 @@ mod tests {
             },
         },
         follower_semantics::FollowerSemantics,
-        math::{fraction::Fraction, log_div::LogDiv, matrix::Matrix, root_log_div::RootLogDiv, traits::{One, Signed, Zero}},
+        math::{
+            fraction::Fraction,
+            log_div::LogDiv,
+            matrix::Matrix,
+            root_log_div::RootLogDiv,
+            traits::{One, Signed, Zero},
+        },
         medoid,
         multiple_reader::MultipleReader,
         optimization_algorithms::network_simplex::NetworkSimplex,
@@ -1349,7 +1356,8 @@ mod tests {
 
         let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, true, false);
         _ = ns.run(false);
-        assert_eq!(ns.get_result().unwrap(), Fraction::from((123, 1)));
+        let result = ns.get_result().unwrap();
+        assert_eq!(result, 123.0);
     }
 
     // test is working but use of Approx and parallelization causes other tests to fail
