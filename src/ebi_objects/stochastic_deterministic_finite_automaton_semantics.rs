@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 
-use crate::{ebi_framework::activity_key::{Activity, HasActivityKey}, ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction};
+use crate::{ebi_framework::activity_key::{Activity, HasActivityKey}, ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction, techniques::livelocks::Livelock};
 
 use super::{deterministic_finite_automaton::DeterministicFiniteAutomaton, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
 
@@ -123,10 +123,6 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         self.get_termination_probability(*state).clone()
     }
 
-    fn get_deterministic_silent_livelock_probability(&self, _state: &Self::DetState) -> Fraction {
-        Fraction::zero()
-    }
-
     fn get_deterministic_activity_probability(&self, state: &usize, activity: Activity) -> Fraction {
         let (found, i) = self.binary_search(*state, self.get_activity_key().get_id_from_activity(activity));
         match found {
@@ -145,5 +141,17 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         }
 
         return result;
+    }
+
+    fn get_deterministic_silent_livelock_probability(&self, _state: &Self::DetState) -> Fraction {
+        Fraction::zero()
+    }
+
+    fn get_deterministic_non_decreasing_livelock_probability(&self, state: &mut Self::DetState) -> Result<Fraction> {
+        if self.is_non_decreasing_livelock(state)? {
+            return Ok(Fraction::one())
+        } else {
+            return Ok(Fraction::zero())
+        }
     }
 }

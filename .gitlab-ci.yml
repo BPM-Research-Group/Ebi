@@ -15,8 +15,7 @@ buildlatex:
     #compile manual
     - cd manual
     - cargo run itself manual -o functions.tex
-    - cargo run itself graph -o graph.svg
-    - rsvg-convert -f pdf -o graph.pdf graph.svg
+    - cargo run itself graph -o graph.pdf
     - lualatex -shell-escape manual.tex
     - bibtex manual
     - lualatex -shell-escape manual.tex

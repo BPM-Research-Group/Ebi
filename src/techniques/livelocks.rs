@@ -27,7 +27,7 @@ macro_rules! is_non_decreasing_livelock_lpn {
         }
 
         impl $t {
-            fn is_non_decreasing_livelock(&self, state: &mut LPNMarking) -> Result<bool> {
+            pub fn is_non_decreasing_livelock(&self, state: &mut LPNMarking) -> Result<bool> {
 
                 let mut trace = vec![];
         

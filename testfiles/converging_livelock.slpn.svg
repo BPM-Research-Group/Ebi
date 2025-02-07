@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg width="360" height="305" viewBox="0 0 360 305" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="startarrow" markerWidth="10" markerHeight="7"
+refX="0" refY="3.5" orient="auto">
+<polygon points="10 0, 10 7, 0 3.5" />
+</marker>
+<marker id="endarrow" markerWidth="10" markerHeight="7"
+refX="10" refY="3.5" orient="auto">
+<polygon points="0 0, 10 3.5, 0 7" />
+</marker>
+
+</defs><style>
+.a15 { font-size: 15px; font-family: Times, serif; }
+</style>
+<ellipse cx="47.5" cy="150" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="135" class="a15"><tspan x = "47.5" dy="1.0em">1</tspan></text><ellipse cx="257.5" cy="150" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="257.5" y="142.5" class="a15"></text><ellipse cx="257.5" cy="250" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="257.5" y="242.5" class="a15"></text><rect x="125" y="30" width="55" height="40" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="152.5" y="27.5" class="a15"><tspan x = "152.5" dy="1.0em">a</tspan><tspan x = "152.5" dy="1.0em">1/2</tspan></text><rect x="125" y="130" width="55" height="40" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="152.5" y="127.5" class="a15"><tspan x = "152.5" dy="1.0em">b</tspan><tspan x = "152.5" dy="1.0em">1/4</tspan></text><rect x="125" y="230" width="55" height="40" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="152.5" y="227.5" class="a15"><tspan x = "152.5" dy="1.0em">c</tspan><tspan x = "152.5" dy="1.0em">1/4</tspan></text><rect x="335" y="235" width="20" height="30" fill="#808080ff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="345" y="235" class="a15"><tspan x = "345" dy="1.0em">1</tspan></text><path id="arrow0" d="M 60.17241379310345 137.9310344827586 C 81.89655172413794 117.24137931034481, 105.00994077449893 87.75629227647951, 125 65.38672517827756 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+<text><textPath href="#arrow0" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><path id="arrow1" d="M 60.17241379310345 137.9310344827586 C 81.89655172413794 117.24137931034481, 105.00994077449893 87.75629227647951, 125 65.38672517827756 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+<text><textPath href="#arrow1" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><path id="arrow2" d="M 65 150 C 95 150, 95 150, 125 150 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+<text><textPath href="#arrow2" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><path id="arrow3" d="M 180 150 C 210 150, 210 150, 240 150 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+<text><textPath href="#arrow3" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><path id="arrow4" d="M 60.17241379310345 162.0689655172414 C 81.89655172413794 182.75862068965517, 105.00994077449893 212.24370772352046, 125 234.61327482172243 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+<text><textPath href="#arrow4" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><path id="arrow5" d="M 180 250 C 210 250, 210 250, 240 250 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+<text><textPath href="#arrow5" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><path id="arrow6" d="M 275 250 C 305 250, 305 250, 335 250 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+<text><textPath href="#arrow6" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><path id="arrow7" d="M 275 250 C 305 250, 305 250, 335 250 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+<text><textPath href="#arrow7" startOffset="50%" text-anchor="middle" class="a15"></textPath></text></svg>

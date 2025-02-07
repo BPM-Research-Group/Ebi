@@ -117,7 +117,7 @@ impl Matrix {
             return Ok(());
         }
 
-        // log::info!("compute inverse of {:?}", self);
+        // log::info!("compute inverse of {}", self);
 
         //extend the rows with the identity matrix
         let n = self.get_number_of_rows();
@@ -126,8 +126,12 @@ impl Matrix {
             row[n + r] = Fraction::one();
         }
 
+        // log::info!("add identity       {}", self);
+
         //solve
         self.solve()?;
+
+        // log::info!("solved             {}", self);
 
         //reduce the rows
         for (_, row) in self.rows.iter_mut().enumerate() {
@@ -181,27 +185,33 @@ impl Matrix {
             }
         }
 
+        // log::info!("row-reduced echelon{}", self);
+
+        // log::info!("number of columns {}", self.get_number_of_columns());
+
         // log::info!("first step done");
 
-        for i in (1..self.rows.len()).rev() {
+        for i in (0..self.rows.len()).rev() {
             if self.rows[i][i].is_zero() {
                 continue;
             } else {
-                for j in (1 .. i+1).rev() {
-                    let factor = &self.rows[j - 1][i] / &self.rows[i][i];
-                    for k in (0..self.get_number_of_columns()).rev() {
+                for j in (0 .. i).rev() {
+                    let factor = &self.rows[j][i] / &self.rows[i][i];
+                    for k in i..self.rows[0].len() {
                         let mut old = self.rows[i][k].clone();
                         old *= &factor;
-                        self.rows[j - 1][k] -= old;
+                        self.rows[j][k] -= old;
                     }
                 }
             }
         }
 
+        // log::info!("second step        {}", self);
+
         // log::info!("second step done");
 
         let failed = AtomicBool::new(false);
-        let number_of_columns = self.get_number_of_columns();
+        let number_of_columns = self.rows[0].len();
         let number_of_rows = self.get_number_of_rows();
         
         if number_of_rows > 100 {

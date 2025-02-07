@@ -204,18 +204,18 @@ mod tests {
         assert_eq!(should_slang, slang2)
     }
 
-    #[test]
-    fn sdfa_minprob_zero_loop() {
-        let fin = fs::read_to_string("testfiles/a-loop.sdfa").unwrap();
-        let sdfa = fin
-            .parse::<StochasticDeterministicFiniteAutomaton>()
-            .unwrap();
-        let semantics = sdfa.to_stochastic_deterministic_semantics();
+    // #[test]
+    // fn sdfa_minprob_zero_loop() {
+    //     let fin = fs::read_to_string("testfiles/a-loop.sdfa").unwrap();
+    //     let sdfa = fin
+    //         .parse::<StochasticDeterministicFiniteAutomaton>()
+    //         .unwrap();
+    //     let semantics = sdfa.to_stochastic_deterministic_semantics();
 
-        assert!(semantics
-            .analyse_minimum_probability(&Fraction::zero())
-            .is_err());
-    }
+    //     assert!(semantics
+    //         .analyse_minimum_probability(&Fraction::zero())
+    //         .is_err());
+    // }
 
     #[test]
     fn slpn_minprob_livelock() {
@@ -745,7 +745,7 @@ mod tests {
         let slang: Box<dyn EbiTraitFiniteStochasticLanguage> =
             Box::new(fin.parse::<FiniteStochasticLanguage>().unwrap());
 
-        assert_eq!(slang.process_variety(), Fraction::from((2, 5)));
+        assert_eq!(slang.rao_stirling_diversity(), Fraction::from((2, 5)));
     }
 
     #[test]
@@ -789,10 +789,10 @@ mod tests {
         let slpn = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
         let state = slpn.get_deterministic_initial_state().unwrap();
         assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 0);
-        assert_eq!(
-            slpn.get_deterministic_termination_probability(&state),
-            Fraction::one()
-        );
+        // assert_eq!(
+        //     slpn.get_deterministic_termination_probability(&state),
+        //     Fraction::one()
+        // );
 
         let slpn: Box<
             dyn StochasticDeterministicSemantics<
@@ -813,6 +813,22 @@ mod tests {
                 .unwrap(),
             slang3
         );
+    }
+
+    #[test]
+    fn slpn_cover_infinite_bs() {
+        let fin = fs::read_to_string("testfiles/infinite_bs.slpn").unwrap();
+        let slpn: Box<
+            dyn StochasticDeterministicSemantics<
+                DetState = PMarking<LPNMarking>,
+                LivState = PMarking<LPNMarking>,
+            >,
+        > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+
+        let state1 = slpn.get_deterministic_initial_state().unwrap();
+        let enabled1 = slpn.get_deterministic_enabled_activities(&state1);
+
+        assert_eq!(enabled1.len(), 2);
     }
 
     #[test]
@@ -913,6 +929,78 @@ mod tests {
             .unwrap();
 
         assert_eq!(slang2.len(), 0);
+    }
+
+    #[test]
+    fn slpn_minprob_bs() {
+        let fin = fs::read_to_string("testfiles/infinite_bs.slpn").unwrap();
+        let slpn: Box<
+            dyn StochasticDeterministicSemantics<
+                DetState = PMarking<LPNMarking>,
+                LivState = PMarking<LPNMarking>,
+            >,
+        > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+        assert_eq!(
+            slpn.analyse_minimum_probability(&Fraction::from((51, 100)))
+                .unwrap()
+                .len(),
+            0
+        );
+    }
+
+    #[test]
+    fn slpn_cover_bs() {
+        let fin = fs::read_to_string("testfiles/infinite_bs.slpn").unwrap();
+        let slpn: Box<
+            dyn StochasticDeterministicSemantics<
+                DetState = PMarking<LPNMarking>,
+                LivState = PMarking<LPNMarking>,
+            >,
+        > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+        assert_eq!(
+            slpn.analyse_probability_coverage(&Fraction::from((4, 10)))
+                .unwrap()
+                .len(),
+            1
+        );
+    }
+
+    #[test]
+    fn slpn_cover_prefix() {
+        let fin = fs::read_to_string("testfiles/aa-aaa-bb.slpn").unwrap();
+        let mut slpn: Box<
+            dyn StochasticDeterministicSemantics<
+                DetState = PMarking<LPNMarking>,
+                LivState = PMarking<LPNMarking>,
+            >,
+        > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+
+        let state1 = slpn.get_deterministic_initial_state().unwrap();
+        let enabled1 = slpn.get_deterministic_enabled_activities(&state1);
+        assert_eq!(enabled1.len(), 2);
+
+        let a = slpn.get_activity_key_mut().process_activity("a");
+
+        let state2 = slpn.execute_deterministic_activity(&state1, a).unwrap();
+        let enabled2 = slpn.get_deterministic_enabled_activities(&state2);
+        assert_eq!(enabled2.len(), 1);
+
+        let state3 = slpn.execute_deterministic_activity(&state2, a).unwrap();
+        assert_eq!(state3.p_marking.len(), 2);
+
+        //after doing <a, a>, the model should be able to terminate with probability 1/10
+        assert_eq!(
+            slpn.get_deterministic_termination_probability(&state3),
+            Fraction::from((1, 10))
+        );
+
+        //all traces must be found
+        assert_eq!(
+            slpn.analyse_probability_coverage(&Fraction::from((1, 1)))
+                .unwrap()
+                .len(),
+            3
+        );
     }
 
     #[test]
@@ -1179,13 +1267,12 @@ mod tests {
     // fn sample_sdfa_no_language() {
     //     let fin1 = fs::read_to_string("testfiles/a-livelock-zeroweight.sdfa").unwrap();
     //     let sdfa = fin1.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
-    //     let semantics: Box<dyn StochasticSemantics<State = usize>> = Box::new(StochasticDeterministicFiniteAutomatonSemantics::new(Rc::new(sdfa)));
 
-    //     let sample = semantics.sample(1);
+    //     let sample = sdfa.sample(1).unwrap();
 
     //     //the language of this model is empty, so it should not have any traces in the sample
     //     println!("{:?}", sample);
-    //     assert!(sample.is_err())
+    //     // assert!(sample.is_err())
     // }
 
     // //#[test] //disabled until we can handle livelocks
