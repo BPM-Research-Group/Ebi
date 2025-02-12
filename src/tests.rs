@@ -6,9 +6,6 @@ mod tests {
         ops::Neg,
     };
 
-    use fraction::{GenericFraction, Zero};
-    use num_bigint::ToBigUint;
-
     use crate::{
         ebi_framework::{
             activity_key::HasActivityKey, ebi_file_handler::EBI_FILE_HANDLERS,
@@ -37,7 +34,13 @@ mod tests {
             },
         },
         follower_semantics::FollowerSemantics,
-        math::{fraction::Fraction, log_div::LogDiv, matrix::Matrix, root_log_div::RootLogDiv},
+        math::{
+            fraction::Fraction,
+            log_div::LogDiv,
+            matrix::Matrix,
+            root_log_div::RootLogDiv,
+            traits::{One, Signed, Zero},
+        },
         medoid,
         multiple_reader::MultipleReader,
         optimization_algorithms::network_simplex::NetworkSimplex,
@@ -114,8 +117,11 @@ mod tests {
         let fin2 = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin2.parse::<FiniteStochasticLanguage>().unwrap();
         let slpn = lpn.mine_occurrences_stochastic(Box::new(slang));
-        let fout = fs::read_to_string("testfiles/aa-ab-ba_occ.slpn").unwrap();
-        assert_eq!(fout, slpn.to_string())
+        if !cfg!(feature = "withoutexactarithmetic") {
+            //with approximate arithmetic, this test is too fragile
+            let fout = fs::read_to_string("testfiles/aa-ab-ba_occ.slpn").unwrap();
+            assert_eq!(fout, slpn.to_string())
+        };
     }
 
     #[test]
@@ -731,11 +737,9 @@ mod tests {
         let slang: Box<dyn EbiTraitFiniteStochasticLanguage> =
             Box::new(log.get_finite_stochastic_language());
 
-        let answer = RootLogDiv::sqrt(LogDiv::Exact(
-            GenericFraction::from(4),
-            2.to_biguint().unwrap(),
-        ))
-        .one_minus();
+        let mut x = LogDiv::from(Fraction::from(2));
+        x /= 2;
+        let answer = RootLogDiv::sqrt(x).one_minus();
 
         assert_eq!(slang.jssc_log2model(Box::new(slpn)).unwrap(), answer);
     }
@@ -1288,12 +1292,6 @@ mod tests {
     // }
 
     #[test]
-    fn network_simplex() {
-        network_simplex_int();
-        network_simplex_bigint();
-        network_simplex_float();
-    }
-
     fn network_simplex_int() {
         let supply: Vec<i64> = vec![20, 0, 0, -5, -14];
 
@@ -1309,6 +1307,7 @@ mod tests {
         assert_eq!(ns.get_result().unwrap(), 123);
     }
 
+    #[test]
     fn network_simplex_bigint() {
         use num::BigInt;
 
@@ -1337,6 +1336,7 @@ mod tests {
         assert_eq!(ns.get_result().unwrap(), BigInt::from(123));
     }
 
+    #[test]
     fn network_simplex_float() {
         let supply: Vec<f64> = vec![20, 0, 0, -5, -14]
             .into_iter()
@@ -1356,7 +1356,8 @@ mod tests {
 
         let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, true, false);
         _ = ns.run(false);
-        assert_eq!(ns.get_result().unwrap(), 123.0);
+        let result = ns.get_result().unwrap();
+        assert_eq!(result, 123.0);
     }
 
     // test is working but use of Approx and parallelization causes other tests to fail

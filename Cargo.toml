@@ -45,6 +45,7 @@ serde = "*"
 derive_activity_key = {path = "lib/derive_activity_key"}
 logging_timer = "*"
 svg2pdf = "*"
+cfg-if = "*"
 
 [dependencies.num-rational]
 version = "0.4.1"
@@ -56,3 +57,7 @@ panic = 'abort'
 opt-level = 3
 lto = true
 codegen-units = 1
+
+[features]
+default = []
+withoutexactarithmetic = []

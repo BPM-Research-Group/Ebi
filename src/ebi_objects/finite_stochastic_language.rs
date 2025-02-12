@@ -33,7 +33,7 @@ use crate::{
     },
     follower_semantics::FollowerSemantics,
     line_reader::LineReader,
-    math::fraction::Fraction,
+    math::{fraction::Fraction, traits::{One, Signed, Zero}},
 };
 
 use super::{

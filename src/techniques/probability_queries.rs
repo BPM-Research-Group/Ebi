@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
+use num::One as _;
 use core::hash::Hash;
-use fraction::One;
 use priority_queue::PriorityQueue;
 use std::{
     cmp::Ordering,
@@ -18,7 +18,7 @@ use crate::{
             EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics,
         },
     },
-    math::fraction::Fraction,
+    math::{fraction::Fraction, traits::{One, Signed, Zero}},
 };
 
 pub trait ProbabilityQueries {
