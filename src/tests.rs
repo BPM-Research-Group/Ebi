@@ -937,6 +937,19 @@ mod tests {
     }
 
     #[test]
+    fn pdc_cover() {
+        let fin = fs::read_to_string("testfiles/pdc2023_121111.xes.gz-IMf.lpn-alignments.slpn").unwrap();
+        let slpn: Box<
+            dyn StochasticDeterministicSemantics<
+                DetState = PMarking<LPNMarking>,
+                LivState = PMarking<LPNMarking>,
+            >,
+        > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+
+        slpn.analyse_probability_coverage(&Fraction::from((4, 1000))).unwrap();
+    }
+
+    #[test]
     fn slpn_minprob_bs() {
         let fin = fs::read_to_string("testfiles/infinite_bs.slpn").unwrap();
         let slpn: Box<

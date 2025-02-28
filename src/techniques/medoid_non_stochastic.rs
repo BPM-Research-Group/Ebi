@@ -155,7 +155,7 @@ where
 /// let data = ndarray::arr2(&[[0,1,2,3],[1,0,4,5],[2,4,0,6],[3,5,6,0]]);
 /// let mut meds = kmedoids::random_initialization(4, 2, &mut rand::thread_rng());
 /// let (loss, assi, n_iter, n_swap): (f64, _, _, _) = kmedoids::fasterpam(&data, &mut meds, 100);
-/// println!("Loss is: {}", loss);
+/// log::debug!("Loss is: {}", loss);
 /// ```
  */
 pub fn fasterpam(

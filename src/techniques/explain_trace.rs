@@ -195,7 +195,7 @@ impl<State: Displayable>
                 let moves = transform_alignment(self, &trace, path)?;
                 let mut alignments = LanguageOfAlignments::new(self.get_activity_key().clone());
                 alignments.push(moves);
-                // println!("cost:{:.4},", cost, prefix_cost, prefix_probability);
+                // log::debug!("cost:{:.4},", cost, prefix_cost, prefix_probability);
                 Ok(alignments)
             }
             None => Err(anyhow!("no alignment found")),

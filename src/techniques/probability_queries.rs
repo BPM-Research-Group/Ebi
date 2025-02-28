@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
-use num::One as _;
 use core::hash::Hash;
+use num::One as _;
 use priority_queue::PriorityQueue;
 use std::{
     cmp::Ordering,
@@ -18,7 +18,10 @@ use crate::{
             EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics,
         },
     },
-    math::{fraction::Fraction, traits::{One, Signed, Zero}},
+    math::{
+        fraction::Fraction,
+        traits::{One, Signed, Zero},
+    },
 };
 
 pub trait ProbabilityQueries {
@@ -235,16 +238,23 @@ impl<DState: Displayable>
         let mut s = vec![];
 
         while let Some((z, priority)) = queue.pop() {
-
             match z {
                 Z::Prefix(prefix_probability, prefix, q_state) => {
                     // log::debug!(
                     //     "queue length: {}, queue head: prefix {:?}, q-state {:?}, priority {:.4}",
-                    //     queue.len(), prefix, q_state, priority
+                    //     queue.len(),
+                    //     prefix,
+                    //     q_state,
+                    //     priority
                     // );
 
                     //see whether we are done
-                    if stop(&s, &prefix_probability, &sum, &total_non_livelock_probability)? {
+                    if stop(
+                        &s,
+                        &prefix_probability,
+                        &sum,
+                        &total_non_livelock_probability,
+                    )? {
                         return Ok(s);
                     }
 
@@ -269,6 +279,10 @@ impl<DState: Displayable>
 
                         let new_q_state =
                             self.execute_deterministic_activity(&q_state, activity)?;
+
+
+                        // log::debug!("\t\tq-state after activity {:?}", new_q_state);
+
                         let livelock_probability = self
                             .get_deterministic_non_decreasing_livelock_probability(
                                 &mut new_q_state.clone(),
@@ -298,7 +312,6 @@ impl<DState: Displayable>
                     }
                 }
                 Z::Trace(trace) => {
-
                     //see whether we are done
                     if stop(&s, &priority, &sum, &total_non_livelock_probability)? {
                         return Ok(s);
@@ -411,21 +424,19 @@ impl<DState: Displayable> ProbabilityQueries
     for dyn StochasticDeterministicSemantics<DetState = DState, LivState = DState>
 {
     fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
-
         let progress_bar = EbiCommand::get_progress_bar_message(
             "found 0 traces; lowest considered prefix probability 0.0000000".to_owned(),
         );
 
         let s = self.iterate_most_likely_traces(
             |s, prefix_probability, _, _| {
-
                 //update progress bar
                 progress_bar.set_message(format!(
                     "found {} traces; lowest considered prefix probability {:.8}",
                     s.len(),
                     prefix_probability
                 ));
-                   
+
                 Ok(prefix_probability < at_least)
             },
             MaybeConstant::none_zero(),
@@ -486,6 +497,9 @@ impl<DState: Displayable> ProbabilityQueries
 
                 //update progress bar
                 if last_number_of_traces != s.len() {
+                    //for experiments
+                    // log::debug!("trace {} found", s.len());
+
                     progress_bar.set_message(format!(
                         "found {} traces, which cover {:.8}",
                         s.len(),

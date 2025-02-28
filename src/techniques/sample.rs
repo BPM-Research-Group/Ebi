@@ -98,7 +98,7 @@ where
             ));
         }
 
-        // println!("Sampled {:?} traces", result);
+        // log::debug!("Sampled {:?} traces", result);
 
         Ok((result, self.get_activity_key().clone()).into())
     }

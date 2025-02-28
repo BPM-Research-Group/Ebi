@@ -106,19 +106,19 @@ impl StochasticLabelledPetriNet {
      * Compute the next q-state.
      */
     fn compute_next(&self, q_state: &mut PMarking<LPNMarking>) -> Result<()> {
-        // log::debug!("compute next q-states for {:?}", q_state);
+        // log::debug!("\t\t\tcompute next q-states for {:?}", q_state);
 
         //create the extended matrix
         let mut markov_model = self.create_markov_model(&q_state)?;
 
-        // log::debug!("T {}", markov_model);
+        // log::debug!("\t\t\t\tT {}", markov_model);
         // log::debug!("T {:?}", markov_model);
 
         //replace livelock states by absorbing states
         let progress_states = Self::get_progress_states(&markov_model);
-        // log::debug!("progress states {:?}", progress_states);
+        // log::debug!("\t\t\t\tprogress states {:?}", progress_states);
         let silent_livelock_states = markov_model.get_states_that_cannot_reach(progress_states);
-        // log::debug!("states that cannot reach a progress state {:?}", silent_livelock_states);
+        // log::debug!("\t\t\t\tstates that cannot reach a progress state {:?}", silent_livelock_states);
         markov_model.make_states_absorbing(&silent_livelock_states);
         markov_model.set_states(&silent_livelock_states, MarkovMarking::SilentLiveLock());
 
@@ -132,7 +132,7 @@ impl StochasticLabelledPetriNet {
         }
 
         let new_state_vector = markov_model.pow_infty()?;
-        // log::debug!("new state vector {}", Matrix::into(new_state_vector.clone()));
+        // log::debug!("new state vector {}", crate::math::matrix::Matrix::into(new_state_vector.clone()));
 
         //create the next q-states
         for (probability, state) in new_state_vector
@@ -143,10 +143,9 @@ impl StochasticLabelledPetriNet {
                 match state {
                     MarkovMarking::ReachableWithSilentTransitions(_) => {
                         /*
-                           This is a marking that can be reached by executing only silent transitions, and has a positive probability.
-                           This should have been classified as a SilentLiveLock, and hence reaching this case is a bug.
-                        */
-                        unreachable!()
+                         * Final state reachable after silent transitions.
+                         */
+                        q_state.termination_probability += probability;
                     }
                     MarkovMarking::AfterExecutingAcrivity(marking, activity) => {
                         match q_state.activity_2_probability.entry(activity) {
