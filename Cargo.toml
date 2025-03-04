@@ -45,6 +45,7 @@ serde = "*"
 derive_activity_key = {path = "lib/derive_activity_key"}
 logging_timer = "*"
 svg2pdf = "*"
+pyo3 = { version = "0.18", features = ["extension-module"] }
 
 [dependencies.num-rational]
 version = "0.4.1"
@@ -53,6 +54,6 @@ version = "0.4.1"
 debug = false
 strip = true
 panic = 'abort'
-opt-level = 3
+opt-level = 2
 lto = true
-codegen-units = 1
+codegen-units = 8

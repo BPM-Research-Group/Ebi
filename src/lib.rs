@@ -10,8 +10,8 @@ pub mod ebi_framework {
     pub mod exportable;
     pub mod importable;
     pub mod infoable;
+    pub mod pm4py_link;
     pub mod prom_link;
-    // pub mod pm4py_link;
 }
 pub mod ebi_commands {
     pub mod ebi_command_analyse;
