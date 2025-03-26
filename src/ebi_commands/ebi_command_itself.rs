@@ -382,10 +382,10 @@ pub fn output_types(output_type: &EbiOutputType) -> String {
     let mut list = output_type.get_exporters().into_iter().map(
         |exp| exp.get_article().to_string() 
         + " " 
-        + &match exp {
+        + match exp {
             EbiExporter::Object(_, file_handler) => format!("{} (.{} -- Section~\\ref{{filehandler:{}}})", file_handler.name, file_handler.file_extension, file_handler.name),
             _ => exp.to_string()
-        }
+        }.as_str()
     ).collect::<Vec<_>>();
     if list.len() == 1 {
         return list.remove(0)
@@ -400,7 +400,7 @@ pub fn graph() -> Result<VisualGraph> {
     //traits
     let mut traits = HashMap::new();
     for etrait in EbiTrait::iter() {
-        let shape = ShapeKind::new_box(&("trait ".to_owned() + &etrait.to_string()));
+        let shape = ShapeKind::new_box(&("trait ".to_owned() + etrait.to_string().as_str()));
         let look = StyleAttr::simple();
         let orientation = Orientation::LeftToRight;
         let mut size = get_shape_size(orientation, &shape, look.font_size, false);
@@ -414,7 +414,7 @@ pub fn graph() -> Result<VisualGraph> {
     //object types
     let mut object_types = HashMap::new();
     for object_type in EbiObjectType::iter() {
-        let shape = ShapeKind::new_box(&("type ".to_owned() + &object_type.to_string()));
+        let shape = ShapeKind::new_box(&("type ".to_owned() + object_type.to_string().as_str()));
         let mut look = StyleAttr::simple();
         look.fill_color = Color::from_name("lightgray");
         let orientation = Orientation::LeftToRight;
@@ -429,7 +429,7 @@ pub fn graph() -> Result<VisualGraph> {
     //file handlers
     let mut file_handlers = HashMap::new();
     for file_handler in EBI_FILE_HANDLERS {
-        let shape = ShapeKind::new_circle(&(".".to_owned() + &file_handler.file_extension.to_string()));
+        let shape = ShapeKind::new_circle(&(".".to_owned() + file_handler.file_extension.to_string().as_str()));
         let look = StyleAttr::simple();
         let orientation = Orientation::LeftToRight;
         let mut size = get_shape_size(orientation, &shape, look.font_size-5, false);

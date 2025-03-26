@@ -54,7 +54,7 @@ pub extern "system" fn Java_org_processmining_ebi_CallEbi_call_1ebi_1internal<'l
     
     let output_ebi = match handle_prom_request(command_name, output_format, inputss) {
         Ok(result) => result,
-        Err(err) => "Ebi: error: ".to_string() + &err.to_string(),
+        Err(err) => "Ebi: error: ".to_string() + err.to_string().as_str(),
     };
     println!("== Ebi sends\n{}", output_ebi);
     let output = env.new_string(output_ebi).expect("Couldn't create java string!");

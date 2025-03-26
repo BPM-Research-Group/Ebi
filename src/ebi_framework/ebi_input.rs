@@ -131,7 +131,7 @@ impl EbiInputType {
                 EbiInputType::Usize => {result.insert("integer".to_string());},
                 EbiInputType::FileHandler => {
                     let extensions: Vec<String> = EBI_FILE_HANDLERS.iter().map(|file_type| file_type.file_extension.to_string()).collect();
-                    result.insert("the file extension of any file type supported by Ebi (".to_owned() + &extensions.join_with(", ", " or ") + ")");
+                    result.insert("the file extension of any file type supported by Ebi (".to_owned() + extensions.join_with(", ", " or ").as_str() + ")");
                 },
                 EbiInputType::Fraction => {result.insert("fraction".to_string());},
             };
@@ -158,7 +158,7 @@ impl EbiInputType {
                 EbiInputType::Usize => {result.insert("integer".to_string());},
                 EbiInputType::FileHandler => {
                     let extensions: Vec<String> = EBI_FILE_HANDLERS.iter().map(|file_type| file_type.file_extension.to_string()).collect();
-                    result.insert("the file extension of any file type supported by Ebi (".to_owned() + &extensions.join_with(", ", " or ") + ")");
+                    result.insert("the file extension of any file type supported by Ebi (".to_owned() + extensions.join_with(", ", " or ").as_str() + ")");
                 },
                 EbiInputType::Fraction => {result.insert("fraction".to_string());},
             };
