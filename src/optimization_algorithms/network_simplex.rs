@@ -1,7 +1,8 @@
-use super::network_simplex_value_type::MulWithFloat;
-use crate::math::traits::{One, Signed, Zero};
+use super::network_simplex_value_type::{MulWithFloat, ToBigInt};
 use crate::optimization_algorithms::network_simplex_value_type::IsFloat;
 use core::convert::From;
+use num::{One, Signed, Zero};
+use fraction::BigInt;
 use rand::{seq::SliceRandom, thread_rng};
 use rayon::ThreadPool;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -10,7 +11,7 @@ use std::{
     cmp::{PartialEq, PartialOrd},
     fmt::{Debug, Display},
     iter::Sum,
-    ops::{AddAssign, MulAssign, Neg, SubAssign},
+    ops::{AddAssign, Mul, MulAssign, Neg, SubAssign},
 };
 
 // Enums for representing various problem types, supply types, and arc states
@@ -229,7 +230,9 @@ where
         + for<'a> AddAssign<&'a T>
         + for<'a> SubAssign<&'a T>
         + for<'a> MulAssign<&'a T>
-        + Neg<Output = T>
+        + Neg
+        + Mul<T, Output = T>
+        + for<'a> Mul<&'a T, Output = T>
         + Signed
         + PartialEq
         + PartialOrd
@@ -240,6 +243,7 @@ where
         + Sum
         + Send
         + Sync
+        + ToBigInt
         + 'static,
 {
     /// Creates a new instance of `NetworkSimplex`.
@@ -927,9 +931,7 @@ where
         }
 
         let max_cost = self.find_max_cost();
-        let mut art_cost = max_cost;
-        art_cost += &T::one();
-        art_cost *= &T::from(self.node_num as i32);
+        let art_cost: T = (max_cost + T::one()) * T::from(self.node_num as i32);
 
         log::debug!("art_cost identified as: {}", art_cost);
 
@@ -1344,6 +1346,23 @@ where
         }
 
         return None;
+    }
+
+    pub fn get_bigint_result(&self) -> Option<BigInt> {
+        if let Some(problem_type) = &self.problem_type {
+            if problem_type == &ProblemType::Optimal {
+                let flow_cost = self.flow.iter().zip(self.cost.iter());
+                let mut result = BigInt::zero();
+                for (flow, cost) in flow_cost {
+                    let mut arc_result = flow.to_big_int();
+                    arc_result *= cost.to_big_int();
+                    result += arc_result;
+                }
+                return Some(result);
+            }
+        }
+
+        None
     }
 
     /// Retrieves the flow values of the network.
