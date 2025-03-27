@@ -183,15 +183,16 @@ pub struct DistanceMatrix {
 }
 
 impl DistanceMatrix {
-    pub fn new<L, K>(lang_a: &L, lang_b: &K) -> Self
+    pub fn new<L, K>(lang_a: &L, lang_b: &mut K) -> Self
     where
         L: EbiTraitFiniteStochasticLanguage + ?Sized,
         K: EbiTraitFiniteStochasticLanguage + ?Sized,
     {
         log::info!("Translate second language to first");
         let mut target_activity_key = lang_a.get_activity_key().clone();
-        //lang_b.translate(&mut target_activity_key);
-        let lang_b_translated = lang_b.translate_using_activity_key(&mut target_activity_key);
+        lang_b.translate(&mut target_activity_key);
+        let lang_b_translated = lang_b;
+        //let lang_b_translated = lang_b.translate_using_activity_key(&mut target_activity_key);
 
         log::info!("Compute distances");
         let len_a = lang_a.len();
