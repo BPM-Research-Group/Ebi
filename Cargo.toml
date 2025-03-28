@@ -46,7 +46,7 @@ derive_activity_key = {path = "lib/derive_activity_key"}
 logging_timer = "*"
 svg2pdf = "*"
 pyo3 = { version = "0.18", features = ["extension-module"] }
-polars = { version = "0.32", features = ["ipc"] }
+polars = { version = "0.32", features = ["ipc", "timezones"] }
 
 
 [dependencies.num-rational]
