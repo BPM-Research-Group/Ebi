@@ -6,14 +6,12 @@ use pyo3::exceptions::PyValueError;
 use std::io::Cursor;
 use std::collections::HashMap;
 
-use super::ebi_input::EbiInputType;
 use super::ebi_output::EbiOutput;
-use super::ebi_trait::EbiTrait;
-use super::prom_link::attempt_parse;
+use crate::ebi_framework::ebi_object::EbiTraitObject;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COMPLETENESS;
 use crate::ebi_framework::ebi_command::EbiCommand;
 use crate::ebi_framework::{ebi_output, ebi_input::EbiInput, ebi_object::EbiObject};
-use crate::ebi_objects::event_log::EventLog;
+use crate::ebi_objects::event_log::{EventLog, EBI_EVENT_LOG};
 use crate::ebi_framework::infoable::Infoable;
 use process_mining::event_log::{event_log_struct::{EventLogClassifier, to_attributes}, Attributes, AttributeValue};
 use process_mining::event_log::{EventLog as ProcessMiningEventLog, Trace, Event};
@@ -87,6 +85,15 @@ pub fn trace_from_py(py_trace: &PyAny) -> PyResult<Trace> {
     Ok(Trace { attributes, events })
 }
 
+
+// ================ Experimentation with passing Logs as DataFrame =================
+/// internal function that creates a Polars DataFrame from IPC bytes
+fn extract_dataframe(ipc_bytes: &[u8]) -> Result<DataFrame, PolarsError> {
+    let cursor = Cursor::new(ipc_bytes);
+    // Use the IPC reader to deserialize the data into a DataFrame.
+    polars::io::ipc::IpcReader::new(cursor).finish()
+}
+
 // ========= EbiCommand execution if inputs are given ==========
 
 impl EbiCommand {
@@ -113,19 +120,22 @@ impl EbiCommand {
 }
 
 // ================= Python bindings - Test functionality ===================
-
+/// Actual Ebi function exposed to Python.
+/// This function takes a PM4Py event log and returns the result of the completeness analysis.
+/// Function chosen as a first example
 #[pyfunction]
-fn ebi_analyse_completeness(event_log: String) -> PyResult<String> {
+fn analyse_completeness(event_log: &PyAny) -> PyResult<String> {
     //let event_log_type = EbiInputType::Object(EbiObjectType::EventLog);
-    let event_log_type = EbiInputType::Trait(EbiTrait::EventLog);
+    let imported = EventLog::import_from_pm4py(event_log)?;
 
-    // Use the same approach as in the Java integration: pass a slice of input types.
-    let input = attempt_parse(&[&event_log_type], event_log).map_err(|e| {
-        pyo3::exceptions::PyException::new_err(format!("Error reading event log: {}", e))
-    })?;
+    let trait_object = match imported {
+        EbiObject::EventLog(log) => EbiTraitObject::EventLog(Box::new(log)),
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected an EventLog.")),
+    };
+
+    let input = EbiInput::Trait(trait_object, &EBI_EVENT_LOG);
 
     let inputs = vec![input];
-
 
     let command: &&EbiCommand = &&EBI_ANALYSE_COMPLETENESS;
 
@@ -151,18 +161,10 @@ fn ebi_analyse_completeness(event_log: String) -> PyResult<String> {
     Ok(output_string)
 }
 
-
 #[pyfunction]
 pub fn get_log_length(event_log: &PyAny) -> PyResult<usize> {
     let list = event_log.getattr("_list")?.downcast::<PyList>()?;
     Ok(list.len())
-}
-
-/// internal function that creates a Polars DataFrame from IPC bytes
-fn extract_dataframe(ipc_bytes: &[u8]) -> Result<DataFrame, PolarsError> {
-    let cursor = Cursor::new(ipc_bytes);
-    // Use the IPC reader to deserialize the data into a DataFrame.
-    polars::io::ipc::IpcReader::new(cursor).finish()
 }
 
 fn count_unique_traces(df: &DataFrame, column: &str) -> Result<usize, PolarsError> {
@@ -242,7 +244,7 @@ pub fn import_event_log(event_log: &PyAny) -> PyResult<String> {
 /// import the module.
 #[pymodule]
 fn ebi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(ebi_analyse_completeness, m)?)?;
+    m.add_function(wrap_pyfunction!(analyse_completeness, m)?)?;
     m.add_function(wrap_pyfunction!(get_log_length, m)?)?;
     m.add_function(wrap_pyfunction!(count_traces, m)?)?;
     m.add_function(wrap_pyfunction!(dataframe_head, m)?)?;
