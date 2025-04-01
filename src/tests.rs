@@ -1389,7 +1389,7 @@ mod tests {
     // }
 
     #[test]
-    #[should_panic(expected = "assertion failed: self.uuid == activity.activity_key_uuid")]
+    #[should_panic(expected = "cannot get activity label of activity of different activity key")]
     fn activity_key_process() {
         let key1 = ActivityKey::new();
         let mut key2 = ActivityKey::new();
@@ -1398,7 +1398,7 @@ mod tests {
     }
 
     #[test]
-    #[should_panic(expected = "assertion failed: self.activity_key_uuid == other.activity_key_uuid")]
+    #[should_panic(expected = "cannot compare activities of different activity keys")]
     fn activity_key_equal() {
         let mut key1 = ActivityKey::new();
         let mut key2 = ActivityKey::new();

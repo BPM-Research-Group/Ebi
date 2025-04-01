@@ -11,6 +11,9 @@ pub trait JensenShannonStochasticConformance {
 
 impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
     fn jssc_log2log(&self, event_log2: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<RootLogDiv> {
+        let mut activity_key1 = self.get_activity_key().clone();
+        let translator = ActivityKeyTranslator::new(&event_log2.get_activity_key(), &mut activity_key1);
+
         let mut sum = LogDiv::zero();
     
         let mut log1_prob_intersection_sum = Fraction::zero();
@@ -18,7 +21,7 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
     
         for (trace1, probability1) in self.iter_trace_probability() {
             for (trace2, probability2) in event_log2.iter_trace_probability() {
-                if trace1 == trace2{
+                if trace1 == &translator.translate_trace(trace2) {
                     log1_prob_intersection_sum += probability1;
                     log2_prob_intersection_sum += probability2;
                     sum += LogDiv::n_log_n(&probability1);
