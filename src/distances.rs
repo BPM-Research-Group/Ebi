@@ -11,6 +11,7 @@ use crate::ebi_traits::{
 };
 use crate::math::fraction::Fraction;
 use crate::math::levenshtein;
+use crate::math::traits::Zero;
 
 pub struct TriangularDistanceMatrix {
     len: usize, //lenght of one side of the matrix

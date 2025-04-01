@@ -65,24 +65,47 @@ pub mod ebi_traits {
 pub mod math {
     pub mod astar;
     pub mod average;
-    pub mod correlation;
+
     pub mod fraction;
-    pub mod fraction_matched;
-    pub mod fraction_raw;
-    pub mod levenshtein;
+    #[cfg(not(feature = "withoutexactarithmetic"))]
+    pub mod fraction_enum;
+    #[cfg(feature = "withoutexactarithmetic")]
+    pub mod fraction_f64;
+
     pub mod log_div;
-    pub mod markov_model;
+    #[cfg(not(feature = "withoutexactarithmetic"))]
+    pub mod log_div_enum;
+    #[cfg(feature = "withoutexactarithmetic")]
+    pub mod log_div_f64;
+
+    pub mod fixed_denominator_fraction;
+    #[cfg(not(feature = "withoutexactarithmetic"))]
+    pub mod fixed_denominator_fraction_enum;
+    #[cfg(feature = "withoutexactarithmetic")]
+    pub mod fixed_denominator_fraction_f64;
+
     pub mod matrix;
     pub mod root;
     pub mod root_log_div;
+    pub mod correlation;
+    pub mod levenshtein;
+    pub mod markov_model;
+    pub mod traits;
 }
+
 pub mod techniques {
     pub mod align;
     pub mod alignment_stochastic_miner;
     pub mod association;
     pub mod completeness;
     pub mod deterministic_semantics_for_stochastic_semantics;
+
     pub mod earth_movers_stochastic_conformance;
+    #[cfg(not(feature = "withoutexactarithmetic"))]
+    pub mod earth_movers_stochastic_conformance_enum;
+    #[cfg(feature = "withoutexactarithmetic")]
+    pub mod earth_movers_stochastic_conformance_f64;
+
     pub mod entropic_relevance;
     pub mod executions;
     pub mod explain_trace;

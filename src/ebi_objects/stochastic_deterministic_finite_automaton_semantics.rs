@@ -1,30 +1,45 @@
 use anyhow::{anyhow, Result};
 
-use crate::{ebi_framework::activity_key::{Activity, HasActivityKey}, ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}}, math::fraction::Fraction, techniques::livelocks::Livelock};
+use crate::{
+    ebi_framework::activity_key::{Activity, HasActivityKey},
+    ebi_traits::{
+        ebi_trait_semantics::Semantics,
+        ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
+        ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex},
+    },
+    math::{fraction::Fraction, traits::{One, Zero}},
+    techniques::livelocks::Livelock,
+};
 
-use super::{deterministic_finite_automaton::DeterministicFiniteAutomaton, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton};
+use super::{
+    deterministic_finite_automaton::DeterministicFiniteAutomaton,
+    stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+};
 
-macro_rules! semantics_for_automaton  {
+macro_rules! semantics_for_automaton {
     ($t:ident) => {
-        
         //In semantics, the final state must be a deadlock state. Therefore, for every state in which we can terminate, we add a virtual silent transition to a virtual deadlock state.
         impl Semantics for $t {
             type SemState = usize;
-        
+
             /**
              * max_state + 1 = final state
              * source.len() = silent transition to final state
              */
-        
+
             fn get_initial_state(&self) -> usize {
                 self.initial_state
             }
-        
-            fn execute_transition(&self, state: &mut usize, transition: TransitionIndex) -> Result<()> {
+
+            fn execute_transition(
+                &self,
+                state: &mut usize,
+                transition: TransitionIndex,
+            ) -> Result<()> {
                 if *state > self.max_state {
-                    return Err(anyhow!("Cannot execute a transition in a final state."))
+                    return Err(anyhow!("Cannot execute a transition in a final state."));
                 }
-        
+
                 if transition == self.sources.len() {
                     //request for termination
                     if self.can_terminate_in_state(*state) {
@@ -33,22 +48,22 @@ macro_rules! semantics_for_automaton  {
                         return Ok(());
                     } else {
                         //termination not possible
-                        return Err(anyhow!("Cannot terminate in state {}.", state))
+                        return Err(anyhow!("Cannot terminate in state {}.", state));
                     }
                 }
 
                 *state = self.get_targets()[transition];
-                return Ok(())
+                return Ok(());
             }
-        
+
             fn is_final_state(&self, state: &usize) -> bool {
                 state > &self.max_state
             }
-        
+
             fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
                 transition >= self.sources.len()
             }
-        
+
             fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
                 if transition == self.sources.len() {
                     None
@@ -56,25 +71,25 @@ macro_rules! semantics_for_automaton  {
                     Some(self.get_activities()[transition])
                 }
             }
-        
+
             fn get_enabled_transitions(&self, state: &usize) -> Vec<TransitionIndex> {
                 let mut result = vec![];
-        
+
                 //check the DFA for enabled transitions
                 let (_, mut i) = self.binary_search(*state, 0);
                 while i < self.sources.len() && self.sources[i] == *state {
                     result.push(i);
                     i += 1;
                 }
-        
+
                 //if the DFA can terminate, then add a termination silent transition
                 if state <= &self.max_state && self.can_terminate_in_state(*state) {
                     result.push(self.sources.len())
                 }
-        
+
                 return result;
             }
-        
+
             fn get_number_of_transitions(&self) -> usize {
                 self.sources.len() + 1
             }
@@ -84,7 +99,6 @@ macro_rules! semantics_for_automaton  {
 
 semantics_for_automaton!(DeterministicFiniteAutomaton);
 semantics_for_automaton!(StochasticDeterministicFiniteAutomaton);
-
 
 impl StochasticSemantics for StochasticDeterministicFiniteAutomaton {
     type StoSemState = usize;
@@ -111,8 +125,11 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
     }
 
     fn execute_deterministic_activity(&self, state: &usize, activity: Activity) -> Result<usize> {
-        let (found, i) = self.binary_search(*state, self.get_activity_key().get_id_from_activity(activity));
-        if found{
+        let (found, i) = self.binary_search(
+            *state,
+            self.get_activity_key().get_id_from_activity(activity),
+        );
+        if found {
             Ok(self.targets[i])
         } else {
             Err(anyhow!("activity not enabled"))
@@ -123,8 +140,15 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         self.get_termination_probability(*state).clone()
     }
 
-    fn get_deterministic_activity_probability(&self, state: &usize, activity: Activity) -> Fraction {
-        let (found, i) = self.binary_search(*state, self.get_activity_key().get_id_from_activity(activity));
+    fn get_deterministic_activity_probability(
+        &self,
+        state: &usize,
+        activity: Activity,
+    ) -> Fraction {
+        let (found, i) = self.binary_search(
+            *state,
+            self.get_activity_key().get_id_from_activity(activity),
+        );
         match found {
             true => self.get_probabilities()[i].clone(),
             false => Fraction::zero(),
@@ -135,7 +159,9 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         let mut result = vec![];
 
         let (_, mut i) = self.binary_search(*state, 0);
-        while i < <StochasticDeterministicFiniteAutomaton>::get_number_of_transitions(self) && self.get_sources()[i] == *state {
+        while i < <StochasticDeterministicFiniteAutomaton>::get_number_of_transitions(self)
+            && self.get_sources()[i] == *state
+        {
             result.push(self.get_activities()[i]);
             i += 1;
         }
@@ -147,11 +173,14 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         Fraction::zero()
     }
 
-    fn get_deterministic_non_decreasing_livelock_probability(&self, state: &mut Self::DetState) -> Result<Fraction> {
+    fn get_deterministic_non_decreasing_livelock_probability(
+        &self,
+        state: &mut Self::DetState,
+    ) -> Result<Fraction> {
         if self.is_non_decreasing_livelock(state)? {
-            return Ok(Fraction::one())
+            return Ok(Fraction::one());
         } else {
-            return Ok(Fraction::zero())
+            return Ok(Fraction::zero());
         }
     }
 }

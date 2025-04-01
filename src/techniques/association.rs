@@ -1,17 +1,32 @@
+use crate::{
+    ebi_objects::event_log::DataType,
+    ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
+    math::{correlation::correlation, fraction::Fraction, levenshtein, root::ContainsRoot, traits::{Signed, Zero}},
+};
 use anyhow::{anyhow, Result};
-use fraction::Zero;
+use num::Zero as NumZero;
 use rand::Rng;
 use rayon::prelude::*;
-use crate::{ebi_objects::event_log::DataType, ebi_traits::ebi_trait_event_log::EbiTraitEventLog, math::{correlation::correlation, fraction::Fraction, levenshtein, root::ContainsRoot}};
 
 pub trait Associations {
-    fn association(self: &mut Box<Self>, number_of_samples: usize, attribute: &String) -> Result<ContainsRoot>;
+    fn association(
+        self: &mut Box<Self>,
+        number_of_samples: usize,
+        attribute: &String,
+    ) -> Result<ContainsRoot>;
 
-    fn associations(self: &mut Box<Self>, number_of_samples: usize) -> Vec<(String, Result<ContainsRoot>)>;
+    fn associations(
+        self: &mut Box<Self>,
+        number_of_samples: usize,
+    ) -> Vec<(String, Result<ContainsRoot>)>;
 }
 
 impl Associations for dyn EbiTraitEventLog {
-    fn association(self: &mut Box<Self>, number_of_samples: usize, attribute: &String) -> Result<ContainsRoot> {
+    fn association(
+        self: &mut Box<Self>,
+        number_of_samples: usize,
+        attribute: &String,
+    ) -> Result<ContainsRoot> {
         let attributes = self.get_trace_attributes();
         let data_type = attributes.get(attribute);
         log::info!("number of samples {}", number_of_samples);
@@ -21,31 +36,48 @@ impl Associations for dyn EbiTraitEventLog {
         }
     }
 
-    fn associations(self: &mut Box<Self>, number_of_samples: usize) -> Vec<(String, Result<ContainsRoot>)> {
+    fn associations(
+        self: &mut Box<Self>,
+        number_of_samples: usize,
+    ) -> Vec<(String, Result<ContainsRoot>)> {
         let attributes = self.get_trace_attributes();
         log::info!("found attributes {:?}", attributes);
         log::info!("number of samples {}", number_of_samples);
         let mut result = vec![];
         for (attribute, data_type) in attributes {
-            result.push((attribute.clone(), self.association_type(number_of_samples, &attribute, &data_type)));
+            result.push((
+                attribute.clone(),
+                self.association_type(number_of_samples, &attribute, &data_type),
+            ));
         }
         result
     }
 }
 
 impl dyn EbiTraitEventLog {
-    fn association_type(self: &Box<Self>, number_of_samples: usize, attribute: &String, data_type: &DataType) -> Result<ContainsRoot> {
+    fn association_type(
+        self: &Box<Self>,
+        number_of_samples: usize,
+        attribute: &String,
+        data_type: &DataType,
+    ) -> Result<ContainsRoot> {
         let result = match data_type {
             DataType::Categorical => self.association_categorical(&attribute, number_of_samples),
             DataType::Numerical(_, _) => self.association_numerical(&attribute, number_of_samples),
             DataType::Time(_, _) => self.association_time(&attribute, number_of_samples),
-            DataType::Undefined => Err(anyhow!("attribute type is not consistent or not supported"))
+            DataType::Undefined => {
+                Err(anyhow!("attribute type is not consistent or not supported"))
+            }
         };
         log::info!("association {:?}", result);
         result
-    } 
+    }
 
-    fn association_time(self: &Box<Self>, case_attribute: &String, number_of_samples: usize) -> Result<ContainsRoot> {
+    fn association_time(
+        self: &Box<Self>,
+        case_attribute: &String,
+        number_of_samples: usize,
+    ) -> Result<ContainsRoot> {
         //gather pairs
         let mut pairs = vec![];
         for trace_index in 0..self.len() {
@@ -61,13 +93,16 @@ impl dyn EbiTraitEventLog {
             return Err(anyhow!("only a single value of the attribute to consider"));
         }
 
-        log::info!("found {} trace-attribute pairs for time attribute {}", pairs.len(), case_attribute);
+        log::info!(
+            "found {} trace-attribute pairs for time attribute {}",
+            pairs.len(),
+            case_attribute
+        );
 
         //transform to numerical pairs and sample
         let mut pairs_numeric = vec![];
         let sample_space = SamplePairsSpace::new(number_of_samples, pairs.len());
         for (i, j) in &sample_space {
-
             let (value1, trace1) = &pairs[i];
             let (value2, trace2) = &pairs[j];
             let lev_dist = levenshtein::normalised(trace1, trace2);
@@ -81,7 +116,11 @@ impl dyn EbiTraitEventLog {
         Ok(ContainsRoot::of(correlation(&pairs_numeric)?))
     }
 
-    pub fn association_categorical(self: &Box<Self>, case_attribute: &String, number_of_samples: usize) -> Result<ContainsRoot> {
+    pub fn association_categorical(
+        self: &Box<Self>,
+        case_attribute: &String,
+        number_of_samples: usize,
+    ) -> Result<ContainsRoot> {
         let sample_size = self.len();
 
         //gather pairs
@@ -99,52 +138,66 @@ impl dyn EbiTraitEventLog {
             return Err(anyhow!("only a single value of the attribute to consider"));
         }
 
-        log::info!("found {} trace-attribute pairs for categorical attribute {}", pairs.len(), case_attribute);
+        log::info!(
+            "found {} trace-attribute pairs for categorical attribute {}",
+            pairs.len(),
+            case_attribute
+        );
 
-        let pairs_categorical: Vec<(Fraction, Fraction)> = (0..number_of_samples).into_par_iter().filter_map(|_| { //parallel execution
+        let pairs_categorical: Vec<(Fraction, Fraction)> = (0..number_of_samples)
+            .into_par_iter()
+            .filter_map(|_| {
+                //parallel execution
 
-            let mut sample = vec![];
-            //create sample
-            for _ in 0..sample_size {
-                let i = rand::thread_rng().gen_range(0..pairs.len());
-                sample.push(i);
-            }
-
-            //measure
-            let mut sum_same = Fraction::zero();
-            let mut count_same = 0u64;
-            let mut sum_different = Fraction::zero();
-            for i in &sample {
-                for j in &sample {
-                    let trace_dist = levenshtein::normalised(self.get_trace(pairs[*i].1).unwrap(), self.get_trace(pairs[*j].1).unwrap());
-
-                    if pairs[*i].0 != pairs[*j].0 {
-                        count_same += 1;
-                        sum_same += &trace_dist;
-                    }
-
-                    sum_different += trace_dist;
+                let mut sample = vec![];
+                //create sample
+                for _ in 0..sample_size {
+                    let i = rand::thread_rng().gen_range(0..pairs.len());
+                    sample.push(i);
                 }
-            }
 
-            if count_same.is_zero() {
-                return None
-            }
+                //measure
+                let mut sum_same = Fraction::zero();
+                let mut count_same = 0u64;
+                let mut sum_different = Fraction::zero();
+                for i in &sample {
+                    for j in &sample {
+                        let trace_dist = levenshtein::normalised(
+                            self.get_trace(pairs[*i].1).unwrap(),
+                            self.get_trace(pairs[*j].1).unwrap(),
+                        );
 
-            let count_different = sample.len() as u64 * sample.len() as u64;
+                        if pairs[*i].0 != pairs[*j].0 {
+                            count_same += 1;
+                            sum_same += &trace_dist;
+                        }
 
-            sum_same /= count_same;
-            sum_different /= count_different;
-            let p = (sum_same, sum_different);
+                        sum_different += trace_dist;
+                    }
+                }
 
-            return Some(p);
+                if count_same.is_zero() {
+                    return None;
+                }
 
-        }).collect();// end parallel execution
+                let count_different = sample.len() as u64 * sample.len() as u64;
+
+                sum_same /= count_same;
+                sum_different /= count_different;
+                let p = (sum_same, sum_different);
+
+                return Some(p);
+            })
+            .collect(); // end parallel execution
 
         Ok(ContainsRoot::one_minus(correlation(&pairs_categorical)?))
     }
 
-    pub fn association_numerical(self: &Box<Self>, case_attribute: &String, number_of_samples: usize) -> Result<ContainsRoot> {
+    pub fn association_numerical(
+        self: &Box<Self>,
+        case_attribute: &String,
+        number_of_samples: usize,
+    ) -> Result<ContainsRoot> {
         //gather pairs
         let mut pairs = vec![];
         for trace_index in 0..self.len() {
@@ -160,28 +213,34 @@ impl dyn EbiTraitEventLog {
             return Err(anyhow!("only a single value of the attribute to consider"));
         }
 
-        log::info!("found {} trace-attribute pairs for numerical attribute {}", pairs.len(), case_attribute);
+        log::info!(
+            "found {} trace-attribute pairs for numerical attribute {}",
+            pairs.len(),
+            case_attribute
+        );
 
         //transform to numerical pairs and sample
         let mut pairs_numeric = vec![];
         let sample_space = SamplePairsSpace::new(number_of_samples, pairs.len());
         for (i, j) in &sample_space {
-
-            let (value1, trace1) = &pairs[i]; 
+            let (value1, trace1) = &pairs[i];
             let (value2, trace2) = &pairs[j];
-            let lev_dist = levenshtein::normalised(self.get_trace(*trace1).unwrap(), self.get_trace(*trace2).unwrap());
+            let lev_dist = levenshtein::normalised(
+                self.get_trace(*trace1).unwrap(),
+                self.get_trace(*trace2).unwrap(),
+            );
 
             // pairs_numeric.push((&Fraction::from(value1 - value2).abs() / &maxx, lev_dist));
             pairs_numeric.push((Fraction::from(value1 - value2).abs(), lev_dist));
         }
-        
+
         Ok(ContainsRoot::of(correlation(&pairs_numeric)?))
     }
 }
 
 pub struct SamplePairsSpace {
     number_of_samples: usize,
-    len: usize
+    len: usize,
 }
 
 impl SamplePairsSpace {
@@ -201,14 +260,14 @@ impl<'a> IntoIterator for &'a SamplePairsSpace {
     fn into_iter(self) -> Self::IntoIter {
         Self::IntoIter {
             done: 0,
-            sample_space: &self
+            sample_space: &self,
         }
     }
 }
 
 pub struct SamplePairsSpaceIterator<'a> {
     done: usize,
-    sample_space: &'a SamplePairsSpace
+    sample_space: &'a SamplePairsSpace,
 }
 
 impl<'a> Iterator for SamplePairsSpaceIterator<'a> {

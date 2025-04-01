@@ -1,7 +1,7 @@
-use std::fmt::{Debug, Display};
 use anyhow::{anyhow, Result};
+use std::fmt::{Debug, Display};
 
-use super::{fraction::Fraction, matrix::Matrix};
+use super::{fraction::Fraction, matrix::Matrix, traits::{One, Signed, Zero}};
 
 pub struct MarkovModel<S> {
     edges: Matrix,
@@ -9,7 +9,7 @@ pub struct MarkovModel<S> {
     initial_vector: Vec<Fraction>,
 }
 
-impl <S: PartialEq + Clone> MarkovModel<S> {
+impl<S: PartialEq + Clone> MarkovModel<S> {
     pub fn new() -> Self {
         Self {
             edges: Matrix::new(),
@@ -19,23 +19,27 @@ impl <S: PartialEq + Clone> MarkovModel<S> {
     }
 
     pub fn add_or_find_state(&mut self, state: S, initial_value: Fraction) -> (usize, bool) {
-        if let Some(state_index) = self.states.iter().position(|s | s == &state) {
+        if let Some(state_index) = self.states.iter().position(|s| s == &state) {
             //already present
             (state_index, false)
         } else {
             //not yet present
             let state_index = self.states.len();
-            self.edges.ensure_capacity(self.states.len() + 1, self.states.len() + 1, &Fraction::zero());
+            self.edges.ensure_capacity(
+                self.states.len() + 1,
+                self.states.len() + 1,
+                &Fraction::zero(),
+            );
             self.edges[state_index][state_index] = Fraction::one();
             self.states.push(state);
             self.initial_vector.push(initial_value);
-            
+
             (state_index, true)
         }
     }
 
     pub fn contains_state(&self, state: &S) -> Option<usize> {
-        self.states.iter().position(|s | s == state)
+        self.states.iter().position(|s| s == state)
     }
 
     pub fn get_states_owned(self) -> Vec<S> {
@@ -55,9 +59,18 @@ impl <S: PartialEq + Clone> MarkovModel<S> {
     }
 
     pub fn normalise_initial_vector(&mut self) -> Result<()> {
-        let sum = self.initial_vector.iter().fold(Fraction::zero(), |mut a, b| {a += b; a});
+        let sum = self
+            .initial_vector
+            .iter()
+            .fold(Fraction::zero(), |mut a, b| {
+                a += b;
+                a
+            });
         if sum.is_positive() {
-            self.initial_vector.retain_mut(|x| {*x /= &sum; true});
+            self.initial_vector.retain_mut(|x| {
+                *x /= &sum;
+                true
+            });
             Ok(())
         } else {
             Err(anyhow!("Initial vector has no probability mass."))
@@ -97,7 +110,7 @@ impl <S: PartialEq + Clone> MarkovModel<S> {
             }
         }
         notseen
-    }   
+    }
 
     /**
      * Raise the edge matrix to infinity / solve the Markov chain.
@@ -122,8 +135,12 @@ impl <S: PartialEq + Clone> MarkovModel<S> {
 
                 //add column to A
                 let column = a.get_number_of_columns();
-                a.ensure_capacity(a.get_number_of_rows(), a.get_number_of_columns() + 1, &Fraction::zero());
-                for row_a in 0..transient_states.len() { 
+                a.ensure_capacity(
+                    a.get_number_of_rows(),
+                    a.get_number_of_columns() + 1,
+                    &Fraction::zero(),
+                );
+                for row_a in 0..transient_states.len() {
                     let transient_state = transient_states[row_a];
                     a.element_add(&row_a, &column, &self.edges[transient_state][state]);
                 }
@@ -138,7 +155,11 @@ impl <S: PartialEq + Clone> MarkovModel<S> {
 
                 //add row to A
                 let row = a.get_number_of_rows();
-                a.ensure_capacity(a.get_number_of_rows() + 1, a.get_number_of_columns(), &Fraction::zero());
+                a.ensure_capacity(
+                    a.get_number_of_rows() + 1,
+                    a.get_number_of_columns(),
+                    &Fraction::zero(),
+                );
                 for column_a in 0..absorbing_states.len() {
                     let absorbing_state = absorbing_states[column_a];
                     a.element_add(&row, &column_a, &self.edges[state][absorbing_state]);
@@ -147,14 +168,19 @@ impl <S: PartialEq + Clone> MarkovModel<S> {
                 //add column to B
                 let row = b.get_number_of_rows();
                 let column = b.get_number_of_columns();
-                b.ensure_capacity(transient_states.len(), transient_states.len(), &Fraction::zero());
+                b.ensure_capacity(
+                    transient_states.len(),
+                    transient_states.len(),
+                    &Fraction::zero(),
+                );
                 for i_b in 0..transient_states.len() {
                     let transient_state = transient_states[i_b];
 
                     // log::debug!("\t\tset matrix B for {},{}", transient_state, state);
                     b.element_add(&row, &i_b, &self.edges[state][transient_state]);
 
-                    if i_b != transient_states.len() - 1 { //avoid doubly adding to the corner cell
+                    if i_b != transient_states.len() - 1 {
+                        //avoid doubly adding to the corner cell
                         b.element_add(&i_b, &column, &self.edges[transient_state][state]);
                     }
                 }
@@ -172,9 +198,9 @@ impl <S: PartialEq + Clone> MarkovModel<S> {
         b.identity_minus();
 
         // log::debug!("matrix I - B = {}", b);
-        
+
         b.inverse()?;
-        
+
         // log::debug!("matrix F = inv(I-B) = {}", b);
 
         let p = b * a;
@@ -208,13 +234,17 @@ impl <S: PartialEq + Clone> MarkovModel<S> {
     }
 }
 
-impl <S: Debug> Debug for MarkovModel<S> {
+impl<S: Debug> Debug for MarkovModel<S> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("MarkovModel").field("matrix", &self.edges).field("states", &self.states).field("initial_vector", &self.initial_vector).finish()
+        f.debug_struct("MarkovModel")
+            .field("matrix", &self.edges)
+            .field("states", &self.states)
+            .field("initial_vector", &self.initial_vector)
+            .finish()
     }
 }
 
-impl <S: Display> Display for MarkovModel<S> {
+impl<S: Display> Display for MarkovModel<S> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "matrix {}, initial vector ", self.edges)?;
         Matrix::display_vector(f, &self.initial_vector)
