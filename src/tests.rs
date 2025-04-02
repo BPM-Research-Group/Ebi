@@ -8,7 +8,7 @@ mod tests {
 
     use crate::{
         ebi_framework::{
-            activity_key::HasActivityKey, ebi_file_handler::EBI_FILE_HANDLERS,
+            activity_key::{ActivityKey, HasActivityKey}, ebi_file_handler::EBI_FILE_HANDLERS,
             ebi_output::EbiOutput,
         },
         ebi_objects::{
@@ -1401,4 +1401,23 @@ mod tests {
 
     //     Fraction::set_exact_globally(true);
     // }
+
+    #[test]
+    #[should_panic(expected = "cannot get activity label of activity of different activity key")]
+    fn activity_key_process() {
+        let key1 = ActivityKey::new();
+        let mut key2 = ActivityKey::new();
+        let a2 = key2.process_activity("a");
+        key1.deprocess_activity(&a2);
+    }
+
+    #[test]
+    #[should_panic(expected = "cannot compare activities of different activity keys")]
+    fn activity_key_equal() {
+        let mut key1 = ActivityKey::new();
+        let mut key2 = ActivityKey::new();
+        let a1 = key1.process_activity("a");
+        let a2 = key2.process_activity("a");
+        let _ = a1 == a2;
+    }
 }
