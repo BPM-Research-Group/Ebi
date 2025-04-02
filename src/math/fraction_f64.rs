@@ -117,6 +117,7 @@ impl FractionF64 {
     pub fn recip(&self) -> Self {
         Self(self.0.recip())
     }
+
 }
 
 impl One for FractionF64 {

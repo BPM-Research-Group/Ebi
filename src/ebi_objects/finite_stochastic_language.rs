@@ -449,7 +449,7 @@ impl Importable for FiniteStochasticLanguage {
             }
         }
 
-        if sum > Fraction::one() {
+        if sum > Fraction::one() && !sum.is_one() { //avoid rounding errors in approximate mode
             return Err(anyhow!(
                 "probabilities in stochastic language sum to {}, which is greater than 1",
                 sum
