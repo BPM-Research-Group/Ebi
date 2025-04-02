@@ -55,6 +55,8 @@ impl <T, State> FindExecutions for T where T: Semantics<SemState = State, AliSta
                 },
             }
         }).flatten().collect::<Vec<_>>();
+
+        progress_bar.finish_and_clear();
         
         //see whether an error was reported
         if let Result::Ok(mutex) = Arc::try_unwrap(error) {

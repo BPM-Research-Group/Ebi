@@ -4,6 +4,10 @@ use anyhow::{anyhow, Result};
 use crate::{ebi_framework::{activity_key::HasActivityKey, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, follower_semantics::FollowerSemantics, math::fraction::Fraction};
 
 pub trait EbiTraitQueriableStochasticLanguage: HasActivityKey + Sync {
+    /**
+     * Compute the probability that self produces a trace that is accepted by the follower.
+     * Note that the follower must use the same activity key.
+     */
     fn get_probability(&self, follower: &FollowerSemantics) -> Result<Fraction>;
 }
 

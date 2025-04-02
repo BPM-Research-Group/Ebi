@@ -1,8 +1,10 @@
-use anyhow::{anyhow, Context};
+use std::sync::{Arc, Mutex};
+
+use anyhow::{anyhow, Context, Error};
 use clap::{value_parser, Arg, ArgAction};
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, techniques::explain_trace::ExplainTrace};
-use crate::math::traits::Zero;
 
 
 pub const EBI_PROBABILITY: EbiCommand = EbiCommand::Group { 
@@ -20,7 +22,7 @@ pub const EBI_PROBABILITY: EbiCommand = EbiCommand::Group {
 pub const EBI_PROBABILITY_MODEL: EbiCommand = EbiCommand::Command { 
     name_short: "mod", 
     name_long: Some("model"), 
-    explanation_short: "Compute the probability that a queriable stochastic language (stochastic model) produces any trace of the model.", 
+    explanation_short: "Compute the probability that a queriable stochastic language (stochastic model) produces any trace of a log.", 
     explanation_long: None, 
     latex_link: Some("~\\cite{DBLP:journals/is/LeemansMM24}"), 
     cli_command: None, 
@@ -32,13 +34,39 @@ pub const EBI_PROBABILITY_MODEL: EbiCommand = EbiCommand::Command {
     input_names: &[ "FILE_1", "FILE_2" ], 
     input_helps: &[ "The queriable stochastic language (model).", "The finite language (log)." ], 
     execute: |mut inputs, _| {
-        let model: Box<dyn EbiTraitQueriableStochasticLanguage> = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
-        let log = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+        let mut model: Box<dyn EbiTraitQueriableStochasticLanguage> = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
+        let mut log = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+
+        log.translate_using_activity_key(model.get_activity_key_mut());
         
-        let mut sum = Fraction::zero();
-        for trace in log.iter() {
-            sum += model.get_probability(&FollowerSemantics::Trace(&trace)).with_context(|| format!("cannot compute probability of trace {:?}", trace))?;
+        let progress_bar = EbiCommand::get_progress_bar_ticks(log.len());
+        let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
+
+        let sum = (0..log.len()).into_par_iter().filter_map(|trace_index| {
+            let trace = log.get_trace(trace_index).unwrap();
+            let c = model.get_probability(&FollowerSemantics::Trace(&trace)).with_context(|| format!("cannot compute probability of trace {:?}", trace));
+            progress_bar.inc(1);
+            match c {
+                Result::Ok(c) => Some(c),
+                Err(err) => {
+                    let error = Arc::clone(&error);
+                    *error.lock().unwrap() = Some(err);
+                    None
+                }
+            }
+        }).sum();
+
+        progress_bar.finish_and_clear();
+
+        //see whether an error was reported
+        if let Result::Ok(mutex) = Arc::try_unwrap(error) {
+            if let Result::Ok(err) = mutex.into_inner() {
+                if let Some(err) = err {
+                    return Err(err);
+                }
+            }
         }
+
         return Ok(EbiOutput::Fraction(sum));
     }, 
     output_type: &EbiOutputType::Fraction,

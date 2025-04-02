@@ -266,37 +266,7 @@ impl EbiTraitIterableLanguage for FiniteStochasticLanguage {
     }
 }
 
-impl EbiTraitFiniteLanguage for FiniteStochasticLanguage {
-    fn translate_using_activity_key(
-        &self,
-        target_activity_key: &mut ActivityKey,
-    ) -> Box<dyn EbiTraitFiniteLanguage> {
-        // Create a translator that maps activities from the current activity key to the target one
-        let translator = ActivityKeyTranslator::new(&self.activity_key, target_activity_key);
-
-        // Create a new translated traces HashMap
-        let translated_traces: HashMap<Vec<Activity>, Fraction> = self
-            .traces
-            .iter() // Iterate over references to the original traces
-            .map(|(trace, fraction)| {
-                // Translate each trace using the translator
-                let translated_trace = translator.translate_trace(trace);
-
-                // Return the translated trace with its associated fraction
-                (translated_trace, fraction.clone()) // Clone the fraction to preserve `self`
-            })
-            .collect();
-
-        // Create a new instance of the implementing type with the translated traces
-        let translated_language = Self {
-            activity_key: target_activity_key.clone(),
-            traces: translated_traces,
-        };
-
-        // Return the translated language as a trait object
-        Box::new(translated_language)
-    }
-}
+impl EbiTraitFiniteLanguage for FiniteStochasticLanguage {}
 
 impl EbiTraitFiniteStochasticLanguage for FiniteStochasticLanguage {
     fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction> {
