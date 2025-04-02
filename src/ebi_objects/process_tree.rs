@@ -5,7 +5,7 @@ use layout::{adt::dag::NodeHandle, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader};
 
 use super::labelled_petri_net::LabelledPetriNet;
 
@@ -506,6 +506,14 @@ impl ProcessTree {
         self.node_to_lpn(0, &mut result, &translator, source, sink).unwrap();
 
         result
+    }
+}
+
+impl TranslateActivityKey for ProcessTree {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+        self.tree.iter_mut().for_each(|node| if let Node::Activity(a) = node { *a = translator.translate_activity(&a) });
+        self.activity_key = to_activity_key.clone();
     }
 }
 

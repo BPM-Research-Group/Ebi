@@ -1,6 +1,6 @@
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey},
+        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -374,6 +374,14 @@ impl StochasticDeterministicFiniteAutomaton {
             }
             _ => unreachable!(),
         }
+    }
+}
+
+impl TranslateActivityKey for StochasticDeterministicFiniteAutomaton {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+        self.activities.iter_mut().for_each(|activity| *activity = translator.translate_activity(&activity));
+        self.activity_key = to_activity_key.clone();
     }
 }
 

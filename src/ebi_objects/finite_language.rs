@@ -9,7 +9,7 @@ use std::{
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey},
+        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -113,6 +113,23 @@ impl FiniteLanguage {
             EbiOutput::Object(EbiObject::EventLog(log)) => log.get_finite_language().export(f),
             _ => unreachable!(),
         }
+    }
+}
+
+impl TranslateActivityKey for FiniteLanguage {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+
+        //a hashmap needs to be rebuilt, unfortunately
+        let translated_traces: HashSet<Vec<Activity>, FnvBuildHasher> = self.traces
+            .drain() 
+            .map(|trace| translator.translate_trace(&trace))
+            .collect();
+
+        // Update the traces in the language with the translated ones
+        self.traces = translated_traces;
+        
+        self.activity_key = to_activity_key.clone();
     }
 }
 

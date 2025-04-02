@@ -1,25 +1,39 @@
-use std::{borrow::Borrow, collections::{HashMap, HashSet}, fmt::{Display, Debug}, hash::Hash};
+use std::{
+    borrow::Borrow,
+    collections::{HashMap, HashSet},
+    fmt::{Debug, Display},
+    hash::Hash,
+};
 
 #[cfg(test)]
 use uuid::Uuid;
 
-pub trait HasActivityKey {
+pub trait HasActivityKey: TranslateActivityKey {
     fn get_activity_key(&self) -> &ActivityKey;
 
     fn get_activity_key_mut(&mut self) -> &mut ActivityKey;
 }
 
-#[derive(Clone,Copy,Ord,Eq,PartialEq,PartialOrd)]
+pub trait TranslateActivityKey {
+    /**
+     * Change the activity key of this object, by translating all mentions of activities to the new activity key  (which will be updated with activity labels it did not have yet.).
+     * This is a potentially expensive operation. If only a part of the activities will be used, then consider using an ActivityKeyTranslator directly.
+     * The activity key of this object will be updated too, so the activity keys will be equivalent afterwards.
+     */
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey);
+}
+
+#[derive(Clone, Copy, Ord, Eq, PartialEq, PartialOrd)]
 #[cfg(not(test))]
 pub struct Activity {
     id: usize,
 }
 
-#[derive(Clone,Copy,Eq)]
+#[derive(Clone, Copy, Eq)]
 #[cfg(test)]
 pub struct Activity {
     id: usize,
-    activity_key_uuid: Uuid //In testing, an uuid is kept of the activity key.
+    activity_key_uuid: Uuid, //In testing, an uuid is kept of the activity key.
 }
 
 impl PartialEq<usize> for Activity {
@@ -55,7 +69,10 @@ impl PartialOrd<usize> for Activity {
 #[cfg(test)]
 impl PartialEq for Activity {
     fn eq(&self, other: &Self) -> bool {
-        assert!(self.activity_key_uuid == other.activity_key_uuid, "cannot compare activities of different activity keys");
+        assert!(
+            self.activity_key_uuid == other.activity_key_uuid,
+            "cannot compare activities of different activity keys"
+        );
 
         self.id == other.id
     }
@@ -64,7 +81,10 @@ impl PartialEq for Activity {
 #[cfg(test)]
 impl Ord for Activity {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        assert!(self.activity_key_uuid == other.activity_key_uuid, "cannot compare activities of different activity keys");
+        assert!(
+            self.activity_key_uuid == other.activity_key_uuid,
+            "cannot compare activities of different activity keys"
+        );
 
         self.id.cmp(&other.id)
     }
@@ -73,22 +93,25 @@ impl Ord for Activity {
 #[cfg(test)]
 impl PartialOrd for Activity {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        assert!(self.activity_key_uuid == other.activity_key_uuid, "cannot compare activities of different activity keys");
+        assert!(
+            self.activity_key_uuid == other.activity_key_uuid,
+            "cannot compare activities of different activity keys"
+        );
 
         self.id.partial_cmp(&other.id)
     }
 }
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 #[cfg(test)]
 pub struct ActivityKey {
     pub name2activity: HashMap<String, Activity>,
     pub activity2name: Vec<String>,
     pub next_index: usize,
-    uuid: Uuid
+    uuid: Uuid,
 }
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 #[cfg(not(test))]
 pub struct ActivityKey {
     pub name2activity: HashMap<String, Activity>,
@@ -96,14 +119,14 @@ pub struct ActivityKey {
     pub next_index: usize,
 }
 
-impl <'a> ActivityKey {
+impl<'a> ActivityKey {
     #[cfg(test)]
     pub fn new() -> Self {
         Self {
             name2activity: HashMap::new(),
             activity2name: vec![],
             next_index: 0,
-            uuid: Uuid::new_v4()
+            uuid: Uuid::new_v4(),
         }
     }
 
@@ -112,12 +135,12 @@ impl <'a> ActivityKey {
         Self {
             name2activity: HashMap::new(),
             activity2name: vec![],
-            next_index: 0
+            next_index: 0,
         }
     }
 
     pub fn get_number_of_activities(&self) -> usize {
-        return self.name2activity.len()
+        return self.name2activity.len();
     }
 
     #[cfg(test)]
@@ -127,12 +150,15 @@ impl <'a> ActivityKey {
             match self.name2activity.get(activity) {
                 Some(index) => result.push(*index),
                 None => {
-                    let index = Activity{id: self.next_index, activity_key_uuid: self.uuid};
+                    let index = Activity {
+                        id: self.next_index,
+                        activity_key_uuid: self.uuid,
+                    };
                     result.push(index.clone());
                     self.activity2name.push(activity.clone());
                     self.name2activity.insert(activity.clone(), index);
                     self.next_index += 1;
-                },
+                }
             }
         }
         return result;
@@ -145,12 +171,14 @@ impl <'a> ActivityKey {
             match self.name2activity.get(activity) {
                 Some(index) => result.push(*index),
                 None => {
-                    let index = Activity{id: self.next_index};
+                    let index = Activity {
+                        id: self.next_index,
+                    };
                     result.push(index.clone());
                     self.activity2name.push(activity.clone());
                     self.name2activity.insert(activity.clone(), index);
                     self.next_index += 1;
-                },
+                }
             }
         }
         return result;
@@ -163,12 +191,15 @@ impl <'a> ActivityKey {
             match self.name2activity.get(&activity.to_string()) {
                 Some(index) => result.push(*index),
                 None => {
-                    let index = Activity{id: self.next_index, activity_key_uuid: self.uuid};
+                    let index = Activity {
+                        id: self.next_index,
+                        activity_key_uuid: self.uuid,
+                    };
                     result.push(index.clone());
                     self.activity2name.push(activity.to_string());
                     self.name2activity.insert(activity.to_string(), index);
                     self.next_index += 1;
-                },
+                }
             }
         }
         return result;
@@ -181,12 +212,14 @@ impl <'a> ActivityKey {
             match self.name2activity.get(&activity.to_string()) {
                 Some(index) => result.push(*index),
                 None => {
-                    let index = Activity{id: self.next_index};
+                    let index = Activity {
+                        id: self.next_index,
+                    };
                     result.push(index.clone());
                     self.activity2name.push(activity.to_string());
                     self.name2activity.insert(activity.to_string(), index);
                     self.next_index += 1;
-                },
+                }
             }
         }
         return result;
@@ -194,7 +227,10 @@ impl <'a> ActivityKey {
 
     #[cfg(test)]
     pub fn get_activity_label(&self, activity: &Activity) -> &str {
-        assert!(self.uuid == activity.activity_key_uuid, "cannot get activity label of activity of different activity key");
+        assert!(
+            self.uuid == activity.activity_key_uuid,
+            "cannot get activity label of activity of different activity key"
+        );
         &self.activity2name[activity.id]
     }
 
@@ -208,12 +244,15 @@ impl <'a> ActivityKey {
         match self.name2activity.get(activity) {
             Some(index) => return *index,
             None => {
-                let result = Activity{id: self.next_index, activity_key_uuid: self.uuid};
+                let result = Activity {
+                    id: self.next_index,
+                    activity_key_uuid: self.uuid,
+                };
                 self.activity2name.push(activity.to_string());
                 self.name2activity.insert(activity.to_string(), result);
                 self.next_index += 1;
                 return result;
-            },
+            }
         }
     }
 
@@ -222,28 +261,28 @@ impl <'a> ActivityKey {
         match self.name2activity.get(activity) {
             Some(index) => return *index,
             None => {
-                let result = Activity{id: self.next_index};
+                let result = Activity {
+                    id: self.next_index,
+                };
                 self.activity2name.push(activity.to_string());
                 self.name2activity.insert(activity.to_string(), result);
                 self.next_index += 1;
                 return result;
-            },
+            }
         }
     }
-    
+
     #[cfg(test)]
     pub fn get_activity_by_id(&self, activity_id: usize) -> Activity {
         Activity {
             id: activity_id,
-            activity_key_uuid: self.uuid
+            activity_key_uuid: self.uuid,
         }
     }
 
     #[cfg(not(test))]
     pub fn get_activity_by_id(&self, activity_id: usize) -> Activity {
-        Activity {
-            id: activity_id,
-        }
+        Activity { id: activity_id }
     }
 
     pub fn get_id_from_activity(&self, activity: impl Borrow<Activity>) -> usize {
@@ -251,15 +290,20 @@ impl <'a> ActivityKey {
     }
 
     pub fn deprocess_trace(&self, trace: &Vec<Activity>) -> Vec<&str> {
-        trace.iter().map(|activity| self.get_activity_label(activity)).collect()
+        trace
+            .iter()
+            .map(|activity| self.get_activity_label(activity))
+            .collect()
     }
 
     pub fn deprocess_set(&'a self, set: &HashSet<Vec<Activity>>) -> HashSet<Vec<&'a str>> {
-        set.iter().map(|trace| self.deprocess_trace(trace)).collect()
+        set.iter()
+            .map(|trace| self.deprocess_trace(trace))
+            .collect()
     }
-    
+
     pub fn deprocess_activity(&self, activity: &Activity) -> &str {
-       self.get_activity_label(activity) 
+        self.get_activity_label(activity)
     }
 }
 
@@ -273,7 +317,7 @@ impl Display for ActivityKey {
 }
 
 pub struct ActivityKeyTranslator {
-    from2to: Vec<Activity>
+    from2to: Vec<Activity>,
 }
 
 impl ActivityKeyTranslator {
@@ -285,9 +329,7 @@ impl ActivityKeyTranslator {
             from2to.push(index_to);
         }
 
-        Self {
-            from2to: from2to
-        }
+        Self { from2to: from2to }
     }
 
     pub fn translate_activity(&self, activity: &Activity) -> Activity {
@@ -300,5 +342,9 @@ impl ActivityKeyTranslator {
             result.push(self.from2to[from.id]);
         }
         result
+    }
+
+    pub fn translate_trace_mut(&self, trace: &mut Vec<Activity>) {
+        trace.iter_mut().for_each(|event| *event = self.translate_activity(event));
     }
 }

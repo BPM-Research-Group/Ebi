@@ -8,7 +8,7 @@ use std::{
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator},
+        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -225,6 +225,25 @@ impl FiniteStochasticLanguage {
         Ok(EbiObject::StochasticDeterministicFiniteAutomaton(
             slang.get_stochastic_deterministic_finite_automaton(),
         ))
+    }
+}
+
+impl TranslateActivityKey for FiniteStochasticLanguage {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+
+        //a hashmap needs to be rebuilt, unfortunately
+        let translated_traces: HashMap<Vec<Activity>, Fraction> = self.traces
+            .drain() // `drain` is used to take ownership of the original traces (use `into_iter()` or `drain()` if we want to consume)
+            .map(|(trace, fraction)| {
+                (translator.translate_trace(&trace), fraction)
+            })
+            .collect();
+
+        // Update the traces in the language with the translated ones
+        self.traces = translated_traces;
+        
+        self.activity_key = to_activity_key.clone();
     }
 }
 

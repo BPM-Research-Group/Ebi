@@ -14,7 +14,7 @@ use std::{
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, HasActivityKey},
+        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -271,6 +271,14 @@ impl EventLog {
         result.scale_outgoing_probabilities(sums);
 
         result
+    }
+}
+
+impl TranslateActivityKey for EventLog {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+        self.traces.iter_mut().for_each(|trace| translator.translate_trace_mut(trace));
+        self.activity_key = to_activity_key.clone();
     }
 }
 

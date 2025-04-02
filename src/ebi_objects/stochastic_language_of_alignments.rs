@@ -3,7 +3,7 @@ use std::{fmt::Display, str::FromStr};
 
 use crate::{
     ebi_framework::{
-        activity_key::ActivityKey,
+        activity_key::{ActivityKey, ActivityKeyTranslator, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInput, EbiObjectImporter},
         ebi_object::EbiObject,
@@ -92,6 +92,20 @@ impl StochasticLanguageOfAlignments {
 
     pub fn get_probability(&self, index: usize) -> Option<&Fraction> {
         self.probabilities.get(index)
+    }
+}
+
+impl TranslateActivityKey for StochasticLanguageOfAlignments {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+        self.alignments.iter_mut().for_each(|alignment|
+            alignment.iter_mut().for_each(|activity| 
+                match activity {
+                    Move::SynchronousMove(activity, _) | Move::LogMove(activity) | Move::ModelMove(activity, _)
+                        => *activity = translator.translate_activity(&activity),
+                    _ => {}
+                }));
+        self.activity_key = to_activity_key.clone();
     }
 }
 

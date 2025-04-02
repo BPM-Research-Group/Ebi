@@ -1,7 +1,7 @@
 use std::{fmt::Display, str::FromStr};
 use anyhow::{anyhow, Context, Error, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::ebi_trait_stochastic_semantics::TransitionIndex, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::ebi_trait_stochastic_semantics::TransitionIndex, line_reader::LineReader};
 
 use super::stochastic_language_of_alignments::StochasticLanguageOfAlignments;
 
@@ -89,6 +89,20 @@ impl LanguageOfAlignments {
             },
             _ => unreachable!()
         }
+    }
+}
+
+impl TranslateActivityKey for LanguageOfAlignments {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+        self.alignments.iter_mut().for_each(|alignment|
+            alignment.iter_mut().for_each(|activity| 
+                match activity {
+                    Move::SynchronousMove(activity, _) | Move::LogMove(activity) | Move::ModelMove(activity, _)
+                        => *activity = translator.translate_activity(&activity),
+                    _ => {}
+                }));
+        self.activity_key = to_activity_key.clone();
     }
 }
 
