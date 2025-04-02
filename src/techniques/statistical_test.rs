@@ -3,7 +3,7 @@ use anyhow::{anyhow, Result};
 
 use crate::{distances::TriangularDistanceMatrix, ebi_framework::ebi_command::EbiCommand, ebi_traits::ebi_trait_event_log::{AttributeKey, EbiTraitEventLog}, math::{average::Average, fraction::Fraction}, techniques::sample};
 
-pub trait StatisticalTests {
+pub trait StatisticalTestsLogCategoricalAttribute {
     /**
      * Perform a test on the hypothesis that the sub-logs defined by the categorical attribute are derived from identical processes and return the p-value of the test, and whether the hypothesis was sustained.
      * 
@@ -13,7 +13,7 @@ pub trait StatisticalTests {
 }
 
 
-impl StatisticalTests for dyn EbiTraitEventLog {
+impl StatisticalTestsLogCategoricalAttribute for dyn EbiTraitEventLog {
     fn log_categorical_attribute(&self, number_of_samples: usize, trace_attribute: &String, alpha: &Fraction) -> Result<(Fraction, bool)> {
 
         let mut attribute_key = AttributeKey::new();

@@ -50,7 +50,7 @@ mod tests {
             medoid_non_stochastic::MedoidNonStochastic,
             occurrences_stochastic_miner::OccurrencesStochasticMiner,
             probability_queries::ProbabilityQueries, process_variety::ProcessVariety,
-            statistical_test::StatisticalTests, uniform_stochastic_miner::UniformStochasticMiner,
+            statistical_test::StatisticalTestsLogCategoricalAttribute, uniform_stochastic_miner::UniformStochasticMiner,
             unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
         },
     };
