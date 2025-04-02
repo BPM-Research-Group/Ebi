@@ -3,7 +3,8 @@ use crate::math::traits::One;
 use crate::optimization_algorithms::network_simplex::NetworkSimplex;
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::fraction::Fraction,
+    math::{fraction::Fraction, fraction_enum::FractionEnum},
+
 };
 use anyhow::{Context, Result};
 use fraction::{BigInt, ToPrimitive};
@@ -157,7 +158,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
             // 2c. If the LCMs are within the range of i64, use i64 for the NetworkSimplex computation (remains exact but faster). Otherwise use BigInt.
             if lcm_probabilities <= BigInt::from(i64::MAX)
-                && lcm_distances <= BigInt::from(i64::MAX)
+                && (lcm_distances.clone() + BigInt::from(1)) * BigInt::from(n+m) <= BigInt::from(i64::MAX)
             {
                 log::info!("Using i64 for NetworkSimplex computation.");
 
@@ -227,21 +228,21 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 ns.run(false);
 
                 let ns_result = ns
-                    .get_result()
+                    .get_bigint_result()
                     .context("NetworkSimplex did not return a result, cannot calculate EMSC")?;
 
                 log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // (i64) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
                 let mut result = Fraction::from(1);
-                let mut distance = Fraction::from(ns_result);
+                let mut distance = FractionEnum::try_from(ns_result)?;
                 distance /= Fraction::try_from(lcm_distances)?;
                 distance /= Fraction::try_from(lcm_probabilities)?;
                 result -= distance;
 
                 return Ok(result);
             } else if lcm_probabilities <= BigInt::from(i128::MAX)
-                && lcm_distances <= BigInt::from(i128::MAX)
+                && (lcm_distances.clone() + BigInt::from(1)) * BigInt::from(n+m) <= BigInt::from(i128::MAX)
             {
                 log::info!("Using i128 for NetworkSimplex computation.");
 
@@ -311,13 +312,13 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 ns.run(false);
 
                 let ns_result = ns
-                    .get_result()
+                    .get_bigint_result()
                     .context("NetworkSimplex did not return a result, cannot calculate EMSC")?;
                 log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // (i128) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
                 let mut result = Fraction::from(1);
-                let mut distance = Fraction::from(ns_result);
+                let mut distance = FractionEnum::try_from(ns_result)?;
                 distance /= Fraction::try_from(lcm_distances)?;
                 distance /= Fraction::try_from(lcm_probabilities)?;
                 result -= distance;

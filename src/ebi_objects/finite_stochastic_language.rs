@@ -294,6 +294,26 @@ impl EbiTraitFiniteStochasticLanguage for FiniteStochasticLanguage {
             x
         })
     }
+
+    fn translate(&mut self, target_activity_key: &mut ActivityKey) {
+        // Create a translator that maps activities from the current activity key to the target one
+        let translator = ActivityKeyTranslator::new(&self.activity_key, target_activity_key);
+
+        // Iterate over all the traces in the language
+        let translated_traces: HashMap<Vec<Activity>, Fraction> = self.traces
+            .drain() // `drain` is used to take ownership of the original traces (use `into_iter()` or `drain()` if we want to consume)
+            .map(|(trace, fraction)| {
+                // Translate each trace using the translator
+                let translated_trace = translator.translate_trace(&trace);
+
+                // Return the translated trace with its associated fraction
+                (translated_trace, fraction)
+            })
+            .collect();
+
+        // Update the traces in the language with the translated ones
+        self.traces = translated_traces;
+    }
 }
 
 impl Eq for FiniteStochasticLanguage {}
