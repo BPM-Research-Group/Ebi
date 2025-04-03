@@ -11,6 +11,7 @@ pub type Fraction = super::fraction_f64::FractionF64;
 pub type UInt = fraction::BigUint;
 pub static EXACT: AtomicBool = AtomicBool::new(true);
 pub const APPROX_DIGITS: u64 = 5;
+pub const EPSILON: f64 = 1e-13;
 
 /**
  * Enables or disables exact arithmetic for all future calls to Fraction.
