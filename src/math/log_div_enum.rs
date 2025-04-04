@@ -209,6 +209,52 @@ impl Zero for LogDivEnum {
     }
 }
 
+impl One for LogDivEnum {
+    fn one() -> Self {
+        if Fraction::create_exact() {
+            Self::Exact(BigFraction::from(2), UInt::from(1u32))
+        } else {
+            Self::Approx(1.0)
+        }
+    }
+
+    fn is_one(&self) -> bool {
+        /*
+         * logdiv = 1 <=> c = log(a/b)
+         */
+        match self {
+            LogDivEnum::Exact(f, c) => {
+
+                //if f.denom is not 1 (given that f is always reduced), then a/b is not an integer and thus the result is false
+                match f.denom() {
+                    Some(denom) => if !denom.is_one() {return false;} else {},
+                    _ => return false
+                };
+
+                //extract a
+                let a = match f.numer() {
+                    Some(numer) => numer,
+                    None => return false
+                };
+
+                //left to check: 2^c = a
+                match a.trailing_zeros() {
+                    Some(zeroes) => {
+                        //the number of trailing zeroes must be exactly c, i.e. all lower bits are 0
+                        if &zeroes.to_biguint().unwrap() != c {return false;};
+
+                        //the number of bits necessary (= the highest bit) must be zeroes + 1, i.e.a is not too high
+                        return a.bits().to_biguint().unwrap() == c + BigUint::one();
+                    },
+                    None => return false
+                }
+            },
+            LogDivEnum::Approx(f) => crate::math::traits::One::is_one(f),
+            _ => false
+        }
+    }
+}
+
 impl PartialEq for LogDivEnum {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {

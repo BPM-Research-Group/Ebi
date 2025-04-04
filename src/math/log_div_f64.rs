@@ -263,6 +263,8 @@ impl std::fmt::Debug for LogDivF64 {
 
 #[cfg(test)]
 mod tests {
+    use crate::math::{log_div_f64::LogDivF64, traits::Zero};
+
 
     #[test]
     fn zero_log_div() {

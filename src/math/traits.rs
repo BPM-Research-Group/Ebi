@@ -1,5 +1,7 @@
 use num::{BigInt, Float, One as NumOne, Signed as NumSigned, Zero as NumZero};
 
+use super::fraction::EPSILON;
+
 pub trait One: Sized {
     fn one() -> Self;
 
@@ -141,7 +143,7 @@ impl One for f64 {
     }
 
     fn is_one(&self) -> bool {
-        (self - 1.0).abs() - &f64::EPSILON < 0.0
+        (self - 1.0).abs() - &EPSILON < 0.0
     }
 }
 
@@ -151,7 +153,7 @@ impl Zero for f64 {
     }
 
     fn is_zero(&self) -> bool {
-        <f64 as Signed>::abs(&self) - &f64::EPSILON < 0.0
+        <f64 as Signed>::abs(&self) - &EPSILON < 0.0
     }
 }
 
@@ -161,10 +163,10 @@ impl Signed for f64 {
     }
 
     fn is_positive(&self) -> bool {
-        self > &f64::EPSILON
+        self > &EPSILON
     }
 
     fn is_negative(&self) -> bool {
-        self < &-f64::EPSILON
+        self < &-EPSILON
     }
 }

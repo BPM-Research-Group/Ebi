@@ -121,10 +121,7 @@ fn h(x: &Fraction) -> LogDiv {
 mod tests {
     use std::fs;
 
-    use fraction::Ratio;
-    use num::{BigUint, FromPrimitive};
-
-    use crate::{ebi_objects::event_log::EventLog, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, math::log_div_enum::LogDivEnum, techniques::entropic_relevance::EntropicRelvance};
+    use crate::{ebi_objects::event_log::EventLog, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, math::traits::One, techniques::entropic_relevance::EntropicRelvance};
 
     #[test]
     fn entropic_relevance() {
@@ -137,6 +134,7 @@ mod tests {
         let lang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(log.get_finite_stochastic_language());
         let lang2: Box<dyn EbiTraitQueriableStochasticLanguage> = Box::new(log2.get_finite_stochastic_language());
         let er = lang.entropic_relevance(lang2).unwrap();
-        assert_eq!(er, LogDivEnum::Exact(fraction::GenericFraction::Rational(fraction::Sign::Plus, Ratio::from_integer(BigUint::from_i32(16).unwrap())), BigUint::from_i32(4).unwrap()));
+
+        assert!(er.is_one());
     }
 }

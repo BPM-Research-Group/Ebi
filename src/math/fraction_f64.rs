@@ -635,11 +635,11 @@ ttype_signed!(i8);
 mod tests {
     use std::ops::Neg;
 
-    use crate::math::{fraction::Fraction, traits::{One, Signed}};
+    use crate::math::{fraction_f64::FractionF64, traits::{One, Signed, Zero}};
 
     #[test]
     fn fraction_neg() {
-        let one = Fractionf64::one();
+        let one = FractionF64::one();
         assert!(one.is_positive());
         let one = one.neg();
         assert!(one.is_negative());
@@ -647,7 +647,7 @@ mod tests {
 
     #[test]
     fn fraction_exact() {
-        let zero = Fractionf64::one().one_minus();
+        let zero = FractionF64::one().one_minus();
 
         assert!(zero.is_zero());
     }
