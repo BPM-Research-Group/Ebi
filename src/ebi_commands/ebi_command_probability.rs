@@ -1,8 +1,5 @@
-use std::sync::{Arc, Mutex};
-
-use anyhow::{anyhow, Context, Error};
+use anyhow::{anyhow, Context};
 use clap::{value_parser, Arg, ArgAction};
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, techniques::explain_trace::ExplainTrace};
 
@@ -35,37 +32,9 @@ pub const EBI_PROBABILITY_MODEL: EbiCommand = EbiCommand::Command {
     input_helps: &[ "The queriable stochastic language (model).", "The finite language (log)." ], 
     execute: |mut inputs, _| {
         let mut model: Box<dyn EbiTraitQueriableStochasticLanguage> = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
-        let mut log = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+        let log = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
 
-        log.translate_using_activity_key(model.get_activity_key_mut());
-        
-        let progress_bar = EbiCommand::get_progress_bar_ticks(log.len());
-        let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
-
-        let sum = (0..log.len()).into_par_iter().filter_map(|trace_index| {
-            let trace = log.get_trace(trace_index).unwrap();
-            let c = model.get_probability(&FollowerSemantics::Trace(&trace)).with_context(|| format!("cannot compute probability of trace {:?}", trace));
-            progress_bar.inc(1);
-            match c {
-                Result::Ok(c) => Some(c),
-                Err(err) => {
-                    let error = Arc::clone(&error);
-                    *error.lock().unwrap() = Some(err);
-                    None
-                }
-            }
-        }).sum();
-
-        progress_bar.finish_and_clear();
-
-        //see whether an error was reported
-        if let Result::Ok(mutex) = Arc::try_unwrap(error) {
-            if let Result::Ok(err) = mutex.into_inner() {
-                if let Some(err) = err {
-                    return Err(err);
-                }
-            }
-        }
+        let sum = model.get_probability_language(log).with_context(|| "cannot compute probability")?;
 
         return Ok(EbiOutput::Fraction(sum));
     }, 
