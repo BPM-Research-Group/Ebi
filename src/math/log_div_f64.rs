@@ -11,7 +11,7 @@ use fraction::{BigFraction, BigUint, GenericFraction, Integer};
 
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
-use super::{fraction::UInt, fraction_f64::FractionF64, traits::Zero};
+use super::{fraction::UInt, fraction_f64::FractionF64, traits::{One, Zero}};
 
 pub struct LogDivF64(FractionF64);
 
@@ -127,6 +127,16 @@ impl Zero for LogDivF64 {
 
     fn is_zero(&self) -> bool {
         self.0.is_zero()
+    }
+}
+
+impl One for LogDivF64 {
+    fn one() -> Self {
+        Self(1.0.into())
+    }
+
+    fn is_one(&self) -> bool {
+        self.0.is_one()
     }
 }
 
