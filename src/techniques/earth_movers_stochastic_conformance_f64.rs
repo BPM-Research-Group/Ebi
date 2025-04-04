@@ -44,7 +44,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
     ///     b. Run the `NetworkSimplex` algorithm to find the optimal flow between the supply and demand nodes.<br>
     ///     c. Calculate the EMSC value as `1 - result`.
     fn earth_movers_stochastic_conformance(
-        &self,
+        &mut self,
         lang_b: &mut dyn EbiTraitFiniteStochasticLanguage,
     ) -> Result<Fraction> {
         // 1. Compute all pairwise distances between the traces of the two languages (parallized, see DistanceMatrix).

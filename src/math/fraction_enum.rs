@@ -6,19 +6,13 @@ use num_rational::Ratio;
 use num_traits::ToPrimitive;
 use rand::Rng;
 use std::{
-    borrow::Borrow,
-    cmp::Ordering,
-    hash::Hash,
-    iter::Sum,
-    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
-    str::FromStr,
-    sync::Arc,
+    borrow::Borrow, cmp::Ordering, f64, hash::Hash, iter::Sum, ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign}, str::FromStr, sync::Arc
 };
 
-use crate::ebi_framework::{
+use crate::{ebi_framework::{
     ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait::FromEbiTraitObject,
     exportable::Exportable, infoable::Infoable,
-};
+}, math::fraction::EPSILON};
 
 use super::{
     fraction::{FractionNotParsedYet, UInt, EXACT},
@@ -277,7 +271,9 @@ impl One for FractionEnum {
     fn is_one(&self) -> bool {
         match self {
             FractionEnum::Exact(f) => fraction::One::is_one(f),
-            FractionEnum::Approx(f) => (f - 1.0).abs() < f64::EPSILON,
+            FractionEnum::Approx(f) => {
+                (f - 1.0).abs() < EPSILON
+            },
             Self::CannotCombineExactAndApprox => false,
         }
     }
@@ -295,7 +291,7 @@ impl Zero for FractionEnum {
     fn is_zero(&self) -> bool {
         match self {
             FractionEnum::Exact(f) => fraction::Zero::is_zero(f),
-            FractionEnum::Approx(f) => f.abs() - &f64::EPSILON < 0.0,
+            FractionEnum::Approx(f) => f.abs() - &EPSILON < 0.0,
             Self::CannotCombineExactAndApprox => false,
         }
     }
@@ -694,7 +690,7 @@ impl PartialEq for FractionEnum {
         match (self, other) {
             (Self::Exact(l0), Self::Exact(r0)) => l0 == r0,
             (Self::Approx(l0), Self::Approx(r0)) => {
-                l0 - f64::EPSILON <= *r0 && *r0 <= l0 + f64::EPSILON
+                l0 - EPSILON <= *r0 && *r0 <= l0 + EPSILON
             }
             _ => false,
         }

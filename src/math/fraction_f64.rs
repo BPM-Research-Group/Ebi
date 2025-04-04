@@ -21,7 +21,7 @@ use crate::{
     optimization_algorithms::network_simplex_value_type::{IsFloat, MulWithFloat},
 };
 
-use super::{fraction::FractionNotParsedYet, traits::{One, Signed, Zero}};
+use super::{fraction::{FractionNotParsedYet, EPSILON}, traits::{One, Signed, Zero}};
 
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub struct FractionF64(pub f64);
@@ -32,7 +32,7 @@ impl FractionF64 {
     }
 
     pub fn is_one(&self) -> bool {
-        (self.0 - 1.0).abs() - &f64::EPSILON < 0.0
+        (self.0 - 1.0).abs() - &EPSILON < 0.0
     }
 
     pub fn two() -> Self {
@@ -126,7 +126,7 @@ impl One for FractionF64 {
     }
 
     fn is_one(&self) -> bool {
-        (self.0 - 1.0).abs() - &f64::EPSILON < 0.0
+        (self.0 - 1.0).abs() - &EPSILON < 0.0
     }
 }
 
@@ -136,7 +136,7 @@ impl Zero for FractionF64 {
     }
 
     fn is_zero(&self) -> bool {
-        self.0.abs() - &f64::EPSILON < 0.0
+        self.0.abs() - &EPSILON < 0.0
     }
 }
 
@@ -146,11 +146,11 @@ impl Signed for FractionF64 {
     }
 
     fn is_positive(&self) -> bool {
-        self.0 > f64::EPSILON
+        self.0 > EPSILON
     }
 
     fn is_negative(&self) -> bool {
-        self.0 < -f64::EPSILON
+        self.0 < -EPSILON
     }
 }
 
