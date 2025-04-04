@@ -84,3 +84,45 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
         return Ok(RootLogDiv::sqrt(sum).one_minus());
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv, traits::Zero}, techniques::jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance};
+
+    
+    #[test]
+    fn jssc() {
+        let fin1 = fs::read_to_string("testfiles/aa-ab-ba_ali.slpn").unwrap();
+        let slpn = fin1.parse::<StochasticLabelledPetriNet>().unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let log = fin2.parse::<EventLog>().unwrap();
+
+        let slang: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(log.get_finite_stochastic_language());
+
+        let mut x = LogDiv::from(Fraction::from(2));
+        x /= 2;
+        let answer = RootLogDiv::sqrt(x).one_minus();
+
+        assert_eq!(slang.jssc_log2model(Box::new(slpn)).unwrap(), answer);
+    }
+
+    #[test]
+    fn jssc_activity_key() {
+        let fin1 = fs::read_to_string("testfiles/aa.slang").unwrap();
+        let slang1 = fin1.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/aa.slang").unwrap();
+        let slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let slang1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang1);
+
+        let jssc = slang1.jssc_log2log(Box::new(slang2)).unwrap();
+
+        let right_side = LogDiv::zero();
+        assert_eq!(jssc, RootLogDiv::sqrt(right_side).one_minus())
+    }
+}

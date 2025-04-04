@@ -260,3 +260,14 @@ impl std::fmt::Debug for LogDivF64 {
         write!(f, "logdiv approx {}", self.0)
     }
 }
+
+#[cfg(test)]
+mod tests {
+
+    #[test]
+    fn zero_log_div() {
+        let mut zero = LogDivF64::zero();
+        zero /= 2;
+        assert_eq!(zero, LogDivF64::zero());
+    }
+}

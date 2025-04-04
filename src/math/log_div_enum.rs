@@ -665,3 +665,15 @@ impl Display for FractionRaw {
         )
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::math::{log_div_enum::LogDivEnum, traits::Zero};
+
+    #[test]
+    fn zero_log_div() {
+        let mut zero = LogDivEnum::zero();
+        zero /= 2;
+        assert_eq!(zero, LogDivEnum::zero());
+    }
+}

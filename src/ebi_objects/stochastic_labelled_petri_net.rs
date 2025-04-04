@@ -408,3 +408,19 @@ impl EbiTraitGraphable for StochasticLabelledPetriNet {
         return graph;
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::stochastic_labelled_petri_net::StochasticLabelledPetriNet, ebi_traits::ebi_trait_semantics::Semantics};
+
+    #[test]
+    fn empty_slpn() {
+        let fin = fs::read_to_string("testfiles/empty_net.slpn").unwrap();
+        let slpn = fin.parse::<StochasticLabelledPetriNet>().unwrap();
+
+        assert_eq!(slpn.get_number_of_places(), 0);
+        assert_eq!(slpn.get_number_of_transitions(), 0);
+    }
+}

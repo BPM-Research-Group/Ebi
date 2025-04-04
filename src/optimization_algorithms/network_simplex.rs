@@ -1380,3 +1380,78 @@ where
         .max_by(|a, b| a.partial_cmp(b).unwrap())
         .cloned()
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::optimization_algorithms::network_simplex::NetworkSimplex;
+
+    
+    #[test]
+    fn network_simplex_int() {
+        let supply: Vec<i64> = vec![20, 0, 0, -5, -14];
+
+        let graph_and_costs: Vec<Vec<Option<i64>>> = vec![
+            vec![None, Some(4), Some(4), None, None],
+            vec![None, None, Some(2), Some(2), Some(6)],
+            vec![None, None, None, Some(1), Some(3)],
+            vec![None, None, None, None, Some(2)],
+            vec![None, None, Some(3), None, None],
+        ];
+        let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, true, false);
+        _ = ns.run(false);
+        assert_eq!(ns.get_result().unwrap(), 123);
+    }
+
+    #[test]
+    fn network_simplex_bigint() {
+        use num::BigInt;
+
+        let supply: Vec<BigInt> = vec![20, 0, 0, -5, -14]
+            .into_iter()
+            .map(|s| BigInt::from(s))
+            .collect();
+
+        let graph_and_costs: Vec<Vec<Option<BigInt>>> = vec![
+            vec![None, Some(4), Some(4), None, None],
+            vec![None, None, Some(2), Some(2), Some(6)],
+            vec![None, None, None, Some(1), Some(3)],
+            vec![None, None, None, None, Some(2)],
+            vec![None, None, Some(3), None, None],
+        ]
+        .into_iter()
+        .map(|row| {
+            row.into_iter()
+                .map(|x| x.map(|cost| BigInt::from(cost)))
+                .collect()
+        })
+        .collect();
+
+        let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, true, false);
+        _ = ns.run(false);
+        assert_eq!(ns.get_result().unwrap(), BigInt::from(123));
+    }
+
+    #[test]
+    fn network_simplex_float() {
+        let supply: Vec<f64> = vec![20, 0, 0, -5, -14]
+            .into_iter()
+            .map(|s| s.into())
+            .collect();
+
+        let graph_and_costs: Vec<Vec<Option<f64>>> = vec![
+            vec![None, Some(4), Some(4), None, None],
+            vec![None, None, Some(2), Some(2), Some(6)],
+            vec![None, None, None, Some(1), Some(3)],
+            vec![None, None, None, None, Some(2)],
+            vec![None, None, Some(3), None, None],
+        ]
+        .into_iter()
+        .map(|row| row.into_iter().map(|x| x.map(|cost| cost.into())).collect())
+        .collect();
+
+        let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, true, false);
+        _ = ns.run(false);
+        let result = ns.get_result().unwrap();
+        assert_eq!(result, 123.0);
+    }
+}

@@ -417,3 +417,25 @@ impl Mul<Vec<Fraction>> for Matrix {
         result
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::math::{fraction::Fraction, matrix::Matrix};
+
+    #[test]
+    fn matrix_vector_multiplication() {
+        let m: Matrix = vec![
+            vec![6.into(), 2.into(), 4.into()],
+            vec![(-1).into(), 4.into(), 3.into()],
+            vec![(-2).into(), 9.into(), 3.into()],
+        ]
+        .into();
+        let v: Vec<Fraction> = vec![4.into(), (-2).into(), 1.into()];
+
+        let x = m * v;
+
+        let t = vec![24.into(), (-9).into(), (-23).into()];
+
+        assert_eq!(x, t);
+    }
+}

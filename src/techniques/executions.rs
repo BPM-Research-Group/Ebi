@@ -195,3 +195,25 @@ impl C {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::{event_log::EventLog, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton}, techniques::executions::FindExecutions};
+
+    #[test]
+    fn executions() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/a-b-c-livelock.sdfa").unwrap();
+        let model = fin2.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
+
+        let out = fs::read_to_string("testfiles/a-b.exs").unwrap();
+
+        let x= model.find_executions(Box::new(log)).unwrap();
+
+        assert_eq!(out, x.to_string());
+    }
+}

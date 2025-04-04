@@ -119,3 +119,21 @@ impl StatisticalTestsLogCategoricalAttribute for dyn EbiTraitEventLog {
         Ok((p_value, !reject))
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::event_log::EventLog, ebi_traits::ebi_trait_event_log::EbiTraitEventLog, math::fraction::Fraction, techniques::statistical_test::StatisticalTestsLogCategoricalAttribute};
+
+    #[test]
+    fn cla_test() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let event_log: Box<dyn EbiTraitEventLog> = Box::new(fin.parse::<EventLog>().unwrap());
+
+        let (_, sustain) = event_log
+            .log_categorical_attribute(500, &"attribute".to_string(), &Fraction::from((1, 20)))
+            .unwrap();
+        assert!(sustain) //The hypothesis should be rejected if we consider the meaning of things, however, as we have only two traces, it will be sustained.
+    }
+}

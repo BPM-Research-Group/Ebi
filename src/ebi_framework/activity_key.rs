@@ -348,3 +348,45 @@ impl ActivityKeyTranslator {
         trace.iter_mut().for_each(|event| *event = self.translate_activity(event));
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_framework::activity_key::{HasActivityKey, TranslateActivityKey}, ebi_objects::directly_follows_model::DirectlyFollowsModel};
+
+    use super::ActivityKey;
+    
+    #[test]
+    #[should_panic(expected = "cannot get activity label of activity of different activity key")]
+    fn activity_key_process() {
+        let key1 = ActivityKey::new();
+        let mut key2 = ActivityKey::new();
+        let a2 = key2.process_activity("a");
+        key1.deprocess_activity(&a2);
+    }
+
+    #[test]
+    #[should_panic(expected = "cannot compare activities of different activity keys")]
+    fn activity_key_equal() {
+        let mut key1 = ActivityKey::new();
+        let mut key2 = ActivityKey::new();
+        let a1 = key1.process_activity("a");
+        let a2 = key2.process_activity("a");
+        let _ = a1 == a2;
+    }
+
+    #[test]
+    fn activity_key_translating() {
+        let fin = fs::read_to_string("testfiles/a-b_star.dfm").unwrap();
+        let mut dfm = fin.parse::<DirectlyFollowsModel>().unwrap();
+
+        let mut activity_key = ActivityKey::new();
+        let x = activity_key.process_activity("xyz");
+
+        dfm.translate_using_activity_key(&mut activity_key);
+
+        assert_eq!(dfm.get_activity_key().get_activity_label(&x), activity_key.get_activity_label(&x));
+    }
+}

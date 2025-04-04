@@ -552,3 +552,22 @@ impl EbiTraitQueriableStochasticLanguage for FiniteStochasticLanguage {
         }
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage}, math::{fraction::Fraction, traits::Zero}};
+
+    
+    #[test]
+    fn empty_slang() {
+        let fin = fs::read_to_string("testfiles/empty.slang").unwrap();
+        let mut slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
+        slang.normalise();
+
+        assert_eq!(slang.len(), 0);
+        assert_eq!(slang.get_probability_sum(), Fraction::zero());
+    }
+}

@@ -111,7 +111,7 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
             .remove(0)
             .to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
         Ok(EbiOutput::LogDiv(
-            log.er(model).context("cannot compute uEMSC")?,
+            log.entropic_relevance(model).context("cannot compute ER")?,
         ))
     },
     output_type: &EbiOutputType::LogDiv,

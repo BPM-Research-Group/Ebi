@@ -91,3 +91,20 @@ pub fn sum_distances<T>(log: &T, distances: &TriangularDistanceMatrix) -> Vec<Fr
 
     sum_distance
 }
+
+#[cfg(test)]
+mod tests{
+    use std::fs;
+
+    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, medoid};
+
+    
+    #[test]
+    fn medoid() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
+        let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
+        let fout = fs::read_to_string("testfiles/ba.lang").unwrap();
+        let medoid = medoid::medoid(&slang, &1).unwrap();
+        assert_eq!(fout, medoid.to_string())
+    }
+}

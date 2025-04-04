@@ -1163,3 +1163,26 @@ ttype_signed!(i64);
 ttype_signed!(i32);
 ttype_signed!(i16);
 ttype_signed!(i8);
+
+
+#[cfg(test)]
+mod tests {
+    use std::ops::Neg;
+
+    use crate::math::{fraction_enum::FractionEnum, traits::{One, Signed, Zero}};
+
+    #[test]
+    fn fraction_neg() {
+        let one = FractionEnum::one();
+        assert!(one.is_positive());
+        let one = one.neg();
+        assert!(one.is_negative());
+    }
+
+    #[test]
+    fn fraction_exact() {
+        let zero = FractionEnum::one().one_minus();
+
+        assert!(zero.is_zero());
+    }
+}

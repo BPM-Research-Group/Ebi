@@ -32,3 +32,20 @@ impl ProcessVariety for dyn EbiTraitFiniteStochasticLanguage {
         Fraction::from(n_c)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::fraction::Fraction, techniques::process_variety::ProcessVariety};
+
+    
+    #[test]
+    fn variety() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
+        let slang: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(fin.parse::<FiniteStochasticLanguage>().unwrap());
+
+        assert_eq!(slang.rao_stirling_diversity(), Fraction::from((2, 5)));
+    }
+}

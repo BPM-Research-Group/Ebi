@@ -410,3 +410,150 @@ impl AlignmentHeuristics for DirectlyFollowsModel {
         0
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, language_of_alignments::Move, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton}, ebi_traits::ebi_trait_semantics::ToSemantics, techniques::align::Align};
+
+    #[test]
+    fn align_sdfa_trace() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
+        let sdfa = fin
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
+        let mut semantics = sdfa.to_semantics();
+
+        let a = semantics.get_activity_key_mut().process_activity("a");
+        let b = semantics.get_activity_key_mut().process_activity("b");
+
+        let trace = vec![b, b];
+
+        let (alignment, _) = semantics.align_trace(&trace).unwrap();
+
+        let correct_1 = vec![
+            Move::SynchronousMove(b, 1),
+            Move::ModelMove(a, 4),
+            Move::SilentMove(5),
+            Move::LogMove(b),
+        ];
+        let correct_2 = vec![
+            Move::SynchronousMove(b, 1),
+            Move::LogMove(b),
+            Move::ModelMove(a, 4),
+            Move::SilentMove(5),
+        ];
+
+        assert!(alignment == correct_1 || alignment == correct_2);
+    }
+
+    #[test]
+    fn align_sdfa_lang() {
+        let fin1 = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
+        let sdfa = fin1
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
+        let mut semantics = sdfa.to_semantics();
+
+        let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
+        let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
+
+        let a = semantics.get_activity_key_mut().process_activity("a");
+        let b = semantics.get_activity_key_mut().process_activity("b");
+
+        let alignment = semantics.align_language(lang).unwrap();
+
+        let correct_1 = vec![
+            Move::SynchronousMove(b, 1),
+            Move::ModelMove(a, 4),
+            Move::SilentMove(5),
+            Move::LogMove(b),
+        ];
+        let correct_2 = vec![
+            Move::SynchronousMove(b, 1),
+            Move::LogMove(b),
+            Move::ModelMove(a, 4),
+            Move::SilentMove(5),
+        ];
+
+        assert!(alignment.get(0) == Some(&correct_1) || alignment.get(0) == Some(&correct_2));
+    }
+
+    #[test]
+    fn align_slang_lang() {
+        let fin1 = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
+        let sdfa = fin1.parse::<FiniteStochasticLanguage>().unwrap();
+        let mut semantics = sdfa.to_semantics();
+
+        let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
+        let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
+
+        let a = semantics.get_activity_key_mut().process_activity("a");
+        let b = semantics.get_activity_key_mut().process_activity("b");
+
+        let alignment = semantics.align_language(lang).unwrap();
+
+        let correct_1 = vec![
+            Move::ModelMove(a, 1),
+            Move::SynchronousMove(b, 2),
+            Move::SilentMove(0),
+            Move::LogMove(b),
+        ]; //other options may be valid, please check semantically when this fails
+        let correct_2 = vec![
+            Move::SynchronousMove(b, 2),
+            Move::ModelMove(a, 1),
+            Move::SilentMove(0),
+            Move::LogMove(b),
+        ]; //other options may be valid, please check semantically when this fails
+        assert!(*alignment.get(0).unwrap() == correct_1 || *alignment.get(0).unwrap() == correct_2);
+    }
+
+    #[test]
+    fn align_lang_lang() {
+        let fin1 = fs::read_to_string("testfiles/aa-ab-ba.lang").unwrap();
+        let sdfa = fin1.parse::<FiniteLanguage>().unwrap();
+        let mut semantics = sdfa.to_semantics();
+
+        let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
+        let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
+
+        let a = semantics.get_activity_key_mut().process_activity("a");
+        let b = semantics.get_activity_key_mut().process_activity("b");
+
+        let alignment = semantics.align_language(lang).unwrap();
+
+        let correct_1 = vec![
+            Move::SynchronousMove(b, 1),
+            Move::ModelMove(a, 2),
+            Move::SilentMove(5),
+            Move::LogMove(b),
+        ]; //other options may be valid, please check semantically when this fails
+
+        assert_eq!(*alignment.get(0).unwrap(), correct_1);
+        // assert!(*alignment.get(0).unwrap() == correct_1 || *alignment.get(0).unwrap() == correct_2);
+    }
+
+    #[test]
+    fn align_dfa_lang() {
+        let fin1 = fs::read_to_string("testfiles/aa-ab-ba.dfa").unwrap();
+        let dfa = fin1.parse::<DeterministicFiniteAutomaton>().unwrap();
+        let mut semantics = dfa.to_semantics();
+
+        let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
+        let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
+
+        let a = semantics.get_activity_key_mut().process_activity("a");
+        let b = semantics.get_activity_key_mut().process_activity("b");
+
+        let alignment = semantics.align_language(lang).unwrap();
+
+        let correct_1 = vec![
+            Move::SynchronousMove(b, 1),
+            Move::ModelMove(a, 4),
+            Move::SilentMove(5),
+            Move::LogMove(b),
+        ]; //other options may be valid, please check semantically when this fails
+        assert_eq!(*alignment.get(0).unwrap(), correct_1);
+    }
+}
