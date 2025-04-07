@@ -141,7 +141,7 @@ mod tests {
     use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{fraction_f64::FractionF64, traits::One}, techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance};
 
     #[test]
-    fn emsc() {
+    fn emsc_one() {
         let fin1 = fs::read_to_string("testfiles/aa.slang").unwrap();
         let mut slang1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(fin1.parse::<FiniteStochasticLanguage>().unwrap());
 
@@ -150,6 +150,19 @@ mod tests {
 
         let emsc = slang1.earth_movers_stochastic_conformance(&mut slang2).unwrap();
 
-        assert_eq!(emsc, FractionF64::one());
+        assert_eq!(emsc, Fraction::one());
+    }
+
+    #[test]
+    fn emsc_zero() {
+        let fin1 = fs::read_to_string("testfiles/aa.slang").unwrap();
+        let mut slang1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(fin1.parse::<FiniteStochasticLanguage>().unwrap());
+
+        let fin2 = fs::read_to_string("testfiles/bb.slang").unwrap();
+        let mut slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let emsc = slang1.earth_movers_stochastic_conformance(&mut slang2).unwrap();
+
+        assert_eq!(emsc, Fraction::zero());
     }
 }
