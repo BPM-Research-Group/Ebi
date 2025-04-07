@@ -709,8 +709,9 @@ where
 
     fn find_entering_arc_par_recursive(&mut self, pool: &ThreadPool, arcs_visited: usize) -> bool {
         let num_threads = pool.current_num_threads();
-        let arcs_per_thread = self.block_size / num_threads;
-        if arcs_per_thread == 0 {
+        let block_size_per_thread = self.block_size / num_threads;
+        let arcs_per_thread = self.search_arc_num / num_threads;
+        if block_size_per_thread == 0 || arcs_per_thread < 500 {
             return self.find_entering_arc();
         }
 
