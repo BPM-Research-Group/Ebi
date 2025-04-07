@@ -138,7 +138,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{fraction_f64::FractionF64, traits::One}, techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance};
+    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{fraction::Fraction, traits::{One, Zero}}, techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance};
 
     #[test]
     fn emsc_one() {
