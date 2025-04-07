@@ -332,3 +332,128 @@ impl IndexMut<usize> for NodeStates {
         self.states.index_mut(index)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::process_tree::ProcessTree, ebi_traits::ebi_trait_semantics::Semantics};
+
+    
+    #[test]
+    fn tree_semantics() {
+        let fin = fs::read_to_string("testfiles/aa.ptree").unwrap();
+        let tree = fin.parse::<ProcessTree>().unwrap();
+        let mut state = tree.get_initial_state();
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![0]);
+
+        tree.execute_transition(&mut state, 0).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![1]);
+
+        tree.execute_transition(&mut state, 1).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![2]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 2).unwrap();
+
+        assert_eq!(tree.get_enabled_transitions(&state), Vec::<usize>::new());
+        assert!(tree.is_final_state(&state));
+    }
+
+    #[test]
+    fn tree_semantics_2() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.ptree").unwrap();
+        let tree = fin.parse::<ProcessTree>().unwrap();
+        let mut state = tree.get_initial_state();
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![0, 2]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 2).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![3, 4]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 3).unwrap();
+        println!("{}", state);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 5).unwrap();
+
+        assert_eq!(tree.get_enabled_transitions(&state), Vec::<usize>::new());
+        assert!(tree.is_final_state(&state));
+    }
+
+    #[test]
+    fn tree_semantics_3() {
+        let fin = fs::read_to_string("testfiles/all_operators.ptree").unwrap();
+        let tree = fin.parse::<ProcessTree>().unwrap();
+
+        let mut state = tree.get_initial_state();
+        println!("{}", state);
+        assert_eq!(
+            tree.get_enabled_transitions(&state),
+            vec![0, 2, 3, 5, 6, 8, 9]
+        );
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 2).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![3, 5, 6, 8, 9]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 3).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![4, 5, 6, 8, 9]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 6).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![4, 7, 8, 9]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 8).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![4, 7, 9]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 7).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![4, 5, 9]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 5).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![4, 9, 10]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 4).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![3, 9]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 3).unwrap();
+
+        println!("{}", state);
+        assert_eq!(tree.get_enabled_transitions(&state), vec![4, 9, 10]);
+        assert!(!tree.is_final_state(&state));
+
+        tree.execute_transition(&mut state, 10).unwrap();
+
+        assert_eq!(tree.get_enabled_transitions(&state), Vec::<usize>::new());
+        assert!(tree.is_final_state(&state));
+    }
+}

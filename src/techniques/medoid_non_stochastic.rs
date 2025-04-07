@@ -503,3 +503,28 @@ where
     }
     best
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, techniques::medoid_non_stochastic::MedoidNonStochastic};
+
+    #[test]
+    fn non_stochastic_clustering() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
+        let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
+        let cluster = slang.k_medoids_clustering(1).unwrap();
+        let fout = fs::read_to_string("testfiles/aa.lang").unwrap();
+        assert_eq!(fout, cluster.to_string())
+    }
+
+    #[test]
+    fn non_stochastic_medoid() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
+        let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
+        let fout = fs::read_to_string("testfiles/aa.lang").unwrap();
+        let medoid = slang.medoid(1).unwrap();
+        assert_eq!(fout, medoid.to_string())
+    }
+}

@@ -2,7 +2,7 @@ use clap::{value_parser, Arg, ArgAction, Command};
 use anyhow::Context;
 use std::io::Write;
 
-use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_info, ebi_traits::ebi_trait_event_log::EbiTraitEventLog, math::fraction::{Fraction, FractionNotParsedYet}, techniques::statistical_test::StatisticalTests};
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_info, ebi_traits::ebi_trait_event_log::EbiTraitEventLog, math::fraction::{Fraction, FractionNotParsedYet}, techniques::statistical_test::StatisticalTestsLogCategoricalAttribute};
 
 use super::ebi_command_association::{self, number_of_samples};
 

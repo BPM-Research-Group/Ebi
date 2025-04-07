@@ -6,7 +6,7 @@ use anyhow::Result;
 
 pub trait EarthMoversStochasticConformance {
     fn earth_movers_stochastic_conformance(
-        &self,
+        &mut self,
         lang_b: &mut dyn EbiTraitFiniteStochasticLanguage,
     ) -> Result<Fraction>;
 }

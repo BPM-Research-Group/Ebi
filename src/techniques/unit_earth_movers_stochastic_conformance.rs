@@ -46,3 +46,27 @@ impl UnitEarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLangua
         return Ok(sum);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{fraction::Fraction, traits::One}, techniques::unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance};
+
+    
+    #[test]
+    fn uemsc_activity_key() {
+        let fin1 = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
+        let slang1 = fin1.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/ba-aa-ab.slang").unwrap();
+        let slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let slang1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang1);
+
+        let uemsc = slang1
+            .unit_earth_movers_stochastic_conformance(Box::new(slang2))
+            .unwrap();
+        assert_eq!(uemsc, Fraction::one())
+    }
+}

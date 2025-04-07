@@ -183,20 +183,18 @@ pub struct DistanceMatrix {
 }
 
 impl DistanceMatrix {
-    pub fn new<L, K>(lang_a: &L, lang_b: &mut K) -> Self
+
+    pub fn new<L, K>(lang_a: &mut L, lang_b: &mut K) -> Self
     where
         L: EbiTraitFiniteStochasticLanguage + ?Sized,
         K: EbiTraitFiniteStochasticLanguage + ?Sized,
     {
         log::info!("Translate second language to first");
-        let mut target_activity_key = lang_a.get_activity_key().clone();
-        lang_b.translate(&mut target_activity_key);
-        let lang_b_translated = lang_b;
-        //let lang_b_translated = lang_b.translate_using_activity_key(&mut target_activity_key);
+        lang_b.translate_using_activity_key(lang_a.get_activity_key_mut());
 
         log::info!("Compute distances");
         let len_a = lang_a.len();
-        let len_b = lang_b_translated.len();
+        let len_b = lang_b.len();
 
         // Pre-allocate the entire matrix
         let mut distances = Vec::with_capacity(len_a);
@@ -210,7 +208,7 @@ impl DistanceMatrix {
         // Pre-fetch all traces to avoid repeated get_trace calls
         let traces_a: Vec<_> = (0..len_a).map(|i| lang_a.get_trace(i).unwrap()).collect();
         let traces_b: Vec<_> = (0..len_b)
-            .map(|j| lang_b_translated.get_trace(j).unwrap())
+            .map(|j| lang_b.get_trace(j).unwrap())
             .collect();
 
         let progress_bar = EbiCommand::get_progress_bar_ticks((len_a * len_b).try_into().unwrap());

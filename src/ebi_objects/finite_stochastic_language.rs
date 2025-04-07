@@ -8,7 +8,7 @@ use std::{
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator},
+        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -228,6 +228,25 @@ impl FiniteStochasticLanguage {
     }
 }
 
+impl TranslateActivityKey for FiniteStochasticLanguage {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+
+        //a hashmap needs to be rebuilt, unfortunately
+        let translated_traces: HashMap<Vec<Activity>, Fraction> = self.traces
+            .drain() // `drain` is used to take ownership of the original traces (use `into_iter()` or `drain()` if we want to consume)
+            .map(|(trace, fraction)| {
+                (translator.translate_trace(&trace), fraction)
+            })
+            .collect();
+
+        // Update the traces in the language with the translated ones
+        self.traces = translated_traces;
+        
+        self.activity_key = to_activity_key.clone();
+    }
+}
+
 impl FromEbiTraitObject for FiniteStochasticLanguage {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
@@ -247,37 +266,7 @@ impl EbiTraitIterableLanguage for FiniteStochasticLanguage {
     }
 }
 
-impl EbiTraitFiniteLanguage for FiniteStochasticLanguage {
-    fn translate_using_activity_key(
-        &self,
-        target_activity_key: &mut ActivityKey,
-    ) -> Box<dyn EbiTraitFiniteLanguage> {
-        // Create a translator that maps activities from the current activity key to the target one
-        let translator = ActivityKeyTranslator::new(&self.activity_key, target_activity_key);
-
-        // Create a new translated traces HashMap
-        let translated_traces: HashMap<Vec<Activity>, Fraction> = self
-            .traces
-            .iter() // Iterate over references to the original traces
-            .map(|(trace, fraction)| {
-                // Translate each trace using the translator
-                let translated_trace = translator.translate_trace(trace);
-
-                // Return the translated trace with its associated fraction
-                (translated_trace, fraction.clone()) // Clone the fraction to preserve `self`
-            })
-            .collect();
-
-        // Create a new instance of the implementing type with the translated traces
-        let translated_language = Self {
-            activity_key: target_activity_key.clone(),
-            traces: translated_traces,
-        };
-
-        // Return the translated language as a trait object
-        Box::new(translated_language)
-    }
-}
+impl EbiTraitFiniteLanguage for FiniteStochasticLanguage {}
 
 impl EbiTraitFiniteStochasticLanguage for FiniteStochasticLanguage {
     fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction> {
@@ -469,7 +458,7 @@ impl Importable for FiniteStochasticLanguage {
             }
         }
 
-        if sum > Fraction::one() {
+        if sum > Fraction::one() && !sum.is_one() { //avoid rounding errors in approximate mode
             return Err(anyhow!(
                 "probabilities in stochastic language sum to {}, which is greater than 1",
                 sum
@@ -581,5 +570,24 @@ impl EbiTraitQueriableStochasticLanguage for FiniteStochasticLanguage {
                 };
             }
         }
+    }
+}
+
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage}, math::{fraction::Fraction, traits::Zero}};
+
+    
+    #[test]
+    fn empty_slang() {
+        let fin = fs::read_to_string("testfiles/empty.slang").unwrap();
+        let mut slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
+        slang.normalise();
+
+        assert_eq!(slang.len(), 0);
+        assert_eq!(slang.get_probability_sum(), Fraction::zero());
     }
 }

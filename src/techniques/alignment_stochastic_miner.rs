@@ -52,3 +52,24 @@ impl AlignmentMiner for LabelledPetriNet {
         Ok((self, probabilities).into())
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::{finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet}, techniques::alignment_stochastic_miner::AlignmentMiner};
+
+    #[test]
+    fn lpn_uniform() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.lpn").unwrap();
+        let lpn = Box::new(fin.parse::<LabelledPetriNet>().unwrap());
+
+        let fin2 = fs::read_to_string("testfiles/ba.slang").unwrap();
+        let slang: Box<FiniteStochasticLanguage> = Box::new(fin2.parse::<FiniteStochasticLanguage>().unwrap());
+
+        let slpn = lpn.mine_stochastic_alignment(slang).unwrap();
+        let fout = fs::read_to_string("testfiles/aa-ab-ba_ali.slpn").unwrap();
+
+        assert_eq!(fout, slpn.to_string())
+    }
+}

@@ -61,7 +61,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
     ///     b. Run the `NetworkSimplex` algorithm to find the optimal flow between the supply and demand nodes.<br>
     ///     c. Calculate the EMSC value as `1 - result`.
     fn earth_movers_stochastic_conformance(
-        &self,
+        &mut self,
         lang_b: &mut dyn EbiTraitFiniteStochasticLanguage,
     ) -> Result<Fraction> {
         // 1. Compute all pairwise distances between the traces of the two languages (parallized, see DistanceMatrix).
@@ -486,5 +486,24 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
             Ok(result)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{fraction::Fraction, traits::One}, techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance};
+
+    #[test]
+    fn emsc() {
+        let fin1 = fs::read_to_string("testfiles/aa.slang").unwrap();
+        let mut slang1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(fin1.parse::<FiniteStochasticLanguage>().unwrap());
+
+        let fin2 = fs::read_to_string("testfiles/aa.slang").unwrap();
+        let mut slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let emsc = slang1.earth_movers_stochastic_conformance(&mut slang2).unwrap();
+
+        assert_eq!(emsc, Fraction::one());
     }
 }

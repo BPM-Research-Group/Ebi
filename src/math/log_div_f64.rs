@@ -11,7 +11,7 @@ use fraction::{BigFraction, BigUint, GenericFraction, Integer};
 
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
-use super::{fraction::UInt, fraction_f64::FractionF64, traits::Zero};
+use super::{fraction::UInt, fraction_f64::FractionF64, traits::{One, Zero}};
 
 pub struct LogDivF64(FractionF64);
 
@@ -127,6 +127,16 @@ impl Zero for LogDivF64 {
 
     fn is_zero(&self) -> bool {
         self.0.is_zero()
+    }
+}
+
+impl One for LogDivF64 {
+    fn one() -> Self {
+        Self(1.0.into())
+    }
+
+    fn is_one(&self) -> bool {
+        self.0.is_one()
     }
 }
 
@@ -258,5 +268,18 @@ impl Display for LogDivF64 {
 impl std::fmt::Debug for LogDivF64 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "logdiv approx {}", self.0)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::math::{log_div_f64::LogDivF64, traits::Zero};
+
+
+    #[test]
+    fn zero_log_div() {
+        let mut zero = LogDivF64::zero();
+        zero /= 2;
+        assert_eq!(zero, LogDivF64::zero());
     }
 }

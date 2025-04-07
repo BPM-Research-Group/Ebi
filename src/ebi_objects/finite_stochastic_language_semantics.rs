@@ -3,7 +3,7 @@ use std::collections::HashMap;
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, HasActivityKey},
+        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
         infoable::Infoable,
     },
     ebi_traits::{
@@ -84,6 +84,18 @@ impl FiniteStochasticLanguageSemantics {
             Some(ai) => 1 + self.activity_key.get_id_from_activity(ai),
             None => 0,
         }
+    }
+}
+
+impl TranslateActivityKey for FiniteStochasticLanguageSemantics {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+
+        self.nodes.iter_mut().for_each(|map| {
+            *map = map.drain().map(|(activity, x)| (if let Some(a) = activity {Some(translator.translate_activity(&a))} else {activity}, x)).collect()
+        });
+        
+        self.activity_key = to_activity_key.clone();
     }
 }
 

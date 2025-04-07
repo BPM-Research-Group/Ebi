@@ -2,7 +2,7 @@ use std::{collections::HashSet, fmt::Display, io::{self, BufRead, Write}, str::F
 use anyhow::{anyhow, Context, Result, Error};
 use layout::topo::layout::VisualGraph;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}}, line_reader::LineReader};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}}, line_reader::LineReader};
 
 use super::labelled_petri_net::LabelledPetriNet;
 
@@ -134,6 +134,14 @@ impl DirectlyFollowsModel {
         }
 
         result
+    }
+}
+
+impl TranslateActivityKey for DirectlyFollowsModel {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+        self.node_2_activity.iter_mut().for_each(|activity| *activity = translator.translate_activity(&activity));
+        self.activity_key = to_activity_key.clone();
     }
 }
 

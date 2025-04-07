@@ -9,7 +9,7 @@ use std::{
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey},
+        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -116,41 +116,30 @@ impl FiniteLanguage {
     }
 }
 
+impl TranslateActivityKey for FiniteLanguage {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+
+        //a hashmap needs to be rebuilt, unfortunately
+        let translated_traces: HashSet<Vec<Activity>, FnvBuildHasher> = self.traces
+            .drain() 
+            .map(|trace| translator.translate_trace(&trace))
+            .collect();
+
+        // Update the traces in the language with the translated ones
+        self.traces = translated_traces;
+        
+        self.activity_key = to_activity_key.clone();
+    }
+}
+
 impl EbiTraitIterableLanguage for FiniteLanguage {
     fn iter(&self) -> Box<dyn Iterator<Item = &Vec<Activity>> + '_> {
         Box::new(self.traces.iter())
     }
 }
 
-impl EbiTraitFiniteLanguage for FiniteLanguage {
-    fn translate_using_activity_key(
-        &self,
-        target_activity_key: &mut ActivityKey,
-    ) -> Box<dyn EbiTraitFiniteLanguage> {
-        // Create a translator that maps activities from the current activity key to the target one
-        let translator = ActivityKeyTranslator::new(&self.activity_key, target_activity_key);
-
-        // Create a new translated traces HashSet using `new_hashmap`
-        let mut translated_traces = Self::new_hashmap();
-
-        self.traces.iter().for_each(|trace| {
-            // Translate each trace using the translator
-            let translated_trace = translator.translate_trace(trace);
-
-            // Insert the translated trace into the HashSet
-            translated_traces.insert(translated_trace);
-        });
-
-        // Create a new instance of the implementing type with the translated traces
-        let translated_language = Self {
-            activity_key: target_activity_key.clone(),
-            traces: translated_traces,
-        };
-
-        // Return the translated language as a trait object
-        Box::new(translated_language)
-    }
-}
+impl EbiTraitFiniteLanguage for FiniteLanguage {}
 
 impl IndexTrace for FiniteLanguage {
     fn len(&self) -> usize {

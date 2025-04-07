@@ -449,3 +449,216 @@ struct Y {
     outgoing_states: Vec<usize>,
     outgoing_state_probabilities: Vec<Fraction>,
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_framework::activity_key::HasActivityKey, ebi_objects::{stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, follower_semantics::FollowerSemantics, math::{fraction::Fraction, traits::Zero}};
+
+    #[test]
+    fn probability_sdfa_livelock_zeroweight() {
+        let fin1 = fs::read_to_string("testfiles/a-livelock-zeroweight.sdfa").unwrap();
+        let mut sdfa = fin1
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
+
+        //a ends in a livelock and has probability 0
+        let strace = vec!["a".to_string()];
+        let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+        let trace_follower = FollowerSemantics::Trace(&trace);
+        assert_eq!(
+            sdfa.get_probability(&trace_follower).unwrap(),
+            Fraction::zero()
+        );
+
+        //a, a ends in a livelock and has probability 0
+        let strace = vec!["a".to_string(), "a".to_string()];
+        let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+        let trace_follower = FollowerSemantics::Trace(&trace);
+        assert_eq!(
+            sdfa.get_probability(&trace_follower).unwrap(),
+            Fraction::zero()
+        );
+
+        //b has weight 0
+        let strace = vec!["b".to_string()];
+        let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+        let trace_follower = FollowerSemantics::Trace(&trace);
+        assert_eq!(
+            sdfa.get_probability(&trace_follower).unwrap(),
+            Fraction::zero()
+        );
+    }
+
+    #[test]
+    fn probability_slpn_livelock_zeroweight() {
+        let fin1 = fs::read_to_string("testfiles/a-livelock-zeroweight.slpn").unwrap();
+        let mut slpn = fin1.parse::<StochasticLabelledPetriNet>().unwrap();
+
+        //a ends in a livelock and has probability 0
+        let strace = vec!["a".to_string()];
+        let trace = slpn.get_activity_key_mut().process_trace(&strace);
+        let trace_follower = FollowerSemantics::Trace(&trace);
+        assert_eq!(
+            slpn.get_probability(&trace_follower).unwrap(),
+            Fraction::zero()
+        );
+
+        //a, a ends in a livelock and has probability 0
+        let strace = vec!["a".to_string(), "a".to_string()];
+        let trace = slpn.get_activity_key_mut().process_trace(&strace);
+        let trace_follower = FollowerSemantics::Trace(&trace);
+        assert_eq!(
+            slpn.get_probability(&trace_follower).unwrap(),
+            Fraction::zero()
+        );
+
+        //b has weight 0
+        let strace = vec!["b".to_string()];
+        let trace = slpn.get_activity_key_mut().process_trace(&strace);
+        let trace_follower = FollowerSemantics::Trace(&trace);
+        assert_eq!(
+            slpn.get_probability(&trace_follower).unwrap(),
+            Fraction::zero()
+        );
+
+        //c has weight 0
+        let strace = vec!["c".to_string()];
+        let trace = slpn.get_activity_key_mut().process_trace(&strace);
+        let trace_follower = FollowerSemantics::Trace(&trace);
+        assert_eq!(
+            slpn.get_probability(&trace_follower).unwrap(),
+            Fraction::zero()
+        );
+    }
+
+    #[test]
+    fn sdfa_trace_prob_livelock() {
+        let fin = fs::read_to_string("testfiles/a-b-c-livelock.sdfa").unwrap();
+        let mut sdfa = fin
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
+
+        //a
+        {
+            let strace = vec!["a".to_string()];
+            let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+            let trace_follower = FollowerSemantics::Trace(&trace);
+            let probability = sdfa.get_probability(&trace_follower).unwrap();
+            assert_eq!(probability, "2/5".parse::<Fraction>().unwrap());
+        }
+
+        //b
+        {
+            let strace = vec!["b".to_string()];
+            let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+            let trace_follower = FollowerSemantics::Trace(&trace);
+            let probability = sdfa.get_probability(&trace_follower).unwrap();
+            assert_eq!(probability, "1/5".parse::<Fraction>().unwrap());
+        }
+
+        //c (part of livelock trace)
+        {
+            let strace = vec!["c".to_string()];
+            let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+            let trace_follower = FollowerSemantics::Trace(&trace);
+            let probability = sdfa.get_probability(&trace_follower).unwrap();
+            assert_eq!(probability, "0".parse::<Fraction>().unwrap());
+        }
+
+        //d (non-existing label)
+        {
+            let strace = vec!["d".to_string()];
+            let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+            let trace_follower = FollowerSemantics::Trace(&trace);
+            let probability = sdfa.get_probability(&trace_follower).unwrap();
+            assert_eq!(probability, "0".parse::<Fraction>().unwrap());
+        }
+    }
+
+    #[test]
+    fn slpn_trace_prob_livelock() {
+        let fin = fs::read_to_string("testfiles/a-b-c-livelock.slpn").unwrap();
+        let mut slpn = fin.parse::<StochasticLabelledPetriNet>().unwrap();
+
+        //a
+        {
+            let strace = vec!["a".to_string()];
+            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace_follower = FollowerSemantics::Trace(&trace);
+            let probability = slpn.get_probability(&trace_follower).unwrap();
+            assert_eq!(probability, "2/5".parse::<Fraction>().unwrap());
+        }
+
+        //b
+        {
+            let strace = vec!["b".to_string()];
+            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace_follower = FollowerSemantics::Trace(&trace);
+            let probability = slpn.get_probability(&trace_follower).unwrap();
+            assert_eq!(probability, "1/5".parse::<Fraction>().unwrap());
+        }
+
+        //c (part of livelock trace)
+        {
+            let strace = vec!["c".to_string()];
+            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace_follower = FollowerSemantics::Trace(&trace);
+            let probability = slpn.get_probability(&trace_follower).unwrap();
+            assert_eq!(probability, "0".parse::<Fraction>().unwrap());
+        }
+
+        //d (non-existing label)
+        {
+            let strace = vec!["d".to_string()];
+            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace_follower = FollowerSemantics::Trace(&trace);
+            let probability = slpn.get_probability(&trace_follower).unwrap();
+            assert_eq!(probability, "0".parse::<Fraction>().unwrap());
+        }
+    }
+
+    #[test]
+    fn slpn_trace_prob_tau_livelock() {
+        let fin = fs::read_to_string("testfiles/a-b-tau-livelock.slpn").unwrap();
+        let mut slpn = fin.parse::<StochasticLabelledPetriNet>().unwrap();
+
+        //a
+        {
+            let strace = vec!["a".to_string()];
+            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace_follower = FollowerSemantics::Trace(&trace);
+            let probability = slpn.get_probability(&trace_follower).unwrap();
+            assert_eq!(probability, "2/5".parse::<Fraction>().unwrap());
+        }
+
+        //b
+        {
+            let strace = vec!["b".to_string()];
+            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace_follower = FollowerSemantics::Trace(&trace);
+            let probability = slpn.get_probability(&trace_follower).unwrap();
+            assert_eq!(probability, "1/5".parse::<Fraction>().unwrap());
+        }
+
+        //empty trace (part of livelock trace)
+        {
+            let strace = vec![];
+            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace_follower = FollowerSemantics::Trace(&trace);
+            let probability = slpn.get_probability(&trace_follower).unwrap();
+            assert_eq!(probability, "0".parse::<Fraction>().unwrap());
+        }
+
+        //d (non-existing label)
+        {
+            let strace = vec!["d".to_string()];
+            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace_follower = FollowerSemantics::Trace(&trace);
+            let probability = slpn.get_probability(&trace_follower).unwrap();
+            assert_eq!(probability, "0".parse::<Fraction>().unwrap());
+        }
+    }
+
+}
