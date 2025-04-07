@@ -1087,6 +1087,7 @@ macro_rules! div_assign {
     };
 }
 
+
 macro_rules! ttype_tuple {
     ($t:ident) => {
         from_tuple_u_u!($t, usize);
@@ -1100,6 +1101,7 @@ macro_rules! ttype_tuple {
         from_tuple_u_i!($t, i32);
         from_tuple_u_i!($t, i16);
         from_tuple_u_i!($t, i8);
+
     };
 }
 

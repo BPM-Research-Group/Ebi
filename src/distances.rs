@@ -183,6 +183,7 @@ pub struct DistanceMatrix {
 }
 
 impl DistanceMatrix {
+
     pub fn new<L, K>(lang_a: &mut L, lang_b: &mut K) -> Self
     where
         L: EbiTraitFiniteStochasticLanguage + ?Sized,

@@ -58,3 +58,32 @@ impl MulWithFloat for BigInt {
         panic!("Cannot multiply values of different types");
     }
 }
+
+pub trait ToBigInt {
+    fn to_big_int(&self) -> BigInt;
+}
+
+impl ToBigInt for f64 {
+    // this should never occur. it is necessary to make network simplex work on both integers and floats
+    fn to_big_int(&self) -> BigInt {
+        panic!("Cannot multiply values of different types");
+    }
+}
+
+impl ToBigInt for i64 {
+    fn to_big_int(&self) -> BigInt {
+        BigInt::from(*self)
+    }
+}
+
+impl ToBigInt for i128 {
+    fn to_big_int(&self) -> BigInt {
+        BigInt::from(*self)
+    }
+}
+
+impl ToBigInt for BigInt {
+    fn to_big_int(&self) -> BigInt {
+        self.clone()
+    }
+}
