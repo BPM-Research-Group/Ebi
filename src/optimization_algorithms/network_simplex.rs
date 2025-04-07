@@ -1,7 +1,7 @@
 use super::network_simplex_value_type::{MulWithFloat, ToBigInt};
+use crate::math::traits::{One, Signed, Zero};
 use crate::optimization_algorithms::network_simplex_value_type::IsFloat;
 use core::convert::From;
-use num::{One, Signed, Zero};
 use fraction::BigInt;
 use rand::{seq::SliceRandom, thread_rng};
 use rayon::ThreadPool;
@@ -11,7 +11,7 @@ use std::{
     cmp::{PartialEq, PartialOrd},
     fmt::{Debug, Display},
     iter::Sum,
-    ops::{AddAssign, Mul, MulAssign, Neg, SubAssign},
+    ops::{AddAssign, MulAssign, Neg, SubAssign},
 };
 
 // Enums for representing various problem types, supply types, and arc states
@@ -230,9 +230,7 @@ where
         + for<'a> AddAssign<&'a T>
         + for<'a> SubAssign<&'a T>
         + for<'a> MulAssign<&'a T>
-        + Neg
-        + Mul<T, Output = T>
-        + for<'a> Mul<&'a T, Output = T>
+        + Neg<Output = T>
         + Signed
         + PartialEq
         + PartialOrd
@@ -931,8 +929,10 @@ where
             return false;
         }
 
-        let max_cost = self.find_max_cost();
-        let art_cost: T = (max_cost + T::one()) * T::from(self.node_num as i32);
+        let mut max_cost = self.find_max_cost();
+        max_cost += &T::one();
+        max_cost *= &T::from(self.node_num as i32);
+        let art_cost: T = max_cost;
 
         log::debug!("art_cost identified as: {}", art_cost);
 

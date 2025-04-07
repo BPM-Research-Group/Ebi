@@ -1,5 +1,7 @@
 use num::BigInt;
 
+use crate::math::fraction::Fraction;
+
 pub trait IsFloat {
     fn is_float(&self) -> bool;
 }
@@ -85,5 +87,11 @@ impl ToBigInt for i128 {
 impl ToBigInt for BigInt {
     fn to_big_int(&self) -> BigInt {
         self.clone()
+    }
+}
+
+impl ToBigInt for Fraction {
+    fn to_big_int(&self) -> BigInt {
+        panic!("Cannot multiply values of different types");
     }
 }
