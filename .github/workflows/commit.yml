@@ -14,10 +14,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Run tests
+    - name: Run tests mixed mode
       run: cargo test --verbose
     - name: Run tests approximate mode
       run: cargo test --verbose --features withoutexactarithmetic
+    - name: Run tests exact mode
+      run: cargo test --verbose --features withoutapproximatearithmetic
     - name: commit to Gitlab
       env:
         GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
