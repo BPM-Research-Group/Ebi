@@ -10,7 +10,7 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics},
     },
-    math::{fraction::Fraction, traits::One},
+    math::{fraction::{ChooseRandomly, Fraction}, traits::One},
 };
 
 pub trait Sampler {

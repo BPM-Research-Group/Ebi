@@ -1,4 +1,5 @@
-use num::{BigInt, Float, One as NumOne, Signed as NumSigned, Zero as NumZero};
+use fraction::BigFraction;
+use num::{BigInt, BigUint, Float, One as NumOne, Signed as NumSigned, Zero as NumZero};
 
 use super::fraction::EPSILON;
 
@@ -137,6 +138,26 @@ impl Signed for BigInt {
     }
 }
 
+impl Zero for BigUint {
+    fn zero() -> Self {
+        num::Zero::zero()
+    }
+
+    fn is_zero(&self) -> bool {
+        num::Zero::is_zero(self)
+    }
+}
+
+impl One for BigUint {
+    fn one() -> Self {
+        num::One::one()
+    }
+
+    fn is_one(&self) -> bool {
+        num::One::is_one(self)
+    }
+}
+
 impl One for f64 {
     fn one() -> Self {
         1.0
@@ -168,5 +189,25 @@ impl Signed for f64 {
 
     fn is_negative(&self) -> bool {
         self < &-EPSILON
+    }
+}
+
+impl Zero for BigFraction {
+    fn zero() -> Self {
+        num::Zero::zero()
+    }
+
+    fn is_zero(&self) -> bool {
+        num::Zero::is_zero(self)
+    }
+}
+
+impl One for BigFraction {
+    fn one() -> Self {
+        num::One::one()
+    }
+
+    fn is_one(&self) -> bool {
+        num::One::is_one(self)
     }
 }

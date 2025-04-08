@@ -11,7 +11,7 @@ use fraction::{BigFraction, BigUint, GenericFraction, Integer};
 
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
-use super::{fraction::UInt, fraction_f64::FractionF64, traits::{One, Zero}};
+use super::{fraction::{MaybeExact, UInt}, fraction_f64::FractionF64, traits::{One, Zero}};
 
 pub struct LogDivF64(FractionF64);
 

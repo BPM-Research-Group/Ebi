@@ -3,7 +3,7 @@ use anyhow::{anyhow, Result};
 
 use crate::distances::TriangularDistanceMatrix;
 
-use super::{fixed_denominator_fraction::FixedDenominatorFraction, fraction::Fraction};
+use super::{fixed_denominator_fraction::FixedDenominatorFraction, fraction::Fraction, traits::Zero};
 
 /**
  * Class to compute the weighted average distance over distances, where these weights are integers and all distances are not negative.

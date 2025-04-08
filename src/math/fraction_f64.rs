@@ -14,27 +14,19 @@ use anyhow::{anyhow, Error, Result};
 use rand::Rng;
 
 use crate::{
-    ebi_framework::{
-        ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait::FromEbiTraitObject,
-        exportable::Exportable, infoable::Infoable,
-    },
+    ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable},
     optimization_algorithms::network_simplex_value_type::{IsFloat, MulWithFloat},
 };
 
-use super::{fraction::{FractionNotParsedYet, EPSILON}, traits::{One, Signed, Zero}};
+use super::{
+    fraction::{ChooseRandomly, FractionNotParsedYet, MaybeExact, EPSILON},
+    traits::{One, Signed, Zero},
+};
 
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub struct FractionF64(pub f64);
 
 impl FractionF64 {
-    pub fn is_exact(&self) -> bool {
-        false
-    }
-
-    pub fn is_one(&self) -> bool {
-        (self.0 - 1.0).abs() - &EPSILON < 0.0
-    }
-
     pub fn two() -> Self {
         Self(2.0)
     }
@@ -77,12 +69,15 @@ impl FractionF64 {
     }
 
     /**
-     * Return a random index from 0 (inclusive) to the length of the list (exclusive).
-     * The likelihood of each index to be returned is proportional to the value of the fraction at that index.
-     *
-     * The fractions do not need to sum to 1.
+     * 1/self
      */
-    pub fn choose_randomly(fractions: &Vec<FractionF64>) -> Result<usize> {
+    pub fn recip(&self) -> Self {
+        Self(self.0.recip())
+    }
+}
+
+impl ChooseRandomly for FractionF64 {
+    fn choose_randomly(fractions: &Vec<FractionF64>) -> Result<usize> {
         if fractions.is_empty() {
             return Err(anyhow!("cannot take an element of an empty list"));
         }
@@ -110,14 +105,23 @@ impl FractionF64 {
         }
         Ok(probabilities.len() - 1)
     }
+}
 
-    /**
-     * 1/self
-     */
-    pub fn recip(&self) -> Self {
-        Self(self.0.recip())
+impl MaybeExact for FractionF64 {
+    type Approximate = f64;
+    type Exact = fraction::BigFraction;
+
+    fn is_exact(&self) -> bool {
+        false
     }
 
+    fn extract_approx(&self) -> Result<f64> {
+        Ok(self.0)
+    }
+
+    fn extract_exact(&self) -> Result<fraction::BigFraction> {
+        Err(anyhow!("cannot extract a fraction from a float"))
+    }
 }
 
 impl One for FractionF64 {
@@ -190,10 +194,10 @@ impl From<&Arc<FractionF64>> for FractionF64 {
     }
 }
 
-impl FromEbiTraitObject for FractionF64 {
-    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
+impl crate::ebi_framework::ebi_trait::FromEbiTraitObject for FractionF64 {
+    fn from_trait_object(object: crate::ebi_framework::ebi_input::EbiInput) -> Result<Box<Self>> {
         match object {
-            EbiInput::Fraction(e) => Ok(Box::new(e)),
+            crate::ebi_framework::ebi_input::EbiInput::Fraction(e) => Ok(Box::new(e)),
             _ => Err(anyhow!(
                 "cannot read {} {} as a fraction",
                 object.get_type().get_article(),
@@ -630,12 +634,14 @@ ttype_signed!(i32);
 ttype_signed!(i16);
 ttype_signed!(i8);
 
-
 #[cfg(test)]
 mod tests {
     use std::ops::Neg;
 
-    use crate::math::{fraction_f64::FractionF64, traits::{One, Signed, Zero}};
+    use crate::math::{
+        fraction_f64::FractionF64,
+        traits::{One, Signed, Zero},
+    };
 
     #[test]
     fn fraction_neg() {

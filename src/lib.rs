@@ -67,22 +67,28 @@ pub mod math {
     pub mod average;
 
     pub mod fraction;
-    #[cfg(not(feature = "withoutexactarithmetic"))]
+    #[cfg(all(not(feature = "withoutexactarithmetic"), not(feature = "withoutapproximatearithmetic")))]
     pub mod fraction_enum;
-    #[cfg(feature = "withoutexactarithmetic")]
+    #[cfg(all(not(feature = "withoutapproximatearithmetic"), feature = "withoutexactarithmetic"))]
     pub mod fraction_f64;
+    #[cfg(all(feature = "withoutapproximatearithmetic", not(feature = "withoutexactarithmetic")))]
+    pub mod fraction_exact;
 
     pub mod log_div;
-    #[cfg(not(feature = "withoutexactarithmetic"))]
+    #[cfg(all(not(feature = "withoutexactarithmetic"), not(feature = "withoutapproximatearithmetic")))]
     pub mod log_div_enum;
-    #[cfg(feature = "withoutexactarithmetic")]
+    #[cfg(all(not(feature = "withoutapproximatearithmetic"), feature = "withoutexactarithmetic"))]
     pub mod log_div_f64;
+    #[cfg(all(feature = "withoutapproximatearithmetic", not(feature = "withoutexactarithmetic")))]
+    pub mod log_div_exact;
 
     pub mod fixed_denominator_fraction;
-    #[cfg(not(feature = "withoutexactarithmetic"))]
+    #[cfg(all(not(feature = "withoutexactarithmetic"), not(feature = "withoutapproximatearithmetic")))]
     pub mod fixed_denominator_fraction_enum;
-    #[cfg(feature = "withoutexactarithmetic")]
+    #[cfg(all(not(feature = "withoutapproximatearithmetic"), feature = "withoutexactarithmetic"))]
     pub mod fixed_denominator_fraction_f64;
+    #[cfg(all(feature = "withoutapproximatearithmetic", not(feature = "withoutexactarithmetic")))]
+    pub mod fixed_denominator_fraction_exact;
 
     pub mod matrix;
     pub mod root;
@@ -101,10 +107,12 @@ pub mod techniques {
     pub mod deterministic_semantics_for_stochastic_semantics;
 
     pub mod earth_movers_stochastic_conformance;
-    #[cfg(not(feature = "withoutexactarithmetic"))]
+    #[cfg(all(not(feature = "withoutexactarithmetic"), not(feature = "withoutapproximatearithmetic")))]
     pub mod earth_movers_stochastic_conformance_enum;
-    #[cfg(feature = "withoutexactarithmetic")]
+    #[cfg(all(not(feature = "withoutapproximatearithmetic"), feature = "withoutexactarithmetic"))]
     pub mod earth_movers_stochastic_conformance_f64;
+    #[cfg(all(feature = "withoutapproximatearithmetic", not(feature = "withoutexactarithmetic")))]
+    pub mod earth_movers_stochastic_conformance_exact;
 
     pub mod entropic_relevance;
     pub mod executions;

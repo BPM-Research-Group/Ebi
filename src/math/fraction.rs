@@ -1,11 +1,46 @@
-use anyhow::Error;
+use anyhow::{Error, Result};
 use std::{str::FromStr, sync::atomic::AtomicBool};
 
-#[cfg(not(feature = "withoutexactarithmetic"))]
+
+#[cfg(all(not(feature = "withoutexactarithmetic"), not(feature = "withoutapproximatearithmetic")))]
 pub type Fraction = super::fraction_enum::FractionEnum;
 
 #[cfg(feature = "withoutexactarithmetic")]
 pub type Fraction = super::fraction_f64::FractionF64;
+
+#[cfg(feature = "withoutapproximatearithmetic")]
+pub type Fraction = super::fraction_exact::FractionExact;
+
+
+//======================== fraction tools ========================//
+
+pub trait ChooseRandomly {
+        /**
+     * Return a random index from 0 (inclusive) to the length of the list (exclusive).
+     * The likelihood of each index to be returned is proportional to the value of the fraction at that index.
+     *
+     * The fractions do not need to sum to 1.
+     */
+    fn choose_randomly(fractions: &Vec<Self>) -> Result<usize> where Self: Sized;
+}
+
+pub trait MaybeExact {
+    type Approximate;
+    type Exact;
+
+    fn is_exact(&self) -> bool;
+
+    /**
+     * This is a low-level function to extract an f64. Will only succeed if the fraction is approximate.
+     */
+    fn extract_approx(&self) -> Result<Self::Approximate>;
+
+    /**
+     * This is a low-level function to extract an exact value. Will only succeed if the fraction is exact.
+     */
+    fn extract_exact(&self) -> Result<Self::Exact>;
+}
+
 
 //======================== exactness tools ========================//
 pub type UInt = fraction::BigUint;

@@ -2,23 +2,29 @@ use std::{borrow::Borrow, ops::{AddAssign, Mul}, sync::Arc};
 
 use anyhow::Result;
 
-use super::{fraction::Fraction, fraction_f64::FractionF64};
+use super::{fraction_f64::FractionF64, traits::Zero};
 
 #[derive(Clone)]
 pub struct FixedDenominatorFractionF64(f64);
 
 impl FixedDenominatorFractionF64 {
 
-    pub fn create(fractions: &Vec<Arc<Fraction>>) -> Result<Vec<Arc<Self>>> {
+    pub fn create(fractions: &Vec<Arc<FractionF64>>) -> Result<Vec<Arc<Self>>> {
         Ok(fractions.iter().map(|f| Arc::new(Self(f.0.clone()))).collect())
     }
 
-    pub fn zero() -> Self {
+    pub fn to_fraction(self) -> FractionF64 {
+        FractionF64(self.0)
+    }
+}
+
+impl Zero for FixedDenominatorFractionF64 {
+    fn zero() -> Self {
         Self(0.0)
     }
-
-    pub fn to_fraction(self) -> Fraction {
-        FractionF64(self.0)
+    
+    fn is_zero(&self) -> bool {
+        self.0.is_zero()
     }
 }
 

@@ -1,9 +1,10 @@
 use crate::distances::DistanceMatrix;
+use crate::math::fraction::MaybeExact;
 use crate::math::traits::One;
 use crate::optimization_algorithms::network_simplex::NetworkSimplex;
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::{fraction::Fraction, fraction_enum::FractionEnum},
+    math::fraction_enum::FractionEnum,
 
 };
 use anyhow::{Context, Result};
@@ -63,11 +64,11 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
     fn earth_movers_stochastic_conformance(
         &mut self,
         lang_b: &mut dyn EbiTraitFiniteStochasticLanguage,
-    ) -> Result<Fraction> {
+    ) -> Result<FractionEnum> {
         // 1. Compute all pairwise distances between the traces of the two languages (parallized, see DistanceMatrix).
 
         let distances = DistanceMatrix::new(self, lang_b);
-        let distances: Vec<Vec<Fraction>> = distances
+        let distances: Vec<Vec<FractionEnum>> = distances
             .distances
             .par_iter()
             .map(|row| {
@@ -107,12 +108,12 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
             let n = distances.len();
             let m = distances[0].len();
 
-            let self_probs: Vec<Fraction> = (0..n)
+            let self_probs: Vec<FractionEnum> = (0..n)
                 .into_par_iter()
                 .map(|i| self.get_trace_probability(i).unwrap().clone())
                 .collect();
 
-            let lang_b_probs: Vec<Fraction> = (0..m)
+            let lang_b_probs: Vec<FractionEnum> = (0..m)
                 .into_par_iter()
                 .map(|i| lang_b.get_trace_probability(i).unwrap().clone())
                 .collect();
@@ -147,8 +148,8 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 .chain(lang_b_denominators)
                 .reduce(|| BigInt::from(1), |a, b| num::integer::lcm(a, b));
 
-            let lcm_distance_fraction = Fraction::try_from(lcm_distances.clone())?;
-            let lcm_probability_fraction = Fraction::try_from(lcm_probabilities.clone())?;
+            let lcm_distance_fraction = FractionEnum::try_from(lcm_distances.clone())?;
+            let lcm_probability_fraction = FractionEnum::try_from(lcm_probabilities.clone())?;
 
             log::debug!(
                 "LCM of distances: {:?} \n LCM of probabilities {:?}",
@@ -234,10 +235,10 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // (i64) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
-                let mut result = Fraction::from(1);
+                let mut result = FractionEnum::from(1);
                 let mut distance = FractionEnum::try_from(ns_result)?;
-                distance /= Fraction::try_from(lcm_distances)?;
-                distance /= Fraction::try_from(lcm_probabilities)?;
+                distance /= FractionEnum::try_from(lcm_distances)?;
+                distance /= FractionEnum::try_from(lcm_probabilities)?;
                 result -= distance;
 
                 return Ok(result);
@@ -317,10 +318,10 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // (i128) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
-                let mut result = Fraction::from(1);
+                let mut result = FractionEnum::from(1);
                 let mut distance = FractionEnum::try_from(ns_result)?;
-                distance /= Fraction::try_from(lcm_distances)?;
-                distance /= Fraction::try_from(lcm_probabilities)?;
+                distance /= FractionEnum::try_from(lcm_distances)?;
+                distance /= FractionEnum::try_from(lcm_probabilities)?;
                 result -= distance;
 
                 return Ok(result);
@@ -397,10 +398,10 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
-                let mut result = Fraction::one();
-                let mut distance = Fraction::try_from(ns_result)?;
-                distance /= Fraction::try_from(lcm_distances)?;
-                distance /= Fraction::try_from(lcm_probabilities)?;
+                let mut result = FractionEnum::one();
+                let mut distance = FractionEnum::try_from(ns_result)?;
+                distance /= FractionEnum::try_from(lcm_distances)?;
+                distance /= FractionEnum::try_from(lcm_probabilities)?;
                 result -= distance;
 
                 return Ok(result);
@@ -482,7 +483,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
             log::debug!("NetworkSimplex result: {:?}", ns_result);
             // 3c. Calculate the EMSC value as 1 - result.
-            let result = Fraction::Approx(1.0 - ns_result);
+            let result = FractionEnum::Approx(1.0 - ns_result);
 
             Ok(result)
         }
