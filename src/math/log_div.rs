@@ -1,8 +1,14 @@
-#[cfg(all(not(feature = "withoutexactarithmetic"), not(feature = "withoutapproximatearithmetic")))]
+#[cfg(any(
+    all(
+        not(feature = "exactarithmetic"),
+        not(feature = "approximatearithmetic")
+    ),
+    all(feature = "exactarithmetic", feature = "approximatearithmetic")
+))]
 pub type LogDiv = super::log_div_enum::LogDivEnum;
 
-#[cfg(feature = "withoutexactarithmetic")]
+#[cfg(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic"))]
 pub type LogDiv = super::log_div_f64::LogDivF64;
 
-#[cfg(feature = "withoutapproximatearithmetic")]
+#[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
 pub type LogDiv = super::log_div_exact::LogDivExact;

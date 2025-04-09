@@ -201,7 +201,6 @@ impl TryFrom<&FractionNotParsedYet> for FractionExact {
     }
 }
 
-#[cfg(feature = "withoutapproximatearithmetic")]
 impl crate::ebi_framework::ebi_trait::FromEbiTraitObject for FractionExact {
     fn from_trait_object(object: crate::ebi_framework::ebi_input::EbiInput) -> Result<Box<Self>> {
         match object {

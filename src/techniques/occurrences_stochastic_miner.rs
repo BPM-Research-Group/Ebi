@@ -62,7 +62,7 @@ impl OccurrencesStochasticMiner for LabelledPetriNet {
 mod tests {
     use std::fs;
 
-    use crate::ebi_objects::{finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet};
+    use crate::{ebi_objects::{finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet}, math};
 
     use super::OccurrencesStochasticMiner;
 
@@ -73,7 +73,7 @@ mod tests {
         let fin2 = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin2.parse::<FiniteStochasticLanguage>().unwrap();
         let slpn = lpn.mine_occurrences_stochastic(Box::new(slang));
-        if !cfg!(feature = "withoutexactarithmetic") {
+        if math::fraction::is_exaxt_globally() {
             //with approximate arithmetic, this test is too fragile
             let fout = fs::read_to_string("testfiles/aa-ab-ba_occ.slpn").unwrap();
             assert_eq!(fout, slpn.to_string())

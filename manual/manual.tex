@@ -119,12 +119,16 @@ Sander J.J. Leemans, Tian Li}
 			\label{speedtrick:multithreaded}
 			If Ebi uses all CPU cores and runs out of RAM, one can try to reduce the CPU cores that Ebi will use by setting the environment variable \verb!RAYON_NUM_THREADS=1! or some other desired number of cores.
 			This will trade run time for RAM in multi-threaded algorithms.
+
 			\item By default, Ebi uses exact arithmetic for most commands.
 			To disable this, provide the \verb=-a= parameter.
 			The results are then not guaranteed, but it may be faster.
 
-   			\item Ebi can be compiled without exact/approximate arithmetic, using the \verb=withoutexactarithmetic=/\verb=withoutapproximatearithmetic= features, which is faster than the default compilation in which the user chooses it using the \verb=-a= parameter.
-            		When Ebi is compiled with any of this features, the \verb=-a= parameter has no effect.
+   			\item By default, Ebi is compiled with support for both exact and approximate arithmetic, and the user can select the arithmetic with the \verb=-a= parameter.
+            However, this comes with a performance penalty.
+            By selecting one of the features \verb=exactarithmetic= or \verb=approximatearithmetic=, the arithmetic is chosen at compilation time, yielding a performance benefit.
+
+            To do this, use \verb=cargo run --features exactarithmetic=, but a faster binary is obtained by compiling for release: \verb=cargo build --release --features exactarithmetic=.
 		\end{enumerate}
 
 \section{Commands}

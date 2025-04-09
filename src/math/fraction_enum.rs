@@ -170,7 +170,7 @@ impl FractionEnum {
 impl MaybeExact for FractionEnum {
     type Approximate = f64;
     type Exact = BigFraction;
-    
+
     fn is_exact(&self) -> bool {
         match self {
             FractionEnum::Exact(_) => true,
@@ -347,10 +347,6 @@ impl TryFrom<&FractionNotParsedYet> for FractionEnum {
     }
 }
 
-#[cfg(all(
-    not(feature = "withoutexactarithmetic"),
-    not(feature = "withoutapproximatearithmetic")
-))]
 impl crate::ebi_framework::ebi_trait::FromEbiTraitObject for FractionEnum {
     fn from_trait_object(object: crate::ebi_framework::ebi_input::EbiInput) -> Result<Box<Self>> {
         match object {

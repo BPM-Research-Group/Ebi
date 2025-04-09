@@ -3,11 +3,17 @@
  * In return, the denominator is fixed and operations are much cheaper.
  */
 
- #[cfg(all(not(feature = "withoutexactarithmetic"), not(feature = "withoutapproximatearithmetic")))]
+ #[cfg(any(
+    all(
+        not(feature = "exactarithmetic"),
+        not(feature = "approximatearithmetic")
+    ),
+    all(feature = "exactarithmetic", feature = "approximatearithmetic")
+))]
 pub type FixedDenominatorFraction = super::fixed_denominator_fraction_enum::FixedDenominatorFractionEnum;
 
-#[cfg(feature = "withoutexactarithmetic")]
+#[cfg(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic"))]
 pub type FixedDenominatorFraction = super::fixed_denominator_fraction_f64::FixedDenominatorFractionF64;
 
-#[cfg(feature = "withoutapproximatearithmetic")]
+#[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
 pub type FixedDenominatorFraction = super::fixed_denominator_fraction_exact::FixedDenominatorFractionExact;
