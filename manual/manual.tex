@@ -285,9 +285,9 @@ Sander J.J. Leemans, Tian Li}
 		There are two steps to take: set up the technique (that is, the implementation), and set up the command (i.e. where \& how Ebi can call it).
 		
 		\subsubsection{Conventions and Hints}
-			\begin{itemize}
+			\begin{enumerate}
 				\item Ebi only uses floating point numbers (f32, f64) when the user asks for it.
-				Commands should use \verb=Fraction= or other numeric exact classes (see Section~\ref{sec:exact}); these perform computations with floating point numbers if possible.
+				Commands should use \verb=Fraction= or other exact numeric classes (see Section~\ref{sec:exact}); these perform computations with the arithmetic type selected by the user.
 				\item It is important that errors are propagated appropriately.
 				Therefore, avoid \verb=.unwrap()= but instead propagate errors using \verb=.with_context(|| "error message")?=.
 				The \verb=anyhow= package formats the error messages nicely to the user.
@@ -295,7 +295,13 @@ Sander J.J. Leemans, Tian Li}
 				\item \verb|a += b| is usually faster than \verb|c = a + b|, as it saves a memory allocation, especially on heap-based structs such as \verb=Fraction=.
 				\item Rather than using a numeric struct, using traits such as \verb=Add= and \verb=Mul= allows code to be used regardless of the arithmetic type.
 				\item To provide debug output, avoid \verb=println= as it is rather inflexible, but use \verb=log::info= instead.
-			\end{itemize}
+				For consistency, Ebi provides two types of progress bars: one where a total integer number of steps is available, and one where a message is used that can be updated, e.g. to denote a probability. 
+				\begin{lstlisting}[language=Rust, style=boxed]
+					EbiCommand::get_progress_bar_ticks(total_steps);
+					EbiCommand::get_progress_bar_message(message);
+				\end{lstlisting}
+
+			\end{enumerate}
 		
 		\subsubsection{The technique}
 			The technique is the place where the code for the algorithm lives.
