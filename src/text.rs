@@ -38,3 +38,18 @@ impl <T> Joiner for Vec<T> where T: Display {
         slice.join_with(sep, last_sep)
     }
 }
+
+#[cfg(test)]
+mod tests{
+    use super::Joiner;
+
+        #[test]
+        fn join_vec() {
+            let x = vec!["a", "b", "c"];
+            assert_eq!(x.join_with(", ", " and "), "a, b and c");
+            assert_eq!((&x).join_with(", ", " and "), "a, b and c");
+            assert_eq!(x.as_slice().join_with(", ", " and "), "a, b and c");
+
+            assert_eq!(vec!["a"].join_with(",", ","), "a");
+        }
+}
