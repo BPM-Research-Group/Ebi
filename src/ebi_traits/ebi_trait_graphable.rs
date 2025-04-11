@@ -79,3 +79,46 @@ pub fn import<X: 'static + Importable + EbiTraitGraphable> (reader: &mut dyn Buf
         Err(x) => Err(x),
     }
 }
+
+#[cfg(test)]
+pub mod tests {
+    use std::fs::{self, File};
+
+    use crate::{ebi_framework::{ebi_file_handler::EBI_FILE_HANDLERS, ebi_object::EbiTraitObject, ebi_trait::EbiTrait}, multiple_reader::MultipleReader};
+
+    #[test]
+    fn all_graphable() {
+        let files = fs::read_dir("./testfiles").unwrap();
+        for path in files {
+            let file = path.unwrap();
+            println!("file {:?}", file.file_name());
+
+            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
+
+            //look for file handlers that should accept this file
+            for file_handler in EBI_FILE_HANDLERS {
+                println!("\tfile handler {}", file_handler);
+                if !file.file_name().into_string().unwrap().contains("invalid")
+                    && file
+                        .file_name()
+                        .into_string()
+                        .unwrap()
+                        .ends_with(&(".".to_string() + file_handler.file_extension))
+                {
+                    //file handler should be able to accept this file
+
+                    for importer in file_handler.trait_importers {
+                        if importer.get_trait() == EbiTrait::Graphable {
+                            println!("\t\timporter {}", importer);
+                            if let EbiTraitObject::Graphable(object) = importer.import(&mut reader.get().unwrap()).unwrap() {
+                                object.to_dot();
+                            } else {
+                                assert!(false);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

@@ -590,6 +590,7 @@ mod tests {
     use std::fs;
 
     use crate::{
+        ebi_framework::activity_key::{TranslateActivityKey, HasActivityKey},
         ebi_objects::{
             deterministic_finite_automaton::DeterministicFiniteAutomaton,
             finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage,
@@ -730,6 +731,30 @@ mod tests {
         let b = semantics.get_activity_key_mut().process_activity("b");
 
         let alignment = semantics.align_language(lang).unwrap();
+
+        let correct_1 = vec![
+            Move::SynchronousMove(b, 1),
+            Move::ModelMove(a, 4),
+            Move::SilentMove(5),
+            Move::LogMove(b),
+        ]; //other options may be valid, please check semantically when this fails
+        assert_eq!(*alignment.get(0).unwrap(), correct_1);
+    }
+
+    #[test]
+    fn align_dfa_lang_translate() {
+        let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
+        let mut lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
+
+        let fin1 = fs::read_to_string("testfiles/aa-ab-ba.dfa").unwrap();
+        let mut dfa = fin1.parse::<DeterministicFiniteAutomaton>().unwrap();
+        dfa.translate_using_activity_key(lang.get_activity_key_mut());
+        let mut semantics = dfa.to_semantics();
+
+        let alignment = semantics.align_language(lang).unwrap();
+
+        let a = semantics.get_activity_key_mut().process_activity("a");
+        let b = semantics.get_activity_key_mut().process_activity("b");
 
         let correct_1 = vec![
             Move::SynchronousMove(b, 1),

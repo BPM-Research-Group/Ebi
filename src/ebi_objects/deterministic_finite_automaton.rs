@@ -443,3 +443,24 @@ impl ToSemantics for DeterministicFiniteAutomaton {
         EbiTraitSemantics::Usize(Box::new(self))
     }
 }
+
+#[cfg(test)]
+mod tests{
+    use crate::ebi_traits::ebi_trait_semantics::Semantics;
+    use crate::ebi_framework::activity_key::HasActivityKey;
+
+    use super::DeterministicFiniteAutomaton;
+
+
+    #[test]
+    fn insert_wrong_edge() {
+        let mut dfa = DeterministicFiniteAutomaton::new();
+        let state = dfa.get_initial_state().unwrap();
+        let activity = dfa.get_activity_key_mut().process_activity("a");
+
+        dfa.get_sources();
+
+        assert!(dfa.add_transition(state, activity, state).is_ok());
+        assert!(dfa.add_transition(state, activity, state).is_err());
+    }
+}

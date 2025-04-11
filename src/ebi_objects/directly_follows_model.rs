@@ -334,3 +334,18 @@ impl Infoable for DirectlyFollowsModel {
         Ok(write!(f, "")?)
     }
 }
+
+#[cfg(test)]
+mod tests{
+    use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable};
+
+    use super::DirectlyFollowsModel;
+
+
+    #[test]
+    #[should_panic]
+    fn unreacahble() {
+        let mut f = vec![];
+        DirectlyFollowsModel::export_from_object(EbiOutput::Usize(0), &mut f).unwrap_err();
+    }
+}
