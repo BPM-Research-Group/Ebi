@@ -30,7 +30,7 @@ use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EbiFileHa
 
 
 // This keeps Rust from "mangling" the name and making it unique for this crate.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_org_processmining_ebi_CallEbi_call_1ebi_1internal<'local>(mut env: JNIEnv<'local>,
 // This is the class that owns our static method. It's not going to be used,
 // but still must be present to match the expected signature of a static
