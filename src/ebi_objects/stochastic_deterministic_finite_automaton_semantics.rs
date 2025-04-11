@@ -27,7 +27,7 @@ macro_rules! semantics_for_automaton {
              * source.len() = silent transition to final state
              */
 
-            fn get_initial_state(&self) -> usize {
+            fn get_initial_state(&self) -> Option<usize> {
                 self.initial_state
             }
 
@@ -120,7 +120,7 @@ impl StochasticSemantics for StochasticDeterministicFiniteAutomaton {
 impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton {
     type DetState = usize;
 
-    fn get_deterministic_initial_state(&self) -> Result<usize> {
+    fn get_deterministic_initial_state(&self) -> Result<Option<usize>> {
         Ok(self.get_initial_state())
     }
 

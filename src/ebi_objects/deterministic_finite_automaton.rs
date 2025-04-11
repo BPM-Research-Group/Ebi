@@ -1,8 +1,8 @@
-use anyhow::{anyhow, Context, Error, Result};
+use anyhow::{Context, Error, Result, anyhow};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
 use std::{
-    cmp::{max, Ordering},
+    cmp::{Ordering, max},
     fmt::{Display, Formatter},
     io::{self, BufRead},
     str::FromStr,
@@ -73,7 +73,7 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
 #[derive(Debug, ActivityKey)]
 pub struct DeterministicFiniteAutomaton {
     pub(crate) activity_key: ActivityKey,
-    pub(crate) initial_state: usize,
+    pub(crate) initial_state: Option<usize>,
     pub(crate) max_state: usize,
     pub(crate) sources: Vec<usize>,       //transition -> source of arc
     pub(crate) targets: Vec<usize>,       //transition -> target of arc
@@ -82,11 +82,14 @@ pub struct DeterministicFiniteAutomaton {
 }
 
 impl DeterministicFiniteAutomaton {
+    /**
+     * Creates a new DFA with an initial state. That is, it will have the language with the empty trace.
+     */
     pub fn new() -> Self {
         Self {
             activity_key: ActivityKey::new(),
             max_state: 0,
-            initial_state: 0,
+            initial_state: Some(0),
             sources: vec![],
             targets: vec![],
             activities: vec![],
@@ -106,8 +109,10 @@ impl DeterministicFiniteAutomaton {
         &self.activities
     }
 
-    pub fn set_initial_state(&mut self, state: usize) {
-        self.ensure_states(state);
+    pub fn set_initial_state(&mut self, state: Option<usize>) {
+        if let Some(state) = state {
+            self.ensure_states(state);
+        }
         self.initial_state = state;
     }
 
@@ -250,7 +255,9 @@ impl DeterministicFiniteAutomaton {
 impl TranslateActivityKey for DeterministicFiniteAutomaton {
     fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
         let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
-        self.activities.iter_mut().for_each(|activity| *activity = translator.translate_activity(&activity));
+        self.activities
+            .iter_mut()
+            .for_each(|activity| *activity = translator.translate_activity(&activity));
         self.activity_key = to_activity_key.clone();
     }
 }
@@ -279,10 +286,7 @@ impl Importable for DeterministicFiniteAutomaton {
 
         let mut result = DeterministicFiniteAutomaton::new();
 
-        result.set_initial_state(
-            json::read_field_number(&json, "initialState")
-                .context("failed to read initial state")?,
-        );
+        result.set_initial_state(json::read_field_number(&json, "initialState").ok());
 
         //read transitions
         let jtrans = json::read_field_list(&json, "transitions")
@@ -348,7 +352,9 @@ impl Infoable for DeterministicFiniteAutomaton {
 impl Display for DeterministicFiniteAutomaton {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "{{")?;
-        writeln!(f, "\"initialState\": {},", self.get_initial_state())?;
+        if let Some(state) = self.get_initial_state() {
+            writeln!(f, "\"initialState\": {},", state)?;
+        }
         writeln!(f, "\"transitions\": [")?;
         for pos in 0..self.sources.len() {
             write!(

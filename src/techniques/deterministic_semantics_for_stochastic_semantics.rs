@@ -1,7 +1,7 @@
 use anyhow::Result;
+use std::collections::HashMap;
 use std::collections::hash_map::DefaultHasher;
 use std::collections::hash_map::Entry;
-use std::collections::HashMap;
 use std::fmt::{self, Debug};
 use std::hash::{Hash, Hasher};
 use strum_macros::Display;
@@ -26,7 +26,7 @@ use crate::math::traits::Zero;
 impl StochasticDeterministicSemantics for StochasticLabelledPetriNet {
     type DetState = PMarking<LPNMarking>;
 
-    fn get_deterministic_initial_state(&self) -> Result<Self::DetState> {
+    fn get_deterministic_initial_state(&self) -> Result<Option<Self::DetState>> {
         let mut result = Self::DetState {
             hash: 0,
             p_marking: HashMap::new(),
@@ -35,15 +35,16 @@ impl StochasticDeterministicSemantics for StochasticLabelledPetriNet {
             activity_2_p_markings: HashMap::new(),
             activity_2_probability: HashMap::new(),
         };
-        let initial_state =
-            <StochasticLabelledPetriNet as Semantics>::get_initial_state(self).clone();
+        let initial_state = <StochasticLabelledPetriNet as Semantics>::get_initial_state(self)
+            .unwrap()
+            .clone();
         if <StochasticLabelledPetriNet as Semantics>::is_final_state(self, &initial_state) {
             result.termination_probability = Fraction::one();
         }
         result.p_marking.insert(initial_state, Fraction::one());
 
         self.compute_next(&mut result)?;
-        return Ok(result);
+        return Ok(Some(result));
     }
 
     fn execute_deterministic_activity(

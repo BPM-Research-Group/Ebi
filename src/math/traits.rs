@@ -36,74 +36,6 @@ pub trait Signed: Sized {
 
 // ============ implementations ============
 
-impl Zero for i64 {
-    fn zero() -> Self {
-        0
-    }
-
-    fn is_zero(&self) -> bool {
-        self == &0i64
-    }
-}
-
-impl One for i64 {
-    fn one() -> Self {
-        1
-    }
-
-    fn is_one(&self) -> bool {
-        self == &1i64
-    }
-}
-
-impl Signed for i64 {
-    fn abs(&self) -> Self {
-        NumSigned::abs(&self)
-    }
-
-    fn is_positive(&self) -> bool {
-        NumSigned::is_positive(self)
-    }
-
-    fn is_negative(&self) -> bool {
-        NumSigned::is_negative(self)
-    }
-}
-
-impl Zero for i128 {
-    fn zero() -> Self {
-        0
-    }
-
-    fn is_zero(&self) -> bool {
-        self == &0i128
-    }
-}
-
-impl One for i128 {
-    fn one() -> Self {
-        1
-    }
-
-    fn is_one(&self) -> bool {
-        self == &1i128
-    }
-}
-
-impl Signed for i128 {
-    fn abs(&self) -> Self {
-        NumSigned::abs(&self)
-    }
-
-    fn is_positive(&self) -> bool {
-        NumSigned::is_positive(self)
-    }
-
-    fn is_negative(&self) -> bool {
-        NumSigned::is_negative(self)
-    }
-}
-
 impl One for BigInt {
     fn one() -> Self {
         <BigInt as NumOne>::one()
@@ -211,3 +143,58 @@ impl One for BigFraction {
         num::One::is_one(self)
     }
 }
+
+macro_rules! ttype_signed {
+    ($t:ident) => {
+        ttype!($t);
+        impl Signed for $t {
+            fn abs(&self) -> Self {
+                NumSigned::abs(&self)
+            }
+        
+            fn is_positive(&self) -> bool {
+                NumSigned::is_positive(self)
+            }
+        
+            fn is_negative(&self) -> bool {
+                NumSigned::is_negative(self)
+            }
+        }
+    };
+}
+
+macro_rules! ttype {
+    ($t:ident) => {
+        impl Zero for $t {
+            fn zero() -> Self {
+                0
+            }
+
+            fn is_zero(&self) -> bool {
+                num::Zero::is_zero(self)
+            }
+        }
+
+        impl One for $t {
+            fn one() -> Self {
+                1
+            }
+        
+            fn is_one(&self) -> bool {
+                num::One::is_one(self)
+            }
+        }
+    };
+}
+
+ttype!(usize);
+ttype!(u128);
+ttype!(u16);
+ttype!(u32);
+ttype!(u64);
+ttype!(u8);
+ttype_signed!(i128);
+ttype_signed!(i16);
+ttype_signed!(i32);
+ttype_signed!(i64);
+ttype_signed!(i8);

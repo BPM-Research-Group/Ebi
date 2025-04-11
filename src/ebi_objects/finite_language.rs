@@ -1,5 +1,6 @@
 use anyhow::{anyhow, Context, Error, Result};
 use fnv::FnvBuildHasher;
+use num::Zero;
 use std::{
     collections::HashSet,
     fmt::Display,
@@ -95,14 +96,18 @@ impl FiniteLanguage {
         let mut result = DeterministicFiniteAutomaton::new();
         result.set_activity_key(self.get_activity_key().clone());
 
-        for trace in self.iter() {
-            let mut state = result.get_initial_state();
+        if self.len().is_zero() {
+            result.set_initial_state(None);
+        } else {
+            for trace in self.iter() {
+                let mut state = result.get_initial_state().unwrap();
 
-            for activity in trace {
-                state = result.take_or_add_transition(state, *activity);
+                for activity in trace {
+                    state = result.take_or_add_transition(state, *activity);
+                }
+
+                result.set_final_state(state, true);
             }
-
-            result.set_final_state(state, true);
         }
 
         result

@@ -1,5 +1,4 @@
 use anyhow::{anyhow, Result};
-use num::One as _;
 
 use crate::{distances::TriangularDistanceMatrix, ebi_objects::finite_language::FiniteLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{fraction::Fraction, traits::{One, Zero}}};
 

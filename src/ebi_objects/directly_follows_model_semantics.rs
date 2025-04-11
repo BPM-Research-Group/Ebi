@@ -15,8 +15,8 @@ impl Semantics for DirectlyFollowsModel {
      */
     type SemState = usize;
 
-    fn get_initial_state(&self) -> <Self as Semantics>::SemState {
-        self.get_number_of_nodes() + 1
+    fn get_initial_state(&self) -> Option<<Self as Semantics>::SemState> {
+        Some(self.get_number_of_nodes() + 1)
     }
 
     fn execute_transition(&self, state: &mut <Self as Semantics>::SemState, transition: TransitionIndex) -> anyhow::Result<()> {
@@ -42,7 +42,7 @@ impl Semantics for DirectlyFollowsModel {
 
     fn get_enabled_transitions(&self, state: &<Self as Semantics>::SemState) -> Vec<TransitionIndex> {
 
-        if state == &self.get_initial_state() {
+        if state == &self.get_initial_state().unwrap() {
             //initial state
 
             //start in start node
@@ -90,7 +90,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/a-b_star.dfm").unwrap();
         let dfm = fin.parse::<DirectlyFollowsModel>().unwrap();
 
-        let mut state = dfm.get_initial_state();
+        let mut state = dfm.get_initial_state().unwrap();
 
         assert_eq!(dfm.get_enabled_transitions(&state), vec![0]);
 

@@ -7,6 +7,11 @@ edition = "2024"
 name = "ebi"
 crate-type = ["cdylib", "lib"]
 
+[features]
+default = []
+exactarithmetic = []
+approximatearithmetic = []
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
@@ -58,8 +63,3 @@ panic = 'abort'
 opt-level = 3
 lto = true
 codegen-units = 1
-
-[features]
-default = []
-exactarithmetic = []
-approximatearithmetic = []

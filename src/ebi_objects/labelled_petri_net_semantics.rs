@@ -43,7 +43,8 @@ impl Semantics for LabelledPetriNet {
         state.number_of_enabled_transitions == 0   
     }
 
-    fn get_initial_state(&self) -> LPNMarking {
+    fn get_initial_state(&self) -> Option<LPNMarking> {
+        //an LPN does supports the empty language, but only in livelocks
         let mut result = LPNMarking {
             marking: self.initial_marking.clone(),
             enabled_transitions: bitvec![0; self.get_number_of_transitions()],
@@ -51,7 +52,7 @@ impl Semantics for LabelledPetriNet {
         };
 		self.compute_enabled_transitions(&mut result);
 
-        result
+        Some(result)
     }
 
 	fn execute_transition(&self, state: &mut LPNMarking, transition: TransitionIndex) -> anyhow::Result<()>{

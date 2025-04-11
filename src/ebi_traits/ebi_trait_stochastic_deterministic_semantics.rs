@@ -24,7 +24,7 @@ pub trait StochasticDeterministicSemantics: Livelock<LivState = Self::DetState> 
     /**
 	 * (Re)set the semantics to the initial state.
 	 */
-    fn get_deterministic_initial_state(&self) -> Result<Self::DetState>;
+    fn get_deterministic_initial_state(&self) -> Result<Option<Self::DetState>>;
 
 
     /**

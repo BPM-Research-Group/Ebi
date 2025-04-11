@@ -18,7 +18,11 @@ use crate::{
         ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::StochasticSemantics,
     },
     follower_semantics::FollowerSemantics,
-    math::{fraction::Fraction, matrix::Matrix, traits::{One, Zero}},
+    math::{
+        fraction::Fraction,
+        matrix::Matrix,
+        traits::{One, Zero},
+    },
 };
 
 //generic implementation
@@ -35,10 +39,16 @@ macro_rules! default_trace_probability {
 
                 // log::debug!("trace probability init");
 
+                let initial_state_a = if let Some(i) = self.get_initial_state() {
+                    i
+                } else {
+                    return Ok(Fraction::zero()); //If the language has no states, then the probability of any trace is zero.
+                };
+
                 //initialise
                 {
                     let state = Rc::new(ABState::<$s> {
-                        state_a: self.get_initial_state(),
+                        state_a: initial_state_a,
                         state_b: follower_b.get_initial_state(),
                     });
                     z.worklist.push(state.clone());
@@ -145,6 +155,11 @@ macro_rules! default_trace_probability {
                     }
                 }
 
+                if cfg!(test) {
+                    //test the debug output
+                    println!("{}", result);
+                }
+
                 let trace_probability = result.solve()?;
                 Ok(trace_probability)
             }
@@ -158,22 +173,26 @@ impl EbiTraitQueriableStochasticLanguage for StochasticDeterministicFiniteAutoma
     fn get_probability(&self, follower: &FollowerSemantics) -> Result<Fraction> {
         match follower {
             FollowerSemantics::Trace(trace) => {
-                let mut state = self.get_initial_state();
-                let mut result = Fraction::one();
+                if let Some(initial_state) = self.get_initial_state() {
+                    let mut state = initial_state;
+                    let mut result = Fraction::one();
 
-                for activity in trace.iter() {
-                    let (found, pos) =
-                        self.binary_search(state, self.activity_key.get_id_from_activity(activity));
-                    if !found {
-                        return Ok(Fraction::zero());
+                    for activity in trace.iter() {
+                        let (found, pos) = self
+                            .binary_search(state, self.activity_key.get_id_from_activity(activity));
+                        if !found {
+                            return Ok(Fraction::zero());
+                        }
+                        state = self.targets[pos];
+                        result *= &self.probabilities[pos];
                     }
-                    state = self.targets[pos];
-                    result *= &self.probabilities[pos];
+
+                    result *= &self.terminating_probabilities[state];
+
+                    Ok(result)
+                } else {
+                    Ok(Fraction::zero())
                 }
-
-                result *= &self.terminating_probabilities[state];
-
-                Ok(result)
             }
         }
     }
@@ -454,7 +473,16 @@ struct Y {
 mod tests {
     use std::fs;
 
-    use crate::{ebi_framework::activity_key::HasActivityKey, ebi_objects::{stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, follower_semantics::FollowerSemantics, math::{fraction::Fraction, traits::Zero}};
+    use crate::{
+        ebi_framework::activity_key::HasActivityKey,
+        ebi_objects::{
+            stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+            stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        },
+        ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+        follower_semantics::FollowerSemantics,
+        math::{fraction::Fraction, traits::Zero},
+    };
 
     #[test]
     fn probability_sdfa_livelock_zeroweight() {
@@ -660,5 +688,4 @@ mod tests {
             assert_eq!(probability, "0".parse::<Fraction>().unwrap());
         }
     }
-
 }

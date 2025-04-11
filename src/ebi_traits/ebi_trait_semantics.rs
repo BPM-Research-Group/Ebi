@@ -42,9 +42,10 @@ pub trait Semantics : Debug + Send + Sync + AlignmentHeuristics<AliState = Self:
 	type SemState: Displayable;
 
     /**
-	 * (Re)set the semantics to the initial state.
+	 * Get the initial state.
+	 * If it does not exist, then the language is empty.
 	 */
-    fn get_initial_state(&self) -> <Self as Semantics>::SemState;
+    fn get_initial_state(&self) -> Option<<Self as Semantics>::SemState>;
 
 
     /**

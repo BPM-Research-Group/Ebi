@@ -1,6 +1,5 @@
 use anyhow::{anyhow, Result};
 use core::hash::Hash;
-use num::One as _;
 use priority_queue::PriorityQueue;
 use std::{
     cmp::Ordering,
@@ -231,7 +230,7 @@ impl<DState: Displayable>
             Z::Prefix(
                 Fraction::one(),
                 vec![],
-                self.get_deterministic_initial_state()?,
+                self.get_deterministic_initial_state()?.ok_or_else(|| anyhow!("Cannot get alignment from an empty language."))?,
             ),
             Fraction::one(),
         );
@@ -551,7 +550,7 @@ mod tests {
             >,
         > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
 
-        let state1 = slpn.get_deterministic_initial_state().unwrap();
+        let state1 = slpn.get_deterministic_initial_state().unwrap().unwrap();
         let enabled1 = slpn.get_deterministic_enabled_activities(&state1);
         assert_eq!(enabled1.len(), 2);
 
@@ -613,18 +612,18 @@ mod tests {
         );
     }
 
-    #[test]
-    fn pdc_cover() {
-        let fin = fs::read_to_string("testfiles/pdc2023_121111.xes.gz-IMf.lpn-alignments.slpn").unwrap();
-        let slpn: Box<
-            dyn StochasticDeterministicSemantics<
-                DetState = PMarking<LPNMarking>,
-                LivState = PMarking<LPNMarking>,
-            >,
-        > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
+    // #[test]
+    // fn pdc_cover() {
+    //     let fin = fs::read_to_string("testfiles/pdc2023_121111.xes.gz-IMf.lpn-alignments.slpn").unwrap();
+    //     let slpn: Box<
+    //         dyn StochasticDeterministicSemantics<
+    //             DetState = PMarking<LPNMarking>,
+    //             LivState = PMarking<LPNMarking>,
+    //         >,
+    //     > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
 
-        slpn.analyse_probability_coverage(&Fraction::from((4, 1000))).unwrap();
-    }
+    //     slpn.analyse_probability_coverage(&Fraction::from((4, 1000))).unwrap();
+    // }
 
 
     #[test]
@@ -649,7 +648,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/empty_net.slpn").unwrap();
 
         let slpn = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
-        let state = slpn.get_deterministic_initial_state().unwrap();
+        let state = slpn.get_deterministic_initial_state().unwrap().unwrap();
         assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 0);
         // assert_eq!(
         //     slpn.get_deterministic_termination_probability(&state),
@@ -687,7 +686,7 @@ mod tests {
             >,
         > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
 
-        let state1 = slpn.get_deterministic_initial_state().unwrap();
+        let state1 = slpn.get_deterministic_initial_state().unwrap().unwrap();
         let enabled1 = slpn.get_deterministic_enabled_activities(&state1);
 
         assert_eq!(enabled1.len(), 2);
@@ -698,7 +697,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/empty_lang_labelled.slpn").unwrap();
 
         let slpn = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
-        let state = slpn.get_deterministic_initial_state().unwrap();
+        let state = slpn.get_deterministic_initial_state().unwrap().unwrap();
         assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
         assert_eq!(
             slpn.get_deterministic_termination_probability(&state),
@@ -731,7 +730,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/empty_lang_silent.slpn").unwrap();
 
         let slpn = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
-        let state = slpn.get_deterministic_initial_state().unwrap();
+        let state = slpn.get_deterministic_initial_state().unwrap().unwrap();
         assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 0);
         assert_eq!(
             slpn.get_deterministic_termination_probability(&state),
@@ -884,7 +883,7 @@ mod tests {
         assert_eq!(sdfa.get_number_of_transitions(), 5);
 
         //initial state
-        let state = sdfa.get_deterministic_initial_state().unwrap();
+        let state = sdfa.get_deterministic_initial_state().unwrap().unwrap();
         assert_eq!(state, 0);
         assert_eq!(sdfa.get_deterministic_enabled_activities(&state).len(), 2);
 

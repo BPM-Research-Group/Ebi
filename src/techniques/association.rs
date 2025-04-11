@@ -4,7 +4,6 @@ use crate::{
     math::{correlation::correlation, fraction::Fraction, levenshtein, root::ContainsRoot, traits::{Signed, Zero}},
 };
 use anyhow::{anyhow, Result};
-use num::Zero as NumZero;
 use rand::Rng;
 use rayon::prelude::*;
 

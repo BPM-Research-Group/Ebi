@@ -1,5 +1,5 @@
 use anyhow::{anyhow, Result};
-use std::io::BufRead;
+use std::{fmt::Debug, io::BufRead};
 
 use crate::{
     ebi_framework::{
@@ -17,7 +17,7 @@ use super::{
 };
 
 pub trait EbiTraitFiniteStochasticLanguage:
-    EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync
+    EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync + Debug
 {
     fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction>;
 
