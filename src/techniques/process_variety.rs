@@ -7,8 +7,6 @@ use crate::{
 
 pub trait ProcessVariety {
     fn rao_stirling_diversity(&self) -> Fraction;
-
-    fn diversity_gini(&self) -> Fraction;
 }
 
 impl ProcessVariety for dyn EbiTraitFiniteStochasticLanguage {
@@ -25,11 +23,6 @@ impl ProcessVariety for dyn EbiTraitFiniteStochasticLanguage {
                 d
             }).sum::<Fraction>()
         }).sum()
-    }
-
-    fn diversity_gini(&self) -> Fraction {
-        let n_c = self.len();
-        Fraction::from(n_c)
     }
 }
 
