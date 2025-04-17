@@ -27,9 +27,10 @@ impl Semantics for ProcessTree {
         } else {
             let node = self.transition2node.get(transition).ok_or_else(|| anyhow!("Transition does not exist."))?;
             self.start_node(state, *node, None);
-            log::debug!("execute node {}", node);
+            // log::debug!("execute node {}", node);
             self.close_node(state, *node);
         }
+        // log::debug!("state after execution {}", state);
         Ok(())
     }
 
@@ -38,13 +39,14 @@ impl Semantics for ProcessTree {
     }
 
     fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
+        // log::debug!("\t is transition silent {}", transition);
         if let Some(node ) = self.transition2node.get(transition) {
             match self.tree.get(*node) {
                 Some(Node::Tau) => true,
                 _ => false,
             }
         } else {
-            false
+            true
         }
     }
 
@@ -85,7 +87,7 @@ impl ProcessTree {
      */
     fn start_node(&self, state: &mut <Self as Semantics>::SemState, node: usize, child: Option<usize>) {
         if state[node] != NodeState::Started {
-            log::debug!("start node {} from child {:?}", node, child);
+            // log::debug!("start node {} from child {:?}", node, child);
             state[node] = NodeState::Started;
 
            match self.tree[node] {
@@ -116,7 +118,7 @@ impl ProcessTree {
     }
 
     fn withdraw_enablement(&self, state: &mut <Self as Semantics>::SemState, node: usize) {
-        log::debug!("withdraw enablement of node {}", node);
+        // log::debug!("withdraw enablement of node {}", node);
         for grandchild in node..self.traverse(node) {
             state[grandchild] = NodeState::Closed;
         }
@@ -124,7 +126,7 @@ impl ProcessTree {
 
     fn close_node(&self, state: &mut <Self as Semantics>::SemState, node: usize) {
 
-        log::debug!("close node {}", node);
+        // log::debug!("close node {}", node);
         
         //close this node and all of its children
         for grandchild in node..self.traverse(node) {
@@ -138,7 +140,7 @@ impl ProcessTree {
                 Node::Activity(_) => unreachable!(),
                 Node::Operator(Operator::Sequence, number_of_children) => {
                     //for a sequence parent, we enable the next child
-                    log::debug!("close node {}, parent is sequence node {}", node, parent);
+                    // log::debug!("close node {}, parent is sequence node {}", node, parent);
                     if child_rank < number_of_children - 1 {
                         let next_child = self.get_child(parent, child_rank + 1);
                         self.enable_node(state, next_child);

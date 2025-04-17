@@ -164,7 +164,7 @@ where
 
         //compute alignments multi-threadedly
         let aligned_traces = (0..log.len())
-            .into_iter()
+            .into_par_iter()
             .filter_map(|trace_index| {
                 let log = Arc::clone(&log);
                 let translator = Arc::clone(&translator);
@@ -175,7 +175,7 @@ where
                 let probability = log.get_probability(trace_index).unwrap().clone();
 
 
-                log::debug!("align trace {:?}", trace);
+                // log::debug!("align trace {:?}", trace);
                 let result = self2
                     .align_trace(&trace_translated)
                     .with_context(|| format!("Aligning trace {:?}", trace));
@@ -319,6 +319,7 @@ where
     T: Semantics<SemState = State> + ?Sized,
     State: Display + Debug + Clone + Hash + Eq,
 {
+    // log::debug!("transform alignment {:?}", states);
     let mut alignment = vec![];
 
     let mut it = states.into_iter();
@@ -326,6 +327,7 @@ where
     let (mut previous_trace_index, mut previous_state) = it.next().unwrap();
 
     for (trace_index, state) in it {
+        // log::debug!("transform {} from {} to {}", trace_index, previous_state, state);
         if trace_index != previous_trace_index {
             //we did a move on the log
             let activity = trace[previous_trace_index];
@@ -381,15 +383,19 @@ where
     T: Semantics<SemState = FS> + ?Sized,
     FS: Display + Debug + Clone + Hash + Eq,
 {
+    // log::debug!("is there a silent transition enabled from {} to {}", from, to);
+    // log::debug!("enabled transitions {:?}", semantics.get_enabled_transitions(from));
     for transition in semantics.get_enabled_transitions(from) {
         if semantics.is_transition_silent(transition) {
             let mut from = from.clone();
             let _ = semantics.execute_transition(&mut from, transition);
             if &from == to {
+                // log::debug!("yes");
                 return Some(transition);
             }
         }
     }
+    // log::debug!("no");
     None
 }
 
