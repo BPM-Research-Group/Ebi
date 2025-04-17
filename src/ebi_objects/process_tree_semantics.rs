@@ -462,13 +462,4 @@ mod tests {
         assert_eq!(tree.get_enabled_transitions(&state), Vec::<usize>::new());
         assert!(tree.is_final_state(&state));
     }
-
-    #[test]
-    fn tree_semantics_4() {
-        let fin = fs::read_to_string("testfiles/aa.ptree").unwrap();
-        let tree = fin.parse::<ProcessTree>().unwrap();
-
-        let mut state = tree.get_initial_state().unwrap();
-
-    }
 }
