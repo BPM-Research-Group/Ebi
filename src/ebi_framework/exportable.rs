@@ -27,3 +27,30 @@ impl Exportable for usize {
         Ok(writeln!(f, "{}", self)?)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Exportable;
+
+    #[test]
+    fn default_exportable() {
+        let mut f = vec![];
+        0usize.export(&mut f).unwrap();
+
+        "a".to_string().export(&mut f).unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn unreachable_string() {
+        let mut f = vec![];
+        String::export_from_object(crate::ebi_framework::ebi_output::EbiOutput::Usize(1), &mut f).unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn unreachable_usize() {
+        let mut f = vec![];
+        usize::export_from_object(crate::ebi_framework::ebi_output::EbiOutput::Usize(1), &mut f).unwrap();
+    }
+}

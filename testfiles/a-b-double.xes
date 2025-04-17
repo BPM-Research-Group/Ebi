@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+  <extension name="Concept" prefix="concept" uri="http://code.deckfour.org/xes/concept.xesext"/>
+  <extension name="Time" prefix="time" uri="http://code.deckfour.org/xes/time.xesext"/>
+  <extension name="Organizational" prefix="org" uri="http://code.deckfour.org/xes/org.xesext"/>
+  <global scope="trace">
+    <string key="concept:name" value="name"/>
+  </global>
+  <global scope="event">
+    <string key="concept:name" value="name"/>
+  </global>
+  <classifier name="Activity" keys="Activity"/>
+  <trace>
+    <string key="concept:name" value="first trace"/>
+    <string key="attribute" value="a"/>
+    <event>
+      <string key="concept:name" value="a"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="first trace 2"/>
+    <string key="attribute" value="a"/>
+    <event>
+      <string key="concept:name" value="a"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="second trace"/>
+    <string key="attribute" value="b"/>
+    <event>
+      <string key="concept:name" value="b"/>
+    </event>
+  </trace>
+</log>

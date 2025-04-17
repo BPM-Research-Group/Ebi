@@ -1,5 +1,6 @@
 use std::{collections::HashSet, fmt::Display, io::{self, BufRead, Write}, str::FromStr};
 use anyhow::{anyhow, Context, Result, Error};
+use itertools::Itertools;
 use layout::topo::layout::VisualGraph;
 
 use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey}, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable, infoable::Infoable}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}}, line_reader::LineReader};
@@ -194,16 +195,13 @@ impl Importable for DirectlyFollowsModel {
             let edge_line = lreader.next_line_string().with_context(|| format!("could not read edge {}", e))?;
 
             let mut arr = edge_line.split('>');
-            let source = match arr.next() {
-                Some(s) => s.parse::<usize>().with_context(|| format!("could not read source of edge {}", e))?,
-                None => return Err(anyhow!("could not read source of edge {}", e)),
-            };
-            let target = match arr.next() {
-                Some(t) => t.parse::<usize>().with_context(|| format!("could not read target of edge {}", e))?,
-                None => return Err(anyhow!("could not read target of edge {}", e)),
-            };
-            
-            edges[source][target] = true;
+            if let Some((source, target)) = arr.next_tuple() {
+                let source = source.parse::<usize>().with_context(|| format!("could not read source of edge {}", e))?;
+                let target = target.parse::<usize>().with_context(|| format!("could not read target of edge {}", e))?;
+                edges[source][target] = true;
+            } else {
+                return Err(anyhow!("could not read edge, which must be two numbers separated by >"));
+            }
         }
 
         Ok(Self {

@@ -326,9 +326,6 @@ impl Importable for EventLog {
             name: "concept:name".to_string(),
             keys: vec!["concept:name".to_string()],
         };
-        if log.traces.is_empty() {
-            return Err(anyhow!("event log has no traces"));
-        }
         Ok(EventLog::new(log, classifier))
     }
 }
@@ -549,5 +546,42 @@ impl Display for DataType {
             DataType::Time(min, max) => write!(f, "time between {} and {}", min, max),
             DataType::Undefined => write!(f, "undefined"),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_framework::activity_key::{ActivityKey, TranslateActivityKey}, ebi_objects::finite_stochastic_language::FiniteStochasticLanguage};
+
+    use super::EventLog;
+    
+    #[test]
+    fn log_to_slang() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+
+        let fin1 = fs::read_to_string("testfiles/a-b.slang").unwrap();
+        let slang = fin1.parse::<FiniteStochasticLanguage>().unwrap();
+
+        assert_eq!(log.get_finite_stochastic_language(), slang);
+    }
+
+    #[test]
+    fn log_activity_key() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let mut log = fin.parse::<EventLog>().unwrap();
+
+        let mut activity_key = ActivityKey::new();
+        log.translate_using_activity_key(&mut activity_key);
+    }
+
+    #[test]
+    fn log_display() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+
+        assert_eq!(format!("{}", log), "event log with 2 traces");
     }
 }

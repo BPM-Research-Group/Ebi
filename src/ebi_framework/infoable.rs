@@ -24,7 +24,9 @@ impl Infoable for BigFraction {
 
 #[cfg(test)]
 mod tests {
-    use std::fs::{self, File};
+    use std::{fs::{self, File}, str::FromStr};
+
+    use fraction::BigFraction;
 
     use crate::{ebi_framework::{ebi_file_handler::EBI_FILE_HANDLERS, infoable::Infoable}, multiple_reader::MultipleReader};
 
@@ -58,5 +60,16 @@ mod tests {
                 }
             }
         }
+    }
+
+    #[test]
+    fn default_infoable() {
+        let x = "x".to_string();
+        let mut f = vec![];
+        x.info(&mut f).unwrap();
+
+        BigFraction::infinity().info(&mut f).unwrap();
+        BigFraction::nan().info(&mut f).unwrap();
+        BigFraction::from_str("1/2").unwrap().info(&mut f).unwrap();
     }
 }

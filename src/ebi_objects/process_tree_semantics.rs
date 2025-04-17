@@ -11,11 +11,13 @@ impl Semantics for ProcessTree {
     type SemState = NodeStates;
 
     fn get_initial_state(&self) -> Option<<Self as Semantics>::SemState> {
-        //a process tree does not support the empty language, so its semantics has an initial state
-
-        let mut state = NodeStates { states: vec![NodeState::Closed; self.get_number_of_nodes()], terminated: self.tree.is_empty() };
-        self.enable_node(&mut state, self.get_root());
-        Some(state)
+        if self.tree.is_empty() {
+            None
+        } else {
+            let mut state = NodeStates { states: vec![NodeState::Closed; self.get_number_of_nodes()], terminated: false };
+            self.enable_node(&mut state, self.get_root());
+            Some(state)
+        }
     }
 
     fn execute_transition(&self, state: &mut <Self as Semantics>::SemState, transition: TransitionIndex) -> Result<()> {
@@ -457,5 +459,14 @@ mod tests {
 
         assert_eq!(tree.get_enabled_transitions(&state), Vec::<usize>::new());
         assert!(tree.is_final_state(&state));
+    }
+
+    #[test]
+    fn tree_semantics_4() {
+        let fin = fs::read_to_string("testfiles/aa.ptree").unwrap();
+        let tree = fin.parse::<ProcessTree>().unwrap();
+
+        let mut state = tree.get_initial_state().unwrap();
+
     }
 }

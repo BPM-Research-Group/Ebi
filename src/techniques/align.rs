@@ -164,7 +164,7 @@ where
 
         //compute alignments multi-threadedly
         let aligned_traces = (0..log.len())
-            .into_par_iter()
+            .into_iter()
             .filter_map(|trace_index| {
                 let log = Arc::clone(&log);
                 let translator = Arc::clone(&translator);
@@ -174,6 +174,8 @@ where
                 let trace_translated = translator.translate_trace(trace);
                 let probability = log.get_probability(trace_index).unwrap().clone();
 
+
+                log::debug!("align trace {:?}", trace);
                 let result = self2
                     .align_trace(&trace_translated)
                     .with_context(|| format!("Aligning trace {:?}", trace));

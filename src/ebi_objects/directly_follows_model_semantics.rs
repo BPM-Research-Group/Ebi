@@ -83,16 +83,17 @@ mod tests {
 
     use crate::{ebi_objects::directly_follows_model::DirectlyFollowsModel, ebi_traits::ebi_trait_semantics::Semantics};
 
-    
-
     #[test]
     fn dfm_semantics() {
         let fin = fs::read_to_string("testfiles/a-b_star.dfm").unwrap();
         let dfm = fin.parse::<DirectlyFollowsModel>().unwrap();
 
+        assert_eq!(dfm.get_number_of_transitions(), 3);
+
         let mut state = dfm.get_initial_state().unwrap();
 
         assert_eq!(dfm.get_enabled_transitions(&state), vec![0]);
+        assert!(!dfm.is_transition_silent(1));
 
         dfm.execute_transition(&mut state, 0).unwrap();
 
@@ -108,6 +109,20 @@ mod tests {
         assert_eq!(dfm.get_enabled_transitions(&state), vec![1, 2]);
 
         dfm.execute_transition(&mut state, 2).unwrap();
+        let empty: Vec<usize> = vec![];
+        assert_eq!(dfm.get_enabled_transitions(&state), empty);
+        assert!(dfm.is_transition_silent(2));
+        assert_eq!(dfm.get_transition_activity(2), None);
+        assert_eq!(dfm.get_transition_activity(3), None);
         assert!(dfm.is_final_state(&state));
+    }
+
+    #[test]
+    fn dfm_empty() {
+        let fin = fs::read_to_string("testfiles/a-b_star_empty.dfm").unwrap();
+        let dfm = fin.parse::<DirectlyFollowsModel>().unwrap();
+
+        let state = dfm.get_initial_state().unwrap();
+        assert_eq!(dfm.get_enabled_transitions(&state), vec![0, 2]);
     }
 }
