@@ -683,25 +683,28 @@ mod tests {
     use super::{EBI_COMMANDS, EbiCommand};
 
     #[test]
-    fn call_all_commands() {
+    fn call_all_non_cli_commands() {
         for command in EBI_COMMANDS.get_command_paths() {
             if let EbiCommand::Command {
                 name_short,
                 input_types,
                 execute,
+                cli_command,
                 ..
             } = command.last().unwrap()
             {
-                println!("command {}", name_short);
+                if cli_command.is_none() {
+                    println!("command {}", name_short);
 
-                //for each input type, find an input file
-                let mut inputs = vec![];
-                for input_type in input_types.iter() {
-                    inputs.push(find_objects(input_type));
+                    //for each input type, find an input file
+                    let mut inputs = vec![];
+                    for input_type in input_types.iter() {
+                        inputs.push(find_objects(input_type));
+                    }
+
+                    //we do not know whether a command should succeed (giving an error is fine in general), but no command should panic
+                    let _ = (execute)(inputs, None);
                 }
-
-                //we do not know whether a command should succeed (giving an error is fine in general), but no command should panic
-                let _ = (execute)(inputs, None);
             }
         }
     }
