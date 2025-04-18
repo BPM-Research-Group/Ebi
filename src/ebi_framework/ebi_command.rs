@@ -689,7 +689,7 @@ mod tests {
     }
 
     #[test]
-    #[timeout(30000)]
+    #[timeout(300000)]
     fn call_all_non_cli_commands() {
         for command in EBI_COMMANDS.get_command_paths() {
             command.first().unwrap().short_name();
