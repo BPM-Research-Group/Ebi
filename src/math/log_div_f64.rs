@@ -13,6 +13,7 @@ use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoab
 
 use super::{fraction::{MaybeExact, UInt}, fraction_f64::FractionF64, traits::{One, Zero}};
 
+#[derive(Clone)]
 pub struct LogDivF64(FractionF64);
 
 impl LogDivF64 {
