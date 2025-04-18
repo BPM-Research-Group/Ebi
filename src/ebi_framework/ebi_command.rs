@@ -672,9 +672,7 @@ mod tests {
     use anyhow::Context;
 
     use crate::{
-        ebi_framework::
-            ebi_input::{self, EbiInput, EbiInputType}
-        ,
+        ebi_framework::ebi_input::{self, EbiInput, EbiInputType},
         ebi_objects::event_log::EBI_EVENT_LOG,
         math::{fraction::Fraction, traits::Zero},
         multiple_reader::MultipleReader,
@@ -690,10 +688,14 @@ mod tests {
                 input_types,
                 execute,
                 cli_command,
+                exact_arithmetic,
                 ..
             } = command.last().unwrap()
             {
-                if cli_command.is_none() {
+                if cli_command.is_none() // only test commands that do not use the cli directly
+                    && (*exact_arithmetic // do not test approximate commands in exact mode
+                        || cfg!(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic")))
+                {
                     println!("command {}", name_short);
 
                     //for each input type, find an input file
@@ -768,7 +770,9 @@ mod tests {
                     }
                 }
                 EbiInputType::AnyObject => {
-                    match ebi_input::read_as_any_object(&mut reader).context("Parsing as any object.") {
+                    match ebi_input::read_as_any_object(&mut reader)
+                        .context("Parsing as any object.")
+                    {
                         Ok((object, file_handler)) => {
                             println!("file {:?}", file.file_name());
                             return Some(EbiInput::Object(object, file_handler));

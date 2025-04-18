@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Context};
+use anyhow::{Context, anyhow};
 
 use super::ebi_command_sample::{self, SAMPLED_OBJECT_INPUTS};
 use crate::{
