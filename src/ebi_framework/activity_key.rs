@@ -352,7 +352,7 @@ impl ActivityKeyTranslator {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
+    use std::{collections::HashSet, fs};
 
     use crate::{ebi_framework::activity_key::{HasActivityKey, TranslateActivityKey}, ebi_objects::directly_follows_model::DirectlyFollowsModel};
 
@@ -388,5 +388,45 @@ mod tests {
         dfm.translate_using_activity_key(&mut activity_key);
 
         assert_eq!(dfm.get_activity_key().get_activity_label(&x), activity_key.get_activity_label(&x));
+    }
+
+    #[test]
+    fn activity_key() {
+        let mut activity_key = ActivityKey::new();
+        let a = activity_key.process_activity("a");
+        let b = activity_key.process_activity("b");
+
+        assert!(a < b);
+        assert!(a < 1);
+        let _ = a.eq(&0);
+        let _ = format!("{:?}", a);
+        assert!(a <= b);
+        assert!(a.cmp(&b).is_lt());
+
+        let trace = activity_key.process_trace_ref(&vec!["a", "b", "c"]);
+        let mut set = HashSet::new();
+        set.insert(trace);
+        activity_key.deprocess_set(&set);
+        activity_key.to_string();
+    }
+
+    #[test]
+    #[should_panic]
+    fn activity_key_ord() {
+        let mut activity_key1 = ActivityKey::new();
+        let mut activity_key2 = ActivityKey::new();
+        let a1 = activity_key1.process_activity("a");
+        let a2 = activity_key2.process_activity("a");
+        let _ = a1.cmp(&a2);
+    }
+
+    #[test]
+    #[should_panic]
+    fn activity_key_partial_ord() {
+        let mut activity_key1 = ActivityKey::new();
+        let mut activity_key2 = ActivityKey::new();
+        let a1 = activity_key1.process_activity("a");
+        let a2 = activity_key2.process_activity("a");
+        let _ = a1.partial_cmp(&a2);
     }
 }

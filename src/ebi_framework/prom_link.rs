@@ -399,3 +399,18 @@ pub const JAVA_OBJECT_HANDLERS_ROOTLOGDIV: &[JavaObjectHandler] = &[
         input_gui: None
     },
 ];
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use super::{handle_prom_request, print_java_plugins};
+
+    #[test]
+    fn java() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        assert!(handle_prom_request("Ebi visualise text".to_string(), "txt".to_string(), vec![fin]).is_ok());
+
+        let _ = print_java_plugins();
+    }
+}

@@ -681,6 +681,11 @@ mod tests {
     use super::{EBI_COMMANDS, EbiCommand};
 
     #[test]
+    fn build_cli() {
+        EBI_COMMANDS.build_cli();
+    }
+
+    #[test]
     fn call_all_non_cli_commands() {
         for command in EBI_COMMANDS.get_command_paths() {
             if let EbiCommand::Command {
