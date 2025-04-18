@@ -142,6 +142,7 @@ impl Display for EbiObjectType {
     }
 }
 
+#[derive(Clone)]
 pub enum EbiObject {
     LabelledPetriNet(LabelledPetriNet),
     StochasticLabelledPetriNet(StochasticLabelledPetriNet),

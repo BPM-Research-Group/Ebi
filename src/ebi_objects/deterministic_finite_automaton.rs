@@ -70,7 +70,7 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[],
 };
 
-#[derive(Debug, ActivityKey)]
+#[derive(Debug, ActivityKey, Clone)]
 pub struct DeterministicFiniteAutomaton {
     pub(crate) activity_key: ActivityKey,
     pub(crate) initial_state: Option<usize>,

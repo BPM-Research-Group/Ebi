@@ -27,7 +27,7 @@ pub const EBI_EXECUTIONS: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[],
 };
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Executions {
     executions: Vec<Execution>
 }
@@ -86,7 +86,7 @@ impl From<Vec<Execution>> for Executions {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Execution {
     pub transition: usize,
     pub enabled_transitions_at_enablement: Option<Vec<usize>>,

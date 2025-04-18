@@ -41,7 +41,7 @@ pub const EBI_DIRCTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[],
 };
 
-#[derive(ActivityKey,Debug)]
+#[derive(ActivityKey,Debug,Clone)]
 pub struct DirectlyFollowsModel {
     activity_key: ActivityKey,
     pub(crate) empty_traces: bool,

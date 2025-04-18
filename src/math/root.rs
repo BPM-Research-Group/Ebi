@@ -10,6 +10,7 @@ use crate::{ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoa
 
 use super::{fraction::Fraction, traits::Zero};
 
+#[derive(Clone)]
 pub struct ContainsRoot {
     root: Root,
     one_minus: bool,
@@ -86,6 +87,7 @@ impl Debug for ContainsRoot {
     }
 }
 
+#[derive(Clone)]
 pub struct Root {
     sign: Sign,
     r: Fraction,

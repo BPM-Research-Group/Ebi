@@ -92,7 +92,7 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     }],
 };
 
-#[derive(ActivityKey)]
+#[derive(ActivityKey,Clone)]
 pub struct EventLog {
     classifier: EventLogClassifier,
     log: process_mining::EventLog,

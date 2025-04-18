@@ -99,7 +99,7 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
     java_object_handlers: &[],
 };
 
-#[derive(Debug, ActivityKey)]
+#[derive(Debug, ActivityKey, Clone)]
 pub struct StochasticDeterministicFiniteAutomaton {
     pub(crate) activity_key: ActivityKey,
     pub(crate) initial_state: Option<usize>,

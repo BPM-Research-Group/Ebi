@@ -82,7 +82,7 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     }],
 };
 
-#[derive(Debug, ActivityKey)]
+#[derive(Debug, ActivityKey, Clone)]
 pub struct ProcessTree {
     activity_key: ActivityKey,
     pub(crate) tree: Vec<Node>,

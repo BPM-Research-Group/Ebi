@@ -55,7 +55,7 @@ pub const EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler
     java_object_handlers: &[],
 };
 
-#[derive(ActivityKey)]
+#[derive(ActivityKey,Clone)]
 pub struct StochasticLanguageOfAlignments {
     pub(crate) activity_key: ActivityKey,
     pub(crate) alignments: Vec<Vec<Move>>,

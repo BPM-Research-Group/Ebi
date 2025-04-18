@@ -43,7 +43,7 @@ pub const EBI_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[],
 };
 
-#[derive(ActivityKey)]
+#[derive(ActivityKey,Clone)]
 pub struct LanguageOfAlignments {
     activity_key: ActivityKey,
     alignments: Vec<Vec<Move>>
@@ -280,7 +280,7 @@ impl From<StochasticLanguageOfAlignments> for LanguageOfAlignments {
     }
 }
 
-#[derive(Debug,PartialEq,Eq,Ord,PartialOrd)]
+#[derive(Debug,PartialEq,Eq,Ord,PartialOrd,Clone)]
 pub enum Move {
     LogMove(Activity),
     ModelMove(Activity, TransitionIndex),

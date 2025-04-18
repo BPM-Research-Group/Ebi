@@ -66,7 +66,7 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[],
 };
 
-#[derive(ActivityKey)]
+#[derive(ActivityKey,Clone)]
 pub struct FiniteLanguage {
     activity_key: ActivityKey,
     traces: HashSet<Vec<Activity>, FnvBuildHasher>,
