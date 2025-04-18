@@ -26,7 +26,6 @@ jobs:
       env:
         GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
       run: |
-        cargo update
         git clone https://ci_token:$GITLAB_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary
         cd rustlibrary
         git config user.name "Github auto committer"
