@@ -76,7 +76,7 @@ impl EbiOutput {
     }
 }
 
-#[derive(PartialEq, Eq, EnumIter, Hash, Clone)]
+#[derive(PartialEq, Eq, EnumIter, Hash, Clone, Debug)]
 pub enum EbiOutputType {
     ObjectType(EbiObjectType),
     String,

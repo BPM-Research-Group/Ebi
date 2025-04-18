@@ -717,6 +717,7 @@ mod tests {
                 execute,
                 cli_command,
                 exact_arithmetic,
+                output_type,
                 ..
             } = command.last().unwrap()
             {
@@ -733,7 +734,12 @@ mod tests {
                     }
 
                     //we do not know whether a command should succeed (giving an error is fine in general), but no command should panic
-                    let _ = (execute)(inputs, None);
+                    let output = (execute)(inputs, None);
+
+                    //verify that the output is of the correct type
+                    if let Ok(output) = output {
+                        assert_eq!(output.get_type(), output_type.to_owned().to_owned());
+                    }
                 }
             }
         }

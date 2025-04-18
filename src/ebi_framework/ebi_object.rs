@@ -39,7 +39,7 @@ use super::{
     prom_link::JavaObjectHandler,
 };
 
-#[derive(PartialEq, Clone, EnumIter, Hash, Default)]
+#[derive(PartialEq, Clone, EnumIter, Hash, Default, Debug)]
 pub enum EbiObjectType {
     #[default]
     LanguageOfAlignments,

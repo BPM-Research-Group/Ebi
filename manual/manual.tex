@@ -387,11 +387,13 @@ for dyn EbiTraitFiniteStochasticLanguage {
 					\item \verb=execute= should call the implemented algorithm.
 					As a first step, the inputs should be retrieved from the variable \verb=inputs=, and transformed into the correct types.
 					Notice that the link between \verb=input_types= and \verb=execute= cannot be verified at compile time, thus this should be tested extensively.
+                    The framework performs a one-off test in some cases, but cannot be exhaustive (see Section~\ref{sec:tests}).
 					
 					The output of the algorithm should be wrapped in the appropriate \verb=EbiOutput= enum.
 					
 					\item \verb=output_type= indicates the single output type of the command.
 					Notice that the link between \verb=execute= and \verb=output_type= cannot be verified at compile time, thus this should be tested extensively.
+                    The framework performs a one-off test in some cases, but cannot be exhaustive (see Section~\ref{sec:tests}).
 					
 				\end{itemize}
 				
@@ -435,6 +437,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
 			\end{enumerate}
 
         \subsubsection{Tests}
+        \label{sec:tests}
             Ebi automatically tests each command, importer, exporter, graphable and infoable, if a corresponding test file is provided in the \verb=testfiles= folder.
             Files with \verb=_invalid= in their file names must not be importable using any importer, that is, importing should give an error message for the test to pass.
 
@@ -447,11 +450,14 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
             \begin{itemize}
                 \item There is no (combination of) test files in the \verb=testfiles= folder that allows the command to be run.
                 \item The \verb=execute= function of the command panics.
+                \item The \verb=execute= function returns an object that does not match the \verb=output_type= field of the command.
                 \item The total time of all the command tests together exceeds 5 minutes.
                 That is, it is fine to return an error message, as this is normal behaviour.
             \end{itemize}
+            Note that only a single attempt is made at calling each command: the files in the \verb=testfiles= are searched in arbitrary order until a combination is found that should enable the command.
+            For performance reasons, no further applicable combinations of files are sought.
 
-            Further tests can (and should) be located at the bottom of the source file, according to Rust convention.
+            Further tests can (and should) be located at the bottom of the source file, following Rust conventions.
             For instance:
 \begin{lstlisting}[language=Rust, style=boxed]
 #[cfg(test)]
