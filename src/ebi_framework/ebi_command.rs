@@ -667,18 +667,21 @@ impl Hash for EbiCommand {
 
 #[cfg(test)]
 mod tests {
-    use std::{collections::HashSet, fs::{self, File}};
+    use std::{
+        collections::HashSet,
+        fs::{self, File},
+    };
 
     use anyhow::Context;
 
+    use super::{EBI_COMMANDS, EbiCommand};
     use crate::{
         ebi_framework::ebi_input::{self, EbiInput, EbiInputType},
         ebi_objects::event_log::EBI_EVENT_LOG,
         math::{fraction::Fraction, traits::Zero},
         multiple_reader::MultipleReader,
     };
-
-    use super::{EBI_COMMANDS, EbiCommand};
+    use ntest::timeout;
 
     #[test]
     fn build_cli() {
@@ -686,6 +689,7 @@ mod tests {
     }
 
     #[test]
+    #[timeout(30000)]
     fn call_all_non_cli_commands() {
         for command in EBI_COMMANDS.get_command_paths() {
             command.first().unwrap().short_name();
@@ -698,7 +702,10 @@ mod tests {
             command.last().unwrap().to_string();
             let _ = format!("{:?}", command.first().unwrap());
             let _ = format!("{:?}", command.last().unwrap());
-            let _ = command.first().unwrap().partial_cmp(&command.last().unwrap());
+            let _ = command
+                .first()
+                .unwrap()
+                .partial_cmp(&command.last().unwrap());
             let _ = command.first().unwrap().eq(command.last().unwrap());
             let _ = command.first().unwrap().eq(command.first().unwrap());
             let _ = command.last().unwrap().eq(command.last().unwrap());

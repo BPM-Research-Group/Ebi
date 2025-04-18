@@ -52,6 +52,7 @@ logging_timer = "*"
 svg2pdf = "*"
 uuid = "*"
 cfg-if = "*"
+ntest = "*"
 
 [dependencies.num-rational]
 version = "0.4.1"
