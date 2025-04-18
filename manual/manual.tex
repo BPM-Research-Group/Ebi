@@ -447,6 +447,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
             \begin{itemize}
                 \item There is no (combination of) test files in the \verb=testfiles= folder that allows the command to be run.
                 \item The \verb=execute= function of the command panics.
+                \item The total time of all the command tests together exceeds 5 minutes.
                 That is, it is fine to return an error message, as this is normal behaviour.
             \end{itemize}
 
