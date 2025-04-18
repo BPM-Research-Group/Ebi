@@ -437,7 +437,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
             Ebi automatically tests each command, importer, exporter, graphable and infoable, if a corresponding test file is provided in the \verb=testfiles= folder.
             Files with \verb=_invalid= in their file names must not be importable using any importer, that is, importing should give an error message for the test to pass.
 
-            The following commands will \emph{not} be tested:
+            The following commands will \emph{not} be tested automatically:
             \begin{itemize}
                 \item A command that manipulates the command-line interface (i.e. \verb=cli_command= is not \verb=None=);
                 \item A command that does not support exact mode (i.e. \verb=exact_arithmetic= is false.).
@@ -451,19 +451,19 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
 
             Further tests can (and should) be located at the bottom of the source file, according to Rust convention.
             For instance:
-            \begin{lstlisting}[language=Rust, style=boxed]
-                #[cfg(test)]
-                    mod tests {
-                    use std::fs;
+\begin{lstlisting}[language=Rust, style=boxed]
+#[cfg(test)]
+mod tests {
+    use std::fs;
 
-                    #[test]
-                    fn a_test() {
-                        let fin = fs::read_to_string("testfiles/aa.ptree").unwrap();
-                        let tree = fin.parse::<ProcessTree>().unwrap();
-                        \ldots
-                    }
-                }
-            \end{lstlisting}
+    #[test]
+    fn a_test() {
+        let fin = fs::read_to_string("testfiles/aa.ptree").unwrap();
+        let tree = fin.parse::<ProcessTree>().unwrap();
+        ... here comes the test ...
+    }
+}
+\end{lstlisting}
 		
 
     \subsection{Exact Computation}
