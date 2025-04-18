@@ -425,7 +425,7 @@ mod tests {
     use crate::{ebi_framework::ebi_file_handler::EBI_FILE_HANDLERS, multiple_reader::MultipleReader};
     
     #[test]
-    fn all_importers() {
+    fn all_object_importers() {
         let files = fs::read_dir("./testfiles").unwrap();
         for path in files {
             let file = path.unwrap();
