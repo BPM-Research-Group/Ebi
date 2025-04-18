@@ -118,3 +118,37 @@ impl FromEbiTraitObject for String {
         } 
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use strum::IntoEnumIterator;
+
+    use crate::ebi_framework::ebi_input::EbiInput;
+
+    use super::{EbiTrait, FromEbiTraitObject};
+
+    #[test]
+    fn traits() {
+        for etrait in EbiTrait::iter() {
+            etrait.get_applicable_commands();
+            etrait.get_article();
+            etrait.get_java_object_handlers_that_can_import();
+            etrait.to_string();
+            let _ = format!("{:?}", etrait);
+        }
+
+        let _ = String::from_trait_object(EbiInput::String("xyz".to_string()));
+    }
+
+    #[test]
+    #[should_panic]
+    fn unreachable_string() {
+        String::from_trait_object(EbiInput::Usize(1)).unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn unreachable_usize() {
+        usize::from_trait_object(EbiInput::String("abc".to_string())).unwrap();
+    }
+}
