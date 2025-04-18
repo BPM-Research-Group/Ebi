@@ -678,7 +678,7 @@ mod tests {
     use crate::{
         ebi_framework::ebi_input::{self, EbiInput, EbiInputType},
         ebi_objects::event_log::EBI_EVENT_LOG,
-        math::{fraction::Fraction, traits::Zero},
+        math::fraction::Fraction,
         multiple_reader::MultipleReader,
     };
     use ntest::timeout;
@@ -755,7 +755,7 @@ mod tests {
                 return Some(EbiInput::FileHandler(EBI_EVENT_LOG));
             }
             EbiInputType::Fraction => {
-                return Some(EbiInput::Fraction(Fraction::zero()));
+                return Some(EbiInput::Fraction(Fraction::from((1, 2))));
             }
             EbiInputType::String => {
                 return Some(EbiInput::String("no".to_string()));
