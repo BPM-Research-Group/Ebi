@@ -47,7 +47,7 @@ use super::{
     },
 };
 
-#[derive(Display,Clone)]
+#[derive(Display, Clone)]
 pub enum EbiOutput {
     Object(EbiObject),
     String(String),
@@ -471,14 +471,14 @@ mod tests {
     use std::{
         fs::{self, File},
         io::Cursor,
+        path::PathBuf,
     };
-
 
     use strum::IntoEnumIterator;
 
     use crate::{
         ebi_framework::{
-            ebi_file_handler::EBI_FILE_HANDLERS, ebi_output::EbiOutput,
+            ebi_command::EbiCommand, ebi_file_handler::EBI_FILE_HANDLERS, ebi_output::EbiOutput,
         },
         math::{
             fraction::Fraction,
@@ -490,7 +490,7 @@ mod tests {
         multiple_reader::MultipleReader,
     };
 
-    use super::{export_to_bytes, export_to_string, EbiExporter, EbiOutputType};
+    use super::{EbiExporter, EbiOutputType, export_to_bytes, export_to_string};
 
     #[test]
     fn all_exporters() {
@@ -584,6 +584,8 @@ mod tests {
             output_type.get_applicable_commands();
             output_type.get_default_exporter();
             output_type.to_string();
+            EbiCommand::select_exporter(&output_type, None);
+            EbiCommand::select_exporter(&output_type, Some(&PathBuf::from(".xes.gz")));
             for exporter in output_type.get_exporters() {
                 exporter.get_article();
                 exporter.get_name();

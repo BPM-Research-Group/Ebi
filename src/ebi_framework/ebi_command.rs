@@ -667,7 +667,7 @@ impl Hash for EbiCommand {
 
 #[cfg(test)]
 mod tests {
-    use std::fs::{self, File};
+    use std::{collections::HashSet, fs::{self, File}};
 
     use anyhow::Context;
 
@@ -688,6 +688,22 @@ mod tests {
     #[test]
     fn call_all_non_cli_commands() {
         for command in EBI_COMMANDS.get_command_paths() {
+            command.first().unwrap().short_name();
+            command.first().unwrap().explanation_long();
+            command.last().unwrap().short_name();
+            command.last().unwrap().explanation_long();
+            EbiCommand::path_to_short_string(&command);
+            command.last().unwrap().is_in_java();
+            command.first().unwrap().is_in_java();
+            command.last().unwrap().to_string();
+            let _ = format!("{:?}", command.first().unwrap());
+            let _ = format!("{:?}", command.last().unwrap());
+            let _ = command.first().unwrap().partial_cmp(&command.last().unwrap());
+            let _ = command.first().unwrap().eq(command.last().unwrap());
+            let _ = command.first().unwrap().eq(command.first().unwrap());
+            let _ = command.last().unwrap().eq(command.last().unwrap());
+            let mut hash = HashSet::new();
+            hash.insert(command.last().unwrap());
             if let EbiCommand::Command {
                 name_short,
                 input_types,
