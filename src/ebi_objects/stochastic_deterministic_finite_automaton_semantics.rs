@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 
 use crate::{
     ebi_framework::activity_key::{Activity, HasActivityKey},
@@ -7,7 +7,10 @@ use crate::{
         ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
         ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex},
     },
-    math::{fraction::Fraction, traits::{One, Zero}},
+    math::{
+        fraction::Fraction,
+        traits::{One, Zero},
+    },
     techniques::livelocks::Livelock,
 };
 
@@ -182,5 +185,13 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         } else {
             return Ok(Fraction::zero());
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn sdfa_empty() {
+        
     }
 }

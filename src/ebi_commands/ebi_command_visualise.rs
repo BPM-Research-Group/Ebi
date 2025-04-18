@@ -115,46 +115,17 @@ pub fn svg_to_pdf(svg: &str) -> Result<Vec<u8>> {
 
 #[cfg(test)]
 mod tests {
-    use std::fs::{self, File};
 
     use crate::{
-        ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT, ebi_framework::{ebi_command::EbiCommand, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInput, ebi_object::EbiTraitObject}, ebi_objects::{finite_language::FiniteLanguage, stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET}, math::{fraction::Fraction, traits::One}, multiple_reader::MultipleReader
+        ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT, ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInput, ebi_object::EbiTraitObject}, ebi_objects::{finite_language::FiniteLanguage, stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET}, math::{fraction::Fraction, traits::One}
     };
 
     #[test]
     fn visualise_as_text() {
-        let files = fs::read_dir("./testfiles").unwrap();
-        for path in files {
-            let file = path.unwrap();
-            println!("file {:?}", file.file_name());
-
-            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
-
-            //look for file handlers that should accept this file
-            for file_handler in EBI_FILE_HANDLERS {
-                if !file.file_name().into_string().unwrap().contains("invalid")
-                    && file
-                        .file_name()
-                        .into_string()
-                        .unwrap()
-                        .ends_with(&(".".to_string() + file_handler.file_extension))
-                {
-                    //file handler should be able to accept this file
-
-                    println!("\tfile handler import {}", file_handler);
-
-                    for importer in file_handler.object_importers {
-                        println!("\t\timporter {}", importer);
-
-                        let object = EbiInput::Object(
-                            (importer.get_importer())(&mut reader.get().unwrap()).unwrap(),
-                            file_handler,
-                        );
-
-                        if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
-                            let _ = (execute)(vec![object], None);
-                        }
-                    }
+        for (object, _, _) in crate::tests::get_all_test_files() {
+            if let EbiInput::Object(_, _) = object {
+                if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
+                    let _ = (execute)(vec![object], None);
                 }
             }
         }

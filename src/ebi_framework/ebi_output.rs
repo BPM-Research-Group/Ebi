@@ -469,7 +469,6 @@ impl Display for EbiObjectExporter {
 #[cfg(test)]
 mod tests {
     use std::{
-        fs::{self, File},
         io::Cursor,
         path::PathBuf,
     };
@@ -478,7 +477,8 @@ mod tests {
 
     use crate::{
         ebi_framework::{
-            ebi_command::EbiCommand, ebi_file_handler::EBI_FILE_HANDLERS, ebi_output::EbiOutput,
+            ebi_command::EbiCommand, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInput,
+            ebi_output::EbiOutput,
         },
         math::{
             fraction::Fraction,
@@ -487,47 +487,19 @@ mod tests {
             root_log_div::RootLogDiv,
             traits::{One, Zero},
         },
-        multiple_reader::MultipleReader,
     };
 
     use super::{EbiExporter, EbiOutputType, export_to_bytes, export_to_string};
 
     #[test]
     fn all_exporters() {
-        let files = fs::read_dir("./testfiles").unwrap();
-        for path in files {
-            let file = path.unwrap();
-            println!("file {:?}", file.file_name());
-
-            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
-
-            //look for file handlers that should accept this file
-            for file_handler in EBI_FILE_HANDLERS {
-                if !file.file_name().into_string().unwrap().contains("invalid")
-                    && file
-                        .file_name()
-                        .into_string()
-                        .unwrap()
-                        .ends_with(&(".".to_string() + file_handler.file_extension))
-                {
-                    //file handler should be able to accept this file
-
-                    println!("\tfile handler import {}", file_handler);
-
-                    for importer in file_handler.object_importers {
-                        for file_handler2 in EBI_FILE_HANDLERS {
-                            for exporter in file_handler2.object_exporters {
-                                if exporter.get_type() == importer.get_type() {
-                                    println!("\t\timporter {}, exporter {}", importer, exporter);
-
-                                    let object =
-                                        (importer.get_importer())(&mut reader.get().unwrap())
-                                            .unwrap();
-                                    let mut c = Cursor::new(Vec::new());
-                                    // let mut f = File::open("/dev/null").unwrap();
-                                    exporter.export(EbiOutput::Object(object), &mut c).unwrap();
-                                }
-                            }
+        for (object, importer, _) in crate::tests::get_all_test_files() {
+            if let EbiInput::Object(object, _) = object {
+                for file_handler2 in EBI_FILE_HANDLERS {
+                    for exporter in file_handler2.object_exporters {
+                        if exporter.get_type() == importer.clone().unwrap().get_type() {
+                            let mut c = Cursor::new(Vec::new());
+                            exporter.export(EbiOutput::Object(object.clone()), &mut c).unwrap();
                         }
                     }
                 }
@@ -549,33 +521,9 @@ mod tests {
         ];
 
         //gather output objects from the test files
-        {
-            let files = fs::read_dir("./testfiles").unwrap();
-            for path in files {
-                let file = path.unwrap();
-                println!("file {:?}", file.file_name());
-
-                let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
-
-                //look for file handlers that should accept this file
-                for file_handler in EBI_FILE_HANDLERS {
-                    println!("\tfile handler {}", file_handler);
-                    if !file.file_name().into_string().unwrap().contains("invalid")
-                        && file
-                            .file_name()
-                            .into_string()
-                            .unwrap()
-                            .ends_with(&(".".to_string() + file_handler.file_extension))
-                    {
-                        for importer in file_handler.object_importers {
-                            println!("\t\timporter {}", importer);
-                            let object = EbiOutput::Object(
-                                (importer.get_importer())(&mut reader.get().unwrap()).unwrap(),
-                            );
-                            outputs.push(object);
-                        }
-                    }
-                }
+        for (input, _, _) in crate::tests::get_all_test_files() {
+            if let EbiInput::Object(object, _) = input {
+                outputs.push(EbiOutput::Object(object));
             }
         }
 

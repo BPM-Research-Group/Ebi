@@ -16,7 +16,11 @@ impl Semantics for DirectlyFollowsModel {
     type SemState = usize;
 
     fn get_initial_state(&self) -> Option<<Self as Semantics>::SemState> {
-        Some(self.get_number_of_nodes() + 1)
+        if self.start_nodes.is_empty() {
+            None
+        } else {
+            Some(self.get_number_of_nodes() + 1)
+        }
     }
 
     fn execute_transition(&self, state: &mut <Self as Semantics>::SemState, transition: TransitionIndex) -> anyhow::Result<()> {
@@ -118,11 +122,19 @@ mod tests {
     }
 
     #[test]
-    fn dfm_empty() {
+    fn dfm_empty_traces() {
         let fin = fs::read_to_string("testfiles/a-b_star_empty.dfm").unwrap();
         let dfm = fin.parse::<DirectlyFollowsModel>().unwrap();
 
         let state = dfm.get_initial_state().unwrap();
         assert_eq!(dfm.get_enabled_transitions(&state), vec![0, 2]);
+    }
+
+    #[test]
+    fn dfm_empty() {
+        let fin = fs::read_to_string("testfiles/empty.dfm").unwrap();
+        let dfm = fin.parse::<DirectlyFollowsModel>().unwrap();
+
+        assert!(dfm.get_initial_state().is_none());
     }
 }

@@ -32,7 +32,7 @@ use super::stochastic_deterministic_finite_automaton::StochasticDeterministicFin
 pub const FORMAT_SPECIFICATION: &str = "A deterministic finite automaton is a JSON structure with the top level being an object.
     This object contains the following key-value pairs:
     \\begin{itemize}
-    \\item \\texttt{initialState} being the index of the initial state.
+    \\item \\texttt{initialState} being the index of the initial state. This field is optional: if omitted, the DFA has an empty language.
     \\item \\texttt{finalStates} being a list of indices of the final states.
     A final state is not necessarily a deadlock state.
     \\item \\texttt{transitions} being a list of transitions. 
@@ -446,7 +446,9 @@ impl ToSemantics for DeterministicFiniteAutomaton {
 
 #[cfg(test)]
 mod tests{
-    use crate::ebi_traits::ebi_trait_semantics::Semantics;
+    use std::fs;
+
+    use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics};
     use crate::ebi_framework::activity_key::HasActivityKey;
 
     use super::DeterministicFiniteAutomaton;
@@ -462,5 +464,17 @@ mod tests{
 
         assert!(dfa.add_transition(state, activity, state).is_ok());
         assert!(dfa.add_transition(state, activity, state).is_err());
+    }
+
+    #[test]
+    fn dfa_empty() {
+        let fin = fs::read_to_string("testfiles/empty.dfa").unwrap();
+        let dfa = fin.parse::<DeterministicFiniteAutomaton>().unwrap();
+
+        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics() {
+            assert!(semantics.get_initial_state().is_none());
+        } else {
+            assert!(false);
+        }
     }
 }

@@ -24,40 +24,18 @@ impl Infoable for BigFraction {
 
 #[cfg(test)]
 mod tests {
-    use std::{fs::{self, File}, str::FromStr};
+    use std::str::FromStr;
 
     use fraction::BigFraction;
 
-    use crate::{ebi_framework::{ebi_file_handler::EBI_FILE_HANDLERS, infoable::Infoable}, multiple_reader::MultipleReader};
+    use crate::ebi_framework::{ebi_input::EbiInput, infoable::Infoable};
 
     #[test]
     fn all_infoable() {
-        let files = fs::read_dir("./testfiles").unwrap();
-        for path in files {
-            let file = path.unwrap();
-            println!("file {:?}", file.file_name());
-
-            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
-
-            //look for file handlers that should accept this file
-            for file_handler in EBI_FILE_HANDLERS {
-                println!("\tfile handler {}", file_handler);
-                if !file.file_name().into_string().unwrap().contains("invalid")
-                    && file
-                        .file_name()
-                        .into_string()
-                        .unwrap()
-                        .ends_with(&(".".to_string() + file_handler.file_extension))
-                {
-                    //file handler should be able to accept this file
-
-                    for importer in file_handler.object_importers {
-                        println!("\t\timporter {}", importer);
-                        let object = (importer.get_importer())(&mut reader.get().unwrap()).unwrap();
-                        let mut f = vec![];
-                        object.info(&mut f).unwrap();
-                    }
-                }
+        for (input, _, _) in crate::tests::get_all_test_files() {
+            if let EbiInput::Object(object, _) = input {
+                let mut f = vec![];
+                object.info(&mut f).unwrap();
             }
         }
     }

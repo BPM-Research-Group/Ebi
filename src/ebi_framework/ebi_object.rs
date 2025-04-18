@@ -255,16 +255,14 @@ impl EbiTraitObject {
 
 #[cfg(test)]
 mod tests {
-    use std::fs::{self, File};
 
     use strum::IntoEnumIterator;
 
-    use crate::{
+    use crate::
         ebi_framework::{
-            ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
-        },
-        multiple_reader::MultipleReader,
-    };
+            ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
+        }
+    ;
 
     use super::EbiObjectType;
 
@@ -282,65 +280,12 @@ mod tests {
 
     #[test]
     fn objects() {
-        let files = fs::read_dir("./testfiles").unwrap();
-        for path in files {
-            let file = path.unwrap();
-            println!("file {:?}", file.file_name());
-
-            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
-
-            //look for file handlers that should accept this file
-            for file_handler in EBI_FILE_HANDLERS {
-                println!("\tfile handler {}", file_handler);
-                if !file.file_name().into_string().unwrap().contains("invalid")
-                    && file
-                        .file_name()
-                        .into_string()
-                        .unwrap()
-                        .ends_with(&(".".to_string() + file_handler.file_extension))
-                {
-                    //file handler should be able to accept this file
-
-                    for importer in file_handler.object_importers {
-                        println!("\t\timporter {}", importer);
-                        let object = (importer.get_importer())(&mut reader.get().unwrap()).unwrap();
-
-                        object.get_type();
-                        object.to_string();
-                    }
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn trait_objects() {
-        let files = fs::read_dir("./testfiles").unwrap();
-        for path in files {
-            let file = path.unwrap();
-            println!("file {:?}", file.file_name());
-
-            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
-
-            //look for file handlers that should accept this file
-            for file_handler in EBI_FILE_HANDLERS {
-                println!("\tfile handler {}", file_handler);
-                if !file.file_name().into_string().unwrap().contains("invalid")
-                    && file
-                        .file_name()
-                        .into_string()
-                        .unwrap()
-                        .ends_with(&(".".to_string() + file_handler.file_extension))
-                {
-                    //file handler should be able to accept this file
-
-                    for importer in file_handler.trait_importers {
-                        println!("\t\timporter {}", importer);
-                        let object = importer.import(&mut reader.get().unwrap()).unwrap();
-
-                        object.get_trait();
-                    }
-                }
+        for (input, _, _) in crate::tests::get_all_test_files() {
+            if let EbiInput::Object(object, _) = input {
+                object.get_type();
+                object.to_string();
+            } else if let EbiInput::Trait(object, _) = input {
+                object.get_trait();
             }
         }
     }

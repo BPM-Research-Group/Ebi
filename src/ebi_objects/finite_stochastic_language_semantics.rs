@@ -208,7 +208,7 @@ mod tests {
     };
 
     #[test]
-    fn to_stochastic_semantics_empty() {
+    fn slang_empty() {
         let fin = fs::read_to_string("testfiles/empty.slang").unwrap();
         let slpn = fin.parse::<FiniteStochasticLanguage>().unwrap();
 

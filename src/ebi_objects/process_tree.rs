@@ -109,8 +109,8 @@ impl ProcessTree {
     }
 
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
-        let dfm = Self::import(reader)?;
-        Ok(EbiObject::LabelledPetriNet(dfm.get_labelled_petri_net()))
+        let tree = Self::import(reader)?;
+        Ok(EbiObject::LabelledPetriNet(tree.get_labelled_petri_net()?))
     }
 
     pub fn get_number_of_nodes(&self) -> usize {
@@ -382,14 +382,25 @@ impl ProcessTree {
         lreader: &mut LineReader<'_>,
         tree: &mut Vec<Node>,
         activity_key: &mut ActivityKey,
+        root: bool,
     ) -> Result<()> {
-        let node_type_line = lreader.next_line_string().with_context(|| {
+        let node_type_line = match lreader.next_line_string().with_context(|| {
             format!(
-                "failed to read node {} at line {}",
+                "Failed to read node {} at line {}",
                 tree.len(),
                 lreader.get_last_line_number()
             )
-        })?;
+        }) {
+            Ok(x) => x,
+            Err(e) => {
+                if root {
+                    //The root may be missing: then, we have an empty tree.
+                    return Ok(());
+                } else {
+                    return Err(e);
+                }
+            }
+        };
 
         if node_type_line.trim_start().starts_with("tau") {
             tree.push(Node::Tau);
@@ -414,8 +425,11 @@ impl ProcessTree {
             }
             tree.push(Node::Operator(operator, number_of_children));
             for _ in 0..number_of_children {
-                Self::string_to_tree(lreader, tree, activity_key)?;
+                Self::string_to_tree(lreader, tree, activity_key, false)?;
             }
+        } else if root && node_type_line.trim_start().is_empty() {
+            //empty tree
+            return Ok(());
         } else {
             return Err(anyhow!(
                 "Could not parse type of node {} at line {}. Expected `tau`, `activity`, `concurrent`, `interleaved`, `or`, `sequence` or `xor`.",
@@ -612,7 +626,13 @@ impl ProcessTree {
         }
     }
 
-    pub fn get_labelled_petri_net(&self) -> LabelledPetriNet {
+    pub fn get_labelled_petri_net(&self) -> Result<LabelledPetriNet> {
+        if self.tree.is_empty() {
+            return Err(anyhow!(
+                "The tree has the empty language, while a labelled Petri net cannot represent the empty language."
+            ));
+        }
+
         let mut result = LabelledPetriNet::new();
         let translator =
             ActivityKeyTranslator::new(&self.activity_key, result.get_activity_key_mut());
@@ -626,7 +646,7 @@ impl ProcessTree {
         self.node_to_lpn(0, &mut result, &translator, source, sink)
             .unwrap();
 
-        result
+        Ok(result)
     }
 }
 
@@ -680,7 +700,7 @@ impl Importable for ProcessTree {
 
         let mut activity_key = ActivityKey::new();
         let mut tree = vec![];
-        Self::string_to_tree(&mut lreader, &mut tree, &mut activity_key)?;
+        Self::string_to_tree(&mut lreader, &mut tree, &mut activity_key, true)?;
 
         Ok(ProcessTree::new(activity_key, tree))
     }
@@ -711,10 +731,10 @@ impl Exportable for ProcessTree {
 impl Display for ProcessTree {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "{}", HEADER)?;
-        match self.node_to_string(0, 0, f) {
-            Ok(_) => Ok(()),
-            Err(_) => write!(f, ""),
-        }
+        if !self.tree.is_empty() {
+            let _ = self.node_to_string(0, 0, f);
+        };
+        write!(f, "")
     }
 }
 
@@ -736,7 +756,9 @@ impl EbiTraitGraphable for ProcessTree {
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
         let source = <dyn EbiTraitGraphable>::create_place(&mut graph, "");
         let sink = <dyn EbiTraitGraphable>::create_place(&mut graph, "");
-        ProcessTree::node_to_dot(&self, &mut graph, 0, &source, &sink);
+        if !self.tree.is_empty() {
+            ProcessTree::node_to_dot(&self, &mut graph, 0, &source, &sink);
+        }
         graph
     }
 }

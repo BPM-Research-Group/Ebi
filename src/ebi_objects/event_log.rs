@@ -553,7 +553,8 @@ impl Display for DataType {
 mod tests {
     use std::fs;
 
-    use crate::{ebi_framework::activity_key::{ActivityKey, TranslateActivityKey}, ebi_objects::finite_stochastic_language::FiniteStochasticLanguage};
+
+    use crate::{ebi_framework::activity_key::{ActivityKey, TranslateActivityKey}, ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}};
 
     use super::EventLog;
     
@@ -583,5 +584,15 @@ mod tests {
         let log = fin.parse::<EventLog>().unwrap();
 
         assert_eq!(format!("{}", log), "event log with 2 traces");
+    }
+
+    #[test]
+    fn log_empty() {
+        let fin = fs::read_to_string("testfiles/empty.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+
+        if let EbiTraitSemantics::Usize(semantics) = log.to_semantics() {
+            assert!(semantics.get_initial_state().is_none());
+        }
     }
 }

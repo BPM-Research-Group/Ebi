@@ -10,12 +10,12 @@ use super::labelled_petri_net::LabelledPetriNet;
 pub const HEADER: &str = "directly follows model";
 
 pub const FORMAT_SPECIFICATION: &str = "A directly follows model is a line-based structure. Lines starting with a \\# are ignored.
-    This first line is exactly `directly follows model'.
-    The second line is a boolean indicating whether the model supports empty traces.
-    The third line is the number of activities in the model. Duplicated labels are accepted. 
-    The following lines each contain an activity.
-    The next line contains the number of start activities, followed by, for each start activity, a line with the index of the start activity.
-    The next line contains the number of end activities, followed by, for each end activity, a line with the index of the end activity.
+    This first line is exactly `directly follows model'.\\
+    The second line is a boolean indicating whether the model supports empty traces.\\
+    The third line is the number of activities in the model.\\
+    The following lines each contain an activity. Duplicated labels are accepted.\\
+    The next line contains the number of start activities, followed by, for each start activity, a line with the index of the start activity.\\
+    The next line contains the number of end activities, followed by, for each end activity, a line with the index of the end activity.\\
     The next line contains the number of edges, followed by, for each edge, a line with first the index of the source activity, then the `>` symbol, then the index of the target activity.
     
     For instance:

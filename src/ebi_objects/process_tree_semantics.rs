@@ -462,4 +462,19 @@ mod tests {
         assert_eq!(tree.get_enabled_transitions(&state), Vec::<usize>::new());
         assert!(tree.is_final_state(&state));
     }
+
+    #[test]
+    fn ptree_empty() {
+        //without carriage return at first line
+        let fin = fs::read_to_string("testfiles/empty.ptree").unwrap();
+        let tree = fin.parse::<ProcessTree>().unwrap();
+        assert!(tree.get_initial_state().is_none());
+        
+        //with carriage return at first line
+        let fin = fs::read_to_string("testfiles/empty_2.ptree").unwrap();
+        let tree = fin.parse::<ProcessTree>().unwrap();
+        assert!(tree.get_initial_state().is_none());
+
+        assert!(tree.get_labelled_petri_net().is_err());
+    }
 }

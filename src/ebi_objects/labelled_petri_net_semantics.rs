@@ -101,3 +101,18 @@ impl Semantics for LabelledPetriNet {
     }
 }
 
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::labelled_petri_net::LabelledPetriNet, ebi_traits::ebi_trait_semantics::Semantics};
+
+    #[test]
+    fn lpn_empty() {
+        let fin = fs::read_to_string("testfiles/empty.lpn").unwrap();
+        let lpn = fin.parse::<LabelledPetriNet>().unwrap();
+
+        let state = lpn.get_initial_state().unwrap();
+        assert_eq!(lpn.get_enabled_transitions(&state).len(), 0);
+    }
+}

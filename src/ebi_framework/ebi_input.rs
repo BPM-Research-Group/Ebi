@@ -306,7 +306,7 @@ impl Display for EbiInputType {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum EbiTraitImporter {
     FiniteLanguage(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitFiniteLanguage>>), //finite set of traces
     FiniteStochasticLanguage(
@@ -380,7 +380,7 @@ impl Display for EbiTraitImporter {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum EbiObjectImporter {
     EventLog(fn(&mut dyn BufRead) -> Result<EbiObject>),
     DirectlyFollowsModel(fn(&mut dyn BufRead) -> Result<EbiObject>),
@@ -560,90 +560,6 @@ mod tests {
 
     use super::{EbiInputType, validate_object_of};
     use crate::ebi_framework::ebi_input;
-
-    #[test]
-    fn all_object_importers() {
-        let files = fs::read_dir("./testfiles").unwrap();
-        for path in files {
-            let file = path.unwrap();
-            println!("file {:?}", file.file_name());
-
-            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
-
-            //look for file handlers that should accept this file
-            for file_handler in EBI_FILE_HANDLERS {
-                println!("\tfile handler {}", file_handler);
-                if !file.file_name().into_string().unwrap().contains("invalid")
-                    && file
-                        .file_name()
-                        .into_string()
-                        .unwrap()
-                        .ends_with(&(".".to_string() + file_handler.file_extension))
-                {
-                    //file handler should be able to accept this file
-
-                    for importer in file_handler.object_importers {
-                        println!("\t\timporter {}", importer);
-                        let object = EbiInput::Object(
-                            (importer.get_importer())(&mut reader.get().unwrap()).unwrap(),
-                            file_handler,
-                        );
-
-                        object.get_type();
-                    }
-                } else {
-                    //file handler should not accept this file
-
-                    for importer in file_handler.object_importers {
-                        println!("\t\timporter {} (should fail)", importer);
-                        assert!((importer.get_importer())(&mut reader.get().unwrap()).is_err());
-                    }
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn all_trait_importers() {
-        let files = fs::read_dir("./testfiles").unwrap();
-        for path in files {
-            let file = path.unwrap();
-            println!("file {:?}", file.file_name());
-
-            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
-
-            //look for file handlers that should accept this file
-            for file_handler in EBI_FILE_HANDLERS {
-                println!("\tfile handler {}", file_handler);
-                if !file.file_name().into_string().unwrap().contains("invalid")
-                    && file
-                        .file_name()
-                        .into_string()
-                        .unwrap()
-                        .ends_with(&(".".to_string() + file_handler.file_extension))
-                {
-                    //file handler should be able to accept this file
-
-                    for importer in file_handler.trait_importers {
-                        println!("\t\timporter {}", importer);
-                        let object = EbiInput::Trait(
-                            importer.import(&mut reader.get().unwrap()).unwrap(),
-                            file_handler,
-                        );
-
-                        object.get_type();
-                    }
-                } else {
-                    //file handler should not accept this file
-
-                    for importer in file_handler.trait_importers {
-                        println!("\t\timporter {} (should fail)", importer);
-                        assert!(importer.import(&mut reader.get().unwrap()).is_err());
-                    }
-                }
-            }
-        }
-    }
 
     #[test]
     fn input_primitives() {

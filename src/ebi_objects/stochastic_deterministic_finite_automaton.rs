@@ -45,7 +45,7 @@ use super::{
 pub const FORMAT_SPECIFICATION: &str = "A stochastic deterministic finite automaton is a JSON structure with the top level being an object.
     This object contains the following key-value pairs:
     \\begin{itemize}
-    \\item \\texttt{initialState} being the index of the initial state.
+    \\item \\texttt{initialState} being the index of the initial state. This field is optional: if omitted, the SDFA has an empty stochastic language.
     \\item \\texttt{transitions} being a list of transitions. 
     Each transition is an object with \\texttt{from} being the source state index of the transition, 
     \\texttt{to} being the target state index of the transition, 
@@ -645,5 +645,26 @@ impl ToStochasticSemantics for StochasticDeterministicFiniteAutomaton {
 impl ToStochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton {
     fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
         EbiTraitStochasticDeterministicSemantics::Usize(Box::new(self))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};
+
+    use super::StochasticDeterministicFiniteAutomaton;
+
+    #[test]
+    fn sdfa_empty() {
+        let fin = fs::read_to_string("testfiles/empty.sdfa").unwrap();
+        let dfa = fin.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
+
+        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics() {
+            assert!(semantics.get_initial_state().is_none());
+        } else {
+            assert!(false);
+        }
     }
 }

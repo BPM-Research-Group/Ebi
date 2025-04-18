@@ -236,9 +236,6 @@ impl Importable for FiniteLanguage {
         let number_of_traces = lreader
             .next_line_index()
             .context("failed to read number of places")?;
-        if number_of_traces == 0 {
-            return Err(anyhow!("language is empty"));
-        }
 
         let mut traces = HashSet::<Vec<Activity>, FnvBuildHasher>::default();
         let mut activity_key = ActivityKey::new();
@@ -310,5 +307,24 @@ impl From<(ActivityKey, HashSet<Vec<Activity>, FnvBuildHasher>)> for FiniteLangu
 impl ToSemantics for FiniteLanguage {
     fn to_semantics(self) -> EbiTraitSemantics {
         self.get_deterministic_finite_automaton().to_semantics()
+    }
+}
+
+#[cfg(test)]
+mod tests{
+    use std::fs;
+
+    use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};
+
+    use super::FiniteLanguage;
+
+    #[test]
+    fn lang_empty() {
+        let fin = fs::read_to_string("testfiles/empty.lang").unwrap();
+        let log = fin.parse::<FiniteLanguage>().unwrap();
+
+        if let EbiTraitSemantics::Usize(semantics) = log.to_semantics() {
+            assert!(semantics.get_initial_state().is_none());
+        }
     }
 }
