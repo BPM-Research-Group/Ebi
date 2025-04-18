@@ -95,7 +95,7 @@ impl LogDivEnum {
     }
 
     pub fn n_log_n(n: &FractionEnum) -> Self {
-        println!("n log n of {}", n);
+        // println!("n log n of {}", n);
 
         if n.is_sign_negative() {
             return Self::nan(n);
@@ -171,7 +171,7 @@ impl LogDivEnum {
      * Internally uses i32 powers for approximate arithmetic
      */
     pub fn power_f_u(base: &BigFraction, power: &UInt) -> BigFraction {
-        println!("power_f_u of {} and {}", base, power);
+        // println!("power_f_u of {} and {}", base, power);
         match base {
             GenericFraction::Rational(sign, ratio) => {
                 let numer = ratio.numer().to_bigint().unwrap();

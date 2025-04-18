@@ -294,16 +294,14 @@ Sander J.J. Leemans, Tian Li}
 				\item For speed considerations, avoid .clone(), but use references instead, especially on heap-based structs such as \verb=Fraction=.
 				\item \verb|a += b| is usually faster than \verb|c = a + b|, as it saves a memory allocation, especially on heap-based structs such as \verb=Fraction=.
 				\item Rather than using a numeric struct, using traits such as \verb=Add= and \verb=Mul= allows code to be used regardless of the arithmetic type.
-				\item To provide debug output, avoid \verb=println= as it is rather inflexible, but use \verb=log::info= instead.
-				For consistency, Ebi provides two types of progress bars: one where a total integer number of steps is available, and one where a message is used that can be updated, e.g. to denote a probability. 
+				\item To provide debug output, avoid \verb=println= as it prevents piping of results, but use \verb=log::info()= or \verb=log::debug()= instead.
+				For consistency, Ebi provides two types of progress bars: one where a total integer number of steps is available, and one where a message is used that can be updated, e.g. to denote a probability:
 				\begin{lstlisting}[language=Rust, style=boxed]
 					EbiCommand::get_progress_bar_ticks(total_steps);
 					EbiCommand::get_progress_bar_message(message);
 				\end{lstlisting}
-				\item Tests are located in each file at the bottom.
-
 			\end{enumerate}
-		
+            
 		\subsubsection{The technique}
 			The technique is the place where the code for the algorithm lives.
 			This should go in its own file in the \verb=techniques= folder.
@@ -434,6 +432,38 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
 				At the top of the file, there is a command declaration (e.g. \verb=EBI_CONFORMANCE=) that contains the sub-commands.
 				Add your new command here, while maintaining the alphabetical order.
 			\end{enumerate}
+
+        \subsubsection{Tests}
+            Ebi automatically tests each command, importer, exporter, graphable and infoable, if a corresponding test file is provided in the \verb=testfiles= folder.
+            Files with \verb=_invalid= in their file names must not be importable using any importer, that is, importing should give an error message for the test to pass.
+
+            The following commands will \emph{not} be tested:
+            \begin{itemize}
+                \item A command that manipulates the command-line interface (i.e. \verb=cli_command= is not \verb=None=);
+                \item A command that does not support exact mode (i.e. \verb=exact_arithmetic= is false.).
+            \end{itemize}
+            The automated command test will fail if either:
+            \begin{itemize}
+                \item There is no (combination of) test files in the \verb=testfiles= folder that allows the command to be run.
+                \item The \verb=execute= function of the command panics.
+                That is, it is fine to return an error message, as this is normal behaviour.
+            \end{itemize}
+
+            Further tests can (and should) be located at the bottom of the source file, according to Rust convention.
+            For instance:
+            \begin{lstlisting}[language=Rust, style=boxed]
+                #[cfg(test)]
+                    mod tests {
+                    use std::fs;
+
+                    #[test]
+                    fn a_test() {
+                        let fin = fs::read_to_string("testfiles/aa.ptree").unwrap();
+                        let tree = fin.parse::<ProcessTree>().unwrap();
+                        \ldots
+                    }
+                }
+            \end{lstlisting}
 		
 
     \subsection{Exact Computation}
