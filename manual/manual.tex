@@ -300,6 +300,7 @@ Sander J.J. Leemans, Tian Li}
 					EbiCommand::get_progress_bar_ticks(total_steps);
 					EbiCommand::get_progress_bar_message(message);
 				\end{lstlisting}
+                \item Compilation for release will fail if there are any warnings.
 			\end{enumerate}
             
 		\subsubsection{The technique}
@@ -464,6 +465,8 @@ mod tests {
     }
 }
 \end{lstlisting}
+
+            Tests can be run using \verb=cargo test=.
 		
 
     \subsection{Exact Computation}

@@ -90,7 +90,7 @@ impl FromEbiTraitObject for EbiFileHandler {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
             EbiInput::FileHandler(e) => Ok(Box::new(e)),
-            _ => Err(anyhow!("cannot read {} {} as an integer", object.get_type().get_article(), object.get_type()))
+            _ => Err(anyhow!("cannot read {} {} as an file handler", object.get_type().get_article(), object.get_type()))
         } 
     }
 }
@@ -124,5 +124,26 @@ impl Hash for EbiFileHandler {
 impl Display for EbiFileHandler {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "{} (.{})", self.name, self.file_extension)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use crate::{ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject}, ebi_objects::{executions::EBI_EXECUTIONS, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE, process_tree::EBI_PROCESS_TREE, stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET}};
+
+    #[test]
+    fn file_handlers() {
+        assert_eq!(EbiFileHandler::from_str("slang").unwrap(), EBI_FINITE_STOCHASTIC_LANGUAGE);
+        assert!(EbiFileHandler::from_str("blablabla44252435").is_err());
+
+        EbiFileHandler::get_producing_commands(&EBI_PROCESS_TREE);
+        EbiFileHandler::get_producing_commands(&EBI_STOCHASTIC_LABELLED_PETRI_NET);
+
+        assert!(EBI_PROCESS_TREE.cmp(&EBI_STOCHASTIC_LABELLED_PETRI_NET).is_lt());
+
+        EbiFileHandler::from_trait_object(EbiInput::Usize(0)).unwrap_err();
+        EbiFileHandler::from_trait_object(EbiInput::FileHandler(EBI_EXECUTIONS)).unwrap();
     }
 }
