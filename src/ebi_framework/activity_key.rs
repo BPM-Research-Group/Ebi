@@ -143,6 +143,10 @@ impl<'a> ActivityKey {
         return self.name2activity.len();
     }
 
+    pub fn get_activities(&self) -> Vec<&Activity> {
+        self.name2activity.values().collect()
+    }
+
     #[cfg(test)]
     pub fn process_trace(&mut self, trace: &Vec<String>) -> Vec<Activity> {
         let mut result = vec![];

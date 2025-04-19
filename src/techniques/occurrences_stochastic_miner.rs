@@ -10,7 +10,10 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_semantics::Semantics,
     },
-    math::{fraction::Fraction, traits::{One, Zero}},
+    math::{
+        fraction::Fraction,
+        traits::{One, Zero},
+    },
 };
 
 pub trait OccurrencesStochasticMiner {
@@ -29,12 +32,15 @@ impl OccurrencesStochasticMiner for LabelledPetriNet {
             ActivityKeyTranslator::new(language.get_activity_key(), self.get_activity_key_mut());
 
         let mut model_activity2frequency = HashMap::new();
+        for activity in self.get_activity_key().get_activities(){
+            model_activity2frequency.insert(*activity, Fraction::zero());
+        }
         for (trace, probability) in language.iter_trace_probability() {
             for log_activity in trace {
                 let model_activity = translator.translate_activity(log_activity);
-                *model_activity2frequency
+                model_activity2frequency
                     .entry(model_activity)
-                    .or_insert(Fraction::zero()) += probability;
+                    .and_modify(|f: &mut Fraction| *f += probability);
             }
         }
 
@@ -62,7 +68,13 @@ impl OccurrencesStochasticMiner for LabelledPetriNet {
 mod tests {
     use std::fs;
 
-    use crate::{ebi_objects::{finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet}, math};
+    use crate::{
+        ebi_objects::{
+            finite_stochastic_language::FiniteStochasticLanguage,
+            labelled_petri_net::LabelledPetriNet,
+        },
+        math,
+    };
 
     use super::OccurrencesStochasticMiner;
 

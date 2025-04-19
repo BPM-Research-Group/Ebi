@@ -669,18 +669,23 @@ impl Hash for EbiCommand {
 mod tests {
     use std::{
         collections::HashSet,
+        fmt::Debug,
         fs::{self, File},
+        path::PathBuf,
     };
-
-    use anyhow::Context;
 
     use super::{EBI_COMMANDS, EbiCommand};
     use crate::{
-        ebi_framework::ebi_input::{self, EbiInput, EbiInputType},
-        ebi_objects::event_log::EBI_EVENT_LOG,
+        ebi_framework::{
+            ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+            ebi_input::{self, EbiInput, EbiInputType},
+            ebi_object::EbiObject,
+            ebi_trait::EbiTrait,
+        },
         math::fraction::Fraction,
         multiple_reader::MultipleReader,
     };
+    use itertools::Itertools;
     use ntest::timeout;
 
     #[test]
@@ -689,8 +694,7 @@ mod tests {
     }
 
     #[test]
-    #[timeout(300000)]
-    fn call_all_non_cli_commands() {
+    fn basic_calls() {
         for command in EBI_COMMANDS.get_command_paths() {
             command.first().unwrap().short_name();
             command.first().unwrap().explanation_long();
@@ -711,112 +715,198 @@ mod tests {
             let _ = command.last().unwrap().eq(command.last().unwrap());
             let mut hash = HashSet::new();
             hash.insert(command.last().unwrap());
+        }
+    }
+
+    #[test]
+    #[timeout(300000)]
+    fn call_all_non_cli_commands() {
+        for path in EBI_COMMANDS.get_command_paths() {
             if let EbiCommand::Command {
-                name_short,
                 input_types,
                 execute,
                 cli_command,
                 exact_arithmetic,
                 output_type,
                 ..
-            } = command.last().unwrap()
+            } = path.last().unwrap()
             {
                 if cli_command.is_none() // only test commands that do not use the cli directly
                     && (*exact_arithmetic // do not test approximate commands in exact mode
                         || cfg!(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic")))
                 {
-                    println!("command {}", name_short);
+                    println!("command {}", EbiCommand::path_to_string(&path));
 
-                    //for each input type, find an input file
-                    let mut inputs = vec![];
-                    for input_type in input_types.iter() {
-                        inputs.push(find_objects(input_type));
+                    //for each input type, find all input combinations
+                    let inputss = find_inputs(input_types);
+                    if inputss.is_empty() {
+                        panic!("Could not find input to call command.");
                     }
 
-                    //we do not know whether a command should succeed (giving an error is fine in general), but no command should panic
-                    let output = (execute)(inputs, None);
+                    //apply the command to all input combinations
+                    for inputs in inputss {
+                        eprintln!("\t\t{:?}", inputs);
+                        //we do not know whether a command should succeed (giving an error is fine in general), but no command should panic
+                        let output = (execute)(transform(inputs), None);
 
-                    //verify that the output is of the correct type
-                    if let Ok(output) = output {
-                        assert_eq!(output.get_type(), output_type.to_owned().to_owned());
+                        //verify that the output is of the correct type
+                        if let Ok(output) = output {
+                            assert_eq!(output.get_type(), output_type.to_owned().to_owned());
+                        }
                     }
                 }
             }
         }
     }
 
-    fn find_objects(input_types: &[&EbiInputType]) -> EbiInput {
-        for input_type in input_types.iter() {
-            if let Some(input) = find_object(input_type) {
-                return input;
-            }
+    fn find_inputs(input_typess: &[&[&EbiInputType]]) -> Vec<Vec<TestInput>> {
+        let mut it = input_typess.iter();
+        let mut result = if let Some(input_types) = it.next() {
+            find_inputs_for_position(input_types)
+                .into_iter()
+                .map(|x| vec![x])
+                .collect()
+        } else {
+            vec![]
+        };
+        while let Some(input_types) = it.next() {
+            let add = find_inputs_for_position(input_types);
+            result = result
+                .into_iter()
+                .cartesian_product(add.into_iter())
+                .map(|(mut xs, x)| {
+                    xs.push(x);
+                    xs
+                })
+                .collect();
         }
-
-        panic!("Could not find input to call command.");
+        println!("\tinput combinations {}", result.len());
+        return result;
     }
 
-    fn find_object(input_type: &EbiInputType) -> Option<EbiInput> {
-        match input_type {
-            EbiInputType::FileHandler => {
-                return Some(EbiInput::FileHandler(EBI_EVENT_LOG));
+    fn transform(inputs: Vec<TestInput>) -> Vec<EbiInput> {
+        inputs
+            .into_iter()
+            .map(|x| x.to_ebi_input())
+            .collect::<Vec<_>>()
+    }
+
+    #[derive(Clone)]
+    enum TestInput {
+        Trait(EbiTrait, PathBuf), //a trait cannot be cloned, thus we must parse it every time in the cartesian product
+        Object(EbiObject, &'static EbiFileHandler, PathBuf),
+        String(String),
+        Usize(usize),
+        FileHandler(EbiFileHandler),
+        Fraction(Fraction),
+    }
+
+    impl TestInput {
+        fn to_ebi_input(self) -> EbiInput {
+            match self {
+                TestInput::Trait(etrait, file) => {
+                    let mut reader = MultipleReader::from_file(File::open(file).unwrap());
+                    match ebi_input::read_as_trait(&etrait, &mut reader) {
+                        Ok((object, file_handler)) => EbiInput::Trait(object, file_handler),
+                        Err(_) => unreachable!(),
+                    }
+                }
+                TestInput::Object(o, fh, _) => EbiInput::Object(o, fh),
+                TestInput::String(s) => EbiInput::String(s),
+                TestInput::Usize(u) => EbiInput::Usize(u),
+                TestInput::FileHandler(fh) => EbiInput::FileHandler(fh),
+                TestInput::Fraction(f) => EbiInput::Fraction(f),
             }
-            EbiInputType::Fraction => {
-                return Some(EbiInput::Fraction(Fraction::from((1, 2))));
-            }
-            EbiInputType::String => {
-                return Some(EbiInput::String("no".to_string()));
-            }
-            EbiInputType::Usize => {
-                return Some(EbiInput::Usize(10));
-            }
-            _ => {}
         }
+    }
 
-        let files = fs::read_dir("./testfiles").unwrap();
-        for path in files {
-            let file = path.unwrap();
+    impl Debug for TestInput {
+        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+            match self {
+                Self::Trait(arg0, arg1) => f.debug_tuple("Trait").field(arg0).field(arg1).finish(),
+                Self::Object(_, _, arg2) => f.debug_tuple("Object").field(arg2).finish(),
+                Self::String(arg0) => f.debug_tuple("String").field(arg0).finish(),
+                Self::Usize(arg0) => f.debug_tuple("Usize").field(arg0).finish(),
+                Self::FileHandler(arg0) => f.debug_tuple("FileHandler").field(&arg0.name).finish(),
+                Self::Fraction(arg0) => f.debug_tuple("Fraction").field(arg0).finish(),
+            }
+        }
+    }
 
-            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
-
+    fn find_inputs_for_position(input_types: &[&EbiInputType]) -> Vec<TestInput> {
+        let mut result = vec![];
+        for input_type in input_types {
             match input_type {
-                EbiInputType::Trait(etrait) => {
-                    //try to parse a trait
-                    match ebi_input::read_as_trait(etrait, &mut reader)
-                        .with_context(|| format!("Parsing as the trait `{}`.", etrait))
-                    {
-                        Ok((object, file_handler)) => {
-                            println!("file {:?}", file.file_name());
-                            return Some(EbiInput::Trait(object, file_handler));
+                EbiInputType::FileHandler => {
+                    result.append(
+                        &mut EBI_FILE_HANDLERS
+                            .iter()
+                            .map(|f| TestInput::FileHandler(f.clone()))
+                            .collect::<Vec<_>>(),
+                    );
+                }
+                EbiInputType::Fraction => {
+                    result.push(TestInput::Fraction(Fraction::from((1, 2))));
+                }
+                EbiInputType::String => {
+                    result.push(TestInput::String("no".to_string()));
+                }
+                EbiInputType::Usize => {
+                    result.push(TestInput::Usize(10));
+                }
+                _ => {
+                    //look through all files
+                    let files = fs::read_dir("./testfiles").unwrap();
+                    for path in files {
+                        let file = path.unwrap();
+
+                        //for now, we skip files with loops and livelocks, as the techniques cannot handle them yet
+                        if !file.file_name().into_string().unwrap().contains("livelock")
+                            && !file.file_name().into_string().unwrap().contains("empty")
+                            && !file.file_name().into_string().unwrap().contains("infinite")
+                            && !file.file_name().into_string().unwrap().contains("loop")
+                            && !file.file_name().into_string().unwrap().contains("pdc")
+                            && !file.file_name().into_string().unwrap().contains("irregular")
+                        {
+                            let mut reader =
+                                MultipleReader::from_file(File::open(file.path()).unwrap());
+
+                            match input_type {
+                                EbiInputType::Trait(etrait) => {
+                                    //try to parse a trait
+
+                                    match ebi_input::read_as_trait(etrait, &mut reader) {
+                                        Ok((_, _)) => {
+                                            result.push(TestInput::Trait(*etrait, file.path()));
+                                        }
+                                        Err(_) => {}
+                                    }
+                                }
+                                EbiInputType::Object(etype) => {
+                                    //try to parse a specific object
+                                    match ebi_input::read_as_object(etype, &mut reader) {
+                                        Ok((object, file_handler)) => {
+                                            result.push(TestInput::Object(object, file_handler, file.path()));
+                                        }
+                                        Err(_) => {}
+                                    }
+                                }
+                                EbiInputType::AnyObject => {
+                                    match ebi_input::read_as_any_object(&mut reader) {
+                                        Ok((object, file_handler)) => {
+                                            result.push(TestInput::Object(object, file_handler, file.path()));
+                                        }
+                                        Err(_) => {}
+                                    }
+                                }
+                                _ => {}
+                            }
                         }
-                        Err(_) => {}
                     }
                 }
-                EbiInputType::Object(etype) => {
-                    //try to parse a specific object
-                    match ebi_input::read_as_object(etype, &mut reader)
-                        .with_context(|| format!("Parsing as the object type `{}`.", etype))
-                    {
-                        Ok((object, file_handler)) => {
-                            println!("file {:?}", file.file_name());
-                            return Some(EbiInput::Object(object, file_handler));
-                        }
-                        Err(_) => {}
-                    }
-                }
-                EbiInputType::AnyObject => {
-                    match ebi_input::read_as_any_object(&mut reader)
-                        .context("Parsing as any object.")
-                    {
-                        Ok((object, file_handler)) => {
-                            println!("file {:?}", file.file_name());
-                            return Some(EbiInput::Object(object, file_handler));
-                        }
-                        Err(_) => {}
-                    }
-                }
-                _ => unreachable!(),
             }
         }
-        None
+
+        result
     }
 }

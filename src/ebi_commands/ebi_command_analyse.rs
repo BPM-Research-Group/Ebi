@@ -24,8 +24,7 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
     name_long: Some("all-traces"), 
     explanation_short: "Find all traces.", 
     explanation_long: Some("List all traces of a stohastic language.
-Models containing loops are not supported and an error will be returned.
-The computation may run forever if the model is unbounded."),
+Models containing loops and unbounded models are not supported and the computation will run forever."),
     cli_command: None, 
     latex_link: None,
     exact_arithmetic: true,

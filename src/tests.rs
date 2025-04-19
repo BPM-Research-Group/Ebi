@@ -75,20 +75,24 @@
 //     Fraction::set_exact_globally(true);
 // }
 #[cfg(test)]
-use std::fs::{self, File};
+use std::fs::{self, File, DirEntry};
 
 #[cfg(test)]
 use crate::{
-    ebi_framework::{ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}},
+    ebi_framework::{
+        ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+        ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    },
+    ebi_objects::process_tree::EBI_PROCESS_TREE,
     multiple_reader::MultipleReader,
 };
 
 #[cfg(test)]
-pub fn get_all_test_files() -> Vec<(EbiInput, Option<EbiObjectImporter>, Option<EbiTraitImporter>)> {
-    use crate::{
-        ebi_framework::ebi_input::EbiObjectImporter, ebi_objects::process_tree::EBI_PROCESS_TREE,
-    };
-
+pub fn get_all_test_files() -> Vec<(
+    EbiInput,
+    Option<EbiObjectImporter>,
+    Option<EbiTraitImporter>,
+)> {
     let mut result = vec![];
     let files = fs::read_dir("./testfiles").unwrap();
     for path in files {
@@ -107,18 +111,13 @@ pub fn get_all_test_files() -> Vec<(EbiInput, Option<EbiObjectImporter>, Option<
             {
                 //file handler should be able to accept this file
                 for importer in file_handler.object_importers {
-                    //special case: empty.ptree and empty_2.ptree cannot be imported as an LPN, but it is not invalid
-                    let special = if let EbiObjectImporter::LabelledPetriNet(_) = importer {
-                        true
-                    } else {
-                        false
-                    };
-                    if !(*file_handler == EBI_PROCESS_TREE
-                        && special
-                        && (file.file_name().into_string().unwrap() == "empty.ptree"
-                            || file.file_name().into_string().unwrap() == "empty_2.ptree"))
-                    {
-                        println!("import {:?}, file handler {}, importer {}", file.file_name(), file_handler, importer);
+                    if should_file_be_tested(&file, importer, file_handler) {
+                        println!(
+                            "import {:?}, file handler {}, importer {}",
+                            file.file_name(),
+                            file_handler,
+                            importer
+                        );
                         let object = EbiInput::Object(
                             (importer.get_importer())(&mut reader.get().unwrap()).unwrap(),
                             file_handler,
@@ -140,16 +139,40 @@ pub fn get_all_test_files() -> Vec<(EbiInput, Option<EbiObjectImporter>, Option<
                 //file handler should not accept this file
 
                 for importer in file_handler.object_importers {
-                    println!("import {:?}, file handler {}, importer {} (should fail)", file.file_name(), file_handler, importer);
+                    println!(
+                        "import {:?}, file handler {}, importer {} (should fail)",
+                        file.file_name(),
+                        file_handler,
+                        importer
+                    );
                     assert!((importer.get_importer())(&mut reader.get().unwrap()).is_err());
                 }
 
                 for importer in file_handler.trait_importers {
-                    println!("import {:?}, file handler {}, importer {} (should fail)", file.file_name(), file_handler, importer);
+                    println!(
+                        "import {:?}, file handler {}, importer {} (should fail)",
+                        file.file_name(),
+                        file_handler,
+                        importer
+                    );
                     assert!(importer.import(&mut reader.get().unwrap()).is_err());
                 }
             }
         }
     }
     result
+}
+
+#[cfg(test)]
+pub fn should_file_be_tested(file: &DirEntry, importer: &EbiObjectImporter, file_handler: &EbiFileHandler) -> bool {
+    //special case: empty.ptree and empty_2.ptree cannot be imported as an LPN, but it is not invalid
+    let special = if let EbiObjectImporter::LabelledPetriNet(_) = importer {
+        true
+    } else {
+        false
+    };
+    !(*file_handler == EBI_PROCESS_TREE
+        && special
+        && (file.file_name().into_string().unwrap() == "empty.ptree"
+            || file.file_name().into_string().unwrap() == "empty_2.ptree"))
 }
