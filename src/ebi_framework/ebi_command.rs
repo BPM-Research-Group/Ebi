@@ -739,7 +739,7 @@ mod tests {
 
                     //for each input type, find all input combinations
                     let inputss = find_inputs(input_types);
-                    if inputss.is_empty() {
+                    if inputss.is_empty() && input_types.len() > 0 {
                         panic!("Could not find input to call command.");
                     }
 
