@@ -1,10 +1,12 @@
+use anyhow::{Context, Error, Result, anyhow};
+use layout::topo::layout::VisualGraph;
 use std::io;
 use std::str::FromStr;
 use std::{fmt, io::BufRead};
-use anyhow::{anyhow, Result, Context, Error};
-use layout::topo::layout::VisualGraph;
 
-use crate::ebi_framework::activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey};
+use crate::ebi_framework::activity_key::{
+    Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
+};
 use crate::ebi_framework::ebi_file_handler::EbiFileHandler;
 use crate::ebi_framework::ebi_input::{self, EbiObjectImporter, EbiTraitImporter};
 use crate::ebi_framework::ebi_object::EbiObject;
@@ -16,13 +18,19 @@ use crate::ebi_framework::prom_link::JavaObjectHandler;
 use crate::ebi_traits::ebi_trait_graphable::{self, EbiTraitGraphable};
 use crate::ebi_traits::ebi_trait_queriable_stochastic_language;
 use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics};
-use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics};
-use crate::ebi_traits::ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics, TransitionIndex};
+use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::{
+    EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
+};
+use crate::ebi_traits::ebi_trait_stochastic_semantics::{
+    EbiTraitStochasticSemantics, ToStochasticSemantics, TransitionIndex,
+};
 use crate::line_reader::LineReader;
 use crate::marking::Marking;
 use crate::math::fraction::Fraction;
+use crate::math::traits::{One, Signed};
 
 use super::labelled_petri_net::LabelledPetriNet;
+use super::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton;
 
 pub const HEADER: &str = "stochastic labelled Petri net";
 
@@ -47,37 +55,47 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<StochasticLabelledPetriNet>,
     trait_importers: &[
-        EbiTraitImporter::QueriableStochasticLanguage(ebi_trait_queriable_stochastic_language::import::<StochasticLabelledPetriNet>),
-        EbiTraitImporter::StochasticDeterministicSemantics(StochasticLabelledPetriNet::import_as_stochastic_deterministic_semantics),
-        EbiTraitImporter::StochasticSemantics(StochasticLabelledPetriNet::import_as_stochastic_semantics),
+        EbiTraitImporter::QueriableStochasticLanguage(
+            ebi_trait_queriable_stochastic_language::import::<StochasticLabelledPetriNet>,
+        ),
+        EbiTraitImporter::StochasticDeterministicSemantics(
+            StochasticLabelledPetriNet::import_as_stochastic_deterministic_semantics,
+        ),
+        EbiTraitImporter::StochasticSemantics(
+            StochasticLabelledPetriNet::import_as_stochastic_semantics,
+        ),
         EbiTraitImporter::Semantics(StochasticLabelledPetriNet::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<StochasticLabelledPetriNet>),
     ],
     object_importers: &[
         EbiObjectImporter::StochasticLabelledPetriNet(StochasticLabelledPetriNet::import_as_object),
-        EbiObjectImporter::LabelledPetriNet(StochasticLabelledPetriNet::import_as_labelled_petri_net)
+        EbiObjectImporter::LabelledPetriNet(
+            StochasticLabelledPetriNet::import_as_labelled_petri_net,
+        ),
     ],
-    object_exporters: &[
-        EbiObjectExporter::StochasticLabelledPetriNet(StochasticLabelledPetriNet::export_from_object)
-    ],
-    java_object_handlers: &[
-        JavaObjectHandler{ 
-            name: "StochasticLabelledPetriNet", 
-            translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiStochasticLabelledPetriNet.EbiString2StochasticLabelledPetriNet"), 
-            translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiStochasticLabelledPetriNet.StochasticLabelledPetriNet2EbiString"),
-            java_class: "org.processmining.stochasticlabelledpetrinets.StochasticLabelledPetriNetSimpleWeights",
-            input_gui: None,
-        },
-    ],
+    object_exporters: &[EbiObjectExporter::StochasticLabelledPetriNet(
+        StochasticLabelledPetriNet::export_from_object,
+    )],
+    java_object_handlers: &[JavaObjectHandler {
+        name: "StochasticLabelledPetriNet",
+        translator_ebi_to_java: Some(
+            "org.processmining.ebi.objects.EbiStochasticLabelledPetriNet.EbiString2StochasticLabelledPetriNet",
+        ),
+        translator_java_to_ebi: Some(
+            "org.processmining.ebi.objects.EbiStochasticLabelledPetriNet.StochasticLabelledPetriNet2EbiString",
+        ),
+        java_class: "org.processmining.stochasticlabelledpetrinets.StochasticLabelledPetriNetSimpleWeights",
+        input_gui: None,
+    }],
 };
 
-#[derive(Clone,Debug,ActivityKey)]
+#[derive(Clone, Debug, ActivityKey)]
 pub struct StochasticLabelledPetriNet {
     pub(crate) activity_key: ActivityKey,
     pub(crate) initial_marking: Marking,
     pub(crate) labels: Vec<Option<Activity>>,
-    pub(crate) transition2input_places:  Vec<Vec<usize>>,
-	pub(crate) transition2output_places: Vec<Vec<usize>>,
+    pub(crate) transition2input_places: Vec<Vec<usize>>,
+    pub(crate) transition2output_places: Vec<Vec<usize>>,
     pub(crate) transition2input_places_cardinality: Vec<Vec<u64>>,
     pub(crate) transition2output_places_cardinality: Vec<Vec<u64>>, //fields are the same as in LabelledPetriNet
     pub(crate) place2output_transitions: Vec<Vec<usize>>,
@@ -85,7 +103,6 @@ pub struct StochasticLabelledPetriNet {
 }
 
 impl StochasticLabelledPetriNet {
-
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let net = Self::import(reader)?;
         Ok(EbiObject::LabelledPetriNet(net.into()))
@@ -102,7 +119,7 @@ impl StochasticLabelledPetriNet {
     pub fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
         self.labels[transition].is_none()
     }
-    
+
     pub fn get_transition_label(&self, transition: TransitionIndex) -> Option<Activity> {
         self.labels[transition]
     }
@@ -113,17 +130,27 @@ impl StochasticLabelledPetriNet {
 
     pub fn incidence_vector(&self, transition: TransitionIndex) -> Vec<i128> {
         let mut vec2 = vec![0; self.get_number_of_places()];
-        for (in_place_pos, in_place) in self.transition2input_places[transition].iter().enumerate() {
-            vec2[*in_place] -= self.transition2input_places_cardinality[transition][in_place_pos] as i128;
+        for (in_place_pos, in_place) in self.transition2input_places[transition].iter().enumerate()
+        {
+            vec2[*in_place] -=
+                self.transition2input_places_cardinality[transition][in_place_pos] as i128;
         }
-        for (out_place_pos, out_place) in self.transition2output_places[transition].iter().enumerate() {
-            vec2[*out_place] += self.transition2output_places_cardinality[transition][out_place_pos] as i128;
+        for (out_place_pos, out_place) in
+            self.transition2output_places[transition].iter().enumerate()
+        {
+            vec2[*out_place] +=
+                self.transition2output_places_cardinality[transition][out_place_pos] as i128;
         }
         vec2
     }
 
     pub fn max_transition_input_arc_cardinality(&self) -> u64 {
-        if let Some(x) = self.transition2input_places_cardinality.iter().flatten().max() {
+        if let Some(x) = self
+            .transition2input_places_cardinality
+            .iter()
+            .flatten()
+            .max()
+        {
             *x
         } else {
             0
@@ -134,17 +161,20 @@ impl StochasticLabelledPetriNet {
 impl TranslateActivityKey for StochasticLabelledPetriNet {
     fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
         let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
-        self.labels.iter_mut().for_each(|activity| if let Some(a) = activity { *a = translator.translate_activity(&a) });
+        self.labels.iter_mut().for_each(|activity| {
+            if let Some(a) = activity {
+                *a = translator.translate_activity(&a)
+            }
+        });
         self.activity_key = to_activity_key.clone();
     }
 }
 
 impl Exportable for StochasticLabelledPetriNet {
-    
     fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(log)) => log.export(f),
-            _ => unreachable!()
+            _ => unreachable!(),
         }
     }
 
@@ -156,9 +186,24 @@ impl Exportable for StochasticLabelledPetriNet {
 impl Infoable for StochasticLabelledPetriNet {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         writeln!(f, "Number of places\t\t{}", self.get_number_of_places())?;
-        writeln!(f, "Number of transitions\t\t{}", self.get_number_of_transitions())?;
-        writeln!(f, "Number of activities\t\t{}", self.get_activity_key().get_number_of_activities())?;
-        writeln!(f, "Number of silent transitions\t{}", (0..self.get_number_of_transitions()).into_iter().filter(|transition| self.is_transition_silent(*transition)).count())?;
+        writeln!(
+            f,
+            "Number of transitions\t\t{}",
+            self.get_number_of_transitions()
+        )?;
+        writeln!(
+            f,
+            "Number of activities\t\t{}",
+            self.get_activity_key().get_number_of_activities()
+        )?;
+        writeln!(
+            f,
+            "Number of silent transitions\t{}",
+            (0..self.get_number_of_transitions())
+                .into_iter()
+                .filter(|transition| self.is_transition_silent(*transition))
+                .count()
+        )?;
 
         Ok(write!(f, "")?)
     }
@@ -174,27 +219,43 @@ impl fmt::Display for StochasticLabelledPetriNet {
             writeln!(f, "{}", place)?;
         }
 
-        writeln!(f, "# number of transitions\n{}", self.get_number_of_transitions())?;
+        writeln!(
+            f,
+            "# number of transitions\n{}",
+            self.get_number_of_transitions()
+        )?;
 
         for transition in 0..self.get_number_of_transitions() {
             writeln!(f, "# transition {}", transition)?;
 
             if let Some(activity) = self.get_transition_label(transition) {
-                writeln!(f, "label {}", self.activity_key.get_activity_label(&activity))?;
+                writeln!(
+                    f,
+                    "label {}",
+                    self.activity_key.get_activity_label(&activity)
+                )?;
             } else {
                 writeln!(f, "silent")?;
             }
 
             writeln!(f, "# weight\n{}", &self.weights[transition])?;
 
-            writeln!(f, "# number of input places\n{}", self.transition2input_places[transition].len())?;
+            writeln!(
+                f,
+                "# number of input places\n{}",
+                self.transition2input_places[transition].len()
+            )?;
             for (pos, place) in self.transition2input_places[transition].iter().enumerate() {
                 for _ in 0..self.transition2input_places_cardinality[transition][pos] {
                     writeln!(f, "{}", place)?;
                 }
             }
 
-            writeln!(f, "# number of output places\n{}", self.transition2output_places[transition].len())?;
+            writeln!(
+                f,
+                "# number of output places\n{}",
+                self.transition2output_places[transition].len()
+            )?;
             for (pos, place) in self.transition2output_places[transition].iter().enumerate() {
                 for _ in 0..self.transition2output_places_cardinality[transition][pos] {
                     writeln!(f, "{}", place)?;
@@ -216,7 +277,6 @@ impl FromStr for StochasticLabelledPetriNet {
 }
 
 impl Importable for StochasticLabelledPetriNet {
-
     fn import_as_object(reader: &mut dyn BufRead) -> Result<EbiObject> {
         Ok(EbiObject::StochasticLabelledPetriNet(Self::import(reader)?))
     }
@@ -224,34 +284,51 @@ impl Importable for StochasticLabelledPetriNet {
     fn import(reader: &mut dyn BufRead) -> Result<Self> {
         let mut lreader = LineReader::new(reader);
 
-        let head = lreader.next_line_string().with_context(|| format!("failed to read header, which should be {}", HEADER))?;
+        let head = lreader
+            .next_line_string()
+            .with_context(|| format!("failed to read header, which should be {}", HEADER))?;
         if head != HEADER {
-            return Err(anyhow!("first line should be exactly `{}`, but found `{}` on line `{}`", HEADER, lreader.get_last_line(), lreader.get_last_line_number()));
+            return Err(anyhow!(
+                "first line should be exactly `{}`, but found `{}` on line `{}`",
+                HEADER,
+                lreader.get_last_line(),
+                lreader.get_last_line_number()
+            ));
         }
 
         let mut activity_key = ActivityKey::new();
-        
-        let number_of_places = lreader.next_line_index().context("failed to read number of places")?;
+
+        let number_of_places = lreader
+            .next_line_index()
+            .context("failed to read number of places")?;
         let mut place2output_transitions = vec![vec![]; number_of_places];
 
         //read initial marking
         let mut initial_marking = vec![0u64; number_of_places];
-        for place in 0 .. number_of_places {
-            initial_marking[place] = lreader.next_line_natural().with_context(|| format!("failed to read initial marking of place {}", place))?;
+        for place in 0..number_of_places {
+            initial_marking[place] = lreader
+                .next_line_natural()
+                .with_context(|| format!("failed to read initial marking of place {}", place))?;
         }
 
         //read transitions
-        let number_of_transitions = lreader.next_line_index().context("failed to read number of transitions")?;
+        let number_of_transitions = lreader
+            .next_line_index()
+            .context("failed to read number of transitions")?;
 
         let mut weights = Vec::with_capacity(number_of_transitions);
         let mut labels = Vec::with_capacity(number_of_transitions);
         let mut transition2input_places: Vec<Vec<usize>> = vec![vec![]; number_of_transitions];
         let mut transition2output_places: Vec<Vec<usize>> = vec![vec![]; number_of_transitions];
-        let mut transition2input_places_cardinality: Vec<Vec<u64>> = vec![vec![]; number_of_transitions];
-        let mut transition2output_places_cardinality: Vec<Vec<u64>> = vec![vec![]; number_of_transitions];
-        
-        for transition in 0 .. number_of_transitions {
-            let label_line = lreader.next_line_string().with_context(|| format!("failed to read label of transition {}", transition))?;
+        let mut transition2input_places_cardinality: Vec<Vec<u64>> =
+            vec![vec![]; number_of_transitions];
+        let mut transition2output_places_cardinality: Vec<Vec<u64>> =
+            vec![vec![]; number_of_transitions];
+
+        for transition in 0..number_of_transitions {
+            let label_line = lreader
+                .next_line_string()
+                .with_context(|| format!("failed to read label of transition {}", transition))?;
 
             //read label
             if label_line.trim_start().starts_with("label ") {
@@ -264,23 +341,44 @@ impl Importable for StochasticLabelledPetriNet {
 
             //read weight
             {
-                let weight = lreader.next_line_weight().with_context(|| format!("failed to read weight of transition {}", transition))?;
+                let weight = lreader.next_line_weight().with_context(|| {
+                    format!("failed to read weight of transition {}", transition)
+                })?;
                 weights.push(weight);
             }
 
             //read input places
             {
-                let number_of_input_places = lreader.next_line_index().with_context(|| format!("Failed to read number of input places of transition {}.", transition))?;                
-                for p in 0 .. number_of_input_places {
-                    let place = lreader.next_line_index().with_context(|| format!("Failed to read input place number {} of transition {}.", p, transition))?;
+                let number_of_input_places = lreader.next_line_index().with_context(|| {
+                    format!(
+                        "Failed to read number of input places of transition {}.",
+                        transition
+                    )
+                })?;
+                for p in 0..number_of_input_places {
+                    let place = lreader.next_line_index().with_context(|| {
+                        format!(
+                            "Failed to read input place number {} of transition {}.",
+                            p, transition
+                        )
+                    })?;
 
                     if place >= number_of_places {
-                        return Err(anyhow!("Non-existing place referenced for transition {}, input place number {}, at line {}; found `{}`.", transition, p, lreader.get_last_line_number(), lreader.get_last_line()));
+                        return Err(anyhow!(
+                            "Non-existing place referenced for transition {}, input place number {}, at line {}; found `{}`.",
+                            transition,
+                            p,
+                            lreader.get_last_line_number(),
+                            lreader.get_last_line()
+                        ));
                     }
 
                     place2output_transitions[place].push(transition);
 
-                    if let Some(pos) = transition2input_places[transition].iter().position(|p| *p == place) {
+                    if let Some(pos) = transition2input_places[transition]
+                        .iter()
+                        .position(|p| *p == place)
+                    {
                         transition2input_places_cardinality[transition][pos] += 1;
                     } else {
                         transition2input_places[transition].push(place);
@@ -291,15 +389,34 @@ impl Importable for StochasticLabelledPetriNet {
 
             //read output places
             {
-                let number_of_output_places= lreader.next_line_index().with_context(|| format!("failed to read number of output places of transition {}", transition))?;
-                for p in 0 .. number_of_output_places {
-                    let place = lreader.next_line_index().with_context(|| format!("failed to read output place number {} of transition {}", p, transition))?;
-                    
+                let number_of_output_places = lreader.next_line_index().with_context(|| {
+                    format!(
+                        "failed to read number of output places of transition {}",
+                        transition
+                    )
+                })?;
+                for p in 0..number_of_output_places {
+                    let place = lreader.next_line_index().with_context(|| {
+                        format!(
+                            "failed to read output place number {} of transition {}",
+                            p, transition
+                        )
+                    })?;
+
                     if place >= number_of_places {
-                        return Err(anyhow!("non-existing place referenced for transition {}, output place number {}, at line {}; found `{}`", transition, p, lreader.get_last_line_number(), lreader.get_last_line()));
+                        return Err(anyhow!(
+                            "non-existing place referenced for transition {}, output place number {}, at line {}; found `{}`",
+                            transition,
+                            p,
+                            lreader.get_last_line_number(),
+                            lreader.get_last_line()
+                        ));
                     }
 
-                    if let Some(pos) = transition2output_places[transition].iter().position(|p| *p == place) {
+                    if let Some(pos) = transition2output_places[transition]
+                        .iter()
+                        .position(|p| *p == place)
+                    {
                         transition2output_places_cardinality[transition][pos] += 1;
                     } else {
                         transition2output_places[transition].push(place);
@@ -309,10 +426,11 @@ impl Importable for StochasticLabelledPetriNet {
             }
         }
 
-
         Ok(StochasticLabelledPetriNet {
             activity_key,
-            initial_marking: Marking {place2token: initial_marking},
+            initial_marking: Marking {
+                place2token: initial_marking,
+            },
             labels,
             place2output_transitions,
             transition2input_places,
@@ -358,13 +476,86 @@ impl From<(LabelledPetriNet, Vec<Fraction>)> for StochasticLabelledPetriNet {
     }
 }
 
+impl From<StochasticDeterministicFiniteAutomaton> for StochasticLabelledPetriNet {
+
+    fn from(
+        value: StochasticDeterministicFiniteAutomaton,
+    ) -> Self {
+        log::info!("convert SDFA to SLPN");
+
+        if value.get_initial_state().is_none() {
+            //SDFA has an empty language, return a livelocked SLPN
+            return Self{
+                activity_key: value.activity_key,
+                initial_marking: Marking::new(0),
+                labels: vec![None],
+                transition2input_places: vec![vec![]],
+                transition2output_places: vec![vec![]],
+                transition2input_places_cardinality: vec![vec![]],
+                transition2output_places_cardinality: vec![vec![]],
+                place2output_transitions: vec![],
+                weights: vec![Fraction::one()],
+            };
+        }
+
+        let mut result = LabelledPetriNet::new();
+        let translator =
+            ActivityKeyTranslator::new(value.get_activity_key(), result.get_activity_key_mut());
+        let mut weights = vec![];
+
+        let source = result.add_place();
+        result
+            .get_initial_marking_mut()
+            .increase(source, 1)
+            .unwrap();
+
+        //add places
+        let mut state2place = vec![];
+        for state in 0..=value.max_state {
+            let lpn_place = result.add_place();
+            state2place.push(lpn_place);
+
+            //add termination
+            if value.get_termination_probability(state).is_positive() {
+                let lpn_transition = result.add_transition(None);
+                weights.push(value.get_termination_probability(state).clone());
+                result
+                    .add_place_transition_arc(lpn_place, lpn_transition, 1)
+                    .unwrap();
+            }
+        }
+
+        //add edges
+        for (source, (target, (activity, probability))) in value.sources.iter().zip(
+            value.targets
+                .iter()
+                .zip(value.activities.iter().zip(value.probabilities.iter())),
+        ) {
+            //add transition
+            let lpn_activity = translator.translate_activity(activity);
+            let lpn_transition = result.add_transition(Some(lpn_activity));
+            let source_place = state2place[*source];
+            let target_place = state2place[*target];
+            result
+                .add_place_transition_arc(source_place, lpn_transition, 1)
+                .unwrap();
+            result
+                .add_transition_place_arc(lpn_transition, target_place, 1)
+                .unwrap();
+
+            weights.push(probability.clone());
+        }
+
+        StochasticLabelledPetriNet::from((result, weights))
+    }
+}
+
 impl EbiTraitGraphable for StochasticLabelledPetriNet {
-    fn to_dot(&self) -> VisualGraph {
+    fn to_dot(&self) -> Result<VisualGraph> {
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
         let mut places = vec![];
-        for place in 0 .. self.get_number_of_places() {
-
+        for place in 0..self.get_number_of_places() {
             let label = if let Some(marked) = self.initial_marking.place2token.get(place) {
                 if marked > &0 {
                     marked.to_string()
@@ -379,17 +570,31 @@ impl EbiTraitGraphable for StochasticLabelledPetriNet {
         }
 
         for transition in 0..self.get_number_of_transitions() {
-
             let node = if let Some(activity) = self.get_transition_label(transition) {
-                <dyn EbiTraitGraphable>::create_transition(&mut graph, self.activity_key.get_activity_label(&activity), &self.get_transition_weight(transition).to_string())
+                <dyn EbiTraitGraphable>::create_transition(
+                    &mut graph,
+                    self.activity_key.get_activity_label(&activity),
+                    &self.get_transition_weight(transition).to_string(),
+                )
             } else {
-                <dyn EbiTraitGraphable>::create_silent_transition(&mut graph, &self.get_transition_weight(transition).to_string())
+                <dyn EbiTraitGraphable>::create_silent_transition(
+                    &mut graph,
+                    &self.get_transition_weight(transition).to_string(),
+                )
             };
 
             for (pos, inplace) in self.transition2input_places[transition].iter().enumerate() {
                 let place_node = places.get(*inplace).unwrap();
                 if self.transition2input_places_cardinality[transition][pos] > 1 {
-                    <dyn EbiTraitGraphable>::create_edge(&mut graph, place_node, &node, &format!("{}", self.transition2input_places_cardinality[transition][pos]));
+                    <dyn EbiTraitGraphable>::create_edge(
+                        &mut graph,
+                        place_node,
+                        &node,
+                        &format!(
+                            "{}",
+                            self.transition2input_places_cardinality[transition][pos]
+                        ),
+                    );
                 } else {
                     <dyn EbiTraitGraphable>::create_edge(&mut graph, place_node, &node, "");
                 }
@@ -398,14 +603,22 @@ impl EbiTraitGraphable for StochasticLabelledPetriNet {
             for (pos, outplace) in self.transition2output_places[transition].iter().enumerate() {
                 let place_node = places.get(*outplace).unwrap();
                 if self.transition2output_places_cardinality[transition][pos] > 1 {
-                    <dyn EbiTraitGraphable>::create_edge(&mut graph, &node, place_node, &format!("{}", self.transition2output_places_cardinality[transition][pos]));
+                    <dyn EbiTraitGraphable>::create_edge(
+                        &mut graph,
+                        &node,
+                        place_node,
+                        &format!(
+                            "{}",
+                            self.transition2output_places_cardinality[transition][pos]
+                        ),
+                    );
                 } else {
                     <dyn EbiTraitGraphable>::create_edge(&mut graph, &node, place_node, "");
                 }
             }
         }
 
-        return graph;
+        Ok(graph)
     }
 }
 
@@ -413,7 +626,10 @@ impl EbiTraitGraphable for StochasticLabelledPetriNet {
 mod tests {
     use std::fs;
 
-    use crate::{ebi_objects::stochastic_labelled_petri_net::StochasticLabelledPetriNet, ebi_traits::ebi_trait_semantics::Semantics};
+    use crate::{
+        ebi_objects::stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        ebi_traits::ebi_trait_semantics::Semantics,
+    };
 
     #[test]
     fn empty_slpn() {

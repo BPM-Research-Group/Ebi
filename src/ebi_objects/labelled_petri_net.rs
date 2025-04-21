@@ -1,12 +1,43 @@
-use std::{fmt::{self, Debug}, hash::{Hash, Hasher}, io::{self, BufRead}, str::FromStr};
-use anyhow::{anyhow, Context, Error, Ok, Result};
+use anyhow::{Context, Error, Ok, Result, anyhow};
 use bitvec::vec::BitVec;
 use layout::topo::layout::VisualGraph;
+use std::{
+    fmt::{self, Debug},
+    hash::{Hash, Hasher},
+    io::{self, BufRead},
+    str::FromStr,
+};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey}, displayable::Displayable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader, marking::Marking};
+use crate::{
+    ebi_framework::{
+        activity_key::{
+            Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
+        },
+        displayable::Displayable,
+        ebi_file_handler::EbiFileHandler,
+        ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
+        ebi_object::EbiObject,
+        ebi_output::{EbiObjectExporter, EbiOutput},
+        ebi_trait::FromEbiTraitObject,
+        exportable::Exportable,
+        importable::Importable,
+        infoable::Infoable,
+        prom_link::JavaObjectHandler,
+    },
+    ebi_traits::{
+        ebi_trait_graphable::{self, EbiTraitGraphable},
+        ebi_trait_semantics::{EbiTraitSemantics, Semantics},
+        ebi_trait_stochastic_semantics::TransitionIndex,
+    },
+    line_reader::LineReader,
+    marking::Marking,
+};
 
-use super::stochastic_labelled_petri_net::StochasticLabelledPetriNet;
-
+use super::{
+    deterministic_finite_automaton::DeterministicFiniteAutomaton,
+    directly_follows_model::DirectlyFollowsModel, lola_net::LolaNet, process_tree::ProcessTree,
+    stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+};
 
 pub const HEADER: &str = "labelled Petri net";
 
@@ -33,46 +64,69 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
         EbiTraitImporter::Semantics(LabelledPetriNet::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<LabelledPetriNet>),
     ],
-    object_importers: &[
-        EbiObjectImporter::LabelledPetriNet(LabelledPetriNet::import_as_object),
-    ],
+    object_importers: &[EbiObjectImporter::LabelledPetriNet(
+        LabelledPetriNet::import_as_object,
+    )],
     object_exporters: &[
         EbiObjectExporter::LabelledPetriNet(LabelledPetriNet::export_from_object),
-        EbiObjectExporter::StochasticLabelledPetriNet(LabelledPetriNet::export_from_stochastic_labelled_petri_net),
-        EbiObjectExporter::StochasticDeterministicFiniteAutomaton(LabelledPetriNet::export_from_stochastic_deterministic_finite_automaton),
-        EbiObjectExporter::DirectlyFollowsModel(LabelledPetriNet::export_from_directly_follows_model),
+        EbiObjectExporter::StochasticLabelledPetriNet(
+            LabelledPetriNet::export_from_stochastic_labelled_petri_net,
+        ),
+        EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
+            LabelledPetriNet::export_from_stochastic_deterministic_finite_automaton,
+        ),
+        EbiObjectExporter::DirectlyFollowsModel(
+            LabelledPetriNet::export_from_directly_follows_model,
+        ),
+        EbiObjectExporter::DeterministicFiniteAutomaton(LabelledPetriNet::export_from_object),
     ],
     java_object_handlers: &[
-        JavaObjectHandler{ 
-            name: "PetriNet", 
-            translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiLabelledPetriNet.EbiString2Petrinet"), 
+        JavaObjectHandler {
+            name: "PetriNet",
+            translator_ebi_to_java: Some(
+                "org.processmining.ebi.objects.EbiLabelledPetriNet.EbiString2Petrinet",
+            ),
             translator_java_to_ebi: None, //Some("org.processmining.ebi.objects.EbiLabelledPetriNet.PetriNet2EbiString"),
             java_class: "org.processmining.models.graphbased.directed.petrinet.Petrinet",
             input_gui: None,
         },
-        JavaObjectHandler{ 
-            name: "AcceptingPetriNet", 
+        JavaObjectHandler {
+            name: "AcceptingPetriNet",
             translator_ebi_to_java: None,
-            translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiLabelledPetriNet.AcceptingPetriNet2EbiString"), 
+            translator_java_to_ebi: Some(
+                "org.processmining.ebi.objects.EbiLabelledPetriNet.AcceptingPetriNet2EbiString",
+            ),
             java_class: "org.processmining.acceptingpetrinet.models.AcceptingPetriNet",
             input_gui: None,
-        }
+        },
     ],
 };
 
-#[derive(Clone,Debug,ActivityKey)]
+#[derive(Clone, Debug, ActivityKey)]
 pub struct LabelledPetriNet {
     pub(crate) activity_key: ActivityKey,
     pub(crate) initial_marking: Marking,
     pub(crate) labels: Vec<Option<Activity>>,
     pub(crate) place2output_transitions: Vec<Vec<usize>>,
-    pub(crate) transition2input_places:  Vec<Vec<usize>>,
-	pub(crate) transition2output_places: Vec<Vec<usize>>,
+    pub(crate) transition2input_places: Vec<Vec<usize>>,
+    pub(crate) transition2output_places: Vec<Vec<usize>>,
     pub(crate) transition2input_places_cardinality: Vec<Vec<u64>>,
     pub(crate) transition2output_places_cardinality: Vec<Vec<u64>>, //fields are the same as in StochasticLabelledPetriNet
 }
 
 impl LabelledPetriNet {
+    pub fn new_empty_language() -> Self {
+        return Self {
+            activity_key: ActivityKey::new(),
+            initial_marking: Marking::new(0),
+            labels: vec![None],
+            transition2input_places: vec![vec![]],
+            transition2output_places: vec![vec![]],
+            transition2input_places_cardinality: vec![vec![]],
+            transition2output_places_cardinality: vec![vec![]],
+            place2output_transitions: vec![],
+        };
+    }
 
     pub fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
         let net = Self::import(reader)?;
@@ -90,7 +144,7 @@ impl LabelledPetriNet {
     pub fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
         self.labels[transition].is_none()
     }
-    
+
     pub fn get_transition_label(&self, transition: TransitionIndex) -> Option<Activity> {
         self.labels[transition]
     }
@@ -128,14 +182,30 @@ impl LabelledPetriNet {
         self.get_number_of_transitions() - 1
     }
 
-    pub fn add_transition_place_arc(&mut self, from_transition: TransitionIndex, to_place: usize, cardinality: u64) -> Result<()> {
+    pub fn add_transition_place_arc(
+        &mut self,
+        from_transition: TransitionIndex,
+        to_place: usize,
+        cardinality: u64,
+    ) -> Result<()> {
         if from_transition >= self.get_number_of_transitions() {
-            return Err(anyhow!("non-existing transition {} referenced, while there are {}", from_transition, self.get_number_of_transitions()));
+            return Err(anyhow!(
+                "non-existing transition {} referenced, while there are {}",
+                from_transition,
+                self.get_number_of_transitions()
+            ));
         } else if to_place >= self.get_number_of_places() {
-            return Err(anyhow!("non-existing place {} referenced, while there are {}", to_place, self.get_number_of_places()));
+            return Err(anyhow!(
+                "non-existing place {} referenced, while there are {}",
+                to_place,
+                self.get_number_of_places()
+            ));
         }
 
-        if let Some(pos) = self.transition2output_places[from_transition].iter().position(|p| *p == to_place) {
+        if let Some(pos) = self.transition2output_places[from_transition]
+            .iter()
+            .position(|p| *p == to_place)
+        {
             self.transition2output_places_cardinality[from_transition][pos] += cardinality;
         } else {
             self.transition2output_places[from_transition].push(to_place);
@@ -144,16 +214,32 @@ impl LabelledPetriNet {
         Ok(())
     }
 
-    pub fn add_place_transition_arc(&mut self, from_place: usize, to_transition: TransitionIndex, cardinality: u64) -> Result<()> {
+    pub fn add_place_transition_arc(
+        &mut self,
+        from_place: usize,
+        to_transition: TransitionIndex,
+        cardinality: u64,
+    ) -> Result<()> {
         if to_transition >= self.get_number_of_transitions() {
-            return Err(anyhow!("non-existing transition {} referenced, while there are {}", to_transition, self.get_number_of_transitions()));
+            return Err(anyhow!(
+                "non-existing transition {} referenced, while there are {}",
+                to_transition,
+                self.get_number_of_transitions()
+            ));
         } else if from_place >= self.get_number_of_places() {
-            return Err(anyhow!("non-existing place {} referenced, while there are {}", from_place, self.get_number_of_places()));
+            return Err(anyhow!(
+                "non-existing place {} referenced, while there are {}",
+                from_place,
+                self.get_number_of_places()
+            ));
         }
 
         self.place2output_transitions[from_place].push(to_transition);
 
-        if let Some(pos) = self.transition2input_places[to_transition].iter().position(|p| *p == from_place) {
+        if let Some(pos) = self.transition2input_places[to_transition]
+            .iter()
+            .position(|p| *p == from_place)
+        {
             self.transition2input_places_cardinality[to_transition][pos] += cardinality;
         } else {
             self.transition2input_places[to_transition].push(from_place);
@@ -162,52 +248,80 @@ impl LabelledPetriNet {
         Ok(())
     }
 
-    fn export_from_stochastic_labelled_petri_net(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+    fn export_from_stochastic_labelled_petri_net(
+        object: EbiOutput,
+        f: &mut dyn std::io::Write,
+    ) -> Result<()> {
         match object {
-            EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(slpn)) => <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(slpn).export(f),
-            _ => unreachable!()
+            EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(slpn)) => {
+                <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(slpn).export(f)
+            }
+            _ => unreachable!(),
         }
     }
 
-    fn export_from_stochastic_deterministic_finite_automaton(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+    fn export_from_stochastic_deterministic_finite_automaton(
+        object: EbiOutput,
+        f: &mut dyn std::io::Write,
+    ) -> Result<()> {
         match object {
-            EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(sdfa.get_stochastic_labelled_petri_net()).export(f),
-            _ => unreachable!()
+            EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => {
+                <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(sdfa.into()).export(f)
+            }
+            _ => unreachable!(),
         }
     }
 
-    fn export_from_directly_follows_model(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+    fn export_from_directly_follows_model(
+        object: EbiOutput,
+        f: &mut dyn std::io::Write,
+    ) -> Result<()> {
         match object {
-            EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => dfm.get_labelled_petri_net().export(f),
-            _ => unreachable!()
+            EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => {
+                Into::<DirectlyFollowsModel>::into(dfm).export(f)
+            }
+            _ => unreachable!(),
         }
     }
 
     pub fn incidence_vector(&self, transition: TransitionIndex) -> Vec<i128> {
         let mut vec2 = vec![0; self.get_number_of_places()];
-        for (in_place_pos, in_place) in self.transition2input_places[transition].iter().enumerate() {
-            vec2[*in_place] -= self.transition2input_places_cardinality[transition][in_place_pos] as i128;
+        for (in_place_pos, in_place) in self.transition2input_places[transition].iter().enumerate()
+        {
+            vec2[*in_place] -=
+                self.transition2input_places_cardinality[transition][in_place_pos] as i128;
         }
-        for (out_place_pos, out_place) in self.transition2output_places[transition].iter().enumerate() {
-            vec2[*out_place] += self.transition2output_places_cardinality[transition][out_place_pos] as i128;
+        for (out_place_pos, out_place) in
+            self.transition2output_places[transition].iter().enumerate()
+        {
+            vec2[*out_place] +=
+                self.transition2output_places_cardinality[transition][out_place_pos] as i128;
         }
         vec2
     }
 
     pub fn max_transition_input_arc_cardinality(&self) -> u64 {
-        if let Some(x) = self.transition2input_places_cardinality.iter().flatten().max() {
+        if let Some(x) = self
+            .transition2input_places_cardinality
+            .iter()
+            .flatten()
+            .max()
+        {
             *x
         } else {
             0
         }
     }
-    
 }
 
 impl TranslateActivityKey for LabelledPetriNet {
     fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
         let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
-        self.labels.iter_mut().for_each(|activity| if let Some(a) = activity { *a = translator.translate_activity(&a) });
+        self.labels.iter_mut().for_each(|activity| {
+            if let Some(a) = activity {
+                *a = translator.translate_activity(&a)
+            }
+        });
         self.activity_key = to_activity_key.clone();
     }
 }
@@ -216,17 +330,23 @@ impl FromEbiTraitObject for LabelledPetriNet {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
             EbiInput::Object(EbiObject::LabelledPetriNet(e), _) => Ok(Box::new(e)),
-            _ => Err(anyhow!("cannot read {} {} as a labelled Petri net", object.get_type().get_article(), object.get_type()))
+            _ => Err(anyhow!(
+                "cannot read {} {} as a labelled Petri net",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
         }
     }
 }
 
 impl Exportable for LabelledPetriNet {
-
     fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::LabelledPetriNet(lpn)) => lpn.export(f),
-            _ => unreachable!()
+            EbiOutput::Object(EbiObject::DeterministicFiniteAutomaton(dfa)) => {
+                <DeterministicFiniteAutomaton as Into<LolaNet>>::into(dfa).export(f)
+            }
+            _ => unreachable!(),
         }
     }
 
@@ -238,9 +358,24 @@ impl Exportable for LabelledPetriNet {
 impl Infoable for LabelledPetriNet {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         writeln!(f, "Number of places\t\t{}", self.get_number_of_places())?;
-        writeln!(f, "Number of transitions\t\t{}", self.get_number_of_transitions())?;
-        writeln!(f, "Number of activities\t\t{}", self.get_activity_key().get_number_of_activities())?;
-        writeln!(f, "Number of silent transitions\t{}", (0..self.get_number_of_transitions()).into_iter().filter(|transition| self.is_transition_silent(*transition)).count())?;
+        writeln!(
+            f,
+            "Number of transitions\t\t{}",
+            self.get_number_of_transitions()
+        )?;
+        writeln!(
+            f,
+            "Number of activities\t\t{}",
+            self.get_activity_key().get_number_of_activities()
+        )?;
+        writeln!(
+            f,
+            "Number of silent transitions\t{}",
+            (0..self.get_number_of_transitions())
+                .into_iter()
+                .filter(|transition| self.is_transition_silent(*transition))
+                .count()
+        )?;
 
         Ok(write!(f, "")?)
     }
@@ -256,25 +391,41 @@ impl fmt::Display for LabelledPetriNet {
             writeln!(f, "{}", place)?;
         }
 
-        writeln!(f, "# number of transitions\n{}", self.get_number_of_transitions())?;
+        writeln!(
+            f,
+            "# number of transitions\n{}",
+            self.get_number_of_transitions()
+        )?;
 
         for transition in 0..self.get_number_of_transitions() {
             writeln!(f, "# transition {}", transition)?;
 
             if let Some(activity) = self.get_transition_label(transition) {
-                writeln!(f, "label {}", self.activity_key.get_activity_label(&activity))?;
+                writeln!(
+                    f,
+                    "label {}",
+                    self.activity_key.get_activity_label(&activity)
+                )?;
             } else {
                 writeln!(f, "silent")?;
             }
 
-            writeln!(f, "# number of input places\n{}", self.transition2input_places[transition].len())?;
+            writeln!(
+                f,
+                "# number of input places\n{}",
+                self.transition2input_places[transition].len()
+            )?;
             for (pos, place) in self.transition2input_places[transition].iter().enumerate() {
                 for _ in 0..self.transition2input_places_cardinality[transition][pos] {
                     writeln!(f, "{}", place)?;
                 }
             }
 
-            writeln!(f, "# number of output places\n{}", self.transition2output_places[transition].len())?;
+            writeln!(
+                f,
+                "# number of output places\n{}",
+                self.transition2output_places[transition].len()
+            )?;
             for (pos, place) in self.transition2output_places[transition].iter().enumerate() {
                 for _ in 0..self.transition2output_places_cardinality[transition][pos] {
                     writeln!(f, "{}", place)?;
@@ -296,7 +447,6 @@ impl FromStr for LabelledPetriNet {
 }
 
 impl Importable for LabelledPetriNet {
-
     fn import_as_object(reader: &mut dyn BufRead) -> Result<EbiObject> {
         Ok(EbiObject::LabelledPetriNet(Self::import(reader)?))
     }
@@ -304,33 +454,50 @@ impl Importable for LabelledPetriNet {
     fn import(reader: &mut dyn BufRead) -> Result<Self> {
         let mut lreader = LineReader::new(reader);
 
-        let head = lreader.next_line_string().with_context(|| format!("failed to read header, which should be {}", HEADER))?;
+        let head = lreader
+            .next_line_string()
+            .with_context(|| format!("failed to read header, which should be {}", HEADER))?;
         if head != HEADER {
-            return Err(anyhow!("first line should be exactly `{}`, but found `{}` on line `{}`", HEADER, lreader.get_last_line(), lreader.get_last_line_number()));
+            return Err(anyhow!(
+                "first line should be exactly `{}`, but found `{}` on line `{}`",
+                HEADER,
+                lreader.get_last_line(),
+                lreader.get_last_line_number()
+            ));
         }
 
         let mut activity_key = ActivityKey::new();
-        
-        let number_of_places = lreader.next_line_index().context("failed to read number of places")?;
+
+        let number_of_places = lreader
+            .next_line_index()
+            .context("failed to read number of places")?;
         let mut place2output_transitions = vec![vec![]; number_of_places];
 
         //read initial marking
         let mut initial_marking = vec![0u64; number_of_places];
-        for place in 0 .. number_of_places {
-            initial_marking[place] = lreader.next_line_natural().with_context(|| format!("failed to read initial marking of place {}", place))?;
+        for place in 0..number_of_places {
+            initial_marking[place] = lreader
+                .next_line_natural()
+                .with_context(|| format!("failed to read initial marking of place {}", place))?;
         }
 
         //read transitions
-        let number_of_transitions = lreader.next_line_index().context("failed to read number of transitions")?;
+        let number_of_transitions = lreader
+            .next_line_index()
+            .context("failed to read number of transitions")?;
 
         let mut labels = Vec::with_capacity(number_of_transitions);
         let mut transition2input_places: Vec<Vec<usize>> = vec![vec![]; number_of_transitions];
         let mut transition2output_places: Vec<Vec<usize>> = vec![vec![]; number_of_transitions];
-        let mut transition2input_places_cardinality: Vec<Vec<u64>> = vec![vec![]; number_of_transitions];
-        let mut transition2output_places_cardinality: Vec<Vec<u64>> = vec![vec![]; number_of_transitions];
-        
-        for transition in 0 .. number_of_transitions {
-            let label_line = lreader.next_line_string().with_context(|| format!("failed to read label of transition {}", transition))?;
+        let mut transition2input_places_cardinality: Vec<Vec<u64>> =
+            vec![vec![]; number_of_transitions];
+        let mut transition2output_places_cardinality: Vec<Vec<u64>> =
+            vec![vec![]; number_of_transitions];
+
+        for transition in 0..number_of_transitions {
+            let label_line = lreader
+                .next_line_string()
+                .with_context(|| format!("failed to read label of transition {}", transition))?;
 
             //read label
             if label_line.trim_start().starts_with("label ") {
@@ -343,17 +510,36 @@ impl Importable for LabelledPetriNet {
 
             //read input places
             {
-                let number_of_input_places = lreader.next_line_index().with_context(|| format!("Failed to read number of input places of transition {}.", transition))?;                
-                for p in 0 .. number_of_input_places {
-                    let place = lreader.next_line_index().with_context(|| format!("Failed to read input place number {} of transition {}.", p, transition))?;
+                let number_of_input_places = lreader.next_line_index().with_context(|| {
+                    format!(
+                        "Failed to read number of input places of transition {}.",
+                        transition
+                    )
+                })?;
+                for p in 0..number_of_input_places {
+                    let place = lreader.next_line_index().with_context(|| {
+                        format!(
+                            "Failed to read input place number {} of transition {}.",
+                            p, transition
+                        )
+                    })?;
 
                     if place >= number_of_places {
-                        return Err(anyhow!("Non-existing place referenced for transition {}, input place number {}, at line {}; found `{}`.", transition, p, lreader.get_last_line_number(), lreader.get_last_line()));
+                        return Err(anyhow!(
+                            "Non-existing place referenced for transition {}, input place number {}, at line {}; found `{}`.",
+                            transition,
+                            p,
+                            lreader.get_last_line_number(),
+                            lreader.get_last_line()
+                        ));
                     }
 
                     place2output_transitions[place].push(transition);
 
-                    if let Some(pos) = transition2input_places[transition].iter().position(|p| *p == place) {
+                    if let Some(pos) = transition2input_places[transition]
+                        .iter()
+                        .position(|p| *p == place)
+                    {
                         transition2input_places_cardinality[transition][pos] += 1;
                     } else {
                         transition2input_places[transition].push(place);
@@ -364,15 +550,34 @@ impl Importable for LabelledPetriNet {
 
             //read output places
             {
-                let number_of_output_places= lreader.next_line_index().with_context(|| format!("failed to read number of output places of transition {}", transition))?;
-                for p in 0 .. number_of_output_places {
-                    let place = lreader.next_line_index().with_context(|| format!("failed to read output place number {} of transition {}", p, transition))?;
-                    
+                let number_of_output_places = lreader.next_line_index().with_context(|| {
+                    format!(
+                        "failed to read number of output places of transition {}",
+                        transition
+                    )
+                })?;
+                for p in 0..number_of_output_places {
+                    let place = lreader.next_line_index().with_context(|| {
+                        format!(
+                            "failed to read output place number {} of transition {}",
+                            p, transition
+                        )
+                    })?;
+
                     if place >= number_of_places {
-                        return Err(anyhow!("non-existing place referenced for transition {}, output place number {}, at line {}; found `{}`", transition, p, lreader.get_last_line_number(), lreader.get_last_line()));
+                        return Err(anyhow!(
+                            "non-existing place referenced for transition {}, output place number {}, at line {}; found `{}`",
+                            transition,
+                            p,
+                            lreader.get_last_line_number(),
+                            lreader.get_last_line()
+                        ));
                     }
 
-                    if let Some(pos) = transition2output_places[transition].iter().position(|p| *p == place) {
+                    if let Some(pos) = transition2output_places[transition]
+                        .iter()
+                        .position(|p| *p == place)
+                    {
                         transition2output_places_cardinality[transition][pos] += 1;
                     } else {
                         transition2output_places[transition].push(place);
@@ -382,27 +587,27 @@ impl Importable for LabelledPetriNet {
             }
         }
 
-
         Ok(LabelledPetriNet {
             activity_key,
-            initial_marking: Marking {place2token: initial_marking},
+            initial_marking: Marking {
+                place2token: initial_marking,
+            },
             labels,
             place2output_transitions,
             transition2input_places,
             transition2output_places,
             transition2input_places_cardinality,
-            transition2output_places_cardinality
+            transition2output_places_cardinality,
         })
     }
 }
 
 impl EbiTraitGraphable for LabelledPetriNet {
-    fn to_dot(&self) -> VisualGraph {
+    fn to_dot(&self) -> Result<VisualGraph> {
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
         let mut places = vec![];
-        for place in 0 .. self.get_number_of_places() {
-
+        for place in 0..self.get_number_of_places() {
             let label = if let Some(marked) = self.initial_marking.place2token.get(place) {
                 if marked > &0 {
                     marked.to_string()
@@ -417,18 +622,28 @@ impl EbiTraitGraphable for LabelledPetriNet {
         }
 
         for transition in 0..self.get_number_of_transitions() {
-
             let node = if let Some(activity) = self.get_transition_label(transition) {
-                <dyn EbiTraitGraphable>::create_transition(&mut graph, self.activity_key.get_activity_label(&activity), "")
+                <dyn EbiTraitGraphable>::create_transition(
+                    &mut graph,
+                    self.activity_key.get_activity_label(&activity),
+                    "",
+                )
             } else {
                 <dyn EbiTraitGraphable>::create_silent_transition(&mut graph, "")
             };
 
-
             for (pos, inplace) in self.transition2input_places[transition].iter().enumerate() {
                 let place_node = places.get(*inplace).unwrap();
                 if self.transition2input_places_cardinality[transition][pos] > 1 {
-                    <dyn EbiTraitGraphable>::create_edge(&mut graph, place_node, &node, &format!("{}", self.transition2input_places_cardinality[transition][pos]));
+                    <dyn EbiTraitGraphable>::create_edge(
+                        &mut graph,
+                        place_node,
+                        &node,
+                        &format!(
+                            "{}",
+                            self.transition2input_places_cardinality[transition][pos]
+                        ),
+                    );
                 } else {
                     <dyn EbiTraitGraphable>::create_edge(&mut graph, place_node, &node, "");
                 }
@@ -437,14 +652,123 @@ impl EbiTraitGraphable for LabelledPetriNet {
             for (pos, outplace) in self.transition2output_places[transition].iter().enumerate() {
                 let place_node = places.get(*outplace).unwrap();
                 if self.transition2output_places_cardinality[transition][pos] > 1 {
-                    <dyn EbiTraitGraphable>::create_edge(&mut graph, &node, place_node, &format!("{}", self.transition2output_places_cardinality[transition][pos]));
+                    <dyn EbiTraitGraphable>::create_edge(
+                        &mut graph,
+                        &node,
+                        place_node,
+                        &format!(
+                            "{}",
+                            self.transition2output_places_cardinality[transition][pos]
+                        ),
+                    );
                 } else {
                     <dyn EbiTraitGraphable>::create_edge(&mut graph, &node, place_node, "");
                 }
             }
         }
 
-        return graph;
+        Ok(graph)
+    }
+}
+
+impl From<LolaNet> for LabelledPetriNet {
+    fn from(value: LolaNet) -> Self {
+        value.0
+    }
+}
+
+impl From<DirectlyFollowsModel> for LabelledPetriNet {
+    fn from(value: DirectlyFollowsModel) -> LabelledPetriNet {
+        if value.get_initial_state().is_none() {
+            //SDFA has an empty language, return a livelocked SLPN
+            return Self::new_empty_language();
+        }
+
+        let mut result = LabelledPetriNet::new();
+        let translator =
+            ActivityKeyTranslator::new(value.get_activity_key(), result.get_activity_key_mut());
+        let source = result.add_place();
+        let sink = result.add_place();
+        result
+            .get_initial_marking_mut()
+            .increase(source, 1)
+            .unwrap();
+
+        /*
+         * empty traces
+         */
+        if value.empty_traces {
+            let transition = result.add_transition(None);
+
+            result
+                .add_place_transition_arc(source, transition, 1)
+                .unwrap();
+            result
+                .add_transition_place_arc(transition, sink, 1)
+                .unwrap();
+        }
+
+        /*
+         * Nodes (states): after doing a node you end up in the corresponding place.
+         */
+        let mut node2place = vec![];
+        for _ in 0..value.get_number_of_nodes() {
+            let place = result.add_place();
+            node2place.push(place);
+        }
+
+        /*
+         * Transitions
+         */
+        for source_node in 0..value.get_number_of_nodes() {
+            for target_node in 0..value.get_number_of_nodes() {
+                if value.edges[source_node][target_node] {
+                    let from_place = node2place[source_node];
+                    let to_place = node2place[target_node];
+                    let activity =
+                        translator.translate_activity(&value.node_2_activity[target_node]);
+                    let transition = result.add_transition(Some(activity));
+
+                    result
+                        .add_place_transition_arc(from_place, transition, 1)
+                        .unwrap();
+                    result
+                        .add_transition_place_arc(transition, to_place, 1)
+                        .unwrap();
+                }
+            }
+        }
+
+        /*
+         * Starts
+         */
+        for start_node in value.start_nodes.iter() {
+            let activity = translator.translate_activity(&value.node_2_activity[*start_node]);
+            let transition = result.add_transition(Some(activity));
+            result
+                .add_place_transition_arc(source, transition, 1)
+                .unwrap();
+            let target_place = node2place[*start_node];
+            result
+                .add_transition_place_arc(transition, target_place, 1)
+                .unwrap();
+        }
+
+        /*
+         * Ends
+        	*/
+        for end_node in value.end_nodes.iter() {
+            let transition = result.add_transition(None);
+            let source_place = node2place[*end_node];
+            result
+                .add_place_transition_arc(source_place, transition, 1)
+                .unwrap();
+            result
+                .add_transition_place_arc(transition, sink, 1)
+                .unwrap();
+        }
+
+        result
     }
 }
 
@@ -460,6 +784,36 @@ impl From<StochasticLabelledPetriNet> for LabelledPetriNet {
             transition2input_places_cardinality: value.transition2input_places_cardinality,
             transition2output_places_cardinality: value.transition2output_places_cardinality,
         }
+    }
+}
+
+impl From<DeterministicFiniteAutomaton> for LabelledPetriNet {
+    fn from(value: DeterministicFiniteAutomaton) -> Self {
+        todo!()
+    }
+}
+
+impl From<ProcessTree> for LabelledPetriNet {
+    fn from(value: ProcessTree) -> Self {
+        if value.tree.is_empty() {
+            return Self::new_empty_language();
+        }
+
+        let mut result = LabelledPetriNet::new();
+        let translator =
+            ActivityKeyTranslator::new(value.get_activity_key(), result.get_activity_key_mut());
+        let source = result.add_place();
+        let sink = result.add_place();
+        result
+            .get_initial_marking_mut()
+            .increase(source, 1)
+            .unwrap();
+
+        value
+            .node_to_lpn(0, &mut result, &translator, source, sink)
+            .unwrap();
+
+        result
     }
 }
 

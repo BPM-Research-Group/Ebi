@@ -110,7 +110,7 @@ impl ProcessTree {
 
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let tree = Self::import(reader)?;
-        Ok(EbiObject::LabelledPetriNet(tree.get_labelled_petri_net()?))
+        Ok(EbiObject::LabelledPetriNet(tree.into()))
     }
 
     pub fn get_number_of_nodes(&self) -> usize {
@@ -441,7 +441,7 @@ impl ProcessTree {
         Ok(())
     }
 
-    fn node_to_lpn(
+    pub(crate) fn node_to_lpn(
         &self,
         node: usize,
         net: &mut LabelledPetriNet,
@@ -625,29 +625,6 @@ impl ProcessTree {
             }
         }
     }
-
-    pub fn get_labelled_petri_net(&self) -> Result<LabelledPetriNet> {
-        if self.tree.is_empty() {
-            return Err(anyhow!(
-                "The tree has the empty language, while a labelled Petri net cannot represent the empty language."
-            ));
-        }
-
-        let mut result = LabelledPetriNet::new();
-        let translator =
-            ActivityKeyTranslator::new(&self.activity_key, result.get_activity_key_mut());
-        let source = result.add_place();
-        let sink = result.add_place();
-        result
-            .get_initial_marking_mut()
-            .increase(source, 1)
-            .unwrap();
-
-        self.node_to_lpn(0, &mut result, &translator, source, sink)
-            .unwrap();
-
-        Ok(result)
-    }
 }
 
 impl TranslateActivityKey for ProcessTree {
@@ -752,14 +729,14 @@ impl Infoable for ProcessTree {
 }
 
 impl EbiTraitGraphable for ProcessTree {
-    fn to_dot(&self) -> layout::topo::layout::VisualGraph {
+    fn to_dot(&self) -> Result<layout::topo::layout::VisualGraph> {
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
         let source = <dyn EbiTraitGraphable>::create_place(&mut graph, "");
         let sink = <dyn EbiTraitGraphable>::create_place(&mut graph, "");
         if !self.tree.is_empty() {
             ProcessTree::node_to_dot(&self, &mut graph, 0, &source, &sink);
         }
-        graph
+        Ok(graph)
     }
 }
 

@@ -1,7 +1,7 @@
 use crate::{
     ebi_framework::{
         activity_key::{
-            Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
+            Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey,
         },
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
@@ -38,9 +38,9 @@ use std::{
     str::FromStr,
 };
 
-use super::{
-    labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-};
+use super::
+    stochastic_labelled_petri_net::StochasticLabelledPetriNet
+;
 
 pub const FORMAT_SPECIFICATION: &str = "A stochastic deterministic finite automaton is a JSON structure with the top level being an object.
     This object contains the following key-value pairs:
@@ -312,62 +312,8 @@ impl StochasticDeterministicFiniteAutomaton {
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let sdfa = Self::import(reader)?;
         Ok(EbiObject::LabelledPetriNet(
-            sdfa.get_stochastic_labelled_petri_net().into(),
+            Into::<StochasticLabelledPetriNet>::into(sdfa).into(),
         ))
-    }
-
-    pub fn get_stochastic_labelled_petri_net(&self) -> StochasticLabelledPetriNet {
-        log::info!("convert SDFA to stochastic labelled Petri net");
-
-        let mut result = LabelledPetriNet::new();
-        let translator =
-            ActivityKeyTranslator::new(self.get_activity_key(), result.get_activity_key_mut());
-        let mut weights = vec![];
-
-        let source = result.add_place();
-        result
-            .get_initial_marking_mut()
-            .increase(source, 1)
-            .unwrap();
-
-        //add places
-        let mut state2place = vec![];
-        for state in 0..=self.max_state {
-            let lpn_place = result.add_place();
-            state2place.push(lpn_place);
-
-            //add termination
-            if self.get_termination_probability(state).is_positive() {
-                let lpn_transition = result.add_transition(None);
-                weights.push(self.get_termination_probability(state).clone());
-                result
-                    .add_place_transition_arc(lpn_place, lpn_transition, 1)
-                    .unwrap();
-            }
-        }
-
-        //add edges
-        for (source, (target, (activity, probability))) in self.sources.iter().zip(
-            self.targets
-                .iter()
-                .zip(self.activities.iter().zip(self.probabilities.iter())),
-        ) {
-            //add transition
-            let lpn_activity = translator.translate_activity(activity);
-            let lpn_transition = result.add_transition(Some(lpn_activity));
-            let source_place = state2place[*source];
-            let target_place = state2place[*target];
-            result
-                .add_place_transition_arc(source_place, lpn_transition, 1)
-                .unwrap();
-            result
-                .add_transition_place_arc(lpn_transition, target_place, 1)
-                .unwrap();
-
-            weights.push(probability.clone());
-        }
-
-        StochasticLabelledPetriNet::from((result, weights))
     }
 
     pub fn set_activity_key(&mut self, activity_key: &ActivityKey) {
@@ -523,7 +469,7 @@ impl fmt::Display for StochasticDeterministicFiniteAutomaton {
 }
 
 impl EbiTraitGraphable for StochasticDeterministicFiniteAutomaton {
-    fn to_dot(&self) -> layout::topo::layout::VisualGraph {
+    fn to_dot(&self) -> Result<layout::topo::layout::VisualGraph> {
         log::info!("to_dot for StochasticDeterministicFiniteAutomaton");
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
@@ -550,7 +496,7 @@ impl EbiTraitGraphable for StochasticDeterministicFiniteAutomaton {
             );
         }
 
-        return graph;
+        Ok(graph)
     }
 }
 

@@ -343,7 +343,7 @@ impl IndexMut<usize> for NodeStates {
 mod tests {
     use std::fs;
 
-    use crate::{ebi_objects::process_tree::ProcessTree, ebi_traits::ebi_trait_semantics::Semantics};
+    use crate::{ebi_objects::{labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree}, ebi_traits::ebi_trait_semantics::Semantics};
 
     
     #[test]
@@ -475,6 +475,6 @@ mod tests {
         let tree = fin.parse::<ProcessTree>().unwrap();
         assert!(tree.get_initial_state().is_none());
 
-        assert!(tree.get_labelled_petri_net().is_err());
+        Into::<LabelledPetriNet>::into(tree);
     }
 }

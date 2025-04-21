@@ -448,6 +448,9 @@ impl Display for EbiObjectImporter {
     }
 }
 
+/**
+ * This is a convenience method: if the object can be imported, then it validates.
+ */
 pub fn validate<X: Importable>(reader: &mut dyn BufRead) -> Result<()> {
     match X::import(reader) {
         Ok(_) => Ok(()),

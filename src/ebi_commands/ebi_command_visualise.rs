@@ -74,7 +74,7 @@ pub const EBI_VISUALISE_SVG: EbiCommand = EbiCommand::Command {
         let result = inputs.remove(0).to_type::<dyn EbiTraitGraphable>()?;
 
         let mut svg = SVGWriter::new();
-        result.to_dot().do_it(false, false, false, &mut svg);
+        result.to_dot()?.do_it(false, false, false, &mut svg);
 
         return Ok(EbiOutput::SVG(svg.finalize()));
     },
@@ -96,7 +96,7 @@ pub const EBI_VISUALISE_PDF: EbiCommand = EbiCommand::Command {
         let result = inputs.remove(0).to_type::<dyn EbiTraitGraphable>()?;
 
         let mut svg = SVGWriter::new();
-        result.to_dot().do_it(false, false, false, &mut svg);
+        result.to_dot()?.do_it(false, false, false, &mut svg);
         let svg_string = svg.finalize();
 
         let pdf = svg_to_pdf(&svg_string)?;

@@ -49,6 +49,7 @@ pub mod ebi_objects {
     pub mod stochastic_labelled_petri_net;
     pub mod stochastic_labelled_petri_net_semantics;
     pub mod stochastic_language_of_alignments;
+    pub mod lola_net;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_event_log;

@@ -22,7 +22,7 @@ use crate::{
         importable::Importable,
     },
     ebi_objects::labelled_petri_net::LPNMarking,
-    ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics},
+    ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}},
     marking::Marking,
 };
 
@@ -42,9 +42,10 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     file_extension: "pnml",
     format_specification: &FORMAT_SPECIFICATION,
     validator: PetriNetMarkupLanguage::validate,
-    trait_importers: &[EbiTraitImporter::Semantics(
-        PetriNetMarkupLanguage::import_as_semantics,
-    )],
+    trait_importers: &[
+        EbiTraitImporter::Semantics(PetriNetMarkupLanguage::import_as_semantics),
+        EbiTraitImporter::Graphable(ebi_trait_graphable::import::<PetriNetMarkupLanguage>),
+    ],
     object_importers: &[EbiObjectImporter::LabelledPetriNet(
         PetriNetMarkupLanguage::import_as_object,
     )],
@@ -63,6 +64,7 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[], //java translations covered by LabelledPetrinet
 };
 
+#[derive(Clone)]
 pub struct PetriNetMarkupLanguage {
     net: process_mining::PetriNet,
 }
@@ -109,9 +111,7 @@ impl PetriNetMarkupLanguage {
     ) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => {
-                let lpn = <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(
-                    sdfa.get_stochastic_labelled_petri_net(),
-                );
+                let lpn = <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(sdfa.into());
                 PetriNetMarkupLanguage::try_from(lpn)?.export(f)
             }
             _ => unreachable!(),
@@ -124,7 +124,7 @@ impl PetriNetMarkupLanguage {
     ) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => {
-                let lpn = dfm.get_labelled_petri_net();
+                let lpn: LabelledPetriNet = dfm.into();
                 PetriNetMarkupLanguage::try_from(lpn)?.export(f)
             }
             _ => unreachable!(),
@@ -166,10 +166,16 @@ impl Exportable for PetriNetMarkupLanguage {
     }
 }
 
+impl EbiTraitGraphable for PetriNetMarkupLanguage {
+    fn to_dot(&self) -> Result<layout::topo::layout::VisualGraph> {
+        TryInto::<LabelledPetriNet>::try_into(self.clone())?.to_dot()
+    }
+}
+
 impl TryFrom<PetriNetMarkupLanguage> for LabelledPetriNet {
     type Error = Error;
 
-    fn try_from(pnml: PetriNetMarkupLanguage) -> std::result::Result<Self, Self::Error> {
+    fn try_from(pnml: PetriNetMarkupLanguage) -> Result<Self, Self::Error> {
         log::info!("Convert PNML into LPN.");
 
         let mut result = LabelledPetriNet::new();

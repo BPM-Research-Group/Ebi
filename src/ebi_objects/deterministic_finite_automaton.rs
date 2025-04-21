@@ -387,7 +387,7 @@ impl Display for DeterministicFiniteAutomaton {
 }
 
 impl EbiTraitGraphable for DeterministicFiniteAutomaton {
-    fn to_dot(&self) -> layout::topo::layout::VisualGraph {
+    fn to_dot(&self) -> Result<layout::topo::layout::VisualGraph> {
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
         let mut places = vec![];
@@ -414,7 +414,7 @@ impl EbiTraitGraphable for DeterministicFiniteAutomaton {
             <dyn EbiTraitGraphable>::create_edge(&mut graph, &source, &target, activity);
         }
 
-        return graph;
+        Ok(graph)
     }
 }
 

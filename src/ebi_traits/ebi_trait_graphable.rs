@@ -6,7 +6,7 @@ use layout::{adt::dag::NodeHandle, core::{base::Orientation, color::Color, geome
 use crate::ebi_framework::{ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable};
 
 pub trait EbiTraitGraphable {
-    fn to_dot(&self) -> VisualGraph;
+    fn to_dot(&self) -> Result<VisualGraph>;
 }
 
 impl dyn EbiTraitGraphable {
@@ -73,6 +73,9 @@ impl FromEbiTraitObject for dyn EbiTraitGraphable {
     }
 }
 
+/**
+ * Convenience function to import any object as a Graphable trait object.
+ */
 pub fn import<X: 'static + Importable + EbiTraitGraphable> (reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitGraphable>> {
     match X::import(reader) {
         Ok(x) => Ok(Box::new(x)),
@@ -90,7 +93,7 @@ pub mod tests {
         for (input, _, _) in crate::tests::get_all_test_files() {
             if let EbiInput::Trait(object, _) = input {
                 if let EbiTraitObject::Graphable(object) = object {
-                    object.to_dot();
+                    assert!(object.to_dot().is_ok());
                 }
             }
         }
