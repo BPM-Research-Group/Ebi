@@ -1,6 +1,6 @@
 use crate::{ebi_framework::activity_key::HasActivityKey, ebi_objects::{
-    deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage
-}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_semantics::Semantics}, math::traits::Zero};
+    deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton
+}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_semantics::Semantics}, math::traits::{Signed, Zero}};
 
 impl From<FiniteLanguage> for DeterministicFiniteAutomaton {
     fn from(value: FiniteLanguage) -> Self {
@@ -23,6 +23,27 @@ impl From<FiniteLanguage> for DeterministicFiniteAutomaton {
         }
 
         result
+    }
+}
+
+impl From<StochasticDeterministicFiniteAutomaton> for DeterministicFiniteAutomaton {
+    fn from(value: StochasticDeterministicFiniteAutomaton) -> Self {
+        log::info!("convert SDFA into DFA");
+        let final_states = value
+            .terminating_probabilities
+            .iter()
+            .map(|p| p.is_positive())
+            .collect();
+
+        Self {
+            activity_key: value.activity_key,
+            initial_state: value.initial_state,
+            max_state: value.max_state,
+            sources: value.sources,
+            targets: value.targets,
+            activities: value.activities,
+            final_states: final_states,
+        }
     }
 }
 

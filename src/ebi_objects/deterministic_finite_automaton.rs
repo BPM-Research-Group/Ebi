@@ -24,10 +24,7 @@ use crate::{
         ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics},
     },
     json,
-    math::traits::Signed,
 };
-
-use super::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton;
 
 pub const FORMAT_SPECIFICATION: &str = "A deterministic finite automaton is a JSON structure with the top level being an object.
     This object contains the following key-value pairs:
@@ -405,26 +402,6 @@ impl EbiTraitGraphable for DeterministicFiniteAutomaton {
         }
 
         Ok(graph)
-    }
-}
-
-impl From<StochasticDeterministicFiniteAutomaton> for DeterministicFiniteAutomaton {
-    fn from(value: StochasticDeterministicFiniteAutomaton) -> Self {
-        let final_states = value
-            .terminating_probabilities
-            .iter()
-            .map(|p| p.is_positive())
-            .collect();
-
-        Self {
-            activity_key: value.activity_key,
-            initial_state: value.initial_state,
-            max_state: value.max_state,
-            sources: value.sources,
-            targets: value.targets,
-            activities: value.activities,
-            final_states: final_states,
-        }
     }
 }
 

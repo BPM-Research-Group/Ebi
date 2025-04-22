@@ -84,16 +84,20 @@ impl CompressedEventLog {
         reader: &mut dyn BufRead,
     ) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>> {
         let event_log = Self::import(reader)?;
-        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(
-            event_log.log.get_finite_stochastic_language(),
-        )))
+        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(Into::<
+            FiniteStochasticLanguage,
+        >::into(
+            event_log.log,
+        ))))
     }
 
     pub fn read_as_queriable_stochastic_language(
         reader: &mut dyn BufRead,
     ) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>> {
         let event_log = Self::import(reader)?;
-        Ok(Box::new(event_log.log.get_finite_stochastic_language()))
+        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(
+            event_log.log,
+        )))
     }
 
     pub fn read_as_iterable_language(
@@ -108,7 +112,7 @@ impl CompressedEventLog {
     ) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>> {
         let event_log = Self::import(reader)?;
         Ok(Box::new(Into::<FiniteStochasticLanguage>::into(
-            event_log.log.get_finite_stochastic_language(),
+            Into::<FiniteStochasticLanguage>::into(event_log.log),
         )))
     }
 

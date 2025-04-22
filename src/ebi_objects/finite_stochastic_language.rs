@@ -95,7 +95,7 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     ],
     object_exporters: &[
         EbiObjectExporter::FiniteStochasticLanguage(FiniteStochasticLanguage::export_from_object),
-        EbiObjectExporter::EventLog(FiniteStochasticLanguage::export_from_event_log),
+        EbiObjectExporter::EventLog(FiniteStochasticLanguage::export_from_object),
     ],
     java_object_handlers: &[],
 };
@@ -158,15 +158,6 @@ impl FiniteStochasticLanguage {
             }
         }
         return false;
-    }
-
-    fn export_from_event_log(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::EventLog(log)) => {
-                log.get_finite_stochastic_language().export(f)
-            }
-            _ => unreachable!(),
-        }
     }
 
     pub fn import_as_stochastic_deterministic_finite_automaton(
@@ -428,6 +419,7 @@ impl Exportable for FiniteStochasticLanguage {
     fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::FiniteStochasticLanguage(slang)) => slang.export(f),
+            EbiOutput::Object(EbiObject::EventLog(log)) => Into::<Self>::into(log).export(f),
             _ => unreachable!(),
         }
     }

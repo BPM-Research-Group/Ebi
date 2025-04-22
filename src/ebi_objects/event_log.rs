@@ -34,11 +34,7 @@ use crate::{
         },
         ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
-    math::{
-        data_type::DataType,
-        fraction::Fraction,
-        traits::One,
-    },
+    math::data_type::DataType,
 };
 
 use super::{
@@ -138,16 +134,18 @@ impl EventLog {
         reader: &mut dyn BufRead,
     ) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>> {
         let event_log = EventLog::import(reader)?;
-        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(
-            event_log.get_finite_stochastic_language(),
-        )))
+        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(Into::<
+            FiniteStochasticLanguage,
+        >::into(
+            event_log,
+        ))))
     }
 
     pub fn read_as_queriable_stochastic_language(
         reader: &mut dyn BufRead,
     ) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>> {
         let event_log = EventLog::import(reader)?;
-        Ok(Box::new(event_log.get_finite_stochastic_language()))
+        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(event_log)))
     }
 
     pub fn read_as_iterable_language(
@@ -161,9 +159,11 @@ impl EventLog {
         reader: &mut dyn BufRead,
     ) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>> {
         let event_log = EventLog::import(reader)?;
-        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(
-            event_log.get_finite_stochastic_language(),
-        )))
+        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(Into::<
+            FiniteStochasticLanguage,
+        >::into(
+            event_log,
+        ))))
     }
 
     pub fn read_as_event_log(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLog>> {
@@ -173,9 +173,9 @@ impl EventLog {
 
     pub fn import_as_finite_stochastic_language(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let log = Self::import(reader)?;
-        Ok(EbiObject::FiniteStochasticLanguage(
-            log.get_finite_stochastic_language(),
-        ))
+        Ok(EbiObject::FiniteStochasticLanguage(Into::<
+            FiniteStochasticLanguage,
+        >::into(log)))
     }
 
     pub fn import_as_stochastic_deterministic_finite_automaton(
@@ -187,30 +187,6 @@ impl EventLog {
         >::into(
             log
         )))
-    }
-
-    pub fn get_finite_stochastic_language(&self) -> FiniteStochasticLanguage {
-        log::info!("create stochastic language");
-        let mut map = HashMap::new();
-        for t in &self.log.traces {
-            let trace = t
-                .events
-                .iter()
-                .map(|event| self.classifier.get_class_identity(event))
-                .collect::<Vec<String>>();
-            match map.entry(trace) {
-                std::collections::hash_map::Entry::Occupied(mut e) => {
-                    *e.get_mut() += Fraction::one();
-                    ()
-                }
-                std::collections::hash_map::Entry::Vacant(e) => {
-                    e.insert(Fraction::one());
-                    ()
-                }
-            }
-        }
-
-        map.into()
     }
 }
 
@@ -226,21 +202,19 @@ impl TranslateActivityKey for EventLog {
 
 impl ToSemantics for EventLog {
     fn to_semantics(self) -> EbiTraitSemantics {
-        self.get_finite_stochastic_language().to_semantics()
+        Into::<FiniteStochasticLanguage>::into(self).to_semantics()
     }
 }
 
 impl ToStochasticSemantics for EventLog {
     fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
-        self.get_finite_stochastic_language()
-            .to_stochastic_semantics()
+        Into::<FiniteStochasticLanguage>::into(self).to_stochastic_semantics()
     }
 }
 
 impl ToStochasticDeterministicSemantics for EventLog {
     fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
-        self.get_finite_stochastic_language()
-            .to_stochastic_deterministic_semantics()
+        Into::<FiniteStochasticLanguage>::into(self).to_stochastic_deterministic_semantics()
     }
 }
 
@@ -393,7 +367,7 @@ mod tests {
         let fin1 = fs::read_to_string("testfiles/a-b.slang").unwrap();
         let slang = fin1.parse::<FiniteStochasticLanguage>().unwrap();
 
-        assert_eq!(log.get_finite_stochastic_language(), slang);
+        assert_eq!(Into::<FiniteStochasticLanguage>::into(log), slang);
     }
 
     #[test]
