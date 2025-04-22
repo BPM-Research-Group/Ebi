@@ -60,11 +60,13 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::DeterministicFiniteAutomaton(
             DeterministicFiniteAutomaton::export_from_object,
         ),
-        EbiObjectExporter::FiniteLanguage(
-            DeterministicFiniteAutomaton::export_from_finite_language,
-        ),
+        EbiObjectExporter::FiniteLanguage(DeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
-            DeterministicFiniteAutomaton::export_from_stochastic_deterministic_finite_automaton,
+            DeterministicFiniteAutomaton::export_from_object,
+        ),
+        EbiObjectExporter::EventLog(DeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::FiniteStochasticLanguage(
+            DeterministicFiniteAutomaton::export_from_object,
         ),
     ],
     java_object_handlers: &[],
@@ -228,28 +230,6 @@ impl DeterministicFiniteAutomaton {
     pub fn set_activity_key(&mut self, activity_key: ActivityKey) {
         self.activity_key = activity_key
     }
-
-    pub fn export_from_finite_language(
-        object: EbiOutput,
-        f: &mut dyn std::io::Write,
-    ) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::FiniteLanguage(lang)) => {
-                lang.get_deterministic_finite_automaton().export(f)
-            }
-            _ => unreachable!(),
-        }
-    }
-
-    pub fn export_from_stochastic_deterministic_finite_automaton(
-        object: EbiOutput,
-        f: &mut dyn std::io::Write,
-    ) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => <StochasticDeterministicFiniteAutomaton as Into<DeterministicFiniteAutomaton>>::into(sdfa).export(f),
-            _ => unreachable!()
-        }
-    }
 }
 
 impl TranslateActivityKey for DeterministicFiniteAutomaton {
@@ -326,6 +306,16 @@ impl Exportable for DeterministicFiniteAutomaton {
     fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::DeterministicFiniteAutomaton(dfa)) => dfa.export(f),
+            EbiOutput::Object(EbiObject::FiniteLanguage(lang)) => {
+                Into::<Self>::into(lang).export(f)
+            }
+            EbiOutput::Object(EbiObject::FiniteStochasticLanguage(slang)) => {
+                Into::<Self>::into(slang).export(f)
+            }
+            EbiOutput::Object(EbiObject::EventLog(log)) => Into::<Self>::into(log).export(f),
+            EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => {
+                Into::<Self>::into(sdfa).export(f)
+            }
             _ => Err(anyhow!("Cannot export to DFA.")),
         }
     }
@@ -445,14 +435,13 @@ impl ToSemantics for DeterministicFiniteAutomaton {
 }
 
 #[cfg(test)]
-mod tests{
+mod tests {
     use std::fs;
 
-    use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics};
     use crate::ebi_framework::activity_key::HasActivityKey;
+    use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics};
 
     use super::DeterministicFiniteAutomaton;
-
 
     #[test]
     fn insert_wrong_edge() {

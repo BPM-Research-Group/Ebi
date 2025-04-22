@@ -6,6 +6,7 @@ pub mod conversions {
     pub mod to_compressed_event_log;
     pub mod to_finite_language;
     pub mod to_stochastic_deterministic_finite_automaton;
+    pub mod to_deterministic_finite_automaton;
 }
 pub mod ebi_framework {
     pub mod activity_key;

@@ -1,6 +1,5 @@
 use anyhow::{Context, Error, Result, anyhow};
 use fnv::FnvBuildHasher;
-use num::Zero;
 use std::{
     collections::HashSet,
     fmt::Display,
@@ -25,12 +24,15 @@ use crate::{
         ebi_trait_event_log::IndexTrace,
         ebi_trait_finite_language::{self, EbiTraitFiniteLanguage},
         ebi_trait_iterable_language::{self, EbiTraitIterableLanguage},
-        ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics},
+        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
     },
     line_reader::LineReader,
 };
 
-use super::{deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage};
+use super::{
+    deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog,
+    finite_stochastic_language::FiniteStochasticLanguage,
+};
 
 pub const HEADER: &str = "finite language";
 
@@ -90,30 +92,11 @@ impl FiniteLanguage {
 
     pub fn import_as_deterministic_finite_automaton(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let lang = Self::import(reader)?;
-        Ok(EbiObject::DeterministicFiniteAutomaton(
-            lang.get_deterministic_finite_automaton(),
-        ))
-    }
-
-    pub fn get_deterministic_finite_automaton(&self) -> DeterministicFiniteAutomaton {
-        let mut result = DeterministicFiniteAutomaton::new();
-        result.set_activity_key(self.get_activity_key().clone());
-
-        if self.len().is_zero() {
-            result.set_initial_state(None);
-        } else {
-            for trace in self.iter() {
-                let mut state = result.get_initial_state().unwrap();
-
-                for activity in trace {
-                    state = result.take_or_add_transition(state, *activity);
-                }
-
-                result.set_final_state(state, true);
-            }
-        }
-
-        result
+        Ok(EbiObject::DeterministicFiniteAutomaton(Into::<
+            DeterministicFiniteAutomaton,
+        >::into(
+            lang
+        )))
     }
 }
 
@@ -309,7 +292,7 @@ impl From<(ActivityKey, HashSet<Vec<Activity>, FnvBuildHasher>)> for FiniteLangu
 
 impl ToSemantics for FiniteLanguage {
     fn to_semantics(self) -> EbiTraitSemantics {
-        self.get_deterministic_finite_automaton().to_semantics()
+        Into::<DeterministicFiniteAutomaton>::into(self).to_semantics()
     }
 }
 
