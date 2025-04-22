@@ -35,7 +35,8 @@ use crate::{
 
 use super::{
     deterministic_finite_automaton::DeterministicFiniteAutomaton,
-    directly_follows_model::DirectlyFollowsModel, lola_net::LolaNet,
+    directly_follows_model::DirectlyFollowsModel, process_tree::ProcessTree,
+    stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
     stochastic_labelled_petri_net::StochasticLabelledPetriNet,
 };
 
@@ -68,17 +69,14 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
         LabelledPetriNet::import_as_object,
     )],
     object_exporters: &[
-        EbiObjectExporter::LabelledPetriNet(LabelledPetriNet::export_from_object),
-        EbiObjectExporter::StochasticLabelledPetriNet(
-            LabelledPetriNet::export_from_stochastic_labelled_petri_net,
-        ),
-        EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
-            LabelledPetriNet::export_from_stochastic_deterministic_finite_automaton,
-        ),
-        EbiObjectExporter::DirectlyFollowsModel(
-            LabelledPetriNet::export_from_directly_follows_model,
-        ),
         EbiObjectExporter::DeterministicFiniteAutomaton(LabelledPetriNet::export_from_object),
+        EbiObjectExporter::DirectlyFollowsModel(LabelledPetriNet::export_from_object),
+        EbiObjectExporter::LabelledPetriNet(LabelledPetriNet::export_from_object),
+        EbiObjectExporter::ProcessTree(LabelledPetriNet::export_from_object),
+        EbiObjectExporter::StochasticLabelledPetriNet(LabelledPetriNet::export_from_object),
+        EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
+            LabelledPetriNet::export_from_object,
+        ),
     ],
     java_object_handlers: &[
         JavaObjectHandler {
@@ -248,42 +246,6 @@ impl LabelledPetriNet {
         Ok(())
     }
 
-    fn export_from_stochastic_labelled_petri_net(
-        object: EbiOutput,
-        f: &mut dyn std::io::Write,
-    ) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(slpn)) => {
-                <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(slpn).export(f)
-            }
-            _ => unreachable!(),
-        }
-    }
-
-    fn export_from_stochastic_deterministic_finite_automaton(
-        object: EbiOutput,
-        f: &mut dyn std::io::Write,
-    ) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => {
-                <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(sdfa.into()).export(f)
-            }
-            _ => unreachable!(),
-        }
-    }
-
-    fn export_from_directly_follows_model(
-        object: EbiOutput,
-        f: &mut dyn std::io::Write,
-    ) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => {
-                Into::<DirectlyFollowsModel>::into(dfm).export(f)
-            }
-            _ => unreachable!(),
-        }
-    }
-
     pub fn incidence_vector(&self, transition: TransitionIndex) -> Vec<i128> {
         let mut vec2 = vec![0; self.get_number_of_places()];
         for (in_place_pos, in_place) in self.transition2input_places[transition].iter().enumerate()
@@ -342,11 +304,50 @@ impl FromEbiTraitObject for LabelledPetriNet {
 impl Exportable for LabelledPetriNet {
     fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
         match object {
-            EbiOutput::Object(EbiObject::LabelledPetriNet(lpn)) => lpn.export(f),
             EbiOutput::Object(EbiObject::DeterministicFiniteAutomaton(dfa)) => {
-                <DeterministicFiniteAutomaton as Into<LolaNet>>::into(dfa).export(f)
-            },
-            _ => unreachable!(),
+                <DeterministicFiniteAutomaton as Into<LabelledPetriNet>>::into(dfa).export(f)
+            }
+            EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => {
+                <DirectlyFollowsModel as Into<LabelledPetriNet>>::into(dfm).export(f)
+            }
+            EbiOutput::Object(EbiObject::LabelledPetriNet(lpn)) => lpn.export(f),
+            EbiOutput::Object(EbiObject::ProcessTree(tree)) => {
+                <ProcessTree as Into<LabelledPetriNet>>::into(tree).export(f)
+            }
+            EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => {
+                <StochasticDeterministicFiniteAutomaton as Into<LabelledPetriNet>>::into(sdfa)
+                    .export(f)
+            }
+            EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(slpn)) => {
+                <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(slpn).export(f)
+            }
+
+            EbiOutput::ContainsRoot(_) => Err(anyhow!("Cannot export ContainsRoot as LPN.")),
+            EbiOutput::Fraction(_) => Err(anyhow!("Cannot export fraction as LPN.")),
+            EbiOutput::LogDiv(_) => Err(anyhow!("Cannot export LogDiv as LPN.")),
+            EbiOutput::PDF(_) => Err(anyhow!("Cannot export PDF as LPN.")),
+            EbiOutput::RootLogDiv(_) => Err(anyhow!("Cannot export RootLogDiv as LPN.")),
+            EbiOutput::SVG(_) => Err(anyhow!("Cannot export SVG as LPN.")),
+            EbiOutput::String(_) => Err(anyhow!("Cannot export string as LPN.")),
+            EbiOutput::Usize(_) => Err(anyhow!("Cannot export integer as LPN.")),
+            EbiOutput::Object(EbiObject::EventLog(_)) => {
+                Err(anyhow!("Cannot export event log as LPN."))
+            }
+            EbiOutput::Object(EbiObject::Executions(_)) => {
+                Err(anyhow!("Cannot export executions as LPN."))
+            }
+            EbiOutput::Object(EbiObject::FiniteLanguage(_)) => {
+                Err(anyhow!("Cannot export finite language as LPN."))
+            }
+            EbiOutput::Object(EbiObject::FiniteStochasticLanguage(_)) => {
+                Err(anyhow!("Cannot export finite stochastic language as LPN."))
+            }
+            EbiOutput::Object(EbiObject::LanguageOfAlignments(_)) => {
+                Err(anyhow!("Cannot export language of alignments as LPN."))
+            }
+            EbiOutput::Object(EbiObject::StochasticLanguageOfAlignments(_)) => Err(anyhow!(
+                "Cannot export stochastic language of alignments as LPN."
+            )),
         }
     }
 

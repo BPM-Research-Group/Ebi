@@ -6,13 +6,7 @@ use bitvec::bitvec;
 use crate::{
     ebi_framework::activity_key::{ActivityKeyTranslator, HasActivityKey},
     ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton,
-        directly_follows_model::DirectlyFollowsModel,
-        labelled_petri_net::{LPNMarking, LabelledPetriNet},
-        lola_net::LolaNet,
-        petri_net_markup_language::PetriNetMarkupLanguage,
-        process_tree::ProcessTree,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::{LPNMarking, LabelledPetriNet}, lola_net::LolaNet, petri_net_markup_language::PetriNetMarkupLanguage, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet
     },
     ebi_traits::ebi_trait_semantics::Semantics,
     marking::Marking,
@@ -20,6 +14,8 @@ use crate::{
 
 impl From<ProcessTree> for LabelledPetriNet {
     fn from(value: ProcessTree) -> Self {
+        log::info!("convert process tree to LPN");
+
         if value.tree.is_empty() {
             return Self::new_empty_language();
         }
@@ -44,12 +40,15 @@ impl From<ProcessTree> for LabelledPetriNet {
 
 impl From<LolaNet> for LabelledPetriNet {
     fn from(value: LolaNet) -> Self {
+        log::info!("convert Lola net to LPN");
         value.0
     }
 }
 
 impl From<DirectlyFollowsModel> for LabelledPetriNet {
     fn from(value: DirectlyFollowsModel) -> LabelledPetriNet {
+        log::info!("convert DFM to LPN");
+
         if value.get_initial_state().is_none() {
             //SDFA has an empty language, return a livelocked SLPN
             return Self::new_empty_language();
@@ -145,6 +144,7 @@ impl From<DirectlyFollowsModel> for LabelledPetriNet {
 
 impl From<StochasticLabelledPetriNet> for LabelledPetriNet {
     fn from(value: StochasticLabelledPetriNet) -> Self {
+        log::info!("convert SLPN to LPN");
         Self {
             activity_key: value.activity_key,
             initial_marking: value.initial_marking,
@@ -228,7 +228,7 @@ impl TryFrom<PetriNetMarkupLanguage> for LabelledPetriNet {
     type Error = Error;
 
     fn try_from(pnml: PetriNetMarkupLanguage) -> Result<Self, Self::Error> {
-        log::info!("Convert PNML into LPN.");
+        log::info!("convert PNML to LPN");
 
         let mut result = LabelledPetriNet::new();
 
@@ -333,5 +333,12 @@ impl TryFrom<PetriNetMarkupLanguage> for LabelledPetriNet {
         }
 
         Ok(result)
+    }
+}
+
+impl From<StochasticDeterministicFiniteAutomaton> for LabelledPetriNet {
+    fn from(value: StochasticDeterministicFiniteAutomaton) -> Self {
+        let dfa: DeterministicFiniteAutomaton = value.into();
+        dfa.into()
     }
 }
