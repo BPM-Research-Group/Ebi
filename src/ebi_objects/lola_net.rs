@@ -248,42 +248,6 @@ impl EbiTraitGraphable for LolaNet {
     }
 }
 
-impl From<LabelledPetriNet> for LolaNet {
-    fn from(value: LabelledPetriNet) -> Self {
-        Self(value)
-    }
-}
-
-impl From<DirectlyFollowsModel> for LolaNet {
-    fn from(value: DirectlyFollowsModel) -> Self {
-        Into::<LabelledPetriNet>::into(value).into()
-    }
-}
-
-impl From<ProcessTree> for LolaNet {
-    fn from(value: ProcessTree) -> Self {
-        Into::<LabelledPetriNet>::into(value).into()
-    }
-}
-
-impl From<DeterministicFiniteAutomaton> for LolaNet {
-    fn from(value: DeterministicFiniteAutomaton) -> Self {
-        Into::<LabelledPetriNet>::into(value).into()
-    }
-}
-
-impl From<StochasticLabelledPetriNet> for LolaNet {
-    fn from(value: StochasticLabelledPetriNet) -> Self {
-        Into::<LabelledPetriNet>::into(value).into()
-    }
-}
-
-impl From<StochasticDeterministicFiniteAutomaton> for LolaNet {
-    fn from(value: StochasticDeterministicFiniteAutomaton) -> Self {
-        Into::<StochasticLabelledPetriNet>::into(value).into()
-    }
-}
-
 struct Tokeniser<'a> {
     remainder: &'a str,
 }

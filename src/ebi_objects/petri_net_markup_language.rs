@@ -1,14 +1,6 @@
-use std::{
-    collections::HashMap,
-    io::{BufRead, Write},
-};
+use std::io::{BufRead, Write};
 
 use anyhow::{Result, anyhow};
-use fraction::ToPrimitive;
-use process_mining::{
-    PetriNet,
-    petri_net::petri_net_struct::{self, ArcType},
-};
 
 use crate::{
     ebi_framework::{
@@ -21,12 +13,16 @@ use crate::{
     },
     ebi_traits::{
         ebi_trait_graphable::{self, EbiTraitGraphable},
-        ebi_trait_semantics::{EbiTraitSemantics, Semantics},
+        ebi_trait_semantics::EbiTraitSemantics,
     },
 };
 
 use super::{
-    labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+    deterministic_finite_automaton::DeterministicFiniteAutomaton,
+    directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet,
+    process_tree::ProcessTree,
+    stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+    stochastic_labelled_petri_net::StochasticLabelledPetriNet,
 };
 
 pub const FORMAT_SPECIFICATION: &str =
@@ -49,15 +45,13 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
         PetriNetMarkupLanguage::import_as_object,
     )],
     object_exporters: &[
+        EbiObjectExporter::DeterministicFiniteAutomaton(PetriNetMarkupLanguage::export_from_object),
+        EbiObjectExporter::DirectlyFollowsModel(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::LabelledPetriNet(PetriNetMarkupLanguage::export_from_object),
-        EbiObjectExporter::StochasticLabelledPetriNet(
-            PetriNetMarkupLanguage::export_from_stochastic_labelled_petri_net,
-        ),
+        EbiObjectExporter::ProcessTree(PetriNetMarkupLanguage::export_from_object),
+        EbiObjectExporter::StochasticLabelledPetriNet(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
-            PetriNetMarkupLanguage::export_from_stochastic_deterministic_finite_automaton,
-        ),
-        EbiObjectExporter::DirectlyFollowsModel(
-            PetriNetMarkupLanguage::export_from_directly_follows_model,
+            PetriNetMarkupLanguage::export_from_object,
         ),
     ],
     java_object_handlers: &[], //java translations covered by LabelledPetrinet
@@ -90,45 +84,6 @@ impl PetriNetMarkupLanguage {
         let lpn = LabelledPetriNet::try_from(pnml)?;
         Ok(EbiTraitSemantics::Marking(Box::new(lpn)))
     }
-
-    fn export_from_stochastic_labelled_petri_net(
-        object: EbiOutput,
-        f: &mut dyn std::io::Write,
-    ) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(slpn)) => {
-                let lpn = <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(slpn);
-                PetriNetMarkupLanguage::try_from(lpn)?.export(f)
-            }
-            _ => unreachable!(),
-        }
-    }
-
-    fn export_from_stochastic_deterministic_finite_automaton(
-        object: EbiOutput,
-        f: &mut dyn std::io::Write,
-    ) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => {
-                let lpn = <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(sdfa.into());
-                PetriNetMarkupLanguage::try_from(lpn)?.export(f)
-            }
-            _ => unreachable!(),
-        }
-    }
-
-    fn export_from_directly_follows_model(
-        object: EbiOutput,
-        f: &mut dyn std::io::Write,
-    ) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => {
-                let lpn: LabelledPetriNet = dfm.into();
-                PetriNetMarkupLanguage::try_from(lpn)?.export(f)
-            }
-            _ => unreachable!(),
-        }
-    }
 }
 
 impl Importable for PetriNetMarkupLanguage {
@@ -152,10 +107,56 @@ impl Importable for PetriNetMarkupLanguage {
 impl Exportable for PetriNetMarkupLanguage {
     fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
-            EbiOutput::Object(EbiObject::LabelledPetriNet(lpn)) => {
-                PetriNetMarkupLanguage::try_from(lpn)?.export(f)
+            EbiOutput::Object(EbiObject::DeterministicFiniteAutomaton(dfa)) => {
+                <DeterministicFiniteAutomaton as TryInto<PetriNetMarkupLanguage>>::try_into(dfa)?
+                    .export(f)
             }
-            _ => unreachable!(),
+            EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => {
+                <DirectlyFollowsModel as TryInto<PetriNetMarkupLanguage>>::try_into(dfm)?.export(f)
+            }
+            EbiOutput::Object(EbiObject::LabelledPetriNet(lpn)) => {
+                <LabelledPetriNet as TryInto<PetriNetMarkupLanguage>>::try_into(lpn)?.export(f)
+            }
+            EbiOutput::Object(EbiObject::ProcessTree(tree)) => {
+                <ProcessTree as TryInto<PetriNetMarkupLanguage>>::try_into(tree)?.export(f)
+            }
+            EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => {
+                <StochasticDeterministicFiniteAutomaton as TryInto<PetriNetMarkupLanguage>>::try_into(
+                    sdfa,
+                )
+                ?.export(f)
+            }
+            EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(slpn)) => {
+                <StochasticLabelledPetriNet as TryInto<PetriNetMarkupLanguage>>::try_into(slpn)?
+                    .export(f)
+            }
+
+            EbiOutput::ContainsRoot(_) => Err(anyhow!("Cannot export ContainsRoot as PNML.")),
+            EbiOutput::Fraction(_) => Err(anyhow!("Cannot export fraction as PNML.")),
+            EbiOutput::LogDiv(_) => Err(anyhow!("Cannot export LogDiv as PNML.")),
+            EbiOutput::PDF(_) => Err(anyhow!("Cannot export PDF as PNML.")),
+            EbiOutput::RootLogDiv(_) => Err(anyhow!("Cannot export RootLogDiv as PNML.")),
+            EbiOutput::SVG(_) => Err(anyhow!("Cannot export SVG as PNML.")),
+            EbiOutput::String(_) => Err(anyhow!("Cannot export string as PNML.")),
+            EbiOutput::Usize(_) => Err(anyhow!("Cannot export integer as PNML.")),
+            EbiOutput::Object(EbiObject::EventLog(_)) => {
+                Err(anyhow!("Cannot export event log as PNML."))
+            }
+            EbiOutput::Object(EbiObject::Executions(_)) => {
+                Err(anyhow!("Cannot export executions as PNML."))
+            }
+            EbiOutput::Object(EbiObject::FiniteLanguage(_)) => {
+                Err(anyhow!("Cannot export finite language as PNML."))
+            }
+            EbiOutput::Object(EbiObject::FiniteStochasticLanguage(_)) => {
+                Err(anyhow!("Cannot export finite stochastic language as PNML."))
+            }
+            EbiOutput::Object(EbiObject::LanguageOfAlignments(_)) => {
+                Err(anyhow!("Cannot export language of alignments as PNML."))
+            }
+            EbiOutput::Object(EbiObject::StochasticLanguageOfAlignments(_)) => Err(anyhow!(
+                "Cannot export stochastic language of alignments as PNML."
+            )),
         }
     }
 
@@ -168,99 +169,6 @@ impl Exportable for PetriNetMarkupLanguage {
 impl EbiTraitGraphable for PetriNetMarkupLanguage {
     fn to_dot(&self) -> Result<layout::topo::layout::VisualGraph> {
         TryInto::<LabelledPetriNet>::try_into(self.clone())?.to_dot()
-    }
-}
-
-impl TryFrom<LabelledPetriNet> for PetriNetMarkupLanguage {
-    type Error = anyhow::Error;
-
-    fn try_from(lpn: LabelledPetriNet) -> std::result::Result<Self, Self::Error> {
-        log::info!("Convert LPN into PNML.");
-
-        let mut result = PetriNet::new();
-
-        //create places
-        let mut place2new_place = HashMap::new();
-        {
-            for place in 0..lpn.get_number_of_places() {
-                let new_place = result.add_place(None);
-                place2new_place.insert(place, new_place);
-            }
-        }
-
-        //create transitions
-        for transition in 0..lpn.get_number_of_transitions() {
-            let new_transition = result.add_transition(
-                match lpn.get_transition_label(transition) {
-                    Some(activity) => {
-                        Some(lpn.activity_key.get_activity_label(&activity).to_string())
-                    }
-                    None => None,
-                },
-                None,
-            );
-
-            //incoming
-            {
-                //transform to a map of places and arc weights
-                let mut map = HashMap::new();
-                for (pos, place) in lpn.transition2input_places[transition].iter().enumerate() {
-                    *map.entry(*place).or_insert(0) +=
-                        u32::try_from(lpn.transition2input_places_cardinality[transition][pos])?;
-                }
-
-                //add
-                for (place, weight) in map {
-                    let new_place = place2new_place
-                        .get(&place)
-                        .ok_or(anyhow!("Non-existing place referenced."))?;
-                    result.add_arc(
-                        ArcType::place_to_transition(*new_place, new_transition),
-                        Some(weight),
-                    );
-                }
-            }
-
-            //outgoing
-            {
-                //transform to a map of places and arc weights
-                let mut map = HashMap::new();
-                for (pos, place) in lpn.transition2output_places[transition].iter().enumerate() {
-                    *map.entry(*place).or_insert(0) +=
-                        u32::try_from(lpn.transition2output_places_cardinality[transition][pos])?;
-                }
-
-                //add
-                for (place, weight) in map {
-                    let new_place = place2new_place
-                        .get(&place)
-                        .ok_or(anyhow!("Non-existing place referenced."))?;
-                    result.add_arc(
-                        ArcType::transition_to_place(new_transition, *new_place),
-                        Some(weight.to_u32().ok_or(anyhow!("value out of bounds"))?),
-                    );
-                }
-            }
-        }
-
-        //initial marking
-        let mut new_initial_marking = petri_net_struct::Marking::new();
-        for (place, cardinality) in lpn
-            .initial_marking
-            .get_place2token()
-            .into_iter()
-            .enumerate()
-        {
-            if cardinality > &0u64 {
-                let new_place = place2new_place
-                    .get(&place)
-                    .ok_or(anyhow!("Non-existing place referenced."))?;
-                new_initial_marking.insert(*new_place, *cardinality);
-            }
-        }
-        result.initial_marking = Some(new_initial_marking);
-
-        Ok(Self { net: result })
     }
 }
 

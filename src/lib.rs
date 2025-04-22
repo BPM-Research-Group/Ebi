@@ -1,5 +1,7 @@
 pub mod conversions {
     pub mod to_labelled_petri_net;
+    pub mod to_lola_net;
+    pub mod to_petri_net_markup_language;
 }
 pub mod ebi_framework {
     pub mod activity_key;
