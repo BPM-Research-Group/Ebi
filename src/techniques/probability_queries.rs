@@ -878,7 +878,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
         assert_eq!(slang.len(), 3);
-        let mut sdfa = slang.get_stochastic_deterministic_finite_automaton();
+        let mut sdfa: StochasticDeterministicFiniteAutomaton = slang.clone().into();
         assert_eq!(sdfa.max_state, 5);
         assert_eq!(sdfa.get_number_of_transitions(), 5);
 

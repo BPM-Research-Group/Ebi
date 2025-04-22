@@ -37,7 +37,7 @@ use crate::{
     math::{
         data_type::DataType,
         fraction::Fraction,
-        traits::{One, Zero},
+        traits::One,
     },
 };
 
@@ -182,9 +182,11 @@ impl EventLog {
         reader: &mut dyn BufRead,
     ) -> Result<EbiObject> {
         let log = Self::import(reader)?;
-        Ok(EbiObject::StochasticDeterministicFiniteAutomaton(
-            log.to_stochastic_deterministic_finite_automaton(),
-        ))
+        Ok(EbiObject::StochasticDeterministicFiniteAutomaton(Into::<
+            StochasticDeterministicFiniteAutomaton,
+        >::into(
+            log
+        )))
     }
 
     pub fn get_finite_stochastic_language(&self) -> FiniteStochasticLanguage {
@@ -209,58 +211,6 @@ impl EventLog {
         }
 
         map.into()
-    }
-
-    pub fn to_stochastic_deterministic_finite_automaton(
-        &self,
-    ) -> StochasticDeterministicFiniteAutomaton {
-        log::info!("convert event log to sdfa");
-
-        let mut result = StochasticDeterministicFiniteAutomaton::new();
-
-        if self.len().is_zero() {
-            result.set_initial_state(None);
-        } else {
-            let mut final_states = HashMap::new();
-
-            //create automaton
-            for trace_index in 0..self.log.traces.len() {
-                let trace =
-                    self.read_trace_with_activity_key(result.get_activity_key_mut(), &trace_index);
-                let mut state = result.get_initial_state().unwrap();
-
-                for activity in trace {
-                    state = result.take_or_add_transition(state, activity, Fraction::one());
-                }
-
-                match final_states.entry(state) {
-                    std::collections::hash_map::Entry::Occupied(mut e) => {
-                        *e.get_mut() += Fraction::one()
-                    }
-                    std::collections::hash_map::Entry::Vacant(e) => {
-                        e.insert(Fraction::one());
-                    }
-                }
-            }
-
-            //count
-            let mut sums = final_states;
-            for (source, _, _, probability) in &result {
-                match sums.entry(*source) {
-                    std::collections::hash_map::Entry::Occupied(mut e) => {
-                        *e.get_mut() += probability
-                    }
-                    std::collections::hash_map::Entry::Vacant(e) => {
-                        e.insert(probability.clone());
-                    }
-                }
-            }
-
-            //normalise
-            result.scale_outgoing_probabilities(sums);
-        }
-
-        result
     }
 }
 

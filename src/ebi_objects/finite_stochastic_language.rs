@@ -1,6 +1,6 @@
 use anyhow::{Context, Error, Result, anyhow};
 use std::{
-    collections::{HashMap, hash_map::Entry},
+    collections::HashMap,
     fmt,
     io::{self, BufRead, Write},
     str::FromStr,
@@ -149,51 +149,6 @@ impl FiniteStochasticLanguage {
         }
     }
 
-    pub fn get_stochastic_deterministic_finite_automaton(
-        &self,
-    ) -> StochasticDeterministicFiniteAutomaton {
-        log::info!("convert finite stochastic language to sdfa");
-
-        let mut result = StochasticDeterministicFiniteAutomaton::new();
-        if self.len().is_zero() {
-            result.set_initial_state(None);
-        } else {
-            let mut final_states = HashMap::new();
-            result.set_activity_key(&self.activity_key);
-
-            //create automaton
-            for (trace, probability) in &self.traces {
-                let mut state = result.get_initial_state().unwrap();
-                for activity in trace {
-                    state = result.take_or_add_transition(state, *activity, probability.clone());
-                }
-
-                match final_states.entry(state) {
-                    Entry::Occupied(mut e) => *e.get_mut() += Fraction::one(),
-                    Entry::Vacant(e) => {
-                        e.insert(Fraction::one());
-                    }
-                }
-            }
-
-            //count
-            let mut sums = final_states;
-            for (source, _, _, probability) in &result {
-                match sums.entry(*source) {
-                    Entry::Occupied(mut e) => *e.get_mut() += probability,
-                    Entry::Vacant(e) => {
-                        e.insert(probability.clone());
-                    }
-                }
-            }
-
-            //normalise
-            result.scale_outgoing_probabilities(sums);
-        }
-
-        result
-    }
-
     fn contains(&self, atrace_b: Vec<&str>, probability_b: &Fraction) -> bool {
         for trace_a in self.traces.iter() {
             let atrace_a = self.activity_key.deprocess_trace(&trace_a.0);
@@ -219,7 +174,7 @@ impl FiniteStochasticLanguage {
     ) -> Result<EbiObject> {
         let slang = Self::import(reader)?;
         Ok(EbiObject::StochasticDeterministicFiniteAutomaton(
-            slang.get_stochastic_deterministic_finite_automaton(),
+            slang.into(),
         ))
     }
 }
@@ -541,9 +496,9 @@ impl ToStochasticSemantics for FiniteStochasticLanguage {
 
 impl ToStochasticDeterministicSemantics for FiniteStochasticLanguage {
     fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::Usize(Box::new(
-            self.get_stochastic_deterministic_finite_automaton(),
-        ))
+        EbiTraitStochasticDeterministicSemantics::Usize(Box::new(Into::<
+            StochasticDeterministicFiniteAutomaton,
+        >::into(self)))
     }
 }
 

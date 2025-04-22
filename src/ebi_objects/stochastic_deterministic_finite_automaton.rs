@@ -1,8 +1,6 @@
 use crate::{
     ebi_framework::{
-        activity_key::{
-            Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey,
-        },
+        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -38,9 +36,7 @@ use std::{
     str::FromStr,
 };
 
-use super::
-    stochastic_labelled_petri_net::StochasticLabelledPetriNet
-;
+use super::stochastic_labelled_petri_net::StochasticLabelledPetriNet;
 
 pub const FORMAT_SPECIFICATION: &str = "A stochastic deterministic finite automaton is a JSON structure with the top level being an object.
     This object contains the following key-value pairs:
@@ -92,9 +88,9 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
             StochasticDeterministicFiniteAutomaton::export_from_object,
         ),
         EbiObjectExporter::FiniteStochasticLanguage(
-            StochasticDeterministicFiniteAutomaton::export_from_finite_stochastic_language,
+            StochasticDeterministicFiniteAutomaton::export_from_object,
         ),
-        EbiObjectExporter::EventLog(StochasticDeterministicFiniteAutomaton::export_from_event_log),
+        EbiObjectExporter::EventLog(StochasticDeterministicFiniteAutomaton::export_from_object),
     ],
     java_object_handlers: &[],
 };
@@ -319,27 +315,6 @@ impl StochasticDeterministicFiniteAutomaton {
     pub fn set_activity_key(&mut self, activity_key: &ActivityKey) {
         self.activity_key = activity_key.clone();
     }
-
-    pub fn export_from_finite_stochastic_language(
-        object: EbiOutput,
-        f: &mut dyn std::io::Write,
-    ) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::FiniteStochasticLanguage(slang)) => slang
-                .get_stochastic_deterministic_finite_automaton()
-                .export(f),
-            _ => unreachable!(),
-        }
-    }
-
-    pub fn export_from_event_log(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::EventLog(log)) => {
-                log.to_stochastic_deterministic_finite_automaton().export(f)
-            }
-            _ => unreachable!(),
-        }
-    }
 }
 
 impl TranslateActivityKey for StochasticDeterministicFiniteAutomaton {
@@ -418,7 +393,11 @@ impl Exportable for StochasticDeterministicFiniteAutomaton {
             EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => {
                 sdfa.export(f)
             }
-            _ => unreachable!(),
+            EbiOutput::Object(EbiObject::FiniteStochasticLanguage(slang)) => {
+                Into::<Self>::into(slang).export(f)
+            }
+            EbiOutput::Object(EbiObject::EventLog(log)) => Into::<Self>::into(log).export(f),
+            _ => Err(anyhow!("Cannot export as SDFA.")),
         }
     }
 
@@ -605,7 +584,9 @@ mod tests {
     #[test]
     fn sdfa_empty() {
         let fin = fs::read_to_string("testfiles/empty.sdfa").unwrap();
-        let dfa = fin.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
+        let dfa = fin
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
 
         if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics() {
             assert!(semantics.get_initial_state().is_none());
