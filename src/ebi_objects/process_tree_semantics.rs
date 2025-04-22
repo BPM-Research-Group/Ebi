@@ -475,6 +475,6 @@ mod tests {
         let tree = fin.parse::<ProcessTree>().unwrap();
         assert!(tree.get_initial_state().is_none());
 
-        Into::<LabelledPetriNet>::into(tree);
+        let _ = Into::<LabelledPetriNet>::into(tree);
     }
 }

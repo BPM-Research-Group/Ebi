@@ -1,6 +1,6 @@
 use super::network_simplex_value_type::{MulWithFloat, ToBigInt};
 use crate::math::traits::{One, Signed, Zero};
-use crate::optimization_algorithms::network_simplex_value_type::IsFloat;
+use crate::optimisation_algorithms::network_simplex_value_type::IsFloat;
 use core::convert::From;
 use fraction::BigInt;
 use rand::{seq::SliceRandom, thread_rng};
@@ -1403,7 +1403,7 @@ where
 
 #[cfg(test)]
 mod tests {
-    use crate::optimization_algorithms::network_simplex::NetworkSimplex;
+    use crate::optimisation_algorithms::network_simplex::NetworkSimplex;
 
     
     #[test]

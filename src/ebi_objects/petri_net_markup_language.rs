@@ -3,8 +3,7 @@ use std::{
     io::{BufRead, Write},
 };
 
-use anyhow::{Error, Result, anyhow};
-use bitvec::bitvec;
+use anyhow::{Result, anyhow};
 use fraction::ToPrimitive;
 use process_mining::{
     PetriNet,
@@ -13,7 +12,6 @@ use process_mining::{
 
 use crate::{
     ebi_framework::{
-        activity_key::HasActivityKey,
         ebi_file_handler::EbiFileHandler,
         ebi_input::{EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -21,9 +19,10 @@ use crate::{
         exportable::Exportable,
         importable::Importable,
     },
-    ebi_objects::labelled_petri_net::LPNMarking,
-    ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}},
-    marking::Marking,
+    ebi_traits::{
+        ebi_trait_graphable::{self, EbiTraitGraphable},
+        ebi_trait_semantics::{EbiTraitSemantics, Semantics},
+    },
 };
 
 use super::{
@@ -66,7 +65,7 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
 
 #[derive(Clone)]
 pub struct PetriNetMarkupLanguage {
-    net: process_mining::PetriNet,
+    pub(crate) net: process_mining::PetriNet,
 }
 
 impl PetriNetMarkupLanguage {
@@ -169,118 +168,6 @@ impl Exportable for PetriNetMarkupLanguage {
 impl EbiTraitGraphable for PetriNetMarkupLanguage {
     fn to_dot(&self) -> Result<layout::topo::layout::VisualGraph> {
         TryInto::<LabelledPetriNet>::try_into(self.clone())?.to_dot()
-    }
-}
-
-impl TryFrom<PetriNetMarkupLanguage> for LabelledPetriNet {
-    type Error = Error;
-
-    fn try_from(pnml: PetriNetMarkupLanguage) -> Result<Self, Self::Error> {
-        log::info!("Convert PNML into LPN.");
-
-        let mut result = LabelledPetriNet::new();
-
-        //create map of places
-        let mut place2index = HashMap::new();
-        for (place_id, _) in pnml.net.places {
-            let place = result.add_place();
-            place2index.insert(place_id, place);
-        }
-
-        //transitions
-        let mut transition2index = HashMap::new();
-        for (transition_id, transition) in &pnml.net.transitions {
-            let label = match &transition.label {
-                Some(activity) => Some(result.get_activity_key_mut().process_activity(activity)),
-                None => None,
-            };
-            let transition = result.add_transition(label);
-
-            transition2index.insert(transition_id, transition);
-        }
-
-        //arcs
-        for arc in pnml.net.arcs.iter() {
-            match arc.from_to {
-                process_mining::petri_net::petri_net_struct::ArcType::PlaceTransition(
-                    place_id,
-                    transition_id,
-                ) => {
-                    let new_place = place2index
-                        .get(&place_id)
-                        .ok_or(anyhow!("Undeclared place referenced."))?;
-                    let new_transition = transition2index
-                        .get(&transition_id)
-                        .ok_or(anyhow!("undeclared transition referenced"))?;
-                    result.add_place_transition_arc(
-                        *new_place,
-                        *new_transition,
-                        arc.weight.into(),
-                    )?;
-                }
-                process_mining::petri_net::petri_net_struct::ArcType::TransitionPlace(
-                    transition_id,
-                    place_id,
-                ) => {
-                    let new_place = place2index
-                        .get(&place_id)
-                        .ok_or(anyhow!("Undeclared place referenced."))?;
-                    let new_transition = transition2index
-                        .get(&transition_id)
-                        .ok_or(anyhow!("undeclared transition referenced"))?;
-                    result.add_transition_place_arc(
-                        *new_transition,
-                        *new_place,
-                        arc.weight.into(),
-                    )?;
-                }
-            };
-        }
-
-        //initial marking
-        // for (place_id, cardinality) in pnml.net.initial_marking.as_ref().ok_or(anyhow!("The given net has no initial marking. Ebi requires an initial marking for its Petri nets."))?.iter() {
-        if let Some(marking) = pnml.net.initial_marking.as_ref() {
-            for (place_id, cardinality) in marking {
-                let new_place = place2index
-                    .get(&place_id.get_uuid())
-                    .ok_or(anyhow!("Undeclared place found in the initial marking."))?;
-                result
-                    .get_initial_marking_mut()
-                    .increase(*new_place, *cardinality)?;
-            }
-        }
-
-        //final markings
-        if let Some(final_markings) = &pnml.net.final_markings {
-            //The nets used by Ebi do not have final markings, as each of their deadlocks is taken as a final marking.
-            //The best we can do here is to verify that no non-deadlocks have been declared as final markings.
-            for final_marking in final_markings.iter() {
-                //transform to an Ebi-final marking
-                let mut new_final_marking = Marking::new(result.get_number_of_places());
-                for (place_id, cardinality) in final_marking.iter() {
-                    let new_place = place2index
-                        .get(&place_id.get_uuid())
-                        .ok_or(anyhow!("Undeclared place found."))?;
-                    new_final_marking.increase(*new_place, *cardinality)?;
-                }
-
-                //verify that this is a deadlock marking
-                let mut state = LPNMarking {
-                    marking: new_final_marking,
-                    enabled_transitions: bitvec![0; result.get_number_of_transitions()],
-                    number_of_enabled_transitions: 0,
-                };
-                result.compute_enabled_transitions(&mut state);
-                if !result.is_final_state(&state) {
-                    return Err(anyhow!(
-                        "This PNML file has a final marking that is not a deadlock. In Ebi, each final marking must be a deadlock. This final marking is {:?}",
-                        final_marking
-                    ));
-                }
-            }
-        }
-
-        Ok(result)
     }
 }
 

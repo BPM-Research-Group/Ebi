@@ -1,3 +1,6 @@
+pub mod conversions {
+    pub mod to_labelled_petri_net;
+}
 pub mod ebi_framework {
     pub mod activity_key;
     pub mod displayable;
@@ -41,6 +44,7 @@ pub mod ebi_objects {
     pub mod labelled_petri_net;
     pub mod labelled_petri_net_semantics;
     pub mod language_of_alignments;
+    pub mod lola_net;
     pub mod petri_net_markup_language;
     pub mod process_tree;
     pub mod process_tree_semantics;
@@ -49,7 +53,6 @@ pub mod ebi_objects {
     pub mod stochastic_labelled_petri_net;
     pub mod stochastic_labelled_petri_net_semantics;
     pub mod stochastic_language_of_alignments;
-    pub mod lola_net;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_event_log;
@@ -154,7 +157,7 @@ pub mod techniques {
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
 }
-pub mod optimization_algorithms {
+pub mod optimisation_algorithms {
     pub mod network_simplex;
     pub mod network_simplex_value_type;
 }

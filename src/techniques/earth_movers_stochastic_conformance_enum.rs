@@ -1,7 +1,7 @@
 use crate::distances::DistanceMatrix;
 use crate::math::fraction::MaybeExact;
 use crate::math::traits::One;
-use crate::optimization_algorithms::network_simplex::NetworkSimplex;
+use crate::optimisation_algorithms::network_simplex::NetworkSimplex;
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::fraction_enum::FractionEnum,
