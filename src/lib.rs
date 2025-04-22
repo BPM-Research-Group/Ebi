@@ -2,6 +2,10 @@ pub mod conversions {
     pub mod to_labelled_petri_net;
     pub mod to_lola_net;
     pub mod to_petri_net_markup_language;
+    pub mod to_event_log;
+    pub mod to_compressed_event_log;
+    pub mod to_finite_language;
+    pub mod to_deterministic_finite_automaton;
 }
 pub mod ebi_framework {
     pub mod activity_key;
@@ -121,6 +125,7 @@ pub mod math {
     pub mod root;
     pub mod root_log_div;
     pub mod traits;
+    pub mod data_type;
 }
 
 pub mod techniques {

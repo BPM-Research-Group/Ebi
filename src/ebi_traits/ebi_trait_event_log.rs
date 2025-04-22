@@ -3,7 +3,7 @@ use anyhow::{anyhow, Result};
 use chrono::{DateTime, FixedOffset};
 use process_mining::event_log::{AttributeValue, Event, XESEditableAttribute};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::event_log::DataType, math::fraction::Fraction};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, math::{data_type::DataType, fraction::Fraction}};
 
 pub const ATTRIBUTE_TIME: &str = "time:timestamp";
 

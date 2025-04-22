@@ -1,16 +1,18 @@
-use anyhow::{anyhow, Context, Error, Result};
+use anyhow::{Context, Error, Result, anyhow};
 use fnv::FnvBuildHasher;
 use num::Zero;
 use std::{
     collections::HashSet,
     fmt::Display,
-    io::{self, BufRead, Write},
+    io::{self, BufRead},
     str::FromStr,
 };
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
+        activity_key::{
+            Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
+        },
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -28,7 +30,7 @@ use crate::{
     line_reader::LineReader,
 };
 
-use super::deterministic_finite_automaton::DeterministicFiniteAutomaton;
+use super::{deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage};
 
 pub const HEADER: &str = "finite language";
 
@@ -60,13 +62,14 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
         ),
     ],
     object_exporters: &[
+        EbiObjectExporter::EventLog(FiniteLanguage::export_from_object),
         EbiObjectExporter::FiniteLanguage(FiniteLanguage::export_from_object),
-        EbiObjectExporter::EventLog(FiniteLanguage::export_from_event_log),
+        EbiObjectExporter::FiniteStochasticLanguage(FiniteLanguage::export_from_object),
     ],
     java_object_handlers: &[],
 };
 
-#[derive(ActivityKey,Clone)]
+#[derive(ActivityKey, Clone)]
 pub struct FiniteLanguage {
     activity_key: ActivityKey,
     traces: HashSet<Vec<Activity>, FnvBuildHasher>,
@@ -112,13 +115,6 @@ impl FiniteLanguage {
 
         result
     }
-
-    fn export_from_event_log(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::EventLog(log)) => log.get_finite_language().export(f),
-            _ => unreachable!(),
-        }
-    }
 }
 
 impl TranslateActivityKey for FiniteLanguage {
@@ -126,14 +122,15 @@ impl TranslateActivityKey for FiniteLanguage {
         let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
 
         //a hashmap needs to be rebuilt, unfortunately
-        let translated_traces: HashSet<Vec<Activity>, FnvBuildHasher> = self.traces
-            .drain() 
+        let translated_traces: HashSet<Vec<Activity>, FnvBuildHasher> = self
+            .traces
+            .drain()
             .map(|trace| translator.translate_trace(&trace))
             .collect();
 
         // Update the traces in the language with the translated ones
         self.traces = translated_traces;
-        
+
         self.activity_key = to_activity_key.clone();
     }
 }
@@ -159,8 +156,14 @@ impl IndexTrace for FiniteLanguage {
 impl Exportable for FiniteLanguage {
     fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
         match object {
+            EbiOutput::Object(EbiObject::EventLog(log)) => {
+                <EventLog as Into<FiniteLanguage>>::into(log).export(f)
+            }
             EbiOutput::Object(EbiObject::FiniteLanguage(slang)) => slang.export(f),
-            _ => unreachable!(),
+            EbiOutput::Object(EbiObject::FiniteStochasticLanguage(slang)) => {
+                <FiniteStochasticLanguage as Into<FiniteLanguage>>::into(slang).export(f)
+            }
+            _ => Err(anyhow!("Cannote export as finite language.")),
         }
     }
 
@@ -311,7 +314,7 @@ impl ToSemantics for FiniteLanguage {
 }
 
 #[cfg(test)]
-mod tests{
+mod tests {
     use std::fs;
 
     use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};

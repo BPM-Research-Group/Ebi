@@ -326,7 +326,7 @@ impl Exportable for DeterministicFiniteAutomaton {
     fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::DeterministicFiniteAutomaton(dfa)) => dfa.export(f),
-            _ => unreachable!(),
+            _ => Err(anyhow!("Cannot export to DFA.")),
         }
     }
 

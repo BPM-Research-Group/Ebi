@@ -102,8 +102,8 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
 
 #[derive(Clone, Debug, ActivityKey)]
 pub struct FiniteStochasticLanguage {
-    activity_key: ActivityKey,
-    traces: HashMap<Vec<Activity>, Fraction>,
+    pub(crate) activity_key: ActivityKey,
+    pub(crate) traces: HashMap<Vec<Activity>, Fraction>,
 }
 
 impl FiniteStochasticLanguage {
@@ -121,7 +121,7 @@ impl FiniteStochasticLanguage {
         reader: &mut dyn BufRead,
     ) -> Result<Box<dyn EbiTraitFiniteLanguage>> {
         let lang = Self::import(reader)?;
-        Ok(Box::new(lang.to_finite_language()))
+        Ok(Box::new(Into::<FiniteLanguage>::into(lang)))
     }
 
     pub fn normalise_before(traces: &mut HashMap<Vec<String>, Fraction>) {
@@ -192,17 +192,6 @@ impl FiniteStochasticLanguage {
         }
 
         result
-    }
-
-    pub fn to_finite_language(self) -> FiniteLanguage {
-        log::info!("create finite language");
-
-        let mut map = FiniteLanguage::new_hashmap();
-        for (trace, _) in self.traces {
-            map.insert(trace);
-        }
-
-        FiniteLanguage::from((self.activity_key, map))
     }
 
     fn contains(&self, atrace_b: Vec<&str>, probability_b: &Fraction) -> bool {
