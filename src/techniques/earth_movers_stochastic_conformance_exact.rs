@@ -3,7 +3,7 @@ use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStoch
 use crate::math::fraction::MaybeExact;
 use crate::math::fraction_exact::FractionExact;
 use crate::math::traits::One;
-use crate::optimization_algorithms::network_simplex::NetworkSimplex;
+use crate::optimisation_algorithms::network_simplex::NetworkSimplex;
 use anyhow::{Context, Result};
 use fraction::{BigInt, ToPrimitive};
 use num_bigint::ToBigInt;

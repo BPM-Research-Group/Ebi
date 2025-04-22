@@ -15,7 +15,7 @@ use rand::Rng;
 
 use crate::{
     ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable},
-    optimization_algorithms::network_simplex_value_type::{IsFloat, MulWithFloat},
+    optimisation_algorithms::network_simplex_value_type::{IsFloat, MulWithFloat},
 };
 
 use super::{
