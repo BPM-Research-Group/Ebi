@@ -127,14 +127,24 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[&[&EbiInputType::Object(EbiObjectType::ProcessTree)]],
+    input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::ProcessTree),
+        &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
+        &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
+    ]],
     input_names: &["MODEL"],
     input_helps: &["The model."],
     execute: |mut objects, _| {
         let model = objects.remove(0);
         let result = match model {
-            EbiInput::Object(EbiObject::ProcessTree(tree), _) => {
-                tree.has_infinitely_many_traces()?
+            EbiInput::Object(EbiObject::ProcessTree(object), _) => {
+                object.has_infinitely_many_traces()?
+            }
+            EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(object), _) => {
+                object.has_infinitely_many_traces()?
+            }
+            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(object), _) => {
+                object.has_infinitely_many_traces()?
             }
             _ => unreachable!(),
         };
