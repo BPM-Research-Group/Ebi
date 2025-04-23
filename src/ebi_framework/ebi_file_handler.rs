@@ -1,9 +1,30 @@
+use anyhow::{Error, Result, anyhow};
 use std::{collections::BTreeSet, fmt::Display, hash::Hash, io::BufRead, str::FromStr};
-use anyhow::{anyhow, Result, Error};
 
-use crate::{ebi_commands::ebi_command_validate::EBI_VALIDATE, ebi_objects::{compressed_event_log::EBI_COMPRESSED_EVENT_LOG, deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON, directly_follows_model::EBI_DIRCTLY_FOLLOWS_MODEL, event_log::EBI_EVENT_LOG, executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE, labelled_petri_net::EBI_LABELLED_PETRI_NET, language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS, lola_net::EBI_LOLA_NET, petri_net_markup_language::EBI_PETRI_NET_MARKUP_LANGUAGE, process_tree::EBI_PROCESS_TREE, stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON, stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET, stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS}};
+use crate::{
+    ebi_commands::ebi_command_validate::EBI_VALIDATE,
+    ebi_objects::{
+        compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
+        deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
+        directly_follows_model::EBI_DIRCTLY_FOLLOWS_MODEL, event_log::EBI_EVENT_LOG,
+        executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE,
+        finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
+        labelled_petri_net::EBI_LABELLED_PETRI_NET,
+        language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS, lola_net::EBI_LOLA_NET,
+        petri_net_markup_language::EBI_PETRI_NET_MARKUP_LANGUAGE, process_tree::EBI_PROCESS_TREE,
+        stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON,
+        stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
+        stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
+    },
+};
 
-use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::{EbiObjectExporter, EbiOutputType}, ebi_trait::FromEbiTraitObject, prom_link::JavaObjectHandler};
+use super::{
+    ebi_command::{EBI_COMMANDS, EbiCommand},
+    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    ebi_output::{EbiObjectExporter, EbiOutputType},
+    ebi_trait::FromEbiTraitObject,
+    prom_link::JavaObjectHandler,
+};
 
 pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_COMPRESSED_EVENT_LOG,
@@ -23,7 +44,7 @@ pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
 ];
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub struct EbiFileHandler {
     pub name: &'static str,
     pub article: &'static str, //a or an
@@ -61,11 +82,11 @@ impl EbiFileHandler {
         //get commands that can output any of the objects
         let mut result = BTreeSet::new();
         for command_path in EBI_COMMANDS.get_command_paths() {
-            if let Some(EbiCommand::Command { output_type , .. }) = command_path.last() {
+            if let Some(EbiCommand::Command { output_type, .. }) = command_path.last() {
                 if let EbiOutputType::ObjectType(x) = output_type {
                     if objects.contains(x) {
                         result.insert(command_path);
-                   }
+                    }
                 }
             }
         }
@@ -91,8 +112,12 @@ impl FromEbiTraitObject for EbiFileHandler {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
             EbiInput::FileHandler(e) => Ok(Box::new(e)),
-            _ => Err(anyhow!("cannot read {} {} as an file handler", object.get_type().get_article(), object.get_type()))
-        } 
+            _ => Err(anyhow!(
+                "cannot read {} {} as an file handler",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
     }
 }
 
@@ -132,17 +157,33 @@ impl Display for EbiFileHandler {
 mod tests {
     use std::str::FromStr;
 
-    use crate::{ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject}, ebi_objects::{executions::EBI_EXECUTIONS, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE, process_tree::EBI_PROCESS_TREE, stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET}};
+    use crate::{
+        ebi_framework::{
+            ebi_file_handler::EbiFileHandler, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
+        },
+        ebi_objects::{
+            executions::EBI_EXECUTIONS, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
+            process_tree::EBI_PROCESS_TREE,
+            stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
+        },
+    };
 
     #[test]
     fn file_handlers() {
-        assert_eq!(EbiFileHandler::from_str("slang").unwrap(), EBI_FINITE_STOCHASTIC_LANGUAGE);
+        assert_eq!(
+            EbiFileHandler::from_str("slang").unwrap(),
+            EBI_FINITE_STOCHASTIC_LANGUAGE
+        );
         assert!(EbiFileHandler::from_str("blablabla44252435").is_err());
 
         EbiFileHandler::get_producing_commands(&EBI_PROCESS_TREE);
         EbiFileHandler::get_producing_commands(&EBI_STOCHASTIC_LABELLED_PETRI_NET);
 
-        assert!(EBI_PROCESS_TREE.cmp(&EBI_STOCHASTIC_LABELLED_PETRI_NET).is_lt());
+        assert!(
+            EBI_PROCESS_TREE
+                .cmp(&EBI_STOCHASTIC_LABELLED_PETRI_NET)
+                .is_lt()
+        );
 
         EbiFileHandler::from_trait_object(EbiInput::Usize(0)).unwrap_err();
         EbiFileHandler::from_trait_object(EbiInput::FileHandler(EBI_EXECUTIONS)).unwrap();

@@ -2,7 +2,6 @@ use crate::{
     ebi_framework::displayable::Displayable,
     ebi_objects::{
         deterministic_finite_automaton::DeterministicFiniteAutomaton,
-        directly_follows_model::DirectlyFollowsModel,
         process_tree::{Node, Operator, ProcessTree},
         process_tree_semantics::NodeStates,
     },
@@ -12,6 +11,9 @@ use anyhow::Result;
 pub trait HasInfinitelyManyTraces {
     type LivState: Displayable;
 
+    /**
+     * Returns whether the model has infinitely many different traces.
+     */
     fn has_infinitely_many_traces(&self) -> Result<bool>;
 }
 
@@ -30,5 +32,13 @@ impl HasInfinitelyManyTraces for ProcessTree {
             }
         }
         return Ok(false);
+    }
+}
+
+impl HasInfinitelyManyTraces for DeterministicFiniteAutomaton {
+    type LivState = usize;
+
+    fn has_infinitely_many_traces(&self) -> Result<bool> {
+        todo!()
     }
 }

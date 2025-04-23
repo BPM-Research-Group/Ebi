@@ -258,11 +258,7 @@ mod tests {
 
     use strum::IntoEnumIterator;
 
-    use crate::
-        ebi_framework::{
-            ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
-        }
-    ;
+    use crate::ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject};
 
     use super::EbiObjectType;
 

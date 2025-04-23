@@ -866,7 +866,11 @@ mod tests {
                             && !file.file_name().into_string().unwrap().contains("infinite")
                             && !file.file_name().into_string().unwrap().contains("loop")
                             && !file.file_name().into_string().unwrap().contains("pdc")
-                            && !file.file_name().into_string().unwrap().contains("irregular")
+                            && !file
+                                .file_name()
+                                .into_string()
+                                .unwrap()
+                                .contains("irregular")
                         {
                             let mut reader =
                                 MultipleReader::from_file(File::open(file.path()).unwrap());
@@ -886,7 +890,11 @@ mod tests {
                                     //try to parse a specific object
                                     match ebi_input::read_as_object(etype, &mut reader) {
                                         Ok((object, file_handler)) => {
-                                            result.push(TestInput::Object(object, file_handler, file.path()));
+                                            result.push(TestInput::Object(
+                                                object,
+                                                file_handler,
+                                                file.path(),
+                                            ));
                                         }
                                         Err(_) => {}
                                     }
@@ -894,7 +902,11 @@ mod tests {
                                 EbiInputType::AnyObject => {
                                     match ebi_input::read_as_any_object(&mut reader) {
                                         Ok((object, file_handler)) => {
-                                            result.push(TestInput::Object(object, file_handler, file.path()));
+                                            result.push(TestInput::Object(
+                                                object,
+                                                file_handler,
+                                                file.path(),
+                                            ));
                                         }
                                         Err(_) => {}
                                     }
