@@ -3,10 +3,7 @@ use std::usize;
 use crate::{
     ebi_framework::displayable::Displayable,
     ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton,
-        process_tree::{Node, Operator, ProcessTree},
-        process_tree_semantics::NodeStates,
-        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+        deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, process_tree::{Node, Operator, ProcessTree}, process_tree_semantics::NodeStates, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton
     },
     ebi_traits::ebi_trait_semantics::Semantics,
     techniques::livelock::IsPartOfLivelock,
@@ -93,5 +90,20 @@ macro_rules! dfm {
     };
 }
 
+macro_rules! lang {
+    ($t:ident) => {
+        impl HasInfinitelyManyTraces for $t {
+            type LivState = usize;
+
+            fn has_infinitely_many_traces(&self) -> Result<bool> {
+                Ok(false)
+            }
+        }
+    };
+}
+
 dfm!(DeterministicFiniteAutomaton);
 dfm!(StochasticDeterministicFiniteAutomaton);
+lang!(EventLog);
+lang!(FiniteLanguage);
+lang!(FiniteStochasticLanguage);

@@ -128,6 +128,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::EventLog),
+        &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage),
+        &EbiInputType::Object(EbiObjectType::FiniteLanguage),
         &EbiInputType::Object(EbiObjectType::ProcessTree),
         &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
@@ -137,6 +140,15 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
     execute: |mut objects, _| {
         let model = objects.remove(0);
         let result = match model {
+            EbiInput::Object(EbiObject::EventLog(object), _) => {
+                object.has_infinitely_many_traces()?
+            }
+            EbiInput::Object(EbiObject::FiniteLanguage(object), _) => {
+                object.has_infinitely_many_traces()?
+            }
+            EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => {
+                object.has_infinitely_many_traces()?
+            }
             EbiInput::Object(EbiObject::ProcessTree(object), _) => {
                 object.has_infinitely_many_traces()?
             }
@@ -163,7 +175,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_HAS_TRACES: EbiCommand = EbiCommand::Comman
     name_long: Some("has-traces"),
     explanation_short: "Compute whether the model has traces.",
     explanation_long: Some(
-        "Compute whether the initial marking is part of a livelock, that is, whether it is impossible to reach a final state. 'true' means that the initial state is part of a livelock, 'false' means that the initial state is not part of a livelock.",
+        "Compute whether the model has any traces.
+        Reasons for a model not to have any traces could be if the initial state is part of a livelock, or if there is no initial state.
+        'true' means that the model has traces, 'false' means that the model has no traces.",
     ),
     latex_link: None,
     cli_command: None,
@@ -175,7 +189,6 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_HAS_TRACES: EbiCommand = EbiCommand::Comman
         &EbiInputType::Object(EbiObjectType::FiniteLanguage),
         &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
-        &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
         &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
     ]],
