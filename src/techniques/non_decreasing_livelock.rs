@@ -2,7 +2,7 @@ use anyhow::Result;
 
 use crate::{ebi_framework::displayable::Displayable, ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, labelled_petri_net::{LPNMarking, LabelledPetriNet}, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_semantics::Semantics, techniques::deterministic_semantics_for_stochastic_semantics::PMarking};
 
-pub trait Livelock {
+pub trait NonDecreasingLivelock {
     type LivState: Displayable;
 
     fn is_non_decreasing_livelock(&self, state: &mut Self::LivState) -> Result<bool>;
@@ -10,7 +10,7 @@ pub trait Livelock {
 
 macro_rules! is_non_decreasing_livelock_lpn {
     ($t:ident) => {
-        impl Livelock for $t {
+        impl NonDecreasingLivelock for $t {
             type LivState = PMarking<LPNMarking>;
 
             /**
@@ -96,7 +96,7 @@ macro_rules! is_non_decreasing_livelock_lpn {
 
 macro_rules! is_non_decreasing_livelock_dfm {
     ($t:ident) => {
-        impl Livelock for $t {
+        impl NonDecreasingLivelock for $t {
             type LivState = usize;
 
             fn is_non_decreasing_livelock(&self, state: &mut usize) -> Result<bool> {
@@ -127,7 +127,7 @@ is_non_decreasing_livelock_lpn!(StochasticLabelledPetriNet);
 is_non_decreasing_livelock_dfm!(DeterministicFiniteAutomaton);
 is_non_decreasing_livelock_dfm!(StochasticDeterministicFiniteAutomaton);
 
-impl Livelock for ProcessTree {
+impl NonDecreasingLivelock for ProcessTree {
     type LivState = usize;
 
     fn is_non_decreasing_livelock(&self, _state: &mut Self::LivState) -> Result<bool> {

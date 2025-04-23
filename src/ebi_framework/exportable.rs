@@ -28,6 +28,16 @@ impl Exportable for usize {
     }
 }
 
+impl Exportable for bool {
+    fn export_from_object(_: EbiOutput, _: &mut dyn std::io::Write) -> Result<()> {
+        unreachable!()
+    }
+
+    fn export(&self, f: &mut dyn std::io::Write) -> Result<()> {
+        Ok(writeln!(f, "{}", self)?)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::Exportable;

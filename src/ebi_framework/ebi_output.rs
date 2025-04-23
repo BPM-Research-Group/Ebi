@@ -35,15 +35,12 @@ use crate::{
 };
 
 use super::{
-    ebi_command::{EBI_COMMANDS, EbiCommand},
-    ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+    ebi_command::{EbiCommand, EBI_COMMANDS},
+    ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS},
     ebi_object::{EbiObject, EbiObjectType},
     exportable::Exportable,
     prom_link::{
-        JAVA_OBJECT_HANDLERS_CONTAINSROOT, JAVA_OBJECT_HANDLERS_FRACTION,
-        JAVA_OBJECT_HANDLERS_LOGDIV, JAVA_OBJECT_HANDLERS_PDF, JAVA_OBJECT_HANDLERS_ROOTLOGDIV,
-        JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_SVG, JAVA_OBJECT_HANDLERS_USIZE,
-        JavaObjectHandler,
+        JavaObjectHandler, JAVA_OBJECT_HANDLERS_BOOL, JAVA_OBJECT_HANDLERS_CONTAINSROOT, JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV, JAVA_OBJECT_HANDLERS_PDF, JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_SVG, JAVA_OBJECT_HANDLERS_USIZE
     },
 };
 
@@ -58,6 +55,7 @@ pub enum EbiOutput {
     LogDiv(LogDiv),
     ContainsRoot(ContainsRoot),
     RootLogDiv(RootLogDiv),
+    Bool(bool),
 }
 
 impl EbiOutput {
@@ -72,6 +70,7 @@ impl EbiOutput {
             EbiOutput::LogDiv(_) => EbiOutputType::LogDiv,
             EbiOutput::ContainsRoot(_) => EbiOutputType::ContainsRoot,
             EbiOutput::RootLogDiv(_) => EbiOutputType::RootLogDiv,
+            EbiOutput::Bool(_) => EbiOutputType::Bool,
         }
     }
 }
@@ -87,6 +86,7 @@ pub enum EbiOutputType {
     LogDiv,
     ContainsRoot,
     RootLogDiv,
+    Bool,
 }
 
 impl EbiOutputType {
@@ -134,6 +134,7 @@ impl EbiOutputType {
             EbiOutputType::LogDiv => vec![EbiExporter::LogDiv],
             EbiOutputType::ContainsRoot => vec![EbiExporter::ContainsRoot],
             EbiOutputType::RootLogDiv => vec![EbiExporter::RootLogDiv],
+            EbiOutputType::Bool => vec![EbiExporter::Bool],
         }
     }
 
@@ -215,6 +216,7 @@ impl EbiOutputType {
             EbiOutputType::LogDiv => EbiExporter::LogDiv,
             EbiOutputType::ContainsRoot => EbiExporter::ContainsRoot,
             EbiOutputType::RootLogDiv => EbiExporter::RootLogDiv,
+            EbiOutputType::Bool => EbiExporter::Bool,
         }
     }
 
@@ -243,6 +245,7 @@ impl Display for EbiOutputType {
             EbiOutputType::LogDiv => Display::fmt(&"logarithm", f),
             EbiOutputType::ContainsRoot => Display::fmt(&"root", f),
             EbiOutputType::RootLogDiv => Display::fmt(&"rootlog", f),
+            EbiOutputType::Bool => Display::fmt(&"bool", f),
         }
     }
 }
@@ -258,6 +261,7 @@ pub enum EbiExporter {
     LogDiv,
     ContainsRoot,
     RootLogDiv,
+    Bool,
 }
 
 impl EbiExporter {
@@ -280,6 +284,8 @@ impl EbiExporter {
             (EbiExporter::ContainsRoot, _) => unreachable!(),
             (EbiExporter::RootLogDiv, EbiOutput::RootLogDiv(object)) => object.export(f),
             (EbiExporter::RootLogDiv, _) => unreachable!(),
+            (EbiExporter::Bool, EbiOutput::Bool(object)) => object.export(f),
+            (EbiExporter::Bool, _) => unreachable!(),
         }
     }
 
@@ -294,6 +300,7 @@ impl EbiExporter {
             EbiExporter::LogDiv => "a",
             EbiExporter::ContainsRoot => "a",
             EbiExporter::RootLogDiv => "a",
+            EbiExporter::Bool => "a",
         }
     }
 
@@ -308,6 +315,7 @@ impl EbiExporter {
             EbiExporter::LogDiv => "logdiv",
             EbiExporter::ContainsRoot => "containsroot",
             EbiExporter::RootLogDiv => "rootlogdiv",
+            EbiExporter::Bool => "boolean",
         }
     }
 
@@ -322,6 +330,7 @@ impl EbiExporter {
             EbiExporter::LogDiv => JAVA_OBJECT_HANDLERS_LOGDIV,
             EbiExporter::ContainsRoot => JAVA_OBJECT_HANDLERS_CONTAINSROOT,
             EbiExporter::RootLogDiv => JAVA_OBJECT_HANDLERS_ROOTLOGDIV,
+            EbiExporter::Bool => JAVA_OBJECT_HANDLERS_BOOL,
         }
     }
 
@@ -336,6 +345,7 @@ impl EbiExporter {
             EbiExporter::LogDiv => "logdiv",
             EbiExporter::ContainsRoot => "croot",
             EbiExporter::RootLogDiv => "rldiv",
+            EbiExporter::Bool => "bool",
         }
     }
 
@@ -350,6 +360,7 @@ impl EbiExporter {
             EbiExporter::LogDiv => false,
             EbiExporter::ContainsRoot => false,
             EbiExporter::RootLogDiv => false,
+            EbiExporter::Bool => false,
         }
     }
 }
@@ -366,6 +377,7 @@ impl Display for EbiExporter {
             EbiExporter::LogDiv => Display::fmt(&"logarithm", f),
             EbiExporter::ContainsRoot => Display::fmt(&"root", f),
             EbiExporter::RootLogDiv => Display::fmt(&"rootlog", f),
+            EbiExporter::Bool => Display::fmt(&"boolean", f),
         }
     }
 }
@@ -468,10 +480,7 @@ impl Display for EbiObjectExporter {
 
 #[cfg(test)]
 mod tests {
-    use std::{
-        io::Cursor,
-        path::PathBuf,
-    };
+    use std::{io::Cursor, path::PathBuf};
 
     use strum::IntoEnumIterator;
 
@@ -499,7 +508,9 @@ mod tests {
                     for exporter in file_handler2.object_exporters {
                         if exporter.get_type() == importer.clone().unwrap().get_type() {
                             let mut c = Cursor::new(Vec::new());
-                            exporter.export(EbiOutput::Object(object.clone()), &mut c).unwrap();
+                            exporter
+                                .export(EbiOutput::Object(object.clone()), &mut c)
+                                .unwrap();
                         }
                     }
                 }

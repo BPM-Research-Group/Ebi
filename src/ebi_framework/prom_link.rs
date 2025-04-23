@@ -399,6 +399,15 @@ pub const JAVA_OBJECT_HANDLERS_ROOTLOGDIV: &[JavaObjectHandler] = &[
         input_gui: None
     },
 ];
+pub const JAVA_OBJECT_HANDLERS_BOOL: &[JavaObjectHandler] = &[
+    JavaObjectHandler{ 
+        name: "bool", 
+        java_class: "boolean",
+        translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiBoolean.fromEbiString"), 
+        translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiBoolean.toEbiString"),
+        input_gui: None,
+    },
+];
 
 #[cfg(test)]
 mod tests {

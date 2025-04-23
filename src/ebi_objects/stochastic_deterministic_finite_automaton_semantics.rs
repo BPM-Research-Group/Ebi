@@ -11,7 +11,7 @@ use crate::{
         fraction::Fraction,
         traits::{One, Zero},
     },
-    techniques::livelocks::Livelock,
+    techniques::non_decreasing_livelock::NonDecreasingLivelock,
 };
 
 use super::{

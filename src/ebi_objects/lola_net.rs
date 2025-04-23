@@ -135,6 +135,7 @@ impl Exportable for LolaNet {
             EbiOutput::Object(EbiObject::ProcessTree(tree)) => {
                 <ProcessTree as Into<LolaNet>>::into(tree).export(f)
             }
+            EbiOutput::Bool(_) => Err(anyhow!("Cannot export boolean as Lolanet.")),
             EbiOutput::ContainsRoot(_) => Err(anyhow!("Cannot export ContainsRoot as Lolanet.")),
             EbiOutput::Fraction(_) => Err(anyhow!("Cannot export fraction as Lolanet.")),
             EbiOutput::LogDiv(_) => Err(anyhow!("Cannot export LogDiv as Lolanet.")),

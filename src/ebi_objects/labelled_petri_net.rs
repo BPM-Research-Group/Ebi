@@ -322,6 +322,7 @@ impl Exportable for LabelledPetriNet {
                 <StochasticLabelledPetriNet as Into<LabelledPetriNet>>::into(slpn).export(f)
             }
 
+            EbiOutput::Bool(_) => Err(anyhow!("Cannot export boolean as LPN.")),
             EbiOutput::ContainsRoot(_) => Err(anyhow!("Cannot export ContainsRoot as LPN.")),
             EbiOutput::Fraction(_) => Err(anyhow!("Cannot export fraction as LPN.")),
             EbiOutput::LogDiv(_) => Err(anyhow!("Cannot export LogDiv as LPN.")),

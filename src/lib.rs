@@ -157,7 +157,8 @@ pub mod techniques {
     pub mod executions;
     pub mod explain_trace;
     pub mod jensen_shannon_stochastic_conformance;
-    pub mod livelocks;
+    pub mod non_decreasing_livelock;
+    pub mod livelock;
     pub mod medoid_non_stochastic;
     pub mod occurrences_stochastic_miner;
     pub mod probability_queries;

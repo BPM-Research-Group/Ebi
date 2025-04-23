@@ -2,7 +2,7 @@ use std::io::BufRead;
 
 use anyhow::{anyhow, Result};
 
-use crate::{ebi_framework::{activity_key::{Activity, HasActivityKey}, displayable::Displayable, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, ebi_objects::labelled_petri_net::LPNMarking, math::fraction::Fraction, techniques::{deterministic_semantics_for_stochastic_semantics::PMarking, livelocks::Livelock}};
+use crate::{ebi_framework::{activity_key::{Activity, HasActivityKey}, displayable::Displayable, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, ebi_objects::labelled_petri_net::LPNMarking, math::fraction::Fraction, techniques::{deterministic_semantics_for_stochastic_semantics::PMarking, non_decreasing_livelock::NonDecreasingLivelock}};
 
 pub enum EbiTraitStochasticDeterministicSemantics {
 	Usize(Box<dyn StochasticDeterministicSemantics<DetState = usize, LivState = usize>>),
@@ -18,7 +18,7 @@ impl FromEbiTraitObject for EbiTraitStochasticDeterministicSemantics {
     }
 }
 
-pub trait StochasticDeterministicSemantics: Livelock<LivState = Self::DetState> + HasActivityKey {
+pub trait StochasticDeterministicSemantics: NonDecreasingLivelock<LivState = Self::DetState> + HasActivityKey {
     type DetState: Displayable;
 
     /**

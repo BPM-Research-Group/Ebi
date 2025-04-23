@@ -1,5 +1,25 @@
-use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics}, techniques::{align::Align, executions::FindExecutions, medoid_non_stochastic::MedoidNonStochastic}};
+use anyhow::anyhow;
 
+use crate::{
+    ebi_framework::{
+        ebi_command::EbiCommand,
+        ebi_input::EbiInputType,
+        ebi_object::{EbiObject, EbiObjectType},
+        ebi_output::{EbiOutput, EbiOutputType},
+        ebi_trait::EbiTrait,
+    },
+    ebi_objects::labelled_petri_net::LabelledPetriNet,
+    ebi_traits::{
+        ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_finite_language::EbiTraitFiniteLanguage,
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_trait_semantics::{EbiTraitSemantics, Semantics},
+    },
+    techniques::{
+        align::Align, executions::FindExecutions, livelock::Livelock,
+        medoid_non_stochastic::MedoidNonStochastic,
+    },
+};
 
 pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     name_short: "anans",
@@ -8,105 +28,148 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[
         &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
+        &EBI_ANALYSE_NON_STOCHASTIC_LIVELOCK,
         &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
         &EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT,
         &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
     ],
 };
 
-pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command { 
-    name_short: "med", 
-    name_long: Some("medoid"),
-    explanation_short: "Find the traces with the least distance to the other traces, without considering the stochastic perspective.", 
-    explanation_long: Some("Find the traces with the lowest average normalised Levenshtein distance to the other traces; ties are resolved arbritrarily. The computation is random and does not take into account how often each trace occurs."), 
-    latex_link: None, 
-    cli_command: None, 
-    exact_arithmetic: true, 
-    input_types: &[ 
-        &[ &EbiInputType::Trait(EbiTrait::FiniteLanguage)], 
-        &[ &EbiInputType::Usize] 
+pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
+    name_short: "clus",
+    name_long: Some("cluster"),
+    explanation_short: "Apply k-medoid clustering on a finite set of traces, without considering the stochastic perspective.",
+    explanation_long: Some(
+        "Apply k-medoid clustering: group the traces into a given number of clusters, such that the average distance of each trace to its closest medoid is minimal. The computation is random and does not take into account how often each trace occurs.",
+    ),
+    latex_link: Some("~\\cite{DBLP:journals/is/SchubertR21}"),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
+        &[&EbiInputType::Usize],
     ],
-    input_names: &[ "FILE", "NUMBER_OF_TRACES"],
-    input_helps: &[ "The finite stochastic language.", "The number of traces that should be extracted."],
+    input_names: &["LANGUAGE", "NUMBER_OF_CLUSTERS"],
+    input_helps: &["The finite stochastic language.", "The number of clusters."],
+    execute: |mut objects, _| {
+        let language = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+        let number_of_clusters = objects.remove(0).to_type::<usize>()?;
+        let result = language.k_medoids_clustering(*number_of_clusters)?;
+        return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage),
+};
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_LIVELOCK: EbiCommand = EbiCommand::Command {
+    name_short: "ll",
+    name_long: Some("livelock"),
+    explanation_short: "Compute whether the initial marking is part of a livelock, that is, whether it is impossible to reach a final state.",
+    explanation_long: Some(
+        "Compute whether the initial marking is part of a livelock, that is, whether it is impossible to reach a final state. 'true' means that the initial state is part of a livelock, 'false' means that the initial state is not part of a livelock.",
+    ),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)]],
+    input_names: &["MODEL"],
+    input_helps: &["The model."],
+    execute: |mut objects, _| {
+        let model = objects.remove(0).to_type::<LabelledPetriNet>()?;
+        let mut initial_marking = model
+            .get_initial_state()
+            .ok_or_else(|| anyhow!("No initial marking available."))?;
+        let result =
+            model.is_livelock_in_model_regardless_of_state()? || model.is_state_in_livelock(&mut initial_marking)?;
+        return Ok(EbiOutput::Bool(result));
+    },
+    output_type: &EbiOutputType::Bool,
+};
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command {
+    name_short: "med",
+    name_long: Some("medoid"),
+    explanation_short: "Find the traces with the least distance to the other traces, without considering the stochastic perspective.",
+    explanation_long: Some(
+        "Find the traces with the lowest average normalised Levenshtein distance to the other traces; ties are resolved arbritrarily. The computation is random and does not take into account how often each trace occurs.",
+    ),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
+        &[&EbiInputType::Usize],
+    ],
+    input_names: &["FILE", "NUMBER_OF_TRACES"],
+    input_helps: &[
+        "The finite stochastic language.",
+        "The number of traces that should be extracted.",
+    ],
     execute: |mut objects, _| {
         let language = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
         let number_of_traces = objects.remove(0).to_type::<usize>()?;
         let language: Box<dyn EbiTraitFiniteLanguage> = language;
         let result = language.medoid(*number_of_traces)?;
         return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
-    }, 
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
-};
-
-pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
-    name_short: "clus", 
-    name_long: Some("cluster"),
-    explanation_short: "Apply k-medoid clustering on a finite set of traces, without considering the stochastic perspective.", 
-    explanation_long: Some("Apply k-medoid clustering: group the traces into a given number of clusters, such that the average distance of each trace to its closest medoid is minimal. The computation is random and does not take into account how often each trace occurs."), 
-    latex_link: Some("~\\cite{DBLP:journals/is/SchubertR21}"), 
-    cli_command: None, 
-    exact_arithmetic: true, 
-    input_types: &[ 
-        &[ &EbiInputType::Trait(EbiTrait::FiniteLanguage)], 
-        &[ &EbiInputType::Usize ] 
-    ],
-    input_names: &[ "LANGUAGE", "NUMBER_OF_CLUSTERS"],
-    input_helps: &[ "The finite stochastic language.", "The number of clusters."],
-    execute: |mut objects, _| {
-        let language = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
-        let number_of_clusters = objects.remove(0).to_type::<usize>()?;
-        let result = language.k_medoids_clustering(*number_of_clusters)?;
-        return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
-    }, 
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage),
 };
 
 pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command {
-    name_short: "ali", 
+    name_short: "ali",
     name_long: Some("alignment"),
-    explanation_short: "Compute alignments.", 
-    explanation_long: Some("Compute alignments.\nNB 1: the model must be able to terminate and its states must be bounded.\nNB 2: the search performed is not optimised. For Petri nets, the ProM implementation may be more efficient."), 
-    latex_link: Some("Alignments according to the method described by Adriansyah~\\cite{DBLP:conf/edoc/AdriansyahDA11}. By default, all traces are computed concurrently on all CPU cores. If this requires too much RAM, please see speed trick~\\ref{speedtrick:multithreaded} in Section~\\ref{sec:speedtricks} for how to reduce the number of CPU cores utilised."), 
-    cli_command: None, 
-    exact_arithmetic: true, 
-    input_types: &[ 
-        &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
-        &[ &EbiInputType::Trait(EbiTrait::Semantics)]
+    explanation_short: "Compute alignments.",
+    explanation_long: Some(
+        "Compute alignments.\nNB 1: the model must be able to terminate and its states must be bounded.\nNB 2: the search performed is not optimised. For Petri nets, the ProM implementation may be more efficient.",
+    ),
+    latex_link: Some(
+        "Alignments according to the method described by Adriansyah~\\cite{DBLP:conf/edoc/AdriansyahDA11}. By default, all traces are computed concurrently on all CPU cores. If this requires too much RAM, please see speed trick~\\ref{speedtrick:multithreaded} in Section~\\ref{sec:speedtricks} for how to reduce the number of CPU cores utilised.",
+    ),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Trait(EbiTrait::Semantics)],
     ],
-    input_names: &[ "FILE_1", "FILE_2"],
-    input_helps: &[ "The finite language.", "The model."],
+    input_names: &["FILE_1", "FILE_2"],
+    input_helps: &["The finite language.", "The model."],
     execute: |mut objects, _| {
-        let log = objects.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let log = objects
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let mut model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
-        
+
         let result = model.align_stochastic_language(log)?;
-        
-        return Ok(EbiOutput::Object(EbiObject::StochasticLanguageOfAlignments(result)));
-    }, 
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLanguageOfAlignments)
+
+        return Ok(EbiOutput::Object(
+            EbiObject::StochasticLanguageOfAlignments(result),
+        ));
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLanguageOfAlignments),
 };
 
 pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Command {
-    name_short: "exe", 
+    name_short: "exe",
     name_long: Some("executions"),
-    explanation_short: "Compute the executions of each transition of the model in the log.", 
-    explanation_long: Some("Compute executions.\nNB 1: the model must be able to terminate and its states must be bounded.\nNB 2: the search performed is not optimised. For Petri nets, the ProM implementation may be more efficient."), 
-    latex_link: None, 
-    cli_command: None, 
-    exact_arithmetic: true, 
-    input_types: &[ 
-        &[ &EbiInputType::Trait(EbiTrait::EventLog)],
-        &[ &EbiInputType::Trait(EbiTrait::Semantics)]
+    explanation_short: "Compute the executions of each transition of the model in the log.",
+    explanation_long: Some(
+        "Compute executions.\nNB 1: the model must be able to terminate and its states must be bounded.\nNB 2: the search performed is not optimised. For Petri nets, the ProM implementation may be more efficient.",
+    ),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::EventLog)],
+        &[&EbiInputType::Trait(EbiTrait::Semantics)],
     ],
-    input_names: &[ "LOG", "MODEL"],
-    input_helps: &[ "The event log.", "The model."],
+    input_names: &["LOG", "MODEL"],
+    input_helps: &["The event log.", "The model."],
     execute: |mut objects, _| {
         let log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         let model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
-        
+
         let result = model.find_executions(log)?;
-        
+
         return Ok(EbiOutput::Object(EbiObject::Executions(result)));
-    }, 
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::Executions)
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::Executions),
 };

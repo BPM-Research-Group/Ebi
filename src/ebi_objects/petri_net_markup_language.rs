@@ -131,6 +131,7 @@ impl Exportable for PetriNetMarkupLanguage {
                     .export(f)
             }
 
+            EbiOutput::Bool(_) => Err(anyhow!("Cannot export boolean as PNML.")),
             EbiOutput::ContainsRoot(_) => Err(anyhow!("Cannot export ContainsRoot as PNML.")),
             EbiOutput::Fraction(_) => Err(anyhow!("Cannot export fraction as PNML.")),
             EbiOutput::LogDiv(_) => Err(anyhow!("Cannot export LogDiv as PNML.")),

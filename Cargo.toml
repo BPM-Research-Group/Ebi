@@ -53,6 +53,7 @@ svg2pdf = "*"
 uuid = "*"
 cfg-if = "*"
 ntest = "*"
+scc = "*"
 
 [dependencies.num-rational]
 version = "0.4.1"
