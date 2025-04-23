@@ -184,6 +184,11 @@ impl ProcessTree {
         ParentsIterator::new(self, node)
     }
 
+    pub fn get_descendants(&self, node: usize) -> &[Node] {
+        let next = self.traverse(node);
+        &self.tree[node..next]
+    }
+
     /**
      *
      * @param parent

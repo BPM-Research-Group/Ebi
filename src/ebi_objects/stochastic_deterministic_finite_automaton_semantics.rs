@@ -180,7 +180,7 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         &self,
         state: &mut Self::DetState,
     ) -> Result<Fraction> {
-        if self.is_non_decreasing_livelock(state)? {
+        if self.is_part_of_non_decreasing_livelock(state)? {
             return Ok(Fraction::one());
         } else {
             return Ok(Fraction::zero());

@@ -168,6 +168,8 @@ pub mod techniques {
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
+    pub mod has_infinitely_many_traces;
+    pub mod has_traces;
 }
 pub mod optimisation_algorithms {
     pub mod network_simplex;

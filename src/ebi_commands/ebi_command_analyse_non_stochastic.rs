@@ -1,5 +1,3 @@
-use anyhow::anyhow;
-
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
@@ -9,13 +7,13 @@ use crate::{
         ebi_trait::EbiTrait,
     },
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog,
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
+        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_semantics::{EbiTraitSemantics, Semantics},
+        ebi_trait_semantics::EbiTraitSemantics,
     },
     techniques::{
-        align::Align, executions::FindExecutions, livelock::Livelock,
+        align::Align, executions::FindExecutions,
+        has_infinitely_many_traces::HasInfinitelyManyTraces, has_traces::HasTraces,
         medoid_non_stochastic::MedoidNonStochastic,
     },
 };
@@ -26,107 +24,13 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     explanation_short: "Analyse a language without considering its stochastic perspective.",
     explanation_long: None,
     children: &[
-        &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
-        &EBI_ANALYSE_NON_STOCHASTIC_LIVELOCK,
-        &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
         &EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT,
+        &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
         &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
+        &EBI_ANALYSE_NON_STOCHASTIC_HAS_TRACES,
+        &EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES,
+        &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
     ],
-};
-
-pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
-    name_short: "clus",
-    name_long: Some("cluster"),
-    explanation_short: "Apply k-medoid clustering on a finite set of traces, without considering the stochastic perspective.",
-    explanation_long: Some(
-        "Apply k-medoid clustering: group the traces into a given number of clusters, such that the average distance of each trace to its closest medoid is minimal. The computation is random and does not take into account how often each trace occurs.",
-    ),
-    latex_link: Some("~\\cite{DBLP:journals/is/SchubertR21}"),
-    cli_command: None,
-    exact_arithmetic: true,
-    input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
-        &[&EbiInputType::Usize],
-    ],
-    input_names: &["LANGUAGE", "NUMBER_OF_CLUSTERS"],
-    input_helps: &["The finite stochastic language.", "The number of clusters."],
-    execute: |mut objects, _| {
-        let language = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
-        let number_of_clusters = objects.remove(0).to_type::<usize>()?;
-        let result = language.k_medoids_clustering(*number_of_clusters)?;
-        return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
-    },
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage),
-};
-
-pub const EBI_ANALYSE_NON_STOCHASTIC_LIVELOCK: EbiCommand = EbiCommand::Command {
-    name_short: "ll",
-    name_long: Some("livelock"),
-    explanation_short: "Compute whether the initial marking is part of a livelock, that is, whether it is impossible to reach a final state.",
-    explanation_long: Some(
-        "Compute whether the initial marking is part of a livelock, that is, whether it is impossible to reach a final state. 'true' means that the initial state is part of a livelock, 'false' means that the initial state is not part of a livelock.",
-    ),
-    latex_link: None,
-    cli_command: None,
-    exact_arithmetic: true,
-    input_types: &[&[
-        &EbiInputType::Object(EbiObjectType::ProcessTree),
-        &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
-    ]],
-    input_names: &["MODEL"],
-    input_helps: &["The model."],
-    execute: |mut objects, _| {
-        let model = objects.remove(0);
-        match model {
-            EbiInput::Object(EbiObject::ProcessTree(tree), _) => {
-                let mut initial_marking = tree
-                    .get_initial_state()
-                    .ok_or_else(|| anyhow!("No initial marking available."))?;
-                let result = tree.is_livelock_in_model_regardless_of_state()?
-                    || tree.is_state_in_livelock(&mut initial_marking)?;
-                return Ok(EbiOutput::Bool(result));
-            }
-            EbiInput::Object(EbiObject::LabelledPetriNet(net), _) => {
-                let mut initial_marking = net
-                    .get_initial_state()
-                    .ok_or_else(|| anyhow!("No initial marking available."))?;
-                let result = net.is_livelock_in_model_regardless_of_state()?
-                    || net.is_state_in_livelock(&mut initial_marking)?;
-                return Ok(EbiOutput::Bool(result));
-            }
-            _ => unreachable!(),
-        }
-    },
-    output_type: &EbiOutputType::Bool,
-};
-
-pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command {
-    name_short: "med",
-    name_long: Some("medoid"),
-    explanation_short: "Find the traces with the least distance to the other traces, without considering the stochastic perspective.",
-    explanation_long: Some(
-        "Find the traces with the lowest average normalised Levenshtein distance to the other traces; ties are resolved arbritrarily. The computation is random and does not take into account how often each trace occurs.",
-    ),
-    latex_link: None,
-    cli_command: None,
-    exact_arithmetic: true,
-    input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
-        &[&EbiInputType::Usize],
-    ],
-    input_names: &["FILE", "NUMBER_OF_TRACES"],
-    input_helps: &[
-        "The finite stochastic language.",
-        "The number of traces that should be extracted.",
-    ],
-    execute: |mut objects, _| {
-        let language = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
-        let number_of_traces = objects.remove(0).to_type::<usize>()?;
-        let language: Box<dyn EbiTraitFiniteLanguage> = language;
-        let result = language.medoid(*number_of_traces)?;
-        return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
-    },
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage),
 };
 
 pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command {
@@ -162,6 +66,31 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLanguageOfAlignments),
 };
 
+pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
+    name_short: "clus",
+    name_long: Some("cluster"),
+    explanation_short: "Apply k-medoid clustering on a finite set of traces, without considering the stochastic perspective.",
+    explanation_long: Some(
+        "Apply k-medoid clustering: group the traces into a given number of clusters, such that the average distance of each trace to its closest medoid is minimal. The computation is random and does not take into account how often each trace occurs.",
+    ),
+    latex_link: Some("~\\cite{DBLP:journals/is/SchubertR21}"),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
+        &[&EbiInputType::Usize],
+    ],
+    input_names: &["LANGUAGE", "NUMBER_OF_CLUSTERS"],
+    input_helps: &["The finite stochastic language.", "The number of clusters."],
+    execute: |mut objects, _| {
+        let language = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+        let number_of_clusters = objects.remove(0).to_type::<usize>()?;
+        let result = language.k_medoids_clustering(*number_of_clusters)?;
+        return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage),
+};
+
 pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Command {
     name_short: "exe",
     name_long: Some("executions"),
@@ -187,4 +116,95 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Comman
         return Ok(EbiOutput::Object(EbiObject::Executions(result)));
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::Executions),
+};
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCommand::Command {
+    name_short: "inft",
+    name_long: Some("infinitely-many-traces"),
+    explanation_short: "Compute whether the model has infinitely many traces.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[&EbiInputType::Object(EbiObjectType::ProcessTree)]],
+    input_names: &["MODEL"],
+    input_helps: &["The model."],
+    execute: |mut objects, _| {
+        let model = objects.remove(0);
+        let result = match model {
+            EbiInput::Object(EbiObject::ProcessTree(tree), _) => {
+                tree.has_infinitely_many_traces()?
+            }
+            _ => unreachable!(),
+        };
+        if result {
+            log::debug!("The language of the model has infinitely many traces.");
+        } else {
+            log::debug!("The language of the model has finitely many traces.")
+        }
+        return Ok(EbiOutput::Bool(result));
+    },
+    output_type: &EbiOutputType::Bool,
+};
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_HAS_TRACES: EbiCommand = EbiCommand::Command {
+    name_short: "ht",
+    name_long: Some("has-traces"),
+    explanation_short: "Compute whether the model has traces.",
+    explanation_long: Some(
+        "Compute whether the initial marking is part of a livelock, that is, whether it is impossible to reach a final state. 'true' means that the initial state is part of a livelock, 'false' means that the initial state is not part of a livelock.",
+    ),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::ProcessTree),
+        &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
+    ]],
+    input_names: &["MODEL"],
+    input_helps: &["The model."],
+    execute: |mut objects, _| {
+        let model = objects.remove(0);
+        let result = match model {
+            EbiInput::Object(EbiObject::ProcessTree(tree), _) => tree.has_traces()?,
+            EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn.has_traces()?,
+            _ => unreachable!(),
+        };
+        if result {
+            log::debug!("The model cannot terminate and has an empty language.");
+        } else {
+            log::debug!("The model can terminate and has traces.")
+        }
+        return Ok(EbiOutput::Bool(result));
+    },
+    output_type: &EbiOutputType::Bool,
+};
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command {
+    name_short: "med",
+    name_long: Some("medoid"),
+    explanation_short: "Find the traces with the least distance to the other traces, without considering the stochastic perspective.",
+    explanation_long: Some(
+        "Find the traces with the lowest average normalised Levenshtein distance to the other traces; ties are resolved arbritrarily. The computation is random and does not take into account how often each trace occurs.",
+    ),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
+        &[&EbiInputType::Usize],
+    ],
+    input_names: &["FILE", "NUMBER_OF_TRACES"],
+    input_helps: &[
+        "The finite stochastic language.",
+        "The number of traces that should be extracted.",
+    ],
+    execute: |mut objects, _| {
+        let language = objects.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+        let number_of_traces = objects.remove(0).to_type::<usize>()?;
+        let language: Box<dyn EbiTraitFiniteLanguage> = language;
+        let result = language.medoid(*number_of_traces)?;
+        return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage),
 };
