@@ -200,7 +200,7 @@ fn manual() -> Result<EbiOutput> {
                 writeln!(f, "The {} file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\\\", exporter)?;
             } else {
                 writeln!(f, "The file to which the results must be written. Based on the file extension, Ebi will output either {}.", output_types(output_type))?;
-                writeln!(f, "If the parameter is not given, the results will be written to STDOUT as {} {}.\\\\", output_type.get_exporters()[0].get_article(), output_type.get_exporters()[0])?;
+                writeln!(f, "If the parameter is not given, the results will be written to STDOUT as {} {}.\\\\", output_type.get_default_exporter().get_article(), output_type.get_default_exporter())?;
             }
             writeln!(f, "&\\textit{{Mandatory:}} \\quad no\\\\")?;
             

@@ -2,7 +2,7 @@ use crate::{
     ebi_framework::displayable::Displayable,
     ebi_objects::{
         labelled_petri_net::{LPNMarking, LabelledPetriNet},
-        process_tree::ProcessTree,
+        process_tree::ProcessTree, process_tree_semantics::NodeStates,
     },
     ebi_traits::ebi_trait_semantics::Semantics,
 };
@@ -26,7 +26,7 @@ pub trait Livelock {
 }
 
 impl Livelock for ProcessTree {
-    type LivState = usize;
+    type LivState = NodeStates;
 
     fn is_livelock_in_model_regardless_of_state(&self) -> Result<bool> {
         Ok(false)

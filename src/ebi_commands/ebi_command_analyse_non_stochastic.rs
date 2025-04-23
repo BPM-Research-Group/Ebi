@@ -3,12 +3,11 @@ use anyhow::anyhow;
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
-        ebi_input::EbiInputType,
+        ebi_input::{EbiInput, EbiInputType},
         ebi_object::{EbiObject, EbiObjectType},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_objects::labelled_petri_net::LabelledPetriNet,
     ebi_traits::{
         ebi_trait_event_log::EbiTraitEventLog,
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
@@ -70,17 +69,33 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_LIVELOCK: EbiCommand = EbiCommand::Command 
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[&[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)]],
+    input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::ProcessTree),
+        &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
+    ]],
     input_names: &["MODEL"],
     input_helps: &["The model."],
     execute: |mut objects, _| {
-        let model = objects.remove(0).to_type::<LabelledPetriNet>()?;
-        let mut initial_marking = model
-            .get_initial_state()
-            .ok_or_else(|| anyhow!("No initial marking available."))?;
-        let result =
-            model.is_livelock_in_model_regardless_of_state()? || model.is_state_in_livelock(&mut initial_marking)?;
-        return Ok(EbiOutput::Bool(result));
+        let model = objects.remove(0);
+        match model {
+            EbiInput::Object(EbiObject::ProcessTree(tree), _) => {
+                let mut initial_marking = tree
+                    .get_initial_state()
+                    .ok_or_else(|| anyhow!("No initial marking available."))?;
+                let result = tree.is_livelock_in_model_regardless_of_state()?
+                    || tree.is_state_in_livelock(&mut initial_marking)?;
+                return Ok(EbiOutput::Bool(result));
+            }
+            EbiInput::Object(EbiObject::LabelledPetriNet(net), _) => {
+                let mut initial_marking = net
+                    .get_initial_state()
+                    .ok_or_else(|| anyhow!("No initial marking available."))?;
+                let result = net.is_livelock_in_model_regardless_of_state()?
+                    || net.is_state_in_livelock(&mut initial_marking)?;
+                return Ok(EbiOutput::Bool(result));
+            }
+            _ => unreachable!(),
+        }
     },
     output_type: &EbiOutputType::Bool,
 };
