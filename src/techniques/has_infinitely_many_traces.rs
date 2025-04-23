@@ -32,11 +32,3 @@ impl HasInfinitelyManyTraces for ProcessTree {
         return Ok(false);
     }
 }
-
-impl HasInfinitelyManyTraces for DeterministicFiniteAutomaton {
-    type LivState = usize;
-
-    fn has_infinitely_many_traces(&self) -> Result<bool> {
-        todo!()
-    }
-}

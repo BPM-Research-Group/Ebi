@@ -1,9 +1,11 @@
 use crate::{
     ebi_framework::displayable::Displayable,
     ebi_objects::{
+        deterministic_finite_automaton::DeterministicFiniteAutomaton,
         labelled_petri_net::{LPNMarking, LabelledPetriNet},
         process_tree::ProcessTree,
         process_tree_semantics::NodeStates,
+        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
     },
     ebi_traits::ebi_trait_semantics::Semantics,
@@ -11,13 +13,13 @@ use crate::{
 use anyhow::Result;
 use scc::HashSet;
 
-pub trait HasLiveLock {
+pub trait IsPartOfLivelock {
     type LivState: Displayable;
 
     fn is_state_part_of_livelock(&self, state: &Self::LivState) -> Result<bool>;
 }
 
-impl HasLiveLock for ProcessTree {
+impl IsPartOfLivelock for ProcessTree {
     type LivState = NodeStates;
 
     fn is_state_part_of_livelock(&self, _: &Self::LivState) -> Result<bool> {
@@ -27,7 +29,7 @@ impl HasLiveLock for ProcessTree {
 
 macro_rules! lpn {
     ($t:ident) => {
-        impl HasLiveLock for $t {
+        impl IsPartOfLivelock for $t {
             type LivState = LPNMarking;
 
             fn is_state_part_of_livelock(&self, state: &Self::LivState) -> Result<bool> {
@@ -40,7 +42,39 @@ macro_rules! lpn {
                     return Ok(true);
                 }
 
-                //for now, only works if the model is bounded
+                //for now, the following only works if the model is bounded
+                let mut queue = vec![];
+                queue.push(state.clone());
+                let visited = HashSet::new();
+                let _ = visited.insert(state.clone());
+
+                while let Some(state) = queue.pop() {
+                    if self.is_final_state(&state) {
+                        return Ok(false);
+                    }
+
+                    for transition in self.get_enabled_transitions(&state) {
+                        let mut child_state = state.clone();
+                        self.execute_transition(&mut child_state, transition)?;
+
+                        if visited.insert(child_state.clone()).is_ok() {
+                            queue.push(child_state);
+                        }
+                    }
+                }
+
+                return Ok(true);
+            }
+        }
+    };
+}
+
+macro_rules! dfm {
+    ($t:ident) => {
+        impl IsPartOfLivelock for $t {
+            type LivState = usize;
+
+            fn is_state_part_of_livelock(&self, state: &Self::LivState) -> Result<bool> {
                 let mut queue = vec![];
                 queue.push(state.clone());
                 let visited = HashSet::new();
@@ -69,3 +103,5 @@ macro_rules! lpn {
 
 lpn!(LabelledPetriNet);
 lpn!(StochasticLabelledPetriNet);
+dfm!(DeterministicFiniteAutomaton);
+dfm!(StochasticDeterministicFiniteAutomaton);

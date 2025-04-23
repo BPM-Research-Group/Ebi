@@ -9,7 +9,11 @@ use process_mining::{
 
 use crate::{
     ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet, petri_net_markup_language::PetriNetMarkupLanguage, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet
+        deterministic_finite_automaton::DeterministicFiniteAutomaton,
+        directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet,
+        petri_net_markup_language::PetriNetMarkupLanguage, process_tree::ProcessTree,
+        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
     },
     ebi_traits::ebi_trait_semantics::Semantics,
 };

@@ -159,6 +159,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_HAS_TRACES: EbiCommand = EbiCommand::Comman
     exact_arithmetic: true,
     input_types: &[&[
         &EbiInputType::Object(EbiObjectType::ProcessTree),
+        &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
+        &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
+        &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
         &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
     ]],
     input_names: &["MODEL"],
@@ -168,6 +171,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_HAS_TRACES: EbiCommand = EbiCommand::Comman
         let result = match model {
             EbiInput::Object(EbiObject::ProcessTree(tree), _) => tree.has_traces()?,
             EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn.has_traces()?,
+            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => slpn.has_traces()?,
+            EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(dfa), _) => dfa.has_traces()?,
+            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => sdfa.has_traces()?,
             _ => unreachable!(),
         };
         if result {
