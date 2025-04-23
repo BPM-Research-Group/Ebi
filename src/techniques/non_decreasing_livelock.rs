@@ -22,6 +22,14 @@ pub trait NonDecreasingLivelock {
     fn is_part_of_non_decreasing_livelock(&self, state: &mut Self::LivState) -> Result<bool>;
 }
 
+impl NonDecreasingLivelock for ProcessTree {
+    type LivState = usize;
+
+    fn is_part_of_non_decreasing_livelock(&self, _state: &mut Self::LivState) -> Result<bool> {
+        Ok(false)
+    }
+}
+
 macro_rules! is_non_decreasing_livelock_lpn {
     ($t:ident) => {
         impl NonDecreasingLivelock for $t {
@@ -143,11 +151,3 @@ is_non_decreasing_livelock_lpn!(LabelledPetriNet);
 is_non_decreasing_livelock_lpn!(StochasticLabelledPetriNet);
 is_non_decreasing_livelock_dfm!(DeterministicFiniteAutomaton);
 is_non_decreasing_livelock_dfm!(StochasticDeterministicFiniteAutomaton);
-
-impl NonDecreasingLivelock for ProcessTree {
-    type LivState = usize;
-
-    fn is_part_of_non_decreasing_livelock(&self, _state: &mut Self::LivState) -> Result<bool> {
-        Ok(false)
-    }
-}

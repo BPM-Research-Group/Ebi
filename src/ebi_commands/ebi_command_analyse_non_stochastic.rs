@@ -17,6 +17,7 @@ use crate::{
         medoid_non_stochastic::MedoidNonStochastic,
     },
 };
+use anyhow::anyhow;
 
 pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     name_short: "anans",
@@ -159,6 +160,10 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_HAS_TRACES: EbiCommand = EbiCommand::Comman
     exact_arithmetic: true,
     input_types: &[&[
         &EbiInputType::Object(EbiObjectType::ProcessTree),
+        &EbiInputType::Object(EbiObjectType::EventLog),
+        &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage),
+        &EbiInputType::Object(EbiObjectType::FiniteLanguage),
+        &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
@@ -171,10 +176,45 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_HAS_TRACES: EbiCommand = EbiCommand::Comman
         let result = match model {
             EbiInput::Object(EbiObject::ProcessTree(tree), _) => tree.has_traces()?,
             EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn.has_traces()?,
-            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => slpn.has_traces()?,
-            EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(dfa), _) => dfa.has_traces()?,
-            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => sdfa.has_traces()?,
-            _ => unreachable!(),
+            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
+                slpn.has_traces()?
+            }
+            EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(dfa), _) => {
+                dfa.has_traces()?
+            }
+            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => {
+                sdfa.has_traces()?
+            }
+            EbiInput::Object(EbiObject::EventLog(object), _) => object.has_traces()?,
+            EbiInput::Object(EbiObject::FiniteLanguage(object), _) => object.has_traces()?,
+            EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => {
+                object.has_traces()?
+            }
+            EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.has_traces()?,
+            EbiInput::Trait(_, _) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
+            EbiInput::String(_) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
+            EbiInput::Usize(_) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
+            EbiInput::FileHandler(_) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
+            EbiInput::Fraction(_) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
+            EbiInput::Object(EbiObject::Executions(_), _) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
+            EbiInput::Object(EbiObject::LanguageOfAlignments(_), _) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
+            EbiInput::Object(EbiObject::StochasticLanguageOfAlignments(_), _) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
         };
         if result {
             log::debug!("The model cannot terminate and has an empty language.");

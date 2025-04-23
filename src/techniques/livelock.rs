@@ -1,12 +1,7 @@
 use crate::{
     ebi_framework::displayable::Displayable,
     ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton,
-        labelled_petri_net::{LPNMarking, LabelledPetriNet},
-        process_tree::ProcessTree,
-        process_tree_semantics::NodeStates,
-        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::{LPNMarking, LabelledPetriNet}, process_tree::ProcessTree, process_tree_semantics::NodeStates, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet
     },
     ebi_traits::ebi_trait_semantics::Semantics,
 };
@@ -105,6 +100,7 @@ lpn!(LabelledPetriNet);
 lpn!(StochasticLabelledPetriNet);
 dfm!(DeterministicFiniteAutomaton);
 dfm!(StochasticDeterministicFiniteAutomaton);
+dfm!(DirectlyFollowsModel);
 
 #[cfg(test)]
 mod tests {
