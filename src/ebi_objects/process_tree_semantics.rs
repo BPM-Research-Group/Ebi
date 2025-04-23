@@ -309,8 +309,8 @@ pub enum NodeState {
 
 #[derive(Clone,Debug,Eq,PartialEq,Hash)]
 pub struct NodeStates {
-    terminated: bool,
-    states: Vec<NodeState>
+    pub(crate) terminated: bool,
+    pub(crate) states: Vec<NodeState>
 }
 
 impl NodeStates {

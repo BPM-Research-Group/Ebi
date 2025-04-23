@@ -105,3 +105,28 @@ lpn!(LabelledPetriNet);
 lpn!(StochasticLabelledPetriNet);
 dfm!(DeterministicFiniteAutomaton);
 dfm!(StochasticDeterministicFiniteAutomaton);
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{
+        ebi_objects::{process_tree::ProcessTree, process_tree_semantics::NodeStates},
+        techniques::livelock::IsPartOfLivelock,
+    };
+
+    #[test]
+    fn livelock_tree() {
+        let fin = fs::read_to_string("testfiles/empty.ptree").unwrap();
+        let tree = fin.parse::<ProcessTree>().unwrap();
+
+        assert!(
+            !tree
+                .is_state_part_of_livelock(&NodeStates {
+                    terminated: false,
+                    states: vec![]
+                })
+                .unwrap()
+        );
+    }
+}
