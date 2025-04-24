@@ -123,7 +123,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
     name_short: "inft",
     name_long: Some("infinitely-many-traces"),
     explanation_short: "Compute whether the model has infinitely many traces.",
-    explanation_long: None,
+    explanation_long: Some(
+        "Compute whether the model has infinitely many traces. The computation may not terminate if the model is unbounded.",
+    ),
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
@@ -177,7 +179,8 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_HAS_TRACES: EbiCommand = EbiCommand::Comman
     explanation_long: Some(
         "Compute whether the model has any traces.
         Reasons for a model not to have any traces could be if the initial state is part of a livelock, or if there is no initial state.
-        'true' means that the model has traces, 'false' means that the model has no traces.",
+        'true' means that the model has traces, 'false' means that the model has no traces.
+        The computation may not terminate if the model is unbounded.",
     ),
     latex_link: None,
     cli_command: None,
