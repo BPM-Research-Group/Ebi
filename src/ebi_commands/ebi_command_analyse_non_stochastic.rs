@@ -28,7 +28,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
         &EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT,
         &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
         &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
-        &EBI_ANALYSE_NON_STOCHASTIC_HAS_TRACES,
+        &EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES,
         &EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES,
         &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
     ],
@@ -119,63 +119,10 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Comman
     output_type: &EbiOutputType::ObjectType(EbiObjectType::Executions),
 };
 
-pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCommand::Command {
-    name_short: "inft",
-    name_long: Some("infinitely-many-traces"),
-    explanation_short: "Compute whether the model has infinitely many traces.",
-    explanation_long: Some(
-        "Compute whether the model has infinitely many traces. The computation may not terminate if the model is unbounded.",
-    ),
-    latex_link: None,
-    cli_command: None,
-    exact_arithmetic: true,
-    input_types: &[&[
-        &EbiInputType::Object(EbiObjectType::EventLog),
-        &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage),
-        &EbiInputType::Object(EbiObjectType::FiniteLanguage),
-        &EbiInputType::Object(EbiObjectType::ProcessTree),
-        &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
-        &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
-    ]],
-    input_names: &["MODEL"],
-    input_helps: &["The model."],
-    execute: |mut objects, _| {
-        let model = objects.remove(0);
-        let result = match model {
-            EbiInput::Object(EbiObject::EventLog(object), _) => {
-                object.has_infinitely_many_traces()?
-            }
-            EbiInput::Object(EbiObject::FiniteLanguage(object), _) => {
-                object.has_infinitely_many_traces()?
-            }
-            EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => {
-                object.has_infinitely_many_traces()?
-            }
-            EbiInput::Object(EbiObject::ProcessTree(object), _) => {
-                object.has_infinitely_many_traces()?
-            }
-            EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(object), _) => {
-                object.has_infinitely_many_traces()?
-            }
-            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(object), _) => {
-                object.has_infinitely_many_traces()?
-            }
-            _ => unreachable!(),
-        };
-        if result {
-            log::debug!("The language of the model has infinitely many traces.");
-        } else {
-            log::debug!("The language of the model has finitely many traces.")
-        }
-        return Ok(EbiOutput::Bool(result));
-    },
-    output_type: &EbiOutputType::Bool,
-};
-
-pub const EBI_ANALYSE_NON_STOCHASTIC_HAS_TRACES: EbiCommand = EbiCommand::Command {
-    name_short: "ht",
-    name_long: Some("has-traces"),
-    explanation_short: "Compute whether the model has traces.",
+pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Command {
+    name_short: "at",
+    name_long: Some("any-traces"),
+    explanation_short: "Compute whether the model has any traces.",
     explanation_long: Some(
         "Compute whether the model has any traces.
         Reasons for a model not to have any traces could be if the initial state is part of a livelock, or if there is no initial state.
@@ -246,6 +193,59 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_HAS_TRACES: EbiCommand = EbiCommand::Comman
             log::debug!("The model cannot terminate and has an empty language.");
         } else {
             log::debug!("The model can terminate and has traces.")
+        }
+        return Ok(EbiOutput::Bool(result));
+    },
+    output_type: &EbiOutputType::Bool,
+};
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCommand::Command {
+    name_short: "inft",
+    name_long: Some("infinitely-many-traces"),
+    explanation_short: "Compute whether the model has infinitely many traces.",
+    explanation_long: Some(
+        "Compute whether the model has infinitely many traces. The computation may not terminate if the model is unbounded.",
+    ),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::EventLog),
+        &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage),
+        &EbiInputType::Object(EbiObjectType::FiniteLanguage),
+        &EbiInputType::Object(EbiObjectType::ProcessTree),
+        &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
+        &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
+    ]],
+    input_names: &["MODEL"],
+    input_helps: &["The model."],
+    execute: |mut objects, _| {
+        let model = objects.remove(0);
+        let result = match model {
+            EbiInput::Object(EbiObject::EventLog(object), _) => {
+                object.has_infinitely_many_traces()?
+            }
+            EbiInput::Object(EbiObject::FiniteLanguage(object), _) => {
+                object.has_infinitely_many_traces()?
+            }
+            EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => {
+                object.has_infinitely_many_traces()?
+            }
+            EbiInput::Object(EbiObject::ProcessTree(object), _) => {
+                object.has_infinitely_many_traces()?
+            }
+            EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(object), _) => {
+                object.has_infinitely_many_traces()?
+            }
+            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(object), _) => {
+                object.has_infinitely_many_traces()?
+            }
+            _ => unreachable!(),
+        };
+        if result {
+            log::debug!("The language of the model has infinitely many traces.");
+        } else {
+            log::debug!("The language of the model has finitely many traces.")
         }
         return Ok(EbiOutput::Bool(result));
     },
