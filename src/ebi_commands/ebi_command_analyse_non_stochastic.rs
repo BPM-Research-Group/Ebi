@@ -12,7 +12,8 @@ use crate::{
         ebi_trait_semantics::EbiTraitSemantics,
     },
     techniques::{
-        align::Align, any_traces::AnyTraces, bounded::Bounded, executions::FindExecutions, infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic
+        align::Align, any_traces::AnyTraces, bounded::Bounded, executions::FindExecutions,
+        infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic,
     },
 };
 use anyhow::anyhow;
@@ -70,7 +71,11 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
     name_short: "bnd",
     name_long: Some("bounded"),
     explanation_short: "Compute whether the model has a bounded state space.",
-    explanation_long: None,
+    explanation_long: Some(
+        "Compute whether the model has a bounded state space. 
+        For Petri nets, a coverability graph is computed~\\cite{esparza2019petri}. 
+        For other types of models, `true' is returned.",
+    ),
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
@@ -91,20 +96,14 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
         let result = match model {
             EbiInput::Object(EbiObject::ProcessTree(tree), _) => tree.bounded()?,
             EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn.bounded()?,
-            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
-                slpn.bounded()?
-            }
-            EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(dfa), _) => {
-                dfa.bounded()?
-            }
+            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => slpn.bounded()?,
+            EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(dfa), _) => dfa.bounded()?,
             EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => {
                 sdfa.bounded()?
             }
             EbiInput::Object(EbiObject::EventLog(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::FiniteLanguage(object), _) => object.bounded()?,
-            EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => {
-                object.bounded()?
-            }
+            EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.bounded()?,
             EbiInput::Trait(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
