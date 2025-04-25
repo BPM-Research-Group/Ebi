@@ -1,9 +1,13 @@
-use std::{fmt::{Debug, Display, Formatter}, ops::MulAssign};
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
+use std::{
+    cmp::Ordering,
+    fmt::{Debug, Display, Formatter},
+    ops::MulAssign,
+};
 
 #[derive(Clone, PartialEq, Eq, Hash)]
 pub struct Marking {
-    pub(crate) place2token: Vec<u64> //for each place: number of tokens in that place
+    pub(crate) place2token: Vec<u64>, //for each place: number of tokens in that place
 }
 
 impl Marking {
@@ -19,13 +23,16 @@ impl Marking {
 
     pub fn from_vec(place2token: Vec<u64>) -> Self {
         Marking {
-            place2token: place2token
+            place2token: place2token,
         }
     }
 
     pub fn increase(&mut self, place: usize, amount: u64) -> Result<()> {
         if self.place2token[place] == u64::MAX - amount {
-            return Err(anyhow!("tried to put too many places in a marking for place {}", place));
+            return Err(anyhow!(
+                "tried to put too many places in a marking for place {}",
+                place
+            ));
         }
 
         self.place2token[place] += amount;
@@ -34,7 +41,10 @@ impl Marking {
 
     pub fn decrease(&mut self, place: usize, amount: u64) -> Result<()> {
         if self.place2token[place] < amount {
-            return Err(anyhow!("tried to obtain a negative number of places in a marking for place {}", place));
+            return Err(anyhow!(
+                "tried to obtain a negative number of places in a marking for place {}",
+                place
+            ));
         }
         self.place2token[place] -= amount;
         Ok(())
@@ -43,13 +53,30 @@ impl Marking {
     pub fn add_place(&mut self) {
         self.place2token.push(0);
     }
+
+    /**
+     * Returns whether all places are at least equal, and at least one has a larger number of tokens.
+     */
+    pub fn is_larger_than(&self, other: &Self) -> bool {
+        let mut at_least_one_larger = false;
+        for (me, you) in self.place2token.iter().zip(other.place2token.iter()) {
+            match me.partial_cmp(you) {
+                Some(Ordering::Equal) => {}
+                Some(Ordering::Greater) => {
+                    return false;
+                }
+                Some(Ordering::Less) => at_least_one_larger = true,
+                None => return false,
+            }
+        }
+
+        at_least_one_larger
+    }
 }
 
 impl From<Vec<u64>> for Marking {
     fn from(value: Vec<u64>) -> Self {
-        Self {
-            place2token: value
-        }
+        Self { place2token: value }
     }
 }
 

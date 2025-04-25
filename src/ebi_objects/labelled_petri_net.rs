@@ -680,6 +680,15 @@ pub struct LPNMarking {
     pub(crate) number_of_enabled_transitions: usize,
 }
 
+impl LPNMarking {
+    /**
+     * Returns whether all places are at least equal, and at least one has a larger number of tokens.
+     */
+    pub fn is_larger_than(&self, other: &Self) -> bool {
+        self.marking.is_larger_than(&other.marking)
+    }
+}
+
 impl Displayable for LPNMarking {}
 
 impl Eq for LPNMarking {}

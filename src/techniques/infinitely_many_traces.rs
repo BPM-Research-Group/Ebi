@@ -3,26 +3,33 @@ use std::usize;
 use crate::{
     ebi_framework::displayable::Displayable,
     ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, process_tree::{Node, Operator, ProcessTree}, process_tree_semantics::NodeStates, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton
+        deterministic_finite_automaton::DeterministicFiniteAutomaton,
+        event_log::EventLog,
+        finite_language::FiniteLanguage,
+        finite_stochastic_language::FiniteStochasticLanguage,
+        labelled_petri_net::{LPNMarking, LabelledPetriNet},
+        process_tree::{Node, Operator, ProcessTree},
+        process_tree_semantics::NodeStates,
+        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
     },
     ebi_traits::ebi_trait_semantics::Semantics,
     techniques::livelock::IsPartOfLivelock,
 };
 use anyhow::Result;
 
-pub trait HasInfinitelyManyTraces {
+pub trait InfinitelyManyTraces {
     type LivState: Displayable;
 
     /**
      * Returns whether the model has infinitely many traces.
      */
-    fn has_infinitely_many_traces(&self) -> Result<bool>;
+    fn infinitely_many_traces(&self) -> Result<bool>;
 }
 
-impl HasInfinitelyManyTraces for ProcessTree {
+impl InfinitelyManyTraces for ProcessTree {
     type LivState = NodeStates;
 
-    fn has_infinitely_many_traces(&self) -> Result<bool> {
+    fn infinitely_many_traces(&self) -> Result<bool> {
         for node in 0..self.get_number_of_nodes() {
             if let Some(Node::Operator(Operator::Loop, _)) = self.get_node(node) {
                 //see whether at least one leaf in the loop is an activity
@@ -37,20 +44,12 @@ impl HasInfinitelyManyTraces for ProcessTree {
     }
 }
 
-impl HasInfinitelyManyTraces for LabelledPetriNet {
-    type LivState = LPNMarking;
-
-    fn has_infinitely_many_traces(&self) -> Result<bool> {
-        todo!()
-    }
-}
-
-macro_rules! dfm {
+macro_rules! dfa {
     ($t:ident) => {
-        impl HasInfinitelyManyTraces for $t {
+        impl InfinitelyManyTraces for $t {
             type LivState = usize;
 
-            fn has_infinitely_many_traces(&self) -> Result<bool> {
+            fn infinitely_many_traces(&self) -> Result<bool> {
                 //in a DFA-like model, we must find a loop that has an activity on it and that has a state that is not in a livelock.
                 let mut queue = vec![];
                 let mut distance_from_initial = vec![usize::MAX; self.get_max_state() + 2];
@@ -100,18 +99,18 @@ macro_rules! dfm {
 
 macro_rules! lang {
     ($t:ident) => {
-        impl HasInfinitelyManyTraces for $t {
+        impl InfinitelyManyTraces for $t {
             type LivState = usize;
 
-            fn has_infinitely_many_traces(&self) -> Result<bool> {
+            fn infinitely_many_traces(&self) -> Result<bool> {
                 Ok(false)
             }
         }
     };
 }
 
-dfm!(DeterministicFiniteAutomaton);
-dfm!(StochasticDeterministicFiniteAutomaton);
+dfa!(DeterministicFiniteAutomaton);
+dfa!(StochasticDeterministicFiniteAutomaton);
 lang!(EventLog);
 lang!(FiniteLanguage);
 lang!(FiniteStochasticLanguage);

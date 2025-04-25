@@ -19,29 +19,29 @@ use crate::{
     techniques::livelock::IsPartOfLivelock,
 };
 
-pub trait HasTraces {
+pub trait AnyTraces {
     type LivState: Displayable;
 
     /**
      * Returns whether the object has any traces.
      */
-    fn has_traces(&self) -> Result<bool>;
+    fn any_traces(&self) -> Result<bool>;
 }
 
-impl HasTraces for ProcessTree {
+impl AnyTraces for ProcessTree {
     type LivState = NodeStates;
 
-    fn has_traces(&self) -> Result<bool> {
+    fn any_traces(&self) -> Result<bool> {
         Ok(self.get_initial_state().is_none()) //an empty tree has no traces, otherwise a tree has traces
     }
 }
 
 macro_rules! lang {
     ($t:ident) => {
-        impl HasTraces for $t {
+        impl AnyTraces for $t {
             type LivState = usize;
 
-            fn has_traces(&self) -> Result<bool> {
+            fn any_traces(&self) -> Result<bool> {
                 Ok(!self.len().is_zero())
             }
         }
@@ -50,10 +50,10 @@ macro_rules! lang {
 
 macro_rules! lpn {
     ($t:ident) => {
-        impl HasTraces for $t {
+        impl AnyTraces for $t {
             type LivState = LPNMarking;
 
-            fn has_traces(&self) -> Result<bool> {
+            fn any_traces(&self) -> Result<bool> {
                 if let Some(initial_state) = self.get_initial_state() {
                     //If the initial state is not a livelock, the model has traces
                     return Ok(!self.is_state_part_of_livelock(&initial_state)?);
@@ -68,10 +68,10 @@ macro_rules! lpn {
 
 macro_rules! dfm {
     ($t:ident) => {
-        impl HasTraces for $t {
+        impl AnyTraces for $t {
             type LivState = usize;
 
-            fn has_traces(&self) -> Result<bool> {
+            fn any_traces(&self) -> Result<bool> {
                 if let Some(initial_state) = self.get_initial_state() {
                     //If the initial state is not a livelock, the model has traces.
                     return Ok(!self.is_state_part_of_livelock(&initial_state)?);
@@ -105,56 +105,56 @@ mod tests {
             stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
             stochastic_labelled_petri_net::StochasticLabelledPetriNet,
         },
-        techniques::has_traces::HasTraces,
+        techniques::any_traces::AnyTraces,
     };
 
     #[test]
-    fn has_traces_tree() {
+    fn any_traces_tree() {
         let fin = fs::read_to_string("testfiles/empty.ptree").unwrap();
         let tree = fin.parse::<ProcessTree>().unwrap();
 
-        assert!(tree.has_traces().unwrap());
+        assert!(tree.any_traces().unwrap());
     }
 
     #[test]
-    fn has_traces_lpn() {
+    fn any_traces_lpn() {
         let fin = fs::read_to_string("testfiles/a-a-livelock.lpn").unwrap();
         let lpn = fin.parse::<LabelledPetriNet>().unwrap();
 
-        assert!(!lpn.has_traces().unwrap());
+        assert!(!lpn.any_traces().unwrap());
     }
 
     #[test]
-    fn has_traces_slpn() {
+    fn any_traces_slpn() {
         let fin = fs::read_to_string("testfiles/infinite_bs.slpn").unwrap();
         let slpn = fin.parse::<StochasticLabelledPetriNet>().unwrap();
 
-        assert!(slpn.has_traces().unwrap());
+        assert!(slpn.any_traces().unwrap());
     }
 
     #[test]
-    fn has_traces_dfa() {
+    fn any_traces_dfa() {
         let fin = fs::read_to_string("testfiles/empty.dfa").unwrap();
         let dfa = fin.parse::<DeterministicFiniteAutomaton>().unwrap();
 
-        assert!(!dfa.has_traces().unwrap());
+        assert!(!dfa.any_traces().unwrap());
     }
 
     #[test]
-    fn has_traces_sdfa() {
+    fn any_traces_sdfa() {
         let fin = fs::read_to_string("testfiles/empty.sdfa").unwrap();
         let sdfa = fin
             .parse::<StochasticDeterministicFiniteAutomaton>()
             .unwrap();
 
-        assert!(!sdfa.has_traces().unwrap());
+        assert!(!sdfa.any_traces().unwrap());
     }
 
     #[test]
-    fn has_traces_slang() {
+    fn any_traces_slang() {
         let fin = fs::read_to_string("testfiles/empty.slang").unwrap();
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
 
-        assert!(!slang.has_traces().unwrap());
+        assert!(!slang.any_traces().unwrap());
     }
 }

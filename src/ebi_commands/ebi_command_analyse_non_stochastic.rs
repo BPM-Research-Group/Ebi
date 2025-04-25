@@ -12,8 +12,8 @@ use crate::{
         ebi_trait_semantics::EbiTraitSemantics,
     },
     techniques::{
-        align::Align, executions::FindExecutions,
-        has_infinitely_many_traces::HasInfinitelyManyTraces, has_traces::HasTraces,
+        align::Align, any_traces::AnyTraces, executions::FindExecutions,
+        infinitely_many_traces::InfinitelyManyTraces,
         medoid_non_stochastic::MedoidNonStochastic,
     },
 };
@@ -147,23 +147,23 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
     execute: |mut objects, _| {
         let model = objects.remove(0);
         let result = match model {
-            EbiInput::Object(EbiObject::ProcessTree(tree), _) => tree.has_traces()?,
-            EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn.has_traces()?,
+            EbiInput::Object(EbiObject::ProcessTree(tree), _) => tree.any_traces()?,
+            EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn.any_traces()?,
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
-                slpn.has_traces()?
+                slpn.any_traces()?
             }
             EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(dfa), _) => {
-                dfa.has_traces()?
+                dfa.any_traces()?
             }
             EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => {
-                sdfa.has_traces()?
+                sdfa.any_traces()?
             }
-            EbiInput::Object(EbiObject::EventLog(object), _) => object.has_traces()?,
-            EbiInput::Object(EbiObject::FiniteLanguage(object), _) => object.has_traces()?,
+            EbiInput::Object(EbiObject::EventLog(object), _) => object.any_traces()?,
+            EbiInput::Object(EbiObject::FiniteLanguage(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => {
-                object.has_traces()?
+                object.any_traces()?
             }
-            EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.has_traces()?,
+            EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.any_traces()?,
             EbiInput::Trait(_, _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
@@ -223,22 +223,22 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
         let model = objects.remove(0);
         let result = match model {
             EbiInput::Object(EbiObject::EventLog(object), _) => {
-                object.has_infinitely_many_traces()?
+                object.infinitely_many_traces()?
             }
             EbiInput::Object(EbiObject::FiniteLanguage(object), _) => {
-                object.has_infinitely_many_traces()?
+                object.infinitely_many_traces()?
             }
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => {
-                object.has_infinitely_many_traces()?
+                object.infinitely_many_traces()?
             }
             EbiInput::Object(EbiObject::ProcessTree(object), _) => {
-                object.has_infinitely_many_traces()?
+                object.infinitely_many_traces()?
             }
             EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(object), _) => {
-                object.has_infinitely_many_traces()?
+                object.infinitely_many_traces()?
             }
             EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(object), _) => {
-                object.has_infinitely_many_traces()?
+                object.infinitely_many_traces()?
             }
             _ => unreachable!(),
         };

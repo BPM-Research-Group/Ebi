@@ -1,14 +1,14 @@
 pub mod conversions {
+    pub mod to_compressed_event_log;
+    pub mod to_deterministic_finite_automaton;
+    pub mod to_event_log;
+    pub mod to_finite_language;
+    pub mod to_finite_stochastic_language;
     pub mod to_labelled_petri_net;
+    pub mod to_language_of_alignments;
     pub mod to_lola_net;
     pub mod to_petri_net_markup_language;
-    pub mod to_event_log;
-    pub mod to_compressed_event_log;
-    pub mod to_finite_language;
     pub mod to_stochastic_deterministic_finite_automaton;
-    pub mod to_deterministic_finite_automaton;
-    pub mod to_finite_stochastic_language;
-    pub mod to_language_of_alignments;
     pub mod to_stochastic_labelled_petri_net;
 }
 pub mod ebi_framework {
@@ -123,13 +123,13 @@ pub mod math {
     pub mod fixed_denominator_fraction_f64;
 
     pub mod correlation;
+    pub mod data_type;
     pub mod levenshtein;
     pub mod markov_model;
     pub mod matrix;
     pub mod root;
     pub mod root_log_div;
     pub mod traits;
-    pub mod data_type;
 }
 
 pub mod techniques {
@@ -153,13 +153,16 @@ pub mod techniques {
     #[cfg(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic"))]
     pub mod earth_movers_stochastic_conformance_f64;
 
+    pub mod any_traces;
+    pub mod bounded;
     pub mod entropic_relevance;
     pub mod executions;
     pub mod explain_trace;
+    pub mod infinitely_many_traces;
     pub mod jensen_shannon_stochastic_conformance;
-    pub mod non_decreasing_livelock;
     pub mod livelock;
     pub mod medoid_non_stochastic;
+    pub mod non_decreasing_livelock;
     pub mod occurrences_stochastic_miner;
     pub mod probability_queries;
     pub mod process_variety;
@@ -168,8 +171,6 @@ pub mod techniques {
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
-    pub mod has_infinitely_many_traces;
-    pub mod has_traces;
 }
 pub mod optimisation_algorithms {
     pub mod network_simplex;
