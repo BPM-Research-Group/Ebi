@@ -12,9 +12,7 @@ use crate::{
         ebi_trait_semantics::EbiTraitSemantics,
     },
     techniques::{
-        align::Align, any_traces::AnyTraces, executions::FindExecutions,
-        infinitely_many_traces::InfinitelyManyTraces,
-        medoid_non_stochastic::MedoidNonStochastic,
+        align::Align, any_traces::AnyTraces, bounded::Bounded, executions::FindExecutions, infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic
     },
 };
 use anyhow::anyhow;
@@ -26,6 +24,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[
         &EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT,
+        &EBI_ANALYSE_NON_STOCHASTIC_BOUNDED,
         &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
         &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
         &EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES,
@@ -65,6 +64,81 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command
         ));
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLanguageOfAlignments),
+};
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
+    name_short: "bnd",
+    name_long: Some("bounded"),
+    explanation_short: "Compute whether the model has a bounded state space.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::ProcessTree),
+        &EbiInputType::Object(EbiObjectType::EventLog),
+        &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage),
+        &EbiInputType::Object(EbiObjectType::FiniteLanguage),
+        &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
+        &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
+        &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
+        &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
+    ]],
+    input_names: &["MODEL"],
+    input_helps: &["The model."],
+    execute: |mut objects, _| {
+        let model = objects.remove(0);
+        let result = match model {
+            EbiInput::Object(EbiObject::ProcessTree(tree), _) => tree.bounded()?,
+            EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn.bounded()?,
+            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
+                slpn.bounded()?
+            }
+            EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(dfa), _) => {
+                dfa.bounded()?
+            }
+            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => {
+                sdfa.bounded()?
+            }
+            EbiInput::Object(EbiObject::EventLog(object), _) => object.bounded()?,
+            EbiInput::Object(EbiObject::FiniteLanguage(object), _) => object.bounded()?,
+            EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => {
+                object.bounded()?
+            }
+            EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.bounded()?,
+            EbiInput::Trait(_, _) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
+            EbiInput::String(_) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
+            EbiInput::Usize(_) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
+            EbiInput::FileHandler(_) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
+            EbiInput::Fraction(_) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
+            EbiInput::Object(EbiObject::Executions(_), _) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
+            EbiInput::Object(EbiObject::LanguageOfAlignments(_), _) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
+            EbiInput::Object(EbiObject::StochasticLanguageOfAlignments(_), _) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
+        };
+        if result {
+            log::debug!("The model has a bounded state space.");
+        } else {
+            log::debug!("The model has an unbounded state space.")
+        }
+        return Ok(EbiOutput::Bool(result));
+    },
+    output_type: &EbiOutputType::Bool,
 };
 
 pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
@@ -222,9 +296,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
     execute: |mut objects, _| {
         let model = objects.remove(0);
         let result = match model {
-            EbiInput::Object(EbiObject::EventLog(object), _) => {
-                object.infinitely_many_traces()?
-            }
+            EbiInput::Object(EbiObject::EventLog(object), _) => object.infinitely_many_traces()?,
             EbiInput::Object(EbiObject::FiniteLanguage(object), _) => {
                 object.infinitely_many_traces()?
             }
