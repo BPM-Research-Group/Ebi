@@ -35,7 +35,8 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
         &EBI_ITSELF_GRAPH,
         &EBI_ITSELF_MANUAL,
         &EBI_ITSELF_JAVA,
-        &EBI_ITSELF_LOGO
+        &EBI_ITSELF_LOGO,
+        &EBI_ITSELF_GENERATE_PM4PY,
      ]
 };
 
@@ -104,6 +105,22 @@ pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command {
     execute: |_, _| Ok(prom_link::print_java_plugins()?), 
     output_type: &EbiOutputType::String
 };
+
+pub const EBI_ITSELF_GENERATE_PM4PY: EbiCommand = EbiCommand::Command { 
+    name_short: "pm4py", 
+    name_long: None, 
+    explanation_short: "Generate the module exposed to PM4Py with all functions.", 
+    explanation_long: None, 
+    cli_command: None, 
+    latex_link: None, 
+    exact_arithmetic: false, 
+    input_types: &[], 
+    input_names: &[],
+    input_helps: &[],
+    execute: |_, _| Ok(generate_pm4py_module()?), 
+    output_type: &EbiOutputType::String
+};
+
 
 fn manual() -> Result<EbiOutput> {
     let mut f = vec![];
@@ -498,4 +515,91 @@ pub fn graph() -> Result<VisualGraph> {
 
 pub fn scale(point: &mut Point) {
     point.x *= 0.5;
+}
+
+pub fn generate_pm4py_module() -> Result<EbiOutput> {
+    let mut result = String::new();
+    
+    for path in EBI_COMMANDS.get_command_paths() {
+        if let EbiCommand::Command { .. } = path[path.len() - 1] {
+            result.push_str(&generate_pyfn(&path));
+        }
+    }
+    
+    Ok(EbiOutput::String(result))
+}
+
+fn generate_pyfn(path: &Vec<&EbiCommand>) -> String {
+    // Derive raw name and fn name
+    let raw_name = EbiCommand::path_to_string(path);
+    let fn_name: String = raw_name
+        .strip_prefix("Ebi ")
+        .unwrap_or(&raw_name)
+        .chars()
+        .map(|c| if c == ' ' || c == '-' { '_' } else { c })
+        .collect();
+
+    // Extract input_types
+    let input_types = if let EbiCommand::Command { input_types, .. } = path[path.len() - 1] {
+        input_types
+    } else {
+        return String::new();
+    };
+
+    // Start building function
+    let mut body = format!(r###"#[pyfunction]
+fn {fname}({args}) -> PyResult<String> {{
+    let command: &&EbiCommand = &&{const_name};
+    let input_types = match **command {{
+        EbiCommand::Command {{ input_types, .. }} => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    }};
+"###,
+        fname = fn_name,
+        args = (0..input_types.len()).map(|i| format!("arg{}: &PyAny", i)).collect::<Vec<_>>().join(", "),
+        const_name = raw_name.to_uppercase().replace(&[' ', '-'][..], "_")
+    );
+
+    // Import each argument
+    for i in 0..input_types.len() {
+        body.push_str(&format!(r###"    let input{idx} = [
+        EventLog::import_from_pm4py,
+        StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg{idx}, input_types[0]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+"###,
+            idx = i
+        ));
+    }
+
+    // Collect inputs
+    let inputs = (0..input_types.len()).map(|i| format!("input{}", i)).collect::<Vec<_>>().join(", ");
+    body.push_str(&format!(r###"    let inputs = vec![{}];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {{}}", e)))?;
+    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+
+    let output_string = if exporter.is_binary() {{
+        let bytes = ebi_output::export_to_bytes(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {{}}", e)))?;
+        String::from_utf8(bytes)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {{}}", e)))?
+    }} else {{
+        ebi_output::export_to_string(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {{}}", e)))?
+    }};
+
+    Ok(output_string)
+}}
+
+"###,
+        inputs = inputs
+    ));
+
+    body
 }

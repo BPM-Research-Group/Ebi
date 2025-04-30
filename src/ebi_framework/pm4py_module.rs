@@ -27,8 +27,6 @@ fn analyse_completeness(event_log: &PyAny) -> PyResult<String> {
 
     let inputs = vec![input];
 
-    let command: &&EbiCommand = &&EBI_ANALYSE_COMPLETENESS;
-
     // Execute the command.
     let result = command
         .execute_with_inputs(inputs)
@@ -52,49 +50,38 @@ fn analyse_completeness(event_log: &PyAny) -> PyResult<String> {
 }
 
 #[pyfunction]
-fn visualise_text(object: &PyAny) -> PyResult<String> {
+fn visualise_text(arg0: &PyAny) -> PyResult<String> {
     let command: &&EbiCommand = &&EBI_VISUALISE_TEXT;
-    
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-
-    let input = [
+    let input0 = [
         EventLog::import_from_pm4py,
         StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
     ]
-        .iter()
-        .find_map(|importer| importer(object, input_types[0]).ok())
-        .ok_or_else(|| {
-            pyo3::exceptions::PyValueError::new_err("Object could not be imported by any handler")
-        })?;
-    
-    let inputs = vec![input];
+    .iter()
+    .find_map(|importer| importer(arg0, input_types[0]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+    let inputs = vec![input0];
 
-    
-
-    let result = command
-        .execute_with_inputs(inputs)
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
         .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-
     let exporter = EbiCommand::select_exporter(&result.get_type(), None);
 
-    // If the exporter is binary, convert the bytes to a UTF-8 string.
     let output_string = if exporter.is_binary() {
         let bytes = ebi_output::export_to_bytes(result, exporter)
             .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes).map_err(|e| {
-            pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e))
-        })?
+        String::from_utf8(bytes)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
     } else {
         ebi_output::export_to_string(result, exporter)
             .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
     };
 
     Ok(output_string)
-
 }
 
 #[pyfunction]
