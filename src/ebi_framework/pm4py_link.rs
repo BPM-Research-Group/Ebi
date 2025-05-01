@@ -71,6 +71,10 @@ impl ImportableFromPM4Py for EventLog {
                         _ => { /* this trait isn’t supported by EventLog; skip */ }
                     }
                 },
+                EbiInputType::AnyObject => {
+                    let obj = EbiObject::EventLog(event_log_rust);
+                    return Ok(EbiInput::Object(obj, &EBI_EVENT_LOG));
+                },
                 _ => {
                     // skip other input types
                 }
@@ -210,6 +214,10 @@ impl ImportableFromPM4Py for LabelledPetriNet {
                     
                     }
                 },
+                EbiInputType::AnyObject => {
+                    let obj = EbiObject::LabelledPetriNet(lpn);
+                    return Ok(EbiInput::Object(obj, &EBI_LABELLED_PETRI_NET));
+                }
                 _ => {}
             }
         }
