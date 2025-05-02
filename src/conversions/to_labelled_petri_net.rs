@@ -6,7 +6,14 @@ use bitvec::bitvec;
 use crate::{
     ebi_framework::activity_key::{ActivityKeyTranslator, HasActivityKey},
     ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::{LPNMarking, LabelledPetriNet}, lola_net::LolaNet, petri_net_markup_language::PetriNetMarkupLanguage, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet
+        deterministic_finite_automaton::DeterministicFiniteAutomaton,
+        directly_follows_model::DirectlyFollowsModel,
+        labelled_petri_net::{LPNMarking, LabelledPetriNet},
+        lola_net::LolaNet,
+        petri_net_markup_language::PetriNetMarkupLanguage,
+        process_tree::ProcessTree,
+        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
     },
     ebi_traits::ebi_trait_semantics::Semantics,
     marking::Marking,
@@ -162,8 +169,10 @@ impl From<DeterministicFiniteAutomaton> for LabelledPetriNet {
     fn from(value: DeterministicFiniteAutomaton) -> Self {
         log::info!("convert DFA to LPN");
 
-        if value.get_initial_state().is_none() {
-            //SDFA has an empty language, return a livelocked LPN
+        let source = if let Some(s) = value.initial_state {
+            s
+        } else {
+            //DFA has an empty language, return a livelocked LPN
             return Self {
                 activity_key: value.activity_key,
                 initial_marking: Marking::new(0),
@@ -174,17 +183,11 @@ impl From<DeterministicFiniteAutomaton> for LabelledPetriNet {
                 transition2output_places_cardinality: vec![vec![]],
                 place2output_transitions: vec![],
             };
-        }
+        };
 
         let mut result = LabelledPetriNet::new();
         let translator =
             ActivityKeyTranslator::new(value.get_activity_key(), result.get_activity_key_mut());
-
-        let source = result.add_place();
-        result
-            .get_initial_marking_mut()
-            .increase(source, 1)
-            .unwrap();
 
         //add places
         let mut state2place = vec![];
@@ -200,6 +203,12 @@ impl From<DeterministicFiniteAutomaton> for LabelledPetriNet {
                     .unwrap();
             }
         }
+
+        //initial marking
+        result
+            .get_initial_marking_mut()
+            .increase(source, 1)
+            .unwrap();
 
         //add edges
         for (source, (target, activity)) in value
@@ -340,5 +349,25 @@ impl From<StochasticDeterministicFiniteAutomaton> for LabelledPetriNet {
     fn from(value: StochasticDeterministicFiniteAutomaton) -> Self {
         let dfa: DeterministicFiniteAutomaton = value.into();
         dfa.into()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::ebi_objects::{deterministic_finite_automaton::DeterministicFiniteAutomaton, labelled_petri_net::LabelledPetriNet};
+
+    #[test]
+    fn dfa_to_lpn() {
+        let fin = fs::read_to_string("testfiles/a-loop.dfa").unwrap();
+        let dfa = fin.parse::<DeterministicFiniteAutomaton>().unwrap();
+        let lpn: LabelledPetriNet = dfa.into();
+
+        let fin2 = fs::read_to_string("testfiles/a-loop.lpn").unwrap();
+        let lpn2 = fin2.parse::<LabelledPetriNet>().unwrap();
+
+        assert_eq!(lpn.to_string(), lpn2.to_string());
+        
     }
 }

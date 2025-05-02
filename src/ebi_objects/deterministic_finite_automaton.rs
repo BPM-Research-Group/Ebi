@@ -52,6 +52,8 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     ],
     object_importers: &[EbiObjectImporter::DeterministicFiniteAutomaton(
         DeterministicFiniteAutomaton::import_as_object,
+    ), EbiObjectImporter::LabelledPetriNet(
+        DeterministicFiniteAutomaton::import_as_labelled_petri_net,
     )],
     object_exporters: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(
@@ -169,6 +171,13 @@ impl DeterministicFiniteAutomaton {
         self.final_states[state]
     }
 
+    /**
+     * Returns whether a transition is not permanently disabled.
+     */
+    pub fn can_execute_transition(&self, _transition: usize) -> bool {
+        true
+    }
+
     pub fn set_final_state(&mut self, state: usize, is_final: bool) {
         self.final_states[state] = is_final
     }
@@ -226,6 +235,11 @@ impl DeterministicFiniteAutomaton {
 
     pub fn set_activity_key(&mut self, activity_key: ActivityKey) {
         self.activity_key = activity_key
+    }
+
+    pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let dfm = Self::import(reader)?;
+        Ok(EbiObject::LabelledPetriNet(dfm.into()))
     }
 }
 

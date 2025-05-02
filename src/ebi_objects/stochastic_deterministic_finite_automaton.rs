@@ -151,6 +151,13 @@ impl StochasticDeterministicFiniteAutomaton {
         self.get_termination_probability(state).is_positive()
     }
 
+    /**
+     * Returns whether a transition is not permanently disabled.
+     */
+    pub fn can_execute_transition(&self, transition: usize) -> bool {
+        self.probabilities[transition].is_positive()
+    }
+
     fn ensure_states(&mut self, new_max_state: usize) {
         if new_max_state > self.max_state {
             self.terminating_probabilities

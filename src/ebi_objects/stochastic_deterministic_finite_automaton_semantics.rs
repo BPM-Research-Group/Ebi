@@ -81,7 +81,9 @@ macro_rules! semantics_for_automaton {
                 //check the DFA for enabled transitions
                 let (_, mut i) = self.binary_search(*state, 0);
                 while i < self.sources.len() && self.sources[i] == *state {
-                    result.push(i);
+                    if self.can_execute_transition(i) {
+                        result.push(i);
+                    }
                     i += 1;
                 }
 
@@ -190,8 +192,19 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
 
 #[cfg(test)]
 mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, ebi_traits::ebi_trait_semantics::Semantics};
+
     #[test]
-    fn sdfa_empty() {
-        
+    fn sdfa_zero_edge() {
+        let fin = fs::read_to_string("testfiles/a-livelock-zeroweight.sdfa").unwrap();
+        let sdfa = fin
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
+
+        let state = sdfa.get_initial_state().unwrap();
+        let enabled = sdfa.get_enabled_transitions(&state);
+        assert_eq!(enabled.len(), 2); //termination and doing a
     }
 }

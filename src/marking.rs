@@ -72,6 +72,23 @@ impl Marking {
 
         at_least_one_larger
     }
+
+    /**
+     * Returns whether all places are at least equal.
+     */
+    pub fn is_larger_than_or_equal_to(&self, other: &Self) -> bool {
+        for (me, you) in self.place2token.iter().zip(other.place2token.iter()) {
+            match me.partial_cmp(you) {
+                Some(Ordering::Equal) => {}
+                Some(Ordering::Greater) => {
+                    return false;
+                }
+                Some(Ordering::Less) => {}
+                None => return false,
+            }
+        }
+        return true;
+    }
 }
 
 impl From<Vec<u64>> for Marking {

@@ -687,6 +687,10 @@ impl LPNMarking {
     pub fn is_larger_than(&self, other: &Self) -> bool {
         self.marking.is_larger_than(&other.marking)
     }
+
+    pub fn is_larger_than_or_equal_to(&self, other: &Self) -> bool {
+        self.marking.is_larger_than_or_equal_to(&other.marking)
+    }
 }
 
 impl Displayable for LPNMarking {}

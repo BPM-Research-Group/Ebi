@@ -289,6 +289,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
         &EbiInputType::Object(EbiObjectType::ProcessTree),
         &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
+        &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
     ]],
     input_names: &["MODEL"],
     input_helps: &["The model."],
@@ -309,6 +310,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
                 object.infinitely_many_traces()?
             }
             EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(object), _) => {
+                object.infinitely_many_traces()?
+            }
+            EbiInput::Object(EbiObject::LabelledPetriNet(object), _) => {
                 object.infinitely_many_traces()?
             }
             _ => unreachable!(),
