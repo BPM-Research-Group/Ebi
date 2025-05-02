@@ -39,6 +39,7 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
 pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
     name_short: "uemsc",
     name_long: Some("unit-earth-movers-stochastic-conformance"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_UEMSC",
     explanation_short: "Compute unit-earth movers' stochastic conformance.",
     explanation_long: None,
     latex_link: Some("\\cite{DBLP:conf/bpm/LeemansSA19}"),
@@ -71,6 +72,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
     name_short: "er",
     name_long: Some("entropic-relevance"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_ER",
     explanation_short: "Compute entropic relevance (uniform).",
     explanation_long: None,
     latex_link: Some(
@@ -120,6 +122,7 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
     name_short: "jssc",
     name_long: Some("jensen-shannon"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_JSSC",
     explanation_short: "Compute Jensen-Shannon stochastic conformance.",
     explanation_long: None,
     latex_link: None,
@@ -158,6 +161,7 @@ pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "jssc-sample",
     name_long: Some("jensen-shannon-sample"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_JSSC_SAMPLE",
     explanation_short: "Compute Jensen-Shannon stochastic conformance with sampling.",
     explanation_long: None,
     latex_link: None,
@@ -201,6 +205,7 @@ pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
     name_short: "emsc",
     name_long: Some("earth-movers-stochastic-conformance"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_EMSC",
     explanation_short: "Compute Earth mover's stochastic conformance.",
     explanation_long: None,
     latex_link: Some("\\cite{DBLP:journals/is/LeemansABP21}"),
@@ -237,6 +242,7 @@ pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "emsc-sample",
     name_long: Some("earth-movers-stochastic-conformance-sample"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_EMSC_SAMPLE",
     explanation_short: "Compute Earth mover's stochastic conformance with sampling.",
     explanation_long: None,
     latex_link: Some("\\cite{DBLP:journals/is/LeemansABP21}"),

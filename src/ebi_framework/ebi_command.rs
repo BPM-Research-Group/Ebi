@@ -1,4 +1,4 @@
-use std::{collections::BTreeSet, fmt::{Debug, Display}, hash::Hash, io::Write, path::PathBuf, time::Duration};
+use std::{arch::x86_64, collections::BTreeSet, fmt::{Debug, Display}, hash::Hash, io::Write, path::PathBuf, time::Duration};
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use anyhow::{anyhow, Context, Result};
 use indicatif::{ProgressBar, ProgressStyle};
@@ -46,6 +46,7 @@ pub enum EbiCommand {
     Command {
         name_short: &'static str,
         name_long: Option<&'static str>,
+        library_name: &'static str, // must match path to the commans, e.g.  (neccessary for automatic code generation)
         explanation_short: &'static str,
         explanation_long: Option<&'static str>,
         latex_link: Option<&'static str>, //insert a link to a Latex target
@@ -66,7 +67,7 @@ impl EbiCommand {
     pub fn build_cli(&self) -> Command {
         let mut command;
         match self {
-            EbiCommand::Group { name_short, name_long, explanation_short, explanation_long, children } => {
+            EbiCommand::Group { name_short, name_long, explanation_short, explanation_long, children, .. } => {
                 let name = if let Some(x) = name_long {x} else {name_short};
                 command = Command::new(name)
                     .about(explanation_short)
@@ -458,8 +459,8 @@ impl Eq for EbiCommand {}
 impl PartialEq for EbiCommand {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (Self::Group { name_short: l_name_short, name_long: l_name_long, explanation_short: l_explanation_short, explanation_long: l_explanation_long, children: l_children }, Self::Group { name_short: r_name_short, name_long: r_name_long, explanation_short: r_explanation_short, explanation_long: r_explanation_long, children: r_children }) => l_name_short == r_name_short && l_name_long == r_name_long && l_explanation_short == r_explanation_short && l_explanation_long == r_explanation_long && l_children == r_children,
-            (Self::Command { name_short: l_name_short, name_long: l_name_long, explanation_short: l_explanation_short, explanation_long: l_explanation_long, latex_link: l_latex_link, cli_command: l_cli_command, exact_arithmetic: l_exact_arithmetic, input_types: l_input_types, input_names: l_input_names, input_helps: l_input_helps, execute: l_execute, output_type: l_output }, Self::Command { name_short: r_name_short, name_long: r_name_long, explanation_short: r_explanation_short, explanation_long: r_explanation_long, latex_link: r_latex_link, cli_command: r_cli_command, exact_arithmetic: r_exact_arithmetic, input_types: r_input_types, input_names: r_input_names, input_helps: r_input_helps, execute: r_execute, output_type: r_output }) => l_name_short == r_name_short && l_name_long == r_name_long && l_explanation_short == r_explanation_short && l_explanation_long == r_explanation_long && l_latex_link == r_latex_link && l_cli_command == r_cli_command && l_exact_arithmetic == r_exact_arithmetic && l_input_types == r_input_types && l_input_names == r_input_names && l_input_helps == r_input_helps && l_execute == r_execute && l_output == r_output,
+            (Self::Group { name_short: l_name_short, name_long: l_name_long, explanation_short: l_explanation_short, explanation_long: l_explanation_long, children: l_children, .. }, Self::Group { name_short: r_name_short, name_long: r_name_long, explanation_short: r_explanation_short, explanation_long: r_explanation_long, children: r_children, .. }) => l_name_short == r_name_short && l_name_long == r_name_long && l_explanation_short == r_explanation_short && l_explanation_long == r_explanation_long && l_children == r_children,
+            (Self::Command { name_short: l_name_short, name_long: l_name_long, explanation_short: l_explanation_short, explanation_long: l_explanation_long, latex_link: l_latex_link, cli_command: l_cli_command, exact_arithmetic: l_exact_arithmetic, input_types: l_input_types, input_names: l_input_names, input_helps: l_input_helps, execute: l_execute, output_type: l_output, .. }, Self::Command { name_short: r_name_short, name_long: r_name_long, explanation_short: r_explanation_short, explanation_long: r_explanation_long, latex_link: r_latex_link, cli_command: r_cli_command, exact_arithmetic: r_exact_arithmetic, input_types: r_input_types, input_names: r_input_names, input_helps: r_input_helps, execute: r_execute, output_type: r_output, .. }) => l_name_short == r_name_short && l_name_long == r_name_long && l_explanation_short == r_explanation_short && l_explanation_long == r_explanation_long && l_latex_link == r_latex_link && l_cli_command == r_cli_command && l_exact_arithmetic == r_exact_arithmetic && l_input_types == r_input_types && l_input_names == r_input_names && l_input_helps == r_input_helps && l_execute == r_execute && l_output == r_output,
             _ => false,
         }
     }

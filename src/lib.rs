@@ -11,7 +11,7 @@ pub mod ebi_framework {
     pub mod importable;
     pub mod infoable;
     pub mod pm4py_link;
-    pub mod pm4py_module;
+    pub mod pm4py_module_autogen;
     pub mod prom_link;
 }
 pub mod ebi_commands {

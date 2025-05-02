@@ -1,9 +1,11 @@
 use std::{collections::HashMap, io::Write};
+use chrono::NaiveTime;
 use clap::Command;
 use anyhow::Result;
 use inflector::Inflector;
 use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
+use svg2pdf::usvg::roxmltree::StringStorage;
 
 use crate::{ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, text::Joiner};
 
@@ -43,6 +45,7 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
 pub const EBI_ITSELF_LOGO: EbiCommand = EbiCommand::Command {
     name_short: "log", 
     name_long: Some("logo"), 
+    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_LOGO",
     explanation_short: "Print the logo of Ebi.", 
     explanation_long: None, 
     cli_command: None, 
@@ -58,6 +61,7 @@ pub const EBI_ITSELF_LOGO: EbiCommand = EbiCommand::Command {
 pub const EBI_ITSELF_MANUAL: EbiCommand = EbiCommand::Command { 
     name_short: "man", 
     name_long: Some("manual"), 
+    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_MANUAL",
     explanation_short: "Print the automatically generated parts of the manual of Ebi in Latex format.", 
     explanation_long: None, 
     cli_command: None, 
@@ -73,6 +77,7 @@ pub const EBI_ITSELF_MANUAL: EbiCommand = EbiCommand::Command {
 pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command { 
     name_short: "graph", 
     name_long: None, 
+    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_GRAPH",
     explanation_short: "Print the graph of Ebi.", 
     explanation_long: None, 
     cli_command: None, 
@@ -94,6 +99,7 @@ pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command {
 pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command { 
     name_short: "java", 
     name_long: None, 
+    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_JAVA",
     explanation_short: "Print the classes for Java.", 
     explanation_long: None, 
     cli_command: None, 
@@ -108,7 +114,8 @@ pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command {
 
 pub const EBI_ITSELF_GENERATE_PM4PY: EbiCommand = EbiCommand::Command { 
     name_short: "pm4py", 
-    name_long: None, 
+    name_long: Some("generate-pm4py"), 
+    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_GENERATE_PM4PY",
     explanation_short: "Generate the module exposed to PM4Py with all functions.", 
     explanation_long: None, 
     cli_command: None, 
@@ -518,23 +525,41 @@ pub fn scale(point: &mut Point) {
 }
 
 pub fn generate_pm4py_module() -> Result<EbiOutput> {
-    let mut result = String::new();
+    let mut imports = format!("use pyo3::prelude::*;
+use pyo3::types::PyAny;
+use super::pm4py_link::ImportableFromPM4Py;
+use crate::ebi_framework::{{ebi_command::EbiCommand, ebi_output}};
+use crate::ebi_objects::{{event_log::EventLog, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet}};");
+    let mut functions = String::new();
+    let mut module = format!("#[pymodule]\nfn ebi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {{");
     
     for path in EBI_COMMANDS.get_command_paths() {
-        if let EbiCommand::Command { .. } = path[path.len() - 1] {
-            result.push_str(&generate_pyfn(&path));
+        if let EbiCommand::Command { library_name,.. } = path[path.len() - 1] {
+            imports.push_str(&format!("\nuse crate::{};", library_name));
+            let (fn_name, body) = generate_pyfn(&path, library_name.to_string());
+            functions.push_str(&body);
+            module.push_str(&format!("    m.add_function(wrap_pyfunction!({}, m)?)?;\n", fn_name));
         }
     }
-    
+
+    module.push_str("    Ok(())
+}
+");
+
+    let result = format!("{}\n\n{}\n\n{}", imports, functions, module);
     Ok(EbiOutput::String(result))
 }
 
-fn generate_pyfn(path: &Vec<&EbiCommand>) -> String {
+/// return the tupe (string1, string2) where
+/// string1 - function name
+/// string2 - function body
+fn generate_pyfn(path: &Vec<&EbiCommand>, library_name: String) -> (String, String) {
     // Derive raw name and fn name
     let raw_name = EbiCommand::path_to_string(path);
     let fn_name: String = raw_name
         .strip_prefix("Ebi ")
         .unwrap_or(&raw_name)
+        .to_lowercase()
         .chars()
         .map(|c| if c == ' ' || c == '-' { '_' } else { c })
         .collect();
@@ -543,13 +568,13 @@ fn generate_pyfn(path: &Vec<&EbiCommand>) -> String {
     let input_types = if let EbiCommand::Command { input_types, .. } = path[path.len() - 1] {
         input_types
     } else {
-        return String::new();
+        return (String::new(), String::new());
     };
 
     // Start building function
     let mut body = format!(r###"#[pyfunction]
 fn {fname}({args}) -> PyResult<String> {{
-    let command: &&EbiCommand = &&{const_name};
+    let command: &&EbiCommand = &&{library_name};
     let input_types = match **command {{
         EbiCommand::Command {{ input_types, .. }} => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -557,19 +582,19 @@ fn {fname}({args}) -> PyResult<String> {{
 "###,
         fname = fn_name,
         args = (0..input_types.len()).map(|i| format!("arg{}: &PyAny", i)).collect::<Vec<_>>().join(", "),
-        const_name = raw_name.to_uppercase().replace(&[' ', '-'][..], "_")
+        library_name = library_name.split("::").last().unwrap()
     );
 
     // Import each argument
     for i in 0..input_types.len() {
         body.push_str(&format!(r###"    let input{idx} = [
         EventLog::import_from_pm4py,
-        StochasticLabelledPetriNet::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
     ]
     .iter()
-    .find_map(|importer| importer(arg{idx}, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+    .find_map(|importer| importer(arg{idx}, input_types[{idx}]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument {idx}"))?;
 "###,
             idx = i
         ));
@@ -597,9 +622,7 @@ fn {fname}({args}) -> PyResult<String> {{
     Ok(output_string)
 }}
 
-"###,
-        inputs = inputs
-    ));
+"###, inputs));
 
-    body
+    (fn_name, body)
 }

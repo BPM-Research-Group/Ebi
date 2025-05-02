@@ -24,6 +24,7 @@ pub const EBI_TEST: EbiCommand = EbiCommand::Group {
 pub const TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command { 
     name_short: "lcat", 
     name_long: Some("log-categorical-attribute"),
+    library_name: "ebi_commands::ebi_command_test::TEST_LOG_ATTRIBUTE",
     explanation_short: "Test the hypothesis that the sub-logs defined by the categorical attribute are derived from identical processes.", 
     explanation_long: Some(concat!("Test the hypothesis that the sub-logs defined by the categorical attribute are derived from identical processes.; ", number_of_samples!(), " samples are taken.")), 
     latex_link: Some("\\cite{DBLP:journals/tkde/LeemansMPH23}"), 

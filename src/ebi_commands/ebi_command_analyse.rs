@@ -21,7 +21,8 @@ pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
 
 pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
     name_short: "all", 
-    name_long: Some("all-traces"), 
+    name_long: Some("all-traces"),
+    library_name: "ebi_commands::ebi_command_analyse::EBI_ANALYSE_ALL", 
     explanation_short: "Find all traces.", 
     explanation_long: Some("List all traces of a stohastic language.
 Models containing loops are not supported and an error will be returned.
@@ -55,6 +56,7 @@ The computation may run forever if the model is unbounded."),
 pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
     name_short: "comp", 
     name_long: Some("completeness"), 
+    library_name: "ebi_commands::ebi_command_analyse::EBI_ANALYSE_COMPLETENESS",
     explanation_short: "Estimate the completeness of a finite language using species discovery.", 
     explanation_long: None,
     cli_command: None, 
@@ -76,6 +78,7 @@ pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
 pub const EBI_ANALYSE_COVERAGE: EbiCommand = EbiCommand::Command {
     name_short: "cov", 
     name_long: Some("coverage"), 
+    library_name: "ebi_commands::ebi_command_analyse::EBI_ANALYSE_COVERAGE",
     explanation_short: "Find the most-likely traces that together cover a minimum probability.", 
     explanation_long: Some("Find the most-likely traces that together cover the given minimum probability.
 Will return a finite stochastic language with the extracted traces.
@@ -110,6 +113,7 @@ The computation may not terminate if the model has non-decreasing livelocks, or 
 pub const EBI_ANALYSE_MINPROB: EbiCommand = EbiCommand::Command {
     name_short: "minprob", 
     name_long: Some("minimum-probability-traces"), 
+    library_name: "ebi_commands::ebi_command_analyse::EBI_ANALYSE_MINPROB",
     explanation_short: "Find all traces that have a given minimum probability.", 
     explanation_long: Some("Find all traces that have a given minimum probability.
 Will return a finate stochastic language with the extracted traces.
@@ -136,6 +140,7 @@ The computation may not terminate if the model is unbounded and this unboundedne
 pub const EBI_ANALYSE_MOSTLIKELY: EbiCommand = EbiCommand::Command {
     name_short: "mostlikely", 
     name_long: Some("most-likely-traces"), 
+    library_name: "ebi_commands::ebi_command_analyse::EBI_ANALYSE_MOSTLIKELY",
     explanation_short: "Find the traces with the highest probabilities.", 
     explanation_long: Some("Find the given number of traces with the highest probabilities.
 If there are more than one trace with the same probability, an arbitrary choice is made which one to return.
@@ -170,6 +175,7 @@ Computation is more efficient for an object with a finite stochastic language.")
 pub const EBI_ANALYSE_MODE: EbiCommand = EbiCommand::Command { 
     name_short: "mode", 
     name_long: None,
+    library_name: "ebi_commands::ebi_command_analyse::EBI_ANALYSE_MODE",
     explanation_short: "Find the trace with the highest probability.", 
     explanation_long: Some("Find the trace with the highest probability.
 If there is more than one trace with the highest probability, an arbitrary choice is made which one to return.
@@ -203,6 +209,7 @@ Computation is more efficient for a model with a finite stochastic language."),
 pub const EBI_ANALYSE_MEDOID: EbiCommand = EbiCommand::Command { 
     name_short: "med", 
     name_long: Some("medoid"),
+    library_name: "ebi_commands::ebi_command_analyse::EBI_ANALYSE_MEDOID",
     explanation_short: "Find the traces with the least distance to the other traces.", 
     explanation_long: Some("Find the traces with the lowest average normalised Levenshtein distance to the other traces.
 If there are more than one such trace, an arbitrary one is returned."), 
@@ -227,6 +234,7 @@ If there are more than one such trace, an arbitrary one is returned."),
 pub const EBI_ANALYSE_VARIETY: EbiCommand = EbiCommand::Command {
     name_short: "var", 
     name_long: Some("variety"), 
+    library_name: "ebi_commands::ebi_command_analyse::EBI_ANALYSE_VARIETY",
     explanation_short: "Compute the variety of a stochastic language. That is, the average distance between two arbitrary traces in the language.", 
     explanation_long: None,
     cli_command: None, 
