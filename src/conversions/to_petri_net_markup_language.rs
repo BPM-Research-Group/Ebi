@@ -13,7 +13,7 @@ use crate::{
         directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet,
         petri_net_markup_language::PetriNetMarkupLanguage, process_tree::ProcessTree,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree,
     },
     ebi_traits::ebi_trait_semantics::Semantics,
 };
@@ -128,4 +128,5 @@ from!(StochasticLabelledPetriNet);
 from!(DeterministicFiniteAutomaton);
 from!(DirectlyFollowsModel);
 from!(ProcessTree);
+from!(StochasticProcessTree);
 from!(StochasticDeterministicFiniteAutomaton);

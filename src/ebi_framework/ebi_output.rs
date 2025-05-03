@@ -30,17 +30,21 @@ use crate::{
         stochastic_language_of_alignments::{
             EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS, StochasticLanguageOfAlignments,
         },
+        stochastic_process_tree::StochasticProcessTree,
     },
     math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv},
 };
 
 use super::{
-    ebi_command::{EbiCommand, EBI_COMMANDS},
-    ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS},
+    ebi_command::{EBI_COMMANDS, EbiCommand},
+    ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
     ebi_object::{EbiObject, EbiObjectType},
     exportable::Exportable,
     prom_link::{
-        JavaObjectHandler, JAVA_OBJECT_HANDLERS_BOOL, JAVA_OBJECT_HANDLERS_CONTAINSROOT, JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV, JAVA_OBJECT_HANDLERS_PDF, JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_SVG, JAVA_OBJECT_HANDLERS_USIZE
+        JAVA_OBJECT_HANDLERS_BOOL, JAVA_OBJECT_HANDLERS_CONTAINSROOT,
+        JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV, JAVA_OBJECT_HANDLERS_PDF,
+        JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_SVG,
+        JAVA_OBJECT_HANDLERS_USIZE, JavaObjectHandler,
     },
 };
 
@@ -206,6 +210,12 @@ impl EbiOutputType {
             }
             EbiOutputType::ObjectType(EbiObjectType::ProcessTree) => EbiExporter::Object(
                 &&EbiObjectExporter::ProcessTree(ProcessTree::export_from_object),
+                &EBI_PROCESS_TREE,
+            ),
+            EbiOutputType::ObjectType(EbiObjectType::StochasticProcessTree) => EbiExporter::Object(
+                &&EbiObjectExporter::StochasticProcessTree(
+                    StochasticProcessTree::export_from_object,
+                ),
                 &EBI_PROCESS_TREE,
             ),
             EbiOutputType::String => EbiExporter::String,
@@ -397,6 +407,7 @@ pub enum EbiObjectExporter {
     StochasticLanguageOfAlignments(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     DeterministicFiniteAutomaton(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     ProcessTree(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
+    StochasticProcessTree(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     Executions(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
 }
 
@@ -424,6 +435,7 @@ impl EbiObjectExporter {
                 EbiObjectType::DeterministicFiniteAutomaton
             }
             EbiObjectExporter::ProcessTree(_) => EbiObjectType::ProcessTree,
+            EbiObjectExporter::StochasticProcessTree(_) => EbiObjectType::StochasticProcessTree,
             EbiObjectExporter::Executions(_) => EbiObjectType::Executions,
         }
     }
@@ -443,6 +455,7 @@ impl EbiObjectExporter {
             EbiObjectExporter::StochasticLanguageOfAlignments(exporter) => (exporter)(object, f),
             EbiObjectExporter::DeterministicFiniteAutomaton(exporter) => (exporter)(object, f),
             EbiObjectExporter::ProcessTree(exporter) => (exporter)(object, f),
+            EbiObjectExporter::StochasticProcessTree(exporter) => (exporter)(object, f),
             EbiObjectExporter::Executions(exporter) => (exporter)(object, f),
         }
     }

@@ -1,0 +1,35 @@
+stochastic process tree
+xor
+2
+	sequence
+	2
+		activity a0
+		1
+		activity b1
+		2
+	concurrent
+	4
+		activity c2
+		3
+		loop
+		2
+			activity d3
+			4
+			activity e4
+			5
+		interleaved
+		2
+			activity f5
+			6
+			sequence
+			2
+				tau
+				7
+				activity g7
+				8
+		or
+		2
+			activity h8
+			9
+			activity i9
+			10

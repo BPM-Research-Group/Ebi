@@ -22,7 +22,7 @@ use crate::{
         process_tree_semantics::NodeStates,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        stochastic_language_of_alignments::StochasticLanguageOfAlignments,
+        stochastic_language_of_alignments::StochasticLanguageOfAlignments, stochastic_process_tree::StochasticProcessTree,
     },
     ebi_traits::{
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
@@ -558,6 +558,24 @@ impl AlignmentHeuristics for StochasticDeterministicFiniteAutomaton {
 }
 
 impl AlignmentHeuristics for ProcessTree {
+    type AliState = NodeStates;
+
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(
+        &self,
+        _: &Vec<Activity>,
+        _: &usize,
+        _: &Self::AliState,
+        _: &Vec<Vec<usize>>,
+    ) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for StochasticProcessTree {
     type AliState = NodeStates;
 
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {

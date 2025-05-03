@@ -11,7 +11,7 @@ use crate::{
         labelled_petri_net::{LPNMarking, LabelledPetriNet},
         process_tree::ProcessTree,
         process_tree_semantics::NodeStates,
-        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree,
     },
     ebi_traits::ebi_trait_semantics::Semantics,
 };
@@ -27,6 +27,14 @@ pub trait Bounded {
 }
 
 impl Bounded for ProcessTree {
+    type LivState = NodeStates;
+
+    fn bounded(&self) -> Result<bool> {
+        Ok(true)
+    }
+}
+
+impl Bounded for StochasticProcessTree {
     type LivState = NodeStates;
 
     fn bounded(&self) -> Result<bool> {

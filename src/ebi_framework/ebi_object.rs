@@ -15,6 +15,7 @@ use crate::{
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
         stochastic_language_of_alignments::StochasticLanguageOfAlignments,
+        stochastic_process_tree::StochasticProcessTree,
     },
     ebi_traits::{
         ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
@@ -53,6 +54,7 @@ pub enum EbiObjectType {
     LabelledPetriNet,
     StochasticLabelledPetriNet,
     ProcessTree,
+    StochasticProcessTree,
     Executions,
 }
 
@@ -70,6 +72,7 @@ impl EbiObjectType {
             EbiObjectType::StochasticLanguageOfAlignments => "an",
             EbiObjectType::DeterministicFiniteAutomaton => "a",
             EbiObjectType::ProcessTree => "a",
+            EbiObjectType::StochasticProcessTree => "a",
             EbiObjectType::Executions => "",
         }
     }
@@ -136,6 +139,7 @@ impl Display for EbiObjectType {
                     "stochastic language of alignments",
                 EbiObjectType::DeterministicFiniteAutomaton => "deterministic finite automaton",
                 EbiObjectType::ProcessTree => "process tree",
+                EbiObjectType::StochasticProcessTree => "stochastic process tree",
                 EbiObjectType::Executions => "executions",
             }
         )
@@ -155,6 +159,7 @@ pub enum EbiObject {
     StochasticLanguageOfAlignments(StochasticLanguageOfAlignments),
     DeterministicFiniteAutomaton(DeterministicFiniteAutomaton),
     ProcessTree(ProcessTree),
+    StochasticProcessTree(StochasticProcessTree),
     Executions(Executions),
 }
 
@@ -178,6 +183,7 @@ impl EbiObject {
                 EbiObjectType::DeterministicFiniteAutomaton
             }
             EbiObject::ProcessTree(_) => EbiObjectType::ProcessTree,
+            EbiObject::StochasticProcessTree(_) => EbiObjectType::StochasticProcessTree,
             EbiObject::Executions(_) => EbiObjectType::Executions,
         }
     }
@@ -197,6 +203,7 @@ impl Display for EbiObject {
             EbiObject::StochasticLanguageOfAlignments(o) => write!(f, "{}", o),
             EbiObject::DeterministicFiniteAutomaton(o) => write!(f, "{}", o),
             EbiObject::ProcessTree(o) => write!(f, "{}", o),
+            EbiObject::StochasticProcessTree(o) => write!(f, "{}", o),
             EbiObject::Executions(o) => write!(f, "{}", o),
         }
     }
@@ -216,6 +223,7 @@ impl Infoable for EbiObject {
             EbiObject::StochasticLanguageOfAlignments(o) => o.info(f),
             EbiObject::DeterministicFiniteAutomaton(o) => o.info(f),
             EbiObject::ProcessTree(o) => o.info(f),
+            EbiObject::StochasticProcessTree(o) => o.info(f),
             EbiObject::Executions(o) => o.info(f),
         }
     }

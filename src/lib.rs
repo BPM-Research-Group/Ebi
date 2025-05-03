@@ -10,6 +10,7 @@ pub mod conversions {
     pub mod to_petri_net_markup_language;
     pub mod to_stochastic_deterministic_finite_automaton;
     pub mod to_stochastic_labelled_petri_net;
+    pub mod to_process_tree;
 }
 pub mod ebi_framework {
     pub mod activity_key;
@@ -63,6 +64,7 @@ pub mod ebi_objects {
     pub mod stochastic_labelled_petri_net;
     pub mod stochastic_labelled_petri_net_semantics;
     pub mod stochastic_language_of_alignments;
+    pub mod stochastic_process_tree;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_event_log;

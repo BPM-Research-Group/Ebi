@@ -23,6 +23,7 @@ use super::{
     process_tree::ProcessTree,
     stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
     stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+    stochastic_process_tree::StochasticProcessTree,
 };
 
 pub const FORMAT_SPECIFICATION: &str =
@@ -49,6 +50,7 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::DirectlyFollowsModel(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::LabelledPetriNet(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::ProcessTree(PetriNetMarkupLanguage::export_from_object),
+        EbiObjectExporter::StochasticProcessTree(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::StochasticLabelledPetriNet(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
             PetriNetMarkupLanguage::export_from_object,
@@ -119,6 +121,9 @@ impl Exportable for PetriNetMarkupLanguage {
             }
             EbiOutput::Object(EbiObject::ProcessTree(tree)) => {
                 <ProcessTree as TryInto<PetriNetMarkupLanguage>>::try_into(tree)?.export(f)
+            }
+            EbiOutput::Object(EbiObject::StochasticProcessTree(tree)) => {
+                <StochasticProcessTree as TryInto<PetriNetMarkupLanguage>>::try_into(tree)?.export(f)
             }
             EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => {
                 <StochasticDeterministicFiniteAutomaton as TryInto<PetriNetMarkupLanguage>>::try_into(

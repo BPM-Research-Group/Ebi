@@ -50,6 +50,9 @@ impl InfinitelyManyTraces for ProcessTree {
 
 macro_rules! lpn {
     ($t:ident) => {
+        //TODO: livelock check
+        //TODO: unbounded models
+        //TODO: silent loops
         impl InfinitelyManyTraces for $t {
             type LivState = LPNMarking;
 

@@ -80,6 +80,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::StochasticProcessTree),
         &EbiInputType::Object(EbiObjectType::ProcessTree),
         &EbiInputType::Object(EbiObjectType::EventLog),
         &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage),
@@ -95,6 +96,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
         let model = objects.remove(0);
         let result = match model {
             EbiInput::Object(EbiObject::ProcessTree(tree), _) => tree.bounded()?,
+            EbiInput::Object(EbiObject::StochasticProcessTree(tree), _) => tree.bounded()?,
             EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn.bounded()?,
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => slpn.bounded()?,
             EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(dfa), _) => dfa.bounded()?,
@@ -206,6 +208,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::StochasticProcessTree),
         &EbiInputType::Object(EbiObjectType::ProcessTree),
         &EbiInputType::Object(EbiObjectType::EventLog),
         &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage),
@@ -221,6 +224,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
         let model = objects.remove(0);
         let result = match model {
             EbiInput::Object(EbiObject::ProcessTree(tree), _) => tree.any_traces()?,
+            EbiInput::Object(EbiObject::StochasticProcessTree(tree), _) => tree.any_traces()?,
             EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn.any_traces()?,
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
                 slpn.any_traces()?

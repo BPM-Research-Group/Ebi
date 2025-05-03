@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use anyhow::{Error, anyhow};
+use anyhow::{Error, anyhow, Result};
 use bitvec::bitvec;
 
 use crate::{
@@ -11,39 +11,233 @@ use crate::{
         labelled_petri_net::{LPNMarking, LabelledPetriNet},
         lola_net::LolaNet,
         petri_net_markup_language::PetriNetMarkupLanguage,
-        process_tree::ProcessTree,
+        process_tree::{ProcessTree, Node, Operator},
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree,
     },
     ebi_traits::ebi_trait_semantics::Semantics,
     marking::Marking,
 };
 
-impl From<ProcessTree> for LabelledPetriNet {
-    fn from(value: ProcessTree) -> Self {
-        log::info!("convert process tree to LPN");
-
-        if value.tree.is_empty() {
-            return Self::new_empty_language();
+macro_rules! tree {
+    ($t:ident) => {
+        impl From<$t> for LabelledPetriNet {
+            fn from(value: $t) -> Self {
+                log::info!("convert (stochastic) process tree to LPN");
+        
+                if value.tree.is_empty() {
+                    return Self::new_empty_language();
+                }
+        
+                let mut result = LabelledPetriNet::new();
+                let translator =
+                    ActivityKeyTranslator::new(value.get_activity_key(), result.get_activity_key_mut());
+                let source = result.add_place();
+                let sink = result.add_place();
+                result
+                    .get_initial_marking_mut()
+                    .increase(source, 1)
+                    .unwrap();
+        
+                value
+                    .node_to_lpn(0, &mut result, &translator, source, sink)
+                    .unwrap();
+        
+                result
+            }
         }
 
-        let mut result = LabelledPetriNet::new();
-        let translator =
-            ActivityKeyTranslator::new(value.get_activity_key(), result.get_activity_key_mut());
-        let source = result.add_place();
-        let sink = result.add_place();
-        result
-            .get_initial_marking_mut()
-            .increase(source, 1)
-            .unwrap();
-
-        value
-            .node_to_lpn(0, &mut result, &translator, source, sink)
-            .unwrap();
-
-        result
-    }
+        impl $t {
+            pub(crate) fn node_to_lpn(
+                &self,
+                node: usize,
+                net: &mut LabelledPetriNet,
+                translator: &ActivityKeyTranslator,
+                source: usize,
+                sink: usize,
+            ) -> Result<usize> {
+                match self.tree[node] {
+                    Node::Tau => {
+                        let transition = net.add_transition(None);
+                        net.add_place_transition_arc(source, transition, 1)?;
+                        net.add_transition_place_arc(transition, sink, 1)?;
+                        Ok(node + 1)
+                    }
+                    Node::Activity(activity) => {
+                        let transition = net.add_transition(Some(translator.translate_activity(&activity)));
+                        net.add_place_transition_arc(source, transition, 1)?;
+                        net.add_transition_place_arc(transition, sink, 1)?;
+                        Ok(node + 1)
+                    }
+                    Node::Operator(Operator::Concurrent, number_of_children) => {
+                        let split = net.add_transition(None);
+                        net.add_place_transition_arc(source, split, 1)?;
+                        let join = net.add_transition(None);
+                        net.add_transition_place_arc(join, sink, 1)?;
+        
+                        let mut child = node + 1;
+                        for _ in 0..number_of_children {
+                            let child_source = net.add_place();
+                            net.add_transition_place_arc(split, child_source, 1)?;
+                            let child_sink = net.add_place();
+                            net.add_place_transition_arc(child_sink, join, 1)?;
+                            child = self.node_to_lpn(child, net, translator, child_source, child_sink)?;
+                        }
+                        Ok(child)
+                    }
+                    Node::Operator(Operator::Interleaved, number_of_children) => {
+                        let split = net.add_transition(None);
+                        net.add_place_transition_arc(source, split, 1)?;
+                        let join = net.add_transition(None);
+                        net.add_transition_place_arc(join, sink, 1)?;
+                        let milestone = net.add_place();
+                        net.add_transition_place_arc(split, milestone, 1)?;
+                        net.add_place_transition_arc(milestone, join, 1)?;
+        
+                        let mut child = node + 1;
+                        for _ in 0..number_of_children {
+                            let child_source = net.add_place();
+                            net.add_transition_place_arc(split, child_source, 1)?;
+        
+                            let child_start = net.add_transition(None);
+                            net.add_place_transition_arc(child_source, child_start, 1)?;
+                            net.add_place_transition_arc(milestone, child_start, 1)?;
+        
+                            let child_source_2 = net.add_place();
+                            net.add_transition_place_arc(child_start, child_source_2, 1)?;
+        
+                            let child_sink = net.add_place();
+                            net.add_place_transition_arc(child_sink, join, 1)?;
+        
+                            let child_stop = net.add_transition(None);
+                            net.add_transition_place_arc(child_stop, child_sink, 1)?;
+                            net.add_transition_place_arc(child_stop, milestone, 1)?;
+        
+                            let child_sink_2 = net.add_place();
+                            net.add_place_transition_arc(child_sink_2, child_stop, 1)?;
+        
+                            child =
+                                self.node_to_lpn(child, net, translator, child_source_2, child_sink_2)?;
+                        }
+                        Ok(child)
+                    }
+                    Node::Operator(Operator::Loop, number_of_children) => {
+                        let start = net.add_transition(None);
+                        net.add_place_transition_arc(source, start, 1)?;
+        
+                        let join = net.add_place();
+                        net.add_transition_place_arc(start, join, 1)?;
+        
+                        let split = net.add_place();
+                        let stop = net.add_transition(None);
+                        net.add_place_transition_arc(split, stop, 1)?;
+                        net.add_transition_place_arc(stop, sink, 1)?;
+        
+                        let mut child = node + 1;
+                        child = self.node_to_lpn(child, net, translator, join, split)?;
+        
+                        if number_of_children > 1 {
+                            for _ in 1..number_of_children {
+                                child = self.node_to_lpn(child, net, translator, split, join)?;
+                            }
+                        } else {
+                            let redo = net.add_transition(None);
+                            net.add_place_transition_arc(split, redo, 1)?;
+                            net.add_transition_place_arc(redo, join, 1)?;
+                        }
+        
+                        Ok(child)
+                    }
+                    Node::Operator(Operator::Or, number_of_children) => {
+                        let start = net.add_transition(None);
+                        net.add_place_transition_arc(source, start, 1)?;
+        
+                        let not_done_first = net.add_place();
+                        net.add_transition_place_arc(start, not_done_first, 1)?;
+        
+                        let done_first = net.add_place();
+                        let end = net.add_transition(None);
+                        net.add_place_transition_arc(done_first, end, 1)?;
+                        net.add_transition_place_arc(end, sink, 1)?;
+        
+                        let mut child = node + 1;
+                        for _ in 0..number_of_children {
+                            let child_source = net.add_place();
+                            net.add_transition_place_arc(start, child_source, 1)?;
+                            let child_sink = net.add_place();
+                            net.add_place_transition_arc(child_sink, end, 1)?;
+                            let do_child = net.add_place();
+        
+                            //skip
+                            let skip_child = net.add_transition(None);
+                            net.add_place_transition_arc(child_source, skip_child, 1)?;
+                            net.add_transition_place_arc(skip_child, child_sink, 1)?;
+                            net.add_transition_place_arc(skip_child, done_first, 1)?;
+                            net.add_place_transition_arc(done_first, skip_child, 1)?;
+        
+                            //first do
+                            let first_do_child = net.add_transition(None);
+                            net.add_place_transition_arc(child_source, first_do_child, 1)?;
+                            net.add_place_transition_arc(not_done_first, first_do_child, 1)?;
+                            net.add_transition_place_arc(first_do_child, done_first, 1)?;
+                            net.add_transition_place_arc(first_do_child, do_child, 1)?;
+        
+                            //later do
+                            let later_do_child = net.add_transition(None);
+                            net.add_place_transition_arc(child_source, later_do_child, 1)?;
+                            net.add_transition_place_arc(later_do_child, do_child, 1)?;
+                            net.add_transition_place_arc(later_do_child, done_first, 1)?;
+                            net.add_place_transition_arc(done_first, later_do_child, 1)?;
+        
+                            child = self.node_to_lpn(child, net, translator, do_child, child_sink)?;
+                        }
+        
+                        Ok(child)
+                    }
+                    Node::Operator(Operator::Sequence, number_of_children) => {
+                        let intermediate_nodes = (0..(number_of_children - 1))
+                            .map(|_| net.add_place())
+                            .collect::<Vec<_>>();
+        
+                        let mut child = node + 1;
+                        for i in 0..number_of_children {
+                            let child_entry = if i == 0 {
+                                source
+                            } else {
+                                intermediate_nodes[i - 1]
+                            };
+                            let child_exit = if i == number_of_children - 1 {
+                                sink
+                            } else {
+                                intermediate_nodes[i]
+                            };
+        
+                            child = $t::node_to_lpn(
+                                &self,
+                                child,
+                                net,
+                                translator,
+                                child_entry,
+                                child_exit,
+                            )?;
+                        }
+                        Ok(child)
+                    }
+                    Node::Operator(Operator::Xor, number_of_children) => {
+                        let mut child = node + 1;
+                        for _ in 0..number_of_children {
+                            child = $t::node_to_lpn(&self, child, net, translator, source, sink)?;
+                        }
+                        Ok(child)
+                    }
+                }
+            }
+        }
+    };
 }
+
+tree!(ProcessTree);
+tree!(StochasticProcessTree);
 
 impl From<LolaNet> for LabelledPetriNet {
     fn from(value: LolaNet) -> Self {

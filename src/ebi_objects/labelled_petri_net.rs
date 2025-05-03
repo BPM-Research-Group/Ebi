@@ -38,6 +38,7 @@ use super::{
     directly_follows_model::DirectlyFollowsModel, process_tree::ProcessTree,
     stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
     stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+    stochastic_process_tree::StochasticProcessTree,
 };
 
 pub const HEADER: &str = "labelled Petri net";
@@ -313,6 +314,9 @@ impl Exportable for LabelledPetriNet {
             EbiOutput::Object(EbiObject::LabelledPetriNet(lpn)) => lpn.export(f),
             EbiOutput::Object(EbiObject::ProcessTree(tree)) => {
                 <ProcessTree as Into<LabelledPetriNet>>::into(tree).export(f)
+            }
+            EbiOutput::Object(EbiObject::StochasticProcessTree(tree)) => {
+                <StochasticProcessTree as Into<LabelledPetriNet>>::into(tree).export(f)
             }
             EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => {
                 <StochasticDeterministicFiniteAutomaton as Into<LabelledPetriNet>>::into(sdfa)

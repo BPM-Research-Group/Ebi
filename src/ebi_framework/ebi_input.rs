@@ -394,6 +394,7 @@ pub enum EbiObjectImporter {
     ProcessTree(fn(&mut dyn BufRead) -> Result<EbiObject>),
     Executions(fn(&mut dyn BufRead) -> Result<EbiObject>),
     StochasticLanguageOfAlignments(fn(&mut dyn BufRead) -> Result<EbiObject>),
+    StochasticProcessTree(fn(&mut dyn BufRead) -> Result<EbiObject>),
 }
 
 impl EbiObjectImporter {
@@ -420,6 +421,7 @@ impl EbiObjectImporter {
                 EbiObjectType::DeterministicFiniteAutomaton
             }
             EbiObjectImporter::ProcessTree(_) => EbiObjectType::ProcessTree,
+            EbiObjectImporter::StochasticProcessTree(_) => EbiObjectType::StochasticProcessTree,
             EbiObjectImporter::Executions(_) => EbiObjectType::Executions,
         }
     }
@@ -437,6 +439,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::StochasticLanguageOfAlignments(importer) => *importer,
             EbiObjectImporter::DeterministicFiniteAutomaton(importer) => *importer,
             EbiObjectImporter::ProcessTree(importer) => *importer,
+            EbiObjectImporter::StochasticProcessTree(importer) => *importer,
             EbiObjectImporter::Executions(importer) => *importer,
         }
     }
@@ -550,7 +553,10 @@ pub fn validate_object_of(
 
 #[cfg(test)]
 mod tests {
-    use std::{fs::{self, File}, path::PathBuf};
+    use std::{
+        fs::{self, File},
+        path::PathBuf,
+    };
 
     use strum::IntoEnumIterator;
 

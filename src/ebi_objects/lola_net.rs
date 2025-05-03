@@ -26,6 +26,7 @@ use super::{
     process_tree::ProcessTree,
     stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
     stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+    stochastic_process_tree::StochasticProcessTree,
 };
 
 pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
@@ -134,6 +135,9 @@ impl Exportable for LolaNet {
             }
             EbiOutput::Object(EbiObject::ProcessTree(tree)) => {
                 <ProcessTree as Into<LolaNet>>::into(tree).export(f)
+            }
+            EbiOutput::Object(EbiObject::StochasticProcessTree(tree)) => {
+                <StochasticProcessTree as Into<LolaNet>>::into(tree).export(f)
             }
             EbiOutput::Bool(_) => Err(anyhow!("Cannot export boolean as Lolanet.")),
             EbiOutput::ContainsRoot(_) => Err(anyhow!("Cannot export ContainsRoot as Lolanet.")),

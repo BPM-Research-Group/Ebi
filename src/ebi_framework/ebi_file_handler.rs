@@ -14,7 +14,7 @@ use crate::{
         petri_net_markup_language::EBI_PETRI_NET_MARKUP_LANGUAGE, process_tree::EBI_PROCESS_TREE,
         stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON,
         stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
-        stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
+        stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS, stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE,
     },
 };
 
@@ -42,6 +42,7 @@ pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_STOCHASTIC_LABELLED_PETRI_NET,
     EBI_PROCESS_TREE,
     EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
+    EBI_STOCHASTIC_PROCESS_TREE,
 ];
 
 #[derive(Clone, Debug)]
