@@ -8,7 +8,7 @@ use strum_macros::Display;
 
 use crate::{
     ebi_framework::activity_key::Activity,
-    ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::TransitionIndex},
+    ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}},
 };
 
 use super::{
@@ -353,6 +353,18 @@ macro_rules! tree {
 
 tree!(ProcessTree);
 tree!(StochasticProcessTree);
+
+// impl StochasticSemantics for StochasticProcessTree {
+//     type StoSemState = NodeStates;
+
+//     fn get_transition_weight(&self, state: &<Self as StochasticSemantics>::StoSemState, transition: TransitionIndex) -> &crate::math::fraction::Fraction {
+//         todo!()
+//     }
+
+//     fn get_total_weight_of_enabled_transitions(&self, state: &<Self as StochasticSemantics>::StoSemState) -> anyhow::Result<crate::math::fraction::Fraction> {
+//         todo!()
+//     }
+// }
 
 #[derive(Clone, Display, Debug, Eq, PartialEq, Hash)]
 pub enum NodeState {

@@ -19,7 +19,7 @@ use crate::{
         labelled_petri_net::{LPNMarking, LabelledPetriNet},
         language_of_alignments::{LanguageOfAlignments, Move},
         process_tree::ProcessTree,
-        process_tree_semantics::NodeStates,
+        stochastic_process_tree_semantics::NodeStates,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
         stochastic_language_of_alignments::StochasticLanguageOfAlignments, stochastic_process_tree::StochasticProcessTree,

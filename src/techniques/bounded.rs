@@ -10,7 +10,7 @@ use crate::{
         finite_stochastic_language::FiniteStochasticLanguage,
         labelled_petri_net::{LPNMarking, LabelledPetriNet},
         process_tree::ProcessTree,
-        process_tree_semantics::NodeStates,
+        stochastic_process_tree_semantics::NodeStates,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree,
     },
     ebi_traits::ebi_trait_semantics::Semantics,

@@ -58,7 +58,7 @@ pub mod ebi_objects {
     pub mod lola_net;
     pub mod petri_net_markup_language;
     pub mod process_tree;
-    pub mod process_tree_semantics;
+    pub mod stochastic_process_tree_semantics;
     pub mod stochastic_deterministic_finite_automaton;
     pub mod stochastic_deterministic_finite_automaton_semantics;
     pub mod stochastic_labelled_petri_net;

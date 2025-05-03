@@ -1,4 +1,4 @@
-use std::io::BufRead;
+use std::{fmt::Display, io::BufRead};
 
 use crate::{
     ebi_framework::{
@@ -365,6 +365,16 @@ impl From<(ActivityKey, Vec<Node>, Vec<Option<Fraction>>)> for StochasticProcess
             transition2node: transition2node,
             weights: weights,
         }
+    }
+}
+
+impl Display for StochasticProcessTree {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "{}", HEADER)?;
+        if !self.tree.is_empty() {
+            let _ = self.node_to_string(0, 0, f);
+        };
+        write!(f, "")
     }
 }
 

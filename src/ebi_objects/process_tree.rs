@@ -469,16 +469,6 @@ macro_rules! tree {
             }
         }
 
-        impl Display for $t {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                writeln!(f, "{}", HEADER)?;
-                if !self.tree.is_empty() {
-                    let _ = self.node_to_string(0, 0, f);
-                };
-                write!(f, "")
-            }
-        }
-
         impl Infoable for $t {
             fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
                 writeln!(f, "Number of nodes\t\t{}", self.get_number_of_nodes())?;
@@ -576,6 +566,16 @@ tree!(
     StochasticChildrenIterator,
     StochasticParentsIterator
 );
+
+impl Display for ProcessTree {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        writeln!(f, "{}", HEADER)?;
+        if !self.tree.is_empty() {
+            let _ = self.node_to_string(0, 0, f);
+        };
+        write!(f, "")
+    }
+}
 
 impl FromEbiTraitObject for ProcessTree {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {

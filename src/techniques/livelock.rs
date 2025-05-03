@@ -5,7 +5,7 @@ use crate::{
         directly_follows_model::DirectlyFollowsModel,
         labelled_petri_net::{LPNMarking, LabelledPetriNet},
         process_tree::ProcessTree,
-        process_tree_semantics::NodeStates,
+        stochastic_process_tree_semantics::NodeStates,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
     },
@@ -314,7 +314,7 @@ mod tests {
         ebi_objects::{
             deterministic_finite_automaton::DeterministicFiniteAutomaton,
             directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet,
-            process_tree::ProcessTree, process_tree_semantics::NodeStates,
+            process_tree::ProcessTree, stochastic_process_tree_semantics::NodeStates,
             stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
             stochastic_labelled_petri_net::StochasticLabelledPetriNet,
         },
