@@ -8,7 +8,11 @@ use strum_macros::Display;
 
 use crate::{
     ebi_framework::activity_key::Activity,
-    ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex}},
+    ebi_traits::{
+        ebi_trait_semantics::Semantics,
+        ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex},
+    },
+    math::{fraction::Fraction, traits::Zero},
 };
 
 use super::{
@@ -46,7 +50,7 @@ macro_rules! tree {
                     let node = self
                         .transition2node
                         .get(transition)
-                        .ok_or_else(|| anyhow!("Transition does not exist."))?;
+                        .ok_or_else(|| anyhow!("transition does not exist"))?;
                     self.start_node(state, *node, None);
                     // log::debug!("execute node {}", node);
                     self.close_node(state, *node);
@@ -354,17 +358,40 @@ macro_rules! tree {
 tree!(ProcessTree);
 tree!(StochasticProcessTree);
 
-// impl StochasticSemantics for StochasticProcessTree {
-//     type StoSemState = NodeStates;
+impl StochasticSemantics for StochasticProcessTree {
+    type StoSemState = NodeStates;
 
-//     fn get_transition_weight(&self, state: &<Self as StochasticSemantics>::StoSemState, transition: TransitionIndex) -> &crate::math::fraction::Fraction {
-//         todo!()
-//     }
+    fn get_transition_weight(
+        &self,
+        _state: &<Self as StochasticSemantics>::StoSemState,
+        transition: TransitionIndex,
+    ) -> &Fraction {
+        if transition < self.transition2node.len() {
+            &self.weights[transition]
+        } else {
+            &self.termination_weight
+        }
+    }
 
-//     fn get_total_weight_of_enabled_transitions(&self, state: &<Self as StochasticSemantics>::StoSemState) -> anyhow::Result<crate::math::fraction::Fraction> {
-//         todo!()
-//     }
-// }
+    fn get_total_weight_of_enabled_transitions(
+        &self,
+        state: &<Self as StochasticSemantics>::StoSemState,
+    ) -> Result<Fraction> {
+        let mut sum = if !state.terminated && self.can_terminate(state, self.get_root()) {
+            self.termination_weight.clone()
+        } else {
+            Fraction::zero()
+        };
+
+        for (transition, node) in self.transition2node.iter().enumerate() {
+            if self.can_execute(state, *node) {
+                sum += &self.weights[transition];
+            }
+        }
+
+        Ok(sum)
+    }
+}
 
 #[derive(Clone, Display, Debug, Eq, PartialEq, Hash)]
 pub enum NodeState {
@@ -410,8 +437,14 @@ mod tests {
     use std::fs;
 
     use crate::{
-        ebi_objects::{labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree},
-        ebi_traits::ebi_trait_semantics::Semantics,
+        ebi_objects::{
+            labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree,
+            stochastic_process_tree::StochasticProcessTree,
+        },
+        ebi_traits::{
+            ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::StochasticSemantics,
+        },
+        math::{fraction::Fraction, traits::One},
     };
 
     #[test]
@@ -544,5 +577,47 @@ mod tests {
         assert!(tree.get_initial_state().is_none());
 
         let _ = Into::<LabelledPetriNet>::into(tree);
+    }
+
+    #[test]
+    fn stree() {
+        let fin = fs::read_to_string("testfiles/seq(a-xor(b-c)).sptree").unwrap();
+        let tree = fin.parse::<StochasticProcessTree>().unwrap();
+
+        let mut state = tree.get_initial_state().unwrap();
+        assert_eq!(tree.get_enabled_transitions(&state), vec![0]);
+        assert!(!tree.is_final_state(&state));
+
+        assert_eq!(
+            tree.get_total_weight_of_enabled_transitions(&state)
+                .unwrap(),
+            Fraction::one()
+        );
+        assert_eq!(tree.get_transition_weight(&state, 0), &Fraction::one());
+
+        assert!(tree.execute_transition(&mut state, 0).is_ok());
+
+        assert_eq!(tree.get_enabled_transitions(&state), vec![1, 2]);
+        assert!(!tree.is_final_state(&state));
+        assert_eq!(
+            tree.get_total_weight_of_enabled_transitions(&state)
+                .unwrap(),
+            Fraction::from(3)
+        );
+
+        assert!(tree.execute_transition(&mut state, 1).is_ok());
+
+        assert_eq!(tree.get_enabled_transitions(&state), vec![3]);
+        assert!(!tree.is_final_state(&state));
+        assert_eq!(
+            tree.get_total_weight_of_enabled_transitions(&state)
+                .unwrap(),
+            Fraction::from(4)
+        );
+        assert_eq!(tree.get_transition_weight(&state, 4), &Fraction::from(4));
+
+        assert!(tree.execute_transition(&mut state, 4).is_ok());
+        assert!(tree.is_final_state(&state));
+        assert!(tree.get_enabled_transitions(&state).is_empty());
     }
 }

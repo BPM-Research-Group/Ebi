@@ -13,7 +13,9 @@ use crate::{
     },
     ebi_traits::{
         ebi_trait_graphable::{self, EbiTraitGraphable},
+        ebi_trait_queriable_stochastic_language,
         ebi_trait_semantics::ToSemantics,
+        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
     line_reader::LineReader,
     math::{fraction::Fraction, traits::Signed},
@@ -37,7 +39,8 @@ pub const FORMAT_SPECIFICATION: &str = "A stochastic process tree is a line-base
         The line thereafter contains the number of children of the node, after which the nodes are given.
         An operator node must have at least one child.
     \\end{itemize}
-    Indentation of nodes is allowed, but not mandatory.
+    Indentation of nodes is allowed, but not mandatory.\\
+    The last line of the file contains the weight of termination.
     
     For instance:
     \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/all_operators.sptree}";
@@ -49,7 +52,13 @@ pub const EBI_STOCHASTIC_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: ebi_input::validate::<StochasticProcessTree>,
     trait_importers: &[
+        EbiTraitImporter::QueriableStochasticLanguage(
+            ebi_trait_queriable_stochastic_language::import::<StochasticProcessTree>,
+        ),
         EbiTraitImporter::Semantics(StochasticProcessTree::import_as_semantics),
+        EbiTraitImporter::StochasticSemantics(
+            StochasticProcessTree::import_as_stochastic_semantics,
+        ),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<StochasticProcessTree>),
     ],
     object_importers: &[
@@ -68,7 +77,9 @@ pub struct StochasticProcessTree {
     pub(crate) activity_key: ActivityKey,
     pub(crate) tree: Vec<Node>,
     pub(crate) transition2node: Vec<usize>,
-    pub(crate) weights: Vec<Option<Fraction>>, //weights must be strictly positive; no deadlocks or livelocks in trees
+    pub(crate) node2transition: Vec<usize>,
+    pub(crate) weights: Vec<Fraction>, //weights must be strictly positive; no deadlocks or livelocks in trees
+    pub(crate) termination_weight: Fraction,
 }
 
 impl StochasticProcessTree {
@@ -84,13 +95,7 @@ impl StochasticProcessTree {
                 writeln!(
                     f,
                     "{}tau\n{}# weight node {}\n{}{}",
-                    id,
-                    id,
-                    node,
-                    id,
-                    self.weights[node]
-                        .as_ref()
-                        .ok_or_else(|| anyhow!("no weight found"))?
+                    id, id, node, id, self.weights[self.node2transition[node]]
                 )?;
                 Ok(node + 1)
             }
@@ -103,9 +108,7 @@ impl StochasticProcessTree {
                     id,
                     node,
                     id,
-                    self.weights[node]
-                        .as_ref()
-                        .ok_or_else(|| anyhow!("no weight found"))?
+                    self.weights[self.node2transition[node]]
                 )?;
                 Ok(node + 1)
             }
@@ -129,7 +132,7 @@ impl StochasticProcessTree {
     fn string_to_tree(
         lreader: &mut LineReader<'_>,
         tree: &mut Vec<Node>,
-        weights: &mut Vec<Option<Fraction>>,
+        weights: &mut Vec<Fraction>,
         activity_key: &mut ActivityKey,
         root: bool,
     ) -> Result<()> {
@@ -166,7 +169,7 @@ impl StochasticProcessTree {
                     lreader.get_last_line_number()
                 ));
             }
-            weights.push(Some(weight));
+            weights.push(weight);
             tree.push(Node::Tau);
         } else if node_type_line.trim_start().starts_with("activity ") {
             let label = node_type_line.trim_start()[9..].to_string();
@@ -186,7 +189,7 @@ impl StochasticProcessTree {
                     lreader.get_last_line_number()
                 ));
             }
-            weights.push(Some(weight));
+            weights.push(weight);
 
             tree.push(Node::Activity(activity));
         } else if let Ok(operator) = node_type_line.trim_start().trim_end().parse::<Operator>() {
@@ -204,7 +207,6 @@ impl StochasticProcessTree {
                     lreader.get_last_line_number()
                 ));
             }
-            weights.push(None);
             tree.push(Node::Operator(operator, number_of_children));
             for _ in 0..number_of_children {
                 Self::string_to_tree(lreader, tree, weights, activity_key, false)?;
@@ -214,7 +216,7 @@ impl StochasticProcessTree {
             return Ok(());
         } else {
             return Err(anyhow!(
-                "Could not parse type of node {} at line {}. Expected `tau`, `activity`, `concurrent`, `interleaved`, `or`, `sequence` or `xor`.",
+                "could not parse type of node {} at line {}; Expected `tau`, `activity`, `concurrent`, `interleaved`, `or`, `sequence` or `xor`",
                 tree.len(),
                 lreader.get_last_line_number()
             ));
@@ -345,14 +347,16 @@ impl StochasticProcessTree {
     }
 }
 
-impl From<(ActivityKey, Vec<Node>, Vec<Option<Fraction>>)> for StochasticProcessTree {
-    fn from(value: (ActivityKey, Vec<Node>, Vec<Option<Fraction>>)) -> Self {
-        let (activity_key, tree, weights) = value;
+impl From<(ActivityKey, Vec<Node>, Vec<Fraction>, Fraction)> for StochasticProcessTree {
+    fn from(value: (ActivityKey, Vec<Node>, Vec<Fraction>, Fraction)) -> Self {
+        let (activity_key, tree, weights, termination_weight) = value;
 
         let mut transition2node = vec![];
+        let mut node2transition = vec![0; tree.len()];
         for (node_index, node) in tree.iter().enumerate() {
             match node {
                 Node::Tau | Node::Activity(_) => {
+                    node2transition[node_index] = transition2node.len();
                     transition2node.push(node_index);
                 }
                 Node::Operator(_, _) => {}
@@ -363,7 +367,9 @@ impl From<(ActivityKey, Vec<Node>, Vec<Option<Fraction>>)> for StochasticProcess
             activity_key: activity_key,
             tree: tree,
             transition2node: transition2node,
+            node2transition: node2transition,
             weights: weights,
+            termination_weight: termination_weight,
         }
     }
 }
@@ -374,7 +380,7 @@ impl Display for StochasticProcessTree {
         if !self.tree.is_empty() {
             let _ = self.node_to_string(0, 0, f);
         };
-        write!(f, "")
+        writeln!(f, "# termination weight\n{}", self.termination_weight)
     }
 }
 
@@ -425,7 +431,22 @@ impl Importable for StochasticProcessTree {
             true,
         )?;
 
-        Ok(StochasticProcessTree::from((activity_key, tree, weights)))
+        let termination_weight = lreader
+            .next_line_weight()
+            .with_context(|| format!("could not read termination weight at end of file"))?;
+        if !termination_weight.is_positive() {
+            return Err(anyhow!(
+                "termination weight ({}) is not positive",
+                termination_weight
+            ));
+        }
+
+        Ok(StochasticProcessTree::from((
+            activity_key,
+            tree,
+            weights,
+            termination_weight,
+        )))
     }
 }
 
@@ -439,5 +460,11 @@ impl Exportable for StochasticProcessTree {
 
     fn export(&self, f: &mut dyn std::io::Write) -> Result<()> {
         Ok(write!(f, "{}", self)?)
+    }
+}
+
+impl ToStochasticSemantics for StochasticProcessTree {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        EbiTraitStochasticSemantics::NodeStates(Box::new(self))
     }
 }

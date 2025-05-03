@@ -309,7 +309,7 @@ impl ProcessTree {
             return Ok(());
         } else {
             return Err(anyhow!(
-                "Could not parse type of node {} at line {}. Expected `tau`, `activity`, `concurrent`, `interleaved`, `or`, `sequence` or `xor`.",
+                "could not parse type of node {} at line {}. Expected `tau`, `activity`, `concurrent`, `interleaved`, `or`, `sequence` or `xor`",
                 tree.len(),
                 lreader.get_last_line_number()
             ));
@@ -494,6 +494,15 @@ macro_rules! tree {
             }
         }
 
+        impl FromStr for $t {
+            type Err = Error;
+
+            fn from_str(s: &str) -> std::prelude::v1::Result<Self, Self::Err> {
+                let mut reader = io::Cursor::new(s);
+                Self::import(&mut reader)
+            }
+        }
+
         pub struct $u<'a> {
             //children iterator
             tree: &'a $t,
@@ -618,15 +627,6 @@ impl Importable for ProcessTree {
         Self::string_to_tree(&mut lreader, &mut tree, &mut activity_key, true)?;
 
         Ok(ProcessTree::new(activity_key, tree))
-    }
-}
-
-impl FromStr for ProcessTree {
-    type Err = Error;
-
-    fn from_str(s: &str) -> std::prelude::v1::Result<Self, Self::Err> {
-        let mut reader = io::Cursor::new(s);
-        Self::import(&mut reader)
     }
 }
 

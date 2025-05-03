@@ -50,4 +50,5 @@ xor
 			activity i9
 			# weight node 16
 			10
-
+# termination weight
+5

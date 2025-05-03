@@ -11,7 +11,7 @@ use crate::{
     ebi_objects::{
         labelled_petri_net::LPNMarking,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree, stochastic_process_tree_semantics::NodeStates,
     },
     ebi_traits::{
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
@@ -168,6 +168,7 @@ macro_rules! default_trace_probability {
 }
 
 default_trace_probability!(StochasticLabelledPetriNet, LPNMarking);
+default_trace_probability!(StochasticProcessTree, NodeStates);
 
 impl EbiTraitQueriableStochasticLanguage for StochasticDeterministicFiniteAutomaton {
     fn get_probability(&self, follower: &FollowerSemantics) -> Result<Fraction> {
@@ -477,7 +478,7 @@ mod tests {
         ebi_framework::activity_key::HasActivityKey,
         ebi_objects::{
             stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-            stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+            stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree,
         },
         ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
         follower_semantics::FollowerSemantics,
@@ -687,5 +688,24 @@ mod tests {
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "0".parse::<Fraction>().unwrap());
         }
+    }
+
+    #[test]
+    fn trace_probability_sptree() {
+        let fin = fs::read_to_string("testfiles/seq(a-xor(b-c)).sptree").unwrap();
+        let mut tree = fin.parse::<StochasticProcessTree>().unwrap();
+
+        let strace = vec!["d".to_string()];
+        let trace = tree.get_activity_key_mut().process_trace(&strace);
+        let trace_follower = FollowerSemantics::Trace(&trace);
+        let probability = tree.get_probability(&trace_follower).unwrap();
+        assert_eq!(probability, Fraction::zero());
+
+        let strace = vec!["a".to_string(), "c".to_string()];
+        let trace = tree.get_activity_key_mut().process_trace(&strace);
+        let trace_follower = FollowerSemantics::Trace(&trace);
+        let probability = tree.get_probability(&trace_follower).unwrap();
+        assert_eq!(probability, Fraction::from((2, 3)));
+        
     }
 }
