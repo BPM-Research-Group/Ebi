@@ -12,9 +12,10 @@ use crate::{
         finite_stochastic_language::FiniteStochasticLanguage,
         labelled_petri_net::{LPNMarking, LabelledPetriNet},
         process_tree::{Node, Operator, ProcessTree},
-        stochastic_process_tree_semantics::NodeStates,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        stochastic_process_tree::StochasticProcessTree,
+        stochastic_process_tree_semantics::NodeStates,
     },
     ebi_traits::ebi_trait_semantics::Semantics,
     techniques::livelock::IsPartOfLivelock,
@@ -30,23 +31,29 @@ pub trait InfinitelyManyTraces {
     fn infinitely_many_traces(&self) -> Result<bool>;
 }
 
-impl InfinitelyManyTraces for ProcessTree {
-    type LivState = NodeStates;
+macro_rules! tree {
+    ($t:ident) => {
+        impl InfinitelyManyTraces for $t {
+            type LivState = NodeStates;
 
-    fn infinitely_many_traces(&self) -> Result<bool> {
-        for node in 0..self.get_number_of_nodes() {
-            if let Some(Node::Operator(Operator::Loop, _)) = self.get_node(node) {
-                //see whether at least one leaf in the loop is an activity
-                for child in self.get_descendants(node) {
-                    if let Node::Activity(_) = child {
-                        return Ok(true);
+            fn infinitely_many_traces(&self) -> Result<bool> {
+                for node in 0..self.get_number_of_nodes() {
+                    if let Some(Node::Operator(Operator::Loop, _)) = self.get_node(node) {
+                        //see whether at least one leaf in the loop is an activity
+                        for child in self.get_descendants(node) {
+                            if let Node::Activity(_) = child {
+                                return Ok(true);
+                            }
+                        }
                     }
                 }
+                return Ok(false);
             }
         }
-        return Ok(false);
-    }
+    };
 }
+tree!(ProcessTree);
+tree!(StochasticProcessTree);
 
 macro_rules! lpn {
     ($t:ident) => {
@@ -286,7 +293,10 @@ mod tests {
 
     use crate::{
         ebi_objects::{
-            deterministic_finite_automaton::DeterministicFiniteAutomaton, labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet
+            deterministic_finite_automaton::DeterministicFiniteAutomaton,
+            labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree,
+            stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+            stochastic_labelled_petri_net::StochasticLabelledPetriNet,
         },
         techniques::infinitely_many_traces::InfinitelyManyTraces,
     };
@@ -318,7 +328,9 @@ mod tests {
     #[test]
     fn infinitely_many_traces_sdfa() {
         let fin = fs::read_to_string("testfiles/a-livelock-zeroweight.sdfa").unwrap();
-        let lpn = fin.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
+        let lpn = fin
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
 
         assert!(!lpn.infinitely_many_traces().unwrap());
     }

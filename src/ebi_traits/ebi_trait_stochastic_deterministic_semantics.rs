@@ -13,13 +13,30 @@ use crate::{
     },
     ebi_objects::{labelled_petri_net::LPNMarking, stochastic_process_tree_semantics::NodeStates},
     math::fraction::Fraction,
-    techniques::deterministic_semantics_for_stochastic_semantics::PMarking,
+    techniques::{
+        deterministic_semantics_for_stochastic_semantics::PMarking,
+        infinitely_many_traces::InfinitelyManyTraces,
+    },
 };
 
 pub enum EbiTraitStochasticDeterministicSemantics {
-    Usize(Box<dyn StochasticDeterministicSemantics<DetState = usize>>),
-    LPNMarkingDistribution(Box<dyn StochasticDeterministicSemantics<DetState = PMarking<LPNMarking>>>),
-    NodeStatesDistribution(Box<dyn StochasticDeterministicSemantics<DetState = PMarking<NodeStates>>>),
+    Usize(Box<dyn StochasticDeterministicSemantics<DetState = usize, LivState = usize>>),
+    LPNMarkingDistribution(
+        Box<
+            dyn StochasticDeterministicSemantics<
+                    DetState = PMarking<LPNMarking>,
+                    LivState = LPNMarking,
+                >,
+        >,
+    ),
+    NodeStatesDistribution(
+        Box<
+            dyn StochasticDeterministicSemantics<
+                    DetState = PMarking<NodeStates>,
+                    LivState = NodeStates,
+                >,
+        >,
+    ),
 }
 
 impl FromEbiTraitObject for EbiTraitStochasticDeterministicSemantics {
@@ -37,7 +54,7 @@ impl FromEbiTraitObject for EbiTraitStochasticDeterministicSemantics {
     }
 }
 
-pub trait StochasticDeterministicSemantics: HasActivityKey {
+pub trait StochasticDeterministicSemantics: HasActivityKey + InfinitelyManyTraces {
     type DetState: Displayable;
 
     /**

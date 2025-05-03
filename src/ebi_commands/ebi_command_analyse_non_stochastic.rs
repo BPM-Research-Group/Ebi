@@ -290,9 +290,11 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
         &EbiInputType::Object(EbiObjectType::EventLog),
         &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage),
         &EbiInputType::Object(EbiObjectType::FiniteLanguage),
+        &EbiInputType::Object(EbiObjectType::StochasticProcessTree),
         &EbiInputType::Object(EbiObjectType::ProcessTree),
         &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
+        &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
         &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
     ]],
     input_names: &["MODEL"],
@@ -307,6 +309,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => {
                 object.infinitely_many_traces()?
             }
+            EbiInput::Object(EbiObject::StochasticProcessTree(object), _) => {
+                object.infinitely_many_traces()?
+            }
             EbiInput::Object(EbiObject::ProcessTree(object), _) => {
                 object.infinitely_many_traces()?
             }
@@ -317,6 +322,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
                 object.infinitely_many_traces()?
             }
             EbiInput::Object(EbiObject::LabelledPetriNet(object), _) => {
+                object.infinitely_many_traces()?
+            }
+            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(object), _) => {
                 object.infinitely_many_traces()?
             }
             _ => unreachable!(),
