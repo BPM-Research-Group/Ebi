@@ -15,6 +15,9 @@ use crate::{
         ebi_trait_graphable::{self, EbiTraitGraphable},
         ebi_trait_queriable_stochastic_language,
         ebi_trait_semantics::ToSemantics,
+        ebi_trait_stochastic_deterministic_semantics::{
+            EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
+        },
         ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
     line_reader::LineReader,
@@ -55,6 +58,9 @@ pub const EBI_STOCHASTIC_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
         EbiTraitImporter::QueriableStochasticLanguage(
             ebi_trait_queriable_stochastic_language::import::<StochasticProcessTree>,
         ),
+        EbiTraitImporter::StochasticDeterministicSemantics(
+            StochasticProcessTree::import_as_stochastic_deterministic_semantics,
+        ),
         EbiTraitImporter::Semantics(StochasticProcessTree::import_as_semantics),
         EbiTraitImporter::StochasticSemantics(
             StochasticProcessTree::import_as_stochastic_semantics,
@@ -78,7 +84,7 @@ pub struct StochasticProcessTree {
     pub(crate) tree: Vec<Node>,
     pub(crate) transition2node: Vec<usize>,
     pub(crate) node2transition: Vec<usize>,
-    pub(crate) weights: Vec<Fraction>, //weights must be strictly positive; no deadlocks or livelocks in trees
+    pub(crate) weights: Vec<Fraction>, //weights must be strictly positive; no deadlocks or livelocks in trees. Index are transitions, not nodes.
     pub(crate) termination_weight: Fraction,
 }
 
@@ -466,5 +472,11 @@ impl Exportable for StochasticProcessTree {
 impl ToStochasticSemantics for StochasticProcessTree {
     fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
         EbiTraitStochasticSemantics::NodeStates(Box::new(self))
+    }
+}
+
+impl ToStochasticDeterministicSemantics for StochasticProcessTree {
+    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+        EbiTraitStochasticDeterministicSemantics::NodeStatesDistribution(Box::new(self))
     }
 }

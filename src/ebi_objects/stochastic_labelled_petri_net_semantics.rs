@@ -41,7 +41,7 @@ impl StochasticLabelledPetriNet {
             state.number_of_enabled_transitions += 1;
         }
 
-        if !self.get_transition_weight(transition).is_positive() {
+        if !self.weights[transition].is_positive() {
             return false;
         }
 
@@ -145,7 +145,7 @@ impl StochasticSemantics for StochasticLabelledPetriNet {
     ) -> anyhow::Result<Fraction> {
         let mut sum = Fraction::zero();
         for index in state.enabled_transitions.iter_ones() {
-            sum += self.get_transition_weight(index);
+            sum += &self.weights[index];
         }
         if sum.is_zero() {
             return Err(anyhow!("total enabled weight is 0"));

@@ -8,9 +8,10 @@ use crate::{
         process_tree::ProcessTree,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        stochastic_process_tree::StochasticProcessTree,
+        stochastic_process_tree_semantics::NodeStates,
     },
     ebi_traits::ebi_trait_semantics::Semantics,
-    techniques::deterministic_semantics_for_stochastic_semantics::PMarking,
 };
 
 pub trait NonDecreasingLivelock {
@@ -22,37 +23,33 @@ pub trait NonDecreasingLivelock {
     fn is_part_of_non_decreasing_livelock(&self, state: &mut Self::LivState) -> Result<bool>;
 }
 
-impl NonDecreasingLivelock for ProcessTree {
-    type LivState = usize;
-
-    fn is_part_of_non_decreasing_livelock(&self, _state: &mut Self::LivState) -> Result<bool> {
-        Ok(false)
-    }
-}
-
-macro_rules! is_non_decreasing_livelock_lpn {
+macro_rules! tree {
     ($t:ident) => {
         impl NonDecreasingLivelock for $t {
-            type LivState = PMarking<LPNMarking>;
+            type LivState = NodeStates;
 
-            /**
-             * A q-state is in a livelock if all of its markings are in a livelock.
-             */
             fn is_part_of_non_decreasing_livelock(
                 &self,
-                state: &mut PMarking<LPNMarking>,
+                _state: &mut Self::LivState,
             ) -> Result<bool> {
-                for (marking, _) in &state.p_marking {
-                    if !$t::is_non_decreasing_livelock(self, &mut marking.clone())? {
-                        return Ok(false);
-                    }
-                }
-                return Ok(true);
+                Ok(false)
             }
         }
+    };
+}
 
-        impl $t {
-            pub fn is_non_decreasing_livelock(&self, state: &mut LPNMarking) -> Result<bool> {
+tree!(ProcessTree);
+tree!(StochasticProcessTree);
+
+macro_rules! lpn {
+    ($t:ident) => {
+        impl NonDecreasingLivelock for $t {
+            type LivState = LPNMarking;
+
+            fn is_part_of_non_decreasing_livelock(
+                &self,
+                state: &mut Self::LivState,
+            ) -> Result<bool> {
                 let mut trace = vec![];
 
                 while !self.is_final_state(state) {
@@ -147,7 +144,7 @@ macro_rules! is_non_decreasing_livelock_dfm {
     };
 }
 
-is_non_decreasing_livelock_lpn!(LabelledPetriNet);
-is_non_decreasing_livelock_lpn!(StochasticLabelledPetriNet);
+lpn!(LabelledPetriNet);
+lpn!(StochasticLabelledPetriNet);
 is_non_decreasing_livelock_dfm!(DeterministicFiniteAutomaton);
 is_non_decreasing_livelock_dfm!(StochasticDeterministicFiniteAutomaton);

@@ -41,7 +41,7 @@ Models containing loops and unbounded models are not supported and the computati
                 slang.as_ref().to_finite_stochastic_language()
             },
             EbiInput::Trait(EbiTraitObject::StochasticDeterministicSemantics(semantics), _) => {
-                semantics.analyse_minimum_probability(&Fraction::zero()).context("Analysing language.")?
+                semantics.analyse_minimum_probability(&Fraction::zero()).with_context(|| "could not analyse language")?
             },
             _ => unreachable!()
         };

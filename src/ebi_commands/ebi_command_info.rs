@@ -32,14 +32,14 @@ pub const EBI_INFO: EbiCommand = EbiCommand::Command {
 
             //show applicable commands
             let commands = file_handler.get_applicable_commands();
-            let mut paths = if commands.len() > 11 {
+            let mut paths = if commands.len() > 31 {
                 commands.iter().take(10).map(|path| EbiCommand::path_to_string(path)).collect::<Vec<_>>()
             } else {
                 commands.iter().map(|path| EbiCommand::path_to_string(path)).collect::<Vec<_>>()
             };
             paths.sort();
-            if commands.len() > 11 {
-                paths.push(format!(".. ({} more)", commands.len() - 10));
+            if commands.len() > 31 {
+                paths.push(format!(".. ({} more)", commands.len() - 30));
             }
             writeln!(f, "{} {} can be used in:", object.get_type().get_article().to_string().to_sentence_case(), object.get_type())?;
 

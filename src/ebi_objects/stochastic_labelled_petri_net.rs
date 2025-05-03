@@ -122,10 +122,6 @@ impl StochasticLabelledPetriNet {
         self.labels[transition]
     }
 
-    pub fn get_transition_weight(&self, transition: TransitionIndex) -> &Fraction {
-        &self.weights[transition]
-    }
-
     pub fn incidence_vector(&self, transition: TransitionIndex) -> Vec<i128> {
         let mut vec2 = vec![0; self.get_number_of_places()];
         for (in_place_pos, in_place) in self.transition2input_places[transition].iter().enumerate()
@@ -454,7 +450,7 @@ impl ToStochasticSemantics for StochasticLabelledPetriNet {
 
 impl ToStochasticDeterministicSemantics for StochasticLabelledPetriNet {
     fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::PMarking(Box::new(self))
+        EbiTraitStochasticDeterministicSemantics::LPNMarkingDistribution(Box::new(self))
     }
 }
 
@@ -498,12 +494,12 @@ impl EbiTraitGraphable for StochasticLabelledPetriNet {
                 <dyn EbiTraitGraphable>::create_transition(
                     &mut graph,
                     self.activity_key.get_activity_label(&activity),
-                    &self.get_transition_weight(transition).to_string(),
+                    &self.weights[transition].to_string(),
                 )
             } else {
                 <dyn EbiTraitGraphable>::create_silent_transition(
                     &mut graph,
-                    &self.get_transition_weight(transition).to_string(),
+                    &self.weights[transition].to_string(),
                 )
             };
 
