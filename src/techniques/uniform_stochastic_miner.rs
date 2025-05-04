@@ -25,7 +25,7 @@ impl UniformStochasticMinerLPN for LabelledPetriNet {
 
 impl UniformStochasticMinerTree for ProcessTree {
     fn mine_uniform_stochastic_tree(self) -> StochasticProcessTree {
-        let len = self.get_number_of_transitions();
+        let len = self.get_number_of_transitions() - 1;
         (self, vec![Fraction::one(); len], Fraction::one()).into()
     }
 }

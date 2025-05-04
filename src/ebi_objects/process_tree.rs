@@ -458,7 +458,7 @@ macro_rules! tree {
                     }
                 }
 
-                if last { Some(transitions  - 1) } else { None }
+                if last { Some(transitions - 1) } else { None }
             }
 
             pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {

@@ -14,7 +14,7 @@ use crate::{
     ebi_traits::{
         ebi_trait_graphable::{self, EbiTraitGraphable},
         ebi_trait_queriable_stochastic_language,
-        ebi_trait_semantics::ToSemantics,
+        ebi_trait_semantics::{Semantics, ToSemantics},
         ebi_trait_stochastic_deterministic_semantics::{
             EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
         },
@@ -483,6 +483,7 @@ impl ToStochasticDeterministicSemantics for StochasticProcessTree {
 
 impl From<(ProcessTree, Vec<Fraction>, Fraction)> for StochasticProcessTree {
     fn from(value: (ProcessTree, Vec<Fraction>, Fraction)) -> Self {
+        assert_eq!(value.0.get_number_of_transitions() - 1, value.1.len());
         Self {
             activity_key: value.0.activity_key,
             tree: value.0.tree,

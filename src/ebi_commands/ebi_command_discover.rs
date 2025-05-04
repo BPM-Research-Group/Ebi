@@ -10,7 +10,9 @@ use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     techniques::{
         alignment_stochastic_miner::AlignmentMiner,
-        occurrences_stochastic_miner::OccurrencesStochasticMiner,
+        occurrences_stochastic_miner::{
+            OccurrencesStochasticMinerLPN, OccurrencesStochasticMinerTree,
+        },
         uniform_stochastic_miner::{UniformStochasticMinerLPN, UniformStochasticMinerTree},
     },
 };
@@ -56,9 +58,17 @@ pub const EBI_DISCOVER_ALIGNMENTS: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
 };
 
-pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Command {
+pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Group {
     name_short: "occ",
     name_long: Some("occurrence"),
+    explanation_short: "Give each transition a weight that matches the occurrences of its label; silent transitions get a weight of 1.",
+    explanation_long: None,
+    children: &[&EBI_DISCOVER_OCCURRENCE_LPN, &EBI_DISCOVER_OCCURRENCE_PTREE],
+};
+
+pub const EBI_DISCOVER_OCCURRENCE_LPN: EbiCommand = EbiCommand::Command {
+    name_short: "lpn",
+    name_long: Some("labelled-petri-net"),
     explanation_short: "Give each transition a weight that matches the occurrences of its label; silent transitions get a weight of 1.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:conf/icpm/BurkeLW20}"),
@@ -79,10 +89,39 @@ pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Command {
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let lpn = inputs.remove(0).to_type::<LabelledPetriNet>()?;
         Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(
-            lpn.mine_occurrences_stochastic(language),
+            lpn.mine_occurrences_stochastic_lpn(language),
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
+};
+
+pub const EBI_DISCOVER_OCCURRENCE_PTREE: EbiCommand = EbiCommand::Command {
+    name_short: "ptree",
+    name_long: Some("process-tree"),
+    explanation_short: "Give each leaf a weight that matches the occurrences of its label; silent leaves get a weight of 1.",
+    explanation_long: None,
+    latex_link: Some("~\\cite{DBLP:conf/icpm/BurkeLW20}"),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Object(EbiObjectType::ProcessTree)],
+    ],
+    input_names: &["LANG", "TREE"],
+    input_helps: &[
+        "A finite stochastic language (log) to get the occurrences from.",
+        "A process tree with the control flow.",
+    ],
+    execute: |mut inputs, _| {
+        let language = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let lpn = inputs.remove(0).to_type::<ProcessTree>()?;
+        Ok(EbiOutput::Object(EbiObject::StochasticProcessTree(
+            lpn.mine_occurrences_stochastic_tree(language),
+        )))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticProcessTree),
 };
 
 pub const EBI_DISCOVER_UNIFORM: EbiCommand = EbiCommand::Group {
