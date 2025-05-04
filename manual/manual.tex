@@ -296,10 +296,10 @@ Sander J.J. Leemans, Tian Li}
 				\item Rather than using a numeric struct, using traits such as \verb=Add= and \verb=Mul= allows code to be used regardless of the arithmetic type.
 				\item To provide debug output, avoid \verb=println= as it prevents piping of results, but use \verb=log::info()= or \verb=log::debug()= instead.
 				For consistency, Ebi provides two types of progress bars: one where a total integer number of steps is available, and one where a message is used that can be updated, e.g. to denote a probability:
-				\begin{lstlisting}[language=Rust, style=boxed]
-					EbiCommand::get_progress_bar_ticks(total_steps);
-					EbiCommand::get_progress_bar_message(message);
-				\end{lstlisting}
+\begin{lstlisting}[language=Rust, style=boxed]
+EbiCommand::get_progress_bar_ticks(total_steps);
+EbiCommand::get_progress_bar_message(message);
+\end{lstlisting}
                 \item Compilation for release will fail if there are any warnings.
 			\end{enumerate}
             
