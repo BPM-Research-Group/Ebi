@@ -566,6 +566,9 @@ mod tests {
                 exporter.is_binary();
                 exporter.to_string();
 
+                println!("\toutput   {}", output);
+                println!("\texporter {}", exporter);
+
                 let _ = export_to_bytes(output.clone(), exporter.clone());
                 let _ = export_to_string(output.clone(), exporter.clone());
 

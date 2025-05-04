@@ -445,6 +445,22 @@ macro_rules! tree {
                 }
             }
 
+            pub fn node_to_transition(&self, node: usize) -> Option<usize> {
+                let mut transitions = 0;
+                let mut last = false;
+                for node in self.tree.iter().take(node + 1) {
+                    match node {
+                        Node::Activity(_) | Node::Tau => {
+                            transitions += 1;
+                            last = true
+                        }
+                        _ => last = false,
+                    }
+                }
+
+                if last { Some(transitions  - 1) } else { None }
+            }
+
             pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
                 let tree = Self::import(reader)?;
                 Ok(EbiObject::LabelledPetriNet(tree.into()))

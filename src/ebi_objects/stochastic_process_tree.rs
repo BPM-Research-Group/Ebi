@@ -27,7 +27,7 @@ use crate::{
 use anyhow::{Context, Result, anyhow};
 use layout::{adt::dag::NodeHandle, topo::layout::VisualGraph};
 
-use super::process_tree::{Node, Operator};
+use super::process_tree::{Node, Operator, ProcessTree};
 
 pub const HEADER: &str = "stochastic process tree";
 
@@ -83,7 +83,6 @@ pub struct StochasticProcessTree {
     pub(crate) activity_key: ActivityKey,
     pub(crate) tree: Vec<Node>,
     pub(crate) transition2node: Vec<usize>,
-    pub(crate) node2transition: Vec<usize>,
     pub(crate) weights: Vec<Fraction>, //weights must be strictly positive; no deadlocks or livelocks in trees. Index are transitions, not nodes.
     pub(crate) termination_weight: Fraction,
 }
@@ -101,7 +100,11 @@ impl StochasticProcessTree {
                 writeln!(
                     f,
                     "{}tau\n{}# weight node {}\n{}{}",
-                    id, id, node, id, self.weights[self.node2transition[node]]
+                    id,
+                    id,
+                    node,
+                    id,
+                    self.weights[self.node_to_transition(node).unwrap()]
                 )?;
                 Ok(node + 1)
             }
@@ -114,7 +117,7 @@ impl StochasticProcessTree {
                     id,
                     node,
                     id,
-                    self.weights[self.node2transition[node]]
+                    self.weights[self.node_to_transition(node).unwrap()]
                 )?;
                 Ok(node + 1)
             }
@@ -358,11 +361,9 @@ impl From<(ActivityKey, Vec<Node>, Vec<Fraction>, Fraction)> for StochasticProce
         let (activity_key, tree, weights, termination_weight) = value;
 
         let mut transition2node = vec![];
-        let mut node2transition = vec![0; tree.len()];
         for (node_index, node) in tree.iter().enumerate() {
             match node {
                 Node::Tau | Node::Activity(_) => {
-                    node2transition[node_index] = transition2node.len();
                     transition2node.push(node_index);
                 }
                 Node::Operator(_, _) => {}
@@ -373,7 +374,6 @@ impl From<(ActivityKey, Vec<Node>, Vec<Fraction>, Fraction)> for StochasticProce
             activity_key: activity_key,
             tree: tree,
             transition2node: transition2node,
-            node2transition: node2transition,
             weights: weights,
             termination_weight: termination_weight,
         }
@@ -478,5 +478,17 @@ impl ToStochasticSemantics for StochasticProcessTree {
 impl ToStochasticDeterministicSemantics for StochasticProcessTree {
     fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
         EbiTraitStochasticDeterministicSemantics::NodeStatesDistribution(Box::new(self))
+    }
+}
+
+impl From<(ProcessTree, Vec<Fraction>, Fraction)> for StochasticProcessTree {
+    fn from(value: (ProcessTree, Vec<Fraction>, Fraction)) -> Self {
+        Self {
+            activity_key: value.0.activity_key,
+            tree: value.0.tree,
+            transition2node: value.0.transition2node,
+            termination_weight: value.2,
+            weights: value.1,
+        }
     }
 }
