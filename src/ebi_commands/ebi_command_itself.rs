@@ -279,7 +279,7 @@ fn manual() -> Result<EbiOutput> {
     writeln!(f, "\\def\\ebitraitlist{{\\begin{{itemize}}")?;
     for etrait in EbiTrait::iter() {
         writeln!(f, "\\item {}.", etrait.to_string().to_sentence_case())?;
-        writeln!(f, "{}\\\\", etrait.get_explanation())?;
+        writeln!(f, "\\\\{}", etrait.get_explanation())?;
 
         writeln!(f, "\\\\File types that can be imported as {} {}: {}.", 
             etrait.get_article(), 
