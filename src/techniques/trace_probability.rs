@@ -155,11 +155,6 @@ macro_rules! default_trace_probability {
                     }
                 }
 
-                if cfg!(test) {
-                    //test the debug output
-                    println!("{}", result);
-                }
-
                 let trace_probability = result.solve()?;
                 Ok(trace_probability)
             }

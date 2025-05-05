@@ -323,18 +323,6 @@ impl EbiTraitEventLog for EventLog {
         }
         map
     }
-
-    fn read_trace_with_activity_key(
-        &self,
-        activity_key: &mut ActivityKey,
-        trace_index: &usize,
-    ) -> Vec<Activity> {
-        self.log.traces[*trace_index]
-            .events
-            .iter()
-            .map(|event| activity_key.process_activity(&self.classifier.get_class_identity(event)))
-            .collect::<Vec<Activity>>()
-    }
 }
 
 impl IndexTrace for EventLog {

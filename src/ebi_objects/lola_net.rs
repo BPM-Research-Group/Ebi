@@ -524,7 +524,6 @@ impl<'a> Tokeniser<'a> {
                     }
                 },
                 State::SeenConsumePlaceColon(transition, place) => {
-                    // println!("token {}", token);
                     if let Ok(cardinality) = token.parse::<u64>() {
                         //the arc was already added with cardinality 1
                         if cardinality == 0 {

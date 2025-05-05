@@ -23,11 +23,11 @@ use crate::{
 };
 
 pub trait FindExecutions {
-    fn find_executions(&self, log: Box<dyn EbiTraitEventLog>) -> Result<Executions>;
+    fn find_executions(&mut self, log: Box<dyn EbiTraitEventLog>) -> Result<Executions>;
 }
 
 impl FindExecutions for EbiTraitSemantics {
-    fn find_executions(&self, log: Box<dyn EbiTraitEventLog>) -> Result<Executions> {
+    fn find_executions(&mut self, log: Box<dyn EbiTraitEventLog>) -> Result<Executions> {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.find_executions(log),
             EbiTraitSemantics::Marking(sem) => sem.find_executions(log),
@@ -41,18 +41,17 @@ where
     T: Semantics<SemState = State, AliState = State> + Send + Sync + ?Sized,
     State: Displayable,
 {
-    fn find_executions(&self, log: Box<dyn EbiTraitEventLog>) -> Result<Executions> {
-        let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
+    fn find_executions(&mut self, mut log: Box<dyn EbiTraitEventLog>) -> Result<Executions> {
         log::info!("Compute alignments");
         let progress_bar = EbiCommand::get_progress_bar_ticks(log.len());
+        let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
+
+        self.translate_using_activity_key(log.get_activity_key_mut());
 
         let result = (0..log.len())
             .into_par_iter()
             .filter_map(|trace_index| {
-                let trace = log.read_trace_with_activity_key(
-                    &mut self.get_activity_key().clone(),
-                    &trace_index,
-                );
+                let trace = log.get_trace(trace_index).unwrap();
 
                 //align the trace
                 let alignment = self.align_trace(&trace);
@@ -278,7 +277,7 @@ mod tests {
         let log = fin.parse::<EventLog>().unwrap();
 
         let fin2 = fs::read_to_string("testfiles/a-b-c-livelock.sdfa").unwrap();
-        let model = fin2
+        let mut model = fin2
             .parse::<StochasticDeterministicFiniteAutomaton>()
             .unwrap();
 
