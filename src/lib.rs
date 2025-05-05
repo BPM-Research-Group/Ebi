@@ -175,6 +175,7 @@ pub mod techniques {
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
     pub mod flower_miner;
+    pub mod prefix_tree_miner;
 }
 pub mod optimisation_algorithms {
     pub mod network_simplex;
