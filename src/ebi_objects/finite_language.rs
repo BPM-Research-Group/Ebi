@@ -11,14 +11,7 @@ use crate::{
     ebi_framework::{
         activity_key::{
             Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
-        },
-        ebi_file_handler::EbiFileHandler,
-        ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
-        ebi_object::EbiObject,
-        ebi_output::{EbiObjectExporter, EbiOutput},
-        exportable::Exportable,
-        importable::Importable,
-        infoable::Infoable,
+        }, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable
     },
     ebi_traits::{
         ebi_trait_event_log::IndexTrace,
@@ -133,6 +126,19 @@ impl IndexTrace for FiniteLanguage {
 
     fn get_trace(&self, trace_index: usize) -> Option<&Vec<Activity>> {
         self.traces.iter().nth(trace_index)
+    }
+}
+
+impl FromEbiTraitObject for FiniteLanguage {
+    fn from_trait_object(object: ebi_input::EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::FiniteLanguage(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "cannot read {} {} as a finite language",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
     }
 }
 

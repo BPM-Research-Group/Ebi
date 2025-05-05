@@ -72,6 +72,21 @@ impl EbiTrait {
     pub fn get_java_object_handlers_that_can_import(&self) -> HashSet<JavaObjectHandler> {
         EbiInputType::Trait(self.clone()).get_java_object_handlers_that_can_import()
     }
+
+    pub fn get_explanation(&self) -> &str {
+        match self {
+            EbiTrait::EventLog => "Has traces and attached event and trace attributes.",
+            EbiTrait::FiniteLanguage => "Finite set of traces.",
+            EbiTrait::FiniteStochasticLanguage => "Finite distribution of traces.",
+            EbiTrait::IterableLanguage => "Can walk over the traces. May iterate over infinitely many traces.",
+            EbiTrait::IterableStochasticLanguage => "Can walk over the traces and their probabilities. May iterate over infinitely many traces.",
+            EbiTrait::QueriableStochasticLanguage => "Can query by giving a trace, which will return its probability.",
+            EbiTrait::Semantics => "An object in which the state space can be traversed. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks.",
+            EbiTrait::StochasticDeterministicSemantics => "An object in which the state space can be traversed deterministically, that is, in each state every activity appears at most once and silent steps are not present. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks.",
+            EbiTrait::StochasticSemantics => "An object in which the state space can be traversed, with probabilities. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks.",
+            EbiTrait::Graphable => "Can be visualised as a graph.",
+        }
+    }
 }
 
 impl Display for EbiTrait {

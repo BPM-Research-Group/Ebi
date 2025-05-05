@@ -20,7 +20,7 @@ use crate::{
 pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
     name_short: "disc",
     name_long: Some("discover"),
-    explanation_short: "Discover a process model.",
+    explanation_short: "Discover a stochastic process model.",
     explanation_long: None,
     children: &[
         &EBI_DISCOVER_ALIGNMENTS,

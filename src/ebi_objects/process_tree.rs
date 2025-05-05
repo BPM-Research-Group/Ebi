@@ -90,24 +90,6 @@ pub struct ProcessTree {
 }
 
 impl ProcessTree {
-    pub fn new(activity_key: ActivityKey, tree: Vec<Node>) -> Self {
-        let mut transition2node = vec![];
-        for (node_index, node) in tree.iter().enumerate() {
-            match node {
-                Node::Tau | Node::Activity(_) => {
-                    transition2node.push(node_index);
-                }
-                Node::Operator(_, _) => {}
-            }
-        }
-
-        Self {
-            activity_key: activity_key,
-            tree: tree,
-            transition2node: transition2node,
-        }
-    }
-
     fn node_to_string(
         &self,
         indent: usize,
@@ -592,6 +574,26 @@ tree!(
     StochasticParentsIterator
 );
 
+impl From<(ActivityKey, Vec<Node>)> for ProcessTree {
+    fn from(value: (ActivityKey, Vec<Node>)) -> Self {
+        let mut transition2node = vec![];
+        for (node_index, node) in value.1.iter().enumerate() {
+            match node {
+                Node::Tau | Node::Activity(_) => {
+                    transition2node.push(node_index);
+                }
+                Node::Operator(_, _) => {}
+            }
+        }
+
+        Self {
+            activity_key: value.0,
+            tree: value.1,
+            transition2node: transition2node,
+        }
+    }
+}
+
 impl Display for ProcessTree {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "{}", HEADER)?;
@@ -642,7 +644,7 @@ impl Importable for ProcessTree {
         let mut tree = vec![];
         Self::string_to_tree(&mut lreader, &mut tree, &mut activity_key, true)?;
 
-        Ok(ProcessTree::new(activity_key, tree))
+        Ok((activity_key, tree).into())
     }
 }
 

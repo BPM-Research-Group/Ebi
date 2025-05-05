@@ -193,7 +193,7 @@ impl FromEbiTraitObject for FiniteStochasticLanguage {
         match object {
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a finite language",
+                "cannot read {} {} as a finite stochastic language",
                 object.get_type().get_article(),
                 object.get_type()
             )),

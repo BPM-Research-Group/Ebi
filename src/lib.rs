@@ -41,6 +41,7 @@ pub mod ebi_commands {
     pub mod ebi_command_test;
     pub mod ebi_command_validate;
     pub mod ebi_command_visualise;
+    pub mod ebi_command_discover_non_stochastic;
 }
 pub mod ebi_objects {
     pub mod compressed_event_log;
@@ -173,6 +174,7 @@ pub mod techniques {
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
+    pub mod flower_miner;
 }
 pub mod optimisation_algorithms {
     pub mod network_simplex;

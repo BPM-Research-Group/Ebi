@@ -50,11 +50,14 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
         EbiTraitImporter::Semantics(DeterministicFiniteAutomaton::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<DeterministicFiniteAutomaton>),
     ],
-    object_importers: &[EbiObjectImporter::DeterministicFiniteAutomaton(
-        DeterministicFiniteAutomaton::import_as_object,
-    ), EbiObjectImporter::LabelledPetriNet(
-        DeterministicFiniteAutomaton::import_as_labelled_petri_net,
-    )],
+    object_importers: &[
+        EbiObjectImporter::DeterministicFiniteAutomaton(
+            DeterministicFiniteAutomaton::import_as_object,
+        ),
+        EbiObjectImporter::LabelledPetriNet(
+            DeterministicFiniteAutomaton::import_as_labelled_petri_net,
+        ),
+    ],
     object_exporters: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(
             DeterministicFiniteAutomaton::export_from_object,
@@ -84,7 +87,7 @@ pub struct DeterministicFiniteAutomaton {
 
 impl DeterministicFiniteAutomaton {
     /**
-     * Creates a new DFA with an initial state. That is, it will have the language with the empty trace.
+     * Creates a new DFA with an initial state that is not an explicit final state. As this state is a deadlock, it is an implicit final state anyway, until an outgoing transition is added.
      */
     pub fn new() -> Self {
         Self {
