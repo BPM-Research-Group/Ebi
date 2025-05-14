@@ -34,7 +34,7 @@ pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "lola",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<LolaNet>,
+    validator: Some(ebi_input::validate::<LolaNet>),
     trait_importers: &[
         EbiTraitImporter::Semantics(LolaNet::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<LolaNet>),

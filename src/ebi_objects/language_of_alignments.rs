@@ -40,7 +40,7 @@ pub const EBI_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "ali",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<LanguageOfAlignments>,
+    validator: Some(ebi_input::validate::<LanguageOfAlignments>),
     trait_importers: &[],
     object_importers: &[EbiObjectImporter::LanguageOfAlignments(
         LanguageOfAlignments::import_as_object,

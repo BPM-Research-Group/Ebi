@@ -37,7 +37,7 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "pnml",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: PetriNetMarkupLanguage::validate,
+    validator: Some(PetriNetMarkupLanguage::validate),
     trait_importers: &[
         EbiTraitImporter::Semantics(PetriNetMarkupLanguage::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<PetriNetMarkupLanguage>),

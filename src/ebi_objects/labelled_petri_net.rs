@@ -61,7 +61,7 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "lpn",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<LabelledPetriNet>,
+    validator: Some(ebi_input::validate::<LabelledPetriNet>),
     trait_importers: &[
         EbiTraitImporter::Semantics(LabelledPetriNet::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<LabelledPetriNet>),

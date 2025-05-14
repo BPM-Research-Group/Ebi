@@ -75,7 +75,7 @@
 //     Fraction::set_exact_globally(true);
 // }
 #[cfg(test)]
-use std::fs::{self, File, DirEntry};
+use std::fs::{self, DirEntry, File};
 
 #[cfg(test)]
 use crate::{
@@ -92,6 +92,7 @@ pub fn get_all_test_files() -> Vec<(
     EbiInput,
     Option<EbiObjectImporter>,
     Option<EbiTraitImporter>,
+    String,
 )> {
     let mut result = vec![];
     let files = fs::read_dir("./testfiles").unwrap();
@@ -123,7 +124,12 @@ pub fn get_all_test_files() -> Vec<(
                             file_handler,
                         );
 
-                        result.push((object, Some(importer.clone()), None));
+                        result.push((
+                            object,
+                            Some(importer.clone()),
+                            None,
+                            format!("{:?}", file),
+                        ));
                     }
                 }
 
@@ -133,7 +139,12 @@ pub fn get_all_test_files() -> Vec<(
                         file_handler,
                     );
 
-                    result.push((object, None, Some(importer.clone())));
+                    result.push((
+                        object,
+                        None,
+                        Some(importer.clone()),
+                        format!("{:?}", file),
+                    ));
                 }
             } else {
                 //file handler should not accept this file
@@ -164,7 +175,11 @@ pub fn get_all_test_files() -> Vec<(
 }
 
 #[cfg(test)]
-pub fn should_file_be_tested(file: &DirEntry, importer: &EbiObjectImporter, file_handler: &EbiFileHandler) -> bool {
+pub fn should_file_be_tested(
+    file: &DirEntry,
+    importer: &EbiObjectImporter,
+    file_handler: &EbiFileHandler,
+) -> bool {
     //special case: empty.ptree and empty_2.ptree cannot be imported as an LPN, but it is not invalid
     let special = if let EbiObjectImporter::LabelledPetriNet(_) = importer {
         true

@@ -44,7 +44,7 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "lang",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<FiniteLanguage>,
+    validator: Some(ebi_input::validate::<FiniteLanguage>),
     trait_importers: &[
         EbiTraitImporter::IterableLanguage(ebi_trait_iterable_language::import::<FiniteLanguage>),
         EbiTraitImporter::FiniteLanguage(ebi_trait_finite_language::import::<FiniteLanguage>),

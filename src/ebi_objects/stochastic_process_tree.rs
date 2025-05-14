@@ -53,7 +53,7 @@ pub const EBI_STOCHASTIC_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "sptree",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<StochasticProcessTree>,
+    validator: Some(ebi_input::validate::<StochasticProcessTree>),
     trait_importers: &[
         EbiTraitImporter::QueriableStochasticLanguage(
             ebi_trait_queriable_stochastic_language::import::<StochasticProcessTree>,

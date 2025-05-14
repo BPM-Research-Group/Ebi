@@ -1,5 +1,3 @@
-use std::io::BufRead;
-
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
@@ -18,7 +16,7 @@ pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
     article: "an",
     file_extension: "svg",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: validate,
+    validator: None,
     trait_importers: &[],
     object_importers: &[],
     object_exporters: &[
@@ -32,10 +30,6 @@ pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
     ],
     java_object_handlers: &[],
 };
-
-pub fn validate(_: &mut dyn BufRead) -> Result<()> {
-    Err(anyhow!("importing of SVG is not supported"))
-}
 
 fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
     match object {
@@ -82,12 +76,21 @@ fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<(
     }
 }
 
+fn empty() -> String {
+    "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg width=\"352.5\" height=\"141\" viewBox=\"0 0 352.5 141\" xmlns=\"http://www.w3.org/2000/svg\"></svg>".to_string()
+}
+
 fn export_as_svg<T>(object: &T, f: &mut dyn std::io::Write) -> Result<()>
 where
     T: EbiTraitGraphable,
 {
     let mut svg = SVGWriter::new();
-    object.to_dot()?.do_it(false, false, false, &mut svg);
-    let output = EbiOutput::SVG(svg.finalize());
+    let mut graph = object.to_dot()?;
+    let output = EbiOutput::SVG(if graph.num_nodes() == 0 {
+        empty()
+    } else {
+        graph.do_it(false, false, false, &mut svg);
+        svg.finalize()
+    });
     EbiExporter::SVG.export_from_object(output, f)
 }

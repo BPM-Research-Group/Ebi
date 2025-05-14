@@ -32,7 +32,7 @@ mod tests {
 
     #[test]
     fn all_infoable() {
-        for (input, _, _) in crate::tests::get_all_test_files() {
+        for (input, _, _, _) in crate::tests::get_all_test_files() {
             if let EbiInput::Object(object, _) = input {
                 let mut f = vec![];
                 object.info(&mut f).unwrap();

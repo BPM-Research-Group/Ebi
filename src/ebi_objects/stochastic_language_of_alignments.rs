@@ -44,7 +44,7 @@ pub const EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler
     article: "a",
     file_extension: "sali",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<StochasticLanguageOfAlignments>,
+    validator: Some(ebi_input::validate::<StochasticLanguageOfAlignments>),
     trait_importers: &[],
     object_importers: &[EbiObjectImporter::StochasticLanguageOfAlignments(
         StochasticLanguageOfAlignments::import_as_object,

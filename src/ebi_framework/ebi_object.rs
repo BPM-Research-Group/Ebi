@@ -284,7 +284,7 @@ mod tests {
 
     #[test]
     fn objects() {
-        for (input, _, _) in crate::tests::get_all_test_files() {
+        for (input, _, _, _) in crate::tests::get_all_test_files() {
             if let EbiInput::Object(object, _) = input {
                 object.get_type();
                 object.to_string();

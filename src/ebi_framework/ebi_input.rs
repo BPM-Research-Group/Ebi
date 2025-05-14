@@ -547,8 +547,15 @@ pub fn validate_object_of(
     reader: &mut MultipleReader,
     file_handler: &EbiFileHandler,
 ) -> Result<()> {
-    let result = (file_handler.validator)(reader.get()?.as_mut());
-    return result;
+    if let Some(validator) = file_handler.validator {
+        let result = (validator)(reader.get()?.as_mut());
+        return result;
+    } else {
+        return Err(anyhow!(
+            "file hanlder {} does not have a validator",
+            file_handler
+        ));
+    }
 }
 
 #[cfg(test)]
@@ -603,19 +610,21 @@ mod tests {
 
                 let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
 
-                println!("\tfile handler {}", file_handler);
-                if !file.file_name().into_string().unwrap().contains("invalid")
-                    && file
-                        .file_name()
-                        .into_string()
-                        .unwrap()
-                        .ends_with(&(".".to_string() + file_handler.file_extension))
-                {
-                    //file handler should be able to accept this file
-                    assert!(validate_object_of(&mut reader, file_handler).is_ok());
-                } else {
-                    //file handler should not accept this file
-                    assert!(validate_object_of(&mut reader, file_handler).is_err());
+                if file_handler.validator.is_some() {
+                    println!("\tfile handler {}", file_handler);
+                    if !file.file_name().into_string().unwrap().contains("invalid")
+                        && file
+                            .file_name()
+                            .into_string()
+                            .unwrap()
+                            .ends_with(&(".".to_string() + file_handler.file_extension))
+                    {
+                        //file handler should be able to accept this file
+                        assert!(validate_object_of(&mut reader, file_handler).is_ok());
+                    } else {
+                        //file handler should not accept this file
+                        assert!(validate_object_of(&mut reader, file_handler).is_err());
+                    }
                 }
             }
         }

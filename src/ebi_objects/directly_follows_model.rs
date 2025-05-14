@@ -47,7 +47,7 @@ pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "dfm",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<DirectlyFollowsModel>,
+    validator: Some(ebi_input::validate::<DirectlyFollowsModel>),
     trait_importers: &[
         EbiTraitImporter::Semantics(DirectlyFollowsModel::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<DirectlyFollowsModel>),
@@ -357,7 +357,7 @@ mod tests {
 
     #[test]
     #[should_panic]
-    fn unreacahble() {
+    fn unreachable() {
         let mut f = vec![];
         DirectlyFollowsModel::export_from_object(EbiOutput::Usize(0), &mut f).unwrap_err();
     }

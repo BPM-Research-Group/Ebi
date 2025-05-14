@@ -123,7 +123,7 @@ mod tests {
 
     #[test]
     fn visualise_as_text() {
-        for (object, _, _) in crate::tests::get_all_test_files() {
+        for (object, _, _, _) in crate::tests::get_all_test_files() {
             if let EbiInput::Object(_, _) = object {
                 if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
                     let _ = (execute)(vec![object], None);

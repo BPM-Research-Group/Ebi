@@ -59,7 +59,7 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
     article: "a",
     file_extension: "sdfa",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<StochasticDeterministicFiniteAutomaton>,
+    validator: Some(ebi_input::validate::<StochasticDeterministicFiniteAutomaton>),
     trait_importers: &[
         EbiTraitImporter::QueriableStochasticLanguage(
             ebi_trait_queriable_stochastic_language::import::<StochasticDeterministicFiniteAutomaton>,

@@ -3,12 +3,12 @@ use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
 };
 
-pub trait DirectlyFollowsGraphAbstractor {
-    fn abstract_to_directly_follows_graph(&self) -> StochasticDirectlyFollowsModel;
+pub trait DirectlyFollowsAbstractor {
+    fn abstract_to_directly_follows_relation(&self) -> StochasticDirectlyFollowsModel;
 }
 
-impl DirectlyFollowsGraphAbstractor for dyn EbiTraitFiniteStochasticLanguage {
-    fn abstract_to_directly_follows_graph(&self) -> StochasticDirectlyFollowsModel {
+impl DirectlyFollowsAbstractor for dyn EbiTraitFiniteStochasticLanguage {
+    fn abstract_to_directly_follows_relation(&self) -> StochasticDirectlyFollowsModel {
         let mut result = StochasticDirectlyFollowsModel::new(self.get_activity_key().clone());
 
         //If the language has no traces, then the directly follows graph has no start activities and no empty traces.

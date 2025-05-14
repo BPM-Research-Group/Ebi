@@ -51,7 +51,7 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "slpn",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<StochasticLabelledPetriNet>,
+    validator: Some(ebi_input::validate::<StochasticLabelledPetriNet>),
     trait_importers: &[
         EbiTraitImporter::QueriableStochasticLanguage(
             ebi_trait_queriable_stochastic_language::import::<StochasticLabelledPetriNet>,

@@ -1,16 +1,26 @@
 use anyhow::{Result, anyhow};
 use std::io::BufRead;
 
-use layout::{adt::dag::NodeHandle, core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element}}, topo::layout::VisualGraph};
+use layout::{
+    adt::dag::NodeHandle,
+    core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr},
+    std_shapes::{
+        render::get_shape_size,
+        shapes::{Arrow, Element},
+    },
+    topo::layout::VisualGraph,
+};
 
-use crate::ebi_framework::{ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable};
+use crate::ebi_framework::{
+    ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject,
+    importable::Importable,
+};
 
 pub trait EbiTraitGraphable {
     fn to_dot(&self) -> Result<VisualGraph>;
 }
 
 impl dyn EbiTraitGraphable {
-
     pub fn create_place(graph: &mut VisualGraph, label: &str) -> NodeHandle {
         let shape = layout::std_shapes::shapes::ShapeKind::Circle(label.to_string());
         let look = StyleAttr::simple();
@@ -62,14 +72,17 @@ impl dyn EbiTraitGraphable {
         let arrow = Arrow::simple(label);
         return graph.add_edge(arrow, *from, *to);
     }
-
 }
 
 impl FromEbiTraitObject for dyn EbiTraitGraphable {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
             EbiInput::Trait(EbiTraitObject::Graphable(e), _) => Ok(e),
-            _ => Err(anyhow!("cannot read {} {} as a finite stochastic language", object.get_type().get_article(), object.get_type()))
+            _ => Err(anyhow!(
+                "cannot read {} {} as a finite stochastic language",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
         }
     }
 }
@@ -77,7 +90,9 @@ impl FromEbiTraitObject for dyn EbiTraitGraphable {
 /**
  * Convenience function to import any object as a Graphable trait object.
  */
-pub fn import<X: 'static + Importable + EbiTraitGraphable> (reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitGraphable>> {
+pub fn import<X: 'static + Importable + EbiTraitGraphable>(
+    reader: &mut dyn BufRead,
+) -> Result<Box<dyn EbiTraitGraphable>> {
     match X::import(reader) {
         Ok(x) => Ok(Box::new(x)),
         Err(x) => Err(x),
@@ -91,7 +106,7 @@ pub mod tests {
 
     #[test]
     fn all_graphable() {
-        for (input, _, _) in crate::tests::get_all_test_files() {
+        for (input, _, _, _) in crate::tests::get_all_test_files() {
             if let EbiInput::Trait(object, _) = input {
                 if let EbiTraitObject::Graphable(object) = object {
                     assert!(object.to_dot().is_ok());

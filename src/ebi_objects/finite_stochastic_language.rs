@@ -64,7 +64,7 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "slang",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<FiniteStochasticLanguage>,
+    validator: Some(ebi_input::validate::<FiniteStochasticLanguage>),
     trait_importers: &[
         EbiTraitImporter::IterableLanguage(
             ebi_trait_iterable_language::import::<FiniteStochasticLanguage>,

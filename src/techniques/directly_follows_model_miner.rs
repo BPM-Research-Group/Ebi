@@ -12,7 +12,7 @@ use crate::{
     math::{fraction::Fraction, traits::One},
 };
 
-use super::directly_follows_graph_abstractor::DirectlyFollowsGraphAbstractor;
+use super::directly_follows_graph_abstractor::DirectlyFollowsAbstractor;
 
 pub trait DirectlyFollowsModelMinerFiltering {
     /**
@@ -33,7 +33,7 @@ impl DirectlyFollowsModelMinerFiltering for dyn EbiTraitFiniteStochasticLanguage
             return Err(anyhow!("cannot obtain a minimum fitness larger than 1"));
         }
 
-        let mut dfm = self.abstract_to_directly_follows_graph();
+        let mut dfm = self.abstract_to_directly_follows_relation();
 
         loop {
             //gather the edges to be filtered
@@ -50,7 +50,7 @@ impl DirectlyFollowsModelMinerFiltering for dyn EbiTraitFiniteStochasticLanguage
             }
 
             //create a new dfg
-            dfm = self.abstract_to_directly_follows_graph();
+            dfm = self.abstract_to_directly_follows_relation();
         }
     }
 }
@@ -120,4 +120,35 @@ fn get_edges_to_filter(
     }
 
     return result;
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{
+        ebi_objects::
+            finite_stochastic_language::FiniteStochasticLanguage
+        ,
+        ebi_traits::{
+            ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+            ebi_trait_semantics::Semantics,
+        },
+        math::{fraction::Fraction, traits::One},
+        techniques::directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
+    };
+
+    #[test]
+    fn dfm() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
+        let mut slang: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(fin.parse::<FiniteStochasticLanguage>().unwrap());
+        let dfm = slang
+            .mine_directly_follows_model_filtering(&Fraction::one())
+            .unwrap();
+
+        let state = dfm.get_initial_state().unwrap();
+
+        assert_eq!(dfm.get_enabled_transitions(&state).len(), 2);
+    }
 }

@@ -515,7 +515,7 @@ mod tests {
 
     #[test]
     fn all_exporters() {
-        for (object, importer, _) in crate::tests::get_all_test_files() {
+        for (object, importer, _, _) in crate::tests::get_all_test_files() {
             if let EbiInput::Object(object, _) = object {
                 for file_handler2 in EBI_FILE_HANDLERS {
                     for exporter in file_handler2.object_exporters {
@@ -534,30 +534,37 @@ mod tests {
     #[test]
     fn ebi_output() {
         let mut outputs = vec![
-            EbiOutput::String("bla".to_string()),
-            EbiOutput::SVG("xyz".to_string()),
-            EbiOutput::PDF(vec![]),
-            EbiOutput::Usize(0),
-            EbiOutput::Fraction(Fraction::one()),
-            EbiOutput::LogDiv(LogDiv::zero()),
-            EbiOutput::ContainsRoot(ContainsRoot::of(Root::of(Fraction::one()))),
-            EbiOutput::RootLogDiv(RootLogDiv::sqrt(LogDiv::one())),
+            (EbiOutput::String("bla".to_string()), "bla".to_string()),
+            (EbiOutput::SVG("xyz".to_string()), "xyz".to_string()),
+            (EbiOutput::PDF(vec![]), "[]".to_string()),
+            (EbiOutput::Usize(0), "0".to_string()),
+            (EbiOutput::Fraction(Fraction::one()), "1".to_string()),
+            (EbiOutput::LogDiv(LogDiv::zero()), "0".to_string()),
+            (
+                EbiOutput::ContainsRoot(ContainsRoot::of(Root::of(Fraction::one()))),
+                "1".to_string(),
+            ),
+            (
+                EbiOutput::RootLogDiv(RootLogDiv::sqrt(LogDiv::one())),
+                "1".to_string(),
+            ),
         ];
 
         //gather output objects from the test files
-        for (input, _, _) in crate::tests::get_all_test_files() {
+        for (input, _, _, file) in crate::tests::get_all_test_files() {
             if let EbiInput::Object(object, _) = input {
-                outputs.push(EbiOutput::Object(object));
+                outputs.push((EbiOutput::Object(object), file));
             }
         }
 
-        for output in outputs {
+        for (output, source) in outputs {
             let output_type = output.get_type();
             output_type.get_applicable_commands();
             output_type.get_default_exporter();
             output_type.to_string();
             EbiCommand::select_exporter(&output_type, None);
             EbiCommand::select_exporter(&output_type, Some(&PathBuf::from(".xes.gz")));
+            println!("source {}, output type {}", source, output.get_type());
             for exporter in output_type.get_exporters() {
                 exporter.get_article();
                 exporter.get_name();
