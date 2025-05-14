@@ -1,20 +1,20 @@
 use crate::{
-    ebi_objects::directly_follows_graph::DirectlyFollowsGraph,
+    ebi_objects::stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
 };
 
 pub trait DirectlyFollowsGraphAbstractor {
-    fn abstract_to_directly_follows_graph(&self) -> DirectlyFollowsGraph;
+    fn abstract_to_directly_follows_graph(&self) -> StochasticDirectlyFollowsModel;
 }
 
 impl DirectlyFollowsGraphAbstractor for dyn EbiTraitFiniteStochasticLanguage {
-    fn abstract_to_directly_follows_graph(&self) -> DirectlyFollowsGraph {
-        let mut result = DirectlyFollowsGraph::new(self.get_activity_key().clone());
+    fn abstract_to_directly_follows_graph(&self) -> StochasticDirectlyFollowsModel {
+        let mut result = StochasticDirectlyFollowsModel::new(self.get_activity_key().clone());
 
         //If the language has no traces, then the directly follows graph has no start activities and no empty traces.
 
         for (trace, probability) in self.iter_trace_probability() {
-            let last_activity = None;
+            let mut last_activity = None;
             for activity in trace {
                 match last_activity {
                     Some(previous) => {
@@ -26,6 +26,7 @@ impl DirectlyFollowsGraphAbstractor for dyn EbiTraitFiniteStochasticLanguage {
                         result.add_start_activity(*activity, probability);
                     }
                 }
+                last_activity = Some(*activity);
             }
 
             match last_activity {

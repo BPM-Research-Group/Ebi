@@ -1,9 +1,12 @@
 use std::collections::HashSet;
 
+use anyhow::{Result, anyhow};
+
 use crate::{
     ebi_framework::activity_key::Activity,
     ebi_objects::{
-        directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel,
+        directly_follows_model::DirectlyFollowsModel,
+        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
     },
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::{fraction::Fraction, traits::One},
@@ -11,39 +14,39 @@ use crate::{
 
 use super::directly_follows_graph_abstractor::DirectlyFollowsGraphAbstractor;
 
-pub trait DirectlyFollowsModelMiner {
-    fn mine_directly_follows_model(&mut self) {
-        self.mine_directly_follows_model_filtering(&Fraction::one());
-    }
-
+pub trait DirectlyFollowsModelMinerFiltering {
     /**
      * This will yield a DFM with at least the given fitness. This method may change the log in-place.
      */
     fn mine_directly_follows_model_filtering(
         &mut self,
         minimum_fitness: &Fraction,
-    ) -> DirectlyFollowsModel;
+    ) -> Result<DirectlyFollowsModel>;
 }
 
-impl DirectlyFollowsModelMiner for dyn EbiTraitFiniteStochasticLanguage {
+impl DirectlyFollowsModelMinerFiltering for dyn EbiTraitFiniteStochasticLanguage {
     fn mine_directly_follows_model_filtering(
         &mut self,
         minimum_fitness: &Fraction,
-    ) -> DirectlyFollowsModel {
+    ) -> Result<DirectlyFollowsModel> {
+        if minimum_fitness > &Fraction::one() {
+            return Err(anyhow!("cannot obtain a minimum fitness larger than 1"));
+        }
+
         let mut dfm = self.abstract_to_directly_follows_graph();
 
         loop {
             //gather the edges to be filtered
             let edges_to_filter = get_edges_to_filter(&dfm);
             if edges_to_filter.is_empty() {
-                return dfm.into();
+                return Ok(dfm.into());
             }
 
             //filter the log
             self.remove_traces_with_directly_follows_edge(edges_to_filter);
 
             if &self.get_probability_sum() < minimum_fitness {
-                return dfm.into();
+                return Ok(dfm.into());
             }
 
             //create a new dfg
@@ -75,7 +78,7 @@ impl dyn EbiTraitFiniteStochasticLanguage {
 }
 
 fn get_edges_to_filter(
-    dfm: &DirectlyFollowsGraph,
+    dfm: &StochasticDirectlyFollowsModel,
 ) -> HashSet<(Option<Activity>, Option<Activity>)> {
     let mut min = &Fraction::one();
     let mut result = HashSet::new();

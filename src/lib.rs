@@ -67,7 +67,8 @@ pub mod ebi_objects {
     pub mod stochastic_labelled_petri_net_semantics;
     pub mod stochastic_language_of_alignments;
     pub mod stochastic_process_tree;
-    pub mod directly_follows_graph;
+    pub mod stochastic_directly_follows_model;
+    pub mod scalable_vector_graphics;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_event_log;

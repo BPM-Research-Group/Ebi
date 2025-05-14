@@ -14,7 +14,7 @@ use crate::{
     },
     math::fraction::Fraction,
     techniques::{
-        directly_follows_model_miner::DirectlyFollowsModelMiner,
+        directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
         flower_miner::{FlowerMinerDFA, FlowerMinerTree},
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
     },
@@ -55,7 +55,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand:
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let minimum_fitness = inputs.remove(0).to_type::<Fraction>()?;
         Ok(EbiOutput::Object(EbiObject::DirectlyFollowsModel(
-            lang.mine_directly_follows_model_filtering(&minimum_fitness),
+            lang.mine_directly_follows_model_filtering(&minimum_fitness)?,
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsModel),

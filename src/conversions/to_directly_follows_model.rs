@@ -2,14 +2,17 @@ use std::collections::HashSet;
 
 use crate::{
     ebi_objects::{
-        directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel,
+        directly_follows_model::DirectlyFollowsModel,
+        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
     },
     math::traits::Signed,
 };
 
-impl From<DirectlyFollowsGraph> for DirectlyFollowsModel {
-    fn from(value: DirectlyFollowsGraph) -> Self {
-        let DirectlyFollowsGraph {
+impl From<StochasticDirectlyFollowsModel> for DirectlyFollowsModel {
+    fn from(value: StochasticDirectlyFollowsModel) -> Self {
+        log::info!("Convert stochastic directly follows model into directly follows model");
+
+        let StochasticDirectlyFollowsModel {
             activity_key,
             empty_traces_weight,
             sources,

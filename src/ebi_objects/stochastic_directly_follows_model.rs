@@ -11,7 +11,7 @@ use crate::{
 };
 
 #[derive(ActivityKey,Clone)]
-pub struct DirectlyFollowsGraph {
+pub struct StochasticDirectlyFollowsModel {
     pub(crate) activity_key: ActivityKey,
     pub(crate) empty_traces_weight: Fraction,
     pub(crate) sources: Vec<Activity>, //edge -> source of edge
@@ -21,7 +21,7 @@ pub struct DirectlyFollowsGraph {
     pub(crate) end_activities: HashMap<Activity, Fraction>, //activity -> how often observed
 }
 
-impl DirectlyFollowsGraph {
+impl StochasticDirectlyFollowsModel {
     pub fn new(activity_key: ActivityKey) -> Self {
         Self {
             empty_traces_weight: Fraction::zero(),
@@ -116,7 +116,7 @@ impl DirectlyFollowsGraph {
     }
 }
 
-impl TranslateActivityKey for DirectlyFollowsGraph {
+impl TranslateActivityKey for StochasticDirectlyFollowsModel {
     fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
         let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
 

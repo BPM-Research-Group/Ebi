@@ -62,6 +62,7 @@ impl dyn EbiTraitGraphable {
         let arrow = Arrow::simple(label);
         return graph.add_edge(arrow, *from, *to);
     }
+
 }
 
 impl FromEbiTraitObject for dyn EbiTraitGraphable {
