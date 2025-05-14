@@ -14,7 +14,7 @@ pub const FORMAT_SPECIFICATION: &str = "Ebi does not support importing of SVG or
 
 pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
     name: "scalable vector graphics",
-    article: "an",
+    article: "a",
     file_extension: "svg",
     format_specification: &FORMAT_SPECIFICATION,
     validator: None,
