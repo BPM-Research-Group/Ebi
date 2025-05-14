@@ -283,7 +283,7 @@ impl From<DirectlyFollowsModel> for LabelledPetriNet {
          * Nodes (states): after doing a node you end up in the corresponding place.
          */
         let mut node2place = vec![];
-        for _ in 0..value.get_number_of_nodes() {
+        for _ in 0..value.number_of_nodes() {
             let place = result.add_place();
             node2place.push(place);
         }
@@ -291,8 +291,8 @@ impl From<DirectlyFollowsModel> for LabelledPetriNet {
         /*
          * Transitions
          */
-        for source_node in 0..value.get_number_of_nodes() {
-            for target_node in 0..value.get_number_of_nodes() {
+        for source_node in 0..value.number_of_nodes() {
+            for target_node in 0..value.number_of_nodes() {
                 if value.edges[source_node][target_node] {
                     let from_place = node2place[source_node];
                     let to_place = node2place[target_node];

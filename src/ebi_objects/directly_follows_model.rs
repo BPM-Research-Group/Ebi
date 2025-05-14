@@ -38,9 +38,11 @@ pub const FORMAT_SPECIFICATION: &str = "A directly follows model is a line-based
     The next line contains the number of edges, followed by, for each edge, a line with first the index of the source activity, then the `>` symbol, then the index of the target activity.
     
     For instance:
-    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/a-b_star.dfm}";
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/a-b_star.dfm}
+    
+    Note that a directly follows model expresses a language and may have duplicated activity labels.";
 
-pub const EBI_DIRCTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
+pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "directly follows model",
     article: "a",
     file_extension: "dfm",
@@ -76,14 +78,22 @@ impl DirectlyFollowsModel {
         Ok(EbiObject::LabelledPetriNet(dfm.into()))
     }
 
-    pub fn get_number_of_edges(&self) -> usize {
+    pub fn number_of_edges(&self) -> usize {
         self.edges
             .iter()
             .fold(0usize, |a, b| a + b.into_iter().filter(|c| **c).count())
     }
 
-    pub fn get_number_of_nodes(&self) -> usize {
+    pub fn number_of_nodes(&self) -> usize {
         self.node_2_activity.len()
+    }
+
+    pub fn start_nodes(&self) -> &HashSet<usize> {
+        &self.start_nodes
+    }
+
+    pub fn end_nodes(&self) -> &HashSet<usize> {
+        &self.end_nodes
     }
 }
 
@@ -247,7 +257,7 @@ impl Display for DirectlyFollowsModel {
         writeln!(
             f,
             "# number of edges\n{}\n# edges",
-            self.get_number_of_edges()
+            self.number_of_edges()
         )?;
         for source in 0..self.edges.len() {
             for target in 0..self.edges.len() {
@@ -333,7 +343,7 @@ impl Infoable for DirectlyFollowsModel {
             "Number of activities\t{}",
             self.activity_key.activity2name.len()
         )?;
-        writeln!(f, "Number of edges\t\t{}", self.get_number_of_edges())?;
+        writeln!(f, "Number of edges\t\t{}", self.number_of_edges())?;
 
         Ok(write!(f, "")?)
     }

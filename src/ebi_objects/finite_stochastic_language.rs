@@ -245,6 +245,13 @@ impl EbiTraitFiniteStochasticLanguage for FiniteStochasticLanguage {
         // Update the traces in the language with the translated ones
         self.traces = translated_traces;
     }
+
+    fn retain_traces<'a>(
+        &'a mut self,
+        f: Box<dyn Fn(&Vec<Activity>, &mut Fraction) -> bool + 'static>,
+    ) {
+        self.traces.retain(f);
+    }
 }
 
 impl Eq for FiniteStochasticLanguage {}

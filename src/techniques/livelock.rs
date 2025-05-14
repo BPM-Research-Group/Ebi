@@ -103,8 +103,8 @@ pub struct LiveLockCacheDirectlyFollowsModel(Vec<bool>);
 
 impl LiveLockCacheDirectlyFollowsModel {
     pub fn new(dfm: &DirectlyFollowsModel) -> Self {
-        let mut result = vec![true; dfm.get_number_of_nodes() + 2];
-        result[dfm.get_number_of_nodes()] = false;
+        let mut result = vec![true; dfm.number_of_nodes() + 2];
+        result[dfm.number_of_nodes()] = false;
         dfm.end_nodes
             .iter()
             .for_each(|state| result[*state] = false);
@@ -116,7 +116,7 @@ impl LiveLockCacheDirectlyFollowsModel {
 
         while let Some(state) = queue.pop() {
             // eprintln!("queue {:?}, result {:?}, state {}", queue, result, state);
-            for source in 0..dfm.get_number_of_nodes() {
+            for source in 0..dfm.number_of_nodes() {
                 if result[source] && dfm.edges[source][state] {
                     result[source] = false;
                     queue.push(source);
@@ -125,7 +125,7 @@ impl LiveLockCacheDirectlyFollowsModel {
         }
 
         if dfm.start_nodes.iter().any(|node| !result[*node]) {
-            result[dfm.get_number_of_nodes() + 1] = false;
+            result[dfm.number_of_nodes() + 1] = false;
         }
 
         Self(result)

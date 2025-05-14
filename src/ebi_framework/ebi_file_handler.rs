@@ -6,7 +6,7 @@ use crate::{
     ebi_objects::{
         compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
         deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
-        directly_follows_model::EBI_DIRCTLY_FOLLOWS_MODEL, event_log::EBI_EVENT_LOG,
+        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log::EBI_EVENT_LOG,
         executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE,
         finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
         labelled_petri_net::EBI_LABELLED_PETRI_NET,
@@ -29,7 +29,7 @@ use super::{
 pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_COMPRESSED_EVENT_LOG,
     EBI_DETERMINISTIC_FINITE_AUTOMATON,
-    EBI_DIRCTLY_FOLLOWS_MODEL,
+    EBI_DIRECTLY_FOLLOWS_MODEL,
     EBI_EVENT_LOG,
     EBI_EXECUTIONS,
     EBI_FINITE_LANGUAGE,

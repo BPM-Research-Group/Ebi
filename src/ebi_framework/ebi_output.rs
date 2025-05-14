@@ -14,7 +14,7 @@ use crate::{
         deterministic_finite_automaton::{
             DeterministicFiniteAutomaton, EBI_DETERMINISTIC_FINITE_AUTOMATON,
         },
-        directly_follows_model::{DirectlyFollowsModel, EBI_DIRCTLY_FOLLOWS_MODEL},
+        directly_follows_model::{DirectlyFollowsModel, EBI_DIRECTLY_FOLLOWS_MODEL},
         executions::{EBI_EXECUTIONS, Executions},
         finite_language::{EBI_FINITE_LANGUAGE, FiniteLanguage},
         finite_stochastic_language::{EBI_FINITE_STOCHASTIC_LANGUAGE, FiniteStochasticLanguage},
@@ -166,7 +166,7 @@ impl EbiOutputType {
             }
             EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsModel) => EbiExporter::Object(
                 &EbiObjectExporter::DirectlyFollowsModel(DirectlyFollowsModel::export_from_object),
-                &EBI_DIRCTLY_FOLLOWS_MODEL,
+                &EBI_DIRECTLY_FOLLOWS_MODEL,
             ),
             EbiOutputType::ObjectType(EbiObjectType::EventLog) => EbiExporter::Object(
                 &EbiObjectExporter::EventLog(CompressedEventLog::export_from_object),

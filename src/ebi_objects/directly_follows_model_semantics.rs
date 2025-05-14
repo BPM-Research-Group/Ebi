@@ -19,7 +19,7 @@ impl Semantics for DirectlyFollowsModel {
         if self.start_nodes.is_empty() {
             None
         } else {
-            Some(self.get_number_of_nodes() + 1)
+            Some(self.number_of_nodes() + 1)
         }
     }
 
@@ -29,15 +29,15 @@ impl Semantics for DirectlyFollowsModel {
     }
 
     fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool {
-        state == &self.get_number_of_nodes()
+        state == &self.number_of_nodes()
     }
 
     fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
-        return transition == self.get_number_of_nodes()
+        return transition == self.number_of_nodes()
     }
 
     fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
-        if transition > self.get_number_of_nodes() {
+        if transition > self.number_of_nodes() {
             None
         } else {
             self.node_2_activity.get(transition).copied()
@@ -54,11 +54,11 @@ impl Semantics for DirectlyFollowsModel {
 
             //terminate from initial state
             if self.empty_traces {
-                result.push(self.get_number_of_nodes());
+                result.push(self.number_of_nodes());
             }
 
             result
-        } else if state < &self.get_number_of_nodes() {
+        } else if state < &self.number_of_nodes() {
             //non-initial state
 
             //outgoing edges
@@ -66,7 +66,7 @@ impl Semantics for DirectlyFollowsModel {
 
             //terminate from end node
             if self.end_nodes.contains(state) {
-                result.push(self.get_number_of_nodes());
+                result.push(self.number_of_nodes());
             }
 
             result
@@ -77,7 +77,7 @@ impl Semantics for DirectlyFollowsModel {
     }
 
     fn get_number_of_transitions(&self) -> usize {
-        self.get_number_of_nodes() + 1
+        self.number_of_nodes() + 1
     }
 }
 
