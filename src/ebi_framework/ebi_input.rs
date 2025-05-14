@@ -164,7 +164,13 @@ impl EbiInputType {
                 EbiInputType::FileHandler => {
                     let extensions: Vec<String> = EBI_FILE_HANDLERS
                         .iter()
-                        .map(|file_type| file_type.file_extension.to_string())
+                        .filter_map(|file_type| {
+                            if file_type.validator.is_some() {
+                                Some(file_type.file_extension.to_string())
+                            } else {
+                                None
+                            }
+                        })
                         .collect();
                     result.insert(
                         "the file extension of any file type supported by Ebi (".to_owned()
@@ -206,7 +212,13 @@ impl EbiInputType {
                 EbiInputType::FileHandler => {
                     let extensions: Vec<String> = EBI_FILE_HANDLERS
                         .iter()
-                        .map(|file_type| file_type.file_extension.to_string())
+                        .filter_map(|file_type| {
+                            if file_type.validator.is_some() {
+                                Some(file_type.file_extension.to_string())
+                            } else {
+                                None
+                            }
+                        })
                         .collect();
                     result.insert(
                         "the file extension of any file type supported by Ebi (".to_owned()
