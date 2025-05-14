@@ -1,7 +1,3 @@
-use anyhow::Result;
-use layout::backends::svg::SVGWriter;
-use svg2pdf::{ConversionOptions, PageOptions};
-
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
@@ -10,6 +6,7 @@ use crate::{
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
+    ebi_objects::scalable_vector_graphics::{svg_to_pdf, to_svg_string_box},
     ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
 };
 
@@ -72,12 +69,11 @@ pub const EBI_VISUALISE_SVG: EbiCommand = EbiCommand::Command {
     input_names: &["FILE"],
     input_helps: &["Any file that can be visualised as a graph."],
     execute: |mut inputs, _| {
-        let result = inputs.remove(0).to_type::<dyn EbiTraitGraphable>()?;
+        let result: Box<dyn EbiTraitGraphable + 'static> =
+            inputs.remove(0).to_type::<dyn EbiTraitGraphable>()?;
 
-        let mut svg = SVGWriter::new();
-        result.to_dot()?.do_it(false, false, false, &mut svg);
-
-        return Ok(EbiOutput::SVG(svg.finalize()));
+        let svg_string = to_svg_string_box(result)?;
+        return Ok(EbiOutput::SVG(svg_string));
     },
     output_type: &EbiOutputType::SVG,
 };
@@ -96,10 +92,7 @@ pub const EBI_VISUALISE_PDF: EbiCommand = EbiCommand::Command {
     execute: |mut inputs, _| {
         let result = inputs.remove(0).to_type::<dyn EbiTraitGraphable>()?;
 
-        let mut svg = SVGWriter::new();
-        result.to_dot()?.do_it(false, false, false, &mut svg);
-        let svg_string = svg.finalize();
-
+        let svg_string = to_svg_string_box(result)?;
         let pdf = svg_to_pdf(&svg_string)?;
 
         return Ok(EbiOutput::PDF(pdf));
@@ -107,18 +100,17 @@ pub const EBI_VISUALISE_PDF: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::PDF,
 };
 
-pub fn svg_to_pdf(svg: &str) -> Result<Vec<u8>> {
-    let mut options = svg2pdf::usvg::Options::default();
-    options.fontdb_mut().load_system_fonts();
-    let tree = svg2pdf::usvg::Tree::from_str(svg, &options)?;
-    Ok(svg2pdf::to_pdf(&tree, ConversionOptions::default(), PageOptions::default()).unwrap())
-}
-
 #[cfg(test)]
 mod tests {
 
     use crate::{
-        ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT, ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInput, ebi_object::EbiTraitObject}, ebi_objects::{finite_language::FiniteLanguage, stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET}, math::{fraction::Fraction, traits::One}
+        ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT,
+        ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInput, ebi_object::EbiTraitObject},
+        ebi_objects::{
+            finite_language::FiniteLanguage,
+            stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
+        },
+        math::{fraction::Fraction, traits::One},
     };
 
     #[test]
@@ -173,7 +165,10 @@ mod tests {
     fn unreachable_trait() {
         let net = "finite language\n0";
         let lang = net.parse::<FiniteLanguage>().unwrap();
-        let object = EbiInput::Trait(EbiTraitObject::FiniteLanguage(Box::new(lang)), &EBI_STOCHASTIC_LABELLED_PETRI_NET);
+        let object = EbiInput::Trait(
+            EbiTraitObject::FiniteLanguage(Box::new(lang)),
+            &EBI_STOCHASTIC_LABELLED_PETRI_NET,
+        );
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
             let _ = (execute)(vec![object], None);
         }
