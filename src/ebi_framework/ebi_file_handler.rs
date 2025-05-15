@@ -78,8 +78,6 @@ impl EbiFileHandler {
         }
         if self.validator.is_some() {
             result.insert(vec![&EBI_COMMANDS, &EBI_VALIDATE]);
-        } else {
-            result.insert(vec![&EBI_COMMANDS]);
         }
 
         result
