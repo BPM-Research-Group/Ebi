@@ -10,7 +10,7 @@ use anyhow::{Result, anyhow};
 use layout::backends::svg::SVGWriter;
 use svg2pdf::{ConversionOptions, PageOptions};
 
-pub const FORMAT_SPECIFICATION: &str = "Ebi does not support importing of SVG or PDF files. However, if you run a command that outputs something that can be made into a graph (Graphable), then providing the \\verb=-o= parameter with a .svg or .pdf extension will output a picture of the output.";
+pub const FORMAT_SPECIFICATION: &str = "Ebi does not support importing of SVG or PDF files.";
 
 pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
     name: "scalable vector graphics",
