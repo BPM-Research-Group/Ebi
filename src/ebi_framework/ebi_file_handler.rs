@@ -76,7 +76,11 @@ impl EbiFileHandler {
         for importer in self.object_importers {
             result.extend(importer.get_type().get_applicable_commands());
         }
-        result.insert(vec![&EBI_COMMANDS, &EBI_VALIDATE]);
+        if self.validator.is_some() {
+            result.insert(vec![&EBI_COMMANDS, &EBI_VALIDATE]);
+        } else {
+            result.insert(vec![&EBI_COMMANDS]);
+        }
 
         result
     }
