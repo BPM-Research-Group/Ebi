@@ -36,19 +36,19 @@ use crate::{
 
 pub const HEADER: &str = "stochastic directly follows model";
 
-pub const FORMAT_SPECIFICATION: &str = "A stochastic directly follows model (also called directly follows graph) is a JSON structure with the top level being an object.
-    This object contains the following key-value pairs:
-    \\begin{itemize}
-    \\item \\texttt{initialState} being the index of the initial state. This field is optional: if omitted, the DFA has an empty language.
-    \\item \\texttt{finalStates} being a list of indices of the final states.
-    A final state is not necessarily a deadlock state.
-    \\item \\texttt{transitions} being a list of transitions. 
-    Each transition is an object with \\texttt{from} being the source state index of the transition, \\texttt{to} being the target state index of the transition, and \texttt{{label}} being the activity of the transition. 
-    Silent transitions are not supported.
-    The file format supports deadlocks and livelocks.
-    \\end{itemize}
+pub const FORMAT_SPECIFICATION: &str = "A stochstic directly follows model is a line-based structure. Lines starting with a \\# are ignored.
+    This first line is exactly `directly follows model'.\\
+    The second line is a boolean indicating whether the model supports empty traces.\\
+    The third line is the number of activities in the model.\\
+    The following lines each contain an activity. Duplicated labels are accepted.\\
+    The next line contains the number of start activities, followed by, for each start activity, a line with the index of the start activity, followed by a `w` and the weight of the start activity.\\
+    The next line contains the number of end activities, followed by, for each end activity, a line with the index of the end activity, followed by a `w` and the weight of the end activity.\\
+    The next line contains the number of edges, followed by, for each edge, a line with first the index of the source activity, then the `>` symbol, then the index of the target activity, then a `w`, and then the weight of the transition.
+    
     For instance:
-    \\lstinputlisting[language=json, style=boxed]{../testfiles/aa-ab-ba.dfa}";
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/a-b_star.dfm}
+    
+    Note that a directly follows model expresses a language and may have duplicated activity labels.";
 
 pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "stochastic directly follows model",

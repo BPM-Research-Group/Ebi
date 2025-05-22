@@ -1,8 +1,37 @@
-use std::{cmp::Ordering, collections::{hash_map::Entry, HashMap}};
+use std::{
+    cmp::Ordering,
+    collections::{HashMap, hash_map::Entry},
+};
+
+use anyhow::{Context, Result, anyhow};
+use serde_json::Value;
 
 use crate::{
-    ebi_framework::activity_key::{Activity, ActivityKey},
+    ebi_framework::{
+        activity_key::{Activity, ActivityKey},
+        ebi_file_handler::EbiFileHandler,
+        ebi_input::{self, EbiObjectImporter},
+        ebi_object::EbiObject,
+        importable::Importable,
+    },
+    json,
     math::{fraction::Fraction, traits::Zero},
+};
+
+pub const FORMAT_SPECIFICATION: &str = "A directly follows graph is a JSON structure.";
+
+pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
+    name: "directly follows graph",
+    article: "a",
+    file_extension: "dfg",
+    format_specification: &FORMAT_SPECIFICATION,
+    validator: Some(ebi_input::validate::<DirectlyFollowsGraph>),
+    trait_importers: &[],
+    object_importers: &[EbiObjectImporter::StochasticDirectlyFollowsModel(
+        DirectlyFollowsGraph::import_as_object,
+    )],
+    object_exporters: &[],
+    java_object_handlers: &[], //java translations covered by LabelledPetrinet
 };
 
 #[derive(Clone)]
@@ -108,5 +137,180 @@ impl DirectlyFollowsGraph {
         } else {
             return Ordering::Equal;
         }
+    }
+}
+
+impl Importable for DirectlyFollowsGraph {
+    fn import_as_object(
+        reader: &mut dyn std::io::BufRead,
+    ) -> anyhow::Result<crate::ebi_framework::ebi_object::EbiObject> {
+        Ok(EbiObject::StochasticDirectlyFollowsModel(
+            Self::import(reader)?.try_into()?,
+        ))
+    }
+
+    fn import(reader: &mut dyn std::io::BufRead) -> anyhow::Result<Self>
+    where
+        Self: Sized,
+    {
+        let json: Value = serde_json::from_reader(reader)?;
+
+        let mut result = DirectlyFollowsGraph::new(ActivityKey::new());
+
+        let activities = json::read_field_object(&json, "activities")
+            .with_context(|| format!("reading field `activities`"))?;
+        let frequencies: Result<HashMap<Activity, usize>> = activities
+            .into_iter()
+            .map(|(activity, json)| {
+                let frequency = json::read_number(json)
+                    .with_context(|| format!("read activity frequency of {}", activity))?;
+                let activity = result.activity_key.process_activity(activity);
+                Ok((activity, frequency))
+            })
+            .collect();
+        let mut frequencies_in = frequencies?;
+        let mut frequencies_out = frequencies_in.clone();
+
+        let edges = json::read_field_list(&json, "directly_follows_relations")
+            .with_context(|| format!("reading field `directly follows relations`"))?;
+        for (i, edge) in edges.into_iter().enumerate() {
+            let edge_list = json::read_list(edge).with_context(|| format!("reading edge {}", i))?;
+            let sourcetarget = json::read_list(
+                edge_list
+                    .get(0)
+                    .ok_or_else(|| anyhow!("could not read source and target of edge {}", i))?,
+            )?;
+
+            let source_act = json::read_string(
+                sourcetarget
+                    .get(0)
+                    .ok_or_else(|| anyhow!("could not read source of edge {}", i))?,
+            )
+            .with_context(|| format!("reading source of edge {}", i))?;
+            let source = result.activity_key.process_activity(source_act);
+
+            let target_act = json::read_string(
+                sourcetarget
+                    .get(1)
+                    .ok_or_else(|| anyhow!("could not read target of edge {}", i))?,
+            )
+            .with_context(|| format!("reading target of edge {}", i))?;
+            let target = result.activity_key.process_activity(target_act);
+
+            let weight = json::read_number(
+                edge_list
+                    .get(1)
+                    .ok_or_else(|| anyhow!("could not read weight of edge {}", i))?,
+            )
+            .with_context(|| format!("reading weight of edge {}", i))?;
+
+            result.add_edge(source, target, &Fraction::from((weight, 1)));
+
+            //keep track of how many executions are left for source
+            match frequencies_out.entry(source) {
+                Entry::Occupied(mut occupied_entry) => {
+                    let pre_weight = occupied_entry.get();
+                    if pre_weight < &weight {
+                        return Err(anyhow!(
+                            "activity {} has too many outgoing edges as of edge {}",
+                            source_act,
+                            i
+                        ));
+                    } else {
+                        *occupied_entry.get_mut() -= weight
+                    }
+                }
+                Entry::Vacant(_) => {
+                    //activity not declared
+                    return Err(anyhow!(
+                        "non-declared activity {} used as source of edge {}",
+                        source_act,
+                        i
+                    ));
+                }
+            }
+
+            //keep track of how many executions are left for source
+            match frequencies_in.entry(target) {
+                Entry::Occupied(mut occupied_entry) => {
+                    let pre_weight = occupied_entry.get();
+                    if pre_weight < &weight {
+                        return Err(anyhow!(
+                            "activity {} has too many incoming edges as of edge {}",
+                            target_act,
+                            i
+                        ));
+                    } else {
+                        *occupied_entry.get_mut() -= weight
+                    }
+                }
+                Entry::Vacant(_) => {
+                    //activity not declared
+                    return Err(anyhow!(
+                        "non-declared activity {} used as target of edge {}",
+                        target_act,
+                        i
+                    ));
+                }
+            }
+        }
+
+        let start_activities = json::read_field_list(&json, "start_activities")
+            .with_context(|| format!("reading field `start activities`"))?;
+        let err: Result<()> = start_activities
+            .into_iter()
+            .map(|json| {
+                let act = json::read_string(json)?;
+                let activity = result.activity_key.process_activity(act);
+
+                match frequencies_in.entry(activity) {
+                    Entry::Occupied(occupied_entry) => {
+                        let weight = occupied_entry.remove();
+                        if weight > 0 {
+                            result.add_start_activity(activity, &Fraction::from((weight, 1)));
+                        }
+                    }
+                    Entry::Vacant(_) => {
+                        //activity not declared
+                        return Err(anyhow!(format!(
+                            "non-declared activity {} used as start activity",
+                            act
+                        )));
+                    }
+                }
+                Ok(())
+            })
+            .collect();
+        err?;
+
+        let end_activities = json::read_field_list(&json, "end_activities")
+            .with_context(|| format!("reading field `end activities`"))?;
+        let err: Result<()> = end_activities
+            .into_iter()
+            .map(|json| {
+                let act = json::read_string(json)?;
+                let activity = result.activity_key.process_activity(act);
+
+                match frequencies_out.entry(activity) {
+                    Entry::Occupied(occupied_entry) => {
+                        let weight = occupied_entry.remove();
+                        if weight > 0 {
+                            result.add_end_activity(activity, &Fraction::from((weight, 1)));
+                        }
+                    }
+                    Entry::Vacant(_) => {
+                        //activity not declared
+                        return Err(anyhow!(format!(
+                            "non-declared activity {} used as end activity",
+                            act
+                        )));
+                    }
+                }
+                Ok(())
+            })
+            .collect();
+        err?;
+
+        return Ok(result);
     }
 }

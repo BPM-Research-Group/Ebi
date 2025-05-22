@@ -396,6 +396,7 @@ impl Display for EbiTraitImporter {
 pub enum EbiObjectImporter {
     EventLog(fn(&mut dyn BufRead) -> Result<EbiObject>),
     DirectlyFollowsModel(fn(&mut dyn BufRead) -> Result<EbiObject>),
+    StochasticDirectlyFollowsModel(fn(&mut dyn BufRead) -> Result<EbiObject>),
     FiniteLanguage(fn(&mut dyn BufRead) -> Result<EbiObject>),
     FiniteStochasticLanguage(fn(&mut dyn BufRead) -> Result<EbiObject>),
     LabelledPetriNet(fn(&mut dyn BufRead) -> Result<EbiObject>),
@@ -414,6 +415,9 @@ impl EbiObjectImporter {
         match self {
             EbiObjectImporter::EventLog(_) => EbiObjectType::EventLog,
             EbiObjectImporter::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
+            EbiObjectImporter::StochasticDirectlyFollowsModel(_) => {
+                EbiObjectType::StochasticDirectlyFollowsModel
+            }
             EbiObjectImporter::FiniteLanguage(_) => EbiObjectType::FiniteLanguage,
             EbiObjectImporter::FiniteStochasticLanguage(_) => {
                 EbiObjectType::FiniteStochasticLanguage
@@ -442,6 +446,7 @@ impl EbiObjectImporter {
         match self {
             EbiObjectImporter::EventLog(importer) => *importer,
             EbiObjectImporter::DirectlyFollowsModel(importer) => *importer,
+            EbiObjectImporter::StochasticDirectlyFollowsModel(importer) => *importer,
             EbiObjectImporter::FiniteLanguage(importer) => *importer,
             EbiObjectImporter::FiniteStochasticLanguage(importer) => *importer,
             EbiObjectImporter::LabelledPetriNet(importer) => *importer,
