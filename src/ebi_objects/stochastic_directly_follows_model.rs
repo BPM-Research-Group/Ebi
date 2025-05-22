@@ -1,10 +1,11 @@
 use std::{
     cmp::Ordering,
     fmt::Display,
-    io::{BufRead, Write},
+    io::{self, BufRead, Write},
+    str::FromStr,
 };
 
-use anyhow::{Context, Result, anyhow};
+use anyhow::{Context, Error, Result, anyhow};
 use itertools::Itertools;
 use layout::topo::layout::VisualGraph;
 
@@ -74,11 +75,9 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
             StochasticDirectlyFollowsModel::import_as_stochastic_labelled_petri_net,
         ),
     ],
-    object_exporters: &[
-        EbiObjectExporter::StochasticDirectlyFollowsModel(
-            StochasticDirectlyFollowsModel::export_from_object,
-        ),
-    ],
+    object_exporters: &[EbiObjectExporter::StochasticDirectlyFollowsModel(
+        StochasticDirectlyFollowsModel::export_from_object,
+    )],
     java_object_handlers: &[],
 };
 
@@ -373,6 +372,15 @@ impl Importable for StochasticDirectlyFollowsModel {
     }
 }
 
+impl FromStr for StochasticDirectlyFollowsModel {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        let mut reader = io::Cursor::new(s);
+        Self::import(&mut reader)
+    }
+}
+
 impl Exportable for StochasticDirectlyFollowsModel {
     fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
@@ -503,12 +511,7 @@ impl EbiTraitGraphable for StochasticDirectlyFollowsModel {
 
         //edges
         for (source, target) in self.sources.iter().zip(self.targets.iter()) {
-            <dyn EbiTraitGraphable>::create_edge(
-                &mut graph,
-                &nodes[*source],
-                &nodes[*target],
-                "",
-            );
+            <dyn EbiTraitGraphable>::create_edge(&mut graph, &nodes[*source], &nodes[*target], "");
         }
 
         Ok(graph)
