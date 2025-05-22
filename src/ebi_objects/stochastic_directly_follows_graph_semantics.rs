@@ -71,7 +71,7 @@ macro_rules! semantics_for_automaton {
                 } else if transition < self.sources.len() {
                     //edge
                     let node = transition;
-                    Some(self.node_2_activity[node])
+                    Some(self.node_2_activity[self.targets[node]])
                 } else {
                     //start
                     let node = transition - (self.sources.len() + 1);
