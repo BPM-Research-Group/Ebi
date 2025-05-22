@@ -16,7 +16,7 @@ pub const EBI_CONVERT: EbiCommand = EbiCommand::Group {
 
 pub const EBI_CONVERT_LPN: EbiCommand = EbiCommand::Command { 
     name_short: "lpn", 
-    name_long: Some("labelled-Petri-net"),
+    name_long: Some("labelled-petri-net"),
     explanation_short: "Convert an object to a labelled Petri net.", 
     explanation_long: None, 
     latex_link: None, 
