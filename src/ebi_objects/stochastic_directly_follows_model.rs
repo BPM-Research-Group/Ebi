@@ -4,13 +4,53 @@ use std::{
 };
 
 use crate::{
-    ebi_framework::activity_key::{
-        Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey,
+    ebi_framework::{
+        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey},
+        ebi_file_handler::EbiFileHandler,
+        ebi_input::{self, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter,
     },
+    ebi_traits::ebi_trait_graphable,
     math::{fraction::Fraction, traits::Zero},
 };
 
-#[derive(ActivityKey,Clone)]
+pub const FORMAT_SPECIFICATION: &str = "A deterministic finite automaton is a JSON structure with the top level being an object.
+    This object contains the following key-value pairs:
+    \\begin{itemize}
+    \\item \\texttt{initialState} being the index of the initial state. This field is optional: if omitted, the DFA has an empty language.
+    \\item \\texttt{finalStates} being a list of indices of the final states.
+    A final state is not necessarily a deadlock state.
+    \\item \\texttt{transitions} being a list of transitions. 
+    Each transition is an object with \\texttt{from} being the source state index of the transition, \\texttt{to} being the target state index of the transition, and \texttt{{label}} being the activity of the transition. 
+    Silent transitions are not supported.
+    The file format supports deadlocks and livelocks.
+    \\end{itemize}
+    For instance:
+    \\lstinputlisting[language=json, style=boxed]{../testfiles/aa-ab-ba.dfa}";
+
+pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
+    name: "finite stochastic language",
+    article: "a",
+    file_extension: "slang",
+    format_specification: &FORMAT_SPECIFICATION,
+    validator: Some(ebi_input::validate::<StochasticDirectlyFollowsModel>),
+    trait_importers: &[
+        EbiTraitImporter::Semantics(StochasticDirectlyFollowsModel::import_as_semantics),
+        EbiTraitImporter::StochasticSemantics(StochasticDirectlyFollowsModel::import_as_stochastic_semantics),
+        EbiTraitImporter::Graphable(ebi_trait_graphable::import::<StochasticDirectlyFollowsModel>),
+    ],
+    object_importers: &[
+        EbiObjectImporter::DirectlyFollowsModel(StochasticDirectlyFollowsModel::import_as_object),
+        EbiObjectImporter::LabelledPetriNet(
+            StochasticDirectlyFollowsModel::import_as_labelled_petri_net,
+        ),
+    ],
+    object_exporters: &[EbiObjectExporter::StochasticDirectlyFollowsModel(
+        StochasticDirectlyFollowsModel::export_from_object,
+    )],
+    java_object_handlers: &[],
+};
+
+#[derive(ActivityKey, Clone)]
 pub struct StochasticDirectlyFollowsModel {
     pub(crate) activity_key: ActivityKey,
     pub(crate) empty_traces_weight: Fraction,

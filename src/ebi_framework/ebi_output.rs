@@ -396,6 +396,7 @@ impl Display for EbiExporter {
 pub enum EbiObjectExporter {
     EventLog(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     DirectlyFollowsModel(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
+    StochasticDirectlyFollowsModel(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     FiniteLanguage(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     FiniteStochasticLanguage(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     LabelledPetriNet(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
@@ -416,6 +417,7 @@ impl EbiObjectExporter {
         match self {
             EbiObjectExporter::EventLog(_) => EbiObjectType::EventLog,
             EbiObjectExporter::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
+            EbiObjectExporter::StochasticDirectlyFollowsModel(_) => EbiObjectType::StochasticDirectlyFollowsModel,
             EbiObjectExporter::FiniteLanguage(_) => EbiObjectType::FiniteLanguage,
             EbiObjectExporter::FiniteStochasticLanguage(_) => {
                 EbiObjectType::FiniteStochasticLanguage
