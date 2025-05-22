@@ -82,11 +82,13 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
     input_types: &[&[
         &EbiInputType::Object(EbiObjectType::StochasticProcessTree),
         &EbiInputType::Object(EbiObjectType::ProcessTree),
+        &EbiInputType::Object(EbiObjectType::StochasticDirectlyFollowsModel),
+        &EbiInputType::Object(EbiObjectType::DirectlyFollowsModel),
         &EbiInputType::Object(EbiObjectType::EventLog),
         &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage),
         &EbiInputType::Object(EbiObjectType::FiniteLanguage),
-        &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
+        &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
         &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
     ]],
@@ -107,6 +109,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::FiniteLanguage(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.bounded()?,
+            EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(object), _) => object.bounded()?,
             EbiInput::Trait(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
@@ -210,11 +213,13 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
     input_types: &[&[
         &EbiInputType::Object(EbiObjectType::StochasticProcessTree),
         &EbiInputType::Object(EbiObjectType::ProcessTree),
+        &EbiInputType::Object(EbiObjectType::StochasticDirectlyFollowsModel),
+        &EbiInputType::Object(EbiObjectType::DirectlyFollowsModel),
         &EbiInputType::Object(EbiObjectType::EventLog),
         &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage),
         &EbiInputType::Object(EbiObjectType::FiniteLanguage),
-        &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
+        &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
         &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
     ]],
@@ -241,6 +246,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
                 object.any_traces()?
             }
             EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.any_traces()?,
+            EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(object), _) => object.any_traces()?,
             EbiInput::Trait(_, _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }

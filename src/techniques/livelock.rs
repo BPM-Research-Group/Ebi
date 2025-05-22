@@ -5,9 +5,10 @@ use crate::{
         directly_follows_model::DirectlyFollowsModel,
         labelled_petri_net::{LPNMarking, LabelledPetriNet},
         process_tree::ProcessTree,
-        stochastic_process_tree_semantics::NodeStates,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        stochastic_process_tree_semantics::NodeStates,
     },
     ebi_traits::ebi_trait_semantics::Semantics,
 };
@@ -67,81 +68,93 @@ impl LiveLockCache for LiveLockCacheProcessTree {
  * 0..nodes:        the activity
  * nodes:           terminate
  */
-impl IsPartOfLivelock for DirectlyFollowsModel {
-    type LivState = usize;
+macro_rules! dfm {
+    ($t:ident, $u:ident) => {
+        impl IsPartOfLivelock for $t {
+            type LivState = usize;
 
-    fn is_state_part_of_livelock(&self, state: &Self::LivState) -> Result<bool> {
-        let mut queue = vec![];
-        queue.push(state.clone());
-        let mut visited = HashSet::new();
-        visited.insert(state.clone());
+            fn is_state_part_of_livelock(&self, state: &Self::LivState) -> Result<bool> {
+                let mut queue = vec![];
+                queue.push(state.clone());
+                let mut visited = HashSet::new();
+                visited.insert(state.clone());
 
-        while let Some(state) = queue.pop() {
-            if self.is_final_state(&state) {
-                return Ok(false);
-            }
+                while let Some(state) = queue.pop() {
+                    if self.is_final_state(&state) {
+                        return Ok(false);
+                    }
 
-            for transition in self.get_enabled_transitions(&state) {
-                let mut child_state = state.clone();
-                self.execute_transition(&mut child_state, transition)?;
+                    for transition in self.get_enabled_transitions(&state) {
+                        let mut child_state = state.clone();
+                        self.execute_transition(&mut child_state, transition)?;
 
-                if visited.insert(child_state.clone()) {
-                    queue.push(child_state);
+                        if visited.insert(child_state.clone()) {
+                            queue.push(child_state);
+                        }
+                    }
                 }
+
+                return Ok(true);
+            }
+
+            fn get_livelock_cache(&self) -> Box<dyn LiveLockCache<LivState = Self::LivState> + '_> {
+                Box::new($u::new(&self))
             }
         }
 
-        return Ok(true);
-    }
+        pub struct $u(Vec<bool>);
 
-    fn get_livelock_cache(&self) -> Box<dyn LiveLockCache<LivState = Self::LivState> + '_> {
-        Box::new(LiveLockCacheDirectlyFollowsModel::new(&self))
-    }
-}
+        impl $u {
+            pub fn new(dfm: &$t) -> Self {
+                let mut result = vec![true; dfm.node_2_activity.len() + 2];
+                let mut queue = vec![];
+                result[dfm.node_2_activity.len()] = false;
+                (0..dfm.node_2_activity.len()).into_iter().for_each(|node| {
+                    if dfm.is_end_node(node) {
+                        result[node] = false;
+                        queue.push(node)
+                    }
+                });
 
-pub struct LiveLockCacheDirectlyFollowsModel(Vec<bool>);
+                // eprintln!("queue {:?}, result {:?}", queue, result);
 
-impl LiveLockCacheDirectlyFollowsModel {
-    pub fn new(dfm: &DirectlyFollowsModel) -> Self {
-        let mut result = vec![true; dfm.number_of_nodes() + 2];
-        result[dfm.number_of_nodes()] = false;
-        dfm.end_nodes
-            .iter()
-            .for_each(|state| result[*state] = false);
+                while let Some(state) = queue.pop() {
+                    // eprintln!("queue {:?}, result {:?}, state {}", queue, result, state);
 
-        let mut queue = vec![];
-        queue.extend(dfm.end_nodes.iter());
-
-        // eprintln!("queue {:?}, result {:?}", queue, result);
-
-        while let Some(state) = queue.pop() {
-            // eprintln!("queue {:?}, result {:?}, state {}", queue, result, state);
-            for source in 0..dfm.number_of_nodes() {
-                if result[source] && dfm.edges[source][state] {
-                    result[source] = false;
-                    queue.push(source);
+                    //walk over the edges that go into state (expensive :'( )
+                    for (source, target) in dfm.sources.iter().zip(dfm.targets.iter()) {
+                        if result[*source] && *target == state {
+                            result[*source] = false;
+                            queue.push(*source);
+                        }
+                    }
                 }
+
+                if (0..dfm.node_2_activity.len()).into_iter().any(|node| !result[node]) {
+                    result[dfm.node_2_activity.len() + 1] = false;
+                }
+
+                Self(result)
             }
         }
 
-        if dfm.start_nodes.iter().any(|node| !result[*node]) {
-            result[dfm.number_of_nodes() + 1] = false;
+        impl LiveLockCache for $u {
+            type LivState = usize;
+
+            fn is_state_part_of_livelock(&mut self, state: &Self::LivState) -> Result<bool> {
+                self.0
+                    .get(*state)
+                    .copied()
+                    .ok_or_else(|| anyhow!("index out of bounds"))
+            }
         }
-
-        Self(result)
-    }
+    };
 }
-
-impl LiveLockCache for LiveLockCacheDirectlyFollowsModel {
-    type LivState = usize;
-
-    fn is_state_part_of_livelock(&mut self, state: &Self::LivState) -> Result<bool> {
-        self.0
-            .get(*state)
-            .copied()
-            .ok_or_else(|| anyhow!("index out of bounds"))
-    }
-}
+dfm!(DirectlyFollowsModel, DirectlyFollowsModelLiveLockCache);
+dfm!(
+    StochasticDirectlyFollowsModel,
+    StochasticDirectlyFollowsModelLiveLockCache
+);
 
 macro_rules! lpn {
     ($t:ident, $u:ident) => {
@@ -314,9 +327,10 @@ mod tests {
         ebi_objects::{
             deterministic_finite_automaton::DeterministicFiniteAutomaton,
             directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet,
-            process_tree::ProcessTree, stochastic_process_tree_semantics::NodeStates,
+            process_tree::ProcessTree,
             stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
             stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+            stochastic_process_tree_semantics::NodeStates,
         },
         ebi_traits::ebi_trait_semantics::Semantics,
         techniques::livelock::IsPartOfLivelock,

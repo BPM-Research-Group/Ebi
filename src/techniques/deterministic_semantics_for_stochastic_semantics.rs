@@ -9,6 +9,7 @@ use strum_macros::Display;
 use crate::ebi_framework::activity_key::Activity;
 use crate::ebi_framework::displayable::Displayable;
 use crate::ebi_objects::labelled_petri_net::LPNMarking;
+use crate::ebi_objects::stochastic_directly_follows_model::StochasticDirectlyFollowsModel;
 use crate::ebi_objects::stochastic_labelled_petri_net::StochasticLabelledPetriNet;
 use crate::ebi_objects::stochastic_process_tree::StochasticProcessTree;
 use crate::ebi_objects::stochastic_process_tree_semantics::NodeStates;
@@ -39,10 +40,9 @@ macro_rules! default_stochastic_deterministic_semantics {
                     activity_2_p_markings: HashMap::new(),
                     activity_2_probability: HashMap::new(),
                 };
-                let initial_state =
-                    <Self as Semantics>::get_initial_state(self)
-                        .unwrap()
-                        .clone();
+                let initial_state = <Self as Semantics>::get_initial_state(self)
+                    .unwrap()
+                    .clone();
                 if <Self as Semantics>::is_final_state(self, &initial_state) {
                     result.termination_probability = Fraction::one();
                 }
@@ -314,6 +314,7 @@ macro_rules! default_stochastic_deterministic_semantics {
 
 default_stochastic_deterministic_semantics!(StochasticLabelledPetriNet, LPNMarking);
 default_stochastic_deterministic_semantics!(StochasticProcessTree, NodeStates);
+default_stochastic_deterministic_semantics!(StochasticDirectlyFollowsModel, usize);
 
 /**
  * Idea: as the computation of next p-states is expensive, it is performed once, and stored in this p-marking struct.

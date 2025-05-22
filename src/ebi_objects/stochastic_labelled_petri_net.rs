@@ -101,6 +101,34 @@ pub struct StochasticLabelledPetriNet {
 }
 
 impl StochasticLabelledPetriNet {
+    pub fn new() -> Self {
+        Self {
+            activity_key: ActivityKey::new(),
+            initial_marking: Marking::new(0),
+            labels: vec![],
+            place2output_transitions: vec![],
+            transition2input_places: vec![],
+            transition2output_places: vec![],
+            transition2input_places_cardinality: vec![],
+            transition2output_places_cardinality: vec![],
+            weights: vec![],
+        }
+    }
+
+    pub fn new_empty_language() -> Self {
+        return Self {
+            activity_key: ActivityKey::new(),
+            initial_marking: Marking::new(0),
+            labels: vec![None],
+            transition2input_places: vec![vec![]],
+            transition2output_places: vec![vec![]],
+            transition2input_places_cardinality: vec![vec![]],
+            transition2output_places_cardinality: vec![vec![]],
+            place2output_transitions: vec![],
+            weights: vec![],
+        };
+    }
+
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let net = Self::import(reader)?;
         Ok(EbiObject::LabelledPetriNet(net.into()))
@@ -149,6 +177,93 @@ impl StochasticLabelledPetriNet {
         } else {
             0
         }
+    }
+
+    pub fn add_place(&mut self) -> usize {
+        let place = self.get_number_of_places();
+        self.place2output_transitions.push(vec![]);
+        self.initial_marking.add_place();
+        place
+    }
+
+    pub fn get_initial_marking_mut(&mut self) -> &mut Marking {
+        &mut self.initial_marking
+    }
+
+    pub fn add_transition(&mut self, label: Option<Activity>, weight: Fraction) -> TransitionIndex {
+        self.labels.push(label);
+        self.transition2input_places.push(vec![]);
+        self.transition2input_places_cardinality.push(vec![]);
+        self.transition2output_places.push(vec![]);
+        self.transition2output_places_cardinality.push(vec![]);
+        self.weights.push(weight);
+        self.get_number_of_transitions() - 1
+    }
+
+    pub fn add_transition_place_arc(
+        &mut self,
+        from_transition: TransitionIndex,
+        to_place: usize,
+        cardinality: u64,
+    ) -> Result<()> {
+        if from_transition >= self.get_number_of_transitions() {
+            return Err(anyhow!(
+                "non-existing transition {} referenced, while there are {}",
+                from_transition,
+                self.get_number_of_transitions()
+            ));
+        } else if to_place >= self.get_number_of_places() {
+            return Err(anyhow!(
+                "non-existing place {} referenced, while there are {}",
+                to_place,
+                self.get_number_of_places()
+            ));
+        }
+
+        if let Some(pos) = self.transition2output_places[from_transition]
+            .iter()
+            .position(|p| *p == to_place)
+        {
+            self.transition2output_places_cardinality[from_transition][pos] += cardinality;
+        } else {
+            self.transition2output_places[from_transition].push(to_place);
+            self.transition2output_places_cardinality[from_transition].push(1);
+        }
+        Ok(())
+    }
+
+    pub fn add_place_transition_arc(
+        &mut self,
+        from_place: usize,
+        to_transition: TransitionIndex,
+        cardinality: u64,
+    ) -> Result<()> {
+        if to_transition >= self.get_number_of_transitions() {
+            return Err(anyhow!(
+                "non-existing transition {} referenced, while there are {}",
+                to_transition,
+                self.get_number_of_transitions()
+            ));
+        } else if from_place >= self.get_number_of_places() {
+            return Err(anyhow!(
+                "non-existing place {} referenced, while there are {}",
+                from_place,
+                self.get_number_of_places()
+            ));
+        }
+
+        self.place2output_transitions[from_place].push(to_transition);
+
+        if let Some(pos) = self.transition2input_places[to_transition]
+            .iter()
+            .position(|p| *p == from_place)
+        {
+            self.transition2input_places_cardinality[to_transition][pos] += cardinality;
+        } else {
+            self.transition2input_places[to_transition].push(from_place);
+            self.transition2input_places_cardinality[to_transition].push(1);
+        }
+        Ok(())
     }
 }
 

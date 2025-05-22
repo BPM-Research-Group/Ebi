@@ -2,7 +2,7 @@ use anyhow::{Context, Error, Result, anyhow};
 use itertools::Itertools;
 use layout::topo::layout::VisualGraph;
 use std::{
-    collections::HashSet,
+    cmp::Ordering,
     fmt::Display,
     io::{self, BufRead, Write},
     str::FromStr,
@@ -25,6 +25,8 @@ use crate::{
     },
     line_reader::LineReader,
 };
+
+use super::stochastic_directly_follows_model::{NodeIndex, StochasticDirectlyFollowsModel};
 
 pub const HEADER: &str = "directly follows model";
 
@@ -65,35 +67,138 @@ pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
 #[derive(ActivityKey, Debug, Clone)]
 pub struct DirectlyFollowsModel {
     pub(crate) activity_key: ActivityKey,
-    pub(crate) empty_traces: bool,
-    pub(crate) edges: Vec<Vec<bool>>, //matrix of edges
     pub(crate) node_2_activity: Vec<Activity>,
-    pub(crate) start_nodes: HashSet<usize>,
-    pub(crate) end_nodes: HashSet<usize>,
+    pub(crate) empty_traces: bool,
+    pub(crate) sources: Vec<NodeIndex>, //edge -> source of edge
+    pub(crate) targets: Vec<NodeIndex>, //edge -> target of edge
+    pub(crate) start_nodes: Vec<bool>,  //node -> how often observed
+    pub(crate) end_nodes: Vec<bool>,    //node -> how often observed
 }
 
 impl DirectlyFollowsModel {
+    /**
+     * Creates a new stochastic directly follows model without any states or edges. This has the empty stochastic language, until a state or an empty trace is added.
+     */
+    pub fn new(activity_key: ActivityKey) -> Self {
+        Self {
+            activity_key: activity_key,
+            node_2_activity: vec![],
+            empty_traces: false,
+            sources: vec![],
+            targets: vec![],
+            start_nodes: vec![],
+            end_nodes: vec![],
+        }
+    }
+
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let dfm = Self::import(reader)?;
         Ok(EbiObject::LabelledPetriNet(dfm.into()))
     }
 
-    pub fn number_of_edges(&self) -> usize {
-        self.edges
+    pub fn has_empty_traces(&self) -> bool {
+        self.empty_traces
+    }
+
+    pub(crate) fn can_terminate_in_node(&self, node: NodeIndex) -> bool {
+        self.end_nodes[node]
+    }
+
+    pub(crate) fn number_of_start_nodes(&self) -> usize {
+        self.start_nodes
             .iter()
-            .fold(0usize, |a, b| a + b.into_iter().filter(|c| **c).count())
+            .fold(0, |a, b| if *b { a + 1 } else { a })
     }
 
-    pub fn number_of_nodes(&self) -> usize {
-        self.node_2_activity.len()
+    pub(crate) fn number_of_end_nodes(&self) -> usize {
+        self.start_nodes
+            .iter()
+            .fold(0, |a, b| if *b { a + 1 } else { a })
     }
 
-    pub fn start_nodes(&self) -> &HashSet<usize> {
-        &self.start_nodes
+    pub(crate) fn is_start_node(&self, node: NodeIndex) -> bool {
+        self.start_nodes[node]
     }
 
-    pub fn end_nodes(&self) -> &HashSet<usize> {
-        &self.end_nodes
+    pub(crate) fn is_end_node(&self, node: NodeIndex) -> bool {
+        self.end_nodes[node]
+    }
+
+    pub(crate) fn can_execute_edge(&self, _edge: usize) -> bool {
+        true
+    }
+
+    pub fn get_max_state(&self) -> usize {
+        self.node_2_activity.len() + 2
+    }
+
+    pub fn add_empty_trace(&mut self) {
+        self.empty_traces = true;
+    }
+
+    pub fn add_node(&mut self, activity: Activity) -> NodeIndex {
+        let index = self.node_2_activity.len();
+        self.node_2_activity.push(activity);
+        self.start_nodes.push(false);
+        self.end_nodes.push(false);
+        index
+    }
+
+    pub fn add_edge(&mut self, source: NodeIndex, target: NodeIndex) {
+        let (found, from) = self.binary_search(source, target);
+        if found {
+            //edge already present
+        } else {
+            //new edge
+            self.sources.insert(from, source);
+            self.targets.insert(from, target);
+        }
+    }
+
+    pub(crate) fn binary_search(&self, source: NodeIndex, target: NodeIndex) -> (bool, usize) {
+        if self.sources.is_empty() {
+            return (false, 0);
+        }
+
+        let mut size = self.sources.len();
+        let mut left = 0;
+        let mut right = size;
+        while left < right {
+            let mid = left + size / 2;
+
+            let cmp = Self::compare(source, target, self.sources[mid], self.targets[mid]);
+
+            left = if cmp == Ordering::Less { mid + 1 } else { left };
+            right = if cmp == Ordering::Greater { mid } else { right };
+            if cmp == Ordering::Equal {
+                assert!(mid < self.sources.len());
+                return (true, mid);
+            }
+
+            size = right - left;
+        }
+
+        assert!(left <= self.sources.len());
+        (false, left)
+    }
+
+    fn compare(
+        source1: NodeIndex,
+        target1: NodeIndex,
+        source2: NodeIndex,
+        target2: NodeIndex,
+    ) -> Ordering {
+        if source1 < source2 {
+            return Ordering::Greater;
+        } else if source1 > source2 {
+            return Ordering::Less;
+        } else if target2 > target1 {
+            return Ordering::Greater;
+        } else if target2 < target1 {
+            return Ordering::Less;
+        } else {
+            return Ordering::Equal;
+        }
     }
 }
 
@@ -135,12 +240,12 @@ impl Importable for DirectlyFollowsModel {
             .context("could not read whether the model supports empty traces")?;
 
         //read activities
-        let number_of_activities = lreader
+        let number_of_nodes = lreader
             .next_line_index()
-            .context("could not read the number of activities")?;
+            .context("could not read the number of nodes")?;
         let mut activity_key = ActivityKey::new();
         let mut node_2_activity = vec![];
-        for activity in 0..number_of_activities {
+        for activity in 0..number_of_nodes {
             let label = lreader
                 .next_line_string()
                 .with_context(|| format!("could not read activity {}", activity))?;
@@ -149,31 +254,40 @@ impl Importable for DirectlyFollowsModel {
         }
 
         //read start activities
-        let mut start_nodes = HashSet::new();
-        let number_of_start_activities = lreader
+        let mut start_nodes = vec![false; number_of_nodes];
+        let number_of_start_nodes = lreader
             .next_line_index()
-            .context("could not read the number of start activities")?;
-        for i in 0..number_of_start_activities {
-            let start_activity = lreader
+            .context("could not read the number of start nodes")?;
+        for i in 0..number_of_start_nodes {
+            let start_node = lreader
                 .next_line_index()
-                .with_context(|| format!("could not read start activity {}", i))?;
-            start_nodes.insert(start_activity);
+                .with_context(|| format!("could not read start node {}", i))?;
+            start_nodes[start_node] = true;
         }
 
         //read end activities
-        let mut end_nodes = HashSet::new();
-        let number_of_end_activities = lreader
+        let mut end_nodes = vec![false; number_of_nodes];
+        let number_of_end_nodes = lreader
             .next_line_index()
-            .context("could not read the number of end activities")?;
-        for i in 0..number_of_end_activities {
-            let end_activity = lreader
+            .context("could not read the number of end nodes")?;
+        for i in 0..number_of_end_nodes {
+            let end_node = lreader
                 .next_line_index()
-                .with_context(|| format!("could not read end activity {}", i))?;
-            end_nodes.insert(end_activity);
+                .with_context(|| format!("could not read end node {}", i))?;
+            end_nodes[end_node] = true;
         }
 
+        let mut result = Self {
+            activity_key,
+            node_2_activity,
+            empty_traces,
+            sources: vec![],
+            targets: vec![],
+            start_nodes,
+            end_nodes,
+        };
+
         //read edges
-        let mut edges = vec![vec![false; number_of_activities]; number_of_activities];
         let number_of_edges = lreader
             .next_line_index()
             .context("could not read number of edges")?;
@@ -190,7 +304,7 @@ impl Importable for DirectlyFollowsModel {
                 let target = target
                     .parse::<usize>()
                     .with_context(|| format!("could not read target of edge {}", e))?;
-                edges[source][target] = true;
+                result.add_edge(source, target);
             } else {
                 return Err(anyhow!(
                     "could not read edge, which must be two numbers separated by >"
@@ -198,14 +312,7 @@ impl Importable for DirectlyFollowsModel {
             }
         }
 
-        Ok(Self {
-            empty_traces,
-            edges,
-            activity_key,
-            node_2_activity,
-            start_nodes,
-            end_nodes,
-        })
+        Ok(result)
     }
 }
 
@@ -254,17 +361,9 @@ impl Display for DirectlyFollowsModel {
         }
 
         //edges
-        writeln!(
-            f,
-            "# number of edges\n{}\n# edges",
-            self.number_of_edges()
-        )?;
-        for source in 0..self.edges.len() {
-            for target in 0..self.edges.len() {
-                if self.edges[source][target] {
-                    writeln!(f, "{}>{}", source, target)?;
-                }
-            }
+        writeln!(f, "# number of edges\n{}\n# edges", self.sources.len())?;
+        for (source, target) in self.sources.iter().zip(self.targets.iter()) {
+            writeln!(f, "{}>{}", source, target)?;
         }
 
         Ok(write!(f, "")?)
@@ -295,27 +394,22 @@ impl EbiTraitGraphable for DirectlyFollowsModel {
         }
 
         //start activities
-        for start_activity in self.start_nodes.iter() {
-            <dyn EbiTraitGraphable>::create_edge(&mut graph, &source, &nodes[*start_activity], "");
+        for (activity, is) in self.start_nodes.iter().enumerate() {
+            if *is {
+                <dyn EbiTraitGraphable>::create_edge(&mut graph, &source, &nodes[activity], "");
+            }
         }
 
         //end activities
-        for end_activity in self.end_nodes.iter() {
-            <dyn EbiTraitGraphable>::create_edge(&mut graph, &nodes[*end_activity], &sink, "");
+        for (activity, is) in self.end_nodes.iter().enumerate() {
+            if *is {
+                <dyn EbiTraitGraphable>::create_edge(&mut graph, &nodes[activity], &sink, "");
+            }
         }
 
         //edges
-        for source in 0..self.edges.len() {
-            for target in 0..self.edges.len() {
-                if self.edges[source][target] {
-                    <dyn EbiTraitGraphable>::create_edge(
-                        &mut graph,
-                        &nodes[source],
-                        &nodes[target],
-                        "",
-                    );
-                }
-            }
+        for (source, target) in self.sources.iter().zip(self.targets.iter()) {
+            <dyn EbiTraitGraphable>::create_edge(&mut graph, &nodes[*source], &nodes[*target], "");
         }
 
         Ok(graph)
@@ -335,19 +429,28 @@ impl Exportable for DirectlyFollowsModel {
     }
 }
 
-impl Infoable for DirectlyFollowsModel {
-    fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
-        writeln!(f, "Number of transitions\t{}", self.node_2_activity.len())?;
-        writeln!(
-            f,
-            "Number of activities\t{}",
-            self.activity_key.activity2name.len()
-        )?;
-        writeln!(f, "Number of edges\t\t{}", self.number_of_edges())?;
+macro_rules! info {
+    ($t:ident) => {
+        impl Infoable for $t {
+            fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
+                writeln!(f, "Number of transitions\t{}", self.node_2_activity.len())?;
+                writeln!(
+                    f,
+                    "Number of activities\t{}",
+                    self.activity_key.activity2name.len()
+                )?;
+                writeln!(f, "Number of nodes\t\t{}", self.node_2_activity.len())?;
+                writeln!(f, "Number of edges\t\t{}", self.sources.len())?;
+                writeln!(f, "Number of start nodes\t{}", self.number_of_start_nodes())?;
+                writeln!(f, "Number of end nodes\t{}", self.number_of_end_nodes())?;
 
-        Ok(write!(f, "")?)
-    }
+                Ok(write!(f, "")?)
+            }
+        }
+    };
 }
+info!(DirectlyFollowsModel);
+info!(StochasticDirectlyFollowsModel);
 
 #[cfg(test)]
 mod tests {

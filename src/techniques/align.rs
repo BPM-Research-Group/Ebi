@@ -19,10 +19,12 @@ use crate::{
         labelled_petri_net::{LPNMarking, LabelledPetriNet},
         language_of_alignments::{LanguageOfAlignments, Move},
         process_tree::ProcessTree,
-        stochastic_process_tree_semantics::NodeStates,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        stochastic_language_of_alignments::StochasticLanguageOfAlignments, stochastic_process_tree::StochasticProcessTree,
+        stochastic_language_of_alignments::StochasticLanguageOfAlignments,
+        stochastic_process_tree::StochasticProcessTree,
+        stochastic_process_tree_semantics::NodeStates,
     },
     ebi_traits::{
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
@@ -173,7 +175,6 @@ where
                 let trace = log.get_trace(trace_index).unwrap();
                 let trace_translated = translator.translate_trace(trace);
                 let probability = log.get_probability(trace_index).unwrap().clone();
-
 
                 // log::debug!("align trace {:?}", trace);
                 let result = self2
@@ -611,12 +612,30 @@ impl AlignmentHeuristics for DirectlyFollowsModel {
     }
 }
 
+impl AlignmentHeuristics for StochasticDirectlyFollowsModel {
+    type AliState = usize;
+
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(
+        &self,
+        _: &Vec<Activity>,
+        _: &usize,
+        _: &Self::AliState,
+        _: &Vec<Vec<usize>>,
+    ) -> usize {
+        0
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::fs;
 
     use crate::{
-        ebi_framework::activity_key::{TranslateActivityKey, HasActivityKey},
+        ebi_framework::activity_key::{HasActivityKey, TranslateActivityKey},
         ebi_objects::{
             deterministic_finite_automaton::DeterministicFiniteAutomaton,
             finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage,

@@ -18,12 +18,7 @@ use crate::{
 };
 
 use super::{
-    deterministic_finite_automaton::DeterministicFiniteAutomaton,
-    directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet,
-    process_tree::ProcessTree,
-    stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-    stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-    stochastic_process_tree::StochasticProcessTree,
+    deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
 };
 
 pub const FORMAT_SPECIFICATION: &str =
@@ -115,6 +110,9 @@ impl Exportable for PetriNetMarkupLanguage {
             }
             EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => {
                 <DirectlyFollowsModel as TryInto<PetriNetMarkupLanguage>>::try_into(dfm)?.export(f)
+            }
+            EbiOutput::Object(EbiObject::StochasticDirectlyFollowsModel(dfm)) => {
+                <StochasticDirectlyFollowsModel as TryInto<PetriNetMarkupLanguage>>::try_into(dfm)?.export(f)
             }
             EbiOutput::Object(EbiObject::LabelledPetriNet(lpn)) => {
                 <LabelledPetriNet as TryInto<PetriNetMarkupLanguage>>::try_into(lpn)?.export(f)

@@ -58,6 +58,9 @@ fn export_from_object_svg(object: EbiOutput, f: &mut dyn std::io::Write) -> Resu
             export_as_svg(&object, f)
         }
         EbiOutput::Object(EbiObject::DirectlyFollowsModel(object)) => export_as_svg(&object, f),
+        EbiOutput::Object(EbiObject::StochasticDirectlyFollowsModel(object)) => {
+            export_as_svg(&object, f)
+        }
         EbiOutput::Object(EbiObject::EventLog(_)) => {
             Err(anyhow!("cannot transform event log into SVG"))
         }
@@ -103,6 +106,9 @@ fn export_from_object_pdf(object: EbiOutput, f: &mut dyn std::io::Write) -> Resu
             export_as_pdf(&object, f)
         }
         EbiOutput::Object(EbiObject::DirectlyFollowsModel(object)) => export_as_pdf(&object, f),
+        EbiOutput::Object(EbiObject::StochasticDirectlyFollowsModel(object)) => {
+            export_as_pdf(&object, f)
+        }
         EbiOutput::Object(EbiObject::EventLog(_)) => {
             Err(anyhow!("cannot transform event log into PDF"))
         }
@@ -166,8 +172,7 @@ where
     EbiExporter::PDF.export_from_object(output, f)
 }
 
-pub fn to_svg_string_box(object: Box<dyn EbiTraitGraphable>) -> Result<String>
-{
+pub fn to_svg_string_box(object: Box<dyn EbiTraitGraphable>) -> Result<String> {
     let mut svg = SVGWriter::new();
     let mut graph = object.to_dot()?;
     Ok(if graph.num_nodes() == 0 {

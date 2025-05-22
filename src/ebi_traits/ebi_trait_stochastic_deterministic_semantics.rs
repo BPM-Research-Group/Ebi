@@ -21,6 +21,7 @@ use crate::{
 
 pub enum EbiTraitStochasticDeterministicSemantics {
     Usize(Box<dyn StochasticDeterministicSemantics<DetState = usize, LivState = usize>>),
+    UsizeDistribution(Box<dyn StochasticDeterministicSemantics<DetState = PMarking<usize>, LivState = usize>>),
     LPNMarkingDistribution(
         Box<
             dyn StochasticDeterministicSemantics<

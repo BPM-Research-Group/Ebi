@@ -4,10 +4,7 @@ use anyhow::{Result, anyhow};
 
 use crate::{
     ebi_framework::activity_key::Activity,
-    ebi_objects::{
-        directly_follows_model::DirectlyFollowsModel,
-        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
-    },
+    ebi_objects::{directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel},
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::{fraction::Fraction, traits::One},
 };
@@ -33,7 +30,7 @@ impl DirectlyFollowsModelMinerFiltering for dyn EbiTraitFiniteStochasticLanguage
             return Err(anyhow!("cannot obtain a minimum fitness larger than 1"));
         }
 
-        let mut dfm = self.abstract_to_directly_follows_relation();
+        let mut dfm = self.abstract_to_directly_follows_graph();
 
         loop {
             //gather the edges to be filtered
@@ -50,7 +47,7 @@ impl DirectlyFollowsModelMinerFiltering for dyn EbiTraitFiniteStochasticLanguage
             }
 
             //create a new dfg
-            dfm = self.abstract_to_directly_follows_relation();
+            dfm = self.abstract_to_directly_follows_graph();
         }
     }
 }
@@ -78,7 +75,7 @@ impl dyn EbiTraitFiniteStochasticLanguage {
 }
 
 fn get_edges_to_filter(
-    dfm: &StochasticDirectlyFollowsModel,
+    dfm: &DirectlyFollowsGraph,
 ) -> HashSet<(Option<Activity>, Option<Activity>)> {
     let mut min = &Fraction::one();
     let mut result = HashSet::new();
@@ -127,9 +124,7 @@ mod tests {
     use std::fs;
 
     use crate::{
-        ebi_objects::
-            finite_stochastic_language::FiniteStochasticLanguage
-        ,
+        ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
         ebi_traits::{
             ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
             ebi_trait_semantics::Semantics,

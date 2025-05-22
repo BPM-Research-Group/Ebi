@@ -34,11 +34,7 @@ use crate::{
 };
 
 use super::{
-    deterministic_finite_automaton::DeterministicFiniteAutomaton,
-    directly_follows_model::DirectlyFollowsModel, process_tree::ProcessTree,
-    stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-    stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-    stochastic_process_tree::StochasticProcessTree,
+    deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
 };
 
 pub const HEADER: &str = "labelled Petri net";
@@ -72,6 +68,7 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     object_exporters: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(LabelledPetriNet::export_from_object),
         EbiObjectExporter::DirectlyFollowsModel(LabelledPetriNet::export_from_object),
+        EbiObjectExporter::StochasticDirectlyFollowsModel(LabelledPetriNet::export_from_object),
         EbiObjectExporter::LabelledPetriNet(LabelledPetriNet::export_from_object),
         EbiObjectExporter::ProcessTree(LabelledPetriNet::export_from_object),
         EbiObjectExporter::StochasticLabelledPetriNet(LabelledPetriNet::export_from_object),
@@ -114,6 +111,19 @@ pub struct LabelledPetriNet {
 }
 
 impl LabelledPetriNet {
+    pub fn new() -> Self {
+        Self {
+            activity_key: ActivityKey::new(),
+            initial_marking: Marking::new(0),
+            labels: vec![],
+            place2output_transitions: vec![],
+            transition2input_places: vec![],
+            transition2output_places: vec![],
+            transition2input_places_cardinality: vec![],
+            transition2output_places_cardinality: vec![],
+        }
+    }
+    
     pub fn new_empty_language() -> Self {
         return Self {
             activity_key: ActivityKey::new(),
@@ -146,19 +156,6 @@ impl LabelledPetriNet {
 
     pub fn get_transition_label(&self, transition: TransitionIndex) -> Option<Activity> {
         self.labels[transition]
-    }
-
-    pub fn new() -> Self {
-        Self {
-            activity_key: ActivityKey::new(),
-            initial_marking: Marking::new(0),
-            labels: vec![],
-            place2output_transitions: vec![],
-            transition2input_places: vec![],
-            transition2output_places: vec![],
-            transition2input_places_cardinality: vec![],
-            transition2output_places_cardinality: vec![],
-        }
     }
 
     pub fn add_place(&mut self) -> usize {
@@ -310,6 +307,9 @@ impl Exportable for LabelledPetriNet {
             }
             EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => {
                 <DirectlyFollowsModel as Into<LabelledPetriNet>>::into(dfm).export(f)
+            }
+            EbiOutput::Object(EbiObject::StochasticDirectlyFollowsModel(dfm)) => {
+                <StochasticDirectlyFollowsModel as Into<LabelledPetriNet>>::into(dfm).export(f)
             }
             EbiOutput::Object(EbiObject::LabelledPetriNet(lpn)) => lpn.export(f),
             EbiOutput::Object(EbiObject::ProcessTree(tree)) => {

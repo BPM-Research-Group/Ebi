@@ -1,18 +1,16 @@
-use std::collections::HashSet;
-
 use crate::{
-    ebi_objects::{
+    ebi_framework::activity_key::HasActivityKey, ebi_objects::{
+        directly_follows_graph::DirectlyFollowsGraph,
         directly_follows_model::DirectlyFollowsModel,
         stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
-    },
-    math::traits::Signed,
+    }, math::traits::Signed
 };
 
-impl From<StochasticDirectlyFollowsModel> for DirectlyFollowsModel {
-    fn from(value: StochasticDirectlyFollowsModel) -> Self {
-        log::info!("Convert stochastic directly follows model into directly follows model");
+impl From<DirectlyFollowsGraph> for DirectlyFollowsModel {
+    fn from(value: DirectlyFollowsGraph) -> Self {
+        log::info!("Convert directly follows graph into directly follows model");
 
-        let StochasticDirectlyFollowsModel {
+        let DirectlyFollowsGraph {
             activity_key,
             empty_traces_weight,
             sources,
@@ -29,45 +27,61 @@ impl From<StochasticDirectlyFollowsModel> for DirectlyFollowsModel {
             .cloned()
             .collect::<Vec<_>>();
 
+        let mut start_nodes = vec![false; node_2_activity.len()];
+        start_activities.into_iter().for_each(|(activity, weight)| {
+            if weight.is_positive() {
+                start_nodes[activity_key.get_id_from_activity(activity)] = true;
+            }
+        });
+
+        let mut end_nodes = vec![false; node_2_activity.len()];
+        end_activities.into_iter().for_each(|(activity, weight)| {
+            if weight.is_positive() {
+                end_nodes[activity_key.get_id_from_activity(activity)] = true;
+            }
+        });
+
+        let mut result = Self {
+            activity_key: activity_key,
+            empty_traces: empty_traces_weight.is_positive(),
+            node_2_activity: node_2_activity,
+            sources: vec![],
+            targets: vec![],
+            start_nodes,
+            end_nodes,
+        };
+
         //edges
-        let mut edges = vec![vec![false; node_2_activity.len()]; node_2_activity.len()];
         for (source, (target, weight)) in sources.iter().zip(targets.iter().zip(weights.iter())) {
             if weight.is_positive() {
-                let source_index = activity_key.get_id_from_activity(source);
-                let target_index = activity_key.get_id_from_activity(target);
-                edges[source_index][target_index] = true;
+                let source_index = result.get_activity_key().get_id_from_activity(source);
+                let target_index = result.get_activity_key().get_id_from_activity(target);
+                result.add_edge(source_index, target_index)
             }
         }
 
-        let start_nodes = start_activities
-            .into_iter()
-            .filter_map(|(activity, weight)| {
-                if weight.is_positive() {
-                    Some(activity_key.get_id_from_activity(activity))
-                } else {
-                    None
-                }
-            })
-            .collect::<HashSet<_>>();
+        result
+    }
+}
 
-        let end_nodes = end_activities
-            .into_iter()
-            .filter_map(|(activity, weight)| {
-                if weight.is_positive() {
-                    Some(activity_key.get_id_from_activity(activity))
-                } else {
-                    None
-                }
-            })
-            .collect::<HashSet<_>>();
-
+impl From<StochasticDirectlyFollowsModel> for DirectlyFollowsModel {
+    fn from(value: StochasticDirectlyFollowsModel) -> Self {
         Self {
-            activity_key: activity_key,
-            empty_traces: empty_traces_weight.is_positive(),
-            edges: edges,
-            node_2_activity: node_2_activity,
-            start_nodes: start_nodes,
-            end_nodes: end_nodes,
+            activity_key: value.activity_key,
+            node_2_activity: value.node_2_activity,
+            empty_traces: value.empty_traces_weight.is_positive(),
+            sources: value.sources,
+            targets: value.targets,
+            start_nodes: value
+                .start_node_weights
+                .into_iter()
+                .map(|w| w.is_positive())
+                .collect(),
+            end_nodes: value
+                .end_node_weights
+                .into_iter()
+                .map(|w| w.is_positive())
+                .collect(),
         }
     }
 }

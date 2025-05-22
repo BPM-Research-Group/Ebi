@@ -10,9 +10,11 @@ use crate::{
         finite_stochastic_language::FiniteStochasticLanguage,
         labelled_petri_net::{LPNMarking, LabelledPetriNet},
         process_tree::ProcessTree,
-        stochastic_process_tree_semantics::NodeStates,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree,
+        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
+        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        stochastic_process_tree::StochasticProcessTree,
+        stochastic_process_tree_semantics::NodeStates,
     },
     ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_semantics::Semantics},
     math::traits::Zero,
@@ -100,6 +102,7 @@ lpn!(StochasticLabelledPetriNet);
 dfm!(DeterministicFiniteAutomaton);
 dfm!(StochasticDeterministicFiniteAutomaton);
 dfm!(DirectlyFollowsModel);
+dfm!(StochasticDirectlyFollowsModel);
 
 #[cfg(test)]
 mod tests {

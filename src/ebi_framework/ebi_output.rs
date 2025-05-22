@@ -10,27 +10,15 @@ use strum_macros::{Display, EnumIter};
 
 use crate::{
     ebi_objects::{
-        compressed_event_log::{CompressedEventLog, EBI_COMPRESSED_EVENT_LOG},
-        deterministic_finite_automaton::{
+        compressed_event_log::{CompressedEventLog, EBI_COMPRESSED_EVENT_LOG}, deterministic_finite_automaton::{
             DeterministicFiniteAutomaton, EBI_DETERMINISTIC_FINITE_AUTOMATON,
-        },
-        directly_follows_model::{DirectlyFollowsModel, EBI_DIRECTLY_FOLLOWS_MODEL},
-        executions::{EBI_EXECUTIONS, Executions},
-        finite_language::{EBI_FINITE_LANGUAGE, FiniteLanguage},
-        finite_stochastic_language::{EBI_FINITE_STOCHASTIC_LANGUAGE, FiniteStochasticLanguage},
-        labelled_petri_net::{EBI_LABELLED_PETRI_NET, LabelledPetriNet},
-        language_of_alignments::{EBI_LANGUAGE_OF_ALIGNMENTS, LanguageOfAlignments},
-        process_tree::{EBI_PROCESS_TREE, ProcessTree},
-        stochastic_deterministic_finite_automaton::{
-            EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON, StochasticDeterministicFiniteAutomaton,
-        },
-        stochastic_labelled_petri_net::{
-            EBI_STOCHASTIC_LABELLED_PETRI_NET, StochasticLabelledPetriNet,
-        },
-        stochastic_language_of_alignments::{
-            EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS, StochasticLanguageOfAlignments,
-        },
-        stochastic_process_tree::StochasticProcessTree,
+        }, directly_follows_model::{DirectlyFollowsModel, EBI_DIRECTLY_FOLLOWS_MODEL}, executions::{Executions, EBI_EXECUTIONS}, finite_language::{FiniteLanguage, EBI_FINITE_LANGUAGE}, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET}, language_of_alignments::{LanguageOfAlignments, EBI_LANGUAGE_OF_ALIGNMENTS}, process_tree::{ProcessTree, EBI_PROCESS_TREE}, stochastic_deterministic_finite_automaton::{
+            StochasticDeterministicFiniteAutomaton, EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON
+        }, stochastic_directly_follows_model::{StochasticDirectlyFollowsModel, EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL}, stochastic_labelled_petri_net::{
+            StochasticLabelledPetriNet, EBI_STOCHASTIC_LABELLED_PETRI_NET
+        }, stochastic_language_of_alignments::{
+            StochasticLanguageOfAlignments, EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS
+        }, stochastic_process_tree::StochasticProcessTree
     },
     math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv},
 };
@@ -167,6 +155,10 @@ impl EbiOutputType {
             EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsModel) => EbiExporter::Object(
                 &EbiObjectExporter::DirectlyFollowsModel(DirectlyFollowsModel::export_from_object),
                 &EBI_DIRECTLY_FOLLOWS_MODEL,
+            ),
+            EbiOutputType::ObjectType(EbiObjectType::StochasticDirectlyFollowsModel) => EbiExporter::Object(
+                &EbiObjectExporter::StochasticDirectlyFollowsModel(StochasticDirectlyFollowsModel::export_from_object),
+                &EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL,
             ),
             EbiOutputType::ObjectType(EbiObjectType::EventLog) => EbiExporter::Object(
                 &EbiObjectExporter::EventLog(CompressedEventLog::export_from_object),
@@ -446,6 +438,7 @@ impl EbiObjectExporter {
         match self {
             EbiObjectExporter::EventLog(exporter) => (exporter)(object, f),
             EbiObjectExporter::DirectlyFollowsModel(exporter) => (exporter)(object, f),
+            EbiObjectExporter::StochasticDirectlyFollowsModel(exporter) => (exporter)(object, f),
             EbiObjectExporter::FiniteLanguage(exporter) => (exporter)(object, f),
             EbiObjectExporter::FiniteStochasticLanguage(exporter) => (exporter)(object, f),
             EbiObjectExporter::LabelledPetriNet(exporter) => (exporter)(object, f),

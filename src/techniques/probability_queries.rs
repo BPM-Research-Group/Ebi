@@ -50,6 +50,9 @@ impl ProbabilityQueries for EbiTraitStochasticDeterministicSemantics {
             EbiTraitStochasticDeterministicSemantics::Usize(sem) => {
                 sem.analyse_minimum_probability(at_least)
             }
+            EbiTraitStochasticDeterministicSemantics::UsizeDistribution(sem) => {
+                sem.analyse_minimum_probability(at_least)
+            }
             EbiTraitStochasticDeterministicSemantics::LPNMarkingDistribution(sem) => {
                 sem.analyse_minimum_probability(at_least)
             }
@@ -67,6 +70,9 @@ impl ProbabilityQueries for EbiTraitStochasticDeterministicSemantics {
             EbiTraitStochasticDeterministicSemantics::Usize(sem) => {
                 sem.analyse_most_likely_traces(number_of_traces)
             }
+            EbiTraitStochasticDeterministicSemantics::UsizeDistribution(sem) => {
+                sem.analyse_most_likely_traces(number_of_traces)
+            }
             EbiTraitStochasticDeterministicSemantics::LPNMarkingDistribution(sem) => {
                 sem.analyse_most_likely_traces(number_of_traces)
             }
@@ -82,6 +88,9 @@ impl ProbabilityQueries for EbiTraitStochasticDeterministicSemantics {
     ) -> Result<FiniteStochasticLanguage> {
         match self {
             EbiTraitStochasticDeterministicSemantics::Usize(sem) => {
+                sem.analyse_probability_coverage(coverage)
+            }
+            EbiTraitStochasticDeterministicSemantics::UsizeDistribution(sem) => {
                 sem.analyse_probability_coverage(coverage)
             }
             EbiTraitStochasticDeterministicSemantics::LPNMarkingDistribution(sem) => {

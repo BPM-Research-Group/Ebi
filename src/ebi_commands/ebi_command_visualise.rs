@@ -40,6 +40,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::EventLog(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::FiniteLanguage(language), _) => language.to_string(),
             EbiInput::Object(EbiObject::DirectlyFollowsModel(d), _) => d.to_string(),
+            EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(d), _) => d.to_string(),
             EbiInput::Object(EbiObject::LanguageOfAlignments(a), _) => a.to_string(),
             EbiInput::Object(EbiObject::StochasticLanguageOfAlignments(a), _) => a.to_string(),
             EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(s), _) => s.to_string(),

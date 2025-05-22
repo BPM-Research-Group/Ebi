@@ -7,15 +7,7 @@ use strum_macros::EnumIter;
 
 use crate::{
     ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton,
-        directly_follows_model::DirectlyFollowsModel, event_log::EventLog, executions::Executions,
-        finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage,
-        labelled_petri_net::LabelledPetriNet, language_of_alignments::LanguageOfAlignments,
-        process_tree::ProcessTree,
-        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        stochastic_language_of_alignments::StochasticLanguageOfAlignments,
-        stochastic_process_tree::StochasticProcessTree,
+        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, executions::Executions, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, language_of_alignments::LanguageOfAlignments, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments, stochastic_process_tree::StochasticProcessTree
     },
     ebi_traits::{
         ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
@@ -48,6 +40,7 @@ pub enum EbiObjectType {
     StochasticDeterministicFiniteAutomaton,
     DeterministicFiniteAutomaton,
     DirectlyFollowsModel,
+    StochasticDirectlyFollowsModel,
     EventLog,
     FiniteLanguage,
     FiniteStochasticLanguage,
@@ -68,6 +61,7 @@ impl EbiObjectType {
             EbiObjectType::EventLog => "an",
             EbiObjectType::FiniteLanguage => "a",
             EbiObjectType::DirectlyFollowsModel => "a",
+            EbiObjectType::StochasticDirectlyFollowsModel => "a",
             EbiObjectType::LanguageOfAlignments => "",
             EbiObjectType::StochasticLanguageOfAlignments => "an",
             EbiObjectType::DeterministicFiniteAutomaton => "a",
@@ -134,6 +128,7 @@ impl Display for EbiObjectType {
                 EbiObjectType::EventLog => "event log",
                 EbiObjectType::FiniteLanguage => "finite language",
                 EbiObjectType::DirectlyFollowsModel => "directly follows model",
+                EbiObjectType::StochasticDirectlyFollowsModel => "stochastic directly follows model",
                 EbiObjectType::LanguageOfAlignments => "alignments",
                 EbiObjectType::StochasticLanguageOfAlignments =>
                     "stochastic language of alignments",
@@ -155,6 +150,7 @@ pub enum EbiObject {
     EventLog(EventLog),
     FiniteLanguage(FiniteLanguage),
     DirectlyFollowsModel(DirectlyFollowsModel),
+    StochasticDirectlyFollowsModel(StochasticDirectlyFollowsModel),
     LanguageOfAlignments(LanguageOfAlignments),
     StochasticLanguageOfAlignments(StochasticLanguageOfAlignments),
     DeterministicFiniteAutomaton(DeterministicFiniteAutomaton),
@@ -175,6 +171,7 @@ impl EbiObject {
             EbiObject::EventLog(_) => EbiObjectType::EventLog,
             EbiObject::FiniteLanguage(_) => EbiObjectType::FiniteLanguage,
             EbiObject::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
+            EbiObject::StochasticDirectlyFollowsModel(_) => EbiObjectType::StochasticDirectlyFollowsModel,
             EbiObject::LanguageOfAlignments(_) => EbiObjectType::LanguageOfAlignments,
             EbiObject::StochasticLanguageOfAlignments(_) => {
                 EbiObjectType::StochasticLanguageOfAlignments
@@ -199,6 +196,7 @@ impl Display for EbiObject {
             EbiObject::EventLog(o) => write!(f, "{}", o),
             EbiObject::FiniteLanguage(o) => write!(f, "{}", o),
             EbiObject::DirectlyFollowsModel(o) => write!(f, "{}", o),
+            EbiObject::StochasticDirectlyFollowsModel(o) => write!(f, "{}", o),
             EbiObject::LanguageOfAlignments(o) => write!(f, "{}", o),
             EbiObject::StochasticLanguageOfAlignments(o) => write!(f, "{}", o),
             EbiObject::DeterministicFiniteAutomaton(o) => write!(f, "{}", o),
@@ -219,6 +217,7 @@ impl Infoable for EbiObject {
             EbiObject::EventLog(o) => o.info(f),
             EbiObject::FiniteLanguage(o) => o.info(f),
             EbiObject::DirectlyFollowsModel(o) => o.info(f),
+            EbiObject::StochasticDirectlyFollowsModel(o) => o.info(f),
             EbiObject::LanguageOfAlignments(o) => o.info(f),
             EbiObject::StochasticLanguageOfAlignments(o) => o.info(f),
             EbiObject::DeterministicFiniteAutomaton(o) => o.info(f),

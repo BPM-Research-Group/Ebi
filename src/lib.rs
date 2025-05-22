@@ -12,6 +12,7 @@ pub mod conversions {
     pub mod to_stochastic_labelled_petri_net;
     pub mod to_process_tree;
     pub mod to_directly_follows_model;
+    pub mod to_stochastic_directly_follows_model;
 }
 pub mod ebi_framework {
     pub mod activity_key;
@@ -48,7 +49,8 @@ pub mod ebi_objects {
     pub mod compressed_event_log;
     pub mod deterministic_finite_automaton;
     pub mod directly_follows_model;
-    pub mod directly_follows_model_semantics;
+    pub mod stochastic_directly_follows_model;
+    pub mod stochastic_directly_follows_graph_semantics;
     pub mod event_log;
     pub mod executions;
     pub mod finite_language;
@@ -67,8 +69,8 @@ pub mod ebi_objects {
     pub mod stochastic_labelled_petri_net_semantics;
     pub mod stochastic_language_of_alignments;
     pub mod stochastic_process_tree;
-    pub mod stochastic_directly_follows_model;
     pub mod scalable_vector_graphics;
+    pub mod directly_follows_graph;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_event_log;
