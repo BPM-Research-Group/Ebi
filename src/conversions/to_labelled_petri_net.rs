@@ -6,16 +6,7 @@ use bitvec::bitvec;
 use crate::{
     ebi_framework::activity_key::{ActivityKeyTranslator, HasActivityKey},
     ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton,
-        directly_follows_model::DirectlyFollowsModel,
-        labelled_petri_net::{LPNMarking, LabelledPetriNet},
-        lola_net::LolaNet,
-        petri_net_markup_language::PetriNetMarkupLanguage,
-        process_tree::{Node, Operator, ProcessTree},
-        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        stochastic_process_tree::StochasticProcessTree,
+        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::{LPNMarking, LabelledPetriNet}, lola_net::LolaNet, petri_net_markup_language::PetriNetMarkupLanguage, process_tree::{Node, Operator, ProcessTree}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
     },
     ebi_traits::ebi_trait_semantics::Semantics,
     marking::Marking,
@@ -568,6 +559,12 @@ impl From<StochasticDeterministicFiniteAutomaton> for LabelledPetriNet {
     fn from(value: StochasticDeterministicFiniteAutomaton) -> Self {
         let dfa: DeterministicFiniteAutomaton = value.into();
         dfa.into()
+    }
+}
+
+impl From<DirectlyFollowsGraph> for LabelledPetriNet {
+    fn from(value: DirectlyFollowsGraph) -> Self {
+        <DirectlyFollowsGraph as Into<DirectlyFollowsModel>>::into(value).into()
     }
 }
 

@@ -1,10 +1,7 @@
 use crate::{
     ebi_framework::activity_key::{ActivityKeyTranslator, HasActivityKey},
     ebi_objects::{
-        labelled_petri_net::LabelledPetriNet,
-        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        directly_follows_graph::DirectlyFollowsGraph, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet
     },
     ebi_traits::ebi_trait_semantics::Semantics,
     marking::Marking,
@@ -185,5 +182,11 @@ impl From<StochasticDirectlyFollowsModel> for StochasticLabelledPetriNet {
         }
 
         result
+    }
+}
+
+impl From<DirectlyFollowsGraph> for StochasticLabelledPetriNet {
+    fn from(value: DirectlyFollowsGraph) -> Self {
+        <DirectlyFollowsGraph as Into<StochasticDirectlyFollowsModel>>::into(value).into()
     }
 }

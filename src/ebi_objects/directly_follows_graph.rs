@@ -1,6 +1,7 @@
 use std::{
     cmp::Ordering,
     collections::{HashMap, hash_map::Entry},
+    io::BufRead,
 };
 
 use anyhow::{Context, Result, anyhow};
@@ -10,12 +11,20 @@ use crate::{
     ebi_framework::{
         activity_key::{Activity, ActivityKey},
         ebi_file_handler::EbiFileHandler,
-        ebi_input::{self, EbiObjectImporter},
+        ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
         importable::Importable,
     },
+    ebi_traits::{
+        ebi_trait_graphable::EbiTraitGraphable, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}
+    },
     json,
     math::{fraction::Fraction, traits::Zero},
+};
+
+use super::{
+    directly_follows_model::DirectlyFollowsModel,
+    stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
 };
 
 pub const FORMAT_SPECIFICATION: &str = "A directly follows graph is a JSON structure.";
@@ -26,10 +35,24 @@ pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
     file_extension: "dfg",
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<DirectlyFollowsGraph>),
-    trait_importers: &[],
-    object_importers: &[EbiObjectImporter::StochasticDirectlyFollowsModel(
-        DirectlyFollowsGraph::import_as_object,
-    )],
+    trait_importers: &[
+        EbiTraitImporter::Semantics(DirectlyFollowsGraph::import_as_semantics),
+        EbiTraitImporter::StochasticSemantics(DirectlyFollowsGraph::import_as_stochastic_semantics),
+        EbiTraitImporter::StochasticDeterministicSemantics(
+            DirectlyFollowsGraph::import_as_stochastic_deterministic_semantics,
+        ),
+        EbiTraitImporter::Graphable(DirectlyFollowsGraph::import_as_graphable),
+    ],
+    object_importers: &[
+        EbiObjectImporter::StochasticDirectlyFollowsModel(DirectlyFollowsGraph::import_as_object),
+        EbiObjectImporter::DirectlyFollowsModel(
+            DirectlyFollowsGraph::import_as_directly_follows_model,
+        ),
+        EbiObjectImporter::LabelledPetriNet(DirectlyFollowsGraph::import_as_labelled_petri_net),
+        EbiObjectImporter::StochasticLabelledPetriNet(
+            DirectlyFollowsGraph::import_as_stochastic_labelled_petri_net,
+        ),
+    ],
     object_exporters: &[],
     java_object_handlers: &[], //java translations covered by LabelledPetrinet
 };
@@ -56,6 +79,26 @@ impl DirectlyFollowsGraph {
             start_activities: HashMap::new(),
             end_activities: HashMap::new(),
         }
+    }
+
+    pub fn import_as_directly_follows_model(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let dfg = Self::import(reader)?;
+        Ok(EbiObject::DirectlyFollowsModel(dfg.into()))
+    }
+
+    pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let dfg = Self::import(reader)?;
+        Ok(EbiObject::LabelledPetriNet(dfg.into()))
+    }
+
+    pub fn import_as_stochastic_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let dfg = Self::import(reader)?;
+        Ok(EbiObject::StochasticLabelledPetriNet(dfg.into()))
+    }
+
+    pub fn import_as_graphable(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitGraphable>> {
+        let dfg: StochasticDirectlyFollowsModel = Self::import(reader)?.into();
+        Ok(Box::new(dfg))
     }
 
     pub fn add_empty_trace(&mut self, weight: &Fraction) {
@@ -312,5 +355,26 @@ impl Importable for DirectlyFollowsGraph {
         err?;
 
         return Ok(result);
+    }
+}
+
+impl ToSemantics for DirectlyFollowsGraph {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        let dfm: DirectlyFollowsModel = self.into();
+        EbiTraitSemantics::Usize(Box::new(dfm))
+    }
+}
+
+impl ToStochasticSemantics for DirectlyFollowsGraph {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        let dfm: StochasticDirectlyFollowsModel = self.into();
+        EbiTraitStochasticSemantics::Usize(Box::new(dfm))
+    }
+}
+
+impl ToStochasticDeterministicSemantics for DirectlyFollowsGraph {
+    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+        let dfm: StochasticDirectlyFollowsModel = self.into();
+        EbiTraitStochasticDeterministicSemantics::UsizeDistribution(Box::new(dfm))
     }
 }
