@@ -510,8 +510,17 @@ impl EbiTraitGraphable for StochasticDirectlyFollowsModel {
         }
 
         //edges
-        for (source, target) in self.sources.iter().zip(self.targets.iter()) {
-            <dyn EbiTraitGraphable>::create_edge(&mut graph, &nodes[*source], &nodes[*target], "");
+        for (source, (target, weight)) in self
+            .sources
+            .iter()
+            .zip(self.targets.iter().zip(self.weights.iter()))
+        {
+            <dyn EbiTraitGraphable>::create_edge(
+                &mut graph,
+                &nodes[*source],
+                &nodes[*target],
+                &format!("{}", weight),
+            );
         }
 
         Ok(graph)
