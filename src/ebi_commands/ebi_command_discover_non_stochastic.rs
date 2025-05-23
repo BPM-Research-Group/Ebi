@@ -55,7 +55,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand:
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let minimum_fitness = inputs.remove(0).to_type::<Fraction>()?;
         Ok(EbiOutput::Object(EbiObject::DirectlyFollowsModel(
-            lang.mine_directly_follows_model_filtering(&minimum_fitness)?,
+            lang.mine_directly_follows_model_filtering(&minimum_fitness)?.into(),
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsModel),

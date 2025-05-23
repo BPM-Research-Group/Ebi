@@ -28,7 +28,7 @@ use crate::{
     line_reader::LineReader,
 };
 
-use super::stochastic_directly_follows_model::{NodeIndex, StochasticDirectlyFollowsModel};
+use super::stochastic_directly_follows_model::NodeIndex;
 
 pub const HEADER: &str = "directly follows model";
 
@@ -431,31 +431,25 @@ impl Exportable for DirectlyFollowsModel {
     }
 }
 
-macro_rules! info {
-    ($t:ident) => {
-        impl Infoable for $t {
-            fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
-                writeln!(f, "Number of transitions\t{}", self.node_2_activity.len())?;
-                writeln!(
-                    f,
-                    "Number of activities\t{}",
-                    self.activity_key.activity2name.len()
-                )?;
-                writeln!(f, "Number of nodes\t\t{}", self.node_2_activity.len())?;
-                writeln!(f, "Number of edges\t\t{}", self.sources.len())?;
-                writeln!(f, "Number of start nodes\t{}", self.number_of_start_nodes())?;
-                writeln!(f, "Number of end nodes\t{}", self.number_of_end_nodes())?;
+impl Infoable for DirectlyFollowsModel {
+    fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
+        writeln!(f, "Number of transitions\t{}", self.node_2_activity.len())?;
+        writeln!(
+            f,
+            "Number of activities\t{}",
+            self.activity_key.activity2name.len()
+        )?;
+        writeln!(f, "Number of nodes\t\t{}", self.node_2_activity.len())?;
+        writeln!(f, "Number of edges\t\t{}", self.sources.len())?;
+        writeln!(f, "Number of start nodes\t{}", self.number_of_start_nodes())?;
+        writeln!(f, "Number of end nodes\t{}", self.number_of_end_nodes())?;
 
-                writeln!(f, "")?;
-                self.get_activity_key().info(f)?;
+        writeln!(f, "")?;
+        self.get_activity_key().info(f)?;
 
-                Ok(write!(f, "")?)
-            }
-        }
-    };
+        Ok(write!(f, "")?)
+    }
 }
-info!(DirectlyFollowsModel);
-info!(StochasticDirectlyFollowsModel);
 
 #[cfg(test)]
 mod tests {

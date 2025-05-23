@@ -4,7 +4,10 @@ use anyhow::{Result, anyhow};
 
 use crate::{
     ebi_framework::activity_key::Activity,
-    ebi_objects::{directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel},
+    ebi_objects::{
+        directly_follows_graph::DirectlyFollowsGraph,
+        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
+    },
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::{fraction::Fraction, traits::One},
 };
@@ -18,14 +21,14 @@ pub trait DirectlyFollowsModelMinerFiltering {
     fn mine_directly_follows_model_filtering(
         &mut self,
         minimum_fitness: &Fraction,
-    ) -> Result<DirectlyFollowsModel>;
+    ) -> Result<StochasticDirectlyFollowsModel>;
 }
 
 impl DirectlyFollowsModelMinerFiltering for dyn EbiTraitFiniteStochasticLanguage {
     fn mine_directly_follows_model_filtering(
         &mut self,
         minimum_fitness: &Fraction,
-    ) -> Result<DirectlyFollowsModel> {
+    ) -> Result<StochasticDirectlyFollowsModel> {
         if minimum_fitness > &Fraction::one() {
             return Err(anyhow!("cannot obtain a minimum fitness larger than 1"));
         }

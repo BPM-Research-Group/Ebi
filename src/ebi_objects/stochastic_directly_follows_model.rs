@@ -11,13 +11,16 @@ use layout::topo::layout::VisualGraph;
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey},
+        activity_key::{
+            Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
+        },
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
         ebi_output::{EbiObjectExporter, EbiOutput},
         exportable::Exportable,
         importable::Importable,
+        infoable::Infoable,
     },
     ebi_traits::{
         ebi_trait_graphable::{self, EbiTraitGraphable},
@@ -524,6 +527,31 @@ impl EbiTraitGraphable for StochasticDirectlyFollowsModel {
         }
 
         Ok(graph)
+    }
+}
+
+impl Infoable for StochasticDirectlyFollowsModel {
+    fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
+        writeln!(f, "Number of transitions\t{}", self.node_2_activity.len())?;
+        writeln!(
+            f,
+            "Number of activities\t{}",
+            self.activity_key.activity2name.len()
+        )?;
+        writeln!(f, "Number of nodes\t\t{}", self.node_2_activity.len())?;
+        writeln!(f, "Number of edges\t\t{}", self.sources.len())?;
+        writeln!(f, "Number of start nodes\t{}", self.number_of_start_nodes())?;
+        writeln!(f, "Number of end nodes\t{}", self.number_of_end_nodes())?;
+
+        let mut sum: Fraction = self.weights.iter().sum();
+        sum += &self.start_node_weights.iter().sum::<Fraction>();
+        sum += &self.end_node_weights.iter().sum::<Fraction>();
+        writeln!(f, "Sum weight of edges\t{}", sum)?;
+
+        writeln!(f, "")?;
+        self.get_activity_key().info(f)?;
+
+        Ok(write!(f, "")?)
     }
 }
 
