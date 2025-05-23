@@ -5,11 +5,18 @@ use crate::{
         ebi_object::{EbiObject, EbiObjectType},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
-    }, ebi_objects::{labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree}, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::fraction::Fraction, techniques::{
-        alignment_stochastic_miner::AlignmentMiner, directly_follows_model_miner::DirectlyFollowsModelMinerFiltering, occurrences_stochastic_miner::{
+    },
+    ebi_objects::{labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree},
+    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    math::fraction::Fraction,
+    techniques::{
+        alignment_stochastic_miner::AlignmentMiner,
+        directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
+        occurrences_stochastic_miner::{
             OccurrencesStochasticMinerLPN, OccurrencesStochasticMinerTree,
-        }, uniform_stochastic_miner::{UniformStochasticMinerLPN, UniformStochasticMinerTree}
-    }
+        },
+        uniform_stochastic_miner::{UniformStochasticMinerLPN, UniformStochasticMinerTree},
+    },
 };
 
 pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
@@ -19,6 +26,7 @@ pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[
         &EBI_DISCOVER_ALIGNMENTS,
+        &EBI_DISCOVER_DIRECTLY_FOLLOWS,
         &EBI_DISCOVER_OCCURRENCE,
         &EBI_DISCOVER_UNIFORM,
     ],
@@ -75,9 +83,11 @@ pub const EBI_DISCOVER_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
             .remove(0)
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let minimum_fitness = inputs.remove(0).to_type::<Fraction>()?;
-        Ok(EbiOutput::Object(EbiObject::StochasticDirectlyFollowsModel(
-            lang.mine_directly_follows_model_filtering(&minimum_fitness)?,
-        )))
+        Ok(EbiOutput::Object(
+            EbiObject::StochasticDirectlyFollowsModel(
+                lang.mine_directly_follows_model_filtering(&minimum_fitness)?,
+            ),
+        ))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticDirectlyFollowsModel),
 };
