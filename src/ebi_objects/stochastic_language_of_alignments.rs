@@ -3,7 +3,7 @@ use std::{fmt::Display, str::FromStr};
 
 use crate::{
     ebi_framework::{
-        activity_key::{ActivityKey, ActivityKeyTranslator, TranslateActivityKey},
+        activity_key::{ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInput, EbiObjectImporter},
         ebi_object::EbiObject,
@@ -350,6 +350,10 @@ impl FromStr for StochasticLanguageOfAlignments {
 impl Infoable for StochasticLanguageOfAlignments {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         writeln!(f, "Number of alignments\t\t{}", self.alignments.len())?;
+
+        writeln!(f, "")?;
+        self.get_activity_key().info(f)?;
+        
         Ok(write!(f, "")?)
     }
 }

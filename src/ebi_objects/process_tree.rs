@@ -476,6 +476,9 @@ macro_rules! tree {
                     $t::get_activity_key(self).get_number_of_activities()
                 )?;
 
+                writeln!(f, "")?;
+                self.get_activity_key().info(f)?;
+
                 Ok(write!(f, "")?)
             }
         }

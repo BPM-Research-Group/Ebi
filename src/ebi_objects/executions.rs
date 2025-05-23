@@ -45,6 +45,7 @@ impl Importable for Executions {
 impl Infoable for Executions {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         writeln!(f, "Number of executions\t\t{}", self.executions.len())?;
+        
         Ok(write!(f, "")?)
     }
 }

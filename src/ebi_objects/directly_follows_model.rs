@@ -10,7 +10,9 @@ use std::{
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey},
+        activity_key::{
+            Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
+        },
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -443,6 +445,9 @@ macro_rules! info {
                 writeln!(f, "Number of edges\t\t{}", self.sources.len())?;
                 writeln!(f, "Number of start nodes\t{}", self.number_of_start_nodes())?;
                 writeln!(f, "Number of end nodes\t{}", self.number_of_end_nodes())?;
+
+                writeln!(f, "")?;
+                self.get_activity_key().info(f)?;
 
                 Ok(write!(f, "")?)
             }

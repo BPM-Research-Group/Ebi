@@ -288,6 +288,9 @@ impl Infoable for EventLog {
             self.get_activity_key().get_number_of_activities()
         )?;
 
+        writeln!(f, "")?;
+        self.get_activity_key().info(f)?;
+        
         let trace_atts = self.get_trace_attributes();
         let t: Vec<String> = trace_atts
             .iter()

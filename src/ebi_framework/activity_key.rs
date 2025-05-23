@@ -8,6 +8,8 @@ use std::{
 #[cfg(test)]
 use uuid::Uuid;
 
+use super::infoable::Infoable;
+
 pub trait HasActivityKey: TranslateActivityKey {
     fn get_activity_key(&self) -> &ActivityKey;
 
@@ -320,6 +322,25 @@ impl Display for ActivityKey {
     }
 }
 
+impl Infoable for ActivityKey {
+    fn info(&self, f: &mut impl std::io::Write) -> anyhow::Result<()> {
+        let count = 20;
+
+        writeln!(f, "Activities:")?;
+        let mut labels = self.activity2name.clone();
+        labels.sort();
+        for label in labels.iter().take(count) {
+            writeln!(f, "\t{}", label)?;
+        }
+
+        if self.activity2name.len() > 20 {
+            writeln!(f, ".. ({} more)", self.activity2name.len() - count)?;
+        }
+
+        Ok(write!(f, "")?)
+    }
+}
+
 pub struct ActivityKeyTranslator {
     from2to: Vec<Activity>,
 }
@@ -349,19 +370,23 @@ impl ActivityKeyTranslator {
     }
 
     pub fn translate_trace_mut(&self, trace: &mut Vec<Activity>) {
-        trace.iter_mut().for_each(|event| *event = self.translate_activity(event));
+        trace
+            .iter_mut()
+            .for_each(|event| *event = self.translate_activity(event));
     }
 }
-
 
 #[cfg(test)]
 mod tests {
     use std::{collections::HashSet, fs};
 
-    use crate::{ebi_framework::activity_key::{HasActivityKey, TranslateActivityKey}, ebi_objects::directly_follows_model::DirectlyFollowsModel};
+    use crate::{
+        ebi_framework::activity_key::{HasActivityKey, TranslateActivityKey},
+        ebi_objects::directly_follows_model::DirectlyFollowsModel,
+    };
 
     use super::ActivityKey;
-    
+
     #[test]
     #[should_panic(expected = "cannot get activity label of activity of different activity key")]
     fn activity_key_process() {
@@ -391,7 +416,10 @@ mod tests {
 
         dfm.translate_using_activity_key(&mut activity_key);
 
-        assert_eq!(dfm.get_activity_key().get_activity_label(&x), activity_key.get_activity_label(&x));
+        assert_eq!(
+            dfm.get_activity_key().get_activity_label(&x),
+            activity_key.get_activity_label(&x)
+        );
     }
 
     #[test]

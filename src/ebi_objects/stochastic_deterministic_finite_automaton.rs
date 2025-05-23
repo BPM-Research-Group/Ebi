@@ -1,6 +1,6 @@
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey},
+        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -422,6 +422,9 @@ impl Infoable for StochasticDeterministicFiniteAutomaton {
             "Number of activities\t{}",
             self.activity_key.get_number_of_activities()
         )?;
+
+        writeln!(f, "")?;
+        self.get_activity_key().info(f)?;
 
         Ok(write!(f, "")?)
     }

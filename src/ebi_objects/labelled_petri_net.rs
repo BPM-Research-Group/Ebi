@@ -383,6 +383,9 @@ impl Infoable for LabelledPetriNet {
                 .count()
         )?;
 
+        writeln!(f, "")?;
+        self.get_activity_key().info(f)?;
+
         Ok(write!(f, "")?)
     }
 }

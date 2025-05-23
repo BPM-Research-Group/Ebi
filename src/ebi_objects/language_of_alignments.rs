@@ -327,6 +327,10 @@ impl FromStr for LanguageOfAlignments {
 impl Infoable for LanguageOfAlignments {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         writeln!(f, "Number of alignments\t\t{}", self.alignments.len())?;
+
+        writeln!(f, "")?;
+        self.get_activity_key().info(f)?;
+        
         Ok(write!(f, "")?)
     }
 }
