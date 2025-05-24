@@ -1,6 +1,6 @@
 use anyhow::Context;
-
-use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::{fraction::Fraction, traits::Zero}, medoid, techniques::{completeness::Completeness, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}};
+use crate::{ebi_framework::{ebi_command::EbiCommand, 
+    ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_objects::directly_follows_graph::DirectlyFollowsGraph, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::{fraction::Fraction, traits::Zero}, medoid, techniques::{completeness::Completeness, edge_difference::EdgeDifference, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}};
 
 pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
     name_short: "ana",
@@ -11,6 +11,7 @@ pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
         &EBI_ANALYSE_ALL,
         &EBI_ANALYSE_COMPLETENESS,
         &EBI_ANALYSE_COVERAGE,
+        &EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE,
         &EBI_ANALYSE_MEDOID,
         &EBI_ANALYSE_MINPROB,
         &EBI_ANALYSE_MODE,
@@ -104,6 +105,31 @@ The computation may not terminate if the model has non-decreasing livelocks, or 
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     }, 
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
+};
+
+pub const EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE: EbiCommand = EbiCommand::Command {
+    name_short: "dfgedi", 
+    name_long: Some("directly-follows-edge-difference"), 
+    explanation_short: "The number of edges that differ between two directly follows graphs.", 
+    explanation_long: None,
+    cli_command: None, 
+    latex_link: None,
+    exact_arithmetic: true,
+    input_types: &[ 
+        &[ &EbiInputType::Object(EbiObjectType::DirectlyFollowsGraph) ], 
+        &[ &EbiInputType::Object(EbiObjectType::DirectlyFollowsGraph)]
+    ],
+    input_names: &[ "DFG_1", "DFG_2"],
+    input_helps: &[ "A directly follows graph.", "A directly follows graph."],
+    execute: |mut objects, _| {
+        let mut dfg1 = objects.remove(0).to_type::<DirectlyFollowsGraph>()?;
+        let mut dfg2 = objects.remove(0).to_type::<DirectlyFollowsGraph>()?;
+        
+        let difference = dfg1.edge_difference(&mut dfg2);
+
+        return Ok(EbiOutput::Fraction(difference));
+    }, 
+    output_type: &EbiOutputType::Fraction
 };
 
 pub const EBI_ANALYSE_MINPROB: EbiCommand = EbiCommand::Command {

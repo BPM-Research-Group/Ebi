@@ -3,18 +3,7 @@ use anyhow::Result;
 use crate::{
     ebi_framework::displayable::Displayable,
     ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton,
-        directly_follows_model::DirectlyFollowsModel,
-        event_log::EventLog,
-        finite_language::FiniteLanguage,
-        finite_stochastic_language::FiniteStochasticLanguage,
-        labelled_petri_net::{LPNMarking, LabelledPetriNet},
-        process_tree::ProcessTree,
-        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        stochastic_process_tree::StochasticProcessTree,
-        stochastic_process_tree_semantics::NodeStates,
+        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree, stochastic_process_tree_semantics::NodeStates
     },
     ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_semantics::Semantics},
     math::traits::Zero,
@@ -103,6 +92,7 @@ dfm!(DeterministicFiniteAutomaton);
 dfm!(StochasticDeterministicFiniteAutomaton);
 dfm!(DirectlyFollowsModel);
 dfm!(StochasticDirectlyFollowsModel);
+dfm!(DirectlyFollowsGraph);
 
 #[cfg(test)]
 mod tests {

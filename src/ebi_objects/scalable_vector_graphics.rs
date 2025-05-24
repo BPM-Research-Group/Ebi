@@ -88,6 +88,7 @@ fn export_from_object_svg(object: EbiOutput, f: &mut dyn std::io::Write) -> Resu
             "cannot transform stochastic language of alignments into SVG"
         )),
         EbiOutput::Object(EbiObject::StochasticProcessTree(object)) => export_as_svg(&object, f),
+        EbiOutput::Object(EbiObject::DirectlyFollowsGraph(object)) => export_as_svg(&object, f),
         EbiOutput::String(_) => Err(anyhow!("cannot transform string into SVG")),
         EbiOutput::SVG(string) => EbiExporter::SVG.export_from_object(EbiOutput::SVG(string), f),
         EbiOutput::PDF(_) => Err(anyhow!("cannot transform PDF into SVG")),
@@ -136,6 +137,7 @@ fn export_from_object_pdf(object: EbiOutput, f: &mut dyn std::io::Write) -> Resu
             "cannot transform stochastic language of alignments into PDF"
         )),
         EbiOutput::Object(EbiObject::StochasticProcessTree(object)) => export_as_pdf(&object, f),
+        EbiOutput::Object(EbiObject::DirectlyFollowsGraph(object)) => export_as_pdf(&object, f),
         EbiOutput::String(_) => Err(anyhow!("cannot transform string into PDF")),
         EbiOutput::SVG(string) => {
             EbiExporter::PDF.export_from_object(EbiOutput::PDF(svg_to_pdf(&string)?), f)

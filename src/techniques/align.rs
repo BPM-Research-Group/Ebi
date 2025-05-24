@@ -14,6 +14,7 @@ use crate::{
     },
     ebi_objects::{
         deterministic_finite_automaton::DeterministicFiniteAutomaton,
+        directly_follows_graph::DirectlyFollowsGraph,
         directly_follows_model::DirectlyFollowsModel,
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
         labelled_petri_net::{LPNMarking, LabelledPetriNet},
@@ -540,95 +541,55 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
     }
 }
 
-impl AlignmentHeuristics for StochasticDeterministicFiniteAutomaton {
-    type AliState = usize;
+macro_rules! usize {
+    ($t:ident) => {
+        impl AlignmentHeuristics for $t {
+            type AliState = usize;
 
-    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
-        vec![]
-    }
+            fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+                vec![]
+            }
 
-    fn underestimate_cost_to_final_synchronous_state(
-        &self,
-        _: &Vec<Activity>,
-        _: &usize,
-        _: &usize,
-        _: &Vec<Vec<usize>>,
-    ) -> usize {
-        0
-    }
+            fn underestimate_cost_to_final_synchronous_state(
+                &self,
+                _: &Vec<Activity>,
+                _: &usize,
+                _: &usize,
+                _: &Vec<Vec<usize>>,
+            ) -> usize {
+                0
+            }
+        }
+    };
 }
 
-impl AlignmentHeuristics for ProcessTree {
-    type AliState = NodeStates;
+macro_rules! nodestates {
+    ($t:ident) => {
+        impl AlignmentHeuristics for $t {
+            type AliState = NodeStates;
 
-    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
-        vec![]
-    }
+            fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+                vec![]
+            }
 
-    fn underestimate_cost_to_final_synchronous_state(
-        &self,
-        _: &Vec<Activity>,
-        _: &usize,
-        _: &Self::AliState,
-        _: &Vec<Vec<usize>>,
-    ) -> usize {
-        0
-    }
+            fn underestimate_cost_to_final_synchronous_state(
+                &self,
+                _: &Vec<Activity>,
+                _: &usize,
+                _: &NodeStates,
+                _: &Vec<Vec<usize>>,
+            ) -> usize {
+                0
+            }
+        }
+    };
 }
-
-impl AlignmentHeuristics for StochasticProcessTree {
-    type AliState = NodeStates;
-
-    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
-        vec![]
-    }
-
-    fn underestimate_cost_to_final_synchronous_state(
-        &self,
-        _: &Vec<Activity>,
-        _: &usize,
-        _: &Self::AliState,
-        _: &Vec<Vec<usize>>,
-    ) -> usize {
-        0
-    }
-}
-
-impl AlignmentHeuristics for DirectlyFollowsModel {
-    type AliState = usize;
-
-    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
-        vec![]
-    }
-
-    fn underestimate_cost_to_final_synchronous_state(
-        &self,
-        _: &Vec<Activity>,
-        _: &usize,
-        _: &Self::AliState,
-        _: &Vec<Vec<usize>>,
-    ) -> usize {
-        0
-    }
-}
-
-impl AlignmentHeuristics for StochasticDirectlyFollowsModel {
-    type AliState = usize;
-
-    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
-        vec![]
-    }
-
-    fn underestimate_cost_to_final_synchronous_state(
-        &self,
-        _: &Vec<Activity>,
-        _: &usize,
-        _: &Self::AliState,
-        _: &Vec<Vec<usize>>,
-    ) -> usize {
-        0
-    }
-}
+usize!(StochasticDeterministicFiniteAutomaton);
+nodestates!(ProcessTree);
+nodestates!(StochasticProcessTree);
+usize!(DirectlyFollowsGraph);
+usize!(DirectlyFollowsModel);
+usize!(StochasticDirectlyFollowsModel);
 
 #[cfg(test)]
 mod tests {

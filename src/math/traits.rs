@@ -33,7 +33,6 @@ pub trait Signed: Sized {
     fn is_negative(&self) -> bool;
 }
 
-
 // ============ implementations ============
 
 impl One for BigInt {
@@ -146,16 +145,35 @@ impl One for BigFraction {
 
 macro_rules! ttype_signed {
     ($t:ident) => {
-        ttype!($t);
+        impl Zero for $t {
+            fn zero() -> Self {
+                0
+            }
+
+            fn is_zero(&self) -> bool {
+                num::Zero::is_zero(self)
+            }
+        }
+
+        impl One for $t {
+            fn one() -> Self {
+                1
+            }
+
+            fn is_one(&self) -> bool {
+                num::One::is_one(self)
+            }
+        }
+
         impl Signed for $t {
             fn abs(&self) -> Self {
                 NumSigned::abs(&self)
             }
-        
+
             fn is_positive(&self) -> bool {
                 NumSigned::is_positive(self)
             }
-        
+
             fn is_negative(&self) -> bool {
                 NumSigned::is_negative(self)
             }
@@ -179,9 +197,23 @@ macro_rules! ttype {
             fn one() -> Self {
                 1
             }
-        
+
             fn is_one(&self) -> bool {
                 num::One::is_one(self)
+            }
+        }
+
+        impl Signed for $t {
+            fn abs(&self) -> Self {
+                *self
+            }
+
+            fn is_positive(&self) -> bool {
+                *self > 0
+            }
+
+            fn is_negative(&self) -> bool {
+                false
             }
         }
     };

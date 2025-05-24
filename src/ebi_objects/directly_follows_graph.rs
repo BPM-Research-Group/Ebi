@@ -1,25 +1,41 @@
 use std::{
     cmp::Ordering,
     collections::{HashMap, hash_map::Entry},
+    fmt::Display,
     io::BufRead,
 };
 
 use anyhow::{Context, Result, anyhow};
+use layout::topo::layout::VisualGraph;
 use serde_json::Value;
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey},
+        activity_key::{
+            Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
+        },
         ebi_file_handler::EbiFileHandler,
-        ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
+        ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
+        ebi_output::EbiOutput,
+        ebi_trait::FromEbiTraitObject,
+        exportable::Exportable,
         importable::Importable,
+        infoable::Infoable,
     },
     ebi_traits::{
-        ebi_trait_graphable::EbiTraitGraphable, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics}, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}
+        ebi_trait_graphable::EbiTraitGraphable,
+        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        ebi_trait_stochastic_deterministic_semantics::{
+            EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
+        },
+        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
     json,
-    math::{fraction::Fraction, traits::Zero},
+    math::{
+        fraction::Fraction,
+        traits::{Signed, Zero},
+    },
 };
 
 use super::{
@@ -44,7 +60,10 @@ pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
         EbiTraitImporter::Graphable(DirectlyFollowsGraph::import_as_graphable),
     ],
     object_importers: &[
-        EbiObjectImporter::StochasticDirectlyFollowsModel(DirectlyFollowsGraph::import_as_object),
+        EbiObjectImporter::DirectlyFollowsGraph(DirectlyFollowsGraph::import_as_object),
+        EbiObjectImporter::StochasticDirectlyFollowsModel(
+            DirectlyFollowsGraph::import_as_stochastic_directly_follows_model,
+        ),
         EbiObjectImporter::DirectlyFollowsModel(
             DirectlyFollowsGraph::import_as_directly_follows_model,
         ),
@@ -57,7 +76,7 @@ pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[], //java translations covered by LabelledPetrinet
 };
 
-#[derive(Clone)]
+#[derive(ActivityKey, Clone, Debug)]
 pub struct DirectlyFollowsGraph {
     pub(crate) activity_key: ActivityKey,
     pub(crate) empty_traces_weight: Fraction,
@@ -86,6 +105,13 @@ impl DirectlyFollowsGraph {
         Ok(EbiObject::DirectlyFollowsModel(dfg.into()))
     }
 
+    pub fn import_as_stochastic_directly_follows_model(
+        reader: &mut dyn BufRead,
+    ) -> Result<EbiObject> {
+        let dfg = Self::import(reader)?;
+        Ok(EbiObject::StochasticDirectlyFollowsModel(dfg.into()))
+    }
+
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let dfg = Self::import(reader)?;
         Ok(EbiObject::LabelledPetriNet(dfg.into()))
@@ -99,6 +125,59 @@ impl DirectlyFollowsGraph {
     pub fn import_as_graphable(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitGraphable>> {
         let dfg: StochasticDirectlyFollowsModel = Self::import(reader)?.into();
         Ok(Box::new(dfg))
+    }
+
+    pub fn get_max_state(&self) -> usize {
+        self.activity_key.get_number_of_activities() + 2
+    }
+
+    pub fn edge_weight(&self, source: Activity, target: Activity) -> Option<&Fraction> {
+        let (found, from) = self.binary_search(source, target);
+        if found {
+            Some(&self.weights[from])
+        } else {
+            None
+        }
+    }
+
+    pub fn is_start_node(&self, node: Activity) -> bool {
+        match self.start_activities.get(&node) {
+            Some(w) => w.is_positive(),
+            None => false,
+        }
+    }
+
+    pub fn is_end_node(&self, node: Activity) -> bool {
+        match self.end_activities.get(&node) {
+            Some(w) => w.is_positive(),
+            None => false,
+        }
+    }
+
+    pub fn activity_cardinality(&self, activity: Activity) -> Fraction {
+        let mut result = match self.start_activities.get(&activity) {
+            Some(a) => a.clone(),
+            None => Fraction::zero(),
+        };
+
+        match self.end_activities.get(&activity) {
+            Some(a) => result += a,
+            None => {}
+        };
+
+        let (_, mut i) = self.binary_search(activity, self.activity_key.get_activity_by_id(0));
+        while i < self.sources.len() && self.sources[i] == activity {
+            if self.weights[i].is_positive() {
+                result += &self.weights[i];
+            }
+            i += 1;
+        }
+
+        result
+    }
+
+    pub fn has_empty_traces(&self) -> bool {
+        self.empty_traces_weight.is_positive()
     }
 
     pub fn add_empty_trace(&mut self, weight: &Fraction) {
@@ -184,12 +263,8 @@ impl DirectlyFollowsGraph {
 }
 
 impl Importable for DirectlyFollowsGraph {
-    fn import_as_object(
-        reader: &mut dyn std::io::BufRead,
-    ) -> anyhow::Result<crate::ebi_framework::ebi_object::EbiObject> {
-        Ok(EbiObject::StochasticDirectlyFollowsModel(
-            Self::import(reader)?.try_into()?,
-        ))
+    fn import_as_object(reader: &mut dyn std::io::BufRead) -> anyhow::Result<EbiObject> {
+        Ok(EbiObject::DirectlyFollowsGraph(Self::import(reader)?))
     }
 
     fn import(reader: &mut dyn std::io::BufRead) -> anyhow::Result<Self>
@@ -202,10 +277,10 @@ impl Importable for DirectlyFollowsGraph {
 
         let activities = json::read_field_object(&json, "activities")
             .with_context(|| format!("reading field `activities`"))?;
-        let frequencies: Result<HashMap<Activity, usize>> = activities
+        let frequencies: Result<HashMap<Activity, Fraction>> = activities
             .into_iter()
             .map(|(activity, json)| {
-                let frequency = json::read_number(json)
+                let frequency = json::read_fraction(json)
                     .with_context(|| format!("read activity frequency of {}", activity))?;
                 let activity = result.activity_key.process_activity(activity);
                 Ok((activity, frequency))
@@ -240,14 +315,14 @@ impl Importable for DirectlyFollowsGraph {
             .with_context(|| format!("reading target of edge {}", i))?;
             let target = result.activity_key.process_activity(target_act);
 
-            let weight = json::read_number(
+            let weight = json::read_fraction(
                 edge_list
                     .get(1)
                     .ok_or_else(|| anyhow!("could not read weight of edge {}", i))?,
             )
             .with_context(|| format!("reading weight of edge {}", i))?;
 
-            result.add_edge(source, target, &Fraction::from((weight, 1)));
+            result.add_edge(source, target, &weight);
 
             //keep track of how many executions are left for source
             match frequencies_out.entry(source) {
@@ -260,7 +335,7 @@ impl Importable for DirectlyFollowsGraph {
                             i
                         ));
                     } else {
-                        *occupied_entry.get_mut() -= weight
+                        *occupied_entry.get_mut() -= &weight
                     }
                 }
                 Entry::Vacant(_) => {
@@ -284,7 +359,7 @@ impl Importable for DirectlyFollowsGraph {
                             i
                         ));
                     } else {
-                        *occupied_entry.get_mut() -= weight
+                        *occupied_entry.get_mut() -= &weight
                     }
                 }
                 Entry::Vacant(_) => {
@@ -309,8 +384,8 @@ impl Importable for DirectlyFollowsGraph {
                 match frequencies_in.entry(activity) {
                     Entry::Occupied(occupied_entry) => {
                         let weight = occupied_entry.remove();
-                        if weight > 0 {
-                            result.add_start_activity(activity, &Fraction::from((weight, 1)));
+                        if weight.is_positive() {
+                            result.add_start_activity(activity, &weight);
                         }
                     }
                     Entry::Vacant(_) => {
@@ -337,8 +412,8 @@ impl Importable for DirectlyFollowsGraph {
                 match frequencies_out.entry(activity) {
                     Entry::Occupied(occupied_entry) => {
                         let weight = occupied_entry.remove();
-                        if weight > 0 {
-                            result.add_end_activity(activity, &Fraction::from((weight, 1)));
+                        if weight.is_positive() {
+                            result.add_end_activity(activity, &weight);
                         }
                     }
                     Entry::Vacant(_) => {
@@ -355,6 +430,240 @@ impl Importable for DirectlyFollowsGraph {
         err?;
 
         return Ok(result);
+    }
+}
+
+impl FromEbiTraitObject for DirectlyFollowsGraph {
+    fn from_trait_object(object: ebi_input::EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::DirectlyFollowsGraph(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "cannot read {} {} as a directly follows graph",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
+    }
+}
+
+impl Exportable for DirectlyFollowsGraph {
+    fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
+        match object {
+            EbiOutput::Object(EbiObject::DirectlyFollowsGraph(dfa)) => dfa.export(f),
+            _ => Err(anyhow!("Cannot export to DFG.")),
+        }
+    }
+
+    fn export(&self, f: &mut dyn std::io::Write) -> Result<()> {
+        Ok(write!(f, "{}", self)?)
+    }
+}
+
+impl TranslateActivityKey for DirectlyFollowsGraph {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+
+        //extract all edges
+        let mut old_sources = vec![];
+        let mut old_targets = vec![];
+        let mut old_weights = vec![];
+        std::mem::swap(&mut self.sources, &mut old_sources);
+        std::mem::swap(&mut self.targets, &mut old_targets);
+        std::mem::swap(&mut self.weights, &mut old_weights);
+
+        //re-add all edges
+        for (source, (target, weight)) in old_sources
+            .into_iter()
+            .zip(old_targets.into_iter().zip(old_weights.into_iter()))
+        {
+            let source = translator.translate_activity(&source);
+            let target = translator.translate_activity(&target);
+            let (_, from) = self.binary_search(source, target);
+            self.sources.insert(from, source);
+            self.targets.insert(from, target);
+            self.weights.insert(from, weight);
+        }
+
+        //extract all start activities
+        let mut old_start = HashMap::new();
+        let mut old_end = HashMap::new();
+        std::mem::swap(&mut self.start_activities, &mut old_start);
+        std::mem::swap(&mut self.end_activities, &mut old_end);
+
+        self.start_activities = old_start
+            .into_iter()
+            .map(|(a, w)| (translator.translate_activity(&a), w))
+            .collect();
+        self.end_activities = old_end
+            .into_iter()
+            .map(|(a, w)| (translator.translate_activity(&a), w))
+            .collect();
+
+        self.activity_key = to_activity_key.clone();
+    }
+}
+
+impl Infoable for DirectlyFollowsGraph {
+    fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
+        writeln!(f, "Number of edges\t{}", self.sources.len())?;
+        writeln!(
+            f,
+            "Number of activities\t{}",
+            self.activity_key.activity2name.len()
+        )?;
+        writeln!(f, "Number of edges\t\t{}", self.sources.len())?;
+        writeln!(f, "Number of start nodes\t{}", self.start_activities.len())?;
+        writeln!(f, "Number of end nodes\t{}", self.end_activities.len())?;
+
+        let mut sum: Fraction = self.weights.iter().sum();
+        sum += &self.start_activities.values().sum::<Fraction>();
+        sum += &self.end_activities.values().sum::<Fraction>();
+        writeln!(f, "Sum weight of edges\t{}", sum)?;
+
+        writeln!(f, "")?;
+        self.get_activity_key().info(f)?;
+
+        Ok(write!(f, "")?)
+    }
+}
+
+impl Display for DirectlyFollowsGraph {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let activities = Value::Object(
+            self.activity_key
+                .get_activities()
+                .iter()
+                .map(|activity| {
+                    (
+                        self.activity_key.get_activity_label(activity).to_string(),
+                        { Value::String(self.activity_cardinality(**activity).to_string()) },
+                    )
+                })
+                .collect(),
+        );
+        let start_activities = Value::Array(
+            self.start_activities
+                .iter()
+                .filter_map(|(a, w)| {
+                    if w.is_positive() {
+                        Some(Value::String(
+                            self.activity_key.get_activity_label(a).to_string(),
+                        ))
+                    } else {
+                        None
+                    }
+                })
+                .collect(),
+        );
+        let end_activities = Value::Array(
+            self.end_activities
+                .iter()
+                .filter_map(|(a, w)| {
+                    if w.is_positive() {
+                        Some(Value::String(
+                            self.activity_key.get_activity_label(a).to_string(),
+                        ))
+                    } else {
+                        None
+                    }
+                })
+                .collect(),
+        );
+        let edges = Value::Array(
+            self.sources
+                .iter()
+                .zip(self.targets.iter().zip(self.weights.iter()))
+                .map(|(source, (target, weight))| {
+                    Value::Array(vec![
+                        Value::Array(vec![
+                            Value::String(self.activity_key.get_activity_label(source).to_string()),
+                            Value::String(self.activity_key.get_activity_label(target).to_string()),
+                        ]),
+                        Value::String(weight.to_string()),
+                    ])
+                })
+                .collect(),
+        );
+        let json = serde_json::json!(
+            {
+                "activities": activities,
+                "start_activities": start_activities,
+                "end_activities": end_activities,
+                "directly_follows_relations": edges
+            }
+        );
+        let x = serde_json::to_string(&json).unwrap();
+        write!(f, "{}", x)
+    }
+}
+
+impl EbiTraitGraphable for DirectlyFollowsGraph {
+    fn to_dot(&self) -> Result<layout::topo::layout::VisualGraph> {
+        let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
+
+        //source + sink
+        let source = <dyn EbiTraitGraphable>::create_place(&mut graph, "");
+        let sink = <dyn EbiTraitGraphable>::create_place(&mut graph, "");
+
+        //empty traces
+        if self.empty_traces_weight.is_positive() {
+            <dyn EbiTraitGraphable>::create_edge(
+                &mut graph,
+                &source,
+                &sink,
+                &format!("{}", self.empty_traces_weight),
+            );
+        }
+
+        //nodes
+        let mut nodes = vec![];
+        for n in &self.activity_key.get_activities() {
+            nodes.push(<dyn EbiTraitGraphable>::create_transition(
+                &mut graph,
+                self.activity_key.get_activity_label(n),
+                "",
+            ));
+        }
+
+        //start activities
+        for (activity, weight) in self.start_activities.iter() {
+            if weight.is_positive() {
+                <dyn EbiTraitGraphable>::create_edge(
+                    &mut graph,
+                    &source,
+                    &nodes[self.activity_key.get_id_from_activity(activity)],
+                    &format!("{}", weight),
+                );
+            }
+        }
+
+        //end activities
+        for (activity, weight) in self.end_activities.iter() {
+            if weight.is_positive() {
+                <dyn EbiTraitGraphable>::create_edge(
+                    &mut graph,
+                    &nodes[self.activity_key.get_id_from_activity(activity)],
+                    &sink,
+                    &format!("{}", weight),
+                );
+            }
+        }
+
+        //edges
+        for (source, (target, weight)) in self
+            .sources
+            .iter()
+            .zip(self.targets.iter().zip(self.weights.iter()))
+        {
+            <dyn EbiTraitGraphable>::create_edge(
+                &mut graph,
+                &nodes[self.activity_key.get_id_from_activity(source)],
+                &nodes[self.activity_key.get_id_from_activity(target)],
+                &format!("{}", weight),
+            );
+        }
+
+        Ok(graph)
     }
 }
 

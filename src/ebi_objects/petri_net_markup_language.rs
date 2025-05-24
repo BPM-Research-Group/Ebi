@@ -18,7 +18,7 @@ use crate::{
 };
 
 use super::{
-    deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
+    deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
 };
 
 pub const FORMAT_SPECIFICATION: &str =
@@ -43,6 +43,8 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     object_exporters: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::DirectlyFollowsModel(PetriNetMarkupLanguage::export_from_object),
+        EbiObjectExporter::StochasticDirectlyFollowsModel(PetriNetMarkupLanguage::export_from_object),
+        EbiObjectExporter::DirectlyFollowsGraph(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::LabelledPetriNet(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::ProcessTree(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::StochasticProcessTree(PetriNetMarkupLanguage::export_from_object),
@@ -107,6 +109,9 @@ impl Exportable for PetriNetMarkupLanguage {
             EbiOutput::Object(EbiObject::DeterministicFiniteAutomaton(dfa)) => {
                 <DeterministicFiniteAutomaton as TryInto<PetriNetMarkupLanguage>>::try_into(dfa)?
                     .export(f)
+            }
+            EbiOutput::Object(EbiObject::DirectlyFollowsGraph(dfm)) => {
+                <DirectlyFollowsGraph as TryInto<PetriNetMarkupLanguage>>::try_into(dfm)?.export(f)
             }
             EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => {
                 <DirectlyFollowsModel as TryInto<PetriNetMarkupLanguage>>::try_into(dfm)?.export(f)

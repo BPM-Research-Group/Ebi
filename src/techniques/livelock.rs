@@ -1,7 +1,8 @@
 use crate::{
-    ebi_framework::displayable::Displayable,
+    ebi_framework::{activity_key::HasActivityKey, displayable::Displayable},
     ebi_objects::{
         deterministic_finite_automaton::DeterministicFiniteAutomaton,
+        directly_follows_graph::DirectlyFollowsGraph,
         directly_follows_model::DirectlyFollowsModel,
         labelled_petri_net::{LPNMarking, LabelledPetriNet},
         process_tree::ProcessTree,
@@ -103,7 +104,11 @@ macro_rules! dfm {
         }
 
         pub struct $u(Vec<bool>);
+    };
+}
 
+macro_rules! dfm_cache {
+    ($t:ident, $u:ident) => {
         impl $u {
             pub fn new(dfm: &$t) -> Self {
                 let mut result = vec![true; dfm.node_2_activity.len() + 2];
@@ -130,7 +135,10 @@ macro_rules! dfm {
                     }
                 }
 
-                if (0..dfm.node_2_activity.len()).into_iter().any(|node| !result[node]) {
+                if (0..dfm.node_2_activity.len())
+                    .into_iter()
+                    .any(|node| !result[node])
+                {
                     result[dfm.node_2_activity.len() + 1] = false;
                 }
 
@@ -155,6 +163,63 @@ dfm!(
     StochasticDirectlyFollowsModel,
     StochasticDirectlyFollowsModelLiveLockCache
 );
+dfm_cache!(DirectlyFollowsModel, DirectlyFollowsModelLiveLockCache);
+dfm_cache!(
+    StochasticDirectlyFollowsModel,
+    StochasticDirectlyFollowsModelLiveLockCache
+);
+dfm!(DirectlyFollowsGraph, DirectlyFollowsGraphLiveLockCache);
+
+impl DirectlyFollowsGraphLiveLockCache {
+    pub fn new(dfm: &DirectlyFollowsGraph) -> Self {
+        let mut result = vec![true; dfm.activity_key.get_number_of_activities() + 2];
+        let mut queue = vec![];
+        result[dfm.activity_key.get_number_of_activities()] = false;
+        dfm.get_activity_key()
+            .get_activities()
+            .iter()
+            .for_each(|node| {
+                if dfm.is_end_node(**node) {
+                    result[dfm.get_activity_key().get_id_from_activity(*node)] = false;
+                    queue.push(*node)
+                }
+            });
+
+        // eprintln!("queue {:?}, result {:?}", queue, result);
+
+        while let Some(state) = queue.pop() {
+            // eprintln!("queue {:?}, result {:?}, state {}", queue, result, state);
+
+            //walk over the edges that go into state (expensive :'( )
+            for (source, target) in dfm.sources.iter().zip(dfm.targets.iter()) {
+                if result[dfm.activity_key.get_id_from_activity(source)] && target == state {
+                    result[dfm.activity_key.get_id_from_activity(source)] = false;
+                    queue.push(source);
+                }
+            }
+        }
+
+        if (0..dfm.get_activity_key().get_number_of_activities())
+            .into_iter()
+            .any(|node| !result[node])
+        {
+            result[dfm.activity_key.get_number_of_activities() + 1] = false;
+        }
+
+        Self(result)
+    }
+}
+
+impl LiveLockCache for DirectlyFollowsGraphLiveLockCache {
+    type LivState = usize;
+
+    fn is_state_part_of_livelock(&mut self, state: &Self::LivState) -> Result<bool> {
+        self.0
+            .get(*state)
+            .copied()
+            .ok_or_else(|| anyhow!("index out of bounds"))
+    }
+}
 
 macro_rules! lpn {
     ($t:ident, $u:ident) => {

@@ -34,21 +34,21 @@ impl From<DirectlyFollowsGraph> for StochasticDirectlyFollowsModel {
         let mut start_node_weights = vec![Fraction::zero(); node_2_activity.len()];
         start_activities.into_iter().for_each(|(activity, weight)| {
             if weight.is_positive() {
-                start_node_weights[activity_key.get_id_from_activity(activity)] = weight;
+                start_node_weights[activity_key.get_id_from_activity(activity)] = weight.into();
             }
         });
 
         let mut end_node_weights = vec![Fraction::zero(); node_2_activity.len()];
         end_activities.into_iter().for_each(|(activity, weight)| {
             if weight.is_positive() {
-                end_node_weights[activity_key.get_id_from_activity(activity)] = weight;
+                end_node_weights[activity_key.get_id_from_activity(activity)] = weight.into();
             }
         });
 
         let mut result = Self {
             activity_key: activity_key,
             node_2_activity: node_2_activity,
-            empty_traces_weight,
+            empty_traces_weight: empty_traces_weight.into(),
             sources: vec![],
             targets: vec![],
             weights: vec![],
@@ -64,7 +64,7 @@ impl From<DirectlyFollowsGraph> for StochasticDirectlyFollowsModel {
             if weight.is_positive() {
                 let source_index = result.get_activity_key().get_id_from_activity(source);
                 let target_index = result.get_activity_key().get_id_from_activity(target);
-                result.add_edge(source_index, target_index, weight)
+                result.add_edge(source_index, target_index, weight.into())
             }
         }
 

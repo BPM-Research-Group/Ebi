@@ -91,6 +91,11 @@ macro_rules! semantics_for_automaton {
                             result.push(self.sources.len() + 1 + node)
                         }
                     }
+
+                    if self.has_empty_traces() {
+                        result.push(self.sources.len())    
+                    }
+
                     result
                 } else if state > &self.node_2_activity.len() {
                     //we are in the final state

@@ -71,6 +71,7 @@ pub mod ebi_objects {
     pub mod stochastic_process_tree;
     pub mod scalable_vector_graphics;
     pub mod directly_follows_graph;
+    pub mod directly_follows_graph_semantics;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_event_log;
@@ -183,6 +184,7 @@ pub mod techniques {
     pub mod prefix_tree_miner;
     pub mod directly_follows_model_miner;
     pub mod directly_follows_graph_abstractor;
+    pub mod edge_difference;
 }
 pub mod optimisation_algorithms {
     pub mod network_simplex;

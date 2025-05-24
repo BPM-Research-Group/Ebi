@@ -395,6 +395,7 @@ impl Display for EbiTraitImporter {
 #[derive(Debug, Clone)]
 pub enum EbiObjectImporter {
     EventLog(fn(&mut dyn BufRead) -> Result<EbiObject>),
+    DirectlyFollowsGraph(fn(&mut dyn BufRead) -> Result<EbiObject>),
     DirectlyFollowsModel(fn(&mut dyn BufRead) -> Result<EbiObject>),
     StochasticDirectlyFollowsModel(fn(&mut dyn BufRead) -> Result<EbiObject>),
     FiniteLanguage(fn(&mut dyn BufRead) -> Result<EbiObject>),
@@ -414,6 +415,7 @@ impl EbiObjectImporter {
     pub fn get_type(&self) -> EbiObjectType {
         match self {
             EbiObjectImporter::EventLog(_) => EbiObjectType::EventLog,
+            EbiObjectImporter::DirectlyFollowsGraph(_) => EbiObjectType::DirectlyFollowsGraph,
             EbiObjectImporter::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
             EbiObjectImporter::StochasticDirectlyFollowsModel(_) => {
                 EbiObjectType::StochasticDirectlyFollowsModel
@@ -445,6 +447,7 @@ impl EbiObjectImporter {
     pub fn get_importer(&self) -> fn(&mut dyn BufRead) -> Result<EbiObject> {
         match self {
             EbiObjectImporter::EventLog(importer) => *importer,
+            EbiObjectImporter::DirectlyFollowsGraph(importer) => *importer,
             EbiObjectImporter::DirectlyFollowsModel(importer) => *importer,
             EbiObjectImporter::StochasticDirectlyFollowsModel(importer) => *importer,
             EbiObjectImporter::FiniteLanguage(importer) => *importer,

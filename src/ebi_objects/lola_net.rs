@@ -21,7 +21,7 @@ use std::{
 };
 
 use super::{
-    deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
+    deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
 };
 
 pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
@@ -40,7 +40,9 @@ pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::DeterministicFiniteAutomaton(LolaNet::export_from_object),
         EbiObjectExporter::StochasticLabelledPetriNet(LolaNet::export_from_object),
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(LolaNet::export_from_object),
+        EbiObjectExporter::StochasticDirectlyFollowsModel(LolaNet::export_from_object),
         EbiObjectExporter::DirectlyFollowsModel(LolaNet::export_from_object),
+        EbiObjectExporter::DirectlyFollowsGraph(LolaNet::export_from_object),
         EbiObjectExporter::ProcessTree(LolaNet::export_from_object),
     ],
     java_object_handlers: &[], //java translations covered by LabelledPetrinet
@@ -124,6 +126,9 @@ impl Exportable for LolaNet {
             }
             EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => {
                 <DirectlyFollowsModel as Into<LolaNet>>::into(dfm).export(f)
+            }
+            EbiOutput::Object(EbiObject::DirectlyFollowsGraph(dfm)) => {
+                <DirectlyFollowsGraph as Into<LolaNet>>::into(dfm).export(f)
             }
             EbiOutput::Object(EbiObject::StochasticDirectlyFollowsModel(dfm)) => {
                 <StochasticDirectlyFollowsModel as Into<LolaNet>>::into(dfm).export(f)

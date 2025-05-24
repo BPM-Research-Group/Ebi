@@ -100,3 +100,14 @@ pub fn read_list(json: &Value) -> Result<&Vec<Value>> {
         Value::Object(_) => return Err(anyhow!("field is an object, where literal expected")),
     }
 }
+
+pub fn read_fraction(json: &Value) -> Result<Fraction> {
+    match &json {
+        Value::Null => return Err(anyhow!("field not found")),
+        Value::Bool(_) => return Err(anyhow!("field is a boolean, where fraction expected")),
+        Value::Number(n) => return Ok(n.to_string().parse::<Fraction>()?),
+        Value::String(s) => return Ok(s.parse::<Fraction>()?),
+        Value::Array(_) => return Err(anyhow!("field is a list, where fraction expected")),
+        Value::Object(_) => return Err(anyhow!("field is an object, where fraction expected")),
+    }
+}

@@ -47,6 +47,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::ProcessTree(pt), _) => pt.to_string(),
             EbiInput::Object(EbiObject::StochasticProcessTree(pt), _) => pt.to_string(),
             EbiInput::Object(EbiObject::Executions(s), _) => s.to_string(),
+            EbiInput::Object(EbiObject::DirectlyFollowsGraph(s), _) => s.to_string(),
             EbiInput::FileHandler(_) => unreachable!(),
             EbiInput::Trait(_, _) => unreachable!(),
             EbiInput::String(_) => unreachable!(),
