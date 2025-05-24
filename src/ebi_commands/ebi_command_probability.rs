@@ -4,7 +4,6 @@ use clap::{value_parser, Arg, ArgAction};
 use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_traits::{ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics}, follower_semantics::FollowerSemantics, math::fraction::Fraction, techniques::explain_trace::ExplainTrace};
 
 
-
 pub const EBI_PROBABILITY: EbiCommand = EbiCommand::Group { 
     name_short: "prob",
     name_long: Some("probability"),
@@ -21,7 +20,7 @@ pub const EBI_PROBABILITY_MODEL: EbiCommand = EbiCommand::Command {
     name_short: "mod", 
     name_long: Some("model"), 
     library_name: "ebi_commands::ebi_command_probability::EBI_PROBABILITY_MODEL",
-    explanation_short: "Compute the probability that a queriable stochastic language (stochastic model) produces any trace of the model.", 
+    explanation_short: "Compute the probability that a queriable stochastic language (stochastic model) produces any trace of a log.", 
     explanation_long: None, 
     latex_link: Some("~\\cite{DBLP:journals/is/LeemansMM24}"), 
     cli_command: None, 
@@ -33,13 +32,11 @@ pub const EBI_PROBABILITY_MODEL: EbiCommand = EbiCommand::Command {
     input_names: &[ "FILE_1", "FILE_2" ], 
     input_helps: &[ "The queriable stochastic language (model).", "The finite language (log)." ], 
     execute: |mut inputs, _| {
-        let model: Box<dyn EbiTraitQueriableStochasticLanguage> = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
+        let mut model: Box<dyn EbiTraitQueriableStochasticLanguage> = inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
         let log = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
-        
-        let mut sum = Fraction::zero();
-        for trace in log.iter() {
-            sum += model.get_probability(&FollowerSemantics::Trace(&trace)).with_context(|| format!("cannot compute probability of trace {:?}", trace))?;
-        }
+
+        let sum = model.get_probability_language(log).with_context(|| "cannot compute probability")?;
+
         return Ok(EbiOutput::Fraction(sum));
     }, 
     output_type: &EbiOutputType::Fraction,

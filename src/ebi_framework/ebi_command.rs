@@ -5,7 +5,7 @@ use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
 use logging_timer::timer;
 
-use crate::{ebi_commands::{ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association, ebi_command_conformance, ebi_command_convert, ebi_command_discover, ebi_command_info, ebi_command_itself, ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate, ebi_command_visualise}, ebi_framework::ebi_output, math::fraction::{Fraction, FractionNotParsedYet}};
+use crate::{ebi_commands::{ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association, ebi_command_conformance, ebi_command_convert, ebi_command_discover, ebi_command_info, ebi_command_itself, ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate, ebi_command_visualise}, ebi_framework::ebi_output, math::fraction::FractionNotParsedYet};
 
 use super::{ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}};
 
@@ -209,7 +209,7 @@ impl EbiCommand {
                 //set exact arithmetic
                 if !exact_arithmetic || cli_matches.get_flag("approx") {
                     log::info!("Use approximate arithmetic");
-                    Fraction::set_exact_globally(false);
+                    crate::math::fraction::set_exact_globally(false);
                 }
 
                 //read the inputs
@@ -460,7 +460,7 @@ impl PartialEq for EbiCommand {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Group { name_short: l_name_short, name_long: l_name_long, explanation_short: l_explanation_short, explanation_long: l_explanation_long, children: l_children, .. }, Self::Group { name_short: r_name_short, name_long: r_name_long, explanation_short: r_explanation_short, explanation_long: r_explanation_long, children: r_children, .. }) => l_name_short == r_name_short && l_name_long == r_name_long && l_explanation_short == r_explanation_short && l_explanation_long == r_explanation_long && l_children == r_children,
-            (Self::Command { name_short: l_name_short, name_long: l_name_long, explanation_short: l_explanation_short, explanation_long: l_explanation_long, latex_link: l_latex_link, cli_command: l_cli_command, exact_arithmetic: l_exact_arithmetic, input_types: l_input_types, input_names: l_input_names, input_helps: l_input_helps, execute: l_execute, output_type: l_output, .. }, Self::Command { name_short: r_name_short, name_long: r_name_long, explanation_short: r_explanation_short, explanation_long: r_explanation_long, latex_link: r_latex_link, cli_command: r_cli_command, exact_arithmetic: r_exact_arithmetic, input_types: r_input_types, input_names: r_input_names, input_helps: r_input_helps, execute: r_execute, output_type: r_output, .. }) => l_name_short == r_name_short && l_name_long == r_name_long && l_explanation_short == r_explanation_short && l_explanation_long == r_explanation_long && l_latex_link == r_latex_link && l_cli_command == r_cli_command && l_exact_arithmetic == r_exact_arithmetic && l_input_types == r_input_types && l_input_names == r_input_names && l_input_helps == r_input_helps && l_execute == r_execute && l_output == r_output,
+            (Self::Command { name_short: l_name_short, name_long: l_name_long, explanation_short: l_explanation_short, explanation_long: l_explanation_long, latex_link: l_latex_link, cli_command: _, exact_arithmetic: l_exact_arithmetic, input_types: l_input_types, input_names: l_input_names, input_helps: l_input_helps, execute: _, output_type: l_output, .. }, Self::Command { name_short: r_name_short, name_long: r_name_long, explanation_short: r_explanation_short, explanation_long: r_explanation_long, latex_link: r_latex_link, cli_command: _, exact_arithmetic: r_exact_arithmetic, input_types: r_input_types, input_names: r_input_names, input_helps: r_input_helps, execute: _, output_type: r_output, .. }) => l_name_short == r_name_short && l_name_long == r_name_long && l_explanation_short == r_explanation_short && l_explanation_long == r_explanation_long && l_latex_link == r_latex_link && l_exact_arithmetic == r_exact_arithmetic && l_input_types == r_input_types && l_input_names == r_input_names && l_input_helps == r_input_helps && l_output == r_output,
             _ => false,
         }
     }

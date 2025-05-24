@@ -1,6 +1,6 @@
 use anyhow::{anyhow, Result};
 
-use super::{fraction::Fraction, root::Root};
+use super::{fraction::Fraction, root::Root, traits::Zero};
 
 pub fn correlation(pairs: &[(Fraction, Fraction)]) -> Result<Root> {
     //method 1
@@ -27,7 +27,7 @@ pub fn correlation(pairs: &[(Fraction, Fraction)]) -> Result<Root> {
     // }
 
     // let result1 = Root::from(sum_denom) / (Root::of(sum_nom_x) * Root::of(sum_nom_y));
-    
+
     //method 2
 
     let mut sum_xy = Fraction::zero();
@@ -44,7 +44,7 @@ pub fn correlation(pairs: &[(Fraction, Fraction)]) -> Result<Root> {
         sum_x_squared += x * x;
         sum_y_squared += y * y;
     }
-    
+
     let num = Root::from(&(&n * &sum_xy) - &(&sum_x * &sum_y));
     let den_x = Root::of(&(&n * &sum_x_squared) - &(&sum_x * &sum_x));
     let den_y = Root::of(&(&n * &sum_y_squared) - &(&sum_y * &sum_y));

@@ -1,7 +1,7 @@
 use super::network_simplex_value_type::MulWithFloat;
+use crate::math::traits::{One, Signed, Zero};
 use crate::optimization_algorithms::network_simplex_value_type::IsFloat;
 use core::convert::From;
-use num::{One, Signed, Zero};
 use rand::{seq::SliceRandom, thread_rng};
 use rayon::ThreadPool;
 use std::sync::atomic::{AtomicUsize, Ordering};
@@ -10,7 +10,7 @@ use std::{
     cmp::{PartialEq, PartialOrd},
     fmt::{Debug, Display},
     iter::Sum,
-    ops::{AddAssign, Mul, MulAssign, Neg, SubAssign},
+    ops::{AddAssign, MulAssign, Neg, SubAssign},
 };
 
 // Enums for representing various problem types, supply types, and arc states
@@ -229,9 +229,7 @@ where
         + for<'a> AddAssign<&'a T>
         + for<'a> SubAssign<&'a T>
         + for<'a> MulAssign<&'a T>
-        + Neg
-        + Mul<T, Output = T>
-        + for<'a> Mul<&'a T, Output = T>
+        + Neg<Output = T>
         + Signed
         + PartialEq
         + PartialOrd
@@ -929,7 +927,9 @@ where
         }
 
         let max_cost = self.find_max_cost();
-        let art_cost: T = (max_cost + T::one()) * T::from(self.node_num as i32);
+        let mut art_cost = max_cost;
+        art_cost += &T::one();
+        art_cost *= &T::from(self.node_num as i32);
 
         log::debug!("art_cost identified as: {}", art_cost);
 
@@ -1379,4 +1379,79 @@ where
         .filter(|x| x.partial_cmp(x).is_some()) // Handles NaN if T is f64
         .max_by(|a, b| a.partial_cmp(b).unwrap())
         .cloned()
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::optimization_algorithms::network_simplex::NetworkSimplex;
+
+    
+    #[test]
+    fn network_simplex_int() {
+        let supply: Vec<i64> = vec![20, 0, 0, -5, -14];
+
+        let graph_and_costs: Vec<Vec<Option<i64>>> = vec![
+            vec![None, Some(4), Some(4), None, None],
+            vec![None, None, Some(2), Some(2), Some(6)],
+            vec![None, None, None, Some(1), Some(3)],
+            vec![None, None, None, None, Some(2)],
+            vec![None, None, Some(3), None, None],
+        ];
+        let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, true, false);
+        _ = ns.run(false);
+        assert_eq!(ns.get_result().unwrap(), 123);
+    }
+
+    #[test]
+    fn network_simplex_bigint() {
+        use num::BigInt;
+
+        let supply: Vec<BigInt> = vec![20, 0, 0, -5, -14]
+            .into_iter()
+            .map(|s| BigInt::from(s))
+            .collect();
+
+        let graph_and_costs: Vec<Vec<Option<BigInt>>> = vec![
+            vec![None, Some(4), Some(4), None, None],
+            vec![None, None, Some(2), Some(2), Some(6)],
+            vec![None, None, None, Some(1), Some(3)],
+            vec![None, None, None, None, Some(2)],
+            vec![None, None, Some(3), None, None],
+        ]
+        .into_iter()
+        .map(|row| {
+            row.into_iter()
+                .map(|x| x.map(|cost| BigInt::from(cost)))
+                .collect()
+        })
+        .collect();
+
+        let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, true, false);
+        _ = ns.run(false);
+        assert_eq!(ns.get_result().unwrap(), BigInt::from(123));
+    }
+
+    #[test]
+    fn network_simplex_float() {
+        let supply: Vec<f64> = vec![20, 0, 0, -5, -14]
+            .into_iter()
+            .map(|s| s.into())
+            .collect();
+
+        let graph_and_costs: Vec<Vec<Option<f64>>> = vec![
+            vec![None, Some(4), Some(4), None, None],
+            vec![None, None, Some(2), Some(2), Some(6)],
+            vec![None, None, None, Some(1), Some(3)],
+            vec![None, None, None, None, Some(2)],
+            vec![None, None, Some(3), None, None],
+        ]
+        .into_iter()
+        .map(|row| row.into_iter().map(|x| x.map(|cost| cost.into())).collect())
+        .collect();
+
+        let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, true, false);
+        _ = ns.run(false);
+        let result = ns.get_result().unwrap();
+        assert_eq!(result, 123.0);
+    }
 }

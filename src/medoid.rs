@@ -1,7 +1,7 @@
 use anyhow::{anyhow, Result};
-use fraction::One;
+use num::One as _;
 
-use crate::{distances::TriangularDistanceMatrix, ebi_objects::finite_language::FiniteLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::fraction::Fraction};
+use crate::{distances::TriangularDistanceMatrix, ebi_objects::finite_language::FiniteLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{fraction::Fraction, traits::{One, Zero}}};
 
 
 pub fn medoid<T>(log: &T, number_of_traces: &usize) -> Result<FiniteLanguage> where T: EbiTraitFiniteStochasticLanguage + ?Sized {
@@ -90,4 +90,21 @@ pub fn sum_distances<T>(log: &T, distances: &TriangularDistanceMatrix) -> Vec<Fr
     }
 
     sum_distance
+}
+
+#[cfg(test)]
+mod tests{
+    use std::fs;
+
+    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, medoid};
+
+    
+    #[test]
+    fn medoid() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
+        let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
+        let fout = fs::read_to_string("testfiles/ba.lang").unwrap();
+        let medoid = medoid::medoid(&slang, &1).unwrap();
+        assert_eq!(fout, medoid.to_string())
+    }
 }

@@ -417,3 +417,84 @@ pub fn validate_object_of(reader: &mut MultipleReader, file_handler: &EbiFileHan
     let result = (file_handler.validator)(reader.get()?.as_mut());
     return result;
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs::{self, File};
+
+    use crate::{ebi_framework::ebi_file_handler::EBI_FILE_HANDLERS, multiple_reader::MultipleReader};
+    
+    #[test]
+    fn all_importers() {
+        let files = fs::read_dir("./testfiles").unwrap();
+        for path in files {
+            let file = path.unwrap();
+            println!("file {:?}", file.file_name());
+
+            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
+
+            //look for file handlers that should accept this file
+            for file_handler in EBI_FILE_HANDLERS {
+                println!("\tfile handler {}", file_handler);
+                if !file.file_name().into_string().unwrap().contains("invalid")
+                    && file
+                        .file_name()
+                        .into_string()
+                        .unwrap()
+                        .ends_with(&(".".to_string() + file_handler.file_extension))
+                {
+                    //file handler should be able to accept this file
+
+                    for importer in file_handler.object_importers {
+                        println!("\t\timporter {}", importer);
+                        assert!((importer.get_importer())(&mut reader.get().unwrap()).is_ok());
+                    }
+                } else {
+                    //file handler should not accept this file
+
+                    for importer in file_handler.object_importers {
+                        println!("\t\timporter {} (should fail)", importer);
+                        assert!((importer.get_importer())(&mut reader.get().unwrap()).is_err());
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn all_trait_importers() {
+        let files = fs::read_dir("./testfiles").unwrap();
+        for path in files {
+            let file = path.unwrap();
+            println!("file {:?}", file.file_name());
+
+            let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
+
+            //look for file handlers that should accept this file
+            for file_handler in EBI_FILE_HANDLERS {
+                println!("\tfile handler {}", file_handler);
+                if !file.file_name().into_string().unwrap().contains("invalid")
+                    && file
+                        .file_name()
+                        .into_string()
+                        .unwrap()
+                        .ends_with(&(".".to_string() + file_handler.file_extension))
+                {
+                    //file handler should be able to accept this file
+
+                    for importer in file_handler.trait_importers {
+                        println!("\t\timporter {}", importer);
+                        assert!(importer.import(&mut reader.get().unwrap()).is_ok());
+                    }
+                } else {
+                    //file handler should not accept this file
+
+                    for importer in file_handler.trait_importers {
+                        println!("\t\timporter {} (should fail)", importer);
+                        assert!(importer.import(&mut reader.get().unwrap()).is_err());
+                    }
+                }
+            }
+        }
+    }
+}

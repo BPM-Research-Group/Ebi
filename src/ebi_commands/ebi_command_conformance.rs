@@ -113,7 +113,7 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
             .remove(0)
             .to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
         Ok(EbiOutput::LogDiv(
-            log.er(model).context("cannot compute uEMSC")?,
+            log.entropic_relevance(model).context("cannot compute ER")?,
         ))
     },
     output_type: &EbiOutputType::LogDiv,
@@ -221,7 +221,7 @@ pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
         "A finite stochastic language to compare.",
     ],
     execute: |mut inputs, _| {
-        let lang_a = inputs
+        let mut lang_a = inputs
             .remove(0)
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
 
@@ -260,7 +260,7 @@ pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
         "Number of traces to sample.",
     ],
     execute: |mut inputs, _| {
-        let lang_a = inputs
+        let mut lang_a = inputs
             .remove(0)
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
 

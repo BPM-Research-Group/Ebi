@@ -4,7 +4,7 @@ use std::{fmt, io::BufRead};
 use anyhow::{anyhow, Result, Context, Error};
 use layout::topo::layout::VisualGraph;
 
-use crate::ebi_framework::activity_key::{Activity, ActivityKey, HasActivityKey};
+use crate::ebi_framework::activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey};
 use crate::ebi_framework::ebi_file_handler::EbiFileHandler;
 use crate::ebi_framework::ebi_input::{self, EbiObjectImporter, EbiTraitImporter};
 use crate::ebi_framework::ebi_object::EbiObject;
@@ -128,6 +128,14 @@ impl StochasticLabelledPetriNet {
         } else {
             0
         }
+    }
+}
+
+impl TranslateActivityKey for StochasticLabelledPetriNet {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+        self.labels.iter_mut().for_each(|activity| if let Some(a) = activity { *a = translator.translate_activity(&a) });
+        self.activity_key = to_activity_key.clone();
     }
 }
 
@@ -398,5 +406,21 @@ impl EbiTraitGraphable for StochasticLabelledPetriNet {
         }
 
         return graph;
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::stochastic_labelled_petri_net::StochasticLabelledPetriNet, ebi_traits::ebi_trait_semantics::Semantics};
+
+    #[test]
+    fn empty_slpn() {
+        let fin = fs::read_to_string("testfiles/empty_net.slpn").unwrap();
+        let slpn = fin.parse::<StochasticLabelledPetriNet>().unwrap();
+
+        assert_eq!(slpn.get_number_of_places(), 0);
+        assert_eq!(slpn.get_number_of_transitions(), 0);
     }
 }

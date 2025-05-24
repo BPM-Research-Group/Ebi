@@ -76,3 +76,38 @@ impl Semantics for DirectlyFollowsModel {
         self.get_number_of_nodes() + 1
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::directly_follows_model::DirectlyFollowsModel, ebi_traits::ebi_trait_semantics::Semantics};
+
+    
+
+    #[test]
+    fn dfm_semantics() {
+        let fin = fs::read_to_string("testfiles/a-b_star.dfm").unwrap();
+        let dfm = fin.parse::<DirectlyFollowsModel>().unwrap();
+
+        let mut state = dfm.get_initial_state();
+
+        assert_eq!(dfm.get_enabled_transitions(&state), vec![0]);
+
+        dfm.execute_transition(&mut state, 0).unwrap();
+
+        assert_eq!(dfm.get_enabled_transitions(&state), vec![1]);
+        assert!(!dfm.is_final_state(&state));
+
+        dfm.execute_transition(&mut state, 1).unwrap();
+
+        assert_eq!(dfm.get_enabled_transitions(&state), vec![1, 2]);
+
+        dfm.execute_transition(&mut state, 1).unwrap();
+
+        assert_eq!(dfm.get_enabled_transitions(&state), vec![1, 2]);
+
+        dfm.execute_transition(&mut state, 2).unwrap();
+        assert!(dfm.is_final_state(&state));
+    }
+}

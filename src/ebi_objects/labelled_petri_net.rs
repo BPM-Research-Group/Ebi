@@ -3,7 +3,7 @@ use anyhow::{anyhow, Context, Error, Ok, Result};
 use bitvec::vec::BitVec;
 use layout::topo::layout::VisualGraph;
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, displayable::Displayable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader, marking::Marking};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey}, displayable::Displayable, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable, prom_link::JavaObjectHandler}, ebi_traits::{ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex}, line_reader::LineReader, marking::Marking};
 
 use super::stochastic_labelled_petri_net::StochasticLabelledPetriNet;
 
@@ -202,6 +202,14 @@ impl LabelledPetriNet {
         }
     }
     
+}
+
+impl TranslateActivityKey for LabelledPetriNet {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
+        self.labels.iter_mut().for_each(|activity| if let Some(a) = activity { *a = translator.translate_activity(&a) });
+        self.activity_key = to_activity_key.clone();
+    }
 }
 
 impl FromEbiTraitObject for LabelledPetriNet {

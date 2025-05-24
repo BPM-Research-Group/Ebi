@@ -55,6 +55,8 @@ impl <T, State> FindExecutions for T where T: Semantics<SemState = State, AliSta
                 },
             }
         }).flatten().collect::<Vec<_>>();
+
+        progress_bar.finish_and_clear();
         
         //see whether an error was reported
         if let Result::Ok(mutex) = Arc::try_unwrap(error) {
@@ -191,5 +193,27 @@ impl C {
         } else {
             last_enabled_before_move
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::{event_log::EventLog, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton}, techniques::executions::FindExecutions};
+
+    #[test]
+    fn executions() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/a-b-c-livelock.sdfa").unwrap();
+        let model = fin2.parse::<StochasticDeterministicFiniteAutomaton>().unwrap();
+
+        let out = fs::read_to_string("testfiles/a-b.exs").unwrap();
+
+        let x= model.find_executions(Box::new(log)).unwrap();
+
+        assert_eq!(out, x.to_string());
     }
 }

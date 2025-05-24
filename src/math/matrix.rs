@@ -1,8 +1,14 @@
-use std::{mem, ops::{Index, IndexMut, Mul}, sync::atomic::AtomicBool};
+use std::{
+    mem,
+    ops::{Index, IndexMut, Mul},
+    sync::atomic::AtomicBool,
+};
 
-use fraction::{One, Zero};
 use anyhow::{anyhow, Result};
+use num::{One as NumOne, Zero as NumZero};
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefMutIterator, ParallelIterator};
+
+use crate::math::traits::{One, Zero};
 
 use super::fraction::Fraction;
 
@@ -62,7 +68,10 @@ impl Matrix {
 
         //second, increase the number of rows
         if rows > self.rows.len() {
-            self.rows.extend(vec![vec![value.clone(); self.number_of_columns]; rows - self.rows.len()]);
+            self.rows.extend(vec![
+                vec![value.clone(); self.number_of_columns];
+                rows - self.rows.len()
+            ]);
         }
     }
 
@@ -164,20 +173,20 @@ impl Matrix {
     pub fn get_number_of_rows(&self) -> usize {
         self.rows.len()
     }
-    
+
     pub fn solve(&mut self) -> Result<()> {
         // row-reduced echelon form
         if self.rows.len() == 0 {
             return Ok(());
         }
-        for i in 0 .. self.rows.len() - 1 {
+        for i in 0..self.rows.len() - 1 {
             if self.rows[i][i].is_zero() {
                 continue;
             } else {
-                for j in i .. self.rows.len() - 1 {
+                for j in i..self.rows.len() - 1 {
                     let factor = &self.rows[j + 1][i] / &self.rows[i][i];
-                    for k in i .. self.get_number_of_columns() {
-                        let mut old =  self.rows[i][k].clone();
+                    for k in i..self.get_number_of_columns() {
+                        let mut old = self.rows[i][k].clone();
                         old *= &factor;
                         self.rows[j + 1][k] -= old;
                     }
@@ -195,7 +204,7 @@ impl Matrix {
             if self.rows[i][i].is_zero() {
                 continue;
             } else {
-                for j in (0 .. i).rev() {
+                for j in (0..i).rev() {
                     let factor = &self.rows[j][i] / &self.rows[i][i];
                     for k in i..self.rows[0].len() {
                         let mut old = self.rows[i][k].clone();
@@ -213,7 +222,7 @@ impl Matrix {
         let failed = AtomicBool::new(false);
         let number_of_columns = self.rows[0].len();
         let number_of_rows = self.get_number_of_rows();
-        
+
         if number_of_rows > 100 {
             self.rows.par_iter_mut().enumerate().for_each(|(i, row)| {
                 Self::solve_step_3(row, i, &failed, number_of_rows, number_of_columns);
@@ -227,13 +236,19 @@ impl Matrix {
         if failed.load(std::sync::atomic::Ordering::Relaxed) {
             return Err(anyhow!("matrix is not invertible"));
         }
-        
+
         // log::info!("third step done");
 
         Ok(())
     }
 
-    fn solve_step_3(row: &mut Vec<Fraction>, i: usize, failed: &AtomicBool, number_of_rows: usize, number_of_columns: usize) {
+    fn solve_step_3(
+        row: &mut Vec<Fraction>,
+        i: usize,
+        failed: &AtomicBool,
+        number_of_rows: usize,
+        number_of_columns: usize,
+    ) {
         let factor = row[i].clone();
         if factor.is_zero() {
             failed.store(true, std::sync::atomic::Ordering::Relaxed);
@@ -269,8 +284,11 @@ impl Matrix {
         result
     }
 
-    pub fn display_vector(f: &mut std::fmt::Formatter<'_>, vector: &Vec<Fraction>) -> std::fmt::Result {
-        write!(f, "{{")?;        
+    pub fn display_vector(
+        f: &mut std::fmt::Formatter<'_>,
+        vector: &Vec<Fraction>,
+    ) -> std::fmt::Result {
+        write!(f, "{{")?;
         for (j, fraction) in vector.iter().enumerate() {
             write!(f, "{}", fraction.to_string())?;
             if j < vector.len() - 1 {
@@ -307,7 +325,8 @@ impl Mul for Matrix {
         let p = rhs.get_number_of_columns();
         let mut rows = vec![vec![Fraction::zero(); p]; n];
 
-        if self.get_number_of_rows() * rhs.get_number_of_columns() > 100 { //use multi-threaded version if there are enough columns to warrant the overhead (threshold is of course arbitrary)
+        if self.get_number_of_rows() * rhs.get_number_of_columns() > 100 {
+            //use multi-threaded version if there are enough columns to warrant the overhead (threshold is of course arbitrary)
             rows.par_iter_mut().enumerate().for_each(|(i, row)| {
                 row.par_iter_mut().enumerate().for_each(|(j, element)| {
                     for k in 0..m {
@@ -326,7 +345,7 @@ impl Mul for Matrix {
         }
 
         // log::debug!("multiplication done");
-        
+
         Self {
             rows: rows,
             number_of_columns: p,
@@ -354,7 +373,12 @@ impl std::fmt::Display for Matrix {
 
 impl std::fmt::Debug for Matrix {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}x{} matrix", self.get_number_of_rows(), self.get_number_of_columns())
+        write!(
+            f,
+            "{}x{} matrix",
+            self.get_number_of_rows(),
+            self.get_number_of_columns()
+        )
     }
 }
 
@@ -369,7 +393,7 @@ impl From<Vec<Fraction>> for Matrix {
 
 impl From<Vec<Vec<Fraction>>> for Matrix {
     fn from(value: Vec<Vec<Fraction>>) -> Self {
-        let columns = if value.len() == 0 {0} else {value[0].len()};
+        let columns = if value.len() == 0 { 0 } else { value[0].len() };
         Self {
             rows: value,
             number_of_columns: columns,
@@ -391,5 +415,27 @@ impl Mul<Vec<Fraction>> for Matrix {
         }
 
         result
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::math::{fraction::Fraction, matrix::Matrix};
+
+    #[test]
+    fn matrix_vector_multiplication() {
+        let m: Matrix = vec![
+            vec![6.into(), 2.into(), 4.into()],
+            vec![(-1).into(), 4.into(), 3.into()],
+            vec![(-2).into(), 9.into(), 3.into()],
+        ]
+        .into();
+        let v: Vec<Fraction> = vec![4.into(), (-2).into(), 1.into()];
+
+        let x = m * v;
+
+        let t = vec![24.into(), (-9).into(), (-23).into()];
+
+        assert_eq!(x, t);
     }
 }

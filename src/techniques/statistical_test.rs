@@ -3,7 +3,7 @@ use anyhow::{anyhow, Result};
 
 use crate::{distances::TriangularDistanceMatrix, ebi_framework::ebi_command::EbiCommand, ebi_traits::ebi_trait_event_log::{AttributeKey, EbiTraitEventLog}, math::{average::Average, fraction::Fraction}, techniques::sample};
 
-pub trait StatisticalTests {
+pub trait StatisticalTestsLogCategoricalAttribute {
     /**
      * Perform a test on the hypothesis that the sub-logs defined by the categorical attribute are derived from identical processes and return the p-value of the test, and whether the hypothesis was sustained.
      * 
@@ -13,7 +13,7 @@ pub trait StatisticalTests {
 }
 
 
-impl StatisticalTests for dyn EbiTraitEventLog {
+impl StatisticalTestsLogCategoricalAttribute for dyn EbiTraitEventLog {
     fn log_categorical_attribute(&self, number_of_samples: usize, trace_attribute: &String, alpha: &Fraction) -> Result<(Fraction, bool)> {
 
         let mut attribute_key = AttributeKey::new();
@@ -117,5 +117,23 @@ impl StatisticalTests for dyn EbiTraitEventLog {
         progress_bar.finish_and_clear();
 
         Ok((p_value, !reject))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::event_log::EventLog, ebi_traits::ebi_trait_event_log::EbiTraitEventLog, math::fraction::Fraction, techniques::statistical_test::StatisticalTestsLogCategoricalAttribute};
+
+    #[test]
+    fn cla_test() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let event_log: Box<dyn EbiTraitEventLog> = Box::new(fin.parse::<EventLog>().unwrap());
+
+        let (_, sustain) = event_log
+            .log_categorical_attribute(500, &"attribute".to_string(), &Fraction::from((1, 20)))
+            .unwrap();
+        assert!(sustain) //The hypothesis should be rejected if we consider the meaning of things, however, as we have only two traces, it will be sustained.
     }
 }
