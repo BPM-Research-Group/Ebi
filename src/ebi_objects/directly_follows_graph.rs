@@ -610,13 +610,14 @@ impl EbiTraitGraphable for DirectlyFollowsGraph {
         }
 
         //nodes
-        let mut nodes = vec![];
+        let mut nodes = vec![sink; self.activity_key.get_number_of_activities()];
         for n in &self.activity_key.get_activities() {
-            nodes.push(<dyn EbiTraitGraphable>::create_transition(
+            let id = self.activity_key.get_id_from_activity(*n);
+            nodes[id] = <dyn EbiTraitGraphable>::create_transition(
                 &mut graph,
                 self.activity_key.get_activity_label(n),
                 "",
-            ));
+            );
         }
 
         //start activities
