@@ -123,7 +123,7 @@ impl DirectlyFollowsGraph {
     }
 
     pub fn import_as_graphable(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitGraphable>> {
-        let dfg: StochasticDirectlyFollowsModel = Self::import(reader)?.into();
+        let dfg = Self::import(reader)?;
         Ok(Box::new(dfg))
     }
 

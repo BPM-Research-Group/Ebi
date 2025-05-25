@@ -34,8 +34,13 @@ use super::{
     prom_link::JavaObjectHandler,
 };
 
+/**
+ * The order of this list is important: for the "any object" input type and for trait importers,
+ * they are attempted in order. Thus, the more restrictive formats should come first.
+ */
 pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_COMPRESSED_EVENT_LOG,
+    EBI_DIRECTLY_FOLLOWS_GRAPH,
     EBI_DETERMINISTIC_FINITE_AUTOMATON,
     EBI_DIRECTLY_FOLLOWS_MODEL,
     EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL,
@@ -54,7 +59,6 @@ pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_SCALABLE_VECTOR_GRAPHICS,
     EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
     EBI_STOCHASTIC_PROCESS_TREE,
-    EBI_DIRECTLY_FOLLOWS_GRAPH,
 ];
 
 #[derive(Clone, Debug)]
