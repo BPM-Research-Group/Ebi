@@ -486,10 +486,10 @@ impl EbiTraitGraphable for StochasticDirectlyFollowsModel {
 
         //nodes
         let mut nodes = vec![];
-        for n in &self.node_2_activity {
+        for node in &self.node_2_activity {
             nodes.push(<dyn EbiTraitGraphable>::create_transition(
                 &mut graph,
-                self.activity_key.get_activity_label(n),
+                self.activity_key.get_activity_label(node),
                 "",
             ));
         }

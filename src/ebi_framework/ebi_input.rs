@@ -543,7 +543,9 @@ pub fn read_as_object(
             }
         }
     }
-    Err(anyhow!("File could not be recognised."))
+    Err(anyhow!(
+        "File could not be recognised. If you know the file format, try validating it with `Ebi validate [file type]'."
+    ))
 }
 
 pub fn read_as_any_object(
@@ -560,7 +562,9 @@ pub fn read_as_any_object(
             }
         }
     }
-    Err(anyhow!("File could not be recognised."))
+    Err(anyhow!(
+        "File could not be recognised. If you know the file type, try validating it with `Ebi validate [file type]'."
+    ))
 }
 
 pub fn validate_object_of(

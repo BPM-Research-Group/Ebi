@@ -155,14 +155,9 @@ impl DirectlyFollowsGraph {
     }
 
     pub fn activity_cardinality(&self, activity: Activity) -> Fraction {
-        let mut result = match self.start_activities.get(&activity) {
+        let mut result = match self.end_activities.get(&activity) {
             Some(a) => a.clone(),
             None => Fraction::zero(),
-        };
-
-        match self.end_activities.get(&activity) {
-            Some(a) => result += a,
-            None => {}
         };
 
         let (_, mut i) = self.binary_search(activity, self.activity_key.get_activity_by_id(0));

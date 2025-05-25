@@ -40,7 +40,6 @@ impl DirectlyFollowsAbstractor for dyn EbiTraitEventLog {
                 };
             }
         }
-
         result
     }
 }
