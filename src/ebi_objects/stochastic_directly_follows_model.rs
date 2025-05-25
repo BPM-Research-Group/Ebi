@@ -78,9 +78,12 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
             StochasticDirectlyFollowsModel::import_as_stochastic_labelled_petri_net,
         ),
     ],
-    object_exporters: &[EbiObjectExporter::StochasticDirectlyFollowsModel(
-        StochasticDirectlyFollowsModel::export_from_object,
-    )],
+    object_exporters: &[
+        EbiObjectExporter::StochasticDirectlyFollowsModel(
+            StochasticDirectlyFollowsModel::export_from_object,
+        ),
+        EbiObjectExporter::DirectlyFollowsGraph(StochasticDirectlyFollowsModel::export_from_object),
+    ],
     java_object_handlers: &[],
 };
 
@@ -389,6 +392,9 @@ impl Exportable for StochasticDirectlyFollowsModel {
         match object {
             EbiOutput::Object(EbiObject::StochasticDirectlyFollowsModel(dfm)) => {
                 Self::export(&dfm, f)
+            }
+            EbiOutput::Object(EbiObject::DirectlyFollowsGraph(dfm)) => {
+                Self::export(&Into::<StochasticDirectlyFollowsModel>::into(dfm), f)
             }
             _ => Err(anyhow!("Cannot export as SDFM.")),
         }

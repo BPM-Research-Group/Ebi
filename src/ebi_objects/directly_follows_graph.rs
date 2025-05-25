@@ -505,7 +505,7 @@ impl TranslateActivityKey for DirectlyFollowsGraph {
 
 impl Infoable for DirectlyFollowsGraph {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
-        writeln!(f, "Number of edges\t{}", self.sources.len())?;
+        writeln!(f, "Number of edges\t\t{}", self.sources.len())?;
         writeln!(
             f,
             "Number of activities\t{}",

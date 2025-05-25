@@ -27,6 +27,14 @@ pub trait EbiTraitEventLog: IndexTrace + HasActivityKey {
     fn get_log(&self) -> &process_mining::EventLog;
 
     fn get_trace_attributes(&self) -> HashMap<String, DataType>;
+
+    /**
+     * Remove traces for which the function returns false.
+     *
+     * Note to callers: please put the closure definition inside the Box::new in the call of retain_traces.
+     * Otherwise, Rust may give weird compile errors.
+     */
+    fn retain_traces<'a>(&'a mut self, f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>);
 }
 
 impl dyn EbiTraitEventLog {

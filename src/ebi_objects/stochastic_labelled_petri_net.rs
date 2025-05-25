@@ -71,9 +71,15 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
             StochasticLabelledPetriNet::import_as_labelled_petri_net,
         ),
     ],
-    object_exporters: &[EbiObjectExporter::StochasticLabelledPetriNet(
-        StochasticLabelledPetriNet::export_from_object,
-    )],
+    object_exporters: &[
+        EbiObjectExporter::StochasticLabelledPetriNet(
+            StochasticLabelledPetriNet::export_from_object,
+        ),
+        EbiObjectExporter::StochasticDirectlyFollowsModel(
+            StochasticLabelledPetriNet::export_from_object,
+        ),
+        EbiObjectExporter::DirectlyFollowsGraph(StochasticLabelledPetriNet::export_from_object),
+    ],
     java_object_handlers: &[JavaObjectHandler {
         name: "StochasticLabelledPetriNet",
         translator_ebi_to_java: Some(
@@ -283,6 +289,12 @@ impl Exportable for StochasticLabelledPetriNet {
     fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(log)) => log.export(f),
+            EbiOutput::Object(EbiObject::StochasticDirectlyFollowsModel(log)) => {
+                Into::<StochasticLabelledPetriNet>::into(log).export(f)
+            }
+            EbiOutput::Object(EbiObject::DirectlyFollowsGraph(log)) => {
+                Into::<StochasticLabelledPetriNet>::into(log).export(f)
+            }
             _ => unreachable!(),
         }
     }

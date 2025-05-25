@@ -4,11 +4,11 @@ use anyhow::{Result, anyhow};
 
 use crate::{
     ebi_framework::activity_key::Activity,
-    ebi_objects::{
-        directly_follows_graph::DirectlyFollowsGraph,
-        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
+    ebi_objects::directly_follows_graph::DirectlyFollowsGraph,
+    ebi_traits::{
+        ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::{fraction::Fraction, traits::One},
 };
 
@@ -21,36 +21,78 @@ pub trait DirectlyFollowsModelMinerFiltering {
     fn mine_directly_follows_model_filtering(
         &mut self,
         minimum_fitness: &Fraction,
-    ) -> Result<StochasticDirectlyFollowsModel>;
+    ) -> Result<DirectlyFollowsGraph>;
+}
+
+impl DirectlyFollowsModelMinerFiltering for dyn EbiTraitEventLog {
+    fn mine_directly_follows_model_filtering(
+        &mut self,
+        minimum_fitness: &Fraction,
+    ) -> Result<DirectlyFollowsGraph> {
+        if minimum_fitness > &Fraction::one() {
+            return Err(anyhow!("cannot obtain a minimum fitness larger than 1"));
+        }
+
+        let mut dfg = self.abstract_to_directly_follows_graph();
+
+        if minimum_fitness.is_one() {
+            return Ok(dfg);
+        }
+
+        let mut minimum_fitness = minimum_fitness.clone();
+        minimum_fitness *= self.len();
+
+        loop {
+            //gather the edges to be filtered
+            let edges_to_filter = get_edges_to_filter(&dfg);
+            if edges_to_filter.is_empty() {
+                return Ok(dfg);
+            }
+
+            //filter the log
+            self.remove_traces_with_directly_follows_edge(edges_to_filter);
+
+            if Fraction::from(self.len()) < minimum_fitness {
+                return Ok(dfg);
+            }
+
+            //create a new dfg
+            dfg = self.abstract_to_directly_follows_graph();
+        }
+    }
 }
 
 impl DirectlyFollowsModelMinerFiltering for dyn EbiTraitFiniteStochasticLanguage {
     fn mine_directly_follows_model_filtering(
         &mut self,
         minimum_fitness: &Fraction,
-    ) -> Result<StochasticDirectlyFollowsModel> {
+    ) -> Result<DirectlyFollowsGraph> {
         if minimum_fitness > &Fraction::one() {
             return Err(anyhow!("cannot obtain a minimum fitness larger than 1"));
         }
 
-        let mut dfm = self.abstract_to_directly_follows_graph();
+        let mut dfg = self.abstract_to_directly_follows_graph();
+
+        if minimum_fitness.is_one() {
+            return Ok(dfg);
+        }
 
         loop {
             //gather the edges to be filtered
-            let edges_to_filter = get_edges_to_filter(&dfm);
+            let edges_to_filter = get_edges_to_filter(&dfg);
             if edges_to_filter.is_empty() {
-                return Ok(dfm.into());
+                return Ok(dfg);
             }
 
             //filter the log
             self.remove_traces_with_directly_follows_edge(edges_to_filter);
 
             if &self.get_probability_sum() < minimum_fitness {
-                return Ok(dfm.into());
+                return Ok(dfg);
             }
 
             //create a new dfg
-            dfm = self.abstract_to_directly_follows_graph();
+            dfg = self.abstract_to_directly_follows_graph();
         }
     }
 }
@@ -61,6 +103,28 @@ impl dyn EbiTraitFiniteStochasticLanguage {
         edges_to_filter: HashSet<(Option<Activity>, Option<Activity>)>,
     ) {
         self.retain_traces(Box::new(move |trace, _| {
+            let mut edge = (None, None);
+            for activity in trace {
+                let activity: &Activity = activity;
+                edge = (edge.1, Some(activity.clone()));
+
+                if edges_to_filter.contains(&edge) {
+                    return false;
+                }
+            }
+
+            edge = (edge.1, None);
+            !edges_to_filter.contains(&edge)
+        }));
+    }
+}
+
+impl dyn EbiTraitEventLog {
+    fn remove_traces_with_directly_follows_edge(
+        &mut self,
+        edges_to_filter: HashSet<(Option<Activity>, Option<Activity>)>,
+    ) {
+        self.retain_traces(Box::new(move |trace| {
             let mut edge = (None, None);
             for activity in trace {
                 let activity: &Activity = activity;

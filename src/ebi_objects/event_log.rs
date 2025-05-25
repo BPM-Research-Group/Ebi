@@ -290,7 +290,7 @@ impl Infoable for EventLog {
 
         writeln!(f, "")?;
         self.get_activity_key().info(f)?;
-        
+
         let trace_atts = self.get_trace_attributes();
         let t: Vec<String> = trace_atts
             .iter()
@@ -325,6 +325,10 @@ impl EbiTraitEventLog for EventLog {
             }
         }
         map
+    }
+
+    fn retain_traces<'a>(&'a mut self, f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>) {
+        self.traces.retain(f);
     }
 }
 

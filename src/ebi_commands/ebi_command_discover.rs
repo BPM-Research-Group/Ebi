@@ -1,13 +1,17 @@
+use anyhow::{Context, anyhow};
+
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
-        ebi_input::EbiInputType,
-        ebi_object::{EbiObject, EbiObjectType},
+        ebi_input::{EbiInput, EbiInputType},
+        ebi_object::{EbiObject, EbiObjectType, EbiTraitObject},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
     ebi_objects::{labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree},
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    ebi_traits::
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage
+    ,
     math::fraction::Fraction,
     techniques::{
         alignment_stochastic_miner::AlignmentMiner,
@@ -62,15 +66,18 @@ pub const EBI_DISCOVER_ALIGNMENTS: EbiCommand = EbiCommand::Command {
 };
 
 pub const EBI_DISCOVER_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
-    name_short: "sdfm",
-    name_long: Some("stochastic-directly-follows-model"),
-    explanation_short: "Discover a stochastic directly follows model.",
+    name_short: "dfg",
+    name_long: Some("directly-follows-graph"),
+    explanation_short: "Discover a directly follows graph.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:conf/icpm/LeemansPW19}"),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[
+            &EbiInputType::Trait(EbiTrait::EventLog),
+            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
+        ],
         &[&EbiInputType::Fraction],
     ],
     input_names: &["LANG", "MIN_FITNESS"],
@@ -79,17 +86,28 @@ pub const EBI_DISCOVER_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
         "The minimum fraction of traces that should fit the resulting model.",
     ],
     execute: |mut inputs, _| {
-        let mut lang = inputs
+        let lang = inputs.remove(0);
+        let minimum_fitness = inputs
             .remove(0)
-            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-        let minimum_fitness = inputs.remove(0).to_type::<Fraction>()?;
-        Ok(EbiOutput::Object(
-            EbiObject::StochasticDirectlyFollowsModel(
-                lang.mine_directly_follows_model_filtering(&minimum_fitness)?,
-            ),
-        ))
+            .to_type::<Fraction>()
+            .with_context(|| "reading minimum fitness")?;
+        match lang {
+            EbiInput::Trait(EbiTraitObject::EventLog(mut log), _) => {
+                Ok(EbiOutput::Object(EbiObject::DirectlyFollowsGraph(
+                    log.mine_directly_follows_model_filtering(&minimum_fitness)?,
+                )))
+            }
+            EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(mut slang), _) => {
+                Ok(EbiOutput::Object(EbiObject::DirectlyFollowsGraph(
+                    slang.mine_directly_follows_model_filtering(&minimum_fitness)?,
+                )))
+            }
+            _ => Err(anyhow!(
+                "can only apply directly follows model miner to event log or finite stochastic language"
+            )),
+        }
     },
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticDirectlyFollowsModel),
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsGraph),
 };
 
 pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Group {
