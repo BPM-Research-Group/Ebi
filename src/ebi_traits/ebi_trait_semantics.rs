@@ -1,6 +1,6 @@
 use std::{fmt::Debug, io::BufRead};
 use anyhow::{anyhow, Result};
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, displayable::Displayable, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, ebi_objects::{labelled_petri_net::LPNMarking, process_tree_semantics::NodeStates}, techniques::align::AlignmentHeuristics};
+use crate::{ebi_framework::{activity_key::{Activity, ActivityKey, HasActivityKey}, displayable::Displayable, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject, importable::Importable}, ebi_objects::{labelled_petri_net::LPNMarking, stochastic_process_tree_semantics::NodeStates}, techniques::align::AlignmentHeuristics};
 
 use super::ebi_trait_stochastic_semantics::TransitionIndex;
 
@@ -42,9 +42,10 @@ pub trait Semantics : Debug + Send + Sync + AlignmentHeuristics<AliState = Self:
 	type SemState: Displayable;
 
     /**
-	 * (Re)set the semantics to the initial state.
+	 * Get the initial state.
+	 * If it does not exist, then the language is empty.
 	 */
-    fn get_initial_state(&self) -> <Self as Semantics>::SemState;
+    fn get_initial_state(&self) -> Option<<Self as Semantics>::SemState>;
 
 
     /**

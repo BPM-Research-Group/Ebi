@@ -1,9 +1,12 @@
-use anyhow::{anyhow, Result};
-use std::io::BufRead;
+use anyhow::{Result, anyhow};
+use std::{fmt::Debug, io::BufRead};
 
 use crate::{
     ebi_framework::{
-        ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject,
+        activity_key::{Activity, ActivityKey},
+        ebi_input::EbiInput,
+        ebi_object::EbiTraitObject,
+        ebi_trait::FromEbiTraitObject,
         importable::Importable,
     },
     ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
@@ -16,13 +19,27 @@ use super::{
 };
 
 pub trait EbiTraitFiniteStochasticLanguage:
-    EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync
+    EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync + Debug
 {
     fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction>;
 
+    fn get_probability_sum(&self) -> Fraction;
+
+    // necessary for translations where order traces must be maintained
+    fn translate(&mut self, target_activity_key: &mut ActivityKey);
+
     fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage;
 
-    fn get_probability_sum(&self) -> Fraction;
+    /**
+     * Remove traces for which the function returns false.
+     *
+     * Note to callers: please put the closure definition inside the Box::new in the call of retain_traces.
+     * Otherwise, Rust may give weird compile errors.
+     */
+    fn retain_traces<'a>(
+        &'a mut self,
+        f: Box<dyn Fn(&Vec<Activity>, &mut Fraction) -> bool + 'static>,
+    );
 }
 
 impl FromEbiTraitObject for dyn EbiTraitFiniteStochasticLanguage {

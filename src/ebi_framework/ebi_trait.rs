@@ -72,6 +72,21 @@ impl EbiTrait {
     pub fn get_java_object_handlers_that_can_import(&self) -> HashSet<JavaObjectHandler> {
         EbiInputType::Trait(self.clone()).get_java_object_handlers_that_can_import()
     }
+
+    pub fn get_explanation(&self) -> &str {
+        match self {
+            EbiTrait::EventLog => "Has traces and attached event and trace attributes.",
+            EbiTrait::FiniteLanguage => "Finite set of traces.",
+            EbiTrait::FiniteStochasticLanguage => "Finite distribution of traces.",
+            EbiTrait::IterableLanguage => "Can walk over the traces. May iterate over infinitely many traces.",
+            EbiTrait::IterableStochasticLanguage => "Can walk over the traces and their probabilities. May iterate over infinitely many traces.",
+            EbiTrait::QueriableStochasticLanguage => "Can query by giving a trace, which will return its probability.",
+            EbiTrait::Semantics => "An object in which the state space can be traversed. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks.",
+            EbiTrait::StochasticDeterministicSemantics => "An object in which the state space can be traversed deterministically, that is, in each state every activity appears at most once and silent steps are not present. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks.",
+            EbiTrait::StochasticSemantics => "An object in which the state space can be traversed, with probabilities. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks.",
+            EbiTrait::Graphable => "Can be visualised as a graph.",
+        }
+    }
 }
 
 impl Display for EbiTrait {
@@ -116,5 +131,39 @@ impl FromEbiTraitObject for String {
             EbiInput::String(e) => Ok(Box::new(e)),
             _ => Err(anyhow!("cannot read {} {} as an integer", object.get_type().get_article(), object.get_type()))
         } 
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use strum::IntoEnumIterator;
+
+    use crate::ebi_framework::ebi_input::EbiInput;
+
+    use super::{EbiTrait, FromEbiTraitObject};
+
+    #[test]
+    fn traits() {
+        for etrait in EbiTrait::iter() {
+            etrait.get_applicable_commands();
+            etrait.get_article();
+            etrait.get_java_object_handlers_that_can_import();
+            etrait.to_string();
+            let _ = format!("{:?}", etrait);
+        }
+
+        let _ = String::from_trait_object(EbiInput::String("xyz".to_string()));
+    }
+
+    #[test]
+    #[should_panic]
+    fn unreachable_string() {
+        String::from_trait_object(EbiInput::Usize(1)).unwrap();
+    }
+
+    #[test]
+    #[should_panic]
+    fn unreachable_usize() {
+        usize::from_trait_object(EbiInput::String("abc".to_string())).unwrap();
     }
 }

@@ -35,10 +35,10 @@ pub const EBI_VALIDATE: EbiCommand = EbiCommand::Command {
         
         if let Some(file) = cli_matches.unwrap().get_one::<PathBuf>("file") {
             let mut reader = ebi_input::get_reader_file(file).context("Could not get reader for file.")?;
-            ebi_input::validate_object_of(&mut reader, &file_handler).context("Validating the file.")?;
+            ebi_input::validate_object_of(&mut reader, &file_handler).with_context(|| "validating the file")?;
             return Ok(EbiOutput::String(format!("Object is a valid {}.", file_handler.name)));
         } else {
-            return Err(anyhow!("No input file given."))
+            return Err(anyhow!("no input file given"))
         }
     },
     output_type: &EbiOutputType::String,

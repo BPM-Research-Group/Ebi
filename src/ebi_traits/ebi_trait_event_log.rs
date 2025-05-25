@@ -1,13 +1,26 @@
-use std::{borrow::Borrow, collections::HashMap, fmt::{Debug, Display}, hash::Hash};
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use chrono::{DateTime, FixedOffset};
 use process_mining::event_log::{AttributeValue, Event, XESEditableAttribute};
+use std::{
+    borrow::Borrow,
+    collections::HashMap,
+    fmt::{Debug, Display},
+    hash::Hash,
+};
 
-use crate::{ebi_framework::{activity_key::{Activity, ActivityKey}, ebi_input::EbiInput, ebi_object::EbiTraitObject, ebi_trait::FromEbiTraitObject}, ebi_objects::event_log::DataType, math::fraction::Fraction};
+use crate::{
+    ebi_framework::{
+        activity_key::{Activity, HasActivityKey},
+        ebi_input::EbiInput,
+        ebi_object::EbiTraitObject,
+        ebi_trait::FromEbiTraitObject,
+    },
+    math::{data_type::DataType, fraction::Fraction},
+};
 
 pub const ATTRIBUTE_TIME: &str = "time:timestamp";
 
-pub trait EbiTraitEventLog: IndexTrace {
+pub trait EbiTraitEventLog: IndexTrace + HasActivityKey {
     /**
      * Provides access to the underlying Rust4pm data structure. Prefer to use other methods if possible.
      */
@@ -15,7 +28,13 @@ pub trait EbiTraitEventLog: IndexTrace {
 
     fn get_trace_attributes(&self) -> HashMap<String, DataType>;
 
-    fn read_trace_with_activity_key(&self, activity_key: &mut ActivityKey, trace_index: &usize) -> Vec<Activity>; //get the trace in numerical form with the specified activity key
+    /**
+     * Remove traces for which the function returns false.
+     *
+     * Note to callers: please put the closure definition inside the Box::new in the call of retain_traces.
+     * Otherwise, Rust may give weird compile errors.
+     */
+    fn retain_traces<'a>(&'a mut self, f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>);
 }
 
 impl dyn EbiTraitEventLog {
@@ -24,8 +43,14 @@ impl dyn EbiTraitEventLog {
         let mut trace_index = 0;
         while let Some(trace) = self.get_trace(trace_index) {
             match map.entry(trace.clone()) {
-                std::collections::hash_map::Entry::Occupied(mut e) => {*e.get_mut() += 1;()},
-                std::collections::hash_map::Entry::Vacant(e) => {e.insert(1);()},
+                std::collections::hash_map::Entry::Occupied(mut e) => {
+                    *e.get_mut() += 1;
+                    ()
+                }
+                std::collections::hash_map::Entry::Vacant(e) => {
+                    e.insert(1);
+                    ()
+                }
             }
 
             trace_index += 1;
@@ -36,15 +61,20 @@ impl dyn EbiTraitEventLog {
     /**
      * Returns a map from trace to with which attributes that trace appeared how often
      */
-    pub fn get_traces_with_categorical_attributes(&self, attribute_key: &mut AttributeKey, trace_attribute: &String) -> HashMap<&Vec<Activity>, HashMap<Attribute, u64>> {
+    pub fn get_traces_with_categorical_attributes(
+        &self,
+        attribute_key: &mut AttributeKey,
+        trace_attribute: &String,
+    ) -> HashMap<&Vec<Activity>, HashMap<Attribute, u64>> {
         let mut result = HashMap::new();
 
         let mut trace_index = 0;
         while let Some(trace) = self.get_trace(trace_index) {
-
-            if let Some(attribute) = self.get_trace_attribute_categorical(trace_index, &trace_attribute) {
+            if let Some(attribute) =
+                self.get_trace_attribute_categorical(trace_index, &trace_attribute)
+            {
                 //the trace has an attribute
-                
+
                 let attribute_id = attribute_key.process_attribute(&attribute);
                 match result.entry(trace) {
                     std::collections::hash_map::Entry::Occupied(mut e) => {
@@ -54,13 +84,13 @@ impl dyn EbiTraitEventLog {
                             std::collections::hash_map::Entry::Occupied(mut ae) => {
                                 //attribute was seen before
                                 *ae.get_mut() += 1;
-                            },
+                            }
                             std::collections::hash_map::Entry::Vacant(e) => {
                                 //attribute was not seen before
                                 e.insert(1);
-                            },
+                            }
                         }
-                    },
+                    }
                     std::collections::hash_map::Entry::Vacant(e) => {
                         //trace was not seen before
                         let mut map = HashMap::new();
@@ -69,7 +99,6 @@ impl dyn EbiTraitEventLog {
                     }
                 }
             }
-            
 
             trace_index += 1;
         }
@@ -88,14 +117,14 @@ impl dyn EbiTraitEventLog {
                 std::collections::hash_map::Entry::Occupied(e) => {
                     //we have seen this trace before
                     *e.get()
-                },
+                }
                 std::collections::hash_map::Entry::Vacant(e) => {
                     //we have not seen this trace before
                     let language_index = next_language_index;
                     next_language_index += 1;
                     e.insert(language_index);
                     language_index
-                },
+                }
             };
             log_index2language_index.push(language_index);
             language_index2trace.push(trace);
@@ -110,22 +139,29 @@ impl dyn EbiTraitEventLog {
         (trace2language_index, log_index2language_index)
     }
 
-    pub fn get_trace_attribute_categorical<'a>(&'a self, trace_index: usize, trace_attribute: &String) -> Option<String> {
-        if let Some(attribute) = self.get_log().traces[trace_index].attributes.get_by_key(trace_attribute) {
+    pub fn get_trace_attribute_categorical<'a>(
+        &'a self,
+        trace_index: usize,
+        trace_attribute: &String,
+    ) -> Option<String> {
+        if let Some(attribute) = self.get_log().traces[trace_index]
+            .attributes
+            .get_by_key(trace_attribute)
+        {
             match &attribute.value {
                 AttributeValue::String(x) => {
                     return Some(x.to_owned());
-                },
+                }
                 AttributeValue::Date(_) => (),
                 AttributeValue::Int(x) => {
                     return Some(x.to_string());
-                },
+                }
                 AttributeValue::Float(x) => {
                     return Some(x.to_string());
-                },
+                }
                 AttributeValue::Boolean(x) => {
                     return Some(x.to_string());
-                },
+                }
                 AttributeValue::ID(_) => (),
                 AttributeValue::List(_) => (),
                 AttributeValue::Container(_) => (),
@@ -134,20 +170,31 @@ impl dyn EbiTraitEventLog {
         }
         None
     }
-    
-    pub fn get_trace_attribute_numeric(&self, trace_index: usize, case_attribute: &String) -> Option<Fraction> {
-        if let Some(attribute) = self.get_log().traces[trace_index].attributes.get_by_key(case_attribute) {
+
+    pub fn get_trace_attribute_numeric(
+        &self,
+        trace_index: usize,
+        case_attribute: &String,
+    ) -> Option<Fraction> {
+        if let Some(attribute) = self.get_log().traces[trace_index]
+            .attributes
+            .get_by_key(case_attribute)
+        {
             match &attribute.value {
                 AttributeValue::String(x) => {
                     return Some(x.parse::<Fraction>().expect("this should not fail"));
-                },
+                }
                 AttributeValue::Date(_) => (),
                 AttributeValue::Int(x) => {
                     return Some(Fraction::from(*x));
-                },
+                }
                 AttributeValue::Float(x) => {
-                    return Some(x.to_string().parse::<Fraction>().expect("this should not fail"));
-                },
+                    return Some(
+                        x.to_string()
+                            .parse::<Fraction>()
+                            .expect("this should not fail"),
+                    );
+                }
                 AttributeValue::Boolean(_) => (),
                 AttributeValue::ID(_) => (),
                 AttributeValue::List(_) => (),
@@ -157,16 +204,27 @@ impl dyn EbiTraitEventLog {
         }
         None
     }
-    
-    pub fn get_trace_attribute_time(&self, trace_index: usize, case_attribute: &String) -> Option<(DateTime<FixedOffset>, Vec<Activity>)> {
-        if let Some(attribute) = self.get_log().traces[trace_index].attributes.get_by_key(case_attribute) {
+
+    pub fn get_trace_attribute_time(
+        &self,
+        trace_index: usize,
+        case_attribute: &String,
+    ) -> Option<(DateTime<FixedOffset>, Vec<Activity>)> {
+        if let Some(attribute) = self.get_log().traces[trace_index]
+            .attributes
+            .get_by_key(case_attribute)
+        {
             match &attribute.value {
                 AttributeValue::String(x) => {
-                    return Some((x.parse::<DateTime<FixedOffset>>().expect("this should not fail"), self.get_trace(trace_index)?.to_owned()));
-                },
+                    return Some((
+                        x.parse::<DateTime<FixedOffset>>()
+                            .expect("this should not fail"),
+                        self.get_trace(trace_index)?.to_owned(),
+                    ));
+                }
                 AttributeValue::Date(x) => {
-                    return Some((*x,  self.get_trace(trace_index)?.to_owned()))
-                },
+                    return Some((*x, self.get_trace(trace_index)?.to_owned()));
+                }
                 AttributeValue::Int(_) => (),
                 AttributeValue::Float(_) => (),
                 AttributeValue::Boolean(_) => (),
@@ -180,28 +238,44 @@ impl dyn EbiTraitEventLog {
     }
 
     fn get_event(&self, trace_index: usize, event_index: usize) -> Option<&Event> {
-        self.get_log().traces.get(trace_index)?.events.get(event_index)
+        self.get_log()
+            .traces
+            .get(trace_index)?
+            .events
+            .get(event_index)
     }
 
-    pub fn get_event_attribute_time(&self, trace_index: usize, event_index: usize, case_attribute: &String) -> Option<DateTime<FixedOffset>> {
-        if let Some(attribute) = self.get_event(trace_index, event_index)?.attributes.get_by_key(case_attribute) {
+    pub fn get_event_attribute_time(
+        &self,
+        trace_index: usize,
+        event_index: usize,
+        case_attribute: &String,
+    ) -> Option<DateTime<FixedOffset>> {
+        if let Some(attribute) = self
+            .get_event(trace_index, event_index)?
+            .attributes
+            .get_by_key(case_attribute)
+        {
             match &attribute.value {
                 AttributeValue::String(x) => x.parse::<DateTime<FixedOffset>>().ok(),
                 AttributeValue::Date(x) => Some(*x),
-                _ => None
+                _ => None,
             }
         } else {
             None
         }
     }
-
 }
 
 impl FromEbiTraitObject for dyn EbiTraitEventLog {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
             EbiInput::Trait(EbiTraitObject::EventLog(e), _) => Ok(e),
-            _ => Err(anyhow!("cannot read {} {} as an event log", object.get_type().get_article(), object.get_type()))
+            _ => Err(anyhow!(
+                "cannot read {} {} as an event log",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
         }
     }
 }
@@ -211,7 +285,7 @@ pub trait IndexTrace: Sync {
     fn get_trace(&self, trace_index: usize) -> Option<&Vec<Activity>>;
 }
 
-impl <T: Sync> IndexTrace for HashMap<Vec<Activity>, T> {
+impl<T: Sync> IndexTrace for HashMap<Vec<Activity>, T> {
     fn len(&self) -> usize {
         self.len()
     }
@@ -221,7 +295,7 @@ impl <T: Sync> IndexTrace for HashMap<Vec<Activity>, T> {
     }
 }
 
-impl <T: Sync> IndexTrace for Vec<(&Vec<Activity>, T)> {
+impl<T: Sync> IndexTrace for Vec<(&Vec<Activity>, T)> {
     fn len(&self) -> usize {
         self.len()
     }
@@ -231,7 +305,7 @@ impl <T: Sync> IndexTrace for Vec<(&Vec<Activity>, T)> {
     }
 }
 
-#[derive(Clone,Copy)]
+#[derive(Clone, Copy)]
 pub struct Attribute {
     id: usize,
 }
@@ -280,14 +354,14 @@ impl PartialOrd<usize> for Attribute {
     }
 }
 
-#[derive(Clone,Debug)]
+#[derive(Clone, Debug)]
 pub struct AttributeKey {
     pub name2attribute: HashMap<String, Attribute>,
     pub attribute2name: Vec<String>,
-    pub next_index: usize
+    pub next_index: usize,
 }
 
-impl <'a> AttributeKey {
+impl<'a> AttributeKey {
     pub fn new() -> Self {
         Self {
             name2attribute: HashMap::new(),
@@ -297,9 +371,7 @@ impl <'a> AttributeKey {
     }
 
     pub fn get_attribute_by_id(&self, attribute_id: usize) -> Attribute {
-        Attribute {
-            id: attribute_id,
-        }
+        Attribute { id: attribute_id }
     }
 
     pub fn get_id_from_attribute(&self, attribute: impl Borrow<Attribute>) -> usize {
@@ -310,12 +382,14 @@ impl <'a> AttributeKey {
         match self.name2attribute.get(attribute) {
             Some(index) => return *index,
             None => {
-                let result = Attribute{id: self.next_index};
+                let result = Attribute {
+                    id: self.next_index,
+                };
                 self.attribute2name.push(attribute.to_string());
                 self.name2attribute.insert(attribute.to_string(), result);
                 self.next_index += 1;
                 return result;
-            },
+            }
         }
     }
 }

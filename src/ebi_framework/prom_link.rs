@@ -30,7 +30,7 @@ use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EbiFileHa
 
 
 // This keeps Rust from "mangling" the name and making it unique for this crate.
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "system" fn Java_org_processmining_ebi_CallEbi_call_1ebi_1internal<'local>(mut env: JNIEnv<'local>,
 // This is the class that owns our static method. It's not going to be used,
 // but still must be present to match the expected signature of a static
@@ -399,3 +399,27 @@ pub const JAVA_OBJECT_HANDLERS_ROOTLOGDIV: &[JavaObjectHandler] = &[
         input_gui: None
     },
 ];
+pub const JAVA_OBJECT_HANDLERS_BOOL: &[JavaObjectHandler] = &[
+    JavaObjectHandler{ 
+        name: "bool", 
+        java_class: "boolean",
+        translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiBoolean.fromEbiString"), 
+        translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiBoolean.toEbiString"),
+        input_gui: None,
+    },
+];
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use super::{handle_prom_request, print_java_plugins};
+
+    #[test]
+    fn java() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        assert!(handle_prom_request("Ebi visualise text".to_string(), "txt".to_string(), vec![fin]).is_ok());
+
+        let _ = print_java_plugins();
+    }
+}

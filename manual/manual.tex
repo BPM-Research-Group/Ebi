@@ -119,12 +119,16 @@ Sander J.J. Leemans, Tian Li}
 			\label{speedtrick:multithreaded}
 			If Ebi uses all CPU cores and runs out of RAM, one can try to reduce the CPU cores that Ebi will use by setting the environment variable \verb!RAYON_NUM_THREADS=1! or some other desired number of cores.
 			This will trade run time for RAM in multi-threaded algorithms.
+
 			\item By default, Ebi uses exact arithmetic for most commands.
 			To disable this, provide the \verb=-a= parameter.
 			The results are then not guaranteed, but it may be faster.
 
-            Another option is to compile Ebi without exact arithmetic, using the \verb=withoutexactarithmetic= feature, which may lead to a speadup in comparison with the \verb=-a= parameter.
-            When this feature is given, the \verb=-a= parameter has no effect.
+   			\item By default, Ebi is compiled with support for both exact and approximate arithmetic, and the user can select the arithmetic with the \verb=-a= parameter.
+            However, this comes with a performance penalty.
+            By selecting one of the features \verb=exactarithmetic= or \verb=approximatearithmetic=, the arithmetic is chosen at compilation time, yielding a performance benefit.
+
+            To do this, use \verb=cargo run --features exactarithmetic=, but a faster binary is obtained by compiling for release: \verb=cargo build --release --features exactarithmetic=.
 		\end{enumerate}
 
 \section{Commands}
@@ -281,18 +285,24 @@ Sander J.J. Leemans, Tian Li}
 		There are two steps to take: set up the technique (that is, the implementation), and set up the command (i.e. where \& how Ebi can call it).
 		
 		\subsubsection{Conventions and Hints}
-			\begin{itemize}
+			\begin{enumerate}
 				\item Ebi only uses floating point numbers (f32, f64) when the user asks for it.
-				Commands should use \verb=Fraction= or other numeric exact classes (see Section~\ref{sec:exact}); these perform computations with floating point numbers if possible.
+				Commands should use \verb=Fraction= or other exact numeric classes (see Section~\ref{sec:exact}); these perform computations with the arithmetic type selected by the user.
 				\item It is important that errors are propagated appropriately.
 				Therefore, avoid \verb=.unwrap()= but instead propagate errors using \verb=.with_context(|| "error message")?=.
 				The \verb=anyhow= package formats the error messages nicely to the user.
 				\item For speed considerations, avoid .clone(), but use references instead, especially on heap-based structs such as \verb=Fraction=.
 				\item \verb|a += b| is usually faster than \verb|c = a + b|, as it saves a memory allocation, especially on heap-based structs such as \verb=Fraction=.
 				\item Rather than using a numeric struct, using traits such as \verb=Add= and \verb=Mul= allows code to be used regardless of the arithmetic type.
-				\item To provide debug output, avoid \verb=println= as it is rather inflexible, but use \verb=log::info= instead.
-			\end{itemize}
-		
+				\item To provide debug output, avoid \verb=println= as it prevents piping of results, but use \verb=log::info()= or \verb=log::debug()= instead.
+				For consistency, Ebi provides two types of progress bars: one where a total integer number of steps is available, and one where a message is used that can be updated, e.g. to denote a probability:
+\begin{lstlisting}[language=Rust, style=boxed]
+EbiCommand::get_progress_bar_ticks(total_steps);
+EbiCommand::get_progress_bar_message(message);
+\end{lstlisting}
+                \item Compilation for release will fail if there are any warnings.
+			\end{enumerate}
+            
 		\subsubsection{The technique}
 			The technique is the place where the code for the algorithm lives.
 			This should go in its own file in the \verb=techniques= folder.
@@ -376,12 +386,12 @@ for dyn EbiTraitFiniteStochasticLanguage {
 					
 					\item \verb=execute= should call the implemented algorithm.
 					As a first step, the inputs should be retrieved from the variable \verb=inputs=, and transformed into the correct types.
-					Notice that the link between \verb=input_types= and \verb=execute= cannot be verified at compile time, thus this should be tested extensively.
+					Ebi tests the \verb=execute= function automatally, see Section~\ref{sec:tests}.
 					
 					The output of the algorithm should be wrapped in the appropriate \verb=EbiOutput= enum.
 					
 					\item \verb=output_type= indicates the single output type of the command.
-					Notice that the link between \verb=execute= and \verb=output_type= cannot be verified at compile time, thus this should be tested extensively.
+                    Ebi automatally tests whether the output of \verb=execute= matches the declared \verb=output_type=; see Section~\ref{sec:tests}.
 					
 				\end{itemize}
 				
@@ -423,6 +433,45 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
 				At the top of the file, there is a command declaration (e.g. \verb=EBI_CONFORMANCE=) that contains the sub-commands.
 				Add your new command here, while maintaining the alphabetical order.
 			\end{enumerate}
+
+        \subsubsection{Tests}
+        \label{sec:tests}
+            Ebi automatically tests each command, importer, exporter, graphable and infoable, if a corresponding test file is provided in the \verb=testfiles= folder.
+            Files with \verb=_invalid= in their file names must not be importable using any importer, that is, importing should give an error message for the test to pass.
+
+            Ebi tests every command automatally.
+            The following commands will however \emph{not} be tested automatically:
+            \begin{itemize}
+                \item A command that manipulates the command-line interface (i.e. \verb=cli_command= is not \verb=None=);
+            \end{itemize}
+            The automated command test will fail if either:
+            \begin{itemize}
+                \item There is no (combination of) test files in the \verb=testfiles= folder that allows the command to be run.
+                \item The \verb=execute= function of the command panics.
+                Note that it is fine to return an error message, as this is normal behaviour.
+                \item The \verb=execute= function returns an object that does not match the \verb=output_type= field of the command.
+                \item The total time of all the command tests together exceeds 5 minutes.
+            \end{itemize}
+            Note that every combination of files in the \verb=testfiles= folder to which the command applies is tested.
+            Tests will be performed using all applicable arithmetic modes (exact/approximate) for each command, thus respecting the \verb=exact_arithmetic= command parameter.
+
+            Further tests can (and should) be located at the bottom of the relevant source file, following Rust conventions.
+            For instance:
+\begin{lstlisting}[language=Rust, style=boxed]
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    #[test]
+    fn a_test() {
+        let fin = fs::read_to_string("testfiles/aa.ptree").unwrap();
+        let tree = fin.parse::<ProcessTree>().unwrap();
+        ... here comes the test ...
+    }
+}
+\end{lstlisting}
+
+            Tests can be run using \verb=cargo test=, and test coverage can be obtained using \verb=cargo llvm-cov --html=.
 		
 
     \subsection{Exact Computation}

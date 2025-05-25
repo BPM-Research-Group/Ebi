@@ -11,6 +11,8 @@ buildlatex:
     - mkdir -p build/nightly
     - git config --global user.name "CI pipeline"
     - git config --global user.email "cipipeline@example.com"
+    - export VERSION=$(date +"%Y.%-m.%-d")
+    - sed -i "s/0.0.0/$VERSION/g" Cargo.toml
     
     #compile manual
     - cd manual

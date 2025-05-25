@@ -79,9 +79,10 @@ impl<'a> LineReader<'a> {
     pub fn next_line(&mut self) -> Result<()> {
         //read line and unpack
         self.next_line_raw()?;
-        while self.get_last_line().starts_with('#') {
+        while self.get_last_line().trim_start().starts_with('#') {
             self.next_line_raw()?;
         }
         Ok(())
     }
+
 }

@@ -1,11 +1,16 @@
 [package]
 name = "ebi"
-version = "0.1.0"
-edition = "2021"
+version = "0.0.0"
+edition = "2024"
 
 [lib]
 name = "ebi"
 crate-type = ["cdylib", "lib"]
+
+[features]
+default = []
+exactarithmetic = []
+approximatearithmetic = []
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -50,6 +55,7 @@ cfg-if = "*"
 pyo3 = { version = "0.18", features = ["extension-module"] }
 polars = { version = "0.32", features = ["ipc", "timezones"] }
 
+ntest = "*"
 
 [dependencies.num-rational]
 version = "0.4.1"
@@ -61,7 +67,3 @@ panic = 'abort'
 opt-level = 2
 lto = true
 codegen-units = 8
-
-[features]
-default = []
-withoutexactarithmetic = []

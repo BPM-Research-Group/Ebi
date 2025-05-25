@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Context};
+use anyhow::{Context, anyhow};
 use bitvec::bitvec;
 
 use crate::{
@@ -10,7 +10,10 @@ use crate::{
         ebi_trait_semantics::Semantics,
         ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex},
     },
-    math::{fraction::Fraction, traits::{Signed, Zero}},
+    math::{
+        fraction::Fraction,
+        traits::{Signed, Zero},
+    },
 };
 
 impl StochasticLabelledPetriNet {
@@ -38,7 +41,7 @@ impl StochasticLabelledPetriNet {
             state.number_of_enabled_transitions += 1;
         }
 
-        if !self.get_transition_weight(transition).is_positive() {
+        if !self.weights[transition].is_positive() {
             return false;
         }
 
@@ -61,7 +64,8 @@ impl Semantics for StochasticLabelledPetriNet {
         state.number_of_enabled_transitions == 0
     }
 
-    fn get_initial_state(&self) -> LPNMarking {
+    fn get_initial_state(&self) -> Option<LPNMarking> {
+        //an SLPN supports the empty language, but only by livelocks
         let mut result = LPNMarking {
             marking: self.initial_marking.clone(),
             enabled_transitions: bitvec![0; self.get_number_of_transitions()],
@@ -69,7 +73,7 @@ impl Semantics for StochasticLabelledPetriNet {
         };
         self.compute_enabled_transitions(&mut result);
 
-        result
+        Some(result)
     }
 
     fn execute_transition(
@@ -141,11 +145,30 @@ impl StochasticSemantics for StochasticLabelledPetriNet {
     ) -> anyhow::Result<Fraction> {
         let mut sum = Fraction::zero();
         for index in state.enabled_transitions.iter_ones() {
-            sum += self.get_transition_weight(index);
+            sum += &self.weights[index];
         }
         if sum.is_zero() {
             return Err(anyhow!("total enabled weight is 0"));
         }
         Ok(sum)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{
+        ebi_objects::stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        ebi_traits::ebi_trait_semantics::Semantics,
+    };
+
+    #[test]
+    fn slpn_empty() {
+        let fin = fs::read_to_string("testfiles/empty.slpn").unwrap();
+        let lpn = fin.parse::<StochasticLabelledPetriNet>().unwrap();
+
+        let state = lpn.get_initial_state().unwrap();
+        assert_eq!(lpn.get_enabled_transitions(&state).len(), 0);
     }
 }

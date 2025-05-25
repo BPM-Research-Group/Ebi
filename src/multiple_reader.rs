@@ -31,7 +31,7 @@ impl MultipleReader {
     pub fn get(&mut self) -> Result<Box<dyn BufRead + '_>> {
         match self {
             MultipleReader::String(s) => Ok(Box::new(Cursor::new(s))),
-            MultipleReader::File(ref mut file) => {
+            MultipleReader::File(file) => {
                 file.seek(io::SeekFrom::Start(0))?;
                 return Ok(Box::new(BufReader::new(file)));
             },

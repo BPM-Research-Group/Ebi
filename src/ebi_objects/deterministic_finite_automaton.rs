@@ -1,8 +1,8 @@
-use anyhow::{anyhow, Context, Error, Result};
+use anyhow::{Context, Error, Result, anyhow};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
 use std::{
-    cmp::{max, Ordering},
+    cmp::{Ordering, max},
     fmt::{Display, Formatter},
     io::{self, BufRead},
     str::FromStr,
@@ -10,7 +10,7 @@ use std::{
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey},
+        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -24,15 +24,12 @@ use crate::{
         ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics},
     },
     json,
-    math::traits::Signed,
 };
-
-use super::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton;
 
 pub const FORMAT_SPECIFICATION: &str = "A deterministic finite automaton is a JSON structure with the top level being an object.
     This object contains the following key-value pairs:
     \\begin{itemize}
-    \\item \\texttt{initialState} being the index of the initial state.
+    \\item \\texttt{initialState} being the index of the initial state. This field is optional: if omitted, the DFA has an empty language.
     \\item \\texttt{finalStates} being a list of indices of the final states.
     A final state is not necessarily a deadlock state.
     \\item \\texttt{transitions} being a list of transitions. 
@@ -48,32 +45,39 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "dfa",
     format_specification: FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<DeterministicFiniteAutomaton>,
+    validator: Some(ebi_input::validate::<DeterministicFiniteAutomaton>),
     trait_importers: &[
         EbiTraitImporter::Semantics(DeterministicFiniteAutomaton::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<DeterministicFiniteAutomaton>),
     ],
-    object_importers: &[EbiObjectImporter::DeterministicFiniteAutomaton(
-        DeterministicFiniteAutomaton::import_as_object,
-    )],
+    object_importers: &[
+        EbiObjectImporter::DeterministicFiniteAutomaton(
+            DeterministicFiniteAutomaton::import_as_object,
+        ),
+        EbiObjectImporter::LabelledPetriNet(
+            DeterministicFiniteAutomaton::import_as_labelled_petri_net,
+        ),
+    ],
     object_exporters: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(
             DeterministicFiniteAutomaton::export_from_object,
         ),
-        EbiObjectExporter::FiniteLanguage(
-            DeterministicFiniteAutomaton::export_from_finite_language,
-        ),
+        EbiObjectExporter::FiniteLanguage(DeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
-            DeterministicFiniteAutomaton::export_from_stochastic_deterministic_finite_automaton,
+            DeterministicFiniteAutomaton::export_from_object,
+        ),
+        EbiObjectExporter::EventLog(DeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::FiniteStochasticLanguage(
+            DeterministicFiniteAutomaton::export_from_object,
         ),
     ],
     java_object_handlers: &[],
 };
 
-#[derive(Debug, ActivityKey)]
+#[derive(Debug, ActivityKey, Clone)]
 pub struct DeterministicFiniteAutomaton {
     pub(crate) activity_key: ActivityKey,
-    pub(crate) initial_state: usize,
+    pub(crate) initial_state: Option<usize>,
     pub(crate) max_state: usize,
     pub(crate) sources: Vec<usize>,       //transition -> source of arc
     pub(crate) targets: Vec<usize>,       //transition -> target of arc
@@ -82,11 +86,14 @@ pub struct DeterministicFiniteAutomaton {
 }
 
 impl DeterministicFiniteAutomaton {
+    /**
+     * Creates a new DFA with an initial state that is not an explicit final state. As this state is a deadlock, it is an implicit final state anyway, until an outgoing transition is added.
+     */
     pub fn new() -> Self {
         Self {
             activity_key: ActivityKey::new(),
             max_state: 0,
-            initial_state: 0,
+            initial_state: Some(0),
             sources: vec![],
             targets: vec![],
             activities: vec![],
@@ -106,8 +113,10 @@ impl DeterministicFiniteAutomaton {
         &self.activities
     }
 
-    pub fn set_initial_state(&mut self, state: usize) {
-        self.ensure_states(state);
+    pub fn set_initial_state(&mut self, state: Option<usize>) {
+        if let Some(state) = state {
+            self.ensure_states(state);
+        }
         self.initial_state = state;
     }
 
@@ -163,6 +172,13 @@ impl DeterministicFiniteAutomaton {
 
     pub fn can_terminate_in_state(&self, state: usize) -> bool {
         self.final_states[state]
+    }
+
+    /**
+     * Returns whether a transition is not permanently disabled.
+     */
+    pub fn can_execute_transition(&self, _transition: usize) -> bool {
+        true
     }
 
     pub fn set_final_state(&mut self, state: usize, is_final: bool) {
@@ -224,33 +240,18 @@ impl DeterministicFiniteAutomaton {
         self.activity_key = activity_key
     }
 
-    pub fn export_from_finite_language(
-        object: EbiOutput,
-        f: &mut dyn std::io::Write,
-    ) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::FiniteLanguage(lang)) => {
-                lang.get_deterministic_finite_automaton().export(f)
-            }
-            _ => unreachable!(),
-        }
-    }
-
-    pub fn export_from_stochastic_deterministic_finite_automaton(
-        object: EbiOutput,
-        f: &mut dyn std::io::Write,
-    ) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => <StochasticDeterministicFiniteAutomaton as Into<DeterministicFiniteAutomaton>>::into(sdfa).export(f),
-            _ => unreachable!()
-        }
+    pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let dfm = Self::import(reader)?;
+        Ok(EbiObject::LabelledPetriNet(dfm.into()))
     }
 }
 
 impl TranslateActivityKey for DeterministicFiniteAutomaton {
     fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
         let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
-        self.activities.iter_mut().for_each(|activity| *activity = translator.translate_activity(&activity));
+        self.activities
+            .iter_mut()
+            .for_each(|activity| *activity = translator.translate_activity(&activity));
         self.activity_key = to_activity_key.clone();
     }
 }
@@ -279,10 +280,7 @@ impl Importable for DeterministicFiniteAutomaton {
 
         let mut result = DeterministicFiniteAutomaton::new();
 
-        result.set_initial_state(
-            json::read_field_number(&json, "initialState")
-                .context("failed to read initial state")?,
-        );
+        result.set_initial_state(json::read_field_number(&json, "initialState").ok());
 
         //read transitions
         let jtrans = json::read_field_list(&json, "transitions")
@@ -322,7 +320,17 @@ impl Exportable for DeterministicFiniteAutomaton {
     fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::DeterministicFiniteAutomaton(dfa)) => dfa.export(f),
-            _ => unreachable!(),
+            EbiOutput::Object(EbiObject::FiniteLanguage(lang)) => {
+                Into::<Self>::into(lang).export(f)
+            }
+            EbiOutput::Object(EbiObject::FiniteStochasticLanguage(slang)) => {
+                Into::<Self>::into(slang).export(f)
+            }
+            EbiOutput::Object(EbiObject::EventLog(log)) => Into::<Self>::into(log).export(f),
+            EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => {
+                Into::<Self>::into(sdfa).export(f)
+            }
+            _ => Err(anyhow!("Cannot export to DFA.")),
         }
     }
 
@@ -341,6 +349,9 @@ impl Infoable for DeterministicFiniteAutomaton {
             self.activity_key.get_number_of_activities()
         )?;
 
+        writeln!(f, "")?;
+        self.get_activity_key().info(f)?;
+
         Ok(write!(f, "")?)
     }
 }
@@ -348,7 +359,9 @@ impl Infoable for DeterministicFiniteAutomaton {
 impl Display for DeterministicFiniteAutomaton {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "{{")?;
-        writeln!(f, "\"initialState\": {},", self.get_initial_state())?;
+        if let Some(state) = self.get_initial_state() {
+            writeln!(f, "\"initialState\": {},", state)?;
+        }
         writeln!(f, "\"transitions\": [")?;
         for pos in 0..self.sources.len() {
             write!(
@@ -381,7 +394,7 @@ impl Display for DeterministicFiniteAutomaton {
 }
 
 impl EbiTraitGraphable for DeterministicFiniteAutomaton {
-    fn to_dot(&self) -> layout::topo::layout::VisualGraph {
+    fn to_dot(&self) -> Result<layout::topo::layout::VisualGraph> {
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
         let mut places = vec![];
@@ -408,32 +421,46 @@ impl EbiTraitGraphable for DeterministicFiniteAutomaton {
             <dyn EbiTraitGraphable>::create_edge(&mut graph, &source, &target, activity);
         }
 
-        return graph;
-    }
-}
-
-impl From<StochasticDeterministicFiniteAutomaton> for DeterministicFiniteAutomaton {
-    fn from(value: StochasticDeterministicFiniteAutomaton) -> Self {
-        let final_states = value
-            .terminating_probabilities
-            .iter()
-            .map(|p| p.is_positive())
-            .collect();
-
-        Self {
-            activity_key: value.activity_key,
-            initial_state: value.initial_state,
-            max_state: value.max_state,
-            sources: value.sources,
-            targets: value.targets,
-            activities: value.activities,
-            final_states: final_states,
-        }
+        Ok(graph)
     }
 }
 
 impl ToSemantics for DeterministicFiniteAutomaton {
     fn to_semantics(self) -> EbiTraitSemantics {
         EbiTraitSemantics::Usize(Box::new(self))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::ebi_framework::activity_key::HasActivityKey;
+    use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics};
+
+    use super::DeterministicFiniteAutomaton;
+
+    #[test]
+    fn insert_wrong_edge() {
+        let mut dfa = DeterministicFiniteAutomaton::new();
+        let state = dfa.get_initial_state().unwrap();
+        let activity = dfa.get_activity_key_mut().process_activity("a");
+
+        dfa.get_sources();
+
+        assert!(dfa.add_transition(state, activity, state).is_ok());
+        assert!(dfa.add_transition(state, activity, state).is_err());
+    }
+
+    #[test]
+    fn dfa_empty() {
+        let fin = fs::read_to_string("testfiles/empty.dfa").unwrap();
+        let dfa = fin.parse::<DeterministicFiniteAutomaton>().unwrap();
+
+        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics() {
+            assert!(semantics.get_initial_state().is_none());
+        } else {
+            assert!(false);
+        }
     }
 }

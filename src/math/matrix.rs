@@ -5,7 +5,6 @@ use std::{
 };
 
 use anyhow::{anyhow, Result};
-use num::{One as NumOne, Zero as NumZero};
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefMutIterator, ParallelIterator};
 
 use crate::math::traits::{One, Zero};

@@ -8,6 +8,8 @@ use std::{
 #[cfg(test)]
 use uuid::Uuid;
 
+use super::infoable::Infoable;
+
 pub trait HasActivityKey: TranslateActivityKey {
     fn get_activity_key(&self) -> &ActivityKey;
 
@@ -16,7 +18,7 @@ pub trait HasActivityKey: TranslateActivityKey {
 
 pub trait TranslateActivityKey {
     /**
-     * Change the activity key of this object, by translating all mentions of activities to the new activity key  (which will be updated with activity labels it did not have yet.).
+     * Change the activity key of this object, by translating all mentions of activities to the new activity key (which will be updated with activity labels it did not have yet.).
      * This is a potentially expensive operation. If only a part of the activities will be used, then consider using an ActivityKeyTranslator directly.
      * The activity key of this object will be updated too, so the activity keys will be equivalent afterwards.
      */
@@ -141,6 +143,10 @@ impl<'a> ActivityKey {
 
     pub fn get_number_of_activities(&self) -> usize {
         return self.name2activity.len();
+    }
+
+    pub fn get_activities(&self) -> Vec<&Activity> {
+        self.name2activity.values().collect()
     }
 
     #[cfg(test)]
@@ -316,6 +322,25 @@ impl Display for ActivityKey {
     }
 }
 
+impl Infoable for ActivityKey {
+    fn info(&self, f: &mut impl std::io::Write) -> anyhow::Result<()> {
+        let count = 20;
+
+        writeln!(f, "Activities:")?;
+        let mut labels = self.activity2name.clone();
+        labels.sort();
+        for label in labels.iter().take(count) {
+            writeln!(f, "\t{}", label)?;
+        }
+
+        if self.activity2name.len() > 20 {
+            writeln!(f, ".. ({} more)", self.activity2name.len() - count)?;
+        }
+
+        Ok(write!(f, "")?)
+    }
+}
+
 pub struct ActivityKeyTranslator {
     from2to: Vec<Activity>,
 }
@@ -345,19 +370,23 @@ impl ActivityKeyTranslator {
     }
 
     pub fn translate_trace_mut(&self, trace: &mut Vec<Activity>) {
-        trace.iter_mut().for_each(|event| *event = self.translate_activity(event));
+        trace
+            .iter_mut()
+            .for_each(|event| *event = self.translate_activity(event));
     }
 }
 
-
 #[cfg(test)]
 mod tests {
-    use std::fs;
+    use std::{collections::HashSet, fs};
 
-    use crate::{ebi_framework::activity_key::{HasActivityKey, TranslateActivityKey}, ebi_objects::directly_follows_model::DirectlyFollowsModel};
+    use crate::{
+        ebi_framework::activity_key::{HasActivityKey, TranslateActivityKey},
+        ebi_objects::directly_follows_model::DirectlyFollowsModel,
+    };
 
     use super::ActivityKey;
-    
+
     #[test]
     #[should_panic(expected = "cannot get activity label of activity of different activity key")]
     fn activity_key_process() {
@@ -387,6 +416,49 @@ mod tests {
 
         dfm.translate_using_activity_key(&mut activity_key);
 
-        assert_eq!(dfm.get_activity_key().get_activity_label(&x), activity_key.get_activity_label(&x));
+        assert_eq!(
+            dfm.get_activity_key().get_activity_label(&x),
+            activity_key.get_activity_label(&x)
+        );
+    }
+
+    #[test]
+    fn activity_key() {
+        let mut activity_key = ActivityKey::new();
+        let a = activity_key.process_activity("a");
+        let b = activity_key.process_activity("b");
+
+        assert!(a < b);
+        assert!(a < 1);
+        let _ = a.eq(&0);
+        let _ = format!("{:?}", a);
+        assert!(a <= b);
+        assert!(a.cmp(&b).is_lt());
+
+        let trace = activity_key.process_trace_ref(&vec!["a", "b", "c"]);
+        let mut set = HashSet::new();
+        set.insert(trace);
+        activity_key.deprocess_set(&set);
+        activity_key.to_string();
+    }
+
+    #[test]
+    #[should_panic]
+    fn activity_key_ord() {
+        let mut activity_key1 = ActivityKey::new();
+        let mut activity_key2 = ActivityKey::new();
+        let a1 = activity_key1.process_activity("a");
+        let a2 = activity_key2.process_activity("a");
+        let _ = a1.cmp(&a2);
+    }
+
+    #[test]
+    #[should_panic]
+    fn activity_key_partial_ord() {
+        let mut activity_key1 = ActivityKey::new();
+        let mut activity_key2 = ActivityKey::new();
+        let a1 = activity_key1.process_activity("a");
+        let a2 = activity_key2.process_activity("a");
+        let _ = a1.partial_cmp(&a2);
     }
 }

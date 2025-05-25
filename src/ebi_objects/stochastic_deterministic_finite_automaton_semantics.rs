@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 
 use crate::{
     ebi_framework::activity_key::{Activity, HasActivityKey},
@@ -7,8 +7,11 @@ use crate::{
         ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
         ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex},
     },
-    math::{fraction::Fraction, traits::{One, Zero}},
-    techniques::livelocks::Livelock,
+    math::{
+        fraction::Fraction,
+        traits::{One, Zero},
+    },
+    techniques::non_decreasing_livelock::NonDecreasingLivelock,
 };
 
 use super::{
@@ -27,7 +30,7 @@ macro_rules! semantics_for_automaton {
              * source.len() = silent transition to final state
              */
 
-            fn get_initial_state(&self) -> usize {
+            fn get_initial_state(&self) -> Option<usize> {
                 self.initial_state
             }
 
@@ -78,7 +81,9 @@ macro_rules! semantics_for_automaton {
                 //check the DFA for enabled transitions
                 let (_, mut i) = self.binary_search(*state, 0);
                 while i < self.sources.len() && self.sources[i] == *state {
-                    result.push(i);
+                    if self.can_execute_transition(i) {
+                        result.push(i);
+                    }
                     i += 1;
                 }
 
@@ -120,7 +125,7 @@ impl StochasticSemantics for StochasticDeterministicFiniteAutomaton {
 impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton {
     type DetState = usize;
 
-    fn get_deterministic_initial_state(&self) -> Result<usize> {
+    fn get_deterministic_initial_state(&self) -> Result<Option<usize>> {
         Ok(self.get_initial_state())
     }
 
@@ -177,10 +182,29 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         &self,
         state: &mut Self::DetState,
     ) -> Result<Fraction> {
-        if self.is_non_decreasing_livelock(state)? {
+        if self.is_part_of_non_decreasing_livelock(state)? {
             return Ok(Fraction::one());
         } else {
             return Ok(Fraction::zero());
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{ebi_objects::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, ebi_traits::ebi_trait_semantics::Semantics};
+
+    #[test]
+    fn sdfa_zero_edge() {
+        let fin = fs::read_to_string("testfiles/a-livelock-zeroweight.sdfa").unwrap();
+        let sdfa = fin
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
+
+        let state = sdfa.get_initial_state().unwrap();
+        let enabled = sdfa.get_enabled_transitions(&state);
+        assert_eq!(enabled.len(), 2); //termination and doing a
     }
 }

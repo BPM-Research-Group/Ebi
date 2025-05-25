@@ -1,11 +1,51 @@
-use anyhow::Error;
+use anyhow::{Error, Result};
 use std::{str::FromStr, sync::atomic::AtomicBool};
 
-#[cfg(not(feature = "withoutexactarithmetic"))]
+#[cfg(any(
+    all(
+        not(feature = "exactarithmetic"),
+        not(feature = "approximatearithmetic")
+    ),
+    all(feature = "exactarithmetic", feature = "approximatearithmetic")
+))]
 pub type Fraction = super::fraction_enum::FractionEnum;
 
-#[cfg(feature = "withoutexactarithmetic")]
+#[cfg(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic"))]
 pub type Fraction = super::fraction_f64::FractionF64;
+
+#[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
+pub type Fraction = super::fraction_exact::FractionExact;
+
+//======================== fraction tools ========================//
+
+pub trait ChooseRandomly {
+    /**
+     * Return a random index from 0 (inclusive) to the length of the list (exclusive).
+     * The likelihood of each index to be returned is proportional to the value of the fraction at that index.
+     *
+     * The fractions do not need to sum to 1.
+     */
+    fn choose_randomly(fractions: &Vec<Self>) -> Result<usize>
+    where
+        Self: Sized;
+}
+
+pub trait MaybeExact {
+    type Approximate;
+    type Exact;
+
+    fn is_exact(&self) -> bool;
+
+    /**
+     * This is a low-level function to extract an f64. Will only succeed if the fraction is approximate.
+     */
+    fn extract_approx(&self) -> Result<Self::Approximate>;
+
+    /**
+     * This is a low-level function to extract an exact value. Will only succeed if the fraction is exact.
+     */
+    fn extract_exact(&self) -> Result<Self::Exact>;
+}
 
 //======================== exactness tools ========================//
 pub type UInt = fraction::BigUint;
@@ -22,8 +62,13 @@ pub fn set_exact_globally(exact: bool) {
 }
 
 pub fn is_exaxt_globally() -> bool {
-    if !cfg!(feature = "withoutexactarithmetic") {
+    if cfg!(any(all(
+        feature = "exactarithmetic",
+        feature = "approximatearithmetic"
+    ), all(not(feature = "exactarithmetic"), not(feature="approximatearithmetic")))) {
         EXACT.load(std::sync::atomic::Ordering::Relaxed)
+    } else if cfg!(feature = "exactarithmetic") {
+        true
     } else {
         false
     }
@@ -33,16 +78,13 @@ pub fn is_exaxt_globally() -> bool {
 
 #[derive(Clone)]
 pub struct FractionNotParsedYet {
-    pub s: String
+    pub s: String,
 }
 
 impl FromStr for FractionNotParsedYet {
     type Err = Error;
 
     fn from_str(s: &str) -> std::prelude::v1::Result<Self, Self::Err> {
-        Ok(Self {
-            s: s.to_string()
-        })
+        Ok(Self { s: s.to_string() })
     }
 }
-

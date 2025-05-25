@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Context};
+use anyhow::{Context, anyhow};
 
 use super::ebi_command_sample::{self, SAMPLED_OBJECT_INPUTS};
 use crate::{
@@ -41,7 +41,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
     name_long: Some("unit-earth-movers-stochastic-conformance"),
     library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_UEMSC",
     explanation_short: "Compute unit-earth movers' stochastic conformance.",
-    explanation_long: None,
+    explanation_long: Some("Compute unit-earth movers' stochastic conformance, also known as total variation distance."),
     latex_link: Some("\\cite{DBLP:conf/bpm/LeemansSA19}"),
     cli_command: None,
     exact_arithmetic: true,
@@ -207,7 +207,7 @@ pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
     name_long: Some("earth-movers-stochastic-conformance"),
     library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_EMSC",
     explanation_short: "Compute Earth mover's stochastic conformance.",
-    explanation_long: None,
+    explanation_long: Some("Compute Earth mover's stochastic conformance, also known as the Wasserstein distance."),
     latex_link: Some("\\cite{DBLP:journals/is/LeemansABP21}"),
     cli_command: None,
     exact_arithmetic: true,
@@ -244,7 +244,7 @@ pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_long: Some("earth-movers-stochastic-conformance-sample"),
     library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_EMSC_SAMPLE",
     explanation_short: "Compute Earth mover's stochastic conformance with sampling.",
-    explanation_long: None,
+    explanation_long: Some("Compute Earth mover's stochastic conformance with sampling, also known as the Wasserstein distance."),
     latex_link: Some("\\cite{DBLP:journals/is/LeemansABP21}"),
     cli_command: None,
     exact_arithmetic: true,

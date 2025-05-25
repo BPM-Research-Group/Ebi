@@ -14,7 +14,7 @@ pub const EBI_EXECUTIONS: EbiFileHandler = EbiFileHandler {
     article: "",
     file_extension: "exs",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<Executions>,
+    validator: Some(ebi_input::validate::<Executions>),
     trait_importers: &[
         
     ],
@@ -27,7 +27,7 @@ pub const EBI_EXECUTIONS: EbiFileHandler = EbiFileHandler {
     java_object_handlers: &[],
 };
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Executions {
     executions: Vec<Execution>
 }
@@ -45,6 +45,7 @@ impl Importable for Executions {
 impl Infoable for Executions {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         writeln!(f, "Number of executions\t\t{}", self.executions.len())?;
+        
         Ok(write!(f, "")?)
     }
 }
@@ -86,7 +87,7 @@ impl From<Vec<Execution>> for Executions {
     }
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct Execution {
     pub transition: usize,
     pub enabled_transitions_at_enablement: Option<Vec<usize>>,

@@ -7,7 +7,12 @@ use crate::{
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
     follower_semantics::FollowerSemantics,
-    math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv, traits::{Signed, Zero}},
+    math::{
+        fraction::Fraction,
+        log_div::LogDiv,
+        root_log_div::RootLogDiv,
+        traits::{Signed, Zero},
+    },
 };
 
 pub trait JensenShannonStochasticConformance {
@@ -23,9 +28,13 @@ pub trait JensenShannonStochasticConformance {
 }
 
 impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
-    fn jssc_log2log(&self, event_log2: Box<dyn EbiTraitFiniteStochasticLanguage>) -> Result<RootLogDiv> {
+    fn jssc_log2log(
+        &self,
+        event_log2: Box<dyn EbiTraitFiniteStochasticLanguage>,
+    ) -> Result<RootLogDiv> {
         let mut activity_key1 = self.get_activity_key().clone();
-        let translator = ActivityKeyTranslator::new(&event_log2.get_activity_key(), &mut activity_key1);
+        let translator =
+            ActivityKeyTranslator::new(&event_log2.get_activity_key(), &mut activity_key1);
 
         let mut sum = LogDiv::zero();
 
@@ -89,9 +98,16 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
 mod tests {
     use std::fs;
 
-    use crate::{ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage, stochastic_labelled_petri_net::StochasticLabelledPetriNet}, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv, traits::Zero}, techniques::jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance};
+    use crate::{
+        ebi_objects::{
+            event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage,
+            stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        },
+        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv, traits::Zero},
+        techniques::jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
+    };
 
-    
     #[test]
     fn jssc() {
         let fin1 = fs::read_to_string("testfiles/aa-ab-ba_ali.slpn").unwrap();
@@ -101,7 +117,7 @@ mod tests {
         let log = fin2.parse::<EventLog>().unwrap();
 
         let slang: Box<dyn EbiTraitFiniteStochasticLanguage> =
-            Box::new(log.get_finite_stochastic_language());
+            Box::new(Into::<FiniteStochasticLanguage>::into(log));
 
         let mut x = LogDiv::from(Fraction::from(2));
         x /= 2;

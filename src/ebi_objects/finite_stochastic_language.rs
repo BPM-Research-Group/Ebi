@@ -1,6 +1,6 @@
-use anyhow::{anyhow, Context, Error, Result};
+use anyhow::{Context, Error, Result, anyhow};
 use std::{
-    collections::{hash_map::Entry, HashMap},
+    collections::HashMap,
     fmt,
     io::{self, BufRead, Write},
     str::FromStr,
@@ -8,7 +8,7 @@ use std::{
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey},
+        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -33,7 +33,10 @@ use crate::{
     },
     follower_semantics::FollowerSemantics,
     line_reader::LineReader,
-    math::{fraction::Fraction, traits::{One, Signed, Zero}},
+    math::{
+        fraction::Fraction,
+        traits::{One, Signed, Zero},
+    },
 };
 
 use super::{
@@ -61,7 +64,7 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "slang",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<FiniteStochasticLanguage>,
+    validator: Some(ebi_input::validate::<FiniteStochasticLanguage>),
     trait_importers: &[
         EbiTraitImporter::IterableLanguage(
             ebi_trait_iterable_language::import::<FiniteStochasticLanguage>,
@@ -92,15 +95,15 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     ],
     object_exporters: &[
         EbiObjectExporter::FiniteStochasticLanguage(FiniteStochasticLanguage::export_from_object),
-        EbiObjectExporter::EventLog(FiniteStochasticLanguage::export_from_event_log),
+        EbiObjectExporter::EventLog(FiniteStochasticLanguage::export_from_object),
     ],
     java_object_handlers: &[],
 };
 
 #[derive(Clone, Debug, ActivityKey)]
 pub struct FiniteStochasticLanguage {
-    activity_key: ActivityKey,
-    traces: HashMap<Vec<Activity>, Fraction>,
+    pub(crate) activity_key: ActivityKey,
+    pub(crate) traces: HashMap<Vec<Activity>, Fraction>,
 }
 
 impl FiniteStochasticLanguage {
@@ -118,7 +121,7 @@ impl FiniteStochasticLanguage {
         reader: &mut dyn BufRead,
     ) -> Result<Box<dyn EbiTraitFiniteLanguage>> {
         let lang = Self::import(reader)?;
-        Ok(Box::new(lang.to_finite_language()))
+        Ok(Box::new(Into::<FiniteLanguage>::into(lang)))
     }
 
     pub fn normalise_before(traces: &mut HashMap<Vec<String>, Fraction>) {
@@ -146,58 +149,6 @@ impl FiniteStochasticLanguage {
         }
     }
 
-    pub fn get_stochastic_deterministic_finite_automaton(
-        &self,
-    ) -> StochasticDeterministicFiniteAutomaton {
-        log::info!("convert finite stochastic language to sdfa");
-
-        let mut result = StochasticDeterministicFiniteAutomaton::new();
-        let mut final_states = HashMap::new();
-        result.set_activity_key(&self.activity_key);
-
-        //create automaton
-        for (trace, probability) in &self.traces {
-            let mut state = result.get_initial_state();
-            for activity in trace {
-                state = result.take_or_add_transition(state, *activity, probability.clone());
-            }
-
-            match final_states.entry(state) {
-                Entry::Occupied(mut e) => *e.get_mut() += Fraction::one(),
-                Entry::Vacant(e) => {
-                    e.insert(Fraction::one());
-                }
-            }
-        }
-
-        //count
-        let mut sums = final_states;
-        for (source, _, _, probability) in &result {
-            match sums.entry(*source) {
-                Entry::Occupied(mut e) => *e.get_mut() += probability,
-                Entry::Vacant(e) => {
-                    e.insert(probability.clone());
-                }
-            }
-        }
-
-        //normalise
-        result.scale_outgoing_probabilities(sums);
-
-        result
-    }
-
-    pub fn to_finite_language(self) -> FiniteLanguage {
-        log::info!("create finite language");
-
-        let mut map = FiniteLanguage::new_hashmap();
-        for (trace, _) in self.traces {
-            map.insert(trace);
-        }
-
-        FiniteLanguage::from((self.activity_key, map))
-    }
-
     fn contains(&self, atrace_b: Vec<&str>, probability_b: &Fraction) -> bool {
         for trace_a in self.traces.iter() {
             let atrace_a = self.activity_key.deprocess_trace(&trace_a.0);
@@ -209,21 +160,12 @@ impl FiniteStochasticLanguage {
         return false;
     }
 
-    fn export_from_event_log(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::EventLog(log)) => {
-                log.get_finite_stochastic_language().export(f)
-            }
-            _ => unreachable!(),
-        }
-    }
-
     pub fn import_as_stochastic_deterministic_finite_automaton(
         reader: &mut dyn BufRead,
     ) -> Result<EbiObject> {
         let slang = Self::import(reader)?;
         Ok(EbiObject::StochasticDeterministicFiniteAutomaton(
-            slang.get_stochastic_deterministic_finite_automaton(),
+            slang.into(),
         ))
     }
 }
@@ -233,16 +175,15 @@ impl TranslateActivityKey for FiniteStochasticLanguage {
         let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
 
         //a hashmap needs to be rebuilt, unfortunately
-        let translated_traces: HashMap<Vec<Activity>, Fraction> = self.traces
+        let translated_traces: HashMap<Vec<Activity>, Fraction> = self
+            .traces
             .drain() // `drain` is used to take ownership of the original traces (use `into_iter()` or `drain()` if we want to consume)
-            .map(|(trace, fraction)| {
-                (translator.translate_trace(&trace), fraction)
-            })
+            .map(|(trace, fraction)| (translator.translate_trace(&trace), fraction))
             .collect();
 
         // Update the traces in the language with the translated ones
         self.traces = translated_traces;
-        
+
         self.activity_key = to_activity_key.clone();
     }
 }
@@ -252,7 +193,7 @@ impl FromEbiTraitObject for FiniteStochasticLanguage {
         match object {
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a finite language",
+                "cannot read {} {} as a finite stochastic language",
                 object.get_type().get_article(),
                 object.get_type()
             )),
@@ -282,6 +223,34 @@ impl EbiTraitFiniteStochasticLanguage for FiniteStochasticLanguage {
             x += y;
             x
         })
+    }
+
+    fn translate(&mut self, target_activity_key: &mut ActivityKey) {
+        // Create a translator that maps activities from the current activity key to the target one
+        let translator = ActivityKeyTranslator::new(&self.activity_key, target_activity_key);
+
+        // Iterate over all the traces in the language
+        let translated_traces: HashMap<Vec<Activity>, Fraction> = self
+            .traces
+            .drain() // `drain` is used to take ownership of the original traces (use `into_iter()` or `drain()` if we want to consume)
+            .map(|(trace, fraction)| {
+                // Translate each trace using the translator
+                let translated_trace = translator.translate_trace(&trace);
+
+                // Return the translated trace with its associated fraction
+                (translated_trace, fraction)
+            })
+            .collect();
+
+        // Update the traces in the language with the translated ones
+        self.traces = translated_traces;
+    }
+
+    fn retain_traces<'a>(
+        &'a mut self,
+        f: Box<dyn Fn(&Vec<Activity>, &mut Fraction) -> bool + 'static>,
+    ) {
+        self.traces.retain(f);
     }
 }
 
@@ -438,7 +407,8 @@ impl Importable for FiniteStochasticLanguage {
             }
         }
 
-        if sum > Fraction::one() && !sum.is_one() { //avoid rounding errors in approximate mode
+        if sum > Fraction::one() && !sum.is_one() {
+            //avoid rounding errors in approximate mode
             return Err(anyhow!(
                 "probabilities in stochastic language sum to {}, which is greater than 1",
                 sum
@@ -456,6 +426,7 @@ impl Exportable for FiniteStochasticLanguage {
     fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::FiniteStochasticLanguage(slang)) => slang.export(f),
+            EbiOutput::Object(EbiObject::EventLog(log)) => Into::<Self>::into(log).export(f),
             _ => unreachable!(),
         }
     }
@@ -481,6 +452,9 @@ impl Infoable for FiniteStochasticLanguage {
                 .get_number_of_activities()
         )?;
         writeln!(f, "Sum of probabilities\t{:.4}", self.get_probability_sum())?;
+
+        writeln!(f, "")?;
+        self.get_activity_key().info(f)?;
 
         Ok(write!(f, "")?)
     }
@@ -524,9 +498,9 @@ impl ToStochasticSemantics for FiniteStochasticLanguage {
 
 impl ToStochasticDeterministicSemantics for FiniteStochasticLanguage {
     fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::Usize(Box::new(
-            self.get_stochastic_deterministic_finite_automaton(),
-        ))
+        EbiTraitStochasticDeterministicSemantics::Usize(Box::new(Into::<
+            StochasticDeterministicFiniteAutomaton,
+        >::into(self)))
     }
 }
 
@@ -553,14 +527,19 @@ impl EbiTraitQueriableStochasticLanguage for FiniteStochasticLanguage {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use std::fs;
 
-    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage}, math::{fraction::Fraction, traits::Zero}};
+    use crate::{
+        ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
+        ebi_traits::{
+            ebi_trait_event_log::IndexTrace,
+            ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        },
+        math::{fraction::Fraction, traits::Zero},
+    };
 
-    
     #[test]
     fn empty_slang() {
         let fin = fs::read_to_string("testfiles/empty.slang").unwrap();

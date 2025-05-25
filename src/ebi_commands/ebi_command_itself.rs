@@ -7,9 +7,7 @@ use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, g
 use strum::IntoEnumIterator;
 use svg2pdf::usvg::roxmltree::StringStorage;
 
-use crate::{ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, text::Joiner};
-
-use super::ebi_command_visualise;
+use crate::{ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, ebi_objects::scalable_vector_graphics::svg_to_pdf, text::Joiner};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
  □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
@@ -91,7 +89,7 @@ pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command {
         let mut svg = SVGWriter::new();
         graph.do_it(false, false, false, &mut svg);
         let svg_string = svg.finalize();
-        Ok(EbiOutput::PDF(ebi_command_visualise::svg_to_pdf(&svg_string)?))
+        Ok(EbiOutput::PDF(svg_to_pdf(&svg_string)?))
     }, 
     output_type: &EbiOutputType::PDF
 };
@@ -224,7 +222,7 @@ fn manual() -> Result<EbiOutput> {
                 writeln!(f, "The {} file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\\\", exporter)?;
             } else {
                 writeln!(f, "The file to which the results must be written. Based on the file extension, Ebi will output either {}.", output_types(output_type))?;
-                writeln!(f, "If the parameter is not given, the results will be written to STDOUT as {} {}.\\\\", output_type.get_exporters()[0].get_article(), output_type.get_exporters()[0])?;
+                writeln!(f, "If the parameter is not given, the results will be written to STDOUT as {} {}.\\\\", output_type.get_default_exporter().get_article(), output_type.get_default_exporter())?;
             }
             writeln!(f, "&\\textit{{Mandatory:}} \\quad no\\\\")?;
             
@@ -303,6 +301,7 @@ fn manual() -> Result<EbiOutput> {
     writeln!(f, "\\def\\ebitraitlist{{\\begin{{itemize}}")?;
     for etrait in EbiTrait::iter() {
         writeln!(f, "\\item {}.", etrait.to_string().to_sentence_case())?;
+        writeln!(f, "\\\\{}", etrait.get_explanation())?;
 
         writeln!(f, "\\\\File types that can be imported as {} {}: {}.", 
             etrait.get_article(), 

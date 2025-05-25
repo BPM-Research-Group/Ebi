@@ -1,0 +1,54 @@
+stochastic process tree
+xor
+# number of children
+2
+	sequence
+	# number of children
+	2
+		activity a0
+		# weight node 2
+		1
+		activity b1
+		# weight node 3
+		2
+	concurrent
+	# number of children
+	4
+		activity c2
+		# weight node 5
+		3
+		loop
+		# number of children
+		2
+			activity d3
+			# weight node 7
+			4
+			activity e4
+			# weight node 8
+			5
+		interleaved
+		# number of children
+		2
+			activity f5
+			# weight node 10
+			6
+			sequence
+			# number of children
+			2
+				tau
+				# weight node 12
+				7
+				activity g7
+				# weight node 13
+				8
+		or
+		# number of children
+		2
+			activity h8
+			# weight node 15
+			9
+			activity i9
+			# weight node 16
+			10
+# termination weight
+5

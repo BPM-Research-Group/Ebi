@@ -1,12 +1,15 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use std::collections::HashMap;
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
+        activity_key::{
+            Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
+        },
         infoable::Infoable,
     },
     ebi_traits::{
+        ebi_trait_event_log::IndexTrace,
         ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage,
         ebi_trait_semantics::Semantics,
         ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex},
@@ -25,43 +28,47 @@ pub struct FiniteStochasticLanguageSemantics {
 impl FiniteStochasticLanguageSemantics {
     pub fn from_language(lang: &FiniteStochasticLanguage) -> Self {
         let activity_key = lang.get_activity_key().clone();
+
         let mut nodes: Vec<HashMap<Option<Activity>, (usize, Fraction)>> = vec![];
+        if lang.len().is_zero() {
+            //empty language
+        } else {
+            nodes.push(HashMap::new()); //0: root
 
-        nodes.push(HashMap::new()); //0: root
+            for (trace, trace_probability) in lang.iter_trace_probability() {
+                let mut node_index = 0usize;
 
-        for (trace, trace_probability) in lang.iter_trace_probability() {
-            let mut node_index = 0usize;
-
-            for activity in trace {
-                let mut new_probability: Fraction;
-                let child_index;
-                if let Some((ci, old_probability)) = nodes[node_index].get(&Some(*activity)) {
-                    child_index = *ci;
-                    new_probability = old_probability.to_owned();
-                    new_probability += trace_probability.to_owned();
-                } else {
-                    child_index = nodes.len();
-                    nodes.push(HashMap::new());
-                    new_probability = trace_probability.to_owned();
+                for activity in trace {
+                    let mut new_probability: Fraction;
+                    let child_index;
+                    if let Some((ci, old_probability)) = nodes[node_index].get(&Some(*activity)) {
+                        child_index = *ci;
+                        new_probability = old_probability.to_owned();
+                        new_probability += trace_probability.to_owned();
+                    } else {
+                        child_index = nodes.len();
+                        nodes.push(HashMap::new());
+                        new_probability = trace_probability.to_owned();
+                    }
+                    nodes[node_index].insert(Some(*activity), (child_index, new_probability));
+                    node_index = child_index;
                 }
-                nodes[node_index].insert(Some(*activity), (child_index, new_probability));
-                node_index = child_index;
-            }
 
-            //add a silent transition to the dead state
-            {
-                let activity = None;
-                let new_probability;
-                let child_index;
-                if let Some((ci, old_probability)) = nodes[node_index].get(&activity) {
-                    child_index = *ci;
-                    new_probability = old_probability + trace_probability;
-                } else {
-                    child_index = nodes.len();
-                    nodes.push(HashMap::new());
-                    new_probability = trace_probability.clone();
+                //add a silent transition to the dead state
+                {
+                    let activity = None;
+                    let new_probability;
+                    let child_index;
+                    if let Some((ci, old_probability)) = nodes[node_index].get(&activity) {
+                        child_index = *ci;
+                        new_probability = old_probability + trace_probability;
+                    } else {
+                        child_index = nodes.len();
+                        nodes.push(HashMap::new());
+                        new_probability = trace_probability.clone();
+                    }
+                    nodes[node_index].insert(activity, (child_index, new_probability));
                 }
-                nodes[node_index].insert(activity, (child_index, new_probability));
             }
         }
 
@@ -92,9 +99,21 @@ impl TranslateActivityKey for FiniteStochasticLanguageSemantics {
         let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
 
         self.nodes.iter_mut().for_each(|map| {
-            *map = map.drain().map(|(activity, x)| (if let Some(a) = activity {Some(translator.translate_activity(&a))} else {activity}, x)).collect()
+            *map = map
+                .drain()
+                .map(|(activity, x)| {
+                    (
+                        if let Some(a) = activity {
+                            Some(translator.translate_activity(&a))
+                        } else {
+                            activity
+                        },
+                        x,
+                    )
+                })
+                .collect()
         });
-        
+
         self.activity_key = to_activity_key.clone();
     }
 }
@@ -102,8 +121,12 @@ impl TranslateActivityKey for FiniteStochasticLanguageSemantics {
 impl Semantics for FiniteStochasticLanguageSemantics {
     type SemState = usize;
 
-    fn get_initial_state(&self) -> usize {
-        0
+    fn get_initial_state(&self) -> Option<usize> {
+        if self.nodes.len().is_zero() {
+            None
+        } else {
+            Some(0)
+        }
     }
 
     fn execute_transition(&self, state: &mut usize, transition: TransitionIndex) -> Result<()> {
@@ -170,5 +193,29 @@ impl Infoable for FiniteStochasticLanguageSemantics {
         writeln!(f, "Number of states\t{}", self.nodes.len())?;
 
         Ok(write!(f, "")?)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{
+        ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
+        ebi_traits::ebi_trait_stochastic_semantics::{
+            EbiTraitStochasticSemantics, ToStochasticSemantics,
+        },
+    };
+
+    #[test]
+    fn slang_empty() {
+        let fin = fs::read_to_string("testfiles/empty.slang").unwrap();
+        let slpn = fin.parse::<FiniteStochasticLanguage>().unwrap();
+
+        if let EbiTraitStochasticSemantics::Usize(semantics) = slpn.to_stochastic_semantics() {
+            assert!(semantics.get_initial_state().is_none())
+        } else {
+            assert!(false)
+        }
     }
 }

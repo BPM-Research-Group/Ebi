@@ -1,21 +1,28 @@
 use anyhow::{anyhow, Error, Result};
 use fraction::{BigFraction, BigUint, GenericFraction, Sign};
-use num::{BigInt, One as NumOne, Zero as NumZero};
+use num::{BigInt, One as NumOne};
 use num_bigint::{RandBigInt, ToBigInt, ToBigUint};
 use num_rational::Ratio;
 use num_traits::ToPrimitive;
 use rand::Rng;
 use std::{
-    borrow::Borrow, cmp::Ordering, f64, hash::Hash, iter::Sum, ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign}, str::FromStr, sync::Arc
+    borrow::Borrow,
+    cmp::Ordering,
+    f64,
+    hash::Hash,
+    iter::Sum,
+    ops::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
+    str::FromStr,
+    sync::Arc,
 };
 
-use crate::{ebi_framework::{
-    ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait::FromEbiTraitObject,
-    exportable::Exportable, infoable::Infoable,
-}, math::fraction::EPSILON};
+use crate::{
+    ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable},
+    math::fraction::EPSILON,
+};
 
 use super::{
-    fraction::{FractionNotParsedYet, UInt, EXACT},
+    fraction::{ChooseRandomly, FractionNotParsedYet, MaybeExact, UInt, EXACT},
     traits::{One, Signed, Zero},
 };
 
@@ -29,14 +36,6 @@ pub enum FractionEnum {
 impl FractionEnum {
     pub(crate) fn create_exact() -> bool {
         EXACT.load(std::sync::atomic::Ordering::Relaxed)
-    }
-
-    pub(crate) fn is_exact(&self) -> bool {
-        match self {
-            FractionEnum::Exact(_) => true,
-            FractionEnum::Approx(_) => false,
-            FractionEnum::CannotCombineExactAndApprox => false,
-        }
     }
 
     /**
@@ -144,13 +143,65 @@ impl FractionEnum {
         }
     }
 
-    /**
-     * Return a random index from 0 (inclusive) to the length of the list (exclusive).
-     * The likelihood of each index to be returned is proportional to the value of the fraction at that index.
-     *
-     * The fractions do not need to sum to 1.
-     */
-    pub fn choose_randomly(fractions: &Vec<FractionEnum>) -> Result<usize> {
+    pub fn one_minus(self) -> Self {
+        match self {
+            FractionEnum::Exact(mut f) => {
+                f = f.neg();
+                f.add_assign(1.to_biguint().unwrap());
+                FractionEnum::Exact(f)
+            }
+            FractionEnum::Approx(f) => FractionEnum::Approx(1.0 - f),
+            Self::CannotCombineExactAndApprox => self,
+        }
+    }
+
+    pub fn two() -> FractionEnum {
+        if Self::create_exact() {
+            FractionEnum::Exact(GenericFraction::Rational(
+                Sign::Plus,
+                Ratio::new_raw(UInt::from(2u32), UInt::from(1u32)),
+            ))
+        } else {
+            FractionEnum::Approx(2.0)
+        }
+    }
+}
+
+impl MaybeExact for FractionEnum {
+    type Approximate = f64;
+    type Exact = BigFraction;
+
+    fn is_exact(&self) -> bool {
+        match self {
+            FractionEnum::Exact(_) => true,
+            FractionEnum::Approx(_) => false,
+            FractionEnum::CannotCombineExactAndApprox => false,
+        }
+    }
+
+    fn extract_approx(&self) -> Result<f64> {
+        match self {
+            FractionEnum::Exact(_) => Err(anyhow!("cannot extract a float from a fraction")),
+            FractionEnum::Approx(f) => Ok(*f),
+            FractionEnum::CannotCombineExactAndApprox => {
+                Err(anyhow!("cannot combine exact and approximate arithmetic"))
+            }
+        }
+    }
+
+    fn extract_exact(&self) -> Result<GenericFraction<BigUint>> {
+        match self {
+            FractionEnum::Exact(generic_fraction) => Ok(generic_fraction.clone()),
+            FractionEnum::Approx(_) => Err(anyhow!("cannot extract a fraction from a float")),
+            FractionEnum::CannotCombineExactAndApprox => {
+                Err(anyhow!("cannot combine exact and approximate arithmetic"))
+            }
+        }
+    }
+}
+
+impl ChooseRandomly for FractionEnum {
+    fn choose_randomly(fractions: &Vec<FractionEnum>) -> Result<usize> {
         if fractions.is_empty() {
             return Err(anyhow!("cannot take an element of an empty list"));
         }
@@ -204,59 +255,6 @@ impl FractionEnum {
         }
         Ok(probabilities.len() - 1)
     }
-
-    pub fn one_minus(self) -> Self {
-        match self {
-            FractionEnum::Exact(mut f) => {
-                f = f.neg();
-                f.add_assign(1.to_biguint().unwrap());
-                FractionEnum::Exact(f)
-            }
-            FractionEnum::Approx(f) => FractionEnum::Approx(1.0 - f),
-            Self::CannotCombineExactAndApprox => self,
-        }
-    }
-
-    pub fn two() -> FractionEnum {
-        if Self::create_exact() {
-            FractionEnum::Exact(GenericFraction::Rational(
-                Sign::Plus,
-                Ratio::new_raw(UInt::from(2u32), UInt::from(1u32)),
-            ))
-        } else {
-            FractionEnum::Approx(2.0)
-        }
-    }
-
-    /**
-     * This is a low-level function to extract an f64. Only use if you are sure that the fraction is approximate.
-     * May not be available in all compilation modes.
-     */
-    pub fn extract_approx(&self) -> Result<f64> {
-        match self {
-            FractionEnum::Exact(_) => {
-                Err(anyhow!("cannot extract a float from a fraction"))
-            }
-            FractionEnum::Approx(f) => Ok(*f),
-            FractionEnum::CannotCombineExactAndApprox => {
-                Err(anyhow!("cannot combine exact and approximate arithmetic"))
-            }
-        }
-    }
-
-    /**
-     * This is a low-level function to extract an f64. Only use if you are sure that the fraction is exact.
-     * May not be available in all compilation modes.
-     */
-    pub fn extract_exact(&self) -> Result<GenericFraction<BigUint>> {
-        match self {
-            FractionEnum::Exact(generic_fraction) => Ok(generic_fraction.clone()),
-            FractionEnum::Approx(_) => Err(anyhow!("cannot extract a fraction from a float")),
-            FractionEnum::CannotCombineExactAndApprox => {
-                Err(anyhow!("cannot combine exact and approximate arithmetic"))
-            }
-        }
-    }
 }
 
 impl One for FractionEnum {
@@ -271,9 +269,7 @@ impl One for FractionEnum {
     fn is_one(&self) -> bool {
         match self {
             FractionEnum::Exact(f) => fraction::One::is_one(f),
-            FractionEnum::Approx(f) => {
-                (f - 1.0).abs() < EPSILON
-            },
+            FractionEnum::Approx(f) => (f - 1.0).abs() < EPSILON,
             Self::CannotCombineExactAndApprox => false,
         }
     }
@@ -282,7 +278,7 @@ impl One for FractionEnum {
 impl Zero for FractionEnum {
     fn zero() -> Self {
         if Self::create_exact() {
-            FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, Ratio::zero()))
+            FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, num::Zero::zero()))
         } else {
             FractionEnum::Approx(<f64 as Zero>::zero())
         }
@@ -308,7 +304,7 @@ impl Signed for FractionEnum {
 
     fn is_positive(&self) -> bool {
         match self {
-            FractionEnum::Exact(f) => !f.is_zero() && fraction::Signed::is_positive(f),
+            FractionEnum::Exact(f) => !num::Zero::is_zero(f) && fraction::Signed::is_positive(f),
             FractionEnum::Approx(f) => *f != 0f64 && f.is_positive(),
             FractionEnum::CannotCombineExactAndApprox => false,
         }
@@ -351,10 +347,10 @@ impl TryFrom<&FractionNotParsedYet> for FractionEnum {
     }
 }
 
-impl FromEbiTraitObject for FractionEnum {
-    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
+impl crate::ebi_framework::ebi_trait::FromEbiTraitObject for FractionEnum {
+    fn from_trait_object(object: crate::ebi_framework::ebi_input::EbiInput) -> Result<Box<Self>> {
         match object {
-            EbiInput::Fraction(e) => Ok(Box::new(e)),
+            crate::ebi_framework::ebi_input::EbiInput::Fraction(e) => Ok(Box::new(e)),
             _ => Err(anyhow!(
                 "cannot read {} {} as a fraction",
                 object.get_type().get_article(),
@@ -689,9 +685,7 @@ impl PartialEq for FractionEnum {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
             (Self::Exact(l0), Self::Exact(r0)) => l0 == r0,
-            (Self::Approx(l0), Self::Approx(r0)) => {
-                l0 - EPSILON <= *r0 && *r0 <= l0 + EPSILON
-            }
+            (Self::Approx(l0), Self::Approx(r0)) => l0 - EPSILON <= *r0 && *r0 <= l0 + EPSILON,
             _ => false,
         }
     }
@@ -1160,12 +1154,14 @@ ttype_signed!(i32);
 ttype_signed!(i16);
 ttype_signed!(i8);
 
-
 #[cfg(test)]
 mod tests {
     use std::ops::Neg;
 
-    use crate::math::{fraction_enum::FractionEnum, traits::{One, Signed, Zero}};
+    use crate::math::{
+        fraction_enum::FractionEnum,
+        traits::{One, Signed, Zero},
+    };
 
     #[test]
     fn fraction_neg() {

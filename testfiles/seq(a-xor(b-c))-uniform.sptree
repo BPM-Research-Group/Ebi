@@ -1,0 +1,18 @@
+stochastic process tree
+sequence
+# number of children
+2
+	activity a
+	# weight node 1
+	1
+	xor
+	# number of children
+	2
+		activity b
+		# weight node 3
+		1
+		activity c
+		# weight node 4
+		1
+# termination weight
+1

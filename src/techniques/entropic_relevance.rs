@@ -121,7 +121,7 @@ fn h(x: &Fraction) -> LogDiv {
 mod tests {
     use std::fs;
 
-    use crate::{ebi_objects::event_log::EventLog, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, math::traits::One, techniques::entropic_relevance::EntropicRelvance};
+    use crate::{ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, math::traits::One, techniques::entropic_relevance::EntropicRelvance};
 
     #[test]
     fn entropic_relevance() {
@@ -131,8 +131,8 @@ mod tests {
         let fin2 = fs::read_to_string("testfiles/a-b.xes").unwrap();
         let log2 = fin2.parse::<EventLog>().unwrap();
 
-        let lang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(log.get_finite_stochastic_language());
-        let lang2: Box<dyn EbiTraitQueriableStochasticLanguage> = Box::new(log2.get_finite_stochastic_language());
+        let lang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(Into::<FiniteStochasticLanguage>::into(log));
+        let lang2: Box<dyn EbiTraitQueriableStochasticLanguage> = Box::new(Into::<FiniteStochasticLanguage>::into(log2));
         let er = lang.entropic_relevance(lang2).unwrap();
 
         assert!(er.is_one());

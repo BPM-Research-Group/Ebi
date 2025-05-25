@@ -20,27 +20,28 @@ use crate::{
         ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
     json,
-    math::{fraction::Fraction, traits::{One, Signed}},
+    math::{
+        fraction::Fraction,
+        traits::{One, Signed},
+    },
 };
-use anyhow::{anyhow, Context, Error, Result};
+use anyhow::{Context, Error, Result, anyhow};
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
 use std::{
-    cmp::{max, Ordering},
+    cmp::{Ordering, max},
     collections::HashMap,
     fmt,
     io::{self, BufRead},
     str::FromStr,
 };
 
-use super::{
-    labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-};
+use super::stochastic_labelled_petri_net::StochasticLabelledPetriNet;
 
 pub const FORMAT_SPECIFICATION: &str = "A stochastic deterministic finite automaton is a JSON structure with the top level being an object.
     This object contains the following key-value pairs:
     \\begin{itemize}
-    \\item \\texttt{initialState} being the index of the initial state.
+    \\item \\texttt{initialState} being the index of the initial state. This field is optional: if omitted, the SDFA has an empty stochastic language.
     \\item \\texttt{transitions} being a list of transitions. 
     Each transition is an object with \\texttt{from} being the source state index of the transition, 
     \\texttt{to} being the target state index of the transition, 
@@ -58,7 +59,7 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
     article: "a",
     file_extension: "sdfa",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<StochasticDeterministicFiniteAutomaton>,
+    validator: Some(ebi_input::validate::<StochasticDeterministicFiniteAutomaton>),
     trait_importers: &[
         EbiTraitImporter::QueriableStochasticLanguage(
             ebi_trait_queriable_stochastic_language::import::<StochasticDeterministicFiniteAutomaton>,
@@ -87,17 +88,17 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
             StochasticDeterministicFiniteAutomaton::export_from_object,
         ),
         EbiObjectExporter::FiniteStochasticLanguage(
-            StochasticDeterministicFiniteAutomaton::export_from_finite_stochastic_language,
+            StochasticDeterministicFiniteAutomaton::export_from_object,
         ),
-        EbiObjectExporter::EventLog(StochasticDeterministicFiniteAutomaton::export_from_event_log),
+        EbiObjectExporter::EventLog(StochasticDeterministicFiniteAutomaton::export_from_object),
     ],
     java_object_handlers: &[],
 };
 
-#[derive(Debug, ActivityKey)]
+#[derive(Debug, ActivityKey, Clone)]
 pub struct StochasticDeterministicFiniteAutomaton {
     pub(crate) activity_key: ActivityKey,
-    pub(crate) initial_state: usize,
+    pub(crate) initial_state: Option<usize>,
     pub(crate) max_state: usize,
     pub(crate) sources: Vec<usize>,       //transition -> source of arc
     pub(crate) targets: Vec<usize>,       //transition -> target of arc
@@ -107,11 +108,14 @@ pub struct StochasticDeterministicFiniteAutomaton {
 }
 
 impl StochasticDeterministicFiniteAutomaton {
+    /**
+     * Creates a new SDFA with an initial state. That is, it will have the stochastic language with the empty trace.
+     */
     pub fn new() -> Self {
         Self {
             activity_key: ActivityKey::new(),
             max_state: 0,
-            initial_state: 0,
+            initial_state: Some(0),
             sources: vec![],
             targets: vec![],
             activities: vec![],
@@ -136,13 +140,22 @@ impl StochasticDeterministicFiniteAutomaton {
         &self.probabilities
     }
 
-    pub fn set_initial_state(&mut self, state: usize) {
-        self.ensure_states(state);
+    pub fn set_initial_state(&mut self, state: Option<usize>) {
+        if let Some(state) = state {
+            self.ensure_states(state);
+        }
         self.initial_state = state;
     }
 
     pub fn can_terminate_in_state(&self, state: usize) -> bool {
         self.get_termination_probability(state).is_positive()
+    }
+
+    /**
+     * Returns whether a transition is not permanently disabled.
+     */
+    pub fn can_execute_transition(&self, transition: usize) -> bool {
+        self.probabilities[transition].is_positive()
     }
 
     fn ensure_states(&mut self, new_max_state: usize) {
@@ -168,7 +181,11 @@ impl StochasticDeterministicFiniteAutomaton {
             self.binary_search(source, self.activity_key.get_id_from_activity(activity));
         if found {
             //edge already present
-            Err(anyhow!("tried to insert edge from {} to {}, which would violate the determinism of the SDFA", source, target))
+            Err(anyhow!(
+                "tried to insert edge from {} to {}, which would violate the determinism of the SDFA",
+                source,
+                target
+            ))
         } else {
             self.sources.insert(from, source);
             self.targets.insert(from, target);
@@ -177,7 +194,12 @@ impl StochasticDeterministicFiniteAutomaton {
             self.probabilities.insert(from, probability);
 
             if self.terminating_probabilities[source].is_negative() {
-                Err(anyhow!("tried to insert edge from {} to {}, which brings the sum outgoing probability of the source state (1-{}) above 1", source, target, self.terminating_probabilities[source]))
+                Err(anyhow!(
+                    "tried to insert edge from {} to {}, which brings the sum outgoing probability of the source state (1-{}) above 1",
+                    source,
+                    target,
+                    self.terminating_probabilities[source]
+                ))
             } else {
                 Ok(())
             }
@@ -231,7 +253,7 @@ impl StochasticDeterministicFiniteAutomaton {
         self.terminating_probabilities = new_terminating_probabilities;
     }
 
-    pub fn get_initial_state(&self) -> usize {
+    pub fn get_initial_state(&self) -> Option<usize> {
         self.initial_state
     }
 
@@ -293,94 +315,21 @@ impl StochasticDeterministicFiniteAutomaton {
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let sdfa = Self::import(reader)?;
         Ok(EbiObject::LabelledPetriNet(
-            sdfa.get_stochastic_labelled_petri_net().into(),
+            Into::<StochasticLabelledPetriNet>::into(sdfa).into(),
         ))
-    }
-
-    pub fn get_stochastic_labelled_petri_net(&self) -> StochasticLabelledPetriNet {
-        log::info!("convert SDFA to stochastic labelled Petri net");
-
-        let mut result = LabelledPetriNet::new();
-        let translator =
-            ActivityKeyTranslator::new(self.get_activity_key(), result.get_activity_key_mut());
-        let mut weights = vec![];
-
-        let source = result.add_place();
-        result
-            .get_initial_marking_mut()
-            .increase(source, 1)
-            .unwrap();
-
-        //add places
-        let mut state2place = vec![];
-        for state in 0..=self.max_state {
-            let lpn_place = result.add_place();
-            state2place.push(lpn_place);
-
-            //add termination
-            if self.get_termination_probability(state).is_positive() {
-                let lpn_transition = result.add_transition(None);
-                weights.push(self.get_termination_probability(state).clone());
-                result
-                    .add_place_transition_arc(lpn_place, lpn_transition, 1)
-                    .unwrap();
-            }
-        }
-
-        //add edges
-        for (source, (target, (activity, probability))) in self.sources.iter().zip(
-            self.targets
-                .iter()
-                .zip(self.activities.iter().zip(self.probabilities.iter())),
-        ) {
-            //add transition
-            let lpn_activity = translator.translate_activity(activity);
-            let lpn_transition = result.add_transition(Some(lpn_activity));
-            let source_place = state2place[*source];
-            let target_place = state2place[*target];
-            result
-                .add_place_transition_arc(source_place, lpn_transition, 1)
-                .unwrap();
-            result
-                .add_transition_place_arc(lpn_transition, target_place, 1)
-                .unwrap();
-
-            weights.push(probability.clone());
-        }
-
-        StochasticLabelledPetriNet::from((result, weights))
     }
 
     pub fn set_activity_key(&mut self, activity_key: &ActivityKey) {
         self.activity_key = activity_key.clone();
-    }
-
-    pub fn export_from_finite_stochastic_language(
-        object: EbiOutput,
-        f: &mut dyn std::io::Write,
-    ) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::FiniteStochasticLanguage(slang)) => slang
-                .get_stochastic_deterministic_finite_automaton()
-                .export(f),
-            _ => unreachable!(),
-        }
-    }
-
-    pub fn export_from_event_log(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
-        match object {
-            EbiOutput::Object(EbiObject::EventLog(log)) => {
-                log.to_stochastic_deterministic_finite_automaton().export(f)
-            }
-            _ => unreachable!(),
-        }
     }
 }
 
 impl TranslateActivityKey for StochasticDeterministicFiniteAutomaton {
     fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
         let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
-        self.activities.iter_mut().for_each(|activity| *activity = translator.translate_activity(&activity));
+        self.activities
+            .iter_mut()
+            .for_each(|activity| *activity = translator.translate_activity(&activity));
         self.activity_key = to_activity_key.clone();
     }
 }
@@ -424,10 +373,7 @@ impl Importable for StochasticDeterministicFiniteAutomaton {
 
         let mut result = StochasticDeterministicFiniteAutomaton::new();
 
-        result.set_initial_state(
-            json::read_field_number(&json, "initialState")
-                .context("failed to read initial state")?,
-        );
+        result.set_initial_state(json::read_field_number(&json, "initialState").ok());
         let jtrans = json::read_field_list(&json, "transitions")
             .context("failed to read list of transitions")?;
         for (i, jtransition) in jtrans.iter().enumerate() {
@@ -454,7 +400,11 @@ impl Exportable for StochasticDeterministicFiniteAutomaton {
             EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa)) => {
                 sdfa.export(f)
             }
-            _ => unreachable!(),
+            EbiOutput::Object(EbiObject::FiniteStochasticLanguage(slang)) => {
+                Into::<Self>::into(slang).export(f)
+            }
+            EbiOutput::Object(EbiObject::EventLog(log)) => Into::<Self>::into(log).export(f),
+            _ => Err(anyhow!("Cannot export as SDFA.")),
         }
     }
 
@@ -473,6 +423,9 @@ impl Infoable for StochasticDeterministicFiniteAutomaton {
             self.activity_key.get_number_of_activities()
         )?;
 
+        writeln!(f, "")?;
+        self.get_activity_key().info(f)?;
+
         Ok(write!(f, "")?)
     }
 }
@@ -480,7 +433,9 @@ impl Infoable for StochasticDeterministicFiniteAutomaton {
 impl fmt::Display for StochasticDeterministicFiniteAutomaton {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         writeln!(f, "{{")?;
-        writeln!(f, "\"initialState\": {},", self.get_initial_state())?;
+        if let Some(state) = self.get_initial_state() {
+            writeln!(f, "\"initialState\": {},", state)?;
+        }
         writeln!(f, "\"transitions\": [")?;
         for pos in 0..self.sources.len() {
             write!(
@@ -503,7 +458,7 @@ impl fmt::Display for StochasticDeterministicFiniteAutomaton {
 }
 
 impl EbiTraitGraphable for StochasticDeterministicFiniteAutomaton {
-    fn to_dot(&self) -> layout::topo::layout::VisualGraph {
+    fn to_dot(&self) -> Result<layout::topo::layout::VisualGraph> {
         log::info!("to_dot for StochasticDeterministicFiniteAutomaton");
         let mut graph = VisualGraph::new(layout::core::base::Orientation::LeftToRight);
 
@@ -530,7 +485,7 @@ impl EbiTraitGraphable for StochasticDeterministicFiniteAutomaton {
             );
         }
 
-        return graph;
+        Ok(graph)
     }
 }
 
@@ -625,5 +580,28 @@ impl ToStochasticSemantics for StochasticDeterministicFiniteAutomaton {
 impl ToStochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton {
     fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
         EbiTraitStochasticDeterministicSemantics::Usize(Box::new(self))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};
+
+    use super::StochasticDeterministicFiniteAutomaton;
+
+    #[test]
+    fn sdfa_empty() {
+        let fin = fs::read_to_string("testfiles/empty.sdfa").unwrap();
+        let dfa = fin
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
+
+        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics() {
+            assert!(semantics.get_initial_state().is_none());
+        } else {
+            assert!(false);
+        }
     }
 }

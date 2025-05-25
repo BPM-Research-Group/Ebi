@@ -1,20 +1,17 @@
-use anyhow::{anyhow, Error, Result};
-use chrono::{DateTime, FixedOffset};
+use anyhow::{Error, Result, anyhow};
 use core::fmt;
-use process_mining::{
-    event_log::{event_log_struct::EventLogClassifier, AttributeValue},
-    XESImportOptions,
-};
+use process_mining::{XESImportOptions, event_log::event_log_struct::EventLogClassifier};
 use std::{
-    collections::{HashMap, HashSet},
-    fmt::Display,
+    collections::HashMap,
     io::{self, BufRead, Write},
     str::FromStr,
 };
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
+        activity_key::{
+            Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
+        },
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -37,7 +34,7 @@ use crate::{
         },
         ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
-    math::{fraction::Fraction, traits::One},
+    math::data_type::DataType,
 };
 
 use super::{
@@ -56,7 +53,7 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     article: "an",
     file_extension: "xes",
     format_specification: &FORMAT_SPECIFICATION,
-    validator: ebi_input::validate::<EventLog>,
+    validator: Some(ebi_input::validate::<EventLog>),
     trait_importers: &[
         EbiTraitImporter::IterableLanguage(EventLog::read_as_iterable_language),
         EbiTraitImporter::FiniteLanguage(EventLog::read_as_finite_language),
@@ -92,10 +89,10 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     }],
 };
 
-#[derive(ActivityKey)]
+#[derive(ActivityKey, Clone)]
 pub struct EventLog {
-    classifier: EventLogClassifier,
-    log: process_mining::EventLog,
+    pub(crate) classifier: EventLogClassifier,
+    pub(crate) log: process_mining::EventLog,
     activity_key: ActivityKey,
     traces: Vec<Vec<Activity>>,
 }
@@ -130,41 +127,43 @@ impl EventLog {
         reader: &mut dyn BufRead,
     ) -> Result<Box<dyn EbiTraitFiniteLanguage>> {
         let event_log = EventLog::import(reader)?;
-        Ok(Box::new(event_log.get_finite_language()))
+        Ok(Box::new(Into::<FiniteLanguage>::into(event_log)))
     }
 
     pub fn read_as_finite_stochastic_language(
         reader: &mut dyn BufRead,
     ) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>> {
         let event_log = EventLog::import(reader)?;
-        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(
-            event_log.get_finite_stochastic_language(),
-        )))
+        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(Into::<
+            FiniteStochasticLanguage,
+        >::into(
+            event_log,
+        ))))
     }
 
     pub fn read_as_queriable_stochastic_language(
         reader: &mut dyn BufRead,
     ) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>> {
         let event_log = EventLog::import(reader)?;
-        Ok(Box::new(event_log.get_finite_stochastic_language()))
+        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(event_log)))
     }
 
     pub fn read_as_iterable_language(
         reader: &mut dyn BufRead,
     ) -> Result<Box<dyn EbiTraitIterableLanguage>> {
         let event_log = EventLog::import(reader)?;
-        Ok(Box::new(Into::<FiniteLanguage>::into(
-            event_log.get_finite_language(),
-        )))
+        Ok(Box::new(Into::<FiniteLanguage>::into(event_log)))
     }
 
     pub fn read_as_iterable_stochastic_language(
         reader: &mut dyn BufRead,
     ) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>> {
         let event_log = EventLog::import(reader)?;
-        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(
-            event_log.get_finite_stochastic_language(),
-        )))
+        Ok(Box::new(Into::<FiniteStochasticLanguage>::into(Into::<
+            FiniteStochasticLanguage,
+        >::into(
+            event_log,
+        ))))
     }
 
     pub fn read_as_event_log(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLog>> {
@@ -174,131 +173,48 @@ impl EventLog {
 
     pub fn import_as_finite_stochastic_language(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let log = Self::import(reader)?;
-        Ok(EbiObject::FiniteStochasticLanguage(
-            log.get_finite_stochastic_language(),
-        ))
+        Ok(EbiObject::FiniteStochasticLanguage(Into::<
+            FiniteStochasticLanguage,
+        >::into(log)))
     }
 
     pub fn import_as_stochastic_deterministic_finite_automaton(
         reader: &mut dyn BufRead,
     ) -> Result<EbiObject> {
         let log = Self::import(reader)?;
-        Ok(EbiObject::StochasticDeterministicFiniteAutomaton(
-            log.to_stochastic_deterministic_finite_automaton(),
-        ))
-    }
-
-    pub fn get_finite_language(&self) -> FiniteLanguage {
-        log::info!("create finite language");
-
-        let mut map: HashSet<Vec<String>> = HashSet::new();
-        for t in &self.log.traces {
-            let trace = t
-                .events
-                .iter()
-                .map(|event| self.classifier.get_class_identity(event))
-                .collect::<Vec<String>>();
-            map.insert(trace);
-        }
-
-        FiniteLanguage::from(map)
-    }
-
-    pub fn get_finite_stochastic_language(&self) -> FiniteStochasticLanguage {
-        log::info!("create stochastic language");
-        let mut map = HashMap::new();
-        for t in &self.log.traces {
-            let trace = t
-                .events
-                .iter()
-                .map(|event| self.classifier.get_class_identity(event))
-                .collect::<Vec<String>>();
-            match map.entry(trace) {
-                std::collections::hash_map::Entry::Occupied(mut e) => {
-                    *e.get_mut() += Fraction::one();
-                    ()
-                }
-                std::collections::hash_map::Entry::Vacant(e) => {
-                    e.insert(Fraction::one());
-                    ()
-                }
-            }
-        }
-
-        map.into()
-    }
-
-    pub fn to_stochastic_deterministic_finite_automaton(
-        &self,
-    ) -> StochasticDeterministicFiniteAutomaton {
-        log::info!("convert event log to sdfa");
-
-        let mut result = StochasticDeterministicFiniteAutomaton::new();
-        let mut final_states = HashMap::new();
-
-        //create automaton
-        for trace_index in 0..self.log.traces.len() {
-            let trace =
-                self.read_trace_with_activity_key(result.get_activity_key_mut(), &trace_index);
-            let mut state = result.get_initial_state();
-
-            for activity in trace {
-                state = result.take_or_add_transition(state, activity, Fraction::one());
-            }
-
-            match final_states.entry(state) {
-                std::collections::hash_map::Entry::Occupied(mut e) => {
-                    *e.get_mut() += Fraction::one()
-                }
-                std::collections::hash_map::Entry::Vacant(e) => {
-                    e.insert(Fraction::one());
-                }
-            }
-        }
-
-        //count
-        let mut sums = final_states;
-        for (source, _, _, probability) in &result {
-            match sums.entry(*source) {
-                std::collections::hash_map::Entry::Occupied(mut e) => *e.get_mut() += probability,
-                std::collections::hash_map::Entry::Vacant(e) => {
-                    e.insert(probability.clone());
-                }
-            }
-        }
-
-        //normalise
-        result.scale_outgoing_probabilities(sums);
-
-        result
+        Ok(EbiObject::StochasticDeterministicFiniteAutomaton(Into::<
+            StochasticDeterministicFiniteAutomaton,
+        >::into(
+            log
+        )))
     }
 }
 
 impl TranslateActivityKey for EventLog {
     fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
         let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
-        self.traces.iter_mut().for_each(|trace| translator.translate_trace_mut(trace));
+        self.traces
+            .iter_mut()
+            .for_each(|trace| translator.translate_trace_mut(trace));
         self.activity_key = to_activity_key.clone();
     }
 }
 
 impl ToSemantics for EventLog {
     fn to_semantics(self) -> EbiTraitSemantics {
-        self.get_finite_stochastic_language().to_semantics()
+        Into::<FiniteStochasticLanguage>::into(self).to_semantics()
     }
 }
 
 impl ToStochasticSemantics for EventLog {
     fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
-        self.get_finite_stochastic_language()
-            .to_stochastic_semantics()
+        Into::<FiniteStochasticLanguage>::into(self).to_stochastic_semantics()
     }
 }
 
 impl ToStochasticDeterministicSemantics for EventLog {
     fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
-        self.get_finite_stochastic_language()
-            .to_stochastic_deterministic_semantics()
+        Into::<FiniteStochasticLanguage>::into(self).to_stochastic_deterministic_semantics()
     }
 }
 
@@ -321,9 +237,6 @@ impl Importable for EventLog {
             name: "concept:name".to_string(),
             keys: vec!["concept:name".to_string()],
         };
-        if log.traces.is_empty() {
-            return Err(anyhow!("event log has no traces"));
-        }
         Ok(EventLog::new(log, classifier))
     }
 }
@@ -341,7 +254,7 @@ impl Exportable for EventLog {
     fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::EventLog(log)) => log.export(f),
-            _ => unreachable!(),
+            _ => Err(anyhow!("Cannot export as event log.")),
         }
     }
 
@@ -359,7 +272,6 @@ impl fmt::Display for EventLog {
 
 impl Infoable for EventLog {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
-        let lang = self.get_finite_language();
         writeln!(f, "Number of traces\t{}", self.log.traces.len())?;
         writeln!(
             f,
@@ -370,12 +282,14 @@ impl Infoable for EventLog {
                 .map(|t| t.events.len())
                 .sum::<usize>()
         )?;
-        writeln!(f, "Number of unique traces\t{}", lang.len())?;
         writeln!(
             f,
             "Number of activities\t{}",
-            lang.get_activity_key().get_number_of_activities()
+            self.get_activity_key().get_number_of_activities()
         )?;
+
+        writeln!(f, "")?;
+        self.get_activity_key().info(f)?;
 
         let trace_atts = self.get_trace_attributes();
         let t: Vec<String> = trace_atts
@@ -413,16 +327,8 @@ impl EbiTraitEventLog for EventLog {
         map
     }
 
-    fn read_trace_with_activity_key(
-        &self,
-        activity_key: &mut ActivityKey,
-        trace_index: &usize,
-    ) -> Vec<Activity> {
-        self.log.traces[*trace_index]
-            .events
-            .iter()
-            .map(|event| activity_key.process_activity(&self.classifier.get_class_identity(event)))
-            .collect::<Vec<Activity>>()
+    fn retain_traces<'a>(&'a mut self, f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>) {
+        self.traces.retain(f);
     }
 }
 
@@ -436,113 +342,53 @@ impl IndexTrace for EventLog {
     }
 }
 
-#[derive(Debug)]
-pub enum DataType {
-    Categorical,
-    Numerical(Fraction, Fraction), //minimum, maximum
-    Time(DateTime<FixedOffset>, DateTime<FixedOffset>), //minimum, maximum
-    Undefined,
-}
+#[cfg(test)]
+mod tests {
+    use std::fs;
 
-impl DataType {
-    fn init(value: &AttributeValue) -> Self {
-        match value {
-            AttributeValue::String(x) => {
-                if let Ok(v) = x.parse::<Fraction>() {
-                    Self::Numerical(v.clone(), v)
-                } else if let Ok(v) = x.parse::<DateTime<FixedOffset>>() {
-                    Self::Time(v, v)
-                } else {
-                    Self::Categorical
-                }
-            }
-            AttributeValue::Date(x) => Self::Time(*x, *x),
-            AttributeValue::Int(x) => Self::Numerical(Fraction::from(*x), Fraction::from(*x)),
-            AttributeValue::Float(x) => Self::Numerical(
-                x.to_string().parse::<Fraction>().unwrap(),
-                x.to_string().parse::<Fraction>().unwrap(),
-            ),
-            AttributeValue::Boolean(_) => Self::Undefined,
-            AttributeValue::ID(_) => Self::Undefined,
-            AttributeValue::List(_) => Self::Undefined,
-            AttributeValue::Container(_) => Self::Undefined,
-            AttributeValue::None() => Self::Undefined,
-        }
+    use crate::{
+        ebi_framework::activity_key::{ActivityKey, TranslateActivityKey},
+        ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
+        ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+    };
+
+    use super::EventLog;
+
+    #[test]
+    fn log_to_slang() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+
+        let fin1 = fs::read_to_string("testfiles/a-b.slang").unwrap();
+        let slang = fin1.parse::<FiniteStochasticLanguage>().unwrap();
+
+        assert_eq!(Into::<FiniteStochasticLanguage>::into(log), slang);
     }
 
-    fn update(&mut self, value: &AttributeValue) {
-        *self = match (&self, value) {
-            (DataType::Categorical, AttributeValue::String(_)) => Self::Categorical,
-            (DataType::Categorical, AttributeValue::Date(_)) => Self::Undefined,
-            (DataType::Categorical, AttributeValue::Int(_)) => Self::Undefined,
-            (DataType::Categorical, AttributeValue::Float(_)) => Self::Undefined,
-            (DataType::Categorical, AttributeValue::Boolean(_)) => Self::Undefined,
-            (DataType::Categorical, AttributeValue::ID(_)) => Self::Undefined,
-            (DataType::Categorical, AttributeValue::List(_)) => Self::Undefined,
-            (DataType::Categorical, AttributeValue::Container(_)) => Self::Undefined,
-            (DataType::Categorical, AttributeValue::None()) => Self::Categorical,
-            (DataType::Numerical(min, max), AttributeValue::String(s)) => {
-                if let Ok(x1) = s.parse::<Fraction>() {
-                    Self::Numerical(x1.clone().min(min.clone()), x1.max(max.clone()))
-                } else {
-                    Self::Undefined
-                }
-            }
-            (DataType::Numerical(_, _), AttributeValue::Date(_)) => Self::Undefined,
-            (DataType::Numerical(min, max), AttributeValue::Int(y)) => Self::Numerical(
-                min.min(&mut Fraction::from(*y)).clone(),
-                max.max(&mut Fraction::from(*y)).clone(),
-            ),
-            (DataType::Numerical(min, max), AttributeValue::Float(y)) => Self::Numerical(
-                min.min(&mut y.to_string().parse::<Fraction>().unwrap())
-                    .clone(),
-                max.max(&mut y.to_string().parse::<Fraction>().unwrap())
-                    .clone(),
-            ),
-            (DataType::Numerical(_, _), AttributeValue::Boolean(_)) => Self::Undefined,
-            (DataType::Numerical(_, _), AttributeValue::ID(_)) => Self::Undefined,
-            (DataType::Numerical(_, _), AttributeValue::List(_)) => Self::Undefined,
-            (DataType::Numerical(_, _), AttributeValue::Container(_)) => Self::Undefined,
-            (DataType::Numerical(min, max), AttributeValue::None()) => {
-                Self::Numerical(min.clone(), max.clone())
-            }
-            (DataType::Time(min, max), AttributeValue::String(s)) => {
-                if let Ok(v) = s.parse::<DateTime<FixedOffset>>() {
-                    Self::Time(v.min(*min), v.max(*max))
-                } else {
-                    Self::Categorical
-                }
-            }
-            (DataType::Time(min, max), AttributeValue::Date(y)) => {
-                Self::Time(*min.min(y), *max.max(y))
-            }
-            (DataType::Time(_, _), AttributeValue::Int(_)) => Self::Undefined,
-            (DataType::Time(_, _), AttributeValue::Float(_)) => Self::Undefined,
-            (DataType::Time(_, _), AttributeValue::Boolean(_)) => Self::Undefined,
-            (DataType::Time(_, _), AttributeValue::ID(_)) => Self::Undefined,
-            (DataType::Time(_, _), AttributeValue::List(_)) => Self::Undefined,
-            (DataType::Time(_, _), AttributeValue::Container(_)) => Self::Undefined,
-            (DataType::Time(x, y), AttributeValue::None()) => Self::Time(*x, *y),
-            (DataType::Undefined, AttributeValue::String(_)) => Self::Undefined,
-            (DataType::Undefined, AttributeValue::Date(_)) => Self::Undefined,
-            (DataType::Undefined, AttributeValue::Int(_)) => Self::Undefined,
-            (DataType::Undefined, AttributeValue::Float(_)) => Self::Undefined,
-            (DataType::Undefined, AttributeValue::Boolean(_)) => Self::Undefined,
-            (DataType::Undefined, AttributeValue::ID(_)) => Self::Undefined,
-            (DataType::Undefined, AttributeValue::List(_)) => Self::Undefined,
-            (DataType::Undefined, AttributeValue::Container(_)) => Self::Undefined,
-            (DataType::Undefined, AttributeValue::None()) => Self::Undefined,
-        };
-    }
-}
+    #[test]
+    fn log_activity_key() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let mut log = fin.parse::<EventLog>().unwrap();
 
-impl Display for DataType {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            DataType::Categorical => write!(f, "categorical"),
-            DataType::Numerical(min, max) => write!(f, "numerical between {} and {}", min, max),
-            DataType::Time(min, max) => write!(f, "time between {} and {}", min, max),
-            DataType::Undefined => write!(f, "undefined"),
+        let mut activity_key = ActivityKey::new();
+        log.translate_using_activity_key(&mut activity_key);
+    }
+
+    #[test]
+    fn log_display() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+
+        assert_eq!(format!("{}", log), "event log with 2 traces");
+    }
+
+    #[test]
+    fn log_empty() {
+        let fin = fs::read_to_string("testfiles/empty.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+
+        if let EbiTraitSemantics::Usize(semantics) = log.to_semantics() {
+            assert!(semantics.get_initial_state().is_none());
         }
     }
 }
