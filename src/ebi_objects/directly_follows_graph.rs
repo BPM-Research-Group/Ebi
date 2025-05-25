@@ -500,20 +500,19 @@ impl TranslateActivityKey for DirectlyFollowsGraph {
 
 impl Infoable for DirectlyFollowsGraph {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
-        writeln!(f, "Number of edges\t\t{}", self.sources.len())?;
+        writeln!(f, "Number of edges\t\t\t{}", self.sources.len())?;
         writeln!(
             f,
-            "Number of activities\t{}",
+            "Number of activities\t\t{}",
             self.activity_key.activity2name.len()
         )?;
-        writeln!(f, "Number of edges\t\t{}", self.sources.len())?;
-        writeln!(f, "Number of start nodes\t{}", self.start_activities.len())?;
-        writeln!(f, "Number of end nodes\t{}", self.end_activities.len())?;
+        writeln!(f, "Number of start activities\t{}", self.start_activities.len())?;
+        writeln!(f, "Number of end activities\t{}", self.end_activities.len())?;
 
         let mut sum: Fraction = self.weights.iter().sum();
         sum += &self.start_activities.values().sum::<Fraction>();
         sum += &self.end_activities.values().sum::<Fraction>();
-        writeln!(f, "Sum weight of edges\t{}", sum)?;
+        writeln!(f, "Sum weight of edges\t\t{}", sum)?;
 
         writeln!(f, "")?;
         self.get_activity_key().info(f)?;
