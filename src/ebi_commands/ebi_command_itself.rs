@@ -529,7 +529,7 @@ pub fn generate_pm4py_module() -> Result<EbiOutput> {
 use pyo3::types::PyAny;
 use super::pm4py_link::ImportableFromPM4Py;
 use crate::ebi_framework::{{ebi_command::EbiCommand, ebi_output}};
-use crate::ebi_objects::{{event_log::EventLog, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet}};");
+use crate::ebi_objects::{{event_log::EventLog, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet, process_tree::ProcessTree}};");
     let mut functions = String::new();
     let mut module = format!("#[pymodule]\nfn ebi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {{");
     
@@ -591,6 +591,7 @@ fn {fname}({args}) -> PyResult<String> {{
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg{idx}, input_types[{idx}]).ok())

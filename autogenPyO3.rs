@@ -2,7 +2,7 @@ use pyo3::prelude::*;
 use pyo3::types::PyAny;
 use super::pm4py_link::ImportableFromPM4Py;
 use crate::ebi_framework::{ebi_command::EbiCommand, ebi_output};
-use crate::ebi_objects::{event_log::EventLog, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet};
+use crate::ebi_objects::{event_log::EventLog, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet, process_tree::ProcessTree};
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ALL;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COMPLETENESS;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COVERAGE;
@@ -56,6 +56,7 @@ fn analyse_all_traces(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -91,6 +92,7 @@ fn analyse_completeness(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -126,6 +128,7 @@ fn analyse_coverage(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -134,6 +137,7 @@ fn analyse_coverage(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -169,6 +173,7 @@ fn analyse_medoid(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -177,6 +182,7 @@ fn analyse_medoid(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -212,6 +218,7 @@ fn analyse_minimum_probability_traces(arg0: &PyAny, arg1: &PyAny) -> PyResult<St
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -220,6 +227,7 @@ fn analyse_minimum_probability_traces(arg0: &PyAny, arg1: &PyAny) -> PyResult<St
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -255,6 +263,7 @@ fn analyse_mode(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -290,6 +299,7 @@ fn analyse_most_likely_traces(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -298,6 +308,7 @@ fn analyse_most_likely_traces(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -333,6 +344,7 @@ fn analyse_variety(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -368,6 +380,7 @@ fn analyse_non_stochastic_alignment(arg0: &PyAny, arg1: &PyAny) -> PyResult<Stri
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -376,6 +389,7 @@ fn analyse_non_stochastic_alignment(arg0: &PyAny, arg1: &PyAny) -> PyResult<Stri
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -411,6 +425,7 @@ fn analyse_non_stochastic_cluster(arg0: &PyAny, arg1: &PyAny) -> PyResult<String
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -419,6 +434,7 @@ fn analyse_non_stochastic_cluster(arg0: &PyAny, arg1: &PyAny) -> PyResult<String
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -454,6 +470,7 @@ fn analyse_non_stochastic_executions(arg0: &PyAny, arg1: &PyAny) -> PyResult<Str
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -462,6 +479,7 @@ fn analyse_non_stochastic_executions(arg0: &PyAny, arg1: &PyAny) -> PyResult<Str
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -497,6 +515,7 @@ fn analyse_non_stochastic_medoid(arg0: &PyAny, arg1: &PyAny) -> PyResult<String>
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -505,6 +524,7 @@ fn analyse_non_stochastic_medoid(arg0: &PyAny, arg1: &PyAny) -> PyResult<String>
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -540,6 +560,7 @@ fn association_all_trace_attributes(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -575,6 +596,7 @@ fn association_trace_attribute(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -583,6 +605,7 @@ fn association_trace_attribute(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -618,6 +641,7 @@ fn conformance_earth_movers_stochastic_conformance(arg0: &PyAny, arg1: &PyAny) -
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -626,6 +650,7 @@ fn conformance_earth_movers_stochastic_conformance(arg0: &PyAny, arg1: &PyAny) -
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -661,6 +686,7 @@ fn conformance_earth_movers_stochastic_conformance_sample(arg0: &PyAny, arg1: &P
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -669,6 +695,7 @@ fn conformance_earth_movers_stochastic_conformance_sample(arg0: &PyAny, arg1: &P
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -677,6 +704,7 @@ fn conformance_earth_movers_stochastic_conformance_sample(arg0: &PyAny, arg1: &P
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg2, input_types[2]).ok())
@@ -712,6 +740,7 @@ fn conformance_entropic_relevance(arg0: &PyAny, arg1: &PyAny) -> PyResult<String
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -720,6 +749,7 @@ fn conformance_entropic_relevance(arg0: &PyAny, arg1: &PyAny) -> PyResult<String
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -755,6 +785,7 @@ fn conformance_jensen_shannon(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -763,6 +794,7 @@ fn conformance_jensen_shannon(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -798,6 +830,7 @@ fn conformance_jensen_shannon_sample(arg0: &PyAny, arg1: &PyAny, arg2: &PyAny) -
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -806,6 +839,7 @@ fn conformance_jensen_shannon_sample(arg0: &PyAny, arg1: &PyAny, arg2: &PyAny) -
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -814,6 +848,7 @@ fn conformance_jensen_shannon_sample(arg0: &PyAny, arg1: &PyAny, arg2: &PyAny) -
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg2, input_types[2]).ok())
@@ -849,6 +884,7 @@ fn conformance_unit_earth_movers_stochastic_conformance(arg0: &PyAny, arg1: &PyA
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -857,6 +893,7 @@ fn conformance_unit_earth_movers_stochastic_conformance(arg0: &PyAny, arg1: &PyA
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -892,6 +929,7 @@ fn convert_finite_stochastic_language(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -927,6 +965,7 @@ fn convert_labelled_petri_net(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -962,6 +1001,7 @@ fn convert_stochastic_finite_deterministic_automaton(arg0: &PyAny) -> PyResult<S
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -997,6 +1037,7 @@ fn discover_alignments(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -1005,6 +1046,7 @@ fn discover_alignments(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -1040,6 +1082,7 @@ fn discover_occurrence(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -1048,6 +1091,7 @@ fn discover_occurrence(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -1083,6 +1127,7 @@ fn discover_uniform(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -1118,6 +1163,7 @@ fn information(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -1288,6 +1334,7 @@ fn probability_explain_trace(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -1296,6 +1343,7 @@ fn probability_explain_trace(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -1331,6 +1379,7 @@ fn probability_model(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -1339,6 +1388,7 @@ fn probability_model(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -1374,6 +1424,7 @@ fn probability_trace(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -1409,6 +1460,7 @@ fn sample(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -1417,6 +1469,7 @@ fn sample(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -1452,6 +1505,7 @@ fn test_log_categorical_attribute(arg0: &PyAny, arg1: &PyAny) -> PyResult<String
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -1460,6 +1514,7 @@ fn test_log_categorical_attribute(arg0: &PyAny, arg1: &PyAny) -> PyResult<String
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
@@ -1495,6 +1550,7 @@ fn validate(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -1530,6 +1586,7 @@ fn visualise_pdf(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -1565,6 +1622,7 @@ fn visualise_svg(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -1600,6 +1658,7 @@ fn visualise_text(arg0: &PyAny) -> PyResult<String> {
         EventLog::import_from_pm4py,
         // StochasticLabelledPetriNet::import_from_pm4py,
         LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
     ]
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
@@ -1670,4 +1729,5 @@ fn ebi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {    m.add_function(wrap_p
     m.add_function(wrap_pyfunction!(visualise_text, m)?)?;
     Ok(())
 }
+
 

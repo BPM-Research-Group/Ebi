@@ -7,6 +7,7 @@ use pyo3::exceptions::PyValueError;
 use std::io::Cursor;
 use std::collections::HashMap;
 
+use crate::ebi_objects::process_tree::ProcessTree;
 use crate::math::fraction::Fraction;
 use super::ebi_output::EbiOutput;
 use crate::ebi_framework::ebi_object::EbiTraitObject;
@@ -14,8 +15,8 @@ use crate::ebi_framework::ebi_command::EbiCommand;
 use crate::ebi_framework::{ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType}, ebi_trait::EbiTrait, activity_key::ActivityKey};
 use crate::ebi_objects::event_log::{EventLog, EBI_EVENT_LOG};
 use crate::ebi_objects::labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET};
-use crate::ebi_traits::ebi_trait_semantics::EbiTraitSemantics;
-use crate::ebi_objects::{stochastic_labelled_petri_net::StochasticLabelledPetriNet, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE};
+use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};
+use crate::ebi_objects::{stochastic_labelled_petri_net::StochasticLabelledPetriNet, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE, process_tree::{Node, Operator, EBI_PROCESS_TREE}};
 use crate::marking::Marking;
 use process_mining::event_log::{event_log_struct::{EventLogClassifier, to_attributes}, Attributes, AttributeValue};
 use process_mining::event_log::{EventLog as ProcessMiningEventLog, Trace, Event};
@@ -355,7 +356,98 @@ impl ImportableFromPM4Py for StochasticLabelledPetriNet {
     }
 }
 
+impl ImportableFromPM4Py for ProcessTree {
+    fn import_from_pm4py(
+        ptree: &PyAny,
+        input_types: &[&EbiInputType],
+    ) -> PyResult<EbiInput> {
+        // 1) Recursively flatten the Python ProcessTree into Vec<Node>
+        let mut key = crate::ebi_framework::activity_key::ActivityKey::new();
+        let mut flat: Vec<Node> = Vec::new();
+        fn walk(
+            py_node: &PyAny,
+            flat: &mut Vec<Node>,
+            key: &mut crate::ebi_framework::activity_key::ActivityKey,
+        ) -> PyResult<()> {
+            // children list
+            let py_children = py_node.getattr("_children")?
+                .downcast::<PyList>()
+                .map_err(|e| PyValueError::new_err(format!("_children is not a list: {}", e)))?;
+            let n_child = py_children.len();
 
+            if n_child == 0 {
+                // leaf: check label
+                let py_label = py_node.getattr("_label")?;
+                if !py_label.is_none() {
+                    let label: String = py_label
+                        .extract()
+                        .map_err(|e| PyValueError::new_err(format!("Label not string: {}", e)))?;
+                    let act = key.process_activity(&label);
+                    flat.push(Node::Activity(act));
+                } else {
+                    flat.push(Node::Tau);
+                }
+            } else {
+                // operator node
+                // extract operator enum
+                let op_str: String = py_node
+                    .getattr("_operator")?
+                    .extract()
+                    .map_err(|e| PyValueError::new_err(format!("Operator not string: {}", e)))?;
+                let op = op_str
+                    .parse::<Operator>()
+                    .map_err(|e| PyValueError::new_err(format!("Bad operator `{}`: {}", op_str, e)))?;
+                flat.push(Node::Operator(op, n_child));
+                // recurse children
+                for child in py_children.iter() {
+                    walk(child, flat, key)?;
+                }
+            }
+            Ok(())
+        }
+        walk(ptree, &mut flat, &mut key)
+            .map_err(|e| PyValueError::new_err(format!("Failed walking ProcessTree: {}", e)))?;
+
+        // 2) Build the Rust ProcessTree
+        let rust_tree = ProcessTree::new(key, flat);
+
+        // 3) Dispatch on input_types
+        for &itype in input_types {
+            match itype {
+                // raw object
+                EbiInputType::Object(EbiObjectType::ProcessTree) => {
+                    return Ok(EbiInput::Object(
+                        EbiObject::ProcessTree(rust_tree.clone()),
+                        &EBI_PROCESS_TREE,
+                    ));
+                }
+                // Semantics trait
+                EbiInputType::Trait(EbiTrait::Semantics) => {
+                    let sem = rust_tree.to_semantics();
+                    let sem_obj = EbiTraitObject::Semantics(sem);
+                    return Ok(EbiInput::Trait(sem_obj, &EBI_PROCESS_TREE));
+                }
+                // Graphable trait
+                EbiInputType::Trait(EbiTrait::Graphable) => {
+                    let graph_obj = EbiTraitObject::Graphable(Box::new(rust_tree.clone()));
+                    return Ok(EbiInput::Trait(graph_obj, &EBI_PROCESS_TREE));
+                }
+                // fallback any-object
+                EbiInputType::AnyObject => {
+                    return Ok(EbiInput::Object(
+                        EbiObject::ProcessTree(rust_tree.clone()),
+                        &EBI_PROCESS_TREE,
+                    ));
+                }
+                _ => { /* skip unsupported */ }
+            }
+        }
+
+        Err(PyValueError::new_err(
+            "ProcessTree could not be wrapped as any of the requested EbiInputType variants",
+        ))
+    }
+}
 
 
 
