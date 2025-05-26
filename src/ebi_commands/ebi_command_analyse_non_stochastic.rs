@@ -37,6 +37,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
 pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command {
     name_short: "ali",
     name_long: Some("alignment"),
+    library_name: "ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT",
     explanation_short: "Compute alignments.",
     explanation_long: Some(
         "Compute alignments.\nNB 1: the model must be able to terminate and its states must be bounded.\nNB 2: the search performed is not optimised. For Petri nets, the ProM implementation may be more efficient.",
@@ -70,6 +71,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command
 pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
     name_short: "bnd",
     name_long: Some("bounded"),
+    library_name: "ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_BOUNDED",
     explanation_short: "Compute whether the model has a bounded state space.",
     explanation_long: Some(
         "Compute whether the model has a bounded state space. 
@@ -206,6 +208,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Comman
 pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Command {
     name_short: "at",
     name_long: Some("any-traces"),
+    library_name: "ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES",
     explanation_short: "Compute whether the model has any traces.",
     explanation_long: Some(
         "Compute whether the model has any traces.
@@ -293,6 +296,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
 pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCommand::Command {
     name_short: "inft",
     name_long: Some("infinitely-many-traces"),
+    library_name: "ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES",
     explanation_short: "Compute whether the model has infinitely many traces.",
     explanation_long: Some(
         "Compute whether the model has infinitely many traces. The computation may not terminate if the model is unbounded.",

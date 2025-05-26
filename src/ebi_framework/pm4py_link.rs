@@ -6,6 +6,9 @@ use polars::prelude::*;
 use pyo3::exceptions::PyValueError;
 use std::io::Cursor;
 use std::collections::HashMap;
+use std::str::FromStr;
+use std::str::Chars;
+use std::iter::Peekable;
 
 use crate::ebi_objects::process_tree::ProcessTree;
 use crate::math::fraction::Fraction;
@@ -16,7 +19,7 @@ use crate::ebi_framework::{ebi_input::{EbiInput, EbiInputType}, ebi_object::{Ebi
 use crate::ebi_objects::event_log::{EventLog, EBI_EVENT_LOG};
 use crate::ebi_objects::labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET};
 use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};
-use crate::ebi_objects::{stochastic_labelled_petri_net::StochasticLabelledPetriNet, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE, process_tree::{Node, Operator, EBI_PROCESS_TREE}};
+use crate::ebi_objects::{stochastic_labelled_petri_net::StochasticLabelledPetriNet, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, process_tree::{Node, Operator, EBI_PROCESS_TREE}};
 use crate::marking::Marking;
 use process_mining::event_log::{event_log_struct::{EventLogClassifier, to_attributes}, Attributes, AttributeValue};
 use process_mining::event_log::{EventLog as ProcessMiningEventLog, Trace, Event};
@@ -64,8 +67,12 @@ impl ImportableFromPM4Py for EventLog {
                             return Ok(EbiInput::Trait(tobj, &EBI_EVENT_LOG));
                         }
                         EbiTrait::FiniteStochasticLanguage => {
-                            let fsl = event_log_rust.get_finite_stochastic_language();
-                            let tobj = EbiTraitObject::FiniteStochasticLanguage(Box::new(fsl));                            
+                            let fsl = Box::new(Into::<FiniteStochasticLanguage>::into(Into::<
+                                FiniteStochasticLanguage,
+                            >::into(
+                                event_log_rust,
+                            )));
+                            let tobj = EbiTraitObject::FiniteStochasticLanguage(fsl);                            
                             return Ok(EbiInput::Trait(tobj, &EBI_FINITE_STOCHASTIC_LANGUAGE));
                         }
                         // … add more traits here …
@@ -356,89 +363,57 @@ impl ImportableFromPM4Py for StochasticLabelledPetriNet {
     }
 }
 
+
 impl ImportableFromPM4Py for ProcessTree {
     fn import_from_pm4py(
         ptree: &PyAny,
         input_types: &[&EbiInputType],
     ) -> PyResult<EbiInput> {
-        // 1) Recursively flatten the Python ProcessTree into Vec<Node>
-        let mut key = crate::ebi_framework::activity_key::ActivityKey::new();
-        let mut flat: Vec<Node> = Vec::new();
-        fn walk(
-            py_node: &PyAny,
-            flat: &mut Vec<Node>,
-            key: &mut crate::ebi_framework::activity_key::ActivityKey,
-        ) -> PyResult<()> {
-            // children list
-            let py_children = py_node.getattr("_children")?
-                .downcast::<PyList>()
-                .map_err(|e| PyValueError::new_err(format!("_children is not a list: {}", e)))?;
-            let n_child = py_children.len();
+        // 1) Get the `.ptree` text via Python's repr/to_string
+        let repr: String = ptree
+            .call_method0("to_string")?
+            .extract()
+            .map_err(|e| PyValueError::new_err(format!("Failed to serialize ProcessTree: {}", e)))?;
 
-            if n_child == 0 {
-                // leaf: check label
-                let py_label = py_node.getattr("_label")?;
-                if !py_label.is_none() {
-                    let label: String = py_label
-                        .extract()
-                        .map_err(|e| PyValueError::new_err(format!("Label not string: {}", e)))?;
-                    let act = key.process_activity(&label);
-                    flat.push(Node::Activity(act));
-                } else {
-                    flat.push(Node::Tau);
-                }
-            } else {
-                // operator node
-                // extract operator enum
-                let op_str: String = py_node
-                    .getattr("_operator")?
-                    .extract()
-                    .map_err(|e| PyValueError::new_err(format!("Operator not string: {}", e)))?;
-                let op = op_str
-                    .parse::<Operator>()
-                    .map_err(|e| PyValueError::new_err(format!("Bad operator `{}`: {}", op_str, e)))?;
-                flat.push(Node::Operator(op, n_child));
-                // recurse children
-                for child in py_children.iter() {
-                    walk(child, flat, key)?;
-                }
-            }
-            Ok(())
-        }
-        walk(ptree, &mut flat, &mut key)
-            .map_err(|e| PyValueError::new_err(format!("Failed walking ProcessTree: {}", e)))?;
+        // 2) Run our text‐based importer
+        let text = translate_pm4py_process_tree(&repr)
+            .map_err(|e| PyValueError::new_err(format!("Translation error: {}", e)))?;
+        // 3) parse
+        let rust_tree = ProcessTree::from_str(&text)
+            .map_err(|e| PyValueError::new_err(format!("Import fail: {}", e)))?;
 
-        // 2) Build the Rust ProcessTree
-        let rust_tree = ProcessTree::new(key, flat);
-
-        // 3) Dispatch on input_types
+        // 3) Dispatch on requested input_types
         for &itype in input_types {
             match itype {
-                // raw object
-                EbiInputType::Object(EbiObjectType::ProcessTree) => {
+                // raw ProcessTree object
+                EbiInputType::Object(obj_ty) if *obj_ty == EbiObjectType::ProcessTree => {
                     return Ok(EbiInput::Object(
                         EbiObject::ProcessTree(rust_tree.clone()),
                         &EBI_PROCESS_TREE,
                     ));
                 }
-                // Semantics trait
+
+                // as the Semantics trait
                 EbiInputType::Trait(EbiTrait::Semantics) => {
-                    let sem = rust_tree.to_semantics();
-                    let sem_obj = EbiTraitObject::Semantics(sem);
-                    return Ok(EbiInput::Trait(sem_obj, &EBI_PROCESS_TREE));
+                    let tobj = EbiTraitObject::Semantics(rust_tree.to_semantics());
+                    return Ok(EbiInput::Trait(tobj, &EBI_PROCESS_TREE));
                 }
-                // Graphable trait
+
+                // as the Graphable trait
                 EbiInputType::Trait(EbiTrait::Graphable) => {
-                    let graph_obj = EbiTraitObject::Graphable(Box::new(rust_tree.clone()));
-                    return Ok(EbiInput::Trait(graph_obj, &EBI_PROCESS_TREE));
+                    let graph = rust_tree.clone();
+                    let tobj = EbiTraitObject::Graphable(Box::new(graph));
+                    return Ok(EbiInput::Trait(tobj, &EBI_PROCESS_TREE));
                 }
-                // fallback any-object
+
+                // fallback: treat as any‐object
                 EbiInputType::AnyObject => {
                     return Ok(EbiInput::Object(
                         EbiObject::ProcessTree(rust_tree.clone()),
                         &EBI_PROCESS_TREE,
                     ));
                 }
+
                 _ => { /* skip unsupported */ }
             }
         }
@@ -500,6 +475,70 @@ fn pyset_as_vec<'a>(set: &'a PySet) -> Vec<&'a PyAny> {
     // Note: sets in Python are unordered.
     set.iter().collect()
 }
+
+// helper functions for process trees
+fn translate_pm4py_process_tree(s: &str) -> Result<String, String> {
+    // Minimal AST
+    enum Node {
+        Act(String), Tau, Op(&'static str, Vec<Node>),
+    }
+    // Parser with inline utilities
+    struct P<'a> { it: Peekable<Chars<'a>> }
+    impl<'a> P<'a> {
+        fn new(s: &'a str) -> Self { P { it: s.chars().peekable() } }
+        fn ws(&mut self) { while matches!(self.it.peek(), Some(c) if c.is_whitespace()) { self.it.next(); } }
+        fn eat(&mut self, c: char) -> bool { match self.it.peek() { Some(&x) if x==c => { self.it.next(); true } _ => false }}
+        fn parse(&mut self) -> Result<Node, String> {
+            self.ws();
+            if self.eat('-') { self.eat('>'); return self.op("sequence"); }
+            if self.eat('X') { return self.op("xor"); }
+            if self.eat('&') { return self.op("concurrent"); }
+            if self.eat('*') { return self.op("loop"); }
+            if self.eat('\'') {
+                let mut lbl = String::new();
+                while let Some(c) = self.it.next() {
+                    if c=='\'' { break; } else { lbl.push(c) }
+                }
+                return Ok(Node::Act(lbl));
+            }
+            if self.it.clone().take(3).collect::<String>()=="tau" {
+                for _ in 0..3 { self.it.next(); }
+                return Ok(Node::Tau);
+            }
+            Err("Unexpected token".into())
+        }
+        fn op(&mut self, name: &'static str) -> Result<Node,String> {
+            self.ws(); if !self.eat('(') { return Err("Expected '('.".into()); }
+            let mut children = Vec::new();
+            loop {
+                self.ws(); if self.eat(')') { break; }
+                children.push(self.parse()?);
+                self.ws(); let _ = self.eat(',');
+            }
+            if children.is_empty() { return Err(format!("Operator '{}' needs children", name)); }
+            Ok(Node::Op(name, children))
+        }
+    }
+    // format
+    fn fmt(n: &Node, indent: usize, out: &mut String) {
+        let pad = "\t".repeat(indent);
+        match n {
+            Node::Act(l) => out.push_str(&format!("{pad}activity {l}\n")),
+            Node::Tau    => out.push_str(&format!("{pad}tau\n")),
+            Node::Op(nm,ch) => {
+                out.push_str(&format!("{pad}{nm}\n{pad}{}\n", ch.len()));
+                for c in ch { fmt(c, indent+1, out); }
+            }
+        }
+    }
+    let mut parser = P::new(s);
+    let root = parser.parse()?;
+    parser.ws(); if parser.it.peek().is_some() { return Err("Trailing chars".into()); }
+    let mut out = String::from("process tree\n");
+    fmt(&root, 0, &mut out);
+    Ok(out)
+}
+
 
 // ================ Experimentation with passing Logs as DataFrame =================
 /// internal function that creates a Polars DataFrame from IPC bytes

@@ -6,14 +6,18 @@ use crate::ebi_objects::{event_log::EventLog, labelled_petri_net::LabelledPetriN
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ALL;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COMPLETENESS;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COVERAGE;
+use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MEDOID;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MINPROB;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MODE;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MOSTLIKELY;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_VARIETY;
 use crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT;
+use crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES;
+use crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_BOUNDED;
 use crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_CLUSTER;
 use crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS;
+use crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES;
 use crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_MEDOID;
 use crate::ebi_commands::ebi_command_association::ASSOCIATION_ATTRIBUTES;
 use crate::ebi_commands::ebi_command_association::ASSOCIATION_ATTRIBUTE;
@@ -27,8 +31,14 @@ use crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SLANG;
 use crate::ebi_commands::ebi_command_convert::EBI_CONVERT_LPN;
 use crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SDFA;
 use crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS;
+use crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_DIRECTLY_FOLLOWS;
 use crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE;
 use crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM;
+use crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_DIRECTLY_FOLLOWS;
+use crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA;
+use crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE;
+use crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA;
+use crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE;
 use crate::ebi_commands::ebi_command_info::EBI_INFO;
 use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_GENERATE_PM4PY;
 use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_GRAPH;
@@ -120,6 +130,51 @@ fn analyse_completeness(arg0: &PyAny) -> PyResult<String> {
 #[pyfunction]
 fn analyse_coverage(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
     let command: &&EbiCommand = &&EBI_ANALYSE_COVERAGE;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = [
+        EventLog::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg0, input_types[0]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+    let input1 = [
+        EventLog::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg1, input_types[1]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
+    let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
+    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+
+    let output_string = if exporter.is_binary() {
+        let bytes = ebi_output::export_to_bytes(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+        String::from_utf8(bytes)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
+    } else {
+        ebi_output::export_to_string(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
+    };
+
+    Ok(output_string)
+}
+
+#[pyfunction]
+fn analyse_directly_follows_edge_difference(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+    let command: &&EbiCommand = &&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -415,6 +470,78 @@ fn analyse_non_stochastic_alignment(arg0: &PyAny, arg1: &PyAny) -> PyResult<Stri
 }
 
 #[pyfunction]
+fn analyse_non_stochastic_any_traces(arg0: &PyAny) -> PyResult<String> {
+    let command: &&EbiCommand = &&EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = [
+        EventLog::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg0, input_types[0]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+    let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
+    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+
+    let output_string = if exporter.is_binary() {
+        let bytes = ebi_output::export_to_bytes(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+        String::from_utf8(bytes)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
+    } else {
+        ebi_output::export_to_string(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
+    };
+
+    Ok(output_string)
+}
+
+#[pyfunction]
+fn analyse_non_stochastic_bounded(arg0: &PyAny) -> PyResult<String> {
+    let command: &&EbiCommand = &&EBI_ANALYSE_NON_STOCHASTIC_BOUNDED;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = [
+        EventLog::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg0, input_types[0]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+    let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
+    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+
+    let output_string = if exporter.is_binary() {
+        let bytes = ebi_output::export_to_bytes(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+        String::from_utf8(bytes)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
+    } else {
+        ebi_output::export_to_string(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
+    };
+
+    Ok(output_string)
+}
+
+#[pyfunction]
 fn analyse_non_stochastic_cluster(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
     let command: &&EbiCommand = &&EBI_ANALYSE_NON_STOCHASTIC_CLUSTER;
     let input_types = match **command {
@@ -485,6 +612,42 @@ fn analyse_non_stochastic_executions(arg0: &PyAny, arg1: &PyAny) -> PyResult<Str
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
     let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
+    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+
+    let output_string = if exporter.is_binary() {
+        let bytes = ebi_output::export_to_bytes(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+        String::from_utf8(bytes)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
+    } else {
+        ebi_output::export_to_string(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
+    };
+
+    Ok(output_string)
+}
+
+#[pyfunction]
+fn analyse_non_stochastic_infinitely_many_traces(arg0: &PyAny) -> PyResult<String> {
+    let command: &&EbiCommand = &&EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = [
+        EventLog::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg0, input_types[0]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+    let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1072,6 +1235,51 @@ fn discover_alignments(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
 }
 
 #[pyfunction]
+fn discover_directly_follows_graph(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+    let command: &&EbiCommand = &&EBI_DISCOVER_DIRECTLY_FOLLOWS;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = [
+        EventLog::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg0, input_types[0]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+    let input1 = [
+        EventLog::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg1, input_types[1]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
+    let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
+    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+
+    let output_string = if exporter.is_binary() {
+        let bytes = ebi_output::export_to_bytes(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+        String::from_utf8(bytes)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
+    } else {
+        ebi_output::export_to_string(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
+    };
+
+    Ok(output_string)
+}
+
+#[pyfunction]
 fn discover_occurrence(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
     let command: &&EbiCommand = &&EBI_DISCOVER_OCCURRENCE;
     let input_types = match **command {
@@ -1119,6 +1327,195 @@ fn discover_occurrence(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
 #[pyfunction]
 fn discover_uniform(arg0: &PyAny) -> PyResult<String> {
     let command: &&EbiCommand = &&EBI_DISCOVER_UNIFORM;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = [
+        EventLog::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg0, input_types[0]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+    let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
+    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+
+    let output_string = if exporter.is_binary() {
+        let bytes = ebi_output::export_to_bytes(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+        String::from_utf8(bytes)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
+    } else {
+        ebi_output::export_to_string(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
+    };
+
+    Ok(output_string)
+}
+
+#[pyfunction]
+fn discover_non_stochastic_directly_follows_model(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+    let command: &&EbiCommand = &&EBI_DISCOVER_NON_STOCHASTIC_DIRECTLY_FOLLOWS;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = [
+        EventLog::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg0, input_types[0]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+    let input1 = [
+        EventLog::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg1, input_types[1]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
+    let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
+    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+
+    let output_string = if exporter.is_binary() {
+        let bytes = ebi_output::export_to_bytes(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+        String::from_utf8(bytes)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
+    } else {
+        ebi_output::export_to_string(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
+    };
+
+    Ok(output_string)
+}
+
+#[pyfunction]
+fn discover_non_stochastic_flower_deterministic_finite_automaton(arg0: &PyAny) -> PyResult<String> {
+    let command: &&EbiCommand = &&EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = [
+        EventLog::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg0, input_types[0]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+    let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
+    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+
+    let output_string = if exporter.is_binary() {
+        let bytes = ebi_output::export_to_bytes(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+        String::from_utf8(bytes)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
+    } else {
+        ebi_output::export_to_string(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
+    };
+
+    Ok(output_string)
+}
+
+#[pyfunction]
+fn discover_non_stochastic_flower_process_tree(arg0: &PyAny) -> PyResult<String> {
+    let command: &&EbiCommand = &&EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = [
+        EventLog::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg0, input_types[0]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+    let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
+    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+
+    let output_string = if exporter.is_binary() {
+        let bytes = ebi_output::export_to_bytes(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+        String::from_utf8(bytes)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
+    } else {
+        ebi_output::export_to_string(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
+    };
+
+    Ok(output_string)
+}
+
+#[pyfunction]
+fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton(arg0: &PyAny) -> PyResult<String> {
+    let command: &&EbiCommand = &&EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = [
+        EventLog::import_from_pm4py,
+        // StochasticLabelledPetriNet::import_from_pm4py,
+        LabelledPetriNet::import_from_pm4py,
+        ProcessTree::import_from_pm4py,
+    ]
+    .iter()
+    .find_map(|importer| importer(arg0, input_types[0]).ok())
+    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+    let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
+    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+
+    let output_string = if exporter.is_binary() {
+        let bytes = ebi_output::export_to_bytes(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+        String::from_utf8(bytes)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
+    } else {
+        ebi_output::export_to_string(result, exporter)
+            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
+    };
+
+    Ok(output_string)
+}
+
+#[pyfunction]
+fn discover_non_stochastic_prefix_tree_process_tree(arg0: &PyAny) -> PyResult<String> {
+    let command: &&EbiCommand = &&EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -1689,14 +2086,18 @@ fn visualise_text(arg0: &PyAny) -> PyResult<String> {
 fn ebi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {    m.add_function(wrap_pyfunction!(analyse_all_traces, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_completeness, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_coverage, m)?)?;
+    m.add_function(wrap_pyfunction!(analyse_directly_follows_edge_difference, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_medoid, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_minimum_probability_traces, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_mode, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_most_likely_traces, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_variety, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_alignment, m)?)?;
+    m.add_function(wrap_pyfunction!(analyse_non_stochastic_any_traces, m)?)?;
+    m.add_function(wrap_pyfunction!(analyse_non_stochastic_bounded, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_cluster, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_executions, m)?)?;
+    m.add_function(wrap_pyfunction!(analyse_non_stochastic_infinitely_many_traces, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_medoid, m)?)?;
     m.add_function(wrap_pyfunction!(association_all_trace_attributes, m)?)?;
     m.add_function(wrap_pyfunction!(association_trace_attribute, m)?)?;
@@ -1710,8 +2111,14 @@ fn ebi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {    m.add_function(wrap_p
     m.add_function(wrap_pyfunction!(convert_labelled_petri_net, m)?)?;
     m.add_function(wrap_pyfunction!(convert_stochastic_finite_deterministic_automaton, m)?)?;
     m.add_function(wrap_pyfunction!(discover_alignments, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_directly_follows_graph, m)?)?;
     m.add_function(wrap_pyfunction!(discover_occurrence, m)?)?;
     m.add_function(wrap_pyfunction!(discover_uniform, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_non_stochastic_directly_follows_model, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_non_stochastic_flower_deterministic_finite_automaton, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_non_stochastic_flower_process_tree, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_non_stochastic_prefix_tree_deterministic_finite_automaton, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_non_stochastic_prefix_tree_process_tree, m)?)?;
     m.add_function(wrap_pyfunction!(information, m)?)?;
     m.add_function(wrap_pyfunction!(itself_generate_pm4py, m)?)?;
     m.add_function(wrap_pyfunction!(itself_graph, m)?)?;
