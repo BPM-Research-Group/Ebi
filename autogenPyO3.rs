@@ -1,6 +1,6 @@
 use pyo3::prelude::*;
 use pyo3::types::PyAny;
-use super::pm4py_link::ImportableFromPM4Py;
+use super::pm4py_link::{ImportableFromPM4Py, IMPORTERS};
 use crate::ebi_framework::{ebi_command::EbiCommand, ebi_output};
 use crate::ebi_objects::{event_log::EventLog, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet, process_tree::ProcessTree};
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ALL;
@@ -62,12 +62,7 @@ fn analyse_all_traces(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -98,12 +93,7 @@ fn analyse_completeness(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -134,21 +124,11 @@ fn analyse_coverage(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -179,21 +159,11 @@ fn analyse_directly_follows_edge_difference(arg0: &PyAny, arg1: &PyAny) -> PyRes
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -224,21 +194,11 @@ fn analyse_medoid(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -269,21 +229,11 @@ fn analyse_minimum_probability_traces(arg0: &PyAny, arg1: &PyAny) -> PyResult<St
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -314,12 +264,7 @@ fn analyse_mode(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -350,21 +295,11 @@ fn analyse_most_likely_traces(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -395,12 +330,7 @@ fn analyse_variety(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -431,21 +361,11 @@ fn analyse_non_stochastic_alignment(arg0: &PyAny, arg1: &PyAny) -> PyResult<Stri
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -476,12 +396,7 @@ fn analyse_non_stochastic_any_traces(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -512,12 +427,7 @@ fn analyse_non_stochastic_bounded(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -548,21 +458,11 @@ fn analyse_non_stochastic_cluster(arg0: &PyAny, arg1: &PyAny) -> PyResult<String
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -593,21 +493,11 @@ fn analyse_non_stochastic_executions(arg0: &PyAny, arg1: &PyAny) -> PyResult<Str
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -638,12 +528,7 @@ fn analyse_non_stochastic_infinitely_many_traces(arg0: &PyAny) -> PyResult<Strin
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -674,21 +559,11 @@ fn analyse_non_stochastic_medoid(arg0: &PyAny, arg1: &PyAny) -> PyResult<String>
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -719,12 +594,7 @@ fn association_all_trace_attributes(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -755,21 +625,11 @@ fn association_trace_attribute(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -800,21 +660,11 @@ fn conformance_earth_movers_stochastic_conformance(arg0: &PyAny, arg1: &PyAny) -
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -845,30 +695,15 @@ fn conformance_earth_movers_stochastic_conformance_sample(arg0: &PyAny, arg1: &P
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let input2 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input2 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg2, input_types[2]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 2"))?;
@@ -899,21 +734,11 @@ fn conformance_entropic_relevance(arg0: &PyAny, arg1: &PyAny) -> PyResult<String
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -944,21 +769,11 @@ fn conformance_jensen_shannon(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -989,30 +804,15 @@ fn conformance_jensen_shannon_sample(arg0: &PyAny, arg1: &PyAny, arg2: &PyAny) -
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let input2 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input2 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg2, input_types[2]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 2"))?;
@@ -1043,21 +843,11 @@ fn conformance_unit_earth_movers_stochastic_conformance(arg0: &PyAny, arg1: &PyA
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -1088,12 +878,7 @@ fn convert_finite_stochastic_language(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -1124,12 +909,7 @@ fn convert_labelled_petri_net(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -1160,12 +940,7 @@ fn convert_stochastic_finite_deterministic_automaton(arg0: &PyAny) -> PyResult<S
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -1196,21 +971,11 @@ fn discover_alignments(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -1241,21 +1006,11 @@ fn discover_directly_follows_graph(arg0: &PyAny, arg1: &PyAny) -> PyResult<Strin
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -1286,21 +1041,11 @@ fn discover_occurrence(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -1331,12 +1076,7 @@ fn discover_uniform(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -1367,21 +1107,11 @@ fn discover_non_stochastic_directly_follows_model(arg0: &PyAny, arg1: &PyAny) ->
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -1412,12 +1142,7 @@ fn discover_non_stochastic_flower_deterministic_finite_automaton(arg0: &PyAny) -
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -1448,12 +1173,7 @@ fn discover_non_stochastic_flower_process_tree(arg0: &PyAny) -> PyResult<String>
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -1484,12 +1204,7 @@ fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton(arg0: &PyA
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -1520,12 +1235,7 @@ fn discover_non_stochastic_prefix_tree_process_tree(arg0: &PyAny) -> PyResult<St
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -1556,12 +1266,7 @@ fn information(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -1727,21 +1432,11 @@ fn probability_explain_trace(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -1772,21 +1467,11 @@ fn probability_model(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -1817,12 +1502,7 @@ fn probability_trace(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -1853,21 +1533,11 @@ fn sample(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -1898,21 +1568,11 @@ fn test_log_categorical_attribute(arg0: &PyAny, arg1: &PyAny) -> PyResult<String
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input1 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg1, input_types[1]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
@@ -1943,12 +1603,7 @@ fn validate(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -1979,12 +1634,7 @@ fn visualise_pdf(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -2015,12 +1665,7 @@ fn visualise_svg(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
@@ -2051,12 +1696,7 @@ fn visualise_text(arg0: &PyAny) -> PyResult<String> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+    let input0 = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg0, input_types[0]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;

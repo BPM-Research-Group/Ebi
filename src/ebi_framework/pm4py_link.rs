@@ -10,6 +10,7 @@ use std::str::FromStr;
 use std::str::Chars;
 use std::iter::Peekable;
 
+use crate::ebi_objects::finite_language::FiniteLanguage;
 use crate::ebi_objects::process_tree::ProcessTree;
 use crate::math::fraction::Fraction;
 use super::ebi_output::EbiOutput;
@@ -19,15 +20,42 @@ use crate::ebi_framework::{ebi_input::{EbiInput, EbiInputType}, ebi_object::{Ebi
 use crate::ebi_objects::event_log::{EventLog, EBI_EVENT_LOG};
 use crate::ebi_objects::labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET};
 use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};
-use crate::ebi_objects::{stochastic_labelled_petri_net::StochasticLabelledPetriNet, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, process_tree::{Node, Operator, EBI_PROCESS_TREE}};
+use crate::ebi_objects::{stochastic_labelled_petri_net::StochasticLabelledPetriNet, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, process_tree::{Node, Operator, EBI_PROCESS_TREE}, finite_language::EBI_FINITE_LANGUAGE};
 use crate::marking::Marking;
 use process_mining::event_log::{event_log_struct::{EventLogClassifier, to_attributes}, Attributes, AttributeValue};
 use process_mining::event_log::{EventLog as ProcessMiningEventLog, Trace, Event};
 
+type Importer = fn(&PyAny, &[&EbiInputType]) -> PyResult<EbiInput>;
+pub const IMPORTERS: &[Importer] = &[
+    usize::import_from_pm4py,
+    EventLog::import_from_pm4py,
+    LabelledPetriNet::import_from_pm4py,
+    ProcessTree::import_from_pm4py,
+];
+
 
 pub trait ImportableFromPM4Py {
     /// Imports a PM4Py Object as its Rust equivalent.
-    fn import_from_pm4py(event_log: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput>;
+    fn import_from_pm4py(object: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput>;
+}
+
+impl ImportableFromPM4Py for usize {
+    fn import_from_pm4py(integer: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput> {
+        let value: usize = integer.extract().map_err(|_| {
+            PyValueError::new_err("Expected a Python integer to convert to Rust usize")
+        })?;
+        for &itype in input_types {
+            match itype {
+                EbiInputType::Usize => {
+                    return Ok(EbiInput::Usize(value));
+                },
+                _ => { /* skip other input types */ }
+            }
+        }
+        Err(PyValueError::new_err(
+            "Integer could not be wrapped as any of the requested EbiInputType variants",
+        ))
+    }
 }
 
 impl ImportableFromPM4Py for EventLog {
@@ -50,9 +78,6 @@ impl ImportableFromPM4Py for EventLog {
         // For classifier, we use a default one.
         let classifier = EventLogClassifier::default();
         let event_log_rust = EventLog::new(pm_log, classifier);
-        //Ok(EbiObject::EventLog(event_log_rust))
-        //Ok(event_log_rust)
-
 
         for &itype in input_types {
             match itype {
@@ -75,6 +100,15 @@ impl ImportableFromPM4Py for EventLog {
                             let tobj = EbiTraitObject::FiniteStochasticLanguage(fsl);                            
                             return Ok(EbiInput::Trait(tobj, &EBI_FINITE_STOCHASTIC_LANGUAGE));
                         }
+                        EbiTrait::FiniteLanguage => {
+                            let fl = Box::new(Into::<FiniteLanguage>::into(Into::<
+                                FiniteLanguage,
+                            >::into(
+                                event_log_rust,
+                            )));
+                            let tobj = EbiTraitObject::FiniteLanguage(fl);
+                            return Ok(EbiInput::Trait(tobj, &EBI_FINITE_LANGUAGE));
+                        },
                         // … add more traits here …
                         _ => { /* this trait isn’t supported by EventLog; skip */ }
                     }

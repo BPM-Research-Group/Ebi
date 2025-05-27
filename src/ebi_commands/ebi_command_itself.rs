@@ -526,7 +526,7 @@ pub fn scale(point: &mut Point) {
 pub fn generate_pm4py_module() -> Result<EbiOutput> {
     let mut imports = format!("use pyo3::prelude::*;
 use pyo3::types::PyAny;
-use super::pm4py_link::ImportableFromPM4Py;
+use super::pm4py_link::{{ImportableFromPM4Py, IMPORTERS}};
 use crate::ebi_framework::{{ebi_command::EbiCommand, ebi_output}};
 use crate::ebi_objects::{{event_log::EventLog, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet, process_tree::ProcessTree}};");
     let mut functions = String::new();
@@ -586,12 +586,7 @@ fn {fname}({args}) -> PyResult<String> {{
 
     // Import each argument
     for i in 0..input_types.len() {
-        body.push_str(&format!(r###"    let input{idx} = [
-        EventLog::import_from_pm4py,
-        // StochasticLabelledPetriNet::import_from_pm4py,
-        LabelledPetriNet::import_from_pm4py,
-        ProcessTree::import_from_pm4py,
-    ]
+        body.push_str(&format!(r###"    let input{idx} = IMPORTERS
     .iter()
     .find_map(|importer| importer(arg{idx}, input_types[{idx}]).ok())
     .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument {idx}"))?;
