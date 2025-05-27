@@ -1,7 +1,8 @@
 use anyhow::{anyhow, Result};
 use fraction::BigFraction;
+use num::ToPrimitive;
 use pyo3::prelude::*;
-use pyo3::types::{PyAny, PyDict, PyList, PySet};
+use pyo3::types::{PyAny, PyDict, PyList, PySet, PyString};
 use pyo3::AsPyPointer;
 use polars::prelude::*;
 use pyo3::exceptions::PyValueError;
@@ -17,7 +18,7 @@ use crate::math::fraction::Fraction;
 use super::ebi_output::EbiOutput;
 use crate::ebi_framework::ebi_object::EbiTraitObject;
 use crate::ebi_framework::ebi_command::EbiCommand;
-use crate::ebi_framework::{ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType}, ebi_trait::EbiTrait, activity_key::ActivityKey};
+use crate::ebi_framework::{ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType}, ebi_trait::EbiTrait, activity_key::ActivityKey, ebi_output};
 use crate::ebi_objects::event_log::{EventLog, EBI_EVENT_LOG};
 use crate::ebi_objects::labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET};
 use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};
@@ -36,11 +37,50 @@ pub const IMPORTERS: &[Importer] = &[
     ProcessTree::import_from_pm4py,
 ];
 
-
 pub trait ImportableFromPM4Py {
-    /// Imports a PM4Py Object as its Rust equivalent.
+    /// Imports a PM4Py Object as its Ebi equivalent.
     fn import_from_pm4py(object: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput>;
 }
+pub trait ExportableToPM4Py {
+    /// Exports an Ebi Object as its PM4Py equivalent.
+    fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>>;
+}
+
+impl ExportableToPM4Py for EbiOutput {
+    fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        match self {
+            EbiOutput::Fraction(frac) => {
+                frac.export_to_pm4py(py)
+            }
+
+            // default: no exporter available (not implemented yet or no equivalent in PM4Py) -> return string representation
+            EbiOutput::Object(_)
+            | EbiOutput::String(_)
+            | EbiOutput::SVG(_)
+            | EbiOutput::PDF(_)
+            | EbiOutput::Usize(_)
+            | EbiOutput::LogDiv(_)
+            | EbiOutput::ContainsRoot(_)
+            | EbiOutput::RootLogDiv(_)
+            | EbiOutput::Bool(_) => {
+                let exporter = EbiCommand::select_exporter(&self.get_type(), None);
+
+                let output_string = if exporter.is_binary() {
+                    let bytes = ebi_output::export_to_bytes(self.clone(), exporter)
+                        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+                    String::from_utf8(bytes)
+                        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
+                } else {
+                    ebi_output::export_to_string(self.clone(), exporter)
+                        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
+                };
+                let py_str: &PyString = PyString::new(py, &output_string);
+                Ok(py_str.into())
+            }
+        }
+    }
+}
+
 
 impl ImportableFromPM4Py for usize {
     fn import_from_pm4py(integer: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput> {
@@ -81,6 +121,50 @@ impl ImportableFromPM4Py for Fraction {
         ))
     }
 }
+
+impl ExportableToPM4Py for Fraction {
+    fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        match self {
+            // Case: Exact fraction (BigFraction)
+            FractionEnum::Exact(big_fraction) => match big_fraction {
+                fraction::GenericFraction::Rational(sign, ratio) => {
+                    let numer = ratio.numer().to_u128().ok_or_else(|| {
+                        PyValueError::new_err("Failed to convert numerator to u128")
+                    })?;
+                    let denom = ratio.denom().to_u128().ok_or_else(|| {
+                        PyValueError::new_err("Failed to convert numerator to u128")
+                    })?;
+                    let float_value =  (sign.is_positive() as i64).to_f64().unwrap_or(1.0) * numer.to_f64().ok_or_else(|| {
+                        PyValueError::new_err("Failed to convert numerator to f64")
+                    })? / denom.to_f64().ok_or_else(|| {
+                        PyValueError::new_err("Failed to convert numerator to f64")
+                    })?;
+
+                
+                    Ok(float_value.to_object(py))
+                }
+                fraction::GenericFraction::Infinity(sign) => Err(PyValueError::new_err(format!(
+                    "Cannot export infinity with sign {:?} to PM4Py",
+                    sign
+                ))),
+                fraction::GenericFraction::NaN => Err(PyValueError::new_err(
+                    "Cannot export NaN to PM4Py",
+                )),
+            },
+
+            // Case: Approximation as f64
+            FractionEnum::Approx(value) => Ok(value.to_object(py)),
+
+            // Case: Invalid state
+            FractionEnum::CannotCombineExactAndApprox => {
+                Err(PyValueError::new_err(
+                    "Cannot export a Fraction that combines Exact and Approx",
+                ))
+            }
+        }
+    }
+}
+
 
 impl ImportableFromPM4Py for EventLog {
     fn import_from_pm4py(event_log: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput> {
