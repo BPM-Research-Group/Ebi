@@ -1,8 +1,10 @@
+#![allow(unsafe_op_in_unsafe_fn)]
+#![allow(unused_variables)]
+
 use pyo3::prelude::*;
 use pyo3::types::PyAny;
-use super::pm4py_link::{ImportableFromPM4Py, IMPORTERS, ExportableToPM4Py};
-use crate::ebi_framework::{ebi_command::EbiCommand, ebi_output};
-use crate::ebi_objects::{event_log::EventLog, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet, process_tree::ProcessTree};
+use super::pm4py_link::{IMPORTERS, ExportableToPM4Py};
+use crate::ebi_framework::ebi_command::EbiCommand;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ALL;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COMPLETENESS;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COVERAGE;
@@ -56,7 +58,7 @@ use crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_SVG;
 use crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT;
 
 #[pyfunction]
-fn analyse_all_traces(arg0: &PyAny) -> PyResult<String> {
+fn analyse_all_traces(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_ALL;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -70,20 +72,11 @@ fn analyse_all_traces(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
@@ -104,12 +97,12 @@ fn analyse_completeness(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
         .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
         .export_to_pm4py(py)
         .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        
+
     Ok(result)
 }
 
 #[pyfunction]
-fn analyse_coverage(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn analyse_coverage(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_COVERAGE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -127,24 +120,15 @@ fn analyse_coverage(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn analyse_directly_follows_edge_difference(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn analyse_directly_follows_edge_difference(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -162,24 +146,15 @@ fn analyse_directly_follows_edge_difference(arg0: &PyAny, arg1: &PyAny) -> PyRes
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn analyse_medoid(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn analyse_medoid(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_MEDOID;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -197,24 +172,15 @@ fn analyse_medoid(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn analyse_minimum_probability_traces(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn analyse_minimum_probability_traces(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_MINPROB;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -232,24 +198,15 @@ fn analyse_minimum_probability_traces(arg0: &PyAny, arg1: &PyAny) -> PyResult<St
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn analyse_mode(arg0: &PyAny) -> PyResult<String> {
+fn analyse_mode(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_MODE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -263,24 +220,15 @@ fn analyse_mode(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn analyse_most_likely_traces(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn analyse_most_likely_traces(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_MOSTLIKELY;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -298,24 +246,15 @@ fn analyse_most_likely_traces(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn analyse_variety(arg0: &PyAny) -> PyResult<String> {
+fn analyse_variety(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_VARIETY;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -329,24 +268,15 @@ fn analyse_variety(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_alignment(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn analyse_non_stochastic_alignment(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -364,24 +294,15 @@ fn analyse_non_stochastic_alignment(arg0: &PyAny, arg1: &PyAny) -> PyResult<Stri
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_any_traces(arg0: &PyAny) -> PyResult<String> {
+fn analyse_non_stochastic_any_traces(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -395,24 +316,15 @@ fn analyse_non_stochastic_any_traces(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_bounded(arg0: &PyAny) -> PyResult<String> {
+fn analyse_non_stochastic_bounded(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_NON_STOCHASTIC_BOUNDED;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -426,24 +338,15 @@ fn analyse_non_stochastic_bounded(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_cluster(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn analyse_non_stochastic_cluster(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_NON_STOCHASTIC_CLUSTER;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -461,24 +364,15 @@ fn analyse_non_stochastic_cluster(arg0: &PyAny, arg1: &PyAny) -> PyResult<String
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_executions(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn analyse_non_stochastic_executions(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -496,24 +390,15 @@ fn analyse_non_stochastic_executions(arg0: &PyAny, arg1: &PyAny) -> PyResult<Str
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_infinitely_many_traces(arg0: &PyAny) -> PyResult<String> {
+fn analyse_non_stochastic_infinitely_many_traces(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -527,24 +412,15 @@ fn analyse_non_stochastic_infinitely_many_traces(arg0: &PyAny) -> PyResult<Strin
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_medoid(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn analyse_non_stochastic_medoid(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ANALYSE_NON_STOCHASTIC_MEDOID;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -562,24 +438,15 @@ fn analyse_non_stochastic_medoid(arg0: &PyAny, arg1: &PyAny) -> PyResult<String>
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn association_all_trace_attributes(arg0: &PyAny) -> PyResult<String> {
+fn association_all_trace_attributes(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&ASSOCIATION_ATTRIBUTES;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -593,24 +460,15 @@ fn association_all_trace_attributes(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn association_trace_attribute(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn association_trace_attribute(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&ASSOCIATION_ATTRIBUTE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -628,24 +486,15 @@ fn association_trace_attribute(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn conformance_earth_movers_stochastic_conformance(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn conformance_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&CONFORMANCE_EMSC;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -663,24 +512,15 @@ fn conformance_earth_movers_stochastic_conformance(arg0: &PyAny, arg1: &PyAny) -
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn conformance_earth_movers_stochastic_conformance_sample(arg0: &PyAny, arg1: &PyAny, arg2: &PyAny) -> PyResult<String> {
+fn conformance_earth_movers_stochastic_conformance_sample(py: Python<'_>, arg0: &PyAny, arg1: &PyAny, arg2: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&CONFORMANCE_EMSC_SAMPLE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -702,24 +542,15 @@ fn conformance_earth_movers_stochastic_conformance_sample(arg0: &PyAny, arg1: &P
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn conformance_entropic_relevance(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn conformance_entropic_relevance(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&CONFORMANCE_ER;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -737,24 +568,15 @@ fn conformance_entropic_relevance(arg0: &PyAny, arg1: &PyAny) -> PyResult<String
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn conformance_jensen_shannon(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn conformance_jensen_shannon(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&CONFORMANCE_JSSC;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -772,24 +594,15 @@ fn conformance_jensen_shannon(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn conformance_jensen_shannon_sample(arg0: &PyAny, arg1: &PyAny, arg2: &PyAny) -> PyResult<String> {
+fn conformance_jensen_shannon_sample(py: Python<'_>, arg0: &PyAny, arg1: &PyAny, arg2: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&CONFORMANCE_JSSC_SAMPLE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -811,24 +624,15 @@ fn conformance_jensen_shannon_sample(arg0: &PyAny, arg1: &PyAny, arg2: &PyAny) -
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn conformance_unit_earth_movers_stochastic_conformance(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn conformance_unit_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&CONFORMANCE_UEMSC;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -846,24 +650,15 @@ fn conformance_unit_earth_movers_stochastic_conformance(arg0: &PyAny, arg1: &PyA
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn convert_finite_stochastic_language(arg0: &PyAny) -> PyResult<String> {
+fn convert_finite_stochastic_language(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_CONVERT_SLANG;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -877,24 +672,15 @@ fn convert_finite_stochastic_language(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn convert_labelled_petri_net(arg0: &PyAny) -> PyResult<String> {
+fn convert_labelled_petri_net(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_CONVERT_LPN;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -908,24 +694,15 @@ fn convert_labelled_petri_net(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn convert_stochastic_finite_deterministic_automaton(arg0: &PyAny) -> PyResult<String> {
+fn convert_stochastic_finite_deterministic_automaton(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_CONVERT_SDFA;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -939,24 +716,15 @@ fn convert_stochastic_finite_deterministic_automaton(arg0: &PyAny) -> PyResult<S
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn discover_alignments(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn discover_alignments(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_DISCOVER_ALIGNMENTS;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -974,24 +742,15 @@ fn discover_alignments(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn discover_directly_follows_graph(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn discover_directly_follows_graph(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_DISCOVER_DIRECTLY_FOLLOWS;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1009,24 +768,15 @@ fn discover_directly_follows_graph(arg0: &PyAny, arg1: &PyAny) -> PyResult<Strin
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn discover_occurrence(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn discover_occurrence(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_DISCOVER_OCCURRENCE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1044,24 +794,15 @@ fn discover_occurrence(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn discover_uniform(arg0: &PyAny) -> PyResult<String> {
+fn discover_uniform(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_DISCOVER_UNIFORM;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1075,24 +816,15 @@ fn discover_uniform(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn discover_non_stochastic_directly_follows_model(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn discover_non_stochastic_directly_follows_model(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_DISCOVER_NON_STOCHASTIC_DIRECTLY_FOLLOWS;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1110,24 +842,15 @@ fn discover_non_stochastic_directly_follows_model(arg0: &PyAny, arg1: &PyAny) ->
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn discover_non_stochastic_flower_deterministic_finite_automaton(arg0: &PyAny) -> PyResult<String> {
+fn discover_non_stochastic_flower_deterministic_finite_automaton(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1141,24 +864,15 @@ fn discover_non_stochastic_flower_deterministic_finite_automaton(arg0: &PyAny) -
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn discover_non_stochastic_flower_process_tree(arg0: &PyAny) -> PyResult<String> {
+fn discover_non_stochastic_flower_process_tree(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1172,24 +886,15 @@ fn discover_non_stochastic_flower_process_tree(arg0: &PyAny) -> PyResult<String>
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton(arg0: &PyAny) -> PyResult<String> {
+fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1203,24 +908,15 @@ fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton(arg0: &PyA
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn discover_non_stochastic_prefix_tree_process_tree(arg0: &PyAny) -> PyResult<String> {
+fn discover_non_stochastic_prefix_tree_process_tree(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1234,24 +930,15 @@ fn discover_non_stochastic_prefix_tree_process_tree(arg0: &PyAny) -> PyResult<St
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn information(arg0: &PyAny) -> PyResult<String> {
+fn information(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_INFO;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1265,24 +952,15 @@ fn information(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn itself_generate_pm4py() -> PyResult<String> {
+fn itself_generate_pm4py(py: Python<'_>, ) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ITSELF_GENERATE_PM4PY;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1292,24 +970,15 @@ fn itself_generate_pm4py() -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn itself_graph() -> PyResult<String> {
+fn itself_graph(py: Python<'_>, ) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ITSELF_GRAPH;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1319,24 +988,15 @@ fn itself_graph() -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn itself_java() -> PyResult<String> {
+fn itself_java(py: Python<'_>, ) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ITSELF_JAVA;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1346,24 +1006,15 @@ fn itself_java() -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn itself_logo() -> PyResult<String> {
+fn itself_logo(py: Python<'_>, ) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ITSELF_LOGO;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1373,24 +1024,15 @@ fn itself_logo() -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn itself_manual() -> PyResult<String> {
+fn itself_manual(py: Python<'_>, ) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ITSELF_MANUAL;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1400,24 +1042,15 @@ fn itself_manual() -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn probability_explain_trace(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn probability_explain_trace(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_PROBABILITY_EXPLAIN_TRACE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1435,24 +1068,15 @@ fn probability_explain_trace(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn probability_model(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn probability_model(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_PROBABILITY_MODEL;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1470,24 +1094,15 @@ fn probability_model(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn probability_trace(arg0: &PyAny) -> PyResult<String> {
+fn probability_trace(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_PROBABILITY_TRACE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1501,24 +1116,15 @@ fn probability_trace(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn sample(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn sample(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_SAMPLE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1536,24 +1142,15 @@ fn sample(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn test_log_categorical_attribute(arg0: &PyAny, arg1: &PyAny) -> PyResult<String> {
+fn test_log_categorical_attribute(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&TEST_LOG_ATTRIBUTE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1571,24 +1168,15 @@ fn test_log_categorical_attribute(arg0: &PyAny, arg1: &PyAny) -> PyResult<String
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn validate(arg0: &PyAny) -> PyResult<String> {
+fn validate(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_VALIDATE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1602,24 +1190,15 @@ fn validate(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
-fn visualise_pdf(arg0: &PyAny) -> PyResult<String> {
+fn visualise_pdf(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_VISUALISE_PDF;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1633,20 +1212,11 @@ fn visualise_pdf(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 #[pyfunction]
@@ -1672,7 +1242,7 @@ fn visualise_svg(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
 }
 
 #[pyfunction]
-fn visualise_text(arg0: &PyAny) -> PyResult<String> {
+fn visualise_text(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_VISUALISE_TEXT;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -1686,20 +1256,11 @@ fn visualise_text(arg0: &PyAny) -> PyResult<String> {
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
 
-    let output_string = if exporter.is_binary() {
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {}", e)))?
-    } else {
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?
-    };
-
-    Ok(output_string)
+    Ok(result)
 }
 
 

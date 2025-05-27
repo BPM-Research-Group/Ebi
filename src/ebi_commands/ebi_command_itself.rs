@@ -1,11 +1,9 @@
 use std::{collections::HashMap, io::Write};
-use chrono::NaiveTime;
 use clap::Command;
 use anyhow::Result;
 use inflector::Inflector;
 use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
-use svg2pdf::usvg::roxmltree::StringStorage;
 
 use crate::{ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, ebi_objects::scalable_vector_graphics::svg_to_pdf, text::Joiner};
 
@@ -524,11 +522,13 @@ pub fn scale(point: &mut Point) {
 }
 
 pub fn generate_pm4py_module() -> Result<EbiOutput> {
-    let mut imports = format!("use pyo3::prelude::*;
+    let mut imports = format!("#![allow(unsafe_op_in_unsafe_fn)]
+#![allow(unused_variables)]
+
+use pyo3::prelude::*;
 use pyo3::types::PyAny;
-use super::pm4py_link::{{ImportableFromPM4Py, IMPORTERS}};
-use crate::ebi_framework::{{ebi_command::EbiCommand, ebi_output}};
-use crate::ebi_objects::{{event_log::EventLog, labelled_petri_net::LabelledPetriNet, stochastic_labelled_petri_net::StochasticLabelledPetriNet, process_tree::ProcessTree}};");
+use super::pm4py_link::{{IMPORTERS, ExportableToPM4Py}};
+use crate::ebi_framework::ebi_command::EbiCommand;");
     let mut functions = String::new();
     let mut module = format!("#[pymodule]\nfn ebi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {{");
     
@@ -572,7 +572,7 @@ fn generate_pyfn(path: &Vec<&EbiCommand>, library_name: String) -> (String, Stri
 
     // Start building function
     let mut body = format!(r###"#[pyfunction]
-fn {fname}({args}) -> PyResult<String> {{
+fn {fname}(py: Python<'_>, {args}) -> PyResult<PyObject> {{
     let command: &&EbiCommand = &&{library_name};
     let input_types = match **command {{
         EbiCommand::Command {{ input_types, .. }} => input_types,
@@ -601,20 +601,11 @@ fn {fname}({args}) -> PyResult<String> {{
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {{}}", e)))?;
-    let exporter = EbiCommand::select_exporter(&result.get_type(), None);
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {{}}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {{}}", e)))?;
 
-    let output_string = if exporter.is_binary() {{
-        let bytes = ebi_output::export_to_bytes(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {{}}", e)))?;
-        String::from_utf8(bytes)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("UTF8 conversion error: {{}}", e)))?
-    }} else {{
-        ebi_output::export_to_string(result, exporter)
-            .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {{}}", e)))?
-    }};
-
-    Ok(output_string)
+    Ok(result)
 }}
 
 "###, inputs));
