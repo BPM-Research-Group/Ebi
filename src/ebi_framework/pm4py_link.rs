@@ -1,4 +1,5 @@
 use anyhow::{anyhow, Result};
+use fraction::BigFraction;
 use pyo3::prelude::*;
 use pyo3::types::{PyAny, PyDict, PyList, PySet};
 use pyo3::AsPyPointer;
@@ -21,6 +22,7 @@ use crate::ebi_objects::event_log::{EventLog, EBI_EVENT_LOG};
 use crate::ebi_objects::labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET};
 use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};
 use crate::ebi_objects::{stochastic_labelled_petri_net::StochasticLabelledPetriNet, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, process_tree::{Node, Operator, EBI_PROCESS_TREE}, finite_language::EBI_FINITE_LANGUAGE};
+use crate::math::fraction_enum::FractionEnum;
 use crate::marking::Marking;
 use process_mining::event_log::{event_log_struct::{EventLogClassifier, to_attributes}, Attributes, AttributeValue};
 use process_mining::event_log::{EventLog as ProcessMiningEventLog, Trace, Event};
@@ -28,6 +30,7 @@ use process_mining::event_log::{EventLog as ProcessMiningEventLog, Trace, Event}
 type Importer = fn(&PyAny, &[&EbiInputType]) -> PyResult<EbiInput>;
 pub const IMPORTERS: &[Importer] = &[
     usize::import_from_pm4py,
+    Fraction::import_from_pm4py,
     EventLog::import_from_pm4py,
     LabelledPetriNet::import_from_pm4py,
     ProcessTree::import_from_pm4py,
@@ -48,6 +51,27 @@ impl ImportableFromPM4Py for usize {
             match itype {
                 EbiInputType::Usize => {
                     return Ok(EbiInput::Usize(value));
+                },
+                _ => { /* skip other input types */ }
+            }
+        }
+        Err(PyValueError::new_err(
+            "Integer could not be wrapped as any of the requested EbiInputType variants",
+        ))
+    }
+}
+
+impl ImportableFromPM4Py for Fraction {
+    fn import_from_pm4py(double: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput> {
+        let value: f64 = double.extract().map_err(|_| {
+            PyValueError::new_err("Expected a Python double to convert to Rust usize")
+        })?;
+        let frac: BigFraction = BigFraction::from_str(&value.to_string())
+            .map_err(|_| PyValueError::new_err("Failed to convert f64 to BigFraction"))?;
+        for &itype in input_types {
+            match itype {
+                EbiInputType::Fraction => {
+                    return Ok(EbiInput::Fraction(FractionEnum::Exact(frac)));
                 },
                 _ => { /* skip other input types */ }
             }
