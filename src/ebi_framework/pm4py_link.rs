@@ -52,17 +52,20 @@ impl ExportableToPM4Py for EbiOutput {
             EbiOutput::Fraction(frac) => {
                 frac.export_to_pm4py(py)
             }
-
+            EbiOutput::Bool(value) => {
+                value.export_to_pm4py(py)
+            }
+            EbiOutput::Usize(value) => {
+                value.export_to_pm4py(py)
+            }
             // default: no exporter available (not implemented yet or no equivalent in PM4Py) -> return string representation
             EbiOutput::Object(_)
             | EbiOutput::String(_)
             | EbiOutput::SVG(_)
             | EbiOutput::PDF(_)
-            | EbiOutput::Usize(_)
             | EbiOutput::LogDiv(_)
             | EbiOutput::ContainsRoot(_)
-            | EbiOutput::RootLogDiv(_)
-            | EbiOutput::Bool(_) => {
+            | EbiOutput::RootLogDiv(_) => {
                 let exporter = EbiCommand::select_exporter(&self.get_type(), None);
 
                 let output_string = if exporter.is_binary() {
@@ -81,6 +84,11 @@ impl ExportableToPM4Py for EbiOutput {
     }
 }
 
+impl ExportableToPM4Py for bool {
+    fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        Ok(self.to_object(py))
+    }
+}
 
 impl ImportableFromPM4Py for usize {
     fn import_from_pm4py(integer: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput> {
@@ -98,6 +106,13 @@ impl ImportableFromPM4Py for usize {
         Err(PyValueError::new_err(
             "Integer could not be wrapped as any of the requested EbiInputType variants",
         ))
+    }
+}
+
+impl ExportableToPM4Py for usize {
+    fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        // Convert the Rust `usize` to a Python integer
+        Ok(self.to_object(py))
     }
 }
 
