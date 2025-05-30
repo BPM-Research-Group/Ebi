@@ -17,7 +17,7 @@ use crate::{
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
-        ebi_output::EbiOutput,
+        ebi_output::{EbiObjectExporter, EbiOutput},
         ebi_trait::FromEbiTraitObject,
         exportable::Exportable,
         importable::Importable,
@@ -72,7 +72,9 @@ pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
             DirectlyFollowsGraph::import_as_stochastic_labelled_petri_net,
         ),
     ],
-    object_exporters: &[],
+    object_exporters: &[EbiObjectExporter::DirectlyFollowsGraph(
+        DirectlyFollowsGraph::export_from_object,
+    )],
     java_object_handlers: &[], //java translations covered by LabelledPetrinet
 };
 
@@ -506,7 +508,11 @@ impl Infoable for DirectlyFollowsGraph {
             "Number of activities\t\t{}",
             self.activity_key.activity2name.len()
         )?;
-        writeln!(f, "Number of start activities\t{}", self.start_activities.len())?;
+        writeln!(
+            f,
+            "Number of start activities\t{}",
+            self.start_activities.len()
+        )?;
         writeln!(f, "Number of end activities\t{}", self.end_activities.len())?;
 
         let mut sum: Fraction = self.weights.iter().sum();
