@@ -6,7 +6,7 @@ use crate::{
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_objects::scalable_vector_graphics::{svg_to_pdf, to_svg_string_box},
+    ebi_objects::scalable_vector_graphics::to_svg_string_box,
     ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
 };
 
@@ -15,7 +15,7 @@ pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
     name_long: Some("visualise"),
     explanation_short: "Visualse an object.",
     explanation_long: None,
-    children: &[&EBI_VISUALISE_PDF, &EBI_VISUALISE_SVG, &EBI_VISUALISE_TEXT],
+    children: &[&EBI_VISUALISE_GRAPH, &EBI_VISUALISE_TEXT],
 };
 
 pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
@@ -59,10 +59,10 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
-pub const EBI_VISUALISE_SVG: EbiCommand = EbiCommand::Command {
-    name_short: "svg",
+pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command {
+    name_short: "graph",
     name_long: None,
-    explanation_short: "Visualise an object as scalable vector graphics.",
+    explanation_short: "Visualise an object as a graph.",
     explanation_long: None,
     latex_link: None,
     cli_command: None,
@@ -78,28 +78,6 @@ pub const EBI_VISUALISE_SVG: EbiCommand = EbiCommand::Command {
         return Ok(EbiOutput::SVG(svg_string));
     },
     output_type: &EbiOutputType::SVG,
-};
-
-pub const EBI_VISUALISE_PDF: EbiCommand = EbiCommand::Command {
-    name_short: "pdf",
-    name_long: None,
-    explanation_short: "Visualise an object as portable document format.",
-    explanation_long: None,
-    latex_link: None,
-    cli_command: None,
-    exact_arithmetic: true,
-    input_types: &[&[&EbiInputType::Trait(EbiTrait::Graphable)]],
-    input_names: &["FILE"],
-    input_helps: &["Any file that can be visualised as a graph."],
-    execute: |mut inputs, _| {
-        let result = inputs.remove(0).to_type::<dyn EbiTraitGraphable>()?;
-
-        let svg_string = to_svg_string_box(result)?;
-        let pdf = svg_to_pdf(&svg_string)?;
-
-        return Ok(EbiOutput::PDF(pdf));
-    },
-    output_type: &EbiOutputType::PDF,
 };
 
 #[cfg(test)]

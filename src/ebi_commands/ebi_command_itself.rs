@@ -2,10 +2,14 @@ use std::{collections::HashMap, io::Write};
 use clap::Command;
 use anyhow::Result;
 use inflector::Inflector;
+use itertools::Itertools;
 use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
-use crate::{ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, ebi_objects::scalable_vector_graphics::svg_to_pdf, text::Joiner};
+use crate::{ebi_framework::{
+    
+    
+    ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, ebi_objects::scalable_vector_graphics::svg_to_pdf, text::Joiner};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
  □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
@@ -31,9 +35,10 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[ 
         &EBI_ITSELF_GRAPH,
-        &EBI_ITSELF_MANUAL,
+        &EBI_ITSELF_HTML,
         &EBI_ITSELF_JAVA,
-        &EBI_ITSELF_LOGO
+        &EBI_ITSELF_LOGO,
+        &EBI_ITSELF_MANUAL,
      ]
 };
 
@@ -100,6 +105,21 @@ pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command {
     input_names: &[],
     input_helps: &[],
     execute: |_, _| Ok(prom_link::print_java_plugins()?), 
+    output_type: &EbiOutputType::String
+};
+
+pub const EBI_ITSELF_HTML: EbiCommand = EbiCommand::Command { 
+    name_short: "html", 
+    name_long: None, 
+    explanation_short: "Print parts of the website.", 
+    explanation_long: None, 
+    cli_command: None, 
+    latex_link: None, 
+    exact_arithmetic: false, 
+    input_types: &[], 
+    input_names: &[],
+    input_helps: &[],
+    execute: |_, _| Ok(EbiOutput::String(html())), 
     output_type: &EbiOutputType::String
 };
 
@@ -497,4 +517,16 @@ pub fn graph() -> Result<VisualGraph> {
 
 pub fn scale(point: &mut Point) {
     point.x *= 0.5;
+}
+
+pub fn html() -> String {
+    "<h3>Commands</h3>".to_owned() +
+    "Ebi offers the following comands and techniques. " +
+    "Please refer to the <a href=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true\">manual</a> for more information. " + 
+    "<ul><li>" +
+    &EBI_COMMANDS.get_command_paths().iter().filter_map(|path| if path[1].long_name() != EBI_ITSELF.long_name() {
+        Some(EbiCommand::path_to_string(&path[1..]).to_sentence_case() + ". " + path.last().unwrap().explanation_short())
+    } else {None}).join("</li><li>") +
+    
+    "</li></ul>"
 }

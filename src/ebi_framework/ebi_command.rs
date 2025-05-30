@@ -14,7 +14,11 @@ use std::{
 
 use crate::{
     ebi_commands::{
-        ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association, ebi_command_conformance, ebi_command_convert, ebi_command_discover, ebi_command_discover_non_stochastic, ebi_command_info, ebi_command_itself, ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate, ebi_command_visualise
+        ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association,
+        ebi_command_conformance, ebi_command_convert, ebi_command_discover,
+        ebi_command_discover_non_stochastic, ebi_command_info, ebi_command_itself,
+        ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate,
+        ebi_command_visualise,
     },
     ebi_framework::ebi_output,
     math::fraction::FractionNotParsedYet,
@@ -216,6 +220,18 @@ impl EbiCommand {
                 Some(x) => x,
                 None => &name_short,
             },
+        }
+    }
+
+    pub fn explanation_short(&self) -> &str {
+        match self {
+            EbiCommand::Group {
+                explanation_short, ..
+            } => &explanation_short,
+
+            EbiCommand::Command {
+                explanation_short, ..
+            } => &explanation_short,
         }
     }
 
@@ -463,7 +479,7 @@ impl EbiCommand {
         }
     }
 
-    pub fn path_to_string(path: &Vec<&EbiCommand>) -> String {
+    pub fn path_to_string(path: &[&EbiCommand]) -> String {
         let result: Vec<&str> = path.iter().map(|command| command.long_name()).collect();
         result.join(" ")
     }
