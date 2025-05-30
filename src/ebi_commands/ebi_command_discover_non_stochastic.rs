@@ -33,10 +33,10 @@ pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
 };
 
 pub const EBI_DISCOVER_NON_STOCHASTIC_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
-    name_short: "dfm",
-    name_long: Some("directly-follows-model"),
-    explanation_short: "Discover a directly follows model.",
-    explanation_long: None,
+    name_short: "dfg",
+    name_long: Some("directly-follows-graph"),
+    explanation_short: "Discover a directly follows graph.",
+    explanation_long: Some("Discover a directly follows graph with at least the given fitness."),
     latex_link: Some("~\\cite{DBLP:conf/icpm/LeemansPW19}"),
     cli_command: None,
     exact_arithmetic: true,
@@ -54,11 +54,11 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand:
             .remove(0)
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let minimum_fitness = inputs.remove(0).to_type::<Fraction>()?;
-        Ok(EbiOutput::Object(EbiObject::DirectlyFollowsModel(
-            lang.mine_directly_follows_model_filtering(&minimum_fitness)?.into(),
+        Ok(EbiOutput::Object(EbiObject::DirectlyFollowsGraph(
+            lang.mine_directly_follows_model_filtering(&minimum_fitness)?,
         )))
     },
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsModel),
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsGraph),
 };
 
 pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER: EbiCommand = EbiCommand::Group {
