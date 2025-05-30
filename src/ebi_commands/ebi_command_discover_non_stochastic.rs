@@ -8,13 +8,10 @@ use crate::{
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_traits::{
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
-    math::fraction::Fraction,
+    ebi_traits::
+        ebi_trait_finite_language::EbiTraitFiniteLanguage
+    ,
     techniques::{
-        directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
         flower_miner::{FlowerMinerDFA, FlowerMinerTree},
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
     },
@@ -26,39 +23,9 @@ pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     explanation_short: "Discover a non-stochastic process model.",
     explanation_long: None,
     children: &[
-        &EBI_DISCOVER_NON_STOCHASTIC_DIRECTLY_FOLLOWS,
         &EBI_DISCOVER_NON_STOCHASTIC_FLOWER,
         &EBI_DISCOVER_NON_STOCHASTIC_PREFIX,
     ],
-};
-
-pub const EBI_DISCOVER_NON_STOCHASTIC_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
-    name_short: "dfm",
-    name_long: Some("directly-follows-model"),
-    explanation_short: "Discover a directly follows model.",
-    explanation_long: None,
-    latex_link: Some("~\\cite{DBLP:conf/icpm/LeemansPW19}"),
-    cli_command: None,
-    exact_arithmetic: true,
-    input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
-        &[&EbiInputType::Fraction],
-    ],
-    input_names: &["LANG", "MIN_FITNESS"],
-    input_helps: &[
-        "A finite stochastic language.",
-        "The minimum fitness of the resulting model.",
-    ],
-    execute: |mut inputs, _| {
-        let mut lang = inputs
-            .remove(0)
-            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-        let minimum_fitness = inputs.remove(0).to_type::<Fraction>()?;
-        Ok(EbiOutput::Object(EbiObject::DirectlyFollowsModel(
-            lang.mine_directly_follows_model_filtering(&minimum_fitness)?.into(),
-        )))
-    },
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsModel),
 };
 
 pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER: EbiCommand = EbiCommand::Group {
