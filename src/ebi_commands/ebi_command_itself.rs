@@ -525,7 +525,7 @@ pub fn html() -> String {
     "Please refer to the <a href=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true\">manual</a> for more information. " + 
     "<ul><li>" +
     &EBI_COMMANDS.get_command_paths().iter().filter_map(|path| if path[1].long_name() != EBI_ITSELF.long_name() {
-        Some(EbiCommand::path_to_string(&path[1..]).to_sentence_case() + ". " + path.last().unwrap().explanation_short())
+        Some("<i>".to_owned() + &EbiCommand::path_to_string(&path[1..]).to_sentence_case() + "</i>. " + path.last().unwrap().explanation_short())
     } else {None}).join("</li><li>") +
     
     "</li></ul>"
