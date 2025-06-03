@@ -26,6 +26,10 @@ buildlatex:
     - mv manual/manual.pdf build/nightly/manual.pdf
     - git add build/nightly/manual.pdf
 
+    #compile html
+    - cargo run itself html -o build/nightly/commands.html
+    - git add build/nightly/commands.html
+
     #compile linux 64 bit
     - cargo build --target x86_64-unknown-linux-gnu --release
     - mv target/x86_64-unknown-linux-gnu/release/ebi build/nightly/Ebi-x86_64-linux
