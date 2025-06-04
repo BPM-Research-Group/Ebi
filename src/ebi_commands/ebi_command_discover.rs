@@ -9,9 +9,7 @@ use crate::{
         ebi_trait::EbiTrait,
     },
     ebi_objects::{labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree},
-    ebi_traits::
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage
-    ,
+    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::fraction::Fraction,
     techniques::{
         alignment_stochastic_miner::AlignmentMiner,
@@ -39,8 +37,10 @@ pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
 pub const EBI_DISCOVER_ALIGNMENTS: EbiCommand = EbiCommand::Command {
     name_short: "ali",
     name_long: Some("alignments"),
-    explanation_short: "Give each transition a weight that matches the aligned occurrences of its label. The model must be livelock-free.",
-    explanation_long: None,
+    explanation_short: "Give each transition a weight that matches the aligned occurrences of its label.",
+    explanation_long: Some(
+        "Give each transition a weight that matches the aligned occurrences of its label. The model must be livelock-free.",
+    ),
     latex_link: Some("~\\cite{DBLP:conf/icpm/BurkeLW20}"),
     cli_command: None,
     exact_arithmetic: true,

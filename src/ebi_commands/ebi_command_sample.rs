@@ -20,7 +20,7 @@ pub fn get_sampled_object(object: EbiInput, number_of_traces: usize) -> Result<F
 pub const EBI_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "sam",
     name_long: Some("sample"),
-    explanation_short: "Sample traces randomly.",
+    explanation_short: "Draw traces randomly from a model.",
     explanation_long: Some("Sample traces randomly. Please note that this may run forever if the model contains a livelock."),
     latex_link: None,
     cli_command: None,

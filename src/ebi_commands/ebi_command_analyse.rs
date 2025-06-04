@@ -23,8 +23,8 @@ pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
 pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
     name_short: "all", 
     name_long: Some("all-traces"), 
-    explanation_short: "Find all traces.", 
-    explanation_long: Some("List all traces of a stohastic language.
+    explanation_short: "Find all traces of a stochastic model.", 
+    explanation_long: Some("List all traces of a stohastic model.
 Models containing loops and unbounded models are not supported and the computation will run forever."),
     cli_command: None, 
     latex_link: None,
@@ -55,7 +55,7 @@ Models containing loops and unbounded models are not supported and the computati
 pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
     name_short: "comp", 
     name_long: Some("completeness"), 
-    explanation_short: "Estimate the completeness of a finite language using species discovery.", 
+    explanation_short: "Estimate the completeness of an event log using species discovery.", 
     explanation_long: None,
     cli_command: None, 
     latex_link: Some("~\\cite{DBLP:conf/icpm/KabierskiRW23}"),
@@ -195,7 +195,7 @@ Computation is more efficient for an object with a finite stochastic language.")
 pub const EBI_ANALYSE_MODE: EbiCommand = EbiCommand::Command { 
     name_short: "mode", 
     name_long: None,
-    explanation_short: "Find the trace with the highest probability.", 
+    explanation_short: "Find a trace with the highest probability in a stochastic model.", 
     explanation_long: Some("Find the trace with the highest probability.
 If there is more than one trace with the highest probability, an arbitrary choice is made which one to return.
 The computation may run forever if the model is unbounded.
