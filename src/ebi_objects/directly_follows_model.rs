@@ -79,7 +79,7 @@ pub struct DirectlyFollowsModel {
 
 impl DirectlyFollowsModel {
     /**
-     * Creates a new stochastic directly follows model without any states or edges. This has the empty stochastic language, until a state or an empty trace is added.
+     * Creates a new directly follows model without any states or edges. This has the empty language, until a state or an empty trace is added.
      */
     pub fn new(activity_key: ActivityKey) -> Self {
         Self {

@@ -70,7 +70,12 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<StochasticDirectlyFollowsModel>),
     ],
     object_importers: &[
-        EbiObjectImporter::DirectlyFollowsModel(StochasticDirectlyFollowsModel::import_as_object),
+        EbiObjectImporter::StochasticDirectlyFollowsModel(
+            StochasticDirectlyFollowsModel::import_as_object,
+        ),
+        EbiObjectImporter::DirectlyFollowsModel(
+            StochasticDirectlyFollowsModel::import_as_directly_follows_model,
+        ),
         EbiObjectImporter::LabelledPetriNet(
             StochasticDirectlyFollowsModel::import_as_labelled_petri_net,
         ),
@@ -116,6 +121,11 @@ impl StochasticDirectlyFollowsModel {
             start_node_weights: vec![],
             end_node_weights: vec![],
         }
+    }
+
+    pub fn import_as_directly_follows_model(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let dfg = Self::import(reader)?;
+        Ok(EbiObject::DirectlyFollowsModel(dfg.into()))
     }
 
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {

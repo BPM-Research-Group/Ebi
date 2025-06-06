@@ -539,11 +539,12 @@ mod tests {
 
     #[test]
     fn all_exporters() {
-        for (object, importer, _, _) in crate::tests::get_all_test_files() {
+        for (object, importer, _, f) in crate::tests::get_all_test_files() {
             if let EbiInput::Object(object, _) = object {
                 for file_handler2 in EBI_FILE_HANDLERS {
                     for exporter in file_handler2.object_exporters {
                         if exporter.get_type() == importer.clone().unwrap().get_type() {
+                            println!("file {} importer {:?} exporter {}", f, importer, exporter);
                             let mut c = Cursor::new(Vec::new());
                             exporter
                                 .export(EbiOutput::Object(object.clone()), &mut c)
