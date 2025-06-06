@@ -49,7 +49,7 @@ pub const FORMAT_SPECIFICATION: &str = "A stochstic directly follows model is a 
     The next line contains the number of edges, followed by, for each edge, a line with first the index of the source activity, then the `>` symbol, then the index of the target activity, then a `w`, and then the weight of the transition.
     
     For instance:
-    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/a-b_star.dfm}
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba.sdfm}
     
     Note that a directly follows model expresses a language and may have duplicated activity labels.";
 

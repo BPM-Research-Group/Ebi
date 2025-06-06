@@ -1,0 +1,23 @@
+stochastic directly follows model
+# empty traces weight
+0
+# number of nodes
+2
+#node 0
+a
+#node 1
+b
+# number of start nodes
+2
+0w2/5
+1w3/5
+# number of end nodes
+2
+0w4/5
+1w1/5
+# number of edges
+3
+# edges
+0>0w1/5
+0>1w1/5
+1>0w3/5
