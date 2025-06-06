@@ -528,5 +528,12 @@ pub fn html() -> String {
         Some("<i>".to_owned() + &EbiCommand::path_to_string(&path[1..]).to_sentence_case() + "</i>. " + path.last().unwrap().explanation_short())
     } else {None}).join("</li><li>") +
     
+    "</li></ul>" + 
+    
+    
+    //file formats
+    "<h3>Supported file formats</h3>" + 
+    "<ul><li>" +
+    &EBI_FILE_HANDLERS.iter().map(|file_handler| format!("{} (.{})", file_handler.name.to_sentence_case(), file_handler.file_extension)).join("</li><li>") +
     "</li></ul>"
 }
