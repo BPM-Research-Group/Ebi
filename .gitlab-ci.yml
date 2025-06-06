@@ -26,6 +26,10 @@ buildlatex:
     - mv manual/manual.pdf build/nightly/manual.pdf
     - git add build/nightly/manual.pdf
 
+    #compile html
+    - cargo run itself html -o build/nightly/commands.html
+    - git add build/nightly/commands.html
+
     #compile linux 64 bit
     - cargo build --target x86_64-unknown-linux-gnu --release
     - mv target/x86_64-unknown-linux-gnu/release/ebi build/nightly/Ebi-x86_64-linux
@@ -47,28 +51,6 @@ buildlatex:
     - zip ../../../build/prom-rust/Rust-6.15.3-win64.zip lib/ebi.dll
     - cd ../../..
     - git add build/prom-rust/Rust-6.15.3-win64.zip
-
-    #compile windows 32 bit
-    - cargo build --target i686-pc-windows-gnu --release
-    - mv target/i686-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-i686-windows.exe
-    - git add build/nightly/Ebi-i686-windows.exe
-    - cd target/i686-pc-windows-gnu/release
-    - mkdir -p lib
-    - mv ebi.dll lib/ 
-    - zip ../../../build/prom-rust/Rust-6.15.3-win32.zip lib/ebi.dll
-    - cd ../../..
-    - git add build/prom-rust/Rust-6.15.3-win32.zip
-
-    #compile linux 32 bit
-    - cargo build --target i686-unknown-linux-gnu --release
-    - mv target/i686-unknown-linux-gnu/release/ebi build/nightly/Ebi-i686-linux
-    - git add build/nightly/Ebi-i686-linux
-    - cd target/i686-unknown-linux-gnu/release
-    - mkdir -p lib
-    - mv libebi.so lib/ 
-    - zip ../../../build/prom-rust/Rust-6.15.3-lin32.zip lib/libebi.so
-    - cd ../../..
-    - git add build/prom-rust/Rust-6.15.3-lin32.zip
 
     #write packages.xml
     - printf "<packages>\n" > build/prom-rust/packages.xml

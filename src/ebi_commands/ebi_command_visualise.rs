@@ -21,7 +21,7 @@ pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
 pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
     name_short: "txt",
     name_long: Some("text"),
-    explanation_short: "Visualise an object as text.",
+    explanation_short: "Visualise a file as text.",
     explanation_long: None,
     latex_link: None,
     cli_command: None,
@@ -62,7 +62,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
 pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command {
     name_short: "graph",
     name_long: None,
-    explanation_short: "Visualise an object as a graph.",
+    explanation_short: "Visualise a file as a graph.",
     explanation_long: None,
     latex_link: None,
     cli_command: None,
