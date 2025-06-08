@@ -16,7 +16,7 @@ impl UnitEarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLangua
 
         let mut sum = (0..self.len()).into_par_iter().filter_map(|trace_index| {
             let trace = self.get_trace(trace_index).unwrap();
-            let probability = self.get_probability(trace_index).unwrap();
+            let probability = self.get_trace_probability(trace_index).unwrap();
 
             match language2.get_probability(&FollowerSemantics::Trace(&translator.translate_trace(trace))) {
                 Ok(probability2) => if *probability > probability2 {

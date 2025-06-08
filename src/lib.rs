@@ -139,6 +139,9 @@ pub mod math {
     pub mod root;
     pub mod root_log_div;
     pub mod traits;
+    pub mod distances;
+    pub mod distances_triangular;
+    pub mod distances_matrix;
 }
 
 pub mod techniques {
@@ -190,7 +193,6 @@ pub mod optimisation_algorithms {
     pub mod network_simplex;
     pub mod network_simplex_value_type;
 }
-pub mod distances;
 pub mod follower_semantics;
 pub mod json;
 pub mod line_reader;

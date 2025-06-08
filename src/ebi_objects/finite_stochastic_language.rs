@@ -8,7 +8,9 @@ use std::{
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
+        activity_key::{
+            Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
+        },
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -210,10 +212,6 @@ impl EbiTraitIterableLanguage for FiniteStochasticLanguage {
 impl EbiTraitFiniteLanguage for FiniteStochasticLanguage {}
 
 impl EbiTraitFiniteStochasticLanguage for FiniteStochasticLanguage {
-    fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction> {
-        Some(self.traces.iter().nth(trace_index)?.1)
-    }
-
     fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage {
         self.clone()
     }
@@ -509,7 +507,7 @@ impl EbiTraitIterableStochasticLanguage for FiniteStochasticLanguage {
         Box::new(self.traces.iter())
     }
 
-    fn get_probability(&self, trace_index: usize) -> Option<&Fraction> {
+    fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction> {
         Some(self.traces.iter().nth(trace_index)?.1)
     }
 }

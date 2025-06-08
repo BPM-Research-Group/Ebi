@@ -1,7 +1,7 @@
 use std::{sync::Arc, fmt::Debug};
 use anyhow::{anyhow, Result};
 
-use crate::distances::TriangularDistanceMatrix;
+use crate::math::distances::TriangularDistanceMatrix;
 
 use super::{fixed_denominator_fraction::FixedDenominatorFraction, fraction::Fraction, traits::Zero};
 

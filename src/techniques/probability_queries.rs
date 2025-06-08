@@ -188,7 +188,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
         //idea: keep a list of traces sorted by probability
 
         //insert the first trace
-        let mut result = vec![(self.get_trace(0).unwrap(), self.get_probability(0).unwrap())];
+        let mut result = vec![(self.get_trace(0).unwrap(), self.get_trace_probability(0).unwrap())];
 
         let mut sum = Fraction::zero();
 

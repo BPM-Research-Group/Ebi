@@ -7,7 +7,7 @@ use crate::{ebi_framework::{activity_key::Activity, ebi_input::EbiInput, ebi_obj
 pub trait EbiTraitIterableStochasticLanguage { //an iterable language is not necessarily finite
     fn iter_trace_probability(&self) -> Box<dyn Iterator<Item = (&Vec<Activity>, &Fraction)> + '_>;
 
-    fn get_probability(&self, trace_index: usize) -> Option<&Fraction>;
+    fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction>;
 }
 
 impl FromEbiTraitObject for dyn EbiTraitIterableStochasticLanguage {

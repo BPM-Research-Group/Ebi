@@ -1,4 +1,4 @@
-use crate::distances::DistanceMatrix;
+use crate::distances::{DistanceMatrix, WeightedDistanceMatrix, WeightedDistances};
 use crate::math::traits::Zero;
 use crate::optimisation_algorithms::network_simplex::NetworkSimplex;
 use crate::{
@@ -11,6 +11,72 @@ use rayon::prelude::*;
 use std::sync::Arc;
 
 use super::earth_movers_stochastic_conformance::EarthMoversStochasticConformance;
+
+impl WeightedDistanceMatrix {
+    fn earth_movers_stochastic_conformance(self) -> Result<Fraction> {
+        // 2. Is exact arithmetic required?
+        //not applicable in this compilation mode
+
+        // 3. Exact arithmetic is not required, use f64 for the NetworkSimplex computation.
+        log::info!("Calculating approximate EMSC value. Using f64 for NetworkSimplex computation.");
+
+        // 3a. Create a network graph with the scaled distances and probabilities:
+        let n = self.len_a();
+        let m = self.len_b();
+
+        // 3a(i). For each trace in the first language, create a supply node with the corresponding trace probability as supply.
+        let mut supply = vec![Fraction::zero(); n + m];
+        supply
+            .par_iter_mut()
+            .enumerate()
+            .take(n)
+            .for_each(|(i, supply)| {
+                *supply = *self.weight_a(i);
+            });
+        // 3a(ii). For each trace in the second language, create a demand node with the corresponding trace probability as demand (i.e. negative supply).
+        supply
+            .par_iter_mut()
+            .enumerate()
+            .skip(n)
+            .take(m)
+            .for_each(|(i, supply)| {
+                *supply = -self.weight_b(i - n);
+            });
+
+        // 3a(iii). Create an edge between each pair of traces with the respective distance as cost.
+        let mut graph_and_costs = vec![vec![None; n + m]; n + m];
+        // Populate the top-right n x m part of graph_and_costs with scaled_distances
+        self.into_iter().for_each(|(i, j, f)| graph_and_costs[i][j + n] = Some(f));
+
+        // 3b. Run the NetworkSimplex algorithm to find the optimal flow between the supply and demand nodes.
+        let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, false, true);
+        log::info!("Starting Network Simplex.");
+
+        ns.run(true);
+
+        let ns_result = match ns.get_result() {
+            Some(result) => result,
+            None => {
+                log::info!(
+                    "NetworkSimplex did not return a result, retrying with adjusted parameters."
+                );
+                let mut retry_ns = NetworkSimplex::new(&graph_and_costs, &supply, false, false);
+
+                retry_ns.run(true);
+
+                retry_ns
+                    .get_result()
+                    .context("NetworkSimplex did not return a result, cannot calculate EMSC")?
+            }
+        };
+
+        log::debug!("NetworkSimplex result: {:?}", ns_result);
+        // 3c. Calculate the EMSC value as 1 - result.
+        let result = ns_result.one_minus();
+
+        Ok(result)
+    }
+}
 
 /// Authored by Leonhard Mühlmeyer (2024)
 /// Implementation of the Earth Movers Stochastic Conformance Cheching (EMSC) described in
@@ -137,18 +203,29 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
 #[cfg(test)]
 mod tests {
+    use crate::{
+        ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
+        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        math::{
+            fraction::Fraction,
+            traits::{One, Zero},
+        },
+        techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
+    };
     use std::fs;
-    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{fraction::Fraction, traits::{One, Zero}}, techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance};
 
     #[test]
     fn emsc_one() {
         let fin1 = fs::read_to_string("testfiles/aa.slang").unwrap();
-        let mut slang1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(fin1.parse::<FiniteStochasticLanguage>().unwrap());
+        let mut slang1: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(fin1.parse::<FiniteStochasticLanguage>().unwrap());
 
         let fin2 = fs::read_to_string("testfiles/aa.slang").unwrap();
         let mut slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
 
-        let emsc = slang1.earth_movers_stochastic_conformance(&mut slang2).unwrap();
+        let emsc = slang1
+            .earth_movers_stochastic_conformance(&mut slang2)
+            .unwrap();
 
         assert_eq!(emsc, Fraction::one());
     }
@@ -156,12 +233,15 @@ mod tests {
     #[test]
     fn emsc_zero() {
         let fin1 = fs::read_to_string("testfiles/aa.slang").unwrap();
-        let mut slang1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(fin1.parse::<FiniteStochasticLanguage>().unwrap());
+        let mut slang1: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(fin1.parse::<FiniteStochasticLanguage>().unwrap());
 
         let fin2 = fs::read_to_string("testfiles/bb.slang").unwrap();
         let mut slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
 
-        let emsc = slang1.earth_movers_stochastic_conformance(&mut slang2).unwrap();
+        let emsc = slang1
+            .earth_movers_stochastic_conformance(&mut slang2)
+            .unwrap();
 
         assert_eq!(emsc, Fraction::zero());
     }

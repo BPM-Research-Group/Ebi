@@ -18,6 +18,21 @@ pub type Fraction = super::fraction_exact::FractionExact;
 
 //======================== fraction tools ========================//
 
+#[cfg(any(
+    all(
+        not(feature = "exactarithmetic"),
+        not(feature = "approximatearithmetic")
+    ),
+    all(feature = "exactarithmetic", feature = "approximatearithmetic")
+))]
+pub type FractionRandomCache = super::fraction_enum::FractionEnum;
+
+#[cfg(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic"))]
+pub type FractFractionRandomCacheion = super::fraction_f64::FractionF64;
+
+#[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
+pub type FractionRandomCache = super::fraction_exact::FractionRandomCacheExact;
+
 pub trait ChooseRandomly {
     /**
      * Return a random index from 0 (inclusive) to the length of the list (exclusive).
@@ -26,6 +41,17 @@ pub trait ChooseRandomly {
      * The fractions do not need to sum to 1.
      */
     fn choose_randomly(fractions: &Vec<Self>) -> Result<usize>
+    where
+        Self: Sized;
+
+    fn choose_randomly_create_cache<'a>(
+        fractions: impl Iterator<Item = &'a Self>,
+    ) -> Result<FractionRandomCache>
+    where
+        Self: Sized,
+        Self: 'a;
+
+    fn choose_randomly_cached(cache: &FractionRandomCache) -> usize
     where
         Self: Sized;
 }
@@ -62,10 +88,16 @@ pub fn set_exact_globally(exact: bool) {
 }
 
 pub fn is_exaxt_globally() -> bool {
-    if cfg!(any(all(
-        feature = "exactarithmetic",
-        feature = "approximatearithmetic"
-    ), all(not(feature = "exactarithmetic"), not(feature="approximatearithmetic")))) {
+    if cfg!(any(
+        all(
+            feature = "exactarithmetic",
+            feature = "approximatearithmetic"
+        ),
+        all(
+            not(feature = "exactarithmetic"),
+            not(feature = "approximatearithmetic")
+        )
+    )) {
         EXACT.load(std::sync::atomic::Ordering::Relaxed)
     } else if cfg!(feature = "exactarithmetic") {
         true

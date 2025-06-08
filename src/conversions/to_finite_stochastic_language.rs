@@ -1,6 +1,9 @@
-use std::collections::{hash_map::Entry, HashMap};
+use std::collections::{HashMap, hash_map::Entry};
 
-use crate::{ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage}, math::{fraction::Fraction, traits::One}};
+use crate::{
+    ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage},
+    math::{fraction::Fraction, traits::One},
+};
 
 impl From<EventLog> for FiniteStochasticLanguage {
     fn from(value: EventLog) -> Self {

@@ -21,8 +21,6 @@ use super::{
 pub trait EbiTraitFiniteStochasticLanguage:
     EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync + Debug
 {
-    fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction>;
-
     fn get_probability_sum(&self) -> Fraction;
 
     // necessary for translations where order traces must be maintained

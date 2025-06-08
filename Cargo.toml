@@ -8,7 +8,7 @@ name = "ebi"
 crate-type = ["cdylib", "lib"]
 
 [features]
-default = []
+default = ["exactarithmetic"]
 exactarithmetic = []
 approximatearithmetic = []
 

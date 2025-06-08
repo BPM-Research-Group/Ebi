@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Error, Result};
+use anyhow::{Error, Result, anyhow};
 use fraction::{BigFraction, BigUint, GenericFraction, Sign};
 use num::BigInt;
 use num_bigint::{RandBigInt, ToBigUint};
@@ -17,7 +17,7 @@ use std::{
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
 use super::{
-    fraction::{FractionNotParsedYet, MaybeExact, ChooseRandomly, UInt},
+    fraction::{ChooseRandomly, FractionNotParsedYet, MaybeExact, UInt},
     traits::{One, Signed, Zero},
 };
 
@@ -83,6 +83,11 @@ impl FractionExact {
     }
 }
 
+pub struct FractionRandomCacheExact {
+    cumulative_probabilities: Vec<FractionExact>,
+    highest_denom: BigUint,
+}
+
 impl ChooseRandomly for FractionExact {
     fn choose_randomly(fractions: &Vec<FractionExact>) -> Result<usize> {
         if fractions.is_empty() {
@@ -127,6 +132,56 @@ impl ChooseRandomly for FractionExact {
             }
         }
         Ok(probabilities.len() - 1)
+    }
+
+    fn choose_randomly_create_cache<'a>(
+        mut fractions: impl Iterator<Item = &'a Self>,
+    ) -> Result<FractionRandomCacheExact>
+    where
+        Self: Sized,
+        Self: 'a,
+    {
+        if let Some(first) = fractions.next() {
+            let mut cumulative_probabilities = vec![first.clone()];
+            let mut highest_denom = first.0.denom().unwrap();
+
+            while let Some(fraction) = fractions.next() {
+                highest_denom = highest_denom.max(fraction.0.denom().unwrap());
+
+                cumulative_probabilities.push(fraction + cumulative_probabilities.last().unwrap());
+            }
+            let highest_denom = highest_denom.clone();
+
+            Ok(FractionRandomCacheExact {
+                cumulative_probabilities,
+                highest_denom,
+            })
+        } else {
+            Err(anyhow!("cannot take an element of an empty list"))
+        }
+    }
+
+    fn choose_randomly_cached(cache: &FractionRandomCacheExact) -> usize
+    where
+        Self: Sized,
+    {
+        //select a random value
+        let mut rng = rand::thread_rng();
+        let rand_val = {
+            //strategy: the highest denominator determines how much precision we need
+
+            //Generate a random value with the number of bits of the highest denominator. Repeat until this value is <= the max denominator.
+            let mut rand_val = rng.gen_biguint(cache.highest_denom.bits());
+            while rand_val > cache.highest_denom {
+                rand_val = rng.gen_biguint(cache.highest_denom.bits());
+            }
+            //create the fraction from the random nominator and the max denominator
+            FractionExact::try_from((rand_val, cache.highest_denom.clone())).unwrap()
+        };
+
+        match cache.cumulative_probabilities.binary_search(&rand_val) {
+            Ok(index) | Err(index) => index,
+        }
     }
 }
 

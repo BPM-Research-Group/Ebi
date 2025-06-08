@@ -201,6 +201,15 @@ impl MaybeExact for FractionEnum {
 }
 
 impl ChooseRandomly for FractionEnum {
+
+    fn choose_randomly_create_cache(fractions: &Vec<FractionEnum>) -> Result<Vec<FractionEnum>> {
+        
+    }
+
+    fn choose_randomly_cached(cache: &Vec<FractionEnum>) -> usize {
+
+    }
+    
     fn choose_randomly(fractions: &Vec<FractionEnum>) -> Result<usize> {
         if fractions.is_empty() {
             return Err(anyhow!("cannot take an element of an empty list"));
