@@ -28,7 +28,7 @@ pub type Fraction = super::fraction_exact::FractionExact;
 pub type FractionRandomCache = super::fraction_enum::FractionEnum;
 
 #[cfg(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic"))]
-pub type FractFractionRandomCacheion = super::fraction_f64::FractionF64;
+pub type FractionRandomCache = super::fraction_f64::FractionRandomCacheF64;
 
 #[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
 pub type FractionRandomCache = super::fraction_exact::FractionRandomCacheExact;

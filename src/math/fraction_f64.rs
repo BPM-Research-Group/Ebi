@@ -10,16 +10,17 @@ use std::{
     sync::Arc,
 };
 
-use anyhow::{anyhow, Error, Result};
+use anyhow::{Error, Result, anyhow};
 use rand::Rng;
 
 use crate::{
     ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable},
+    math::fraction::FractionRandomCache,
     optimisation_algorithms::network_simplex_value_type::{IsFloat, MulWithFloat},
 };
 
 use super::{
-    fraction::{ChooseRandomly, FractionNotParsedYet, MaybeExact, EPSILON},
+    fraction::{ChooseRandomly, EPSILON, FractionNotParsedYet, MaybeExact},
     traits::{One, Signed, Zero},
 };
 
@@ -76,6 +77,10 @@ impl FractionF64 {
     }
 }
 
+pub struct FractionRandomCacheF64 {
+    cumulative_probabilities: Vec<FractionF64>,
+}
+
 impl ChooseRandomly for FractionF64 {
     fn choose_randomly(fractions: &Vec<FractionF64>) -> Result<usize> {
         if fractions.is_empty() {
@@ -104,6 +109,50 @@ impl ChooseRandomly for FractionF64 {
             }
         }
         Ok(probabilities.len() - 1)
+    }
+
+    fn choose_randomly_create_cache<'a>(
+        mut fractions: impl Iterator<Item = &'a Self>,
+    ) -> Result<FractionRandomCache>
+    where
+        Self: Sized,
+        Self: 'a,
+    {
+        if let Some(first) = fractions.next() {
+            let mut cumulative_probabilities = vec![*first];
+
+            while let Some(fraction) = fractions.next() {
+                cumulative_probabilities.push(fraction + cumulative_probabilities.last().unwrap());
+            }
+
+            Ok(FractionRandomCacheF64 {
+                cumulative_probabilities,
+            })
+        } else {
+            Err(anyhow!("cannot take an element of an empty list"))
+        }
+    }
+
+    fn choose_randomly_cached(cache: &FractionRandomCache) -> usize
+    where
+        Self: Sized,
+    {
+        //select a random value
+        let mut rng = rand::thread_rng();
+        let rand_val = FractionF64::from(
+            rng.gen_range(
+                0.0..=cache
+                    .cumulative_probabilities
+                    .last()
+                    .unwrap()
+                    .extract_approx()
+                    .unwrap(),
+            ),
+        );
+
+        match cache.cumulative_probabilities.binary_search(&rand_val) {
+            Ok(index) | Err(index) => index,
+        }
     }
 }
 

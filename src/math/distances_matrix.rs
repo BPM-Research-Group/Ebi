@@ -1,11 +1,17 @@
+use anyhow::Result;
 #[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
 use num::BigInt;
-use anyhow::Result;
 use num_bigint::ToBigInt;
 use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
 use crate::{
-    ebi_framework::ebi_command::EbiCommand, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{distances::WeightedDistances, fraction::{Fraction, MaybeExact}, levenshtein}
+    ebi_framework::ebi_command::EbiCommand,
+    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    math::{
+        distances::WeightedDistances,
+        fraction::{Fraction, MaybeExact},
+        levenshtein,
+    },
 };
 
 /**
@@ -155,6 +161,7 @@ impl WeightedDistances for WeightedDistanceMatrix {
         Ok(lcm)
     }
 
+    #[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
     fn lowest_common_multiple_denominators_weights(&self) -> Result<BigInt> {
         let self_denominators: Vec<BigInt> = self
             .weights_a

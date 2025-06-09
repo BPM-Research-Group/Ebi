@@ -210,19 +210,11 @@ impl StatisticalTestLogLog for dyn EbiTraitFiniteStochasticLanguage {
                 //compute emsc
                 let sample_conformance = self_self_distances.earth_movers_stochastic_conformance();
 
-                // log::debug!("sample {:?}", sample);
-
                 progress_bar.inc(1);
 
-                // log::debug!("sample done\n   average distance with knowledge of attribute {} \naverage distance without knowledge of attribute {}", &sum_a / count_a, &sum_r / count_r);
-                if let Ok(a) = sample_conformance {
-                    if &a <= &base_conformance {
-                        // log::debug!("a wins -- average a {}, average r {} -- sample {:?}", a, r, sample);
-                        1
-                    } else {
-                        // log::debug!("r wins -- average a {}, average r {} -- sample {:?}", a, r, sample);
-                        0
-                    }
+                if let Ok(d) = sample_conformance {
+                    //Here, the paper says "<=", however that does not match intuition.
+                    if &d < &base_conformance { 1 } else { 0 }
                 } else {
                     err.fetch_add(1, Ordering::Relaxed);
                     0
@@ -236,9 +228,8 @@ impl StatisticalTestLogLog for dyn EbiTraitFiniteStochasticLanguage {
 
         let mut p_value = Fraction::from(e);
         p_value /= number_of_samples - err.load(Ordering::Relaxed);
-        p_value = p_value.one_minus();
 
-        let reject = &p_value < alpha;
+        let reject = p_value >= alpha.one_minus();
 
         progress_bar.finish_and_clear();
 
@@ -251,9 +242,15 @@ mod tests {
     use std::fs;
 
     use crate::{
-        ebi_objects::event_log::EventLog, ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
+        ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage},
+        ebi_traits::{
+            ebi_trait_event_log::EbiTraitEventLog,
+            ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        },
         math::fraction::Fraction,
-        techniques::statistical_test::StatisticalTestsLogCategoricalAttribute,
+        techniques::statistical_test::{
+            StatisticalTestLogLog, StatisticalTestsLogCategoricalAttribute,
+        },
     };
 
     #[test]
@@ -265,5 +262,17 @@ mod tests {
             .log_categorical_attribute(500, &"attribute".to_string(), &Fraction::from((1, 20)))
             .unwrap();
         assert!(sustain) //The hypothesis should be rejected if we consider the meaning of things, however, as we have only two traces, it will be sustained.
+    }
+
+    #[test]
+    fn llup_test() {
+        let fin = fs::read_to_string("testfiles/aa.slang").unwrap();
+        let slpn = fin.parse::<FiniteStochasticLanguage>().unwrap();
+        let mut slpn2 = slpn.clone();
+        let mut slpn: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slpn);
+        let (_, sustain) = slpn
+            .log_log_test(&mut slpn2, 1, &Fraction::from((1, 20)))
+            .unwrap();
+        assert!(sustain);
     }
 }

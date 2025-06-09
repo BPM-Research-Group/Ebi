@@ -1,9 +1,9 @@
-use crate::distances::{DistanceMatrix, WeightedDistanceMatrix, WeightedDistances};
+use crate::math::distances::{DistanceMatrix, WeightedDistances};
 use crate::math::traits::Zero;
 use crate::optimisation_algorithms::network_simplex::NetworkSimplex;
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::fraction::Fraction,
+    math::fraction_f64::FractionF64,
 };
 use anyhow::{Context, Result};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
@@ -12,8 +12,8 @@ use std::sync::Arc;
 
 use super::earth_movers_stochastic_conformance::EarthMoversStochasticConformance;
 
-impl WeightedDistanceMatrix {
-    fn earth_movers_stochastic_conformance(self) -> Result<Fraction> {
+impl dyn WeightedDistances {
+    pub fn earth_movers_stochastic_conformance(&self) -> Result<FractionF64> {
         // 2. Is exact arithmetic required?
         //not applicable in this compilation mode
 
@@ -25,7 +25,7 @@ impl WeightedDistanceMatrix {
         let m = self.len_b();
 
         // 3a(i). For each trace in the first language, create a supply node with the corresponding trace probability as supply.
-        let mut supply = vec![Fraction::zero(); n + m];
+        let mut supply = vec![FractionF64::zero(); n + m];
         supply
             .par_iter_mut()
             .enumerate()
@@ -46,7 +46,8 @@ impl WeightedDistanceMatrix {
         // 3a(iii). Create an edge between each pair of traces with the respective distance as cost.
         let mut graph_and_costs = vec![vec![None; n + m]; n + m];
         // Populate the top-right n x m part of graph_and_costs with scaled_distances
-        self.into_iter().for_each(|(i, j, f)| graph_and_costs[i][j + n] = Some(f));
+        self.iter()
+            .for_each(|(i, j, f)| graph_and_costs[i][j + n] = Some(*f));
 
         // 3b. Run the NetworkSimplex algorithm to find the optimal flow between the supply and demand nodes.
         let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, false, true);
@@ -112,11 +113,11 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
     fn earth_movers_stochastic_conformance(
         &mut self,
         lang_b: &mut dyn EbiTraitFiniteStochasticLanguage,
-    ) -> Result<Fraction> {
+    ) -> Result<FractionF64> {
         // 1. Compute all pairwise distances between the traces of the two languages (parallized, see DistanceMatrix).
 
         let distances = DistanceMatrix::new(self, lang_b);
-        let distances: Vec<Vec<Fraction>> = distances
+        let distances: Vec<Vec<FractionF64>> = distances
             .distances
             .par_iter()
             .map(|row| {
@@ -144,7 +145,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
         let m = float_distances[0].len();
 
         // 3a(i). For each trace in the first language, create a supply node with the corresponding trace probability as supply.
-        let mut supply = vec![Fraction::zero(); n + m];
+        let mut supply = vec![FractionF64::zero(); n + m];
         supply
             .par_iter_mut()
             .enumerate()
