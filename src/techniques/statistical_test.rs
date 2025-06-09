@@ -229,7 +229,7 @@ impl StatisticalTestLogLog for dyn EbiTraitFiniteStochasticLanguage {
         let mut p_value = Fraction::from(e);
         p_value /= number_of_samples - err.load(Ordering::Relaxed);
 
-        let reject = p_value >= alpha.one_minus();
+        let reject = p_value >= alpha.clone().one_minus();
 
         progress_bar.finish_and_clear();
 
