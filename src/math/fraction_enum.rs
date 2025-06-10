@@ -1,4 +1,4 @@
-use anyhow::{anyhow, Error, Result};
+use anyhow::{Context, Error, Result, anyhow};
 use fraction::{BigFraction, BigUint, GenericFraction, Sign};
 use num::{BigInt, One as NumOne};
 use num_bigint::{RandBigInt, ToBigInt, ToBigUint};
@@ -18,11 +18,11 @@ use std::{
 
 use crate::{
     ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable},
-    math::fraction::EPSILON,
+    math::fraction::{EPSILON, Fraction, FractionRandomCache},
 };
 
 use super::{
-    fraction::{ChooseRandomly, FractionNotParsedYet, MaybeExact, UInt, EXACT},
+    fraction::{ChooseRandomly, EXACT, FractionNotParsedYet, MaybeExact, UInt},
     traits::{One, Signed, Zero},
 };
 
@@ -189,9 +189,9 @@ impl MaybeExact for FractionEnum {
         }
     }
 
-    fn extract_exact(&self) -> Result<GenericFraction<BigUint>> {
+    fn extract_exact(&self) -> Result<&GenericFraction<BigUint>> {
         match self {
-            FractionEnum::Exact(generic_fraction) => Ok(generic_fraction.clone()),
+            FractionEnum::Exact(generic_fraction) => Ok(generic_fraction),
             FractionEnum::Approx(_) => Err(anyhow!("cannot extract a fraction from a float")),
             FractionEnum::CannotCombineExactAndApprox => {
                 Err(anyhow!("cannot combine exact and approximate arithmetic"))
@@ -200,16 +200,12 @@ impl MaybeExact for FractionEnum {
     }
 }
 
+pub enum FractionRandomCacheEnum {
+    Exact(Vec<fraction::BigFraction>, BigUint),
+    Approx(Vec<f64>),
+}
+
 impl ChooseRandomly for FractionEnum {
-
-    fn choose_randomly_create_cache(fractions: &Vec<FractionEnum>) -> Result<Vec<FractionEnum>> {
-        
-    }
-
-    fn choose_randomly_cached(cache: &Vec<FractionEnum>) -> usize {
-
-    }
-    
     fn choose_randomly(fractions: &Vec<FractionEnum>) -> Result<usize> {
         if fractions.is_empty() {
             return Err(anyhow!("cannot take an element of an empty list"));
@@ -263,6 +259,108 @@ impl ChooseRandomly for FractionEnum {
             }
         }
         Ok(probabilities.len() - 1)
+    }
+
+    fn choose_randomly_create_cache<'a>(
+        mut fractions: impl Iterator<Item = &'a Self>,
+    ) -> Result<FractionRandomCache>
+    where
+        Self: Sized,
+        Self: 'a,
+    {
+        if Fraction::create_exact() {
+            //exact mode
+            if let Some(first) = fractions.next() {
+                let mut cumulative_probabilities = vec![
+                    first
+                        .extract_exact()
+                        .with_context(|| "cannot combine exact and approximate arithmetic")?
+                        .clone(),
+                ];
+                let mut highest_denom = first.extract_exact()?.denom().unwrap();
+
+                while let Some(fraction) = fractions.next() {
+                    highest_denom = highest_denom.max(fraction.extract_exact()?.denom().unwrap());
+
+                    let mut x = fraction
+                        .extract_exact()
+                        .with_context(|| "cannot combine exact and approximate arithmetic")?
+                        .clone();
+                    x += cumulative_probabilities.last().unwrap();
+                    cumulative_probabilities.push(x);
+                }
+                let highest_denom = highest_denom.clone();
+
+                Ok(FractionRandomCacheEnum::Exact(
+                    cumulative_probabilities,
+                    highest_denom,
+                ))
+            } else {
+                Err(anyhow!("cannot take an element of an empty list"))
+            }
+        } else {
+            //approximate mode
+            if let Some(first) = fractions.next() {
+                let mut cumulative_probabilities = vec![
+                    first
+                        .extract_approx()
+                        .with_context(|| "cannot combine exact and approximate arithmetic")?,
+                ];
+
+                while let Some(fraction) = fractions.next() {
+                    cumulative_probabilities.push(
+                        fraction
+                            .extract_approx()
+                            .with_context(|| "cannot combine exact and approximate arithmetic")?
+                            + cumulative_probabilities.last().unwrap(),
+                    );
+                }
+
+                Ok(FractionRandomCacheEnum::Approx(cumulative_probabilities))
+            } else {
+                Err(anyhow!("cannot take an element of an empty list"))
+            }
+        }
+    }
+
+    fn choose_randomly_cached(cache: &FractionRandomCache) -> usize
+    where
+        Self: Sized,
+    {
+        match cache {
+            FractionRandomCacheEnum::Exact(cumulative_probabilities, highest_denom) => {
+                //select a random value
+                let mut rng = rand::thread_rng();
+                let rand_val = {
+                    //strategy: the highest denominator determines how much precision we need
+
+                    //Generate a random value with the number of bits of the highest denominator. Repeat until this value is <= the max denominator.
+                    let mut rand_val = rng.gen_biguint(highest_denom.bits());
+                    while &rand_val > highest_denom {
+                        rand_val = rng.gen_biguint(highest_denom.bits());
+                    }
+                    //create the fraction from the random nominator and the max denominator
+                    GenericFraction::Rational(
+                        Sign::Plus,
+                        Ratio::new(rand_val, highest_denom.clone()),
+                    )
+                };
+
+                match cumulative_probabilities.binary_search(&rand_val) {
+                    Ok(index) | Err(index) => index,
+                }
+            }
+            FractionRandomCacheEnum::Approx(cumulative_probabilities) => {
+                //select a random value
+                let mut rng = rand::thread_rng();
+                let rand_val = rng.gen_range(0.0..=*cumulative_probabilities.last().unwrap());
+
+                match cumulative_probabilities.binary_search_by(|probe| probe.total_cmp(&rand_val))
+                {
+                    Ok(index) | Err(index) => index,
+                }
+            }
+        }
     }
 }
 
@@ -496,9 +594,15 @@ impl Exportable for FractionEnum {
 impl Infoable for FractionEnum {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         match self {
-            FractionEnum::Exact(v) => {v.info(f)?; writeln!(f, "")?;},
+            FractionEnum::Exact(v) => {
+                v.info(f)?;
+                writeln!(f, "")?;
+            }
             FractionEnum::Approx(v) => writeln!(f, "Approximate value\t{}", v)?,
-            FractionEnum::CannotCombineExactAndApprox => writeln!(f, "Fraction is a result of combining exact and approximate arithmethic and therefore has no value.")?,
+            FractionEnum::CannotCombineExactAndApprox => writeln!(
+                f,
+                "Fraction is a result of combining exact and approximate arithmethic and therefore has no value."
+            )?,
         };
 
         Ok(write!(f, "")?)

@@ -34,15 +34,21 @@ pub trait WeightedDistances: Send + Sync {
 
     fn clone(&self) -> Box<dyn WeightedDistances>;
 
-    #[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
+    #[cfg(not(feature = "approximatearithmetic"))]
+    /**
+     * Only call in exact mode.
+     */
     fn lowest_common_multiple_denominators_distances(&self) -> Result<BigInt>;
 
-    #[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
+    #[cfg(not(feature = "approximatearithmetic"))]
+    /**
+     * Only call in exact mode.
+     */
     fn lowest_common_multiple_denominators_weights(&self) -> Result<BigInt>;
 }
 
 pub struct TriangularDistanceMatrix {
-    len: usize, //lenght of one side of the matrix
+    len: usize, //length of one side of the matrix
     pub(crate) distances: Vec<Arc<Fraction>>,
     zero: Arc<Fraction>,
 }

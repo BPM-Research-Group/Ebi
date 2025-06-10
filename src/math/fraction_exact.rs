@@ -201,8 +201,8 @@ impl MaybeExact for FractionExact {
      * This is a low-level function to extract an f64. Only use if you are sure that the fraction is exact.
      * May not be available in all compilation modes.
      */
-    fn extract_exact(&self) -> Result<GenericFraction<BigUint>> {
-        Ok(self.0.clone())
+    fn extract_exact(&self) -> Result<&GenericFraction<BigUint>> {
+        Ok(&self.0)
     }
 }
 

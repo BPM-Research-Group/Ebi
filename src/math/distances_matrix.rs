@@ -1,5 +1,5 @@
 use anyhow::Result;
-#[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
+#[cfg(not(feature = "approximatearithmetic"))]
 use num::BigInt;
 use num_bigint::ToBigInt;
 use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
@@ -129,7 +129,7 @@ impl WeightedDistances for WeightedDistanceMatrix {
         Box::new(Clone::clone(self))
     }
 
-    #[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
+    #[cfg(not(feature = "approximatearithmetic"))]
     fn lowest_common_multiple_denominators_distances(&self) -> Result<BigInt> {
         // 2a. Calculate the Least Common Multiple (LCM) of all denominators of distances (i.e. the elements in the DistanceMatrix).
 
@@ -161,7 +161,7 @@ impl WeightedDistances for WeightedDistanceMatrix {
         Ok(lcm)
     }
 
-    #[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
+    #[cfg(not(feature = "approximatearithmetic"))]
     fn lowest_common_multiple_denominators_weights(&self) -> Result<BigInt> {
         let self_denominators: Vec<BigInt> = self
             .weights_a

@@ -25,7 +25,7 @@ pub type Fraction = super::fraction_exact::FractionExact;
     ),
     all(feature = "exactarithmetic", feature = "approximatearithmetic")
 ))]
-pub type FractionRandomCache = super::fraction_enum::FractionEnum;
+pub type FractionRandomCache = super::fraction_enum::FractionRandomCacheEnum;
 
 #[cfg(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic"))]
 pub type FractionRandomCache = super::fraction_f64::FractionRandomCacheF64;
@@ -70,7 +70,7 @@ pub trait MaybeExact {
     /**
      * This is a low-level function to extract an exact value. Will only succeed if the fraction is exact.
      */
-    fn extract_exact(&self) -> Result<Self::Exact>;
+    fn extract_exact(&self) -> Result<&Self::Exact>;
 }
 
 //======================== exactness tools ========================//
