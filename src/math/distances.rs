@@ -1,10 +1,24 @@
-#[cfg(not(feature = "approximatearithmetic"))]
+#[cfg(any(
+    all(
+        not(feature = "exactarithmetic"),
+        not(feature = "approximatearithmetic")
+    ),
+    all(feature = "exactarithmetic", feature = "approximatearithmetic"),
+    all(feature = "exactarithmetic", not(feature = "approximatearithmetic")),
+))]
 use anyhow::Result;
 use std::fmt;
 use std::fmt::Debug;
 use std::{iter::FusedIterator, sync::Arc};
 
-#[cfg(not(feature = "approximatearithmetic"))]
+#[cfg(any(
+    all(
+        not(feature = "exactarithmetic"),
+        not(feature = "approximatearithmetic")
+    ),
+    all(feature = "exactarithmetic", feature = "approximatearithmetic"),
+    all(feature = "exactarithmetic", not(feature = "approximatearithmetic")),
+))]
 use num::BigInt;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
@@ -36,13 +50,27 @@ pub trait WeightedDistances: Send + Sync {
 
     fn clone(&self) -> Box<dyn WeightedDistances>;
 
-    #[cfg(not(feature = "approximatearithmetic"))]
+    #[cfg(any(
+        all(
+            not(feature = "exactarithmetic"),
+            not(feature = "approximatearithmetic")
+        ),
+        all(feature = "exactarithmetic", feature = "approximatearithmetic"),
+        all(feature = "exactarithmetic", not(feature = "approximatearithmetic")),
+    ))]
     /**
      * Only call in exact mode.
      */
     fn lowest_common_multiple_denominators_distances(&self) -> Result<BigInt>;
 
-    #[cfg(not(feature = "approximatearithmetic"))]
+    #[cfg(any(
+        all(
+            not(feature = "exactarithmetic"),
+            not(feature = "approximatearithmetic")
+        ),
+        all(feature = "exactarithmetic", feature = "approximatearithmetic"),
+        all(feature = "exactarithmetic", not(feature = "approximatearithmetic")),
+    ))]
     /**
      * Only call in exact mode.
      */
