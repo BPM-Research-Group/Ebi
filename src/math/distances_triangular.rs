@@ -75,6 +75,8 @@ impl WeightedTriangularDistanceMatrix {
                 .collect();
         });
 
+        // println!("distances {:?}", distances);
+
         progress_bar.finish_and_clear();
 
         Self {
@@ -112,12 +114,13 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
     }
 
     fn distance(&self, index_a: usize, index_b: usize) -> &Fraction {
+        // println!("distance {}, {}", index_a, index_b);
         if index_a == index_b {
             &self.zero
-        } else if index_a > index_b {
-            &self.distances[index_a][index_b]
+        } else if index_a < index_b {
+            &self.distances[index_a][index_b - 1]
         } else {
-            &self.distances[index_b][index_a]
+            &self.distances[index_b][index_a - 1]
         }
     }
 

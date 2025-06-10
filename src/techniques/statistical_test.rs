@@ -265,9 +265,21 @@ mod tests {
     }
 
     #[test]
-    fn llup_test() {
+    fn llup_test_single() {
         let fin = fs::read_to_string("testfiles/aa.slang").unwrap();
         let slpn = fin.parse::<FiniteStochasticLanguage>().unwrap();
+        let mut slpn2 = slpn.clone();
+        let mut slpn: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slpn);
+        let (_, sustain) = slpn
+            .log_log_test(&mut slpn2, 1, &Fraction::from((1, 20)))
+            .unwrap();
+        assert!(sustain);
+    }
+
+    #[test]
+    fn llup_test() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let slpn: FiniteStochasticLanguage = fin.parse::<EventLog>().unwrap().into();
         let mut slpn2 = slpn.clone();
         let mut slpn: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slpn);
         let (_, sustain) = slpn
