@@ -3,7 +3,7 @@ use std::{fmt::Debug, io::BufRead};
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey},
+        activity_key::{Activity, ActivityKey, TranslateActivityKey},
         ebi_input::EbiInput,
         ebi_object::EbiTraitObject,
         ebi_trait::FromEbiTraitObject,
@@ -19,7 +19,7 @@ use super::{
 };
 
 pub trait EbiTraitFiniteStochasticLanguage:
-    EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync + Debug
+    EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync + Debug + TranslateActivityKey
 {
     fn get_probability_sum(&self) -> Fraction;
 
