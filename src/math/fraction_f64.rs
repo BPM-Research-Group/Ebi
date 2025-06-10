@@ -168,7 +168,7 @@ impl MaybeExact for FractionF64 {
         Ok(self.0)
     }
 
-    fn extract_exact(&self) -> Result<fraction::BigFraction> {
+    fn extract_exact(&self) -> Result<&fraction::BigFraction> {
         Err(anyhow!("cannot extract a fraction from a float"))
     }
 }

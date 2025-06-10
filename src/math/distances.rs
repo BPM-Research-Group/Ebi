@@ -1,8 +1,10 @@
+#[cfg(not(feature = "approximatearithmetic"))]
 use anyhow::Result;
 use std::fmt;
 use std::fmt::Debug;
 use std::{iter::FusedIterator, sync::Arc};
 
+#[cfg(not(feature = "approximatearithmetic"))]
 use num::BigInt;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 

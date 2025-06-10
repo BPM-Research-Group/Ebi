@@ -1,15 +1,22 @@
+#[cfg(not(feature = "approximatearithmetic"))]
 use anyhow::Result;
 #[cfg(not(feature = "approximatearithmetic"))]
 use num::BigInt;
+#[cfg(not(feature = "approximatearithmetic"))]
 use num_bigint::ToBigInt;
-use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
+#[cfg(not(feature = "approximatearithmetic"))]
+use rayon::iter::IntoParallelRefIterator;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
+
+#[cfg(not(feature = "approximatearithmetic"))]
+use crate::math::fraction::MaybeExact;
 
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::{
         distances::WeightedDistances,
-        fraction::{Fraction, MaybeExact},
+        fraction::Fraction,
         levenshtein,
     },
 };

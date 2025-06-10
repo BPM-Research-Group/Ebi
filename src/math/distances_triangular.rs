@@ -1,19 +1,18 @@
 use std::sync::Arc;
 
+#[cfg(not(feature = "approximatearithmetic"))]
 use anyhow::Result;
 #[cfg(not(feature = "approximatearithmetic"))]
 use num::BigInt;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
+#[cfg(not(feature = "approximatearithmetic"))]
+use crate::math::fraction::MaybeExact;
+
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::{
-        distances::WeightedDistances,
-        fraction::{Fraction, MaybeExact},
-        levenshtein,
-        traits::Zero,
-    },
+    math::{distances::WeightedDistances, fraction::Fraction, levenshtein, traits::Zero},
 };
 
 /**
