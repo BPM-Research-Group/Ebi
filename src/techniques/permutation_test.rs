@@ -10,7 +10,7 @@ use crate::{
         distances::WeightedDistances, distances_matrix::WeightedDistanceMatrix,
         distances_triangular::WeightedTriangularDistanceMatrix, fraction::Fraction,
     },
-    techniques::sample,
+    techniques::sample::Resampler,
 };
 use anyhow::{Context, Result, anyhow};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
@@ -41,9 +41,11 @@ impl PermutationTest for dyn EbiTraitFiniteStochasticLanguage {
                 .with_context(|| format!("computing base earth movers' stochastic conformance"))?,
         );
 
-        //compute the distance between self and other
         log::info!("Compute the trace distances");
         let self_self_distances = Arc::new(WeightedTriangularDistanceMatrix::new(self));
+
+        //create resampling cache
+        let resample_cache = Arc::new(self.resample_cache_init()?);
 
         let err = AtomicUsize::new(0);
 
@@ -57,18 +59,16 @@ impl PermutationTest for dyn EbiTraitFiniteStochasticLanguage {
                 let base_conformance = base_conformance.as_ref();
                 let mut self_self_distances =
                     WeightedDistances::clone(self_self_distances.as_ref());
+                let resample_cache = resample_cache.as_ref();
 
                 //create the sample
-                let mut sample_indices = vec![0; self.len()];
-                sample::sample_indices(self.len(), &mut sample_indices);
-                let mut sample = vec![0usize; self.len()];
-                for index in sample_indices {
-                    sample[index] += 1;
-                }
-                for (index_b, weight) in sample.into_iter().enumerate() {
-                    *self_self_distances.weight_b_mut(index_b) =
-                        Fraction::from((weight, self.len()));
-                }
+                let sample = self.resample(resample_cache, self.len());
+                sample
+                    .into_iter()
+                    .enumerate()
+                    .for_each(|(index_b, weight)| {
+                        *self_self_distances.weight_b_mut(index_b) = weight
+                    });
 
                 //compute emsc
                 let sample_conformance = self_self_distances.earth_movers_stochastic_conformance();
