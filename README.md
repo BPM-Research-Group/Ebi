@@ -1,4 +1,4 @@
-# How to use
+# How to use from the command line
 
 Ebi is a command line tool that requires neither installation nor internet access.
 

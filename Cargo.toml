@@ -2,6 +2,13 @@
 name = "ebi"
 version = "0.0.0"
 edition = "2024"
+license = "MIT OR Apache-2.0"
+keywords = ["stochastic-process-mining", "process-mining"]
+categories = ["command-line-utilities"]
+description = "A stochastic process mining utility"
+homepage = "https://ebitools.org"
+repository = "https://github.com/BPM-Research-Group/Ebi"
+readme = "README.md"
 
 [lib]
 name = "ebi"
