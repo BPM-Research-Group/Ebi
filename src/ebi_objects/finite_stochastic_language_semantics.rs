@@ -1,4 +1,5 @@
 use anyhow::{Result, anyhow};
+use ebi_derive::ActivityKey;
 use std::collections::HashMap;
 
 use crate::{

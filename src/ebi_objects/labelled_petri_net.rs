@@ -1,5 +1,6 @@
 use anyhow::{Context, Error, Ok, Result, anyhow};
 use bitvec::vec::BitVec;
+use ebi_derive::ActivityKey;
 use layout::topo::layout::VisualGraph;
 use std::{
     fmt::{self, Debug},

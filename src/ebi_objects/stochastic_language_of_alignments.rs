@@ -1,4 +1,5 @@
-use anyhow::{anyhow, Context, Error, Result};
+use anyhow::{Context, Error, Result, anyhow};
+use ebi_derive::ActivityKey;
 use std::{fmt::Display, str::FromStr};
 
 use crate::{
@@ -14,7 +15,10 @@ use crate::{
         infoable::Infoable,
     },
     line_reader::LineReader,
-    math::{fraction::Fraction, traits::{One, Signed}},
+    math::{
+        fraction::Fraction,
+        traits::{One, Signed},
+    },
 };
 
 use super::language_of_alignments::Move;
@@ -55,7 +59,7 @@ pub const EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler
     java_object_handlers: &[],
 };
 
-#[derive(ActivityKey,Clone)]
+#[derive(ActivityKey, Clone)]
 pub struct StochasticLanguageOfAlignments {
     pub(crate) activity_key: ActivityKey,
     pub(crate) alignments: Vec<Vec<Move>>,
@@ -98,13 +102,16 @@ impl StochasticLanguageOfAlignments {
 impl TranslateActivityKey for StochasticLanguageOfAlignments {
     fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
         let translator = ActivityKeyTranslator::new(&self.activity_key, to_activity_key);
-        self.alignments.iter_mut().for_each(|alignment|
-            alignment.iter_mut().for_each(|activity| 
-                match activity {
-                    Move::SynchronousMove(activity, _) | Move::LogMove(activity) | Move::ModelMove(activity, _)
-                        => *activity = translator.translate_activity(&activity),
-                    _ => {}
-                }));
+        self.alignments.iter_mut().for_each(|alignment| {
+            alignment.iter_mut().for_each(|activity| match activity {
+                Move::SynchronousMove(activity, _)
+                | Move::LogMove(activity)
+                | Move::ModelMove(activity, _) => {
+                    *activity = translator.translate_activity(&activity)
+                }
+                _ => {}
+            })
+        });
         self.activity_key = to_activity_key.clone();
     }
 }
@@ -353,7 +360,7 @@ impl Infoable for StochasticLanguageOfAlignments {
 
         writeln!(f, "")?;
         self.get_activity_key().info(f)?;
-        
+
         Ok(write!(f, "")?)
     }
 }

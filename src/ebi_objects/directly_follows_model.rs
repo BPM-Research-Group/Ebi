@@ -1,4 +1,5 @@
 use anyhow::{Context, Error, Result, anyhow};
+use ebi_derive::ActivityKey;
 use itertools::Itertools;
 use layout::topo::layout::VisualGraph;
 use std::{

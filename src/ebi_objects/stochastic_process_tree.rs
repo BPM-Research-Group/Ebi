@@ -25,6 +25,7 @@ use crate::{
 };
 
 use anyhow::{Context, Result, anyhow};
+use ebi_derive::ActivityKey;
 use layout::{adt::dag::NodeHandle, topo::layout::VisualGraph};
 
 use super::process_tree::{Node, Operator, ProcessTree};

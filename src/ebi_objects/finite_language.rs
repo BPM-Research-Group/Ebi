@@ -1,4 +1,5 @@
 use anyhow::{Context, Error, Result, anyhow};
+use ebi_derive::ActivityKey;
 use fnv::FnvBuildHasher;
 use std::{
     collections::HashSet,
@@ -11,7 +12,15 @@ use crate::{
     ebi_framework::{
         activity_key::{
             Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
-        }, ebi_file_handler::EbiFileHandler, ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, ebi_trait::FromEbiTraitObject, exportable::Exportable, importable::Importable, infoable::Infoable
+        },
+        ebi_file_handler::EbiFileHandler,
+        ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
+        ebi_object::EbiObject,
+        ebi_output::{EbiObjectExporter, EbiOutput},
+        ebi_trait::FromEbiTraitObject,
+        exportable::Exportable,
+        importable::Importable,
+        infoable::Infoable,
     },
     ebi_traits::{
         ebi_trait_event_log::IndexTrace,

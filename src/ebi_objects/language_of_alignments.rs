@@ -1,4 +1,5 @@
 use anyhow::{Context, Error, Result, anyhow};
+use ebi_derive::ActivityKey;
 use std::{fmt::Display, str::FromStr};
 
 use crate::{

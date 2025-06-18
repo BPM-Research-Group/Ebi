@@ -202,6 +202,3 @@ pub mod medoid;
 pub mod multiple_reader;
 pub mod tests;
 pub mod text;
-
-#[macro_use]
-extern crate derive_activity_key;

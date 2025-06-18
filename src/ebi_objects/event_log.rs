@@ -1,5 +1,6 @@
 use anyhow::{Error, Result, anyhow};
 use core::fmt;
+use ebi_derive::ActivityKey;
 use process_mining::{XESImportOptions, event_log::event_log_struct::EventLogClassifier};
 use std::{
     collections::HashMap,
