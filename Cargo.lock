@@ -440,10 +440,11 @@ dependencies = [
 [[package]]
 name = "derive_activity_key"
 version = "0.1.0"
+source = "git+https://github.com/BPM-Research-Group/Ebi.git#e3cf55e4f8271ae26300df256124554f0f0767a6"
 dependencies = [
  "darling",
  "quote",
- "syn 2.0.100",
+ "syn 1.0.109",
 ]
 
 [[package]]
