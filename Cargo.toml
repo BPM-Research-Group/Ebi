@@ -54,7 +54,7 @@ fnv = "*"
 jni = "*"
 itertools = "*"
 serde = "*"
-derive_activity_key = {git = "https://github.com/BPM-Research-Group/Ebi.git"}
+derive_activity_key = {version = "*", git = "https://github.com/BPM-Research-Group/Ebi.git"}
 logging_timer = "*"
 svg2pdf = "*"
 uuid = "*"
