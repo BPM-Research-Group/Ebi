@@ -188,6 +188,7 @@ pub mod techniques {
     pub mod directly_follows_model_miner;
     pub mod directly_follows_graph_abstractor;
     pub mod edge_difference;
+    pub mod permutation_test;
 }
 pub mod optimisation_algorithms {
     pub mod network_simplex;
