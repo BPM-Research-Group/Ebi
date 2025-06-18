@@ -9,7 +9,7 @@ description = "A stochastic process mining utility"
 homepage = "https://ebitools.org"
 repository = "https://github.com/BPM-Research-Group/Ebi"
 readme = "README.md"
-exclude = ["/testfiles", "/manual", ".github/", "*.gitlab-ci.yml"]
+exclude = ["/testfiles", "/manual", ".github/", ".*"]
 
 [lib]
 name = "ebi"
