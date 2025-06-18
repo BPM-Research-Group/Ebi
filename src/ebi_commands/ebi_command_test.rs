@@ -15,9 +15,9 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
     math::fraction::{Fraction, FractionNotParsedYet},
-    techniques::statistical_test::{
-        StatisticalTestLogLog, StatisticalTestsLogCategoricalAttribute,
-    },
+    techniques::{permutation_test::PermutationTest, bootstrap_test::{
+        BootstrapTest, StatisticalTestsLogCategoricalAttribute,
+    }},
 };
 
 use super::ebi_command_association::{self, number_of_samples};
@@ -34,7 +34,7 @@ pub const EBI_TEST: EbiCommand = EbiCommand::Group {
     name_long: Some("test"),
     explanation_short: "Test a hypothesis.",
     explanation_long: None,
-    children: &[&EBI_TEST_LOG_ATTRIBUTE, &EBI_TEST_LOGS],
+    children: &[&EBI_BOOTSTRAP_TEST, &EBI_TEST_LOG_ATTRIBUTE, &EBI_PERMUTATION_TEST],
 };
 
 pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
@@ -107,12 +107,12 @@ pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
-pub const EBI_TEST_LOGS: EbiCommand = EbiCommand::Command {
-    name_short: "logs",
-    name_long: None,
+pub const EBI_BOOTSTRAP_TEST: EbiCommand = EbiCommand::Command {
+    name_short: "btst",
+    name_long: Some("bootstrap-test"),
     explanation_short: "Test the hypothesis that the logs are derived from identical processes.",
     explanation_long: Some(concat!(
-        "Test the hypothesis that the logs are derived from identical processes.; ",
+        "Test the hypothesis that the logs are derived from identical processes; ",
         number_of_samples!(),
         " samples are taken."
     )),
@@ -147,7 +147,71 @@ pub const EBI_TEST_LOGS: EbiCommand = EbiCommand::Command {
             .context("Parsing p value")?;
 
         let (value, sustained) = log1
-            .log_log_test(log2.as_mut(), *number_of_samples, &p_value)
+            .bootstrap_test(log2.as_mut(), *number_of_samples, &p_value)
+            .with_context(|| format!("performing test"))?;
+
+        let mut f = vec![];
+        writeln!(f, "p-value \t {}", value)?;
+        writeln!(f, "Null-hypothesis: the logs follow identical processes.")?;
+
+        if sustained {
+            writeln!(
+                f,
+                "The data does not provide enough evidence to make a claim on this hypothesis.\nDo not reject the null-hypothesis."
+            )?;
+        } else {
+            writeln!(
+                f,
+                "The data provides enough evidence to conclude that the logs are derived from different processes.\nReject the null-hypothesis.",
+            )?;
+        };
+
+        Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
+    },
+    output_type: &EbiOutputType::String,
+};
+
+pub const EBI_PERMUTATION_TEST: EbiCommand = EbiCommand::Command {
+    name_short: "perm",
+    name_long: Some("permutation-test"),
+    explanation_short: "Test the hypothesis that the logs are derived from identical processes.",
+    explanation_long: Some(concat!(
+        "Test the hypothesis that the logs are derived from identical processes; ",
+        number_of_samples!(),
+        " samples are taken."
+    )),
+    latex_link: None,
+    cli_command: Some(|command| {
+        cli_p_value(ebi_command_association::cli_number_of_samples(command))
+    }),
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+    ],
+    input_names: &["LANG_1", "LANG_2"],
+    input_helps: &[
+        "The first event log for which the test is to be performed.",
+        "The first event log for which the test is to be performed.",
+    ],
+    execute: |mut inputs, cli_matches| {
+        let mut log1 = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let mut log2: Box<dyn EbiTraitFiniteStochasticLanguage + 'static> =
+            inputs
+                .remove(0)
+                .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let number_of_samples = cli_matches.unwrap().get_one::<usize>("samples").unwrap();
+        let p_value = cli_matches
+            .unwrap()
+            .get_one::<FractionNotParsedYet>("pvalue")
+            .unwrap()
+            .try_into()
+            .context("Parsing p value")?;
+
+        let (value, sustained) = log1
+            .permutation_test(log2.as_mut(), *number_of_samples, &p_value)
             .with_context(|| format!("performing test"))?;
 
         let mut f = vec![];
