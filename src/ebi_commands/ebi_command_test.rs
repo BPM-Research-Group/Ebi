@@ -15,8 +15,8 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
     math::fraction::{Fraction, FractionNotParsedYet},
-    techniques::{permutation_test::PermutationTest, statistical_test::{
-        StatisticalTestLogLog, StatisticalTestsLogCategoricalAttribute,
+    techniques::{permutation_test::PermutationTest, bootstrap_test::{
+        BootstrapTest, StatisticalTestsLogCategoricalAttribute,
     }},
 };
 
@@ -108,11 +108,11 @@ pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
 };
 
 pub const EBI_BOOTSTRAP_TEST: EbiCommand = EbiCommand::Command {
-    name_short: "logs",
-    name_long: None,
+    name_short: "btst",
+    name_long: Some("bootstrap-test"),
     explanation_short: "Test the hypothesis that the logs are derived from identical processes.",
     explanation_long: Some(concat!(
-        "Test the hypothesis that the logs are derived from identical processes.; ",
+        "Test the hypothesis that the logs are derived from identical processes; ",
         number_of_samples!(),
         " samples are taken."
     )),
@@ -147,7 +147,7 @@ pub const EBI_BOOTSTRAP_TEST: EbiCommand = EbiCommand::Command {
             .context("Parsing p value")?;
 
         let (value, sustained) = log1
-            .log_log_test(log2.as_mut(), *number_of_samples, &p_value)
+            .bootstrap_test(log2.as_mut(), *number_of_samples, &p_value)
             .with_context(|| format!("performing test"))?;
 
         let mut f = vec![];
@@ -176,7 +176,7 @@ pub const EBI_PERMUTATION_TEST: EbiCommand = EbiCommand::Command {
     name_long: Some("permutation-test"),
     explanation_short: "Test the hypothesis that the logs are derived from identical processes.",
     explanation_long: Some(concat!(
-        "Test the hypothesis that the logs are derived from identical processes.; ",
+        "Test the hypothesis that the logs are derived from identical processes; ",
         number_of_samples!(),
         " samples are taken."
     )),

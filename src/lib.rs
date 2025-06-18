@@ -179,7 +179,7 @@ pub mod techniques {
     pub mod probability_queries;
     pub mod process_variety;
     pub mod sample;
-    pub mod statistical_test;
+    pub mod bootstrap_test;
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;

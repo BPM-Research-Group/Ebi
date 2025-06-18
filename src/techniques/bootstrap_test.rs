@@ -21,8 +21,8 @@ use crate::{
     techniques::sample::{self, Resampler},
 };
 
-pub trait StatisticalTestLogLog {
-    fn log_log_test(
+pub trait BootstrapTest {
+    fn bootstrap_test(
         &mut self,
         other: &mut dyn EbiTraitFiniteStochasticLanguage,
         number_of_samples: usize,
@@ -162,8 +162,8 @@ impl StatisticalTestsLogCategoricalAttribute for dyn EbiTraitEventLog {
     }
 }
 
-impl StatisticalTestLogLog for dyn EbiTraitFiniteStochasticLanguage {
-    fn log_log_test(
+impl BootstrapTest for dyn EbiTraitFiniteStochasticLanguage {
+    fn bootstrap_test(
         &mut self,
         other: &mut dyn EbiTraitFiniteStochasticLanguage,
         number_of_samples: usize,
@@ -244,8 +244,8 @@ mod tests {
             ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         },
         math::fraction::Fraction,
-        techniques::statistical_test::{
-            StatisticalTestLogLog, StatisticalTestsLogCategoricalAttribute,
+        techniques::bootstrap_test::{
+            BootstrapTest, StatisticalTestsLogCategoricalAttribute,
         },
     };
 
@@ -267,7 +267,7 @@ mod tests {
         let mut slpn2 = slpn.clone();
         let mut slpn: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slpn);
         let (_, sustain) = slpn
-            .log_log_test(&mut slpn2, 1, &Fraction::from((1, 20)))
+            .bootstrap_test(&mut slpn2, 1, &Fraction::from((1, 20)))
             .unwrap();
         assert!(sustain);
     }
@@ -279,7 +279,7 @@ mod tests {
         let mut slpn2 = slpn.clone();
         let mut slpn: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slpn);
         let (_, sustain) = slpn
-            .log_log_test(&mut slpn2, 1, &Fraction::from((1, 20)))
+            .bootstrap_test(&mut slpn2, 1, &Fraction::from((1, 20)))
             .unwrap();
         assert!(sustain);
     }
