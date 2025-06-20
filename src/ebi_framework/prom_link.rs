@@ -237,7 +237,7 @@ pub fn print_java_plugins() -> Result<EbiOutput> {
                             writeln!(f, "\t\tparameterLabels = {{ \"{}\" }},", parameterlabels.join("\", \""))?;
                             writeln!(f, "\t\tuserAccessible = true,")?;
                             writeln!(f, "\t\tcategories = {{ PluginCategory.Discovery, PluginCategory.Analytics, PluginCategory.ConformanceChecking }},")?;
-                            writeln!(f, "\t\thelp = \"{} (calls Ebi)\"", path.last().unwrap().explanation_long())?;
+                            writeln!(f, "\t\thelp = \"{} (calls Ebi)\"", escape_string(path.last().unwrap().explanation_long()))?;
                             writeln!(f, "\t)")?;
                             writeln!(f, "\t@UITopiaVariant(affiliation = IMMiningDialog.affiliation, author = IMMiningDialog.author, email = IMMiningDialog.email)")?;
                             writeln!(f, "\t@PluginVariant(variantLabel = \"Call Ebi\", requiredParameterLabels = {{ {} }})", (0..inputs_java_object_handler_without_gui.len()).join(", "))?;
@@ -315,7 +315,7 @@ pub fn escape_code(str: String) -> String {
 }
 
 pub fn escape_string(str: &str) -> String {
-    str.replace("\"", "\\\"")
+    str.replace("\"", "\\\"").replace("\n", " ")
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
