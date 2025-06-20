@@ -34,6 +34,7 @@ pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
     name: "LoLa Petri net",
     article: "a",
     file_extension: "lola",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<LolaNet>),
     trait_importers: &[
@@ -152,7 +153,6 @@ impl Exportable for LolaNet {
             EbiOutput::ContainsRoot(_) => Err(anyhow!("Cannot export ContainsRoot as Lolanet.")),
             EbiOutput::Fraction(_) => Err(anyhow!("Cannot export fraction as Lolanet.")),
             EbiOutput::LogDiv(_) => Err(anyhow!("Cannot export LogDiv as Lolanet.")),
-            EbiOutput::PDF(_) => Err(anyhow!("Cannot export PDF as Lolanet.")),
             EbiOutput::RootLogDiv(_) => Err(anyhow!("Cannot export RootLogDiv as Lolanet.")),
             EbiOutput::String(_) => Err(anyhow!("Cannot export string as Lolanet.")),
             EbiOutput::Usize(_) => Err(anyhow!("Cannot export integer as Lolanet.")),

@@ -53,6 +53,7 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     name: "event log",
     article: "an",
     file_extension: "xes",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<EventLog>),
     trait_importers: &[

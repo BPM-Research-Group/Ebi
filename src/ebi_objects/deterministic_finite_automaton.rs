@@ -45,6 +45,7 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     name: "deterministic finite automaton",
     article: "a",
     file_extension: "dfa",
+    is_binary: false,
     format_specification: FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<DeterministicFiniteAutomaton>),
     trait_importers: &[

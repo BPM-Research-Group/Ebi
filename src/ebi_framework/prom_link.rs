@@ -360,9 +360,6 @@ pub const JAVA_OBJECT_HANDLERS_FRACTION: &[JavaObjectHandler] = &[
         input_gui: Some("org.processmining.ebi.objects.EbiFraction.create_input_panel"),
     },
 ];
-pub const JAVA_OBJECT_HANDLERS_PDF: &[JavaObjectHandler] = &[
-
-];
 pub const JAVA_OBJECT_HANDLERS_LOGDIV: &[JavaObjectHandler] = &[
     JavaObjectHandler{ 
         name: "logdiv", 

@@ -13,6 +13,7 @@ pub const EBI_EXECUTIONS: EbiFileHandler = EbiFileHandler {
     name: "executions",
     article: "",
     file_extension: "exs",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<Executions>),
     trait_importers: &[

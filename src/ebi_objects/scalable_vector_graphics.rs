@@ -4,7 +4,7 @@ use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
         ebi_object::EbiObject,
-        ebi_output::{EbiExporter, EbiObjectExporter, EbiOutput},
+        ebi_output::{EbiObjectExporter, EbiOutput},
         exportable::Exportable,
         infoable::Infoable,
         prom_link::JavaObjectHandler,
@@ -12,15 +12,15 @@ use crate::{
     ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
 };
 use anyhow::{Result, anyhow};
-use layout::backends::svg::SVGWriter;
-use svg2pdf::{ConversionOptions, PageOptions};
+use layout::{backends::svg::SVGWriter, topo::layout::VisualGraph};
 
-pub const FORMAT_SPECIFICATION: &str = "Ebi does not support importing of SVG or PDF files.";
+pub const FORMAT_SPECIFICATION: &str = "Ebi does not support importing of SVG files.";
 
 pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
     name: "scalable vector graphics",
     article: "a",
     file_extension: "svg",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: None,
     trait_importers: &[],
@@ -47,7 +47,7 @@ pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
 };
 
 #[derive(Clone)]
-pub struct ScalableVectorGraphics(String);
+pub struct ScalableVectorGraphics(pub(crate) String);
 
 impl ScalableVectorGraphics {
     pub fn empty() -> Self {
@@ -63,16 +63,6 @@ impl ScalableVectorGraphics {
             graph.do_it(false, false, false, &mut svg);
             ScalableVectorGraphics(svg.finalize())
         })
-    }
-
-    pub fn to_pdf(&self) -> Result<Vec<u8>> {
-        let mut options = svg2pdf::usvg::Options::default();
-        options.fontdb_mut().load_system_fonts();
-        let tree = svg2pdf::usvg::Tree::from_str(&self.0, &options)?;
-        match svg2pdf::to_pdf(&tree, ConversionOptions::default(), PageOptions::default()) {
-            Ok(x) => Ok(x),
-            Err(err) => Err(anyhow!(err)),
-        }
     }
 }
 
@@ -134,7 +124,6 @@ impl Exportable for ScalableVectorGraphics {
             }
             EbiOutput::Object(EbiObject::ScalableVectorGraphics(object)) => object.export(f),
             EbiOutput::String(_) => Err(anyhow!("cannot export string as SVG")),
-            EbiOutput::PDF(_) => Err(anyhow!("cannot export PDF as SVG")),
             EbiOutput::Usize(_) => Err(anyhow!("cannot export usize as SVG")),
             EbiOutput::Fraction(_) => Err(anyhow!("cannot export fraction as SVG")),
             EbiOutput::LogDiv(_) => Err(anyhow!("cannot export lopdiv as SVG")),
@@ -157,10 +146,6 @@ impl From<String> for ScalableVectorGraphics {
 
 pub trait ToSVG {
     fn to_svg(&self) -> Result<ScalableVectorGraphics>;
-
-    fn to_pdf(&self) -> Result<Vec<u8>> {
-        self.to_svg()?.to_pdf()
-    }
 }
 
 impl<T> ToSVG for T
@@ -179,83 +164,14 @@ where
     }
 }
 
-pub fn export_as_pdf<T>(object: &T, f: &mut dyn std::io::Write) -> Result<()>
-where
-    T: EbiTraitGraphable,
-{
-    let pdf = object.to_pdf()?;
-    let output = EbiOutput::PDF(pdf);
-    EbiExporter::PDF.export_from_object(output, f)
+pub trait ToSVGMut {
+    fn to_svg_mut(&mut self) -> Result<ScalableVectorGraphics>;
 }
 
-fn export_from_object_pdf(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
-    match object {
-        EbiOutput::Object(EbiObject::DeterministicFiniteAutomaton(object)) => {
-            export_as_pdf(&object, f)
-        }
-        EbiOutput::Object(EbiObject::DirectlyFollowsModel(object)) => export_as_pdf(&object, f),
-        EbiOutput::Object(EbiObject::StochasticDirectlyFollowsModel(object)) => {
-            export_as_pdf(&object, f)
-        }
-        EbiOutput::Object(EbiObject::EventLog(_)) => {
-            Err(anyhow!("cannot transform event log into PDF"))
-        }
-        EbiOutput::Object(EbiObject::Executions(_)) => {
-            Err(anyhow!("cannot transform executions into PDF"))
-        }
-        EbiOutput::Object(EbiObject::FiniteLanguage(_)) => {
-            Err(anyhow!("cannot transform finite language into PDF"))
-        }
-        EbiOutput::Object(EbiObject::FiniteStochasticLanguage(_)) => {
-            Err(anyhow!("cannot transform finite stochastic into PDF"))
-        }
-        EbiOutput::Object(EbiObject::LabelledPetriNet(object)) => export_as_pdf(&object, f),
-        EbiOutput::Object(EbiObject::LanguageOfAlignments(_)) => {
-            Err(anyhow!("cannot transform language of alignments into PDF"))
-        }
-        EbiOutput::Object(EbiObject::ProcessTree(object)) => export_as_pdf(&object, f),
-        EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(object)) => {
-            export_as_pdf(&object, f)
-        }
-        EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(object)) => {
-            export_as_pdf(&object, f)
-        }
-        EbiOutput::Object(EbiObject::StochasticLanguageOfAlignments(_)) => Err(anyhow!(
-            "cannot transform stochastic language of alignments into PDF"
-        )),
-        EbiOutput::Object(EbiObject::StochasticProcessTree(object)) => export_as_pdf(&object, f),
-        EbiOutput::Object(EbiObject::DirectlyFollowsGraph(object)) => export_as_pdf(&object, f),
-        EbiOutput::Object(EbiObject::ScalableVectorGraphics(svg)) => {
-            EbiExporter::PDF.export_from_object(EbiOutput::PDF(svg.to_pdf()?), f)
-        }
-        EbiOutput::String(_) => Err(anyhow!("cannot transform string into PDF")),
-        EbiOutput::PDF(pdf) => EbiExporter::PDF.export_from_object(EbiOutput::PDF(pdf), f),
-        EbiOutput::Usize(_) => Err(anyhow!("cannot transform usize into PDF")),
-        EbiOutput::Fraction(_) => Err(anyhow!("cannot transform fraction into PDF")),
-        EbiOutput::LogDiv(_) => Err(anyhow!("cannot transform lopdiv into PDF")),
-        EbiOutput::ContainsRoot(_) => Err(anyhow!("cannot transform containsroot into PDF")),
-        EbiOutput::RootLogDiv(_) => Err(anyhow!("cannot transform rootlogdiv into PDF")),
-        EbiOutput::Bool(_) => Err(anyhow!("cannot transform boolean into PDF")),
+impl ToSVGMut for VisualGraph {
+    fn to_svg_mut(&mut self) -> Result<ScalableVectorGraphics> {
+        let mut svg = SVGWriter::new();
+        self.do_it(false, false, false, &mut svg);
+        Ok(svg.finalize().into())
     }
 }
-
-pub const EBI_PORTABLE_DOCUMENT_FORMAT: EbiFileHandler = EbiFileHandler {
-    name: "portable document format",
-    article: "a",
-    file_extension: "pdf",
-    format_specification: &FORMAT_SPECIFICATION,
-    validator: None,
-    trait_importers: &[],
-    object_importers: &[],
-    object_exporters: &[
-        EbiObjectExporter::DeterministicFiniteAutomaton(export_from_object_pdf),
-        EbiObjectExporter::DirectlyFollowsModel(export_from_object_pdf),
-        EbiObjectExporter::LabelledPetriNet(export_from_object_pdf),
-        EbiObjectExporter::ProcessTree(export_from_object_pdf),
-        EbiObjectExporter::StochasticDeterministicFiniteAutomaton(export_from_object_pdf),
-        EbiObjectExporter::StochasticLabelledPetriNet(export_from_object_pdf),
-        EbiObjectExporter::StochasticProcessTree(export_from_object_pdf),
-        EbiObjectExporter::ScalableVectorGraphics(export_from_object_pdf),
-    ],
-    java_object_handlers: &[],
-};

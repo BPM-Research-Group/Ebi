@@ -39,6 +39,7 @@ pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "xes.gz",
     format_specification: &FORMAT_SPECIFICATION,
+    is_binary: true,
     validator: Some(ebi_input::validate::<CompressedEventLog>),
     trait_importers: &[
         EbiTraitImporter::IterableLanguage(CompressedEventLog::read_as_iterable_language),

@@ -57,6 +57,7 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     name: "process tree",
     article: "a",
     file_extension: "ptree",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<ProcessTree>),
     trait_importers: &[

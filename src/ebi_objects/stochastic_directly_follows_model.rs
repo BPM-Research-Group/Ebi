@@ -58,6 +58,7 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
     name: "stochastic directly follows model",
     article: "a",
     file_extension: "sdfm",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticDirectlyFollowsModel>),
     trait_importers: &[

@@ -61,6 +61,7 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
     name: "stochastic deterministic finite automaton",
     article: "a",
     file_extension: "sdfa",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticDeterministicFiniteAutomaton>),
     trait_importers: &[

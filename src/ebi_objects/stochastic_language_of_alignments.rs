@@ -47,6 +47,7 @@ pub const EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler
     name: "stochastic language of alignments",
     article: "a",
     file_extension: "sali",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticLanguageOfAlignments>),
     trait_importers: &[],

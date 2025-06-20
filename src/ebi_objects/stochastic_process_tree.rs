@@ -53,6 +53,7 @@ pub const EBI_STOCHASTIC_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     name: "stochastic process tree",
     article: "a",
     file_extension: "sptree",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticProcessTree>),
     trait_importers: &[

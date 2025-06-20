@@ -51,6 +51,7 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "stochastic labelled Petri net",
     article: "a",
     file_extension: "slpn",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticLabelledPetriNet>),
     trait_importers: &[

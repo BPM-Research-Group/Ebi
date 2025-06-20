@@ -50,6 +50,7 @@ pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
     name: "directly follows graph",
     article: "a",
     file_extension: "dfg",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<DirectlyFollowsGraph>),
     trait_importers: &[

@@ -3,13 +3,10 @@ use clap::Command;
 use anyhow::Result;
 use inflector::Inflector;
 use itertools::Itertools;
-use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
+use layout::{core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
-use crate::{ebi_framework::{
-    
-    
-    ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, ebi_objects::scalable_vector_graphics::ScalableVectorGraphics, text::Joiner};
+use crate::{ebi_framework::{    ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, ebi_objects::scalable_vector_graphics::ToSVGMut, text::Joiner};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
  □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
@@ -84,13 +81,10 @@ pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command {
     input_names: &[],
     input_helps: &[],
     execute: |_, _| {
-        let mut graph = graph()?;
-        let mut svg = SVGWriter::new();
-        graph.do_it(false, false, false, &mut svg);
-        let svg: ScalableVectorGraphics = svg.finalize().into();
-        Ok(EbiOutput::PDF(svg.to_pdf()?))
+        let svg = graph()?.to_svg_mut()?;
+        Ok(EbiOutput::Object(EbiObject::ScalableVectorGraphics(svg)))
     }, 
-    output_type: &EbiOutputType::PDF
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::ScalableVectorGraphics)
 };
 
 pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command { 

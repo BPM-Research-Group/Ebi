@@ -47,7 +47,7 @@ use super::{
     exportable::Exportable,
     prom_link::{
         JAVA_OBJECT_HANDLERS_BOOL, JAVA_OBJECT_HANDLERS_CONTAINSROOT,
-        JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV, JAVA_OBJECT_HANDLERS_PDF,
+        JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV,
         JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE,
         JavaObjectHandler,
     },
@@ -57,7 +57,6 @@ use super::{
 pub enum EbiOutput {
     Object(EbiObject),
     String(String),
-    PDF(Vec<u8>),
     Usize(usize),
     Fraction(Fraction),
     LogDiv(LogDiv),
@@ -71,7 +70,6 @@ impl EbiOutput {
         match self {
             EbiOutput::Object(o) => EbiOutputType::ObjectType(o.get_type()),
             EbiOutput::String(_) => EbiOutputType::String,
-            EbiOutput::PDF(_) => EbiOutputType::PDF,
             EbiOutput::Usize(_) => EbiOutputType::Usize,
             EbiOutput::Fraction(_) => EbiOutputType::Fraction,
             EbiOutput::LogDiv(_) => EbiOutputType::LogDiv,
@@ -86,7 +84,6 @@ impl EbiOutput {
 pub enum EbiOutputType {
     ObjectType(EbiObjectType),
     String,
-    PDF,
     Usize,
     Fraction,
     LogDiv,
@@ -133,7 +130,6 @@ impl EbiOutputType {
                 result
             }
             EbiOutputType::String => vec![EbiExporter::String],
-            EbiOutputType::PDF => vec![EbiExporter::PDF],
             EbiOutputType::Usize => vec![EbiExporter::Usize],
             EbiOutputType::Fraction => vec![EbiExporter::Fraction],
             EbiOutputType::LogDiv => vec![EbiExporter::LogDiv],
@@ -240,7 +236,6 @@ impl EbiOutputType {
                 )
             }
             EbiOutputType::String => EbiExporter::String,
-            EbiOutputType::PDF => EbiExporter::PDF,
             EbiOutputType::Usize => EbiExporter::Usize,
             EbiOutputType::Fraction => EbiExporter::Fraction,
             EbiOutputType::LogDiv => EbiExporter::LogDiv,
@@ -268,7 +263,6 @@ impl Display for EbiOutputType {
         match self {
             EbiOutputType::ObjectType(t) => t.fmt(f),
             EbiOutputType::String => Display::fmt(&"text", f),
-            EbiOutputType::PDF => Display::fmt(&"pdf", f),
             EbiOutputType::Usize => Display::fmt(&"integer", f),
             EbiOutputType::Fraction => Display::fmt(&"fraction", f),
             EbiOutputType::LogDiv => Display::fmt(&"logarithm", f),
@@ -283,7 +277,6 @@ impl Display for EbiOutputType {
 pub enum EbiExporter {
     Object(&'static EbiObjectExporter, &'static EbiFileHandler),
     String,
-    PDF,
     Usize,
     Fraction,
     LogDiv,
@@ -298,8 +291,6 @@ impl EbiExporter {
             (EbiExporter::Object(exporter, _), object) => exporter.export(object, f),
             (EbiExporter::String, EbiOutput::String(object)) => object.export(f),
             (EbiExporter::String, _) => unreachable!(),
-            (EbiExporter::PDF, EbiOutput::PDF(object)) => Ok(f.write_all(&object)?),
-            (EbiExporter::PDF, _) => unreachable!(),
             (EbiExporter::Usize, EbiOutput::Usize(object)) => object.export(f),
             (EbiExporter::Usize, _) => unreachable!(),
             (EbiExporter::Fraction, EbiOutput::Fraction(object)) => object.export(f),
@@ -319,7 +310,6 @@ impl EbiExporter {
         match self {
             EbiExporter::Object(_, file_handler) => file_handler.article,
             EbiExporter::String => "",
-            EbiExporter::PDF => "a",
             EbiExporter::Usize => "an",
             EbiExporter::Fraction => "a",
             EbiExporter::LogDiv => "a",
@@ -333,7 +323,6 @@ impl EbiExporter {
         match self {
             EbiExporter::Object(_, file_handler) => file_handler.name,
             EbiExporter::String => "string",
-            EbiExporter::PDF => "PDF",
             EbiExporter::Usize => "integer",
             EbiExporter::Fraction => "fraction",
             EbiExporter::LogDiv => "logdiv",
@@ -347,7 +336,6 @@ impl EbiExporter {
         match self {
             EbiExporter::Object(_, file_handler) => file_handler.java_object_handlers,
             EbiExporter::String => JAVA_OBJECT_HANDLERS_STRING,
-            EbiExporter::PDF => JAVA_OBJECT_HANDLERS_PDF,
             EbiExporter::Usize => JAVA_OBJECT_HANDLERS_USIZE,
             EbiExporter::Fraction => JAVA_OBJECT_HANDLERS_FRACTION,
             EbiExporter::LogDiv => JAVA_OBJECT_HANDLERS_LOGDIV,
@@ -361,7 +349,6 @@ impl EbiExporter {
         match self {
             EbiExporter::Object(_, file_handler) => file_handler.file_extension,
             EbiExporter::String => "txt",
-            EbiExporter::PDF => "pdf",
             EbiExporter::Usize => "int",
             EbiExporter::Fraction => "frac",
             EbiExporter::LogDiv => "logdiv",
@@ -373,9 +360,8 @@ impl EbiExporter {
 
     pub fn is_binary(&self) -> bool {
         match self {
-            EbiExporter::Object(_, _) => false,
+            EbiExporter::Object(_, file_handler) => file_handler.is_binary,
             EbiExporter::String => false,
-            EbiExporter::PDF => true,
             EbiExporter::Usize => false,
             EbiExporter::Fraction => false,
             EbiExporter::LogDiv => false,
@@ -391,7 +377,6 @@ impl Display for EbiExporter {
         match self {
             EbiExporter::Object(_, file_handler) => Display::fmt(file_handler, f),
             EbiExporter::String => Display::fmt(&"text", f),
-            EbiExporter::PDF => Display::fmt(&"pdf", f),
             EbiExporter::Usize => Display::fmt(&"integer", f),
             EbiExporter::Fraction => Display::fmt(&"fraction", f),
             EbiExporter::LogDiv => Display::fmt(&"logarithm", f),
@@ -557,7 +542,6 @@ mod tests {
     fn ebi_output() {
         let mut outputs = vec![
             (EbiOutput::String("bla".to_string()), "bla".to_string()),
-            (EbiOutput::PDF(vec![]), "[]".to_string()),
             (EbiOutput::Usize(0), "0".to_string()),
             (EbiOutput::Fraction(Fraction::one()), "1".to_string()),
             (EbiOutput::LogDiv(LogDiv::zero()), "0".to_string()),
@@ -619,13 +603,6 @@ mod tests {
     fn unreachable_usize() {
         let mut f = vec![];
         let _ = EbiExporter::Usize.export_from_object(EbiOutput::String("a".to_string()), &mut f);
-    }
-
-    #[test]
-    #[should_panic]
-    fn unreachable_pdf() {
-        let mut f = vec![];
-        let _ = EbiExporter::PDF.export_from_object(EbiOutput::Usize(10), &mut f);
     }
 
     #[test]

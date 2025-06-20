@@ -37,6 +37,7 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "Petri net markup language",
     article: "a",
     file_extension: "pnml",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(PetriNetMarkupLanguage::validate),
     trait_importers: &[
@@ -151,7 +152,6 @@ impl Exportable for PetriNetMarkupLanguage {
             EbiOutput::ContainsRoot(_) => Err(anyhow!("Cannot export ContainsRoot as PNML.")),
             EbiOutput::Fraction(_) => Err(anyhow!("Cannot export fraction as PNML.")),
             EbiOutput::LogDiv(_) => Err(anyhow!("Cannot export LogDiv as PNML.")),
-            EbiOutput::PDF(_) => Err(anyhow!("Cannot export PDF as PNML.")),
             EbiOutput::RootLogDiv(_) => Err(anyhow!("Cannot export RootLogDiv as PNML.")),
             EbiOutput::String(_) => Err(anyhow!("Cannot export string as PNML.")),
             EbiOutput::Usize(_) => Err(anyhow!("Cannot export integer as PNML.")),

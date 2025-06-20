@@ -57,6 +57,7 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "labelled Petri net",
     article: "a",
     file_extension: "lpn",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<LabelledPetriNet>),
     trait_importers: &[
@@ -335,7 +336,6 @@ impl Exportable for LabelledPetriNet {
             EbiOutput::ContainsRoot(_) => Err(anyhow!("Cannot export ContainsRoot as LPN.")),
             EbiOutput::Fraction(_) => Err(anyhow!("Cannot export fraction as LPN.")),
             EbiOutput::LogDiv(_) => Err(anyhow!("Cannot export LogDiv as LPN.")),
-            EbiOutput::PDF(_) => Err(anyhow!("Cannot export PDF as LPN.")),
             EbiOutput::RootLogDiv(_) => Err(anyhow!("Cannot export RootLogDiv as LPN.")),
             EbiOutput::String(_) => Err(anyhow!("Cannot export string as LPN.")),
             EbiOutput::Usize(_) => Err(anyhow!("Cannot export integer as LPN.")),

@@ -51,6 +51,7 @@ pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "directly follows model",
     article: "a",
     file_extension: "dfm",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<DirectlyFollowsModel>),
     trait_importers: &[
