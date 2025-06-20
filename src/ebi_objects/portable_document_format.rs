@@ -26,6 +26,7 @@ pub const EBI_PORTABLE_DOCUMENT_FORMAT: EbiFileHandler = EbiFileHandler {
     object_exporters: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(PortableDocumentFormat::export_from_object),
         EbiObjectExporter::DirectlyFollowsModel(PortableDocumentFormat::export_from_object),
+        EbiObjectExporter::DirectlyFollowsGraph(PortableDocumentFormat::export_from_object),
         EbiObjectExporter::LabelledPetriNet(PortableDocumentFormat::export_from_object),
         EbiObjectExporter::ProcessTree(PortableDocumentFormat::export_from_object),
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
