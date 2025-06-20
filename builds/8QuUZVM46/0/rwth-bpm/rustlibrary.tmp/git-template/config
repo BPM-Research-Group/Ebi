@@ -1,0 +1,12 @@
+[init]
+	defaultBranch = none
+[fetch]
+	recurseSubmodules = false
+[credential]
+	interactive = never
+[gc]
+	autoDetach = false
+[transfer]
+	bundleURI = true
+[http "https://git.rwth-aachen.de"]
+	sslCAInfo = /home/sander/rust-workspace/Ebi/builds/8QuUZVM46/0/rwth-bpm/rustlibrary.tmp/CI_SERVER_TLS_CA_FILE

@@ -34,7 +34,7 @@ pub const EBI_TEST: EbiCommand = EbiCommand::Group {
     name_long: Some("test"),
     explanation_short: "Test a hypothesis.",
     explanation_long: None,
-    children: &[&EBI_BOOTSTRAP_TEST, &EBI_TEST_LOG_ATTRIBUTE, &EBI_PERMUTATION_TEST],
+    children: &[&EBI_BOOTSTRAP_TEST, &EBI_TEST_LOG_ATTRIBUTE],
 };
 
 pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
