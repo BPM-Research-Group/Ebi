@@ -70,7 +70,7 @@ impl From<EventLog> for StochasticDeterministicFiniteAutomaton {
             let mut final_states = HashMap::new();
 
             //create automaton
-            for trace_index in 0..value.log.traces.len() {
+            for trace_index in 0..value.len() {
                 let trace = value.get_trace(trace_index).unwrap();
                 let mut state = result.get_initial_state().unwrap();
 

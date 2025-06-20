@@ -94,9 +94,9 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
 #[derive(ActivityKey, Clone)]
 pub struct EventLog {
     pub(crate) classifier: EventLogClassifier,
-    pub(crate) log: process_mining::EventLog,
-    activity_key: ActivityKey,
-    traces: Vec<Vec<Activity>>,
+    pub(crate) activity_key: ActivityKey,
+    pub(crate) traces: Vec<Vec<Activity>>,
+    log: process_mining::EventLog, //field is not updated with other measures -> private
 }
 
 impl EventLog {
@@ -336,7 +336,7 @@ impl EbiTraitEventLog for EventLog {
 
 impl IndexTrace for EventLog {
     fn len(&self) -> usize {
-        self.log.traces.len()
+        self.traces.len()
     }
 
     fn get_trace(&self, trace_index: usize) -> Option<&Vec<Activity>> {
@@ -351,7 +351,7 @@ mod tests {
     use crate::{
         ebi_framework::activity_key::{ActivityKey, TranslateActivityKey},
         ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
-        ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}},
     };
 
     use super::EventLog;
@@ -392,5 +392,18 @@ mod tests {
         if let EbiTraitSemantics::Usize(semantics) = log.to_semantics() {
             assert!(semantics.get_initial_state().is_none());
         }
+    }
+
+    #[test]
+    fn len_retain() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let mut log = fin.parse::<EventLog>().unwrap();
+
+        assert_eq!(log.len(), 2);
+
+        log.retain_traces(Box::new(|_| false));
+
+
+        assert_eq!(log.len(), 0);
     }
 }

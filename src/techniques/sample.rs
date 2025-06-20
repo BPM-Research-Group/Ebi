@@ -57,7 +57,7 @@ impl Sampler for dyn EbiTraitFiniteStochasticLanguage {
             };
         }
 
-        Ok((result, self.get_activity_key().clone()).into())
+        Ok((self.get_activity_key().clone(), result).into())
     }
 }
 
@@ -117,7 +117,7 @@ where
 
             // log::debug!("Sampled {:?} traces", result);
 
-            Ok((result, self.get_activity_key().clone()).into())
+            Ok((self.get_activity_key().clone(), result).into())
         } else {
             return Err(anyhow!("Language contains no traces, so cannot sample."));
         }

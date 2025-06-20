@@ -300,14 +300,14 @@ impl From<HashMap<Vec<String>, Fraction>> for FiniteStochasticLanguage {
     }
 }
 
-impl From<(HashMap<Vec<Activity>, Fraction>, ActivityKey)> for FiniteStochasticLanguage {
+impl From<(ActivityKey, HashMap<Vec<Activity>, Fraction>)> for FiniteStochasticLanguage {
     /**
      * Normalises the distribution. Use new_raw to avoid normalisation.
      */
-    fn from(value: (HashMap<Vec<Activity>, Fraction>, ActivityKey)) -> Self {
+    fn from(value: (ActivityKey, HashMap<Vec<Activity>, Fraction>)) -> Self {
         let mut result = Self {
-            activity_key: value.1,
-            traces: value.0,
+            activity_key: value.0,
+            traces: value.1,
         };
         result.normalise();
         result

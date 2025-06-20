@@ -109,7 +109,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
         number_of_traces: &usize,
     ) -> Result<FiniteStochasticLanguage> {
         if self.len() == 0 {
-            Ok((HashMap::new(), self.get_activity_key().clone()).into())
+            Ok((self.get_activity_key().clone(), HashMap::new()).into())
         } else if number_of_traces.is_one() {
             let mut result = HashMap::new();
 
@@ -127,7 +127,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
 
             result.insert(max_trace.clone(), max_probability.clone());
 
-            Ok((result, self.get_activity_key().clone()).into())
+            Ok((self.get_activity_key().clone(), result).into())
         } else {
             let mut result = vec![];
             for (trace, probability) in self.iter_trace_probability() {
@@ -152,7 +152,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
                 result2.insert(trace.clone(), probability.clone());
             }
 
-            Ok((result2, self.get_activity_key().clone()).into())
+            Ok((self.get_activity_key().clone(), result2).into())
         }
     }
 
@@ -169,7 +169,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
             result2.insert(trace.clone(), probability.clone());
         }
 
-        Ok((result2, self.get_activity_key().clone()).into())
+        Ok((self.get_activity_key().clone(), result2).into())
     }
 
     fn analyse_probability_coverage(
@@ -177,7 +177,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
         coverage: &Fraction,
     ) -> Result<FiniteStochasticLanguage> {
         if coverage.is_zero() {
-            return Ok((HashMap::new(), self.get_activity_key().clone()).into());
+            return Ok((self.get_activity_key().clone(), HashMap::new()).into());
         } else if self.len() == 0 {
             return Err(anyhow!(
                 "A coverage of {:.4} is unattainable as the stochastic language is empty.",
@@ -188,7 +188,10 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
         //idea: keep a list of traces sorted by probability
 
         //insert the first trace
-        let mut result = vec![(self.get_trace(0).unwrap(), self.get_trace_probability(0).unwrap())];
+        let mut result = vec![(
+            self.get_trace(0).unwrap(),
+            self.get_trace_probability(0).unwrap(),
+        )];
 
         let mut sum = Fraction::zero();
 
@@ -226,7 +229,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
             result2.insert(trace.clone(), probability.clone());
         }
 
-        Ok((result2, self.get_activity_key().clone()).into())
+        Ok((self.get_activity_key().clone(), result2).into())
     }
 }
 
@@ -470,7 +473,7 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
         progress_bar.finish_and_clear();
 
         let map: HashMap<_, _> = s.into_iter().collect();
-        Ok((map, self.get_activity_key().clone()).into())
+        Ok((self.get_activity_key().clone(), map).into())
     }
 
     fn analyse_most_likely_traces(
@@ -497,7 +500,7 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
         progress_bar.finish_and_clear();
 
         let map: HashMap<_, _> = s.into_iter().collect();
-        Ok((map, self.get_activity_key().clone()).into())
+        Ok((self.get_activity_key().clone(), map).into())
     }
 
     fn analyse_probability_coverage(
@@ -545,7 +548,7 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
         progress_bar.finish_and_clear();
 
         let map: HashMap<_, _> = s.into_iter().collect();
-        Ok((map, self.get_activity_key().clone()).into())
+        Ok((self.get_activity_key().clone(), map).into())
     }
 }
 

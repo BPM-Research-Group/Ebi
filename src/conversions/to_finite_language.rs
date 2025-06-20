@@ -1,25 +1,27 @@
 use std::collections::HashSet;
 
-use crate::ebi_objects::{
-    event_log::EventLog, finite_language::FiniteLanguage,
-    finite_stochastic_language::FiniteStochasticLanguage,
+use fnv::FnvBuildHasher;
+
+use crate::{
+    ebi_framework::activity_key::Activity,
+    ebi_objects::{
+        event_log::EventLog, finite_language::FiniteLanguage,
+        finite_stochastic_language::FiniteStochasticLanguage,
+    },
 };
 
 impl From<EventLog> for FiniteLanguage {
     fn from(value: EventLog) -> Self {
         log::info!("convert event log to finite language");
+        let EventLog {
+            activity_key,
+            traces,
+            ..
+        } = value;
 
-        let mut map: HashSet<Vec<String>> = HashSet::new();
-        for t in &value.log.traces {
-            let trace = t
-                .events
-                .iter()
-                .map(|event| value.classifier.get_class_identity(event))
-                .collect::<Vec<String>>();
-            map.insert(trace);
-        }
+        let map: HashSet<Vec<Activity>, FnvBuildHasher> = traces.into_iter().collect();
 
-        FiniteLanguage::from(map)
+        FiniteLanguage::from((activity_key, map))
     }
 }
 

@@ -9,12 +9,14 @@ impl From<EventLog> for FiniteStochasticLanguage {
     fn from(value: EventLog) -> Self {
         log::info!("create stochastic language");
         let mut map = HashMap::new();
-        for t in &value.log.traces {
-            let trace = t
-                .events
-                .iter()
-                .map(|event| value.classifier.get_class_identity(event))
-                .collect::<Vec<String>>();
+
+        let EventLog {
+            activity_key,
+            traces,
+            ..
+        } = value;
+
+        for trace in traces {
             match map.entry(trace) {
                 Entry::Occupied(mut e) => {
                     *e.get_mut() += Fraction::one();
@@ -27,6 +29,6 @@ impl From<EventLog> for FiniteStochasticLanguage {
             }
         }
 
-        map.into()
+        (activity_key, map).into()
     }
 }
