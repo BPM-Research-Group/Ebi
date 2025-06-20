@@ -96,21 +96,21 @@ pub struct EventLog {
     pub(crate) classifier: EventLogClassifier,
     pub(crate) activity_key: ActivityKey,
     pub(crate) traces: Vec<Vec<Activity>>,
-    log: process_mining::EventLog, //field is not updated with other measures -> private
+    rust4pm_log: process_mining::EventLog, //field is not updated with other measures -> private
 }
 
 impl EventLog {
     pub fn new(log: process_mining::EventLog, classifier: EventLogClassifier) -> Self {
         let mut result = Self {
             classifier: classifier,
-            log: log,
+            rust4pm_log: log,
             activity_key: ActivityKey::new(),
             traces: vec![],
         };
 
-        for trace_index in 0..result.log.traces.len() {
+        for trace_index in 0..result.rust4pm_log.traces.len() {
             result.traces.push(
-                result.log.traces[trace_index]
+                result.rust4pm_log.traces[trace_index]
                     .events
                     .iter()
                     .map(|event| {
@@ -261,28 +261,24 @@ impl Exportable for EventLog {
     }
 
     fn export(&self, f: &mut dyn std::io::Write) -> Result<()> {
-        process_mining::event_log::export_xes::export_xes_event_log(f, &self.log)?;
+        process_mining::event_log::export_xes::export_xes_event_log(f, &self.rust4pm_log)?;
         Ok(())
     }
 }
 
 impl fmt::Display for EventLog {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "event log with {} traces", self.log.traces.len())
+        write!(f, "event log with {} traces", self.len())
     }
 }
 
 impl Infoable for EventLog {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
-        writeln!(f, "Number of traces\t{}", self.log.traces.len())?;
+        writeln!(f, "Number of traces\t{}", self.len())?;
         writeln!(
             f,
             "Number of events\t{}",
-            self.log
-                .traces
-                .iter()
-                .map(|t| t.events.len())
-                .sum::<usize>()
+            self.traces.iter().map(|trace| trace.len()).sum::<usize>()
         )?;
         writeln!(
             f,
@@ -307,12 +303,12 @@ impl Infoable for EventLog {
 
 impl EbiTraitEventLog for EventLog {
     fn get_log(&self) -> &process_mining::EventLog {
-        &self.log
+        &self.rust4pm_log
     }
 
     fn get_trace_attributes(&self) -> HashMap<String, DataType> {
         let mut map: HashMap<String, DataType> = HashMap::new();
-        for trace in &self.log.traces {
+        for trace in &self.rust4pm_log.traces {
             for attribute in &trace.attributes {
                 match map.entry(attribute.key.clone()) {
                     std::collections::hash_map::Entry::Occupied(mut e) => {
@@ -351,7 +347,10 @@ mod tests {
     use crate::{
         ebi_framework::activity_key::{ActivityKey, TranslateActivityKey},
         ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
-        ebi_traits::{ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}},
+        ebi_traits::{
+            ebi_trait_event_log::{EbiTraitEventLog, IndexTrace},
+            ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        },
     };
 
     use super::EventLog;
@@ -402,7 +401,6 @@ mod tests {
         assert_eq!(log.len(), 2);
 
         log.retain_traces(Box::new(|_| false));
-
 
         assert_eq!(log.len(), 0);
     }
