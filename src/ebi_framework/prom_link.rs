@@ -14,6 +14,7 @@ use jni::objects::{JClass, JObjectArray, JString};
 // lifetime checker won't let us.
 use jni::sys::jstring;
 use anyhow::{anyhow, Context, Result};
+use regex::Regex;
 use strum::IntoEnumIterator;
 
 use crate::{math::fraction::FractionNotParsedYet, multiple_reader::MultipleReader};
@@ -315,7 +316,10 @@ pub fn escape_code(str: String) -> String {
 }
 
 pub fn escape_string(str: &str) -> String {
-    str.replace("\"", "\\\"").replace("\n", " ")
+    let str = str.replace("\"", "\\\"").replace("\n", "");
+    let re = Regex::new(r"~\\cite\{[^\}]*\}").unwrap();
+    let str = re.replace_all(&str, " ");
+    str.to_string()
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]

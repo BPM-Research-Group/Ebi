@@ -61,6 +61,7 @@ svg2pdf = "0.13.0"
 uuid = "1.17.0"
 cfg-if = "1.0.1"
 ntest = "0.9.3"
+regex = "1.11.1"
 
 [dependencies.num-rational]
 version = "0.4.1"
