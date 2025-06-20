@@ -312,7 +312,7 @@ fn java_compiler_trigger(f: &mut Vec<u8>, java_object_handler: &JavaObjectHandle
 }
 
 pub fn escape_code(str: String) -> String {
-    str.replace(' ', "_").replace("-", "_")
+    str.replace(' ', "_").replace("-", "_").replace(".", "_")
 }
 
 pub fn escape_string(str: &str) -> String {
