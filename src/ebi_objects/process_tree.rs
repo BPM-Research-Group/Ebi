@@ -72,7 +72,7 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
         ProcessTree::export_from_object,
     )],
     java_object_handlers: &[JavaObjectHandler {
-        name: "process tree",
+        name: "ProcessTree",
         java_class: "org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree",
         translator_ebi_to_java: Some(
             "org.processmining.ebi.objects.EbiProcessTree.EbiString2EfficientTree",

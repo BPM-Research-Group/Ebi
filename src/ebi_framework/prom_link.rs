@@ -324,7 +324,7 @@ pub fn escape_string(str: &str) -> String {
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]
 pub struct JavaObjectHandler {
-    pub name: &'static str, //name to be used in java function names to indicate the Ebi object that is being handled. Must be unique.
+    pub name: &'static str, //name to be used in java function names to indicate the Ebi object that is being handled. Must be unique. Must not contain spaces.
     pub java_class: &'static str, //The full path of the java class to/from which the Ebi object is to be translated
     pub translator_ebi_to_java: Option<&'static str>, //Full path of the java function that translates from a String returned by Ebi to the given java class
     pub translator_java_to_ebi: Option<&'static str>, //Full paht of the java function that translates from the java class to a String that can be read by Ebi
