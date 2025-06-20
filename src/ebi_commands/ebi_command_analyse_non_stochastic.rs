@@ -114,6 +114,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
                 object.bounded()?
             }
             EbiInput::Object(EbiObject::DirectlyFollowsGraph(object), _) => object.bounded()?,
+
             EbiInput::Trait(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
@@ -136,6 +137,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
             EbiInput::Object(EbiObject::StochasticLanguageOfAlignments(_), _) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
+            EbiInput::Object(EbiObject::ScalableVectorGraphics(_), _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
         };
@@ -275,6 +279,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
             EbiInput::Object(EbiObject::StochasticLanguageOfAlignments(_), _) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
+            EbiInput::Object(EbiObject::ScalableVectorGraphics(_), _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
         };

@@ -7,7 +7,7 @@ use strum_macros::EnumIter;
 
 use crate::{
     ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, executions::Executions, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, language_of_alignments::LanguageOfAlignments, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments, stochastic_process_tree::StochasticProcessTree
+        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, executions::Executions, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, language_of_alignments::LanguageOfAlignments, process_tree::ProcessTree, scalable_vector_graphics::ScalableVectorGraphics, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments, stochastic_process_tree::StochasticProcessTree
     },
     ebi_traits::{
         ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
@@ -49,7 +49,8 @@ pub enum EbiObjectType {
     ProcessTree,
     StochasticProcessTree,
     Executions,
-    DirectlyFollowsGraph
+    DirectlyFollowsGraph,
+    ScalableVectorGraphics,
 }
 
 impl EbiObjectType {
@@ -70,6 +71,7 @@ impl EbiObjectType {
             EbiObjectType::StochasticProcessTree => "a",
             EbiObjectType::Executions => "",
             EbiObjectType::DirectlyFollowsGraph => "a",
+            EbiObjectType::ScalableVectorGraphics => "a", 
         }
     }
 
@@ -139,6 +141,7 @@ impl Display for EbiObjectType {
                 EbiObjectType::StochasticProcessTree => "stochastic process tree",
                 EbiObjectType::Executions => "executions",
                 EbiObjectType::DirectlyFollowsGraph => "directly follows graph",
+                EbiObjectType::ScalableVectorGraphics => "scalable vector graphics",
             }
         )
     }
@@ -161,6 +164,7 @@ pub enum EbiObject {
     StochasticProcessTree(StochasticProcessTree),
     Executions(Executions),
     DirectlyFollowsGraph(DirectlyFollowsGraph),
+    ScalableVectorGraphics(ScalableVectorGraphics),
 }
 
 impl EbiObject {
@@ -187,6 +191,7 @@ impl EbiObject {
             EbiObject::StochasticProcessTree(_) => EbiObjectType::StochasticProcessTree,
             EbiObject::Executions(_) => EbiObjectType::Executions,
             EbiObject::DirectlyFollowsGraph(_) => EbiObjectType::DirectlyFollowsGraph,
+            EbiObject::ScalableVectorGraphics(_) => EbiObjectType::ScalableVectorGraphics,
         }
     }
 }
@@ -209,6 +214,7 @@ impl Display for EbiObject {
             EbiObject::StochasticProcessTree(o) => write!(f, "{}", o),
             EbiObject::Executions(o) => write!(f, "{}", o),
             EbiObject::DirectlyFollowsGraph(o) => write!(f, "{}", o),
+            EbiObject::ScalableVectorGraphics(o) => write!(f, "{}", o),
         }
     }
 }
@@ -231,6 +237,7 @@ impl Infoable for EbiObject {
             EbiObject::StochasticProcessTree(o) => o.info(f),
             EbiObject::Executions(o) => o.info(f),
             EbiObject::DirectlyFollowsGraph(o) => o.info(f),
+            EbiObject::ScalableVectorGraphics(o) => o.info(f),
         }
     }
 }

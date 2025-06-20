@@ -21,7 +21,13 @@ use std::{
 };
 
 use super::{
-    deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
+    deterministic_finite_automaton::DeterministicFiniteAutomaton,
+    directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel,
+    labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree,
+    stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+    stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
+    stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+    stochastic_process_tree::StochasticProcessTree,
 };
 
 pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
@@ -148,7 +154,6 @@ impl Exportable for LolaNet {
             EbiOutput::LogDiv(_) => Err(anyhow!("Cannot export LogDiv as Lolanet.")),
             EbiOutput::PDF(_) => Err(anyhow!("Cannot export PDF as Lolanet.")),
             EbiOutput::RootLogDiv(_) => Err(anyhow!("Cannot export RootLogDiv as Lolanet.")),
-            EbiOutput::SVG(_) => Err(anyhow!("Cannot export SVG as Lolanet.")),
             EbiOutput::String(_) => Err(anyhow!("Cannot export string as Lolanet.")),
             EbiOutput::Usize(_) => Err(anyhow!("Cannot export integer as Lolanet.")),
             EbiOutput::Object(EbiObject::EventLog(_)) => {
@@ -168,6 +173,9 @@ impl Exportable for LolaNet {
             }
             EbiOutput::Object(EbiObject::StochasticLanguageOfAlignments(_)) => Err(anyhow!(
                 "Cannot export stochastic language of alignments as Lolanet."
+            )),
+            EbiOutput::Object(EbiObject::ScalableVectorGraphics(_)) => Err(anyhow!(
+                "Cannot export scalable vector graphics as Lolanet."
             )),
         }
     }

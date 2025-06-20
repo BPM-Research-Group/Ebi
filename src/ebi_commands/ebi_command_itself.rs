@@ -9,7 +9,7 @@ use strum::IntoEnumIterator;
 use crate::{ebi_framework::{
     
     
-    ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, ebi_objects::scalable_vector_graphics::svg_to_pdf, text::Joiner};
+    ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, ebi_objects::scalable_vector_graphics::ScalableVectorGraphics, text::Joiner};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
  □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
@@ -87,8 +87,8 @@ pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command {
         let mut graph = graph()?;
         let mut svg = SVGWriter::new();
         graph.do_it(false, false, false, &mut svg);
-        let svg_string = svg.finalize();
-        Ok(EbiOutput::PDF(svg_to_pdf(&svg_string)?))
+        let svg: ScalableVectorGraphics = svg.finalize().into();
+        Ok(EbiOutput::PDF(svg.to_pdf()?))
     }, 
     output_type: &EbiOutputType::PDF
 };

@@ -360,15 +360,6 @@ pub const JAVA_OBJECT_HANDLERS_FRACTION: &[JavaObjectHandler] = &[
         input_gui: Some("org.processmining.ebi.objects.EbiFraction.create_input_panel"),
     },
 ];
-pub const JAVA_OBJECT_HANDLERS_SVG: &[JavaObjectHandler] = &[
-    JavaObjectHandler{ 
-        name: "svg", 
-        java_class: "com.kitfox.svg.SVGDiagram",
-        translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiSvg.fromEbiString"),
-        translator_java_to_ebi: None,
-        input_gui: None
-    },
-];
 pub const JAVA_OBJECT_HANDLERS_PDF: &[JavaObjectHandler] = &[
 
 ];

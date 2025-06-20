@@ -337,7 +337,6 @@ impl Exportable for LabelledPetriNet {
             EbiOutput::LogDiv(_) => Err(anyhow!("Cannot export LogDiv as LPN.")),
             EbiOutput::PDF(_) => Err(anyhow!("Cannot export PDF as LPN.")),
             EbiOutput::RootLogDiv(_) => Err(anyhow!("Cannot export RootLogDiv as LPN.")),
-            EbiOutput::SVG(_) => Err(anyhow!("Cannot export SVG as LPN.")),
             EbiOutput::String(_) => Err(anyhow!("Cannot export string as LPN.")),
             EbiOutput::Usize(_) => Err(anyhow!("Cannot export integer as LPN.")),
             EbiOutput::Object(EbiObject::EventLog(_)) => {
@@ -357,6 +356,9 @@ impl Exportable for LabelledPetriNet {
             }
             EbiOutput::Object(EbiObject::StochasticLanguageOfAlignments(_)) => Err(anyhow!(
                 "Cannot export stochastic language of alignments as LPN."
+            )),
+            EbiOutput::Object(EbiObject::ScalableVectorGraphics(_)) => Err(anyhow!(
+                "Cannot export scalable vector graphics as LPN."
             )),
         }
     }

@@ -2,12 +2,10 @@ use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
-        ebi_object::EbiObject,
+        ebi_object::{EbiObject, EbiObjectType},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
-    },
-    ebi_objects::scalable_vector_graphics::to_svg_string_box,
-    ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
+    }, ebi_objects::scalable_vector_graphics::ScalableVectorGraphics, ebi_traits::ebi_trait_graphable::EbiTraitGraphable
 };
 
 pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
@@ -48,6 +46,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::StochasticProcessTree(pt), _) => pt.to_string(),
             EbiInput::Object(EbiObject::Executions(s), _) => s.to_string(),
             EbiInput::Object(EbiObject::DirectlyFollowsGraph(s), _) => s.to_string(),
+            EbiInput::Object(EbiObject::ScalableVectorGraphics(s), _) => s.to_string(),
             EbiInput::FileHandler(_) => unreachable!(),
             EbiInput::Trait(_, _) => unreachable!(),
             EbiInput::String(_) => unreachable!(),
@@ -74,10 +73,10 @@ pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command {
         let result: Box<dyn EbiTraitGraphable + 'static> =
             inputs.remove(0).to_type::<dyn EbiTraitGraphable>()?;
 
-        let svg_string = to_svg_string_box(result)?;
-        return Ok(EbiOutput::SVG(svg_string));
+        let svg = ScalableVectorGraphics::from_graphable(result)?;
+        return Ok(EbiOutput::Object(EbiObject::ScalableVectorGraphics(svg)));
     },
-    output_type: &EbiOutputType::SVG,
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::ScalableVectorGraphics),
 };
 
 #[cfg(test)]
