@@ -520,7 +520,7 @@ pub fn scale(point: &mut Point) {
 }
 
 pub fn html() -> String {
-    "<h3>Commands</h3>".to_owned() +
+    "<h2>Commands</h2>".to_owned() +
     "Ebi offers the following comands and techniques. " +
     "Please refer to the <a href=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true\">manual</a> for more information. " + 
     "<ul><li>" +
@@ -532,7 +532,7 @@ pub fn html() -> String {
     
     
     //file formats
-    "<h3>Supported file formats</h3>" + 
+    "<h2>Supported file formats</h2>" + 
     "<ul><li>" +
     &EBI_FILE_HANDLERS.iter().map(|file_handler| format!("{} (.{})", file_handler.name.to_sentence_case(), file_handler.file_extension)).join("</li><li>") +
     "</li></ul>"
