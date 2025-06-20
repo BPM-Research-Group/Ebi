@@ -1,4 +1,4 @@
-use anyhow::{Error, Result, anyhow};
+use anyhow::{Result, anyhow};
 use std::fmt::Display;
 use svg2pdf::{ConversionOptions, PageOptions};
 
@@ -91,12 +91,14 @@ impl Exportable for PortableDocumentFormat {
                 "cannot export stochastic language of alignments as PDF"
             )),
             EbiOutput::Object(EbiObject::StochasticProcessTree(object)) => {
-                object.to_svg()?.export(f)
+                object.to_pdf()?.export(f)
             }
             EbiOutput::Object(EbiObject::DirectlyFollowsGraph(object)) => {
-                object.to_svg()?.export(f)
+                object.to_pdf()?.export(f)
             }
-            EbiOutput::Object(EbiObject::ScalableVectorGraphics(object)) => object.export(f),
+            EbiOutput::Object(EbiObject::ScalableVectorGraphics(object)) => {
+                object.to_pdf()?.export(f)
+            }
             EbiOutput::String(_) => Err(anyhow!("cannot export string as PDF")),
             EbiOutput::Usize(_) => Err(anyhow!("cannot export usize as PDF")),
             EbiOutput::Fraction(_) => Err(anyhow!("cannot export fraction as PDF")),
@@ -121,17 +123,15 @@ where
     T: ToSVG,
 {
     fn to_pdf(&self) -> Result<PortableDocumentFormat> {
-        self.to_svg()?.try_into()
+        self.to_svg()?.to_pdf()
     }
 }
 
-impl TryFrom<ScalableVectorGraphics> for PortableDocumentFormat {
-    type Error = Error;
-
-    fn try_from(value: ScalableVectorGraphics) -> std::result::Result<Self, Self::Error> {
+impl ToPDF for ScalableVectorGraphics {
+    fn to_pdf(&self) -> Result<PortableDocumentFormat> {
         let mut options = svg2pdf::usvg::Options::default();
         options.fontdb_mut().load_system_fonts();
-        let tree = svg2pdf::usvg::Tree::from_str(&value.0, &options)?;
+        let tree = svg2pdf::usvg::Tree::from_str(&self.0, &options)?;
         match svg2pdf::to_pdf(&tree, ConversionOptions::default(), PageOptions::default()) {
             Ok(x) => Ok(x.into()),
             Err(err) => Err(anyhow!(err)),
