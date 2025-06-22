@@ -15,6 +15,7 @@ use super::fraction::Fraction;
  * It is rather unfortunate, but there doesn't seem to be a Rust library that supports matrix operations (inversion) on fractional data types.
  * Hence, we have to do with these probably sub-optimal implementations.
  */
+#[derive(PartialEq)]
 pub struct Matrix {
     rows: Vec<Vec<Fraction>>,
     number_of_columns: usize, //keep track of the number of columns, even if there are no rows
@@ -133,6 +134,7 @@ impl Matrix {
             row.extend(vec![Fraction::zero(); n]);
             row[n + r] = Fraction::one();
         }
+        self.number_of_columns += n;
 
         // log::info!("add identity       {}", self);
 
@@ -145,6 +147,7 @@ impl Matrix {
         for (_, row) in self.rows.iter_mut().enumerate() {
             row.drain(0..n);
         }
+        self.number_of_columns = n;
 
         // log::info!("inverse done");
 
@@ -436,5 +439,36 @@ mod tests {
         let t = vec![24.into(), (-9).into(), (-23).into()];
 
         assert_eq!(x, t);
+    }
+
+    #[test]
+    fn inverse() {
+        let mut m: Matrix = vec![
+            vec![1.into(), 0.into(), 0.into(), 0.into()],
+            vec![0.into(), 1.into(), 0.into(), Fraction::from((-3, 5))],
+            vec![0.into(), Fraction::from((-3, 4)), 1.into(), 0.into()],
+            vec![0.into(), 0.into(), 0.into(), 1.into()],
+        ]
+        .into();
+
+        let i = vec![
+            vec![1.into(), 0.into(), 0.into(), 0.into()],
+            vec![0.into(), 1.into(), 0.into(), Fraction::from((3, 5))],
+            vec![
+                0.into(),
+                Fraction::from((3, 4)),
+                1.into(),
+                Fraction::from((9, 20)),
+            ],
+            vec![0.into(), 0.into(), 0.into(), 1.into()],
+        ]
+        .into();
+
+        m.inverse().unwrap();
+
+        // log::debug!("\t\tinverted matrix    {}", m);
+        // log::debug!("\t\tcorrect inverse    {}", i);
+
+        assert_eq!(m, i);
     }
 }
