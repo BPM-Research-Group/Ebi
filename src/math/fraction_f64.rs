@@ -24,7 +24,7 @@ use super::{
     traits::{One, Signed, Zero},
 };
 
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub struct FractionF64(pub f64);
 
 impl FractionF64 {
@@ -204,6 +204,14 @@ impl Signed for FractionF64 {
 
     fn is_negative(&self) -> bool {
         self.0 < -EPSILON
+    }
+}
+
+impl PartialEq for FractionF64 {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (FractionF64(l0), FractionF64(r0)) => l0 - EPSILON <= *r0 && *r0 <= l0 + EPSILON,
+        }
     }
 }
 
