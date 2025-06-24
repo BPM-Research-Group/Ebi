@@ -471,21 +471,33 @@ mod tests {
         assert_eq!(state.termination_probability, Fraction::zero());
 
         //prefix <a, a, a, a>
-        // state = slpn.execute_deterministic_activity(&state, a).unwrap();
-        // assert_eq!(state.p_marking.len(), 4);
-        // assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
-        // assert!(
-        //     slpn.get_deterministic_enabled_activities(&state)
-        //         .contains(&a)
-        // );
-        // assert_eq!(state.termination_probability, Fraction::from((1, 16)));
+        state = slpn.execute_deterministic_activity(&state, a).unwrap();
+        assert_eq!(state.p_marking.len(), 4);
+        assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
+        assert!(
+            slpn.get_deterministic_enabled_activities(&state)
+                .contains(&a)
+        );
+        assert_eq!(state.termination_probability, Fraction::zero());
 
         //prefix <a, a, a, a, a>
-        // state = slpn.execute_deterministic_activity(&state, a).unwrap();
-        // assert_eq!(state.p_marking.len(), 6);
+        state = slpn.execute_deterministic_activity(&state, a).unwrap();
+        assert_eq!(state.p_marking.len(), 6);
+        assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
+        assert!(
+            slpn.get_deterministic_enabled_activities(&state)
+                .contains(&a)
+        );
+        assert_eq!(state.termination_probability, Fraction::from((1, 16)));
 
         //prefix <a, a, a, a, a, a>
-        // state = slpn.execute_deterministic_activity(&state, a).unwrap();
-        // assert_eq!(state.p_marking.len(), 6);
+        state = slpn.execute_deterministic_activity(&state, a).unwrap();
+        assert_eq!(state.p_marking.len(), 7);
+        assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
+        assert!(
+            slpn.get_deterministic_enabled_activities(&state)
+                .contains(&a)
+        );
+        assert_eq!(state.termination_probability, Fraction::zero());
     }
 }
