@@ -17,7 +17,10 @@ use std::{
 };
 
 use crate::{
-    ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable},
+    ebi_framework::{
+        ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait::FromEbiTraitObject,
+        exportable::Exportable, infoable::Infoable,
+    },
     math::fraction::{EPSILON, Fraction, FractionRandomCache},
 };
 
@@ -454,10 +457,10 @@ impl TryFrom<&FractionNotParsedYet> for FractionEnum {
     }
 }
 
-impl crate::ebi_framework::ebi_trait::FromEbiTraitObject for FractionEnum {
-    fn from_trait_object(object: crate::ebi_framework::ebi_input::EbiInput) -> Result<Box<Self>> {
+impl FromEbiTraitObject for FractionEnum {
+    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
-            crate::ebi_framework::ebi_input::EbiInput::Fraction(e) => Ok(Box::new(e)),
+            EbiInput::Fraction(e, _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
                 "cannot read {} {} as a fraction",
                 object.get_type().get_article(),

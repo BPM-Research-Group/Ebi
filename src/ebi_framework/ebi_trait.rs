@@ -1,12 +1,21 @@
-use std::{collections::{BTreeSet, HashSet}, fmt::{Debug, Display}};
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
+use std::{
+    collections::{BTreeSet, HashSet},
+    fmt::{Debug, Display},
+};
 use strum_macros::EnumIter;
 
-use super::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS}, ebi_input::{EbiInput, EbiInputType}, prom_link::JavaObjectHandler};
+use super::{
+    ebi_command::{EBI_COMMANDS, EbiCommand},
+    ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+    ebi_input::{EbiInput, EbiInputType},
+    prom_link::JavaObjectHandler,
+};
 
 #[derive(Clone, Copy, PartialEq, Eq, EnumIter, Hash, Default)]
 pub enum EbiTrait {
-    #[default] EventLog,
+    #[default]
+    EventLog,
     FiniteLanguage,
     FiniteStochasticLanguage,
     IterableLanguage,
@@ -30,7 +39,7 @@ impl EbiTrait {
                     result.insert(file_handler);
                 }
             }
-        };
+        }
 
         let mut result: Vec<&EbiFileHandler> = result.into_iter().collect();
         result.sort();
@@ -51,7 +60,7 @@ impl EbiTrait {
             EbiTrait::Graphable => "a",
         }
     }
-    
+
     pub fn get_applicable_commands(&self) -> BTreeSet<Vec<&'static EbiCommand>> {
         let mut result = EBI_COMMANDS.get_command_paths();
         result.retain(|path| {
@@ -78,12 +87,24 @@ impl EbiTrait {
             EbiTrait::EventLog => "Has traces and attached event and trace attributes.",
             EbiTrait::FiniteLanguage => "Finite set of traces.",
             EbiTrait::FiniteStochasticLanguage => "Finite distribution of traces.",
-            EbiTrait::IterableLanguage => "Can walk over the traces. May iterate over infinitely many traces.",
-            EbiTrait::IterableStochasticLanguage => "Can walk over the traces and their probabilities. May iterate over infinitely many traces.",
-            EbiTrait::QueriableStochasticLanguage => "Can query by giving a trace, which will return its probability.",
-            EbiTrait::Semantics => "An object in which the state space can be traversed. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks.",
-            EbiTrait::StochasticDeterministicSemantics => "An object in which the state space can be traversed deterministically, that is, in each state every activity appears at most once and silent steps are not present. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks.",
-            EbiTrait::StochasticSemantics => "An object in which the state space can be traversed, with probabilities. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks.",
+            EbiTrait::IterableLanguage => {
+                "Can walk over the traces. May iterate over infinitely many traces."
+            }
+            EbiTrait::IterableStochasticLanguage => {
+                "Can walk over the traces and their probabilities. May iterate over infinitely many traces."
+            }
+            EbiTrait::QueriableStochasticLanguage => {
+                "Can query by giving a trace, which will return its probability."
+            }
+            EbiTrait::Semantics => {
+                "An object in which the state space can be traversed. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
+            }
+            EbiTrait::StochasticDeterministicSemantics => {
+                "An object in which the state space can be traversed deterministically, that is, in each state every activity appears at most once and silent steps are not present. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
+            }
+            EbiTrait::StochasticSemantics => {
+                "An object in which the state space can be traversed, with probabilities. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
+            }
             EbiTrait::Graphable => "Can be visualised as a graph.",
         }
     }
@@ -91,18 +112,22 @@ impl EbiTrait {
 
 impl Display for EbiTrait {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", match self {
-            EbiTrait::EventLog => "event log",
-            EbiTrait::IterableLanguage => "iterable language",
-            EbiTrait::FiniteLanguage => "finite language",
-            EbiTrait::FiniteStochasticLanguage => "finite stochastic language",
-            EbiTrait::IterableStochasticLanguage => "iterable stochastic language",
-            EbiTrait::QueriableStochasticLanguage => "queriable stochastic language",
-            EbiTrait::StochasticDeterministicSemantics => "stochastic deterministic semantics",
-            EbiTrait::StochasticSemantics => "stochastic semantics",
-            EbiTrait::Semantics => "semantics",
-            EbiTrait::Graphable => "graphable",
-        })
+        write!(
+            f,
+            "{}",
+            match self {
+                EbiTrait::EventLog => "event log",
+                EbiTrait::IterableLanguage => "iterable language",
+                EbiTrait::FiniteLanguage => "finite language",
+                EbiTrait::FiniteStochasticLanguage => "finite stochastic language",
+                EbiTrait::IterableStochasticLanguage => "iterable stochastic language",
+                EbiTrait::QueriableStochasticLanguage => "queriable stochastic language",
+                EbiTrait::StochasticDeterministicSemantics => "stochastic deterministic semantics",
+                EbiTrait::StochasticSemantics => "stochastic semantics",
+                EbiTrait::Semantics => "semantics",
+                EbiTrait::Graphable => "graphable",
+            }
+        )
     }
 }
 
@@ -119,9 +144,13 @@ pub trait FromEbiTraitObject {
 impl FromEbiTraitObject for usize {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
-            EbiInput::Usize(e) => Ok(Box::new(e)),
-            _ => Err(anyhow!("cannot read {} {} as an integer", object.get_type().get_article(), object.get_type()))
-        } 
+            EbiInput::Usize(e, _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "cannot read {} {} as an integer",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
     }
 }
 
@@ -129,8 +158,12 @@ impl FromEbiTraitObject for String {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
             EbiInput::String(e) => Ok(Box::new(e)),
-            _ => Err(anyhow!("cannot read {} {} as an integer", object.get_type().get_article(), object.get_type()))
-        } 
+            _ => Err(anyhow!(
+                "cannot read {} {} as an integer",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
     }
 }
 
@@ -138,7 +171,7 @@ impl FromEbiTraitObject for String {
 mod tests {
     use strum::IntoEnumIterator;
 
-    use crate::ebi_framework::ebi_input::EbiInput;
+    use crate::ebi_framework::ebi_input::{EbiInput, TEST_INPUT_TYPE_USIZE};
 
     use super::{EbiTrait, FromEbiTraitObject};
 
@@ -158,7 +191,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn unreachable_string() {
-        String::from_trait_object(EbiInput::Usize(1)).unwrap();
+        String::from_trait_object(EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE)).unwrap();
     }
 
     #[test]

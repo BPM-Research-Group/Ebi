@@ -10,7 +10,7 @@ use crate::{
     },
     ebi_objects::{labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree},
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::fraction::Fraction,
+    math::fraction::{ConstFraction, Fraction},
     techniques::{
         alignment_stochastic_miner::AlignmentMiner,
         directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
@@ -78,7 +78,11 @@ pub const EBI_DISCOVER_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
             &EbiInputType::Trait(EbiTrait::EventLog),
             &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
         ],
-        &[&EbiInputType::Fraction],
+        &[&EbiInputType::Fraction(
+            Some(ConstFraction::zero()),
+            Some(ConstFraction::one()),
+            None,
+        )],
     ],
     input_names: &["LANG", "MIN_FITNESS"],
     input_helps: &[

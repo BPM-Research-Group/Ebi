@@ -1,6 +1,6 @@
 use anyhow::Context;
 use crate::{ebi_framework::{ebi_command::EbiCommand, 
-    ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_objects::directly_follows_graph::DirectlyFollowsGraph, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::{fraction::Fraction, traits::Zero}, medoid, techniques::{completeness::Completeness, edge_difference::EdgeDifference, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}};
+    ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_objects::directly_follows_graph::DirectlyFollowsGraph, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::{fraction::{ConstFraction, Fraction}, traits::Zero}, medoid, techniques::{completeness::Completeness, edge_difference::EdgeDifference, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}};
 
 pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
     name_short: "ana",
@@ -85,7 +85,7 @@ The computation may not terminate if the model has non-decreasing livelocks, or 
     exact_arithmetic: true,
     input_types: &[ 
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics) ], 
-        &[ &EbiInputType::Fraction]
+        &[ &EbiInputType::Fraction(Some(ConstFraction::zero()), Some(ConstFraction::one()), None)]
     ],
     input_names: &[ "FILE", "MINIMUM_COVERAGE"],
     input_helps: &[ "Any object with deterministic stochastic semantics.", "The minimum probability that a trace should have to be included."],
@@ -145,7 +145,7 @@ The computation may not terminate if the model is unbounded and this unboundedne
     exact_arithmetic: true,
     input_types: &[ 
         &[ &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics) ], 
-        &[ &EbiInputType::Fraction]
+        &[ &EbiInputType::Fraction(Some(ConstFraction::zero()), Some(ConstFraction::one()), None)]
     ],
     input_names: &[ "FILE", "MINIMUM_PROBABILITY"],
     input_helps: &[ "Any object with deterministic stochastic semantics.", "The minimum probability that a trace should have to be included."],
@@ -171,7 +171,7 @@ Computation is more efficient for an object with a finite stochastic language.")
     exact_arithmetic: true,
     input_types: &[ 
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics)], 
-        &[ &EbiInputType::Usize] 
+        &[ &EbiInputType::Usize(None, None, None)] 
     ],
     input_names: &[ "FILE", "NUMBER_OF_TRACES"],
     input_helps: &[ "Any object with deterministic stochastic semantics.", "The number of traces that should be extracted."],
@@ -236,7 +236,7 @@ If there are more than one such trace, an arbitrary one is returned."),
     exact_arithmetic: true, 
     input_types: &[ 
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)], 
-        &[ &EbiInputType::Usize] 
+        &[ &EbiInputType::Usize(None, None, Some(1))] 
     ],
     input_names: &[ "FILE", "NUMBER_OF_TRACES"],
     input_helps: &[ "Any object with a finite stochastic language.", "The number of traces that should be extracted."],

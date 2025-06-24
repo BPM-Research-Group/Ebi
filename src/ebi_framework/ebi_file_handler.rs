@@ -189,7 +189,6 @@ mod tests {
                 .is_lt()
         );
 
-        EbiFileHandler::from_trait_object(EbiInput::Usize(0)).unwrap_err();
         EbiFileHandler::from_trait_object(EbiInput::FileHandler(EBI_EXECUTIONS)).unwrap();
     }
 }

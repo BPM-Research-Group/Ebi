@@ -121,13 +121,13 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
             EbiInput::String(_) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
-            EbiInput::Usize(_) => {
+            EbiInput::Usize(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
             EbiInput::FileHandler(_) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
-            EbiInput::Fraction(_) => {
+            EbiInput::Fraction(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
             EbiInput::Object(EbiObject::Executions(_), _) => {
@@ -165,7 +165,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
-        &[&EbiInputType::Usize],
+        &[&EbiInputType::Usize(None, None, None)],
     ],
     input_names: &["LANGUAGE", "NUMBER_OF_CLUSTERS"],
     input_helps: &["The finite stochastic language.", "The number of clusters."],
@@ -263,13 +263,13 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
             EbiInput::String(_) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
-            EbiInput::Usize(_) => {
+            EbiInput::Usize(_, _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
             EbiInput::FileHandler(_) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
-            EbiInput::Fraction(_) => {
+            EbiInput::Fraction(_, _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
             EbiInput::Object(EbiObject::Executions(_), _) => {
@@ -382,7 +382,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
-        &[&EbiInputType::Usize],
+        &[&EbiInputType::Usize(None, None, Some(1))],
     ],
     input_names: &["FILE", "NUMBER_OF_TRACES"],
     input_helps: &[

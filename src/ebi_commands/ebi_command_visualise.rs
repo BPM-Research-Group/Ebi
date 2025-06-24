@@ -5,7 +5,9 @@ use crate::{
         ebi_object::{EbiObject, EbiObjectType},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
-    }, ebi_objects::scalable_vector_graphics::ScalableVectorGraphics, ebi_traits::ebi_trait_graphable::EbiTraitGraphable
+    },
+    ebi_objects::scalable_vector_graphics::ScalableVectorGraphics,
+    ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
 };
 
 pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
@@ -50,8 +52,8 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             EbiInput::FileHandler(_) => unreachable!(),
             EbiInput::Trait(_, _) => unreachable!(),
             EbiInput::String(_) => unreachable!(),
-            EbiInput::Usize(_) => unreachable!(),
-            EbiInput::Fraction(_) => unreachable!(),
+            EbiInput::Usize(_, _) => unreachable!(),
+            EbiInput::Fraction(_, _) => unreachable!(),
         };
         Ok(EbiOutput::String(result))
     },
@@ -84,7 +86,11 @@ mod tests {
 
     use crate::{
         ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT,
-        ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInput, ebi_object::EbiTraitObject},
+        ebi_framework::{
+            ebi_command::EbiCommand,
+            ebi_input::{EbiInput, TEST_INPUT_TYPE_FRACTION, TEST_INPUT_TYPE_USIZE},
+            ebi_object::EbiTraitObject,
+        },
         ebi_objects::{
             finite_language::FiniteLanguage,
             stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
@@ -124,7 +130,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn unreachable_usize() {
-        let object = EbiInput::Usize(10);
+        let object = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
             let _ = (execute)(vec![object], None);
         }
@@ -133,7 +139,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn unreachable_fraction() {
-        let object = EbiInput::Fraction(Fraction::one());
+        let object = EbiInput::Fraction(Fraction::one(), &TEST_INPUT_TYPE_FRACTION);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
             let _ = (execute)(vec![object], None);
         }
