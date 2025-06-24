@@ -1,16 +1,10 @@
-use crate::math::distances::{DistanceMatrix, WeightedDistances};
+use crate::math::distances::WeightedDistances;
+use crate::math::fraction_f64::FractionF64;
 use crate::math::traits::Zero;
 use crate::optimisation_algorithms::network_simplex::NetworkSimplex;
-use crate::{
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::fraction_f64::FractionF64,
-};
 use anyhow::{Context, Result};
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
+use rayon::iter::ParallelIterator;
 use rayon::prelude::*;
-use std::sync::Arc;
-
-use super::earth_movers_stochastic_conformance::EarthMoversStochasticConformance;
 
 /// Authored by Leonhard Mühlmeyer (2024)
 /// Implementation of the Earth Movers Stochastic Conformance Cheching (EMSC) described in

@@ -68,7 +68,7 @@ macro_rules! lpn {
                 while let Some(state_index) = queue.pop() {
                     let state = graph.get_state(state_index).clone();
 
-                    // println!("marking {}, state_index {}", state, state_index);
+                    // log::debug!("marking {}, state_index {}", state, state_index);
 
                     let enabled_transitions = self.get_enabled_transitions(&state);
 
@@ -80,7 +80,7 @@ macro_rules! lpn {
                         if new {
                             queue.push(child_state_index);
 
-                            // println!(
+                            // log::debug!(
                             //     "\tnew child\tmarking {}, state_index {}",
                             //     child_state, child_state_index
                             // );
@@ -92,7 +92,7 @@ macro_rules! lpn {
                             self.is_transition_silent(transition),
                         );
 
-                        // println!("\tgraph {}", graph);
+                        // log::debug!("\tgraph {}", graph);
 
                         if graph.search_for_non_silent_cycle(child_state_index) {
                             return Ok(true);
@@ -165,7 +165,7 @@ impl CycleGraph {
         let mut queue = vec![];
         queue.push(state);
 
-        // println!("\tsearch for silent cycle state index {}", state);
+        // log::debug!("\tsearch for silent cycle state index {}", state);
 
         while let Some(state) = queue.pop() {
             for (predecessor, edge_silent) in self.edges[state]
@@ -187,8 +187,8 @@ impl CycleGraph {
             }
         }
 
-        // println!("\t\t reached {:?}", reached);
-        // println!("\t\tr_silent {:?}", reached_with_non_silent_transition);
+        // log::debug!("\t\t reached {:?}", reached);
+        // log::debug!("\t\tr_silent {:?}", reached_with_non_silent_transition);
 
         false
     }

@@ -105,13 +105,13 @@ impl Importable for LolaNet {
             .read_places(&mut lpn)
             .with_context(|| "Parsing places.")?;
 
-        // println!("places {:?}", place_id_2_place);
+        // log::debug!("places {:?}", place_id_2_place);
 
         tokeniser
             .read_initial_marking(&place_id_2_place, &mut lpn)
             .with_context(|| "Parsing initial marking.")?;
 
-        // println!("marking {:?}", lpn.get_initial_marking());
+        // log::debug!("marking {:?}", lpn.get_initial_marking());
 
         tokeniser
             .read_transitions(place_id_2_place, &mut lpn)
@@ -286,7 +286,7 @@ impl<'a> Tokeniser<'a> {
             if index == 0 {
                 //, and ; are tokens, so preserve them (note that trim has been applied as an invariant)
                 if let Some((pos_next, _)) = self.remainder.char_indices().nth(2) {
-                    // println!("\tfound , or ' at {}, pos {}", index, pos_next);
+                    // log::debug!("\tfound , or ' at {}, pos {}", index, pos_next);
                     index = pos_next;
                     (token, remainder) = self.remainder.split_at(index);
                     token = token.trim_end();
@@ -299,13 +299,13 @@ impl<'a> Tokeniser<'a> {
                 (token, remainder) = self.remainder.split_at(index);
             }
             self.remainder = remainder.trim_start();
-            // println!("token {}", token);
+            // log::debug!("token {}", token);
             Some(token)
         } else {
             //last token
             let token = self.remainder;
             self.remainder = "";
-            // println!("token {}", token);
+            // log::debug!("token {}", token);
             Some(token)
         }
     }

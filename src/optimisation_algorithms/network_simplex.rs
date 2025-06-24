@@ -1327,9 +1327,9 @@ where
     /// ```ignore
     /// // Assuming `simplex` is an instance of `NetworkSimplex` with optimal flow.
     /// if let Some(total_cost) = simplex.get_result() {
-    ///     println!("The total flow cost is: {}", total_cost);
+    ///     log::debug!("The total flow cost is: {}", total_cost);
     /// } else {
-    ///     println!("The problem is not in an optimal state.");
+    ///     log::debug!("The problem is not in an optimal state.");
     /// }
     /// ```
     pub fn get_result(&self) -> Option<T> {

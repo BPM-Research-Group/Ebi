@@ -254,7 +254,7 @@ impl<DState: Displayable, LState: Displayable> dyn StochasticDeterministicSemant
                 Fraction::one(),
                 vec![],
                 self.get_deterministic_initial_state()?
-                    .ok_or_else(|| anyhow!("Cannot get alignment from an empty language."))?,
+                    .ok_or_else(|| anyhow!("Cannot get deterministic initial state."))?,
             ),
             Fraction::one(),
         );
@@ -263,12 +263,12 @@ impl<DState: Displayable, LState: Displayable> dyn StochasticDeterministicSemant
         while let Some((z, priority)) = queue.pop() {
             match z {
                 Z::Prefix(prefix_probability, prefix, q_state) => {
+                    // log::debug!("queue length: {}", queue.len() + 1);
                     // log::debug!(
-                    //     "queue length: {}, queue head: prefix {:?}, q-state {:?}, priority {:.4}",
-                    //     queue.len(),
+                    //     "queue head: prefix {:?}, q-state {:?}, priority {:.4}",
                     //     prefix,
                     //     q_state,
-                    //     priority
+                    //     priority,
                     // );
 
                     //see whether we are done
@@ -284,26 +284,29 @@ impl<DState: Displayable, LState: Displayable> dyn StochasticDeterministicSemant
                     //check whether we can terminate
                     let termination_probability =
                         self.get_deterministic_termination_probability(&q_state);
+                        log::debug!("\ttermination probability {:.4}", termination_probability);
                     if termination_probability.is_positive() {
                         let mut trace_probability = termination_probability;
                         trace_probability *= &prefix_probability;
                         queue.push(Z::Trace(prefix.clone()), trace_probability);
+
+                        log::debug!("\tpush trace of length {} to queue, queue length {}", prefix.len(), queue.len());
                     }
 
                     //follow outgoing activities
                     let enabled_activities = self.get_deterministic_enabled_activities(&q_state);
-                    // log::debug!("\tenabled activities: {}", enabled_activities.len());
+                    log::debug!("\tenabled activities: {}", enabled_activities.len());
                     for activity in enabled_activities {
-                        // log::debug!(
-                        //     "\t\tconsider activity {:?} {}",
-                        //     activity,
-                        //     self.get_activity_key().deprocess_activity(&activity)
-                        // );
+                        log::debug!(
+                            "\t\tconsider activity {:?} {}",
+                            activity,
+                            self.get_activity_key().deprocess_activity(&activity)
+                        );
 
                         let new_q_state =
                             self.execute_deterministic_activity(&q_state, activity)?;
 
-                        // log::debug!("\t\tq-state after activity {:?}", new_q_state);
+                        log::debug!("\t\tq-state after activity {:?}", new_q_state);
 
                         let livelock_probability = self
                             .get_deterministic_non_decreasing_livelock_probability(
@@ -327,7 +330,7 @@ impl<DState: Displayable, LState: Displayable> dyn StochasticDeterministicSemant
                                 Z::Prefix(new_probability, new_prefix, new_q_state),
                                 new_priority,
                             );
-                            // log::debug!("\t\t\tpush to queue, queue length {}\n{:?}", queue.len(), queue);
+                            log::debug!("\t\t\tpush prefix to queue, queue length {}", queue.len());
                         } else {
                             total_non_livelock_probability -= &prefix_probability;
                         }

@@ -4,7 +4,7 @@ use std::{
     sync::atomic::AtomicBool,
 };
 
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefMutIterator, ParallelIterator};
 
 use crate::math::traits::{One, Zero};
@@ -15,7 +15,7 @@ use super::fraction::Fraction;
  * It is rather unfortunate, but there doesn't seem to be a Rust library that supports matrix operations (inversion) on fractional data types.
  * Hence, we have to do with these probably sub-optimal implementations.
  */
-#[derive(PartialEq)]
+#[derive(PartialEq, Debug)]
 pub struct Matrix {
     rows: Vec<Vec<Fraction>>,
     number_of_columns: usize, //keep track of the number of columns, even if there are no rows
@@ -80,7 +80,9 @@ impl Matrix {
     }
 
     pub fn inverse(&mut self) -> Result<()> {
-        assert!(self.get_number_of_columns() == self.get_number_of_rows());
+        if self.get_number_of_columns() != self.get_number_of_rows() {
+            return Err(anyhow!("can only take the inverse of a square matrix"));
+        }
 
         //optimisation: size-zero matrix
         if self.get_number_of_rows().is_zero() {
@@ -126,7 +128,7 @@ impl Matrix {
             return Ok(());
         }
 
-        // log::info!("compute inverse of {}", self);
+        // log::debug!("\t\tcompute inverse of {}", self);
 
         //extend the rows with the identity matrix
         let n = self.get_number_of_rows();
@@ -136,12 +138,12 @@ impl Matrix {
         }
         self.number_of_columns += n;
 
-        // log::info!("add identity       {}", self);
+        // log::debug!("\t\tadd identity       {}", self);
 
         //solve
         self.solve()?;
 
-        // log::info!("solved             {}", self);
+        // log::debug!("\t\tsolved             {}", self);
 
         //reduce the rows
         for (_, row) in self.rows.iter_mut().enumerate() {
@@ -177,26 +179,35 @@ impl Matrix {
     }
 
     pub fn solve(&mut self) -> Result<()> {
-        // row-reduced echelon form
         if self.rows.len() == 0 {
             return Ok(());
         }
-        for i in 0..self.rows.len() - 1 {
-            if self.rows[i][i].is_zero() {
+
+        for row_a in 0..self.rows.len() - 1 {
+            if self.rows[row_a][row_a].is_zero() {
                 continue;
             } else {
-                for j in i..self.rows.len() - 1 {
-                    let factor = &self.rows[j + 1][i] / &self.rows[i][i];
-                    for k in i..self.get_number_of_columns() {
-                        let mut old = self.rows[i][k].clone();
-                        old *= &factor;
-                        self.rows[j + 1][k] -= old;
+                for row_b in row_a..self.rows.len() - 1 {
+                    //optimisation: do not attempt to add a factor of 0
+                    if !self.rows[row_b + 1][row_a].is_zero() {
+                        let factor = &self.rows[row_b + 1][row_a] / &self.rows[row_a][row_a];
+                        // log::debug!(
+                        //     "\t\t\t\t\tfactor row_a {}, row_b {}, {}",
+                        //     row_a, row_b, factor
+                        // );
+                        for column in row_a..self.get_number_of_columns() {
+                            let mut old = self.rows[row_a][column].clone();
+                            old *= &factor;
+                            self.rows[row_b + 1][column] -= old;
+                        }
+
+                        // log::debug!("\t\t\t       now {}", self);
                     }
                 }
             }
         }
 
-        // log::info!("row-reduced echelon{}", self);
+        // log::debug!("\t\trow-reduced echelon{}", self);
 
         // log::info!("number of columns {}", self.get_number_of_columns());
 
@@ -217,7 +228,7 @@ impl Matrix {
             }
         }
 
-        // log::info!("second step        {}", self);
+        // log::debug!("\t\tsecond step        {}", self);
 
         // log::info!("second step done");
 
@@ -373,16 +384,16 @@ impl std::fmt::Display for Matrix {
     }
 }
 
-impl std::fmt::Debug for Matrix {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}x{} matrix",
-            self.get_number_of_rows(),
-            self.get_number_of_columns()
-        )
-    }
-}
+// impl std::fmt::Debug for Matrix {
+//     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+//         write!(
+//             f,
+//             "{}x{} matrix",
+//             self.get_number_of_rows(),
+//             self.get_number_of_columns()
+//         )
+//     }
+// }
 
 impl From<Vec<Fraction>> for Matrix {
     fn from(value: Vec<Fraction>) -> Self {
@@ -422,6 +433,7 @@ impl Mul<Vec<Fraction>> for Matrix {
 
 #[cfg(test)]
 mod tests {
+
     use crate::math::{fraction::Fraction, matrix::Matrix};
 
     #[test]
@@ -466,8 +478,8 @@ mod tests {
 
         m.inverse().unwrap();
 
-        // log::debug!("\t\tinverted matrix    {}", m);
-        // log::debug!("\t\tcorrect inverse    {}", i);
+        log::debug!("\t\tinverted matrix    {:?}", m);
+        log::debug!("\t\tcorrect inverse    {:?}", i);
 
         assert_eq!(m, i);
     }

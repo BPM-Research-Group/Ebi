@@ -69,8 +69,8 @@ impl WeightedTriangularDistanceMatrix {
             .collect::<Vec<_>>();
         let weights_b = weights_a.clone();
 
-        // println!("weights_a {:?}", weights_a);
-        // println!("weights_b {:?}", weights_b);
+        // log::debug!("weights_a {:?}", weights_a);
+        // log::debug!("weights_b {:?}", weights_b);
 
         let progress_bar =
             EbiCommand::get_progress_bar_ticks((lang.len() * lang.len()).try_into().unwrap());
@@ -95,7 +95,7 @@ impl WeightedTriangularDistanceMatrix {
                 .collect();
         });
 
-        // println!("distances {:?}", distances);
+        // log::debug!("distances {:?}", distances);
 
         progress_bar.finish_and_clear();
 
@@ -134,7 +134,7 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
     }
 
     fn distance(&self, index_a: usize, index_b: usize) -> &Fraction {
-        // println!("distance {}, {}", index_a, index_b);
+        // log::debug!("distance {}, {}", index_a, index_b);
         if index_a == index_b {
             &self.zero
         } else if index_a < index_b {
