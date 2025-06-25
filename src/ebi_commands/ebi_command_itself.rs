@@ -172,7 +172,7 @@ fn manual() -> Result<EbiOutput> {
 
                 //mandatoryness
                 if let Some(default) = ebi_input::default(input_types) {
-                    writeln!(f, "&\\textit{{Mandatory:}} \\quad no; it can be given on STDIN by giving a `-' on the command line. If no value is provided, a default of {} will be used.\\\\", default)?;
+                    writeln!(f, "&\\textit{{Mandatory:}} \\quad no: if no value is provided, a default of {} will be used. It can also be provided on STDIN by giving a `-' on the command line.\\\\", default)?;
                 } else {
                     writeln!(f, "&\\textit{{Mandatory:}} \\quad yes, though it can be given on STDIN by giving a `-' on the command line.\\\\")?;
                 }
