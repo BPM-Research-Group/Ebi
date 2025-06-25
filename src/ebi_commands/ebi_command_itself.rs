@@ -197,8 +197,11 @@ fn manual() -> Result<EbiOutput> {
 
                     if arg.get_short().is_none() && arg.get_long().is_none() {
                         //custom argument
-
-                        writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes"} else {"no"} )?;
+                        if let Some(default) = arg.get_default_values().iter().next() {
+                            writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes".to_owned()} else {format!("no; if not provided, a default value of {} will be used", default.to_string_lossy())} )?;
+                        } else {
+                            writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes"} else {"no"} )?;
+                        }
                     } else {
                         writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
                     }
