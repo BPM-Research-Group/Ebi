@@ -82,6 +82,24 @@ pub enum EbiInputType {
 }
 
 impl EbiInputType {
+    pub fn default(&self) -> Option<String> {
+        match self {
+            EbiInputType::Trait(_) => None,
+            EbiInputType::Object(_) => None,
+            EbiInputType::AnyObject => None,
+            EbiInputType::FileHandler => None,
+            EbiInputType::String => None,
+            EbiInputType::Usize(_, _, integer) => match integer {
+                Some(integer) => Some(integer.to_string()),
+                None => None,
+            },
+            EbiInputType::Fraction(_, _, default) => match default {
+                Some(fraction) => Some(fraction.to_string()),
+                None => None,
+            },
+        }
+    }
+
     pub fn get_article(&self) -> &str {
         match self {
             EbiInputType::Trait(t) => t.get_article(),
@@ -380,6 +398,16 @@ impl Display for EbiInputType {
     }
 }
 
+/**
+ * Returns true if one of the input types has a default.
+ */
+pub fn default(input_types: &[&EbiInputType]) -> Option<String> {
+    input_types
+        .iter()
+        .filter_map(|input_type| input_type.default())
+        .next()
+}
+
 #[derive(Debug, Clone)]
 pub enum EbiTraitImporter {
     FiniteLanguage(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitFiniteLanguage>>), //finite set of traces
@@ -563,7 +591,9 @@ pub fn get_reader(cli_matches: &ArgMatches, cli_id: &str) -> Result<MultipleRead
             return Ok(MultipleReader::from_file(file));
         }
     } else {
-        return MultipleReader::from_stdin();
+        return Err(anyhow!(
+            "No argument given, or it could not be parsed as a path."
+        ));
     }
 }
 

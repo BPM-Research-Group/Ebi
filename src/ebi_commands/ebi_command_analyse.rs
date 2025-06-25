@@ -8,10 +8,10 @@ pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
     explanation_short: "Analyse a stochastic language.",
     explanation_long: None,
     children: &[
-        &EBI_ANALYSE_ALL,
-        &EBI_ANALYSE_COMPLETENESS,
-        &EBI_ANALYSE_COVERAGE,
-        &EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE,
+        // &EBI_ANALYSE_ALL,
+        // &EBI_ANALYSE_COMPLETENESS,
+        // &EBI_ANALYSE_COVERAGE,
+        // &EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE,
         &EBI_ANALYSE_MEDOID,
         &EBI_ANALYSE_MINPROB,
         &EBI_ANALYSE_MODE,
@@ -236,7 +236,7 @@ If there are more than one such trace, an arbitrary one is returned."),
     exact_arithmetic: true, 
     input_types: &[ 
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)], 
-        &[ &EbiInputType::Usize(None, None, Some(1))] 
+        &[ &EbiInputType::Usize(None, None, Some(1))],
     ],
     input_names: &[ "FILE", "NUMBER_OF_TRACES"],
     input_helps: &[ "Any object with a finite stochastic language.", "The number of traces that should be extracted."],

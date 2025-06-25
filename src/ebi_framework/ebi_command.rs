@@ -150,15 +150,20 @@ impl EbiCommand {
                     .zip(input_types.iter().zip(input_help.iter()))
                     .enumerate()
                 {
-                    let arg = Arg::new(format!("{}x{}", input_name, i))
+                    let mut arg = Arg::new(format!("{}x{}", input_name, i))
                         .action(ArgAction::Set)
                         .value_name(input_name)
                         .help(input_help)
-                        .required(true)
                         .value_parser(EbiInputType::get_parser_of_list(input_type))
                         .long_help(EbiInputType::possible_inputs_as_strings_with_articles(
                             input_type, " and ",
                         ));
+
+                    if let Some(default) = ebi_input::default(input_type) {
+                        arg = arg.required(false).default_value(default);
+                    } else {
+                        arg = arg.required(true);
+                    }
 
                     command = command.arg(arg);
                 }
