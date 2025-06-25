@@ -6,7 +6,7 @@ use itertools::Itertools;
 use layout::{core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
-use crate::{ebi_framework::{    ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, ebi_objects::scalable_vector_graphics::ToSVGMut, text::Joiner};
+use crate::{ebi_framework::{    ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::{self, EbiInputType}, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, ebi_objects::scalable_vector_graphics::ToSVGMut, text::Joiner};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
  □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
@@ -171,7 +171,11 @@ fn manual() -> Result<EbiOutput> {
                 writeln!(f, "&{}\\\\", input_help)?;
 
                 //mandatoryness
-                writeln!(f, "&\\textit{{Mandatory:}} \\quad yes, though it can be given on STDIN by giving a `-' on the command line.\\\\")?;
+                if let Some(default) = ebi_input::default(input_types) {
+                    writeln!(f, "&\\textit{{Mandatory:}} \\quad no; it can be given on STDIN by giving a `-' on the command line. If no value is provided, a default of {} will be used.\\\\", default)?;
+                } else {
+                    writeln!(f, "&\\textit{{Mandatory:}} \\quad yes, though it can be given on STDIN by giving a `-' on the command line.\\\\")?;
+                }
 
                 //accepted values
                 writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", EbiInputType::get_possible_inputs_with_latex(input_types).join_with(", ", " and "))?;
