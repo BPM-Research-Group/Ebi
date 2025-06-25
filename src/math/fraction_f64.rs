@@ -14,7 +14,10 @@ use anyhow::{Error, Result, anyhow};
 use rand::Rng;
 
 use crate::{
-    ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable},
+    ebi_framework::{
+        ebi_input::EbiInput, ebi_output::EbiOutput, ebi_trait::FromEbiTraitObject,
+        exportable::Exportable, infoable::Infoable,
+    },
     math::fraction::FractionRandomCache,
     optimisation_algorithms::network_simplex_value_type::{IsFloat, MulWithFloat},
 };
@@ -251,10 +254,10 @@ impl From<&Arc<FractionF64>> for FractionF64 {
     }
 }
 
-impl crate::ebi_framework::ebi_trait::FromEbiTraitObject for FractionF64 {
-    fn from_trait_object(object: crate::ebi_framework::ebi_input::EbiInput) -> Result<Box<Self>> {
+impl FromEbiTraitObject for FractionF64 {
+    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
-            crate::ebi_framework::ebi_input::EbiInput::Fraction(e) => Ok(Box::new(e)),
+            EbiInput::Fraction(e, _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
                 "cannot read {} {} as a fraction",
                 object.get_type().get_article(),
