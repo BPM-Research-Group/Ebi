@@ -677,8 +677,8 @@ pub const JAVA_OBJECT_HANDLERS_ROOTLOGDIV: &[JavaObjectHandler] = &[JavaObjectHa
     input_gui: None,
 }];
 pub const JAVA_OBJECT_HANDLERS_BOOL: &[JavaObjectHandler] = &[JavaObjectHandler {
-    name: "bool",
-    java_class: "boolean",
+    name: "boolean",
+    java_class: "java.lang.Boolean",
     translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiBoolean.fromEbiString"),
     translator_java_to_ebi: Some("org.processmining.ebi.objects.EbiBoolean.toEbiString"),
     input_gui: None,
