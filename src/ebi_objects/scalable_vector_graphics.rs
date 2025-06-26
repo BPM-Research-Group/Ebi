@@ -7,7 +7,6 @@ use crate::{
         ebi_output::{EbiObjectExporter, EbiOutput},
         exportable::Exportable,
         infoable::Infoable,
-        prom_link::JavaObjectHandler,
     },
     ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
 };
@@ -38,13 +37,15 @@ pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::StochasticProcessTree(ScalableVectorGraphics::export_from_object),
         EbiObjectExporter::ScalableVectorGraphics(ScalableVectorGraphics::export_from_object),
     ],
-    java_object_handlers: &[JavaObjectHandler {
-        name: "svg",
-        java_class: "com.kitfox.svg.SVGDiagram",
-        translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiSvg.fromEbiString"),
-        translator_java_to_ebi: None,
-        input_gui: None,
-    }],
+    java_object_handlers: &[
+    //     JavaObjectHandler {
+    //     name: "svg",
+    //     java_class: "com.kitfox.svg.SVGDiagram",
+    //     translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiSvg.fromEbiString"),
+    //     translator_java_to_ebi: None,
+    //     input_gui: None,
+    // }
+    ],
 };
 
 #[derive(Clone)]
