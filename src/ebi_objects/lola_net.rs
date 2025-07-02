@@ -180,6 +180,9 @@ impl Exportable for LolaNet {
             EbiOutput::Object(EbiObject::BusinessProcessModelAndNotation(_)) => Err(anyhow!(
                 "Cannot export business process model and notation as Lolanet."
             )),
+            EbiOutput::Object(EbiObject::StochasticBusinessProcessModelAndNotation(_)) => Err(anyhow!(
+                "Cannot export business process model and notation as Lolanet."
+            )),
         }
     }
 

@@ -179,6 +179,9 @@ impl Exportable for PetriNetMarkupLanguage {
             EbiOutput::Object(EbiObject::BusinessProcessModelAndNotation(_)) => Err(anyhow!(
                 "Cannot export business process model and notation as PNML."
             )),
+            EbiOutput::Object(EbiObject::StochasticBusinessProcessModelAndNotation(_)) => Err(anyhow!(
+                "Cannot export stochastic business process model and notation as PNML."
+            )),
         }
     }
 

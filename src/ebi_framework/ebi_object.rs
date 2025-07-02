@@ -14,6 +14,7 @@ use crate::{
         finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet,
         language_of_alignments::LanguageOfAlignments, process_tree::ProcessTree,
         scalable_vector_graphics::ScalableVectorGraphics,
+        stochastic_business_process_model_and_notation::StochasticBusinessProcessModelAndNotation,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
         stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
@@ -63,6 +64,7 @@ pub enum EbiObjectType {
     DirectlyFollowsGraph,
     ScalableVectorGraphics,
     BusinessProcessModelAndNotation,
+    StochasticBusinessProcessModelAndNotation,
 }
 
 impl EbiObjectType {
@@ -85,6 +87,7 @@ impl EbiObjectType {
             EbiObjectType::DirectlyFollowsGraph => "a",
             EbiObjectType::ScalableVectorGraphics => "a",
             EbiObjectType::BusinessProcessModelAndNotation => "a",
+            EbiObjectType::StochasticBusinessProcessModelAndNotation => "a",
         }
     }
 
@@ -158,6 +161,8 @@ impl Display for EbiObjectType {
                 EbiObjectType::ScalableVectorGraphics => "scalable vector graphics",
                 EbiObjectType::BusinessProcessModelAndNotation =>
                     "business process modelling and notation",
+                EbiObjectType::StochasticBusinessProcessModelAndNotation =>
+                    "stochastic business process modelling and notation",
             }
         )
     }
@@ -182,6 +187,7 @@ pub enum EbiObject {
     DirectlyFollowsGraph(DirectlyFollowsGraph),
     ScalableVectorGraphics(ScalableVectorGraphics),
     BusinessProcessModelAndNotation(BusinessProcessModelAndNotation),
+    StochasticBusinessProcessModelAndNotation(StochasticBusinessProcessModelAndNotation),
 }
 
 impl EbiObject {
@@ -214,6 +220,9 @@ impl EbiObject {
             EbiObject::BusinessProcessModelAndNotation(_) => {
                 EbiObjectType::BusinessProcessModelAndNotation
             }
+            EbiObject::StochasticBusinessProcessModelAndNotation(_) => {
+                EbiObjectType::StochasticBusinessProcessModelAndNotation
+            }
         }
     }
 }
@@ -238,6 +247,7 @@ impl Display for EbiObject {
             EbiObject::DirectlyFollowsGraph(o) => write!(f, "{}", o),
             EbiObject::ScalableVectorGraphics(o) => write!(f, "{}", o),
             EbiObject::BusinessProcessModelAndNotation(o) => write!(f, "{}", o),
+            EbiObject::StochasticBusinessProcessModelAndNotation(o) => write!(f, "{}", o),
         }
     }
 }
@@ -262,6 +272,7 @@ impl Infoable for EbiObject {
             EbiObject::DirectlyFollowsGraph(o) => o.info(f),
             EbiObject::ScalableVectorGraphics(o) => o.info(f),
             EbiObject::BusinessProcessModelAndNotation(o) => o.info(f),
+            EbiObject::StochasticBusinessProcessModelAndNotation(o) => o.info(f),
         }
     }
 }

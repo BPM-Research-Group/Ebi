@@ -124,9 +124,12 @@ impl Exportable for ScalableVectorGraphics {
             EbiOutput::Object(EbiObject::DirectlyFollowsGraph(object)) => {
                 object.to_svg()?.export(f)
             }
-            EbiOutput::Object(EbiObject::BusinessProcessModelAndNotation(_)) => {
-                Err(anyhow!("cannot export BPMN as SVG"))
-            }
+            EbiOutput::Object(EbiObject::BusinessProcessModelAndNotation(_)) => Err(anyhow!(
+                "cannot export business process model an notation as SVG"
+            )),
+            EbiOutput::Object(EbiObject::StochasticBusinessProcessModelAndNotation(_)) => Err(
+                anyhow!("cannot export stochastic business process model an notation as SVG"),
+            ),
             EbiOutput::Object(EbiObject::ScalableVectorGraphics(object)) => object.export(f),
             EbiOutput::String(_) => Err(anyhow!("cannot export string as SVG")),
             EbiOutput::Usize(_) => Err(anyhow!("cannot export usize as SVG")),

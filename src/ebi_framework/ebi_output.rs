@@ -26,6 +26,10 @@ use crate::{
         language_of_alignments::{EBI_LANGUAGE_OF_ALIGNMENTS, LanguageOfAlignments},
         process_tree::{EBI_PROCESS_TREE, ProcessTree},
         scalable_vector_graphics::{EBI_SCALABLE_VECTOR_GRAPHICS, ScalableVectorGraphics},
+        stochastic_business_process_model_and_notation::{
+            EBI_STOCHASTIC_BUSINESS_PROCESS_MODEL_AND_NOTATION,
+            StochasticBusinessProcessModelAndNotation,
+        },
         stochastic_deterministic_finite_automaton::{
             EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON, StochasticDeterministicFiniteAutomaton,
         },
@@ -246,6 +250,14 @@ impl EbiOutputType {
                     &EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION,
                 )
             }
+            EbiOutputType::ObjectType(EbiObjectType::StochasticBusinessProcessModelAndNotation) => {
+                EbiExporter::Object(
+                    &&EbiObjectExporter::StochasticBusinessProcessModelAndNotation(
+                        StochasticBusinessProcessModelAndNotation::export_from_object,
+                    ),
+                    &EBI_STOCHASTIC_BUSINESS_PROCESS_MODEL_AND_NOTATION,
+                )
+            }
             EbiOutputType::String => EbiExporter::String,
             EbiOutputType::Usize => EbiExporter::Usize,
             EbiOutputType::Fraction => EbiExporter::Fraction,
@@ -419,6 +431,9 @@ pub enum EbiObjectExporter {
     DirectlyFollowsGraph(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     ScalableVectorGraphics(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     BusinessProcessModelAndNotation(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
+    StochasticBusinessProcessModelAndNotation(
+        fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>,
+    ),
 }
 
 impl EbiObjectExporter {
@@ -455,6 +470,9 @@ impl EbiObjectExporter {
             EbiObjectExporter::BusinessProcessModelAndNotation(_) => {
                 EbiObjectType::BusinessProcessModelAndNotation
             }
+            EbiObjectExporter::StochasticBusinessProcessModelAndNotation(_) => {
+                EbiObjectType::StochasticBusinessProcessModelAndNotation
+            }
         }
     }
 
@@ -479,6 +497,7 @@ impl EbiObjectExporter {
             EbiObjectExporter::DirectlyFollowsGraph(exporter) => (exporter)(object, f),
             EbiObjectExporter::ScalableVectorGraphics(exporter) => (exporter)(object, f),
             EbiObjectExporter::BusinessProcessModelAndNotation(exporter) => (exporter)(object, f),
+            EbiObjectExporter::StochasticBusinessProcessModelAndNotation(exporter) => (exporter)(object, f),
         }
     }
 }
