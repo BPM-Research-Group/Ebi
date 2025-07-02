@@ -16,6 +16,7 @@ use crate::{
         petri_net_markup_language::EBI_PETRI_NET_MARKUP_LANGUAGE,
         portable_document_format::EBI_PORTABLE_DOCUMENT_FORMAT, process_tree::EBI_PROCESS_TREE,
         scalable_vector_graphics::EBI_SCALABLE_VECTOR_GRAPHICS,
+        stochastic_business_process_model_and_notation::EBI_STOCHASTIC_BUSINESS_PROCESS_MODEL_AND_NOTATION,
         stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON,
         stochastic_directly_follows_model::EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL,
         stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
@@ -37,6 +38,7 @@ use super::{
  * they are attempted in order. Thus, the more restrictive formats should come first.
  */
 pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
+    EBI_STOCHASTIC_BUSINESS_PROCESS_MODEL_AND_NOTATION,
     EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION,
     EBI_COMPRESSED_EVENT_LOG,
     EBI_DIRECTLY_FOLLOWS_GRAPH,
