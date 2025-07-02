@@ -1,11 +1,12 @@
-use anyhow::anyhow;
+use anyhow::{Result, anyhow};
 use std::fmt::Display;
 
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
-    ebi_input::{self, EbiObjectImporter},
+    ebi_input::{self, EbiInput, EbiObjectImporter},
     ebi_object::EbiObject,
     ebi_output::{EbiObjectExporter, EbiOutput},
+    ebi_trait::FromEbiTraitObject,
     exportable::Exportable,
     importable::Importable,
     infoable::Infoable,
@@ -49,6 +50,19 @@ impl Importable for BusinessProcessModelAndNotation {
         Self: Sized,
     {
         todo!()
+    }
+}
+
+impl FromEbiTraitObject for BusinessProcessModelAndNotation {
+    fn from_trait_object(object: ebi_input::EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::BusinessProcessModelAndNotation(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "cannot read {} {} as a business process model and notation",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
     }
 }
 

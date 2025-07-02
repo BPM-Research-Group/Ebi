@@ -1,11 +1,12 @@
-use anyhow::anyhow;
+use anyhow::{Result, anyhow};
 use std::fmt::Display;
 
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
-    ebi_input::{self, EbiObjectImporter},
+    ebi_input::{self, EbiInput, EbiObjectImporter},
     ebi_object::EbiObject,
     ebi_output::{EbiObjectExporter, EbiOutput},
+    ebi_trait::FromEbiTraitObject,
     exportable::Exportable,
     importable::Importable,
     infoable::Infoable,
@@ -25,12 +26,16 @@ pub const EBI_STOCHASTIC_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = E
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticBusinessProcessModelAndNotation>),
     trait_importers: &[],
-    object_importers: &[EbiObjectImporter::StochasticBusinessProcessModelAndNotation(
-        StochasticBusinessProcessModelAndNotation::import_as_object,
-    )],
-    object_exporters: &[EbiObjectExporter::StochasticBusinessProcessModelAndNotation(
-        StochasticBusinessProcessModelAndNotation::export_from_object,
-    )],
+    object_importers: &[
+        EbiObjectImporter::StochasticBusinessProcessModelAndNotation(
+            StochasticBusinessProcessModelAndNotation::import_as_object,
+        ),
+    ],
+    object_exporters: &[
+        EbiObjectExporter::StochasticBusinessProcessModelAndNotation(
+            StochasticBusinessProcessModelAndNotation::export_from_object,
+        ),
+    ],
     java_object_handlers: &[],
 };
 
@@ -39,9 +44,9 @@ pub struct StochasticBusinessProcessModelAndNotation {}
 
 impl Importable for StochasticBusinessProcessModelAndNotation {
     fn import_as_object(reader: &mut dyn std::io::BufRead) -> anyhow::Result<EbiObject> {
-        Ok(EbiObject::StochasticBusinessProcessModelAndNotation(Self::import(
-            reader,
-        )?))
+        Ok(EbiObject::StochasticBusinessProcessModelAndNotation(
+            Self::import(reader)?,
+        ))
     }
 
     fn import(reader: &mut dyn std::io::BufRead) -> anyhow::Result<Self>
@@ -52,10 +57,27 @@ impl Importable for StochasticBusinessProcessModelAndNotation {
     }
 }
 
+impl FromEbiTraitObject for StochasticBusinessProcessModelAndNotation {
+    fn from_trait_object(object: ebi_input::EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::StochasticBusinessProcessModelAndNotation(e), _) => {
+                Ok(Box::new(e))
+            }
+            _ => Err(anyhow!(
+                "cannot read {} {} as a stochastic business process model and notation",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
+    }
+}
+
 impl Exportable for StochasticBusinessProcessModelAndNotation {
     fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> anyhow::Result<()> {
         match object {
-            EbiOutput::Object(EbiObject::StochasticBusinessProcessModelAndNotation(bpmn)) => bpmn.export(f),
+            EbiOutput::Object(EbiObject::StochasticBusinessProcessModelAndNotation(bpmn)) => {
+                bpmn.export(f)
+            }
             _ => Err(anyhow!("Cannot export object as BPMN.")),
         }
     }

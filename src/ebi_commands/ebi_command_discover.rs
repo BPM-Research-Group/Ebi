@@ -8,7 +8,10 @@ use crate::{
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_objects::{labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree},
+    ebi_objects::{
+        business_process_model_and_notation::BusinessProcessModelAndNotation,
+        labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree,
+    },
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::fraction::{ConstFraction, Fraction},
     techniques::{
@@ -119,7 +122,47 @@ pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Group {
     name_long: Some("occurrence"),
     explanation_short: "Give each transition a weight that matches the occurrences of its label; silent transitions get a weight of 1.",
     explanation_long: None,
-    children: &[&EBI_DISCOVER_OCCURRENCE_LPN, &EBI_DISCOVER_OCCURRENCE_PTREE],
+    children: &[
+        &EBI_DISCOVER_OCCURRENCE_BPMN,
+        &EBI_DISCOVER_OCCURRENCE_LPN,
+        &EBI_DISCOVER_OCCURRENCE_PTREE,
+    ],
+};
+
+pub const EBI_DISCOVER_OCCURRENCE_BPMN: EbiCommand = EbiCommand::Command {
+    name_short: "bpmn",
+    name_long: Some("business-process-model-and-notation"),
+    explanation_short: "Give each transition an estimated weight based on the occurrences of its nearby labels.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)],
+    ],
+    input_names: &["FILE_1", "FILE_2"],
+    input_helps: &[
+        "A finite stochastic language (log) to get the occurrences from.",
+        "A labelled Petri net with the control flow.",
+    ],
+    execute: |mut inputs, _| {
+        let language = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let bpmn = inputs
+            .remove(0)
+            .to_type::<BusinessProcessModelAndNotation>()?;
+        
+        let sbpmn = todo!();
+
+        Ok(EbiOutput::Object(
+            EbiObject::StochasticBusinessProcessModelAndNotation(sbpmn),
+        ))
+    },
+    output_type: &EbiOutputType::ObjectType(
+        EbiObjectType::StochasticBusinessProcessModelAndNotation,
+    ),
 };
 
 pub const EBI_DISCOVER_OCCURRENCE_LPN: EbiCommand = EbiCommand::Command {
