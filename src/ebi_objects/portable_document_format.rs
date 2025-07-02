@@ -100,6 +100,9 @@ impl Exportable for PortableDocumentFormat {
             EbiOutput::Object(EbiObject::ScalableVectorGraphics(object)) => {
                 object.to_pdf()?.export(f)
             }
+            EbiOutput::Object(EbiObject::BusinessProcessModelAndNotation(_)) => {
+                Err(anyhow!("cannot export BPMN as PDF"))
+            }
             EbiOutput::String(_) => Err(anyhow!("cannot export string as PDF")),
             EbiOutput::Usize(_) => Err(anyhow!("cannot export usize as PDF")),
             EbiOutput::Fraction(_) => Err(anyhow!("cannot export fraction as PDF")),

@@ -10,6 +10,9 @@ use strum_macros::{Display, EnumIter};
 
 use crate::{
     ebi_objects::{
+        business_process_model_and_notation::{
+            BusinessProcessModelAndNotation, EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION,
+        },
         compressed_event_log::{CompressedEventLog, EBI_COMPRESSED_EVENT_LOG},
         deterministic_finite_automaton::{
             DeterministicFiniteAutomaton, EBI_DETERMINISTIC_FINITE_AUTOMATON,
@@ -235,6 +238,14 @@ impl EbiOutputType {
                     &EBI_SCALABLE_VECTOR_GRAPHICS,
                 )
             }
+            EbiOutputType::ObjectType(EbiObjectType::BusinessProcessModelAndNotation) => {
+                EbiExporter::Object(
+                    &&EbiObjectExporter::BusinessProcessModelAndNotation(
+                        BusinessProcessModelAndNotation::export_from_object,
+                    ),
+                    &EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION,
+                )
+            }
             EbiOutputType::String => EbiExporter::String,
             EbiOutputType::Usize => EbiExporter::Usize,
             EbiOutputType::Fraction => EbiExporter::Fraction,
@@ -407,6 +418,7 @@ pub enum EbiObjectExporter {
     Executions(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     DirectlyFollowsGraph(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     ScalableVectorGraphics(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
+    BusinessProcessModelAndNotation(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
 }
 
 impl EbiObjectExporter {
@@ -440,6 +452,9 @@ impl EbiObjectExporter {
             EbiObjectExporter::Executions(_) => EbiObjectType::Executions,
             EbiObjectExporter::DirectlyFollowsGraph(_) => EbiObjectType::DirectlyFollowsGraph,
             EbiObjectExporter::ScalableVectorGraphics(_) => EbiObjectType::ScalableVectorGraphics,
+            EbiObjectExporter::BusinessProcessModelAndNotation(_) => {
+                EbiObjectType::BusinessProcessModelAndNotation
+            }
         }
     }
 
@@ -463,6 +478,7 @@ impl EbiObjectExporter {
             EbiObjectExporter::Executions(exporter) => (exporter)(object, f),
             EbiObjectExporter::DirectlyFollowsGraph(exporter) => (exporter)(object, f),
             EbiObjectExporter::ScalableVectorGraphics(exporter) => (exporter)(object, f),
+            EbiObjectExporter::BusinessProcessModelAndNotation(exporter) => (exporter)(object, f),
         }
     }
 }

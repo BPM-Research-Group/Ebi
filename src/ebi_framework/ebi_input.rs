@@ -499,6 +499,7 @@ pub enum EbiObjectImporter {
     Executions(fn(&mut dyn BufRead) -> Result<EbiObject>),
     StochasticLanguageOfAlignments(fn(&mut dyn BufRead) -> Result<EbiObject>),
     StochasticProcessTree(fn(&mut dyn BufRead) -> Result<EbiObject>),
+    BusinessProcessModelAndNotation(fn(&mut dyn BufRead) -> Result<EbiObject>),
 }
 
 impl EbiObjectImporter {
@@ -531,6 +532,9 @@ impl EbiObjectImporter {
             EbiObjectImporter::ProcessTree(_) => EbiObjectType::ProcessTree,
             EbiObjectImporter::StochasticProcessTree(_) => EbiObjectType::StochasticProcessTree,
             EbiObjectImporter::Executions(_) => EbiObjectType::Executions,
+            EbiObjectImporter::BusinessProcessModelAndNotation(_) => {
+                EbiObjectType::BusinessProcessModelAndNotation
+            }
         }
     }
 
@@ -551,6 +555,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::ProcessTree(importer) => *importer,
             EbiObjectImporter::StochasticProcessTree(importer) => *importer,
             EbiObjectImporter::Executions(importer) => *importer,
+            EbiObjectImporter::BusinessProcessModelAndNotation(importer) => *importer,
         }
     }
 }

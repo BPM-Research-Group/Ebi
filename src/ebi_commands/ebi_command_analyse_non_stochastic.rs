@@ -114,6 +114,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
                 object.bounded()?
             }
             EbiInput::Object(EbiObject::DirectlyFollowsGraph(object), _) => object.bounded()?,
+            EbiInput::Object(EbiObject::BusinessProcessModelAndNotation(_), _) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
 
             EbiInput::Trait(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
@@ -257,6 +260,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
             EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::DirectlyFollowsGraph(object), _) => object.any_traces()?,
+            EbiInput::Object(EbiObject::BusinessProcessModelAndNotation(_), _) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
             EbiInput::Trait(_, _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }

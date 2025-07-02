@@ -35,7 +35,13 @@ use crate::{
 };
 
 use super::{
-    deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
+    deterministic_finite_automaton::DeterministicFiniteAutomaton,
+    directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel,
+    process_tree::ProcessTree,
+    stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+    stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
+    stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+    stochastic_process_tree::StochasticProcessTree,
 };
 
 pub const HEADER: &str = "labelled Petri net";
@@ -126,7 +132,7 @@ impl LabelledPetriNet {
             transition2output_places_cardinality: vec![],
         }
     }
-    
+
     pub fn new_empty_language() -> Self {
         return Self {
             activity_key: ActivityKey::new(),
@@ -357,8 +363,11 @@ impl Exportable for LabelledPetriNet {
             EbiOutput::Object(EbiObject::StochasticLanguageOfAlignments(_)) => Err(anyhow!(
                 "Cannot export stochastic language of alignments as LPN."
             )),
-            EbiOutput::Object(EbiObject::ScalableVectorGraphics(_)) => Err(anyhow!(
-                "Cannot export scalable vector graphics as LPN."
+            EbiOutput::Object(EbiObject::ScalableVectorGraphics(_)) => {
+                Err(anyhow!("Cannot export scalable vector graphics as LPN."))
+            }
+            EbiOutput::Object(EbiObject::BusinessProcessModelAndNotation(_)) => Err(anyhow!(
+                "Cannot export business process model and notation as LPN."
             )),
         }
     }

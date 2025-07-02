@@ -177,6 +177,9 @@ impl Exportable for LolaNet {
             EbiOutput::Object(EbiObject::ScalableVectorGraphics(_)) => Err(anyhow!(
                 "Cannot export scalable vector graphics as Lolanet."
             )),
+            EbiOutput::Object(EbiObject::BusinessProcessModelAndNotation(_)) => Err(anyhow!(
+                "Cannot export business process model and notation as Lolanet."
+            )),
         }
     }
 

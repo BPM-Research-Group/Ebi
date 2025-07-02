@@ -1,7 +1,11 @@
-use fraction::BigFraction;
 use anyhow::Result;
+use fraction::BigFraction;
 
 pub trait Infoable {
+    /**
+     * Provides some information about the object, such as its size, the activities involved in it, additional data, ....
+     * Basically anything that a user may want to know and that does not take too long to compute.
+     */
     fn info(&self, f: &mut impl std::io::Write) -> Result<()>;
 }
 
@@ -14,8 +18,15 @@ impl Infoable for String {
 impl Infoable for BigFraction {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
         match self {
-            fraction::GenericFraction::Rational(_, ratio) => write!(f, "{} bits / {} bits", ratio.numer().bits(), ratio.denom().bits())?,
-            fraction::GenericFraction::Infinity(sign) => write!(f, "{} infinity", sign.to_string())?,
+            fraction::GenericFraction::Rational(_, ratio) => write!(
+                f,
+                "{} bits / {} bits",
+                ratio.numer().bits(),
+                ratio.denom().bits()
+            )?,
+            fraction::GenericFraction::Infinity(sign) => {
+                write!(f, "{} infinity", sign.to_string())?
+            }
             fraction::GenericFraction::NaN => write!(f, "NaN")?,
         }
         Ok(write!(f, "")?)

@@ -73,6 +73,7 @@ pub mod ebi_objects {
     pub mod directly_follows_graph;
     pub mod directly_follows_graph_semantics;
     pub mod portable_document_format;
+    pub mod business_process_model_and_notation;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_event_log;

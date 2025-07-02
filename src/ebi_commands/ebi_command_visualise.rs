@@ -49,6 +49,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::Executions(s), _) => s.to_string(),
             EbiInput::Object(EbiObject::DirectlyFollowsGraph(s), _) => s.to_string(),
             EbiInput::Object(EbiObject::ScalableVectorGraphics(s), _) => s.to_string(),
+            EbiInput::Object(EbiObject::BusinessProcessModelAndNotation(s), _) => s.to_string(),
             EbiInput::FileHandler(_) => unreachable!(),
             EbiInput::Trait(_, _) => unreachable!(),
             EbiInput::String(_) => unreachable!(),
