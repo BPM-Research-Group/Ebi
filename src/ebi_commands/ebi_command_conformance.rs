@@ -18,6 +18,10 @@ use crate::{
         entropic_relevance::EntropicRelvance,
         jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
         unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
+        hellinger_stochastic_conformance::HellingerStochasticConformance,
+        chi_square_stochastic_conformance::ChiSquareStochasticConformance,
+        bhattacharyya_distance::BhattacharyyaDistance,
+        kullback_leibler_divergence::KullbackLeiblerDivergence,
     },
 };
 
@@ -33,6 +37,10 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
         &CONFORMANCE_JSSC,
         &CONFORMANCE_JSSC_SAMPLE,
         &CONFORMANCE_UEMSC,
+        &CONFORMANCE_CSSC,
+        &CONFORMANCE_HSC,
+        &CONFORMANCE_BD,
+        &CONFORMANCE_KLD,
     ],
 };
 
@@ -281,4 +289,156 @@ pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
         ))
     },
     output_type: &EbiOutputType::Fraction,
+};
+
+pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
+    name_short: "cssc",
+    name_long: Some("chi-square-stochastic-conformance"),
+    explanation_short: "Compute Chi-square stochastic conformance.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[
+            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
+            &EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage),
+        ],
+    ],
+    input_names: &["FILE_1", "FILE_2"],
+    input_helps: &[
+        "A finite stochastic language to compare.",
+        "A queriable stochastic language to compare.",
+    ],
+    execute: |mut inputs, _| {
+        let event_log = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+
+        match inputs.remove(0) {
+            EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => Ok(
+                EbiOutput::Fraction(event_log.cssc_log2log(slang).context("Compute CSSC.")?),
+            ),
+            EbiInput::Trait(EbiTraitObject::QueriableStochasticLanguage(slang), _) => Ok(
+                EbiOutput::Fraction(event_log.cssc_log2model(slang).context("Compute CSSC.")?),
+            ),
+            _ => Err(anyhow!("wrong input given")),
+        }
+    },
+    output_type: &EbiOutputType::Fraction,
+};
+
+pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
+    name_short: "hsc",
+    name_long: Some("hellinger-stochastic-conformance"),
+    explanation_short: "Compute Hellinger stochastic conformance.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[
+            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
+            &EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage),
+        ],
+    ],
+    input_names: &["FILE_1", "FILE_2"],
+    input_helps: &[
+        "A finite stochastic language to compare.",
+        "A queriable stochastic language to compare.",
+    ],
+    execute: |mut inputs, _| {
+        let event_log = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+
+        match inputs.remove(0) {
+            EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => Ok(
+                EbiOutput::Fraction(event_log.hsc_log2log(slang).context("Compute HSC.")?),
+            ),
+            EbiInput::Trait(EbiTraitObject::QueriableStochasticLanguage(slang), _) => Ok(
+                EbiOutput::Fraction(event_log.hsc_log2model(slang).context("Compute HSC.")?),
+            ),
+            _ => Err(anyhow!("wrong input given")),
+        }
+    },
+    output_type: &EbiOutputType::Fraction,
+};
+
+pub const CONFORMANCE_BD: EbiCommand = EbiCommand::Command {
+    name_short: "bd",
+    name_long: Some("bhattacharyya"),
+    explanation_short: "Compute Bhattacharyya distance.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[
+            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
+            &EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage),
+        ],
+    ],
+    input_names: &["FILE_1", "FILE_2"],
+    input_helps: &[
+        "A finite stochastic language to compare.",
+        "A queriable stochastic language to compare.",
+    ],
+    execute: |mut inputs, _| {
+        let event_log = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+
+        match inputs.remove(0) {
+            EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => Ok(
+                EbiOutput::Fraction(event_log.bd_log2log(slang).context("Compute BD.")?),
+            ),
+            EbiInput::Trait(EbiTraitObject::QueriableStochasticLanguage(slang), _) => Ok(
+                EbiOutput::Fraction(event_log.bd_log2model(slang).context("Compute BD.")?),
+            ),
+            _ => Err(anyhow!("wrong input given")),
+        }
+    },
+    output_type: &EbiOutputType::Fraction,
+};
+
+pub const CONFORMANCE_KLD: EbiCommand = EbiCommand::Command {
+    name_short: "kld",
+    name_long: Some("kullback-leibler divergence"),
+    explanation_short: "Compute Kullback-Leibler divergence.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[
+            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
+            &EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage),
+        ],
+    ],
+    input_names: &["FILE_1", "FILE_2"],
+    input_helps: &[
+        "A finite stochastic language to compare.",
+        "A queriable stochastic language to compare.",
+    ],
+    execute: |mut inputs, _| {
+        let event_log = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+
+        match inputs.remove(0) {
+            EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => Ok(
+                EbiOutput::LogDiv(event_log.kld_log2log(slang).context("Compute KLD.")?),
+            ),
+            EbiInput::Trait(EbiTraitObject::QueriableStochasticLanguage(slang), _) => Ok(
+                EbiOutput::LogDiv(event_log.kld_log2model(slang).context("Compute KLD.")?),
+            ),
+            _ => Err(anyhow!("wrong input given")),
+        }
+    },
+    output_type: &EbiOutputType::LogDiv,
 };

@@ -173,6 +173,10 @@ pub mod techniques {
     pub mod explain_trace;
     pub mod infinitely_many_traces;
     pub mod jensen_shannon_stochastic_conformance;
+    pub mod hellinger_stochastic_conformance;
+    pub mod chi_square_stochastic_conformance;
+    pub mod kullback_leibler_divergence;
+    pub mod bhattacharyya_distance;
     pub mod livelock;
     pub mod medoid_non_stochastic;
     pub mod non_decreasing_livelock;
