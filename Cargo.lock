@@ -501,6 +501,7 @@ dependencies = [
  "pathfinding",
  "priority-queue",
  "process_mining",
+ "quick-xml 0.38.0",
  "rand",
  "rayon",
  "regex",
@@ -1390,7 +1391,7 @@ dependencies = [
  "graphviz-rust",
  "ordered-float",
  "petgraph",
- "quick-xml",
+ "quick-xml 0.31.0",
  "rayon",
  "serde",
  "serde_json",
@@ -1409,6 +1410,15 @@ name = "quick-xml"
 version = "0.31.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1004a344b30a54e2ee58d66a71b32d2db2feb0a31f9a2d302bf0536f15de2a33"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
+name = "quick-xml"
+version = "0.38.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8927b0664f5c5a98265138b7e3f90aa19a6b21353182469ace36d4ac527b7b1b"
 dependencies = [
  "memchr",
 ]
