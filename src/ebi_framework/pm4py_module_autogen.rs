@@ -4,6 +4,7 @@
 use pyo3::prelude::*;
 use pyo3::types::PyAny;
 use super::pm4py_link::{IMPORTERS, ExportableToPM4Py};
+use crate::ebi_framework::pm4py_link::import_or_load;
 use crate::ebi_framework::ebi_command::EbiCommand;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ALL;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COMPLETENESS;
@@ -64,10 +65,9 @@ fn analyse_all_traces(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
+    let input0 = import_or_load(arg0, input_types[0], 0)
+        .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+
     let inputs = vec![input0];
 
     // Execute the command.

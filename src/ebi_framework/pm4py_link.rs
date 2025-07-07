@@ -17,7 +17,7 @@ use crate::ebi_objects::process_tree::ProcessTree;
 use crate::math::fraction::Fraction;
 use super::ebi_output::EbiOutput;
 use crate::ebi_framework::ebi_object::EbiTraitObject;
-use crate::ebi_framework::ebi_command::EbiCommand;
+use crate::ebi_framework::{ebi_command::EbiCommand, prom_link::attempt_parse};
 use crate::ebi_framework::{ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType}, ebi_trait::EbiTrait, activity_key::ActivityKey, ebi_output};
 use crate::ebi_objects::event_log::{EventLog, EBI_EVENT_LOG};
 use crate::ebi_objects::labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET};
@@ -730,3 +730,36 @@ impl EbiCommand {
     }
 }
 
+// helper: try import via PM4Py importer, else if it's a str, treat as file path
+pub fn import_or_load(
+    py_obj: &PyAny,
+    input_types: &[&EbiInputType],
+    index: usize,
+) -> PyResult<EbiInput> {
+    // 1) try all in‑memory importers
+    let input = if let Some(inp) = IMPORTERS
+        .iter()
+        .find_map(|importer| importer(py_obj, input_types).ok())
+    {
+        inp
+    }
+    // 2) if that failed, see if we got a Python str → file path
+    else if let Ok(path) = py_obj.extract::<&str>() {
+        // read the file
+        let content = std::fs::read_to_string(path)
+            .map_err(|e| PyValueError::new_err(format!("Failed to read file `{}`: {}", path, e)))?;
+        // parse via your CLI-style function
+        attempt_parse(input_types, content)
+            .map_err(|e| PyValueError::new_err(format!(
+                "Failed to parse `{}` as input {}: {}", path, index, e
+            )))?
+    }
+    // 3) else, give up
+    else {
+        return Err(PyValueError::new_err(format!(
+            "Could not import argument {}", index
+        )));
+    };
+
+    Ok(input)
+}
