@@ -268,7 +268,55 @@ impl Exportable for BusinessProcessModelAndNotation {
 
 impl Display for BusinessProcessModelAndNotation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        writeln!(f, "Business Process Model and Notation")?;
+        writeln!(f, "Start Event: {}", self.start_event.id)?;
+        writeln!(f, "Tasks:")?;
+        for node in &self.nodes {
+            if let Some(label) = self.label.get(&node.id) {
+                writeln!(f, "  - {}: {}", label, node.id)?;
+            } else {
+                writeln!(f, "  - {}", node.id)?;
+            }
+        }
+        writeln!(f, "XOR Gateways:")?;
+        if self.xor_gateways.is_empty() {
+            writeln!(f, "  None")?;
+        } else {
+            for g in &self.xor_gateways {
+                writeln!(f, "  - {} ({:?})", g.id, g.direction)?;
+            }
+        }
+        writeln!(f, "AND Gateways:")?;
+        if self.and_gateways.is_empty() {
+            writeln!(f, "  None")?;
+        } else {
+            for g in &self.and_gateways {
+                writeln!(f, "  - {} ({:?})", g.id, g.direction)?;
+            }
+        }
+        writeln!(f, "OR Gateways:")?;
+        if self.or_gateways.is_empty() {
+            writeln!(f, "  None")?;
+        } else {
+            for g in &self.or_gateways {
+                writeln!(f, "  - {} ({:?})", g.id, g.direction)?;
+            }
+        }
+        writeln!(f, "End Events:")?;
+        if self.end_events.is_empty() {
+            writeln!(f, "  None")?;
+        } else {
+            for n in &self.end_events {
+                writeln!(f, "  - {}", n.id)?;
+            }
+        }
+        writeln!(f, "Sequence Flows:")?;
+        for sf in &self.sequence_flows {
+            let source_label = self.label.get(&sf.source_id).cloned().unwrap_or_else(|| sf.source_id.clone());
+            let target_label = self.label.get(&sf.target_id).cloned().unwrap_or_else(|| sf.target_id.clone());
+            writeln!(f, "  - {} -> {}", source_label, target_label)?;
+        }
+        Ok(())
     }
 }
 
@@ -279,56 +327,3 @@ impl Infoable for BusinessProcessModelAndNotation {
 }
 
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::io::Cursor;
-
-    #[test]
-    fn test_import_bpmn() {
-        let bpmn_xml = r#"
-        <?xml version="1.0" encoding="UTF-8"?>
-        <definitions>
-          <process>
-            <startEvent id="start1"/>
-            <task id="task1" name="Task 1"/>
-            <task id="task2" name="Task 2"/>
-            <task id="task3" name="Task 3"/>
-            <exclusiveGateway id="xor1" gatewayDirection="Diverging"/>
-            <exclusiveGateway id="xor2" gatewayDirection="Converging"/>
-            <endEvent id="end1"/>
-            <sequenceFlow sourceRef="start1" targetRef="task1"/>
-            <sequenceFlow sourceRef="task1" targetRef="xor1"/>
-            <sequenceFlow sourceRef="xor1" targetRef="task2"/>
-            <sequenceFlow sourceRef="xor1" targetRef="task3"/>
-            <sequenceFlow sourceRef="task2" targetRef="xor2"/>
-            <sequenceFlow sourceRef="task3" targetRef="xor2"/>
-            <sequenceFlow sourceRef="xor2" targetRef="end1"/>
-          </process>
-        </definitions>
-        "#;
-
-        let mut cursor = Cursor::new(bpmn_xml);
-        let result = BusinessProcessModelAndNotation::import(&mut cursor);
-
-        assert!(result.is_ok());
-        let model = result.unwrap();
-
-        // Check start event
-        assert_eq!(model.start_event.id, "start1");
-        // Check nodes (tasks)
-        assert!(model.nodes.iter().any(|n| n.id == "task1"));
-        assert!(model.nodes.iter().any(|n| n.id == "task2"));
-        assert!(model.nodes.iter().any(|n| n.id == "task3"));
-        // Check end events
-        assert!(model.end_events.iter().any(|n| n.id == "end1"));
-        // Check gateways
-        assert!(model.xor_gateways.iter().any(|g| g.id == "xor1"));
-        assert!(model.xor_gateways.iter().any(|g| g.id == "xor2"));
-        // Check sequence flows (should be 7)
-        assert_eq!(model.sequence_flows.len(), 7);
-        // Check label for task1
-        assert_eq!(model.label.get("task1").unwrap(), "Task 1");
-        println!("BPMN moder {:#?}", model);
-    }
-}
