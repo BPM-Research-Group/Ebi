@@ -527,7 +527,7 @@ pub fn generate_pm4py_module() -> Result<EbiOutput> {
 
 use pyo3::prelude::*;
 use pyo3::types::PyAny;
-use super::pm4py_link::{{IMPORTERS, ExportableToPM4Py}};
+use super::pm4py_link::{{import_or_load, ExportableToPM4Py}};
 use crate::ebi_framework::ebi_command::EbiCommand;");
     let mut functions = String::new();
     let mut module = format!("#[pymodule]\nfn ebi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {{");
@@ -585,13 +585,11 @@ fn {fname}(py: Python<'_>, {args}) -> PyResult<PyObject> {{
     );
 
     // Import each argument
-    for i in 0..input_types.len() {
-        body.push_str(&format!(r###"    let input{idx} = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg{idx}, input_types[{idx}]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument {idx}"))?;
-"###,
-            idx = i
+    for idx in 0..input_types.len() {
+        body.push_str(&format!(r###"    let input{idx} = import_or_load(arg{idx}, input_types[{idx}], {idx})
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument {idx}: {{}}", e)))?;
+    "###,
+            idx = idx
         ));
     }
 

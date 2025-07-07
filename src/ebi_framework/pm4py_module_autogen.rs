@@ -3,8 +3,7 @@
 
 use pyo3::prelude::*;
 use pyo3::types::PyAny;
-use super::pm4py_link::{IMPORTERS, ExportableToPM4Py};
-use crate::ebi_framework::pm4py_link::import_or_load;
+use super::pm4py_link::{import_or_load, ExportableToPM4Py};
 use crate::ebi_framework::ebi_command::EbiCommand;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ALL;
 use crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COMPLETENESS;
@@ -66,9 +65,8 @@ fn analyse_all_traces(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
     let input0 = import_or_load(arg0, input_types[0], 0)
-        .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
-
-    let inputs = vec![input0];
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -86,11 +84,9 @@ fn analyse_completeness(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -108,15 +104,11 @@ fn analyse_coverage(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyOb
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -134,15 +126,11 @@ fn analyse_directly_follows_edge_difference(py: Python<'_>, arg0: &PyAny, arg1: 
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -160,15 +148,11 @@ fn analyse_medoid(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObje
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -186,15 +170,11 @@ fn analyse_minimum_probability_traces(py: Python<'_>, arg0: &PyAny, arg1: &PyAny
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -212,11 +192,9 @@ fn analyse_mode(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -234,15 +212,11 @@ fn analyse_most_likely_traces(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyR
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -260,11 +234,9 @@ fn analyse_variety(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -282,15 +254,11 @@ fn analyse_non_stochastic_alignment(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) 
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -308,11 +276,9 @@ fn analyse_non_stochastic_any_traces(py: Python<'_>, arg0: &PyAny) -> PyResult<P
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -330,11 +296,9 @@ fn analyse_non_stochastic_bounded(py: Python<'_>, arg0: &PyAny) -> PyResult<PyOb
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -352,15 +316,11 @@ fn analyse_non_stochastic_cluster(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) ->
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -378,15 +338,11 @@ fn analyse_non_stochastic_executions(py: Python<'_>, arg0: &PyAny, arg1: &PyAny)
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -404,11 +360,9 @@ fn analyse_non_stochastic_infinitely_many_traces(py: Python<'_>, arg0: &PyAny) -
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -426,15 +380,11 @@ fn analyse_non_stochastic_medoid(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> 
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -452,11 +402,9 @@ fn association_all_trace_attributes(py: Python<'_>, arg0: &PyAny) -> PyResult<Py
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -474,15 +422,11 @@ fn association_trace_attribute(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> Py
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -500,15 +444,11 @@ fn conformance_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &PyAny,
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -526,19 +466,13 @@ fn conformance_earth_movers_stochastic_conformance_sample(py: Python<'_>, arg0: 
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let input2 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg2, input_types[2]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 2"))?;
-    let inputs = vec![input0, input1, input2];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let input2 = import_or_load(arg2, input_types[2], 2)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
+        let inputs = vec![input0, input1, input2];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -556,15 +490,11 @@ fn conformance_entropic_relevance(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) ->
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -582,15 +512,11 @@ fn conformance_jensen_shannon(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyR
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -608,19 +534,13 @@ fn conformance_jensen_shannon_sample(py: Python<'_>, arg0: &PyAny, arg1: &PyAny,
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let input2 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg2, input_types[2]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 2"))?;
-    let inputs = vec![input0, input1, input2];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let input2 = import_or_load(arg2, input_types[2], 2)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
+        let inputs = vec![input0, input1, input2];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -638,15 +558,11 @@ fn conformance_unit_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &P
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -664,11 +580,9 @@ fn convert_finite_stochastic_language(py: Python<'_>, arg0: &PyAny) -> PyResult<
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -686,11 +600,9 @@ fn convert_labelled_petri_net(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -708,11 +620,9 @@ fn convert_stochastic_finite_deterministic_automaton(py: Python<'_>, arg0: &PyAn
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -730,15 +640,11 @@ fn discover_alignments(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<P
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -756,15 +662,11 @@ fn discover_directly_follows_graph(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -782,15 +684,11 @@ fn discover_occurrence(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<P
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -808,11 +706,9 @@ fn discover_uniform(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -830,15 +726,11 @@ fn discover_non_stochastic_directly_follows_model(py: Python<'_>, arg0: &PyAny, 
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -856,11 +748,9 @@ fn discover_non_stochastic_flower_deterministic_finite_automaton(py: Python<'_>,
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -878,11 +768,9 @@ fn discover_non_stochastic_flower_process_tree(py: Python<'_>, arg0: &PyAny) -> 
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -900,11 +788,9 @@ fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton(py: Python
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -922,11 +808,9 @@ fn discover_non_stochastic_prefix_tree_process_tree(py: Python<'_>, arg0: &PyAny
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -944,11 +828,9 @@ fn information(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1056,15 +938,11 @@ fn probability_explain_trace(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyRe
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1082,15 +960,11 @@ fn probability_model(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyO
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1108,11 +982,9 @@ fn probability_trace(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1130,15 +1002,11 @@ fn sample(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1156,15 +1024,11 @@ fn test_log_categorical_attribute(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) ->
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let input1 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg1, input_types[1]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 1"))?;
-    let inputs = vec![input0, input1];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1182,11 +1046,9 @@ fn validate(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1204,11 +1066,9 @@ fn visualise_pdf(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1226,11 +1086,9 @@ fn visualise_svg(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1248,11 +1106,9 @@ fn visualise_text(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
     };
-    let input0 = IMPORTERS
-    .iter()
-    .find_map(|importer| importer(arg0, input_types[0]).ok())
-    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Could not import argument 0"))?;
-    let inputs = vec![input0];
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
