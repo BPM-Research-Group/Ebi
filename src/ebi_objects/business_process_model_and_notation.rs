@@ -322,7 +322,15 @@ impl Display for BusinessProcessModelAndNotation {
 
 impl Infoable for BusinessProcessModelAndNotation {
     fn info(&self, f: &mut impl std::io::Write) -> anyhow::Result<()> {
-        todo!()
+        writeln!(f, "Business Process Model and Notation:")?;
+        writeln!(f, "  Start Event: {}", self.start_event.id)?;
+        writeln!(f, "  Tasks: {}", self.nodes.len())?;
+        writeln!(f, "  XOR Gateways: {}", self.xor_gateways.len())?;
+        writeln!(f, "  AND Gateways: {}", self.and_gateways.len())?;
+        writeln!(f, "  OR Gateways: {}", self.or_gateways.len())?;
+        writeln!(f, "  End Events: {}", self.end_events.len())?;
+        writeln!(f, "  Sequence Flows: {}", self.sequence_flows.len())?;
+        Ok(())
     }
 }
 
