@@ -314,7 +314,7 @@ macro_rules! tree {
                 self.tree.get(node)
             }
 
-            pub fn get_root(&self) -> usize {
+            pub fn root(&self) -> usize {
                 0
             }
 
@@ -678,6 +678,15 @@ impl Node {
         match self {
             Self::Tau | Self::Activity(_) => true,
             Self::Operator(_, _) => false,
+        }
+    }
+
+    pub fn set_number_of_children(&mut self, number_of_children: usize) -> Result<()> {
+        if let Self::Operator(_, old_number_of_children) = self {
+            *old_number_of_children = number_of_children;
+            Ok(())
+        } else {
+            Err(anyhow!("attempted to alter the number of children of an activity or a tau"))
         }
     }
 }

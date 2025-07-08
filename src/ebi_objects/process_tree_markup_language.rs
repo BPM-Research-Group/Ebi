@@ -55,7 +55,7 @@ pub const EBI_PROCESS_TREE_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::ProcessTree(ProcessTreeMarkupLanguage::export_from_object),
         EbiObjectExporter::StochasticProcessTree(ProcessTreeMarkupLanguage::export_from_object),
     ],
-    java_object_handlers: &[],
+    java_object_handlers: &[], //java object handlers are through processtree
 };
 
 #[derive(Clone)]
@@ -463,8 +463,117 @@ impl Exportable for ProcessTreeMarkupLanguage {
                         self.tree.get_activity_key().deprocess_activity(activity)
                     )
                 )?,
+                Node::Operator(Operator::Loop, 1) => {
+                    //special case: loop with 1 child gets a second "redo tau child and a third "exit" tau child
+                    writeln!(
+                        f,
+                        "<{} id=\"{}\"/>",
+                        PTMLTag::from(&Operator::Loop),
+                        node_id
+                    )?;
+                    //edges
+                    for child_id in self.tree.get_children(node_id) {
+                        writeln!(
+                            f,
+                            "<parentsNode sourceId=\"{}\", targetId=\"{}\"/>",
+                            node_id, child_id
+                        )?;
+                    }
+
+                    //redo-tau
+                    writeln!(f, "<automaticTask id=\"{}redo\" name=\"tau\"/>", node_id)?;
+                    writeln!(
+                        f,
+                        "<parentsNode sourceId=\"{}\", targetId=\"{}redo\"/>",
+                        node_id, node_id
+                    )?;
+
+                    //exit-tau
+                    writeln!(f, "<automaticTask id=\"{}exit\" name=\"tau\"/>", node_id)?;
+                    writeln!(
+                        f,
+                        "<parentsNode sourceId=\"{}\", targetId=\"{}exit\"/>",
+                        node_id, node_id
+                    )?
+                }
+                Node::Operator(Operator::Loop, 2) => {
+                    //special case: loop with 2 children gets a third "exit" tau child
+                    writeln!(
+                        f,
+                        "<{} id=\"{}\"/>",
+                        PTMLTag::from(&Operator::Loop),
+                        node_id
+                    )?;
+                    //edges
+                    for child_id in self.tree.get_children(node_id) {
+                        writeln!(
+                            f,
+                            "<parentsNode sourceId=\"{}\", targetId=\"{}\"/>",
+                            node_id, child_id
+                        )?;
+                    }
+
+                    //exit-tau
+                    writeln!(f, "<automaticTask id=\"{}exit\" name=\"tau\"/>", node_id)?;
+                    writeln!(
+                        f,
+                        "<parentsNode sourceId=\"{}\", targetId=\"{}exit\"/>",
+                        node_id, node_id
+                    )?
+                }
+                Node::Operator(Operator::Loop, _) => {
+                    //special case: loop with more than 2 children gets an xor-child
+                    writeln!(
+                        f,
+                        "<{} id=\"{}\"/>",
+                        PTMLTag::from(&Operator::Loop),
+                        node_id
+                    )?;
+                    writeln!(
+                        f,
+                        "<{} id=\"{}redo\"/>",
+                        PTMLTag::from(&Operator::Xor),
+                        node_id
+                    )?;
+
+                    //edges
+                    for (i, child_id) in self.tree.get_children(node_id).enumerate() {
+                        if i == 0 {
+                            //body gets attached to the loop node
+                            writeln!(
+                                f,
+                                "<parentsNode sourceId=\"{}\", targetId=\"{}\"/>",
+                                node_id, child_id
+                            )?;
+                        } else {
+                            writeln!(
+                                f,
+                                "<parentsNode sourceId=\"{}\", targetId=\"{}redo\"/>",
+                                node_id, child_id
+                            )?;
+                        }
+                    }
+
+                    //exit-tau
+                    writeln!(f, "<automaticTask id=\"{}exit\" name=\"tau\"/>", node_id)?;
+                    writeln!(
+                        f,
+                        "<parentsNode sourceId=\"{}\", targetId=\"{}exit\"/>",
+                        node_id, node_id
+                    )?
+                }
                 Node::Operator(operator, _) => {
-                    writeln!(f, "<{} id=\"{}\"/>", PTMLTag::from(operator), node_id)?
+                    //other operators
+                    writeln!(f, "<{} id=\"{}\"/>", PTMLTag::from(operator), node_id)?;
+
+                    //edges
+                    for child_id in self.tree.get_children(node_id) {
+                        writeln!(
+                            f,
+                            "<parentsNode sourceId=\"{}\", targetId=\"{}\"/>",
+                            node_id, child_id
+                        )?;
+                    }
                 }
             }
         }
@@ -494,6 +603,10 @@ enum PTMLTag {
     AutomaticTask,
     Xor,
     XorLoop,
+    Or,
+    Interleaved,
+    Def,
+    DefLoop,
 }
 
 impl PTMLTag {
@@ -503,7 +616,11 @@ impl PTMLTag {
             b"sequence" => Ok(Some(Self::Sequence)),
             b"automaticTask" => Ok(Some(Self::AutomaticTask)),
             b"xor" => Ok(Some(Self::Xor)),
+            b"def" => Ok(Some(Self::Def)),
             b"xorLoop" => Ok(Some(Self::XorLoop)),
+            b"defLoop" => Ok(Some(Self::DefLoop)),
+            b"or" => Ok(Some(Self::Or)),
+            b"interleaved" => Ok(Some(Self::Interleaved)),
             b"manualTask" => {
                 if let Ok(Some(attribute)) = e.try_get_attribute("name") {
                     let activity_label = String::from_utf8_lossy(&attribute.value);
@@ -525,6 +642,10 @@ impl PTMLTag {
             PTMLTag::AutomaticTask => Node::Tau,
             PTMLTag::Xor => Node::Operator(Operator::Xor, 0),
             PTMLTag::XorLoop => Node::Operator(Operator::Loop, 0),
+            PTMLTag::Or => Node::Operator(Operator::Loop, 0),
+            PTMLTag::Interleaved => Node::Operator(Operator::Interleaved, 0),
+            PTMLTag::Def => Node::Operator(Operator::Xor, 0),
+            PTMLTag::DefLoop => Node::Operator(Operator::Loop, 0),
         }
     }
 }
@@ -534,9 +655,9 @@ impl From<&Operator> for PTMLTag {
         match value {
             Operator::Xor => PTMLTag::Xor,
             Operator::Sequence => PTMLTag::Sequence,
-            Operator::Interleaved => todo!(),
+            Operator::Interleaved => PTMLTag::Interleaved,
             Operator::Concurrent => PTMLTag::And,
-            Operator::Or => todo!(),
+            Operator::Or => PTMLTag::Or,
             Operator::Loop => PTMLTag::XorLoop,
         }
     }
@@ -554,6 +675,10 @@ impl Display for PTMLTag {
                 PTMLTag::AutomaticTask => "automaticTask",
                 PTMLTag::Xor => "xor",
                 PTMLTag::XorLoop => "xorLoop",
+                PTMLTag::Or => "or",
+                PTMLTag::Interleaved => "interleaved",
+                PTMLTag::Def => "def",
+                PTMLTag::DefLoop => "defLoop",
             }
         )
     }
@@ -563,11 +688,18 @@ impl Display for PTMLTag {
 mod tests {
     use std::fs::{self};
 
-    use crate::ebi_objects::process_tree_markup_language::ProcessTreeMarkupLanguage;
+    use crate::{
+        ebi_objects::process_tree_markup_language::ProcessTreeMarkupLanguage,
+        ebi_traits::ebi_trait_semantics::Semantics,
+    };
 
     #[test]
     fn nested_ptml() {
         let fin = fs::read_to_string("testfiles/valid nested.ptml").unwrap();
-        let mut ptml = fin.parse::<ProcessTreeMarkupLanguage>().unwrap();
+        let ptml = fin.parse::<ProcessTreeMarkupLanguage>().unwrap();
+
+        let sem = ptml.tree;
+        let state = sem.get_initial_state().unwrap();
+        assert_eq!(sem.get_enabled_transitions(&state).len(), 1);
     }
 }

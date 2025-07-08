@@ -33,7 +33,7 @@ macro_rules! tree {
                         states: vec![NodeState::Closed; self.get_number_of_nodes()],
                         terminated: false,
                     };
-                    self.enable_node(&mut state, self.get_root());
+                    self.enable_node(&mut state, self.root());
                     Some(state)
                 }
             }
@@ -96,7 +96,7 @@ macro_rules! tree {
                     }
                 }
 
-                if !state.terminated && self.can_terminate(state, self.get_root()) {
+                if !state.terminated && self.can_terminate(state, self.root()) {
                     result.push(self.transition2node.len());
                 }
 
@@ -377,7 +377,7 @@ impl StochasticSemantics for StochasticProcessTree {
         &self,
         state: &<Self as StochasticSemantics>::StoSemState,
     ) -> Result<Fraction> {
-        let mut sum = if !state.terminated && self.can_terminate(state, self.get_root()) {
+        let mut sum = if !state.terminated && self.can_terminate(state, self.root()) {
             self.termination_weight.clone()
         } else {
             Fraction::zero()
