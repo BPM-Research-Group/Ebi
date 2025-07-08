@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ptml>
+  <processTree root="bla2">
+    <processTree>
+      <and />
+    </processTree>
+    <processTree />
+    <and id="bla"/>
+    <sequence id="bla2"/>
+    <manualTask id="bla3" name="xyz"/>
+    <parentsNode id="7867faa3-d600-4b0b-b451-c95f6adec6c6" sourceId="bla2" targetId="bla3"/>
+  </processTree>
+  <ptml>
+    <and />
+  </ptml>
+</ptml>
