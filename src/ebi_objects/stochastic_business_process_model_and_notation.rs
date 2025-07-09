@@ -1,4 +1,7 @@
 use anyhow::{Result, anyhow};
+use quick_xml::Reader as XmlReader;
+use quick_xml::events::Event;
+use std::collections::HashMap;
 use std::fmt::Display;
 
 use crate::ebi_framework::{
@@ -39,8 +42,29 @@ pub const EBI_STOCHASTIC_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = E
     java_object_handlers: &[],
 };
 
-#[derive(Clone)]
-pub struct StochasticBusinessProcessModelAndNotation {}
+#[derive(Debug, Clone)]
+pub struct StochasticTask {
+    pub id: String,
+    pub weight: f64,
+}
+
+#[derive(Debug, Clone)]
+pub struct StochasticSequenceFlow {
+    pub source_id: String,
+    pub target_id: String,
+    pub weight: f64,
+}
+
+#[derive(Clone, Debug)]
+pub struct StochasticBusinessProcessModelAndNotation {
+    pub tasks: Vec<StochasticTask>,
+    pub start_event: String,
+    pub xor_gateways: Vec<String>,
+    pub and_gateways: Vec<String>,
+    pub or_gateways: Vec<String>,
+    pub end_events: usize,
+    pub sequence_flows: Vec<StochasticSequenceFlow>,
+}
 
 impl Importable for StochasticBusinessProcessModelAndNotation {
     fn import_as_object(reader: &mut dyn std::io::BufRead) -> anyhow::Result<EbiObject> {
@@ -53,7 +77,105 @@ impl Importable for StochasticBusinessProcessModelAndNotation {
     where
         Self: Sized,
     {
-        todo!()
+        let mut xml_data = String::new();
+        reader.read_to_string(&mut xml_data)?;
+        let mut xml_reader = XmlReader::from_str(&xml_data);
+        let mut buf = Vec::new();
+        let mut tasks = Vec::new();
+        let mut sequence_flows = Vec::new();
+        let mut start_event = String::new();
+        let mut xor_gateways = Vec::new();
+        let mut and_gateways = Vec::new();
+        let mut or_gateways = Vec::new();
+        let mut end_events = 0;
+        while let Ok(event) = xml_reader.read_event_into(&mut buf) {
+            match event {
+                Event::Start(ref e) | Event::Empty(ref e) => {
+                    let tag = xml_reader.decoder().decode(e.name().into_inner()).unwrap();
+                    let tag = tag.split(':').last().unwrap();
+                    match tag {
+                        "startEvent" => {
+                            for attr in e.attributes().flatten() {
+                                if attr.key.as_ref() == b"id" {
+                                    start_event = attr.unescape_value().unwrap().to_string();
+                                }
+                            }
+                        }
+                        "endEvent" => {
+                            end_events += 1;
+                        }
+                        "task" => {
+                            let mut id = String::new();
+                            let mut weight = 1.0;
+                            for attr in e.attributes().flatten() {
+                                match attr.key.as_ref() {
+                                    b"id" => id = attr.unescape_value().unwrap().to_string(),
+                                    b"weight" => {
+                                        weight = attr.unescape_value().unwrap().parse().unwrap_or(1.0)
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            tasks.push(StochasticTask { id, weight });
+                        }
+                        "exclusiveGateway" => {
+                            for attr in e.attributes().flatten() {
+                                if attr.key.as_ref() == b"id" {
+                                    xor_gateways.push(attr.unescape_value().unwrap().to_string());
+                                }
+                            }
+                        }
+                        "parallelGateway" => {
+                            for attr in e.attributes().flatten() {
+                                if attr.key.as_ref() == b"id" {
+                                    and_gateways.push(attr.unescape_value().unwrap().to_string());
+                                }
+                            }
+                        }
+                        "inclusiveGateway" => {
+                            for attr in e.attributes().flatten() {
+                                if attr.key.as_ref() == b"id" {
+                                    or_gateways.push(attr.unescape_value().unwrap().to_string());
+                                }
+                            }
+                        }
+                        "sequenceFlow" => {
+                            let mut source_id = String::new();
+                            let mut target_id = String::new();
+                            let mut weight = 1.0;
+                            for attr in e.attributes().flatten() {
+                                match attr.key.as_ref() {
+                                    b"sourceRef" => source_id = attr.unescape_value().unwrap().to_string(),
+                                    b"targetRef" => target_id = attr.unescape_value().unwrap().to_string(),
+                                    b"weight" => {
+                                        weight = attr.unescape_value().unwrap().parse().unwrap_or(1.0)
+                                    }
+                                    _ => {}
+                                }
+                            }
+                            sequence_flows.push(StochasticSequenceFlow {
+                                source_id,
+                                target_id,
+                                weight,
+                            });
+                        }
+                        _ => {}
+                    }
+                }
+                Event::Eof => break,
+                _ => {}
+            }
+            buf.clear();
+        }
+        Ok(StochasticBusinessProcessModelAndNotation {
+            tasks,
+            start_event,
+            xor_gateways,
+            and_gateways,
+            or_gateways,
+            end_events,
+            sequence_flows,
+        })
     }
 }
 
@@ -89,12 +211,34 @@ impl Exportable for StochasticBusinessProcessModelAndNotation {
 
 impl Display for StochasticBusinessProcessModelAndNotation {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        writeln!(f, "Stochastic Business Process Model and Notation")?;
+        writeln!(f, "Start Event: {}", self.start_event)?;
+        writeln!(f, "Tasks:")?;
+        for task in &self.tasks {
+            writeln!(f, "  - {} (weight: {})", task.id, task.weight)?;
+        }
+        writeln!(f, "XOR Gateways: {}", self.xor_gateways.len())?;
+        writeln!(f, "AND Gateways: {}", self.and_gateways.len())?;
+        writeln!(f, "OR Gateways: {}", self.or_gateways.len())?;
+        writeln!(f, "End Events: {}", self.end_events)?;
+        writeln!(f, "Sequence Flows:")?;
+        for sf in &self.sequence_flows {
+            writeln!(f, "  - {} -> {} (weight: {})", sf.source_id, sf.target_id, sf.weight)?;
+        }
+        Ok(())
     }
 }
 
 impl Infoable for StochasticBusinessProcessModelAndNotation {
     fn info(&self, f: &mut impl std::io::Write) -> anyhow::Result<()> {
-        todo!()
+        writeln!(f, "Stochastic Business Process Model and Notation:")?;
+        writeln!(f, "  Start Event: {}", self.start_event)?;
+        writeln!(f, "  Tasks: {}", self.tasks.len())?;
+        writeln!(f, "  XOR Gateways: {}", self.xor_gateways.len())?;
+        writeln!(f, "  AND Gateways: {}", self.and_gateways.len())?;
+        writeln!(f, "  OR Gateways: {}", self.or_gateways.len())?;
+        writeln!(f, "  End Events: {}", self.end_events)?;
+        writeln!(f, "  Sequence Flows: {}", self.sequence_flows.len())?;
+        Ok(())
     }
 }
