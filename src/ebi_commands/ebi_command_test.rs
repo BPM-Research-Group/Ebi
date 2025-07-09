@@ -1,8 +1,8 @@
 use anyhow::Context;
-use clap::{Arg, ArgAction, Command, value_parser};
 use std::io::Write;
 
 use crate::{
+    ebi_commands::ebi_command_association::DEFAULT_NUMBER_OF_SAMPLES,
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::EbiInputType,
@@ -14,20 +14,14 @@ use crate::{
         ebi_trait_event_log::EbiTraitEventLog,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
-    math::fraction::{Fraction, FractionNotParsedYet},
-    techniques::{permutation_test::PermutationTest, bootstrap_test::{
-        BootstrapTest, StatisticalTestsLogCategoricalAttribute,
-    }},
+    math::fraction::{ConstFraction, Fraction},
+    techniques::{
+        bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
+        permutation_test::PermutationTest,
+    },
 };
 
-use super::ebi_command_association::{self, number_of_samples};
-
-macro_rules! p_value {
-    () => {
-        Fraction::from((1usize, 20usize))
-    };
-}
-pub(crate) use p_value;
+pub const DEFAULT_P_VALUE: ConstFraction = ConstFraction::of(1, 20);
 
 pub const EBI_TEST: EbiCommand = EbiCommand::Group {
     name_short: "tst",
@@ -41,21 +35,25 @@ pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     name_short: "lcat",
     name_long: Some("log-categorical-attribute"),
     explanation_short: "Test the hypothesis that the sub-logs defined by the categorical attribute are derived from identical processes.",
-    explanation_long: Some(concat!(
-        "Test the hypothesis that the sub-logs defined by the categorical attribute are derived from identical processes.; ",
-        number_of_samples!(),
-        " samples are taken."
-    )),
+    explanation_long: None,
     latex_link: Some("\\cite{DBLP:journals/tkde/LeemansMPH23}"),
-    cli_command: Some(|command| {
-        cli_p_value(ebi_command_association::cli_number_of_samples(command))
-    }),
+    cli_command: None,
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::EventLog)],
-        &[&EbiInputType::String],
+        &[&EbiInputType::String(None, None)],
+        &[&EbiInputType::Usize(
+            Some(1),
+            None,
+            Some(DEFAULT_NUMBER_OF_SAMPLES),
+        )],
+        &[&EbiInputType::Fraction(
+            Some(ConstFraction::zero()),
+            Some(ConstFraction::one()),
+            Some(DEFAULT_P_VALUE),
+        )],
     ],
-    input_names: &["FILE", "ATTRIBUTE"],
+    input_names: &["FILE", "ATTRIBUTE", "SAMPLES", "P-VALUE"],
     input_helps: &[
         "The event log for which the test is to be performed.",
         concat!(
@@ -65,17 +63,14 @@ pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
             ),
             "`."
         ),
+        "The number of samples taken.",
+        "The threshold p-value.",
     ],
-    execute: |mut inputs, cli_matches| {
+    execute: |mut inputs, _| {
         let event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         let attribute = inputs.remove(0).to_type::<String>()?;
-        let number_of_samples = cli_matches.unwrap().get_one::<usize>("samples").unwrap();
-        let p_value = cli_matches
-            .unwrap()
-            .get_one::<FractionNotParsedYet>("pvalue")
-            .unwrap()
-            .try_into()
-            .context("Parsing p value")?;
+        let number_of_samples = inputs.remove(0).to_type::<usize>()?;
+        let p_value = inputs.remove(0).to_type::<Fraction>()?;
 
         let (value, sustained) = event_log
             .log_categorical_attribute(*number_of_samples, &attribute, &p_value)
@@ -111,26 +106,32 @@ pub const EBI_BOOTSTRAP_TEST: EbiCommand = EbiCommand::Command {
     name_short: "btst",
     name_long: Some("bootstrap-test"),
     explanation_short: "Test the hypothesis that the logs are derived from identical processes.",
-    explanation_long: Some(concat!(
-        "Test the hypothesis that the logs are derived from identical processes; ",
-        number_of_samples!(),
-        " samples are taken."
-    )),
+    explanation_long: None,
     latex_link: Some("\\cite{DBLP:journals/tkde/LeemansMPH23}"),
-    cli_command: Some(|command| {
-        cli_p_value(ebi_command_association::cli_number_of_samples(command))
-    }),
+    cli_command: None,
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Usize(
+            Some(1),
+            None,
+            Some(DEFAULT_NUMBER_OF_SAMPLES),
+        )],
+        &[&EbiInputType::Fraction(
+            Some(ConstFraction::zero()),
+            Some(ConstFraction::one()),
+            Some(DEFAULT_P_VALUE),
+        )],
     ],
-    input_names: &["LANG_1", "LANG_2"],
+    input_names: &["LANG_1", "LANG_2", "SAMPLES", "P-VALUE"],
     input_helps: &[
         "The first event log for which the test is to be performed.",
         "The first event log for which the test is to be performed.",
+        "The number of samples taken.",
+        "The threshold p-value",
     ],
-    execute: |mut inputs, cli_matches| {
+    execute: |mut inputs, _| {
         let mut log1 = inputs
             .remove(0)
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
@@ -138,13 +139,10 @@ pub const EBI_BOOTSTRAP_TEST: EbiCommand = EbiCommand::Command {
             inputs
                 .remove(0)
                 .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-        let number_of_samples = cli_matches.unwrap().get_one::<usize>("samples").unwrap();
-        let p_value = cli_matches
-            .unwrap()
-            .get_one::<FractionNotParsedYet>("pvalue")
-            .unwrap()
-            .try_into()
-            .context("Parsing p value")?;
+        let number_of_samples = inputs.remove(0).to_type::<usize>()?;
+        let p_value = inputs.remove(0).to_type::<Fraction>()?;
+
+        log1.translate_using_activity_key(log2.get_activity_key_mut());
 
         let (value, sustained) = log1
             .bootstrap_test(log2.as_mut(), *number_of_samples, &p_value)
@@ -175,26 +173,32 @@ pub const EBI_PERMUTATION_TEST: EbiCommand = EbiCommand::Command {
     name_short: "perm",
     name_long: Some("permutation-test"),
     explanation_short: "Test the hypothesis that the logs are derived from identical processes.",
-    explanation_long: Some(concat!(
-        "Test the hypothesis that the logs are derived from identical processes; ",
-        number_of_samples!(),
-        " samples are taken."
-    )),
+    explanation_long: None,
     latex_link: None,
-    cli_command: Some(|command| {
-        cli_p_value(ebi_command_association::cli_number_of_samples(command))
-    }),
+    cli_command: None,
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Usize(
+            Some(1),
+            None,
+            Some(DEFAULT_NUMBER_OF_SAMPLES),
+        )],
+        &[&EbiInputType::Fraction(
+            Some(ConstFraction::zero()),
+            Some(ConstFraction::one()),
+            Some(DEFAULT_P_VALUE),
+        )],
     ],
-    input_names: &["LANG_1", "LANG_2"],
+    input_names: &["LANG_1", "LANG_2", "SAMPLES", "P-VALUE"],
     input_helps: &[
         "The first event log for which the test is to be performed.",
         "The first event log for which the test is to be performed.",
+        "The number of samples taken.",
+        "The threshold p-value",
     ],
-    execute: |mut inputs, cli_matches| {
+    execute: |mut inputs, _| {
         let mut log1 = inputs
             .remove(0)
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
@@ -202,13 +206,8 @@ pub const EBI_PERMUTATION_TEST: EbiCommand = EbiCommand::Command {
             inputs
                 .remove(0)
                 .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-        let number_of_samples = cli_matches.unwrap().get_one::<usize>("samples").unwrap();
-        let p_value = cli_matches
-            .unwrap()
-            .get_one::<FractionNotParsedYet>("pvalue")
-            .unwrap()
-            .try_into()
-            .context("Parsing p value")?;
+        let number_of_samples = inputs.remove(0).to_type::<usize>()?;
+        let p_value = inputs.remove(0).to_type::<Fraction>()?;
 
         let (value, sustained) = log1
             .permutation_test(log2.as_mut(), *number_of_samples, &p_value)
@@ -234,17 +233,3 @@ pub const EBI_PERMUTATION_TEST: EbiCommand = EbiCommand::Command {
     },
     output_type: &EbiOutputType::String,
 };
-
-pub fn cli_p_value(command: Command) -> Command {
-    command.arg(
-        Arg::new("pvalue")
-            .action(ArgAction::Set)
-            .value_name("NUMBER")
-            .short('p')
-            .long("p-value")
-            .help("Use threshold p-value.")
-            .default_value(p_value!().to_string())
-            .value_parser(value_parser!(FractionNotParsedYet))
-            .required(false),
-    )
-}

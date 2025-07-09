@@ -188,9 +188,20 @@ pub fn attempt_parse(input_types: &[&'static EbiInputType], value: String) -> Re
                     }
                 };
             }
-            EbiInputType::String => {
-                if let MultipleReader::String(string) = reader {
-                    return Ok(EbiInput::String(string));
+            EbiInputType::String(None, _) => {
+                if let MultipleReader::String(string) = &reader {
+                    return Ok(EbiInput::String(string.clone(), &input_type));
+                } else {
+                    unreachable!()
+                }
+            }
+            EbiInputType::String(Some(allowed_values), _) => {
+                if let MultipleReader::String(string) = &reader {
+                    if allowed_values.contains(&string.as_str()) {
+                        return Ok(EbiInput::String(string.clone(), &input_type));
+                    } else {
+                        error = Some(anyhow!("value should be one of {:?}", allowed_values));
+                    }
                 } else {
                     unreachable!()
                 }

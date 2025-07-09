@@ -157,7 +157,7 @@ impl FromEbiTraitObject for usize {
 impl FromEbiTraitObject for String {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
-            EbiInput::String(e) => Ok(Box::new(e)),
+            EbiInput::String(e, _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
                 "cannot read {} {} as an integer",
                 object.get_type().get_article(),
@@ -171,7 +171,9 @@ impl FromEbiTraitObject for String {
 mod tests {
     use strum::IntoEnumIterator;
 
-    use crate::ebi_framework::ebi_input::{EbiInput, TEST_INPUT_TYPE_USIZE};
+    use crate::ebi_framework::ebi_input::{
+        EbiInput, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE,
+    };
 
     use super::{EbiTrait, FromEbiTraitObject};
 
@@ -185,7 +187,8 @@ mod tests {
             let _ = format!("{:?}", etrait);
         }
 
-        let _ = String::from_trait_object(EbiInput::String("xyz".to_string()));
+        let _ =
+            String::from_trait_object(EbiInput::String("xyz".to_string(), &TEST_INPUT_TYPE_STRING));
     }
 
     #[test]
@@ -197,6 +200,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn unreachable_usize() {
-        usize::from_trait_object(EbiInput::String("abc".to_string())).unwrap();
+        usize::from_trait_object(EbiInput::String("abc".to_string(), &TEST_INPUT_TYPE_STRING))
+            .unwrap();
     }
 }

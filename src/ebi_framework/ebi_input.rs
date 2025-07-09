@@ -43,7 +43,7 @@ use super::{
 pub enum EbiInput {
     Trait(EbiTraitObject, &'static EbiFileHandler),
     Object(EbiObject, &'static EbiFileHandler),
-    String(String),
+    String(String, &'static EbiInputType),
     Usize(usize, &'static EbiInputType),
     FileHandler(EbiFileHandler),
     Fraction(Fraction, &'static EbiInputType),
@@ -58,7 +58,7 @@ impl EbiInput {
         match self {
             EbiInput::Trait(t, _) => EbiInputType::Trait(t.get_trait()),
             EbiInput::Object(o, _) => EbiInputType::Object(o.get_type()),
-            EbiInput::String(_) => EbiInputType::String,
+            EbiInput::String(_, input_type) => (*input_type).clone(),
             EbiInput::Usize(_, input_type) => (*input_type).clone(),
             EbiInput::FileHandler(_) => EbiInputType::FileHandler,
             EbiInput::Fraction(_, input_type) => (*input_type).clone(),
@@ -72,12 +72,18 @@ pub enum EbiInputType {
     Object(EbiObjectType),
     AnyObject,
     FileHandler,
-    String,
-    Usize(Option<usize>, Option<usize>, Option<usize>), //min, max, default
+
+    ///Fields: allowed values, default value.
+    String(Option<&'static [&'static str]>, Option<&'static str>),
+
+    //Fields: minimum, maximum, default value.
+    Usize(Option<usize>, Option<usize>, Option<usize>),
+
+    //Fields: minimum, maximum, default value.
     Fraction(
-        Option<ConstFraction>, //min
-        Option<ConstFraction>, //max
-        Option<ConstFraction>, //default
+        Option<ConstFraction>,
+        Option<ConstFraction>,
+        Option<ConstFraction>,
     ),
 }
 
@@ -88,7 +94,10 @@ impl EbiInputType {
             EbiInputType::Object(_) => None,
             EbiInputType::AnyObject => None,
             EbiInputType::FileHandler => None,
-            EbiInputType::String => None,
+            EbiInputType::String(_, string) => match string {
+                Some(string) => Some(string.to_string()),
+                None => None,
+            },
             EbiInputType::Usize(_, _, integer) => match integer {
                 Some(integer) => Some(integer.to_string()),
                 None => None,
@@ -105,7 +114,7 @@ impl EbiInputType {
             EbiInputType::Trait(t) => t.get_article(),
             EbiInputType::Object(o) => o.get_article(),
             EbiInputType::AnyObject => "an",
-            EbiInputType::String => "a",
+            EbiInputType::String(_, _) => "a",
             EbiInputType::Usize(_, _, _) => "an",
             EbiInputType::FileHandler => "a",
             EbiInputType::Fraction(_, _, _) => "a",
@@ -117,7 +126,7 @@ impl EbiInputType {
             EbiInputType::Trait(_) => value_parser!(PathBuf),
             EbiInputType::Object(_) => value_parser!(PathBuf),
             EbiInputType::AnyObject => value_parser!(PathBuf),
-            EbiInputType::String => value_parser!(String).into(),
+            EbiInputType::String(_, _) => value_parser!(String).into(),
             EbiInputType::Usize(_, _, _) => value_parser!(usize).into(),
             EbiInputType::FileHandler => value_parser!(EbiFileHandler).into(),
             EbiInputType::Fraction(_, _, _) => value_parser!(FractionNotParsedYet).into(),
@@ -131,7 +140,7 @@ impl EbiInputType {
             EbiInputType::AnyObject => {
                 Self::get_file_handlers_java(EBI_FILE_HANDLERS.iter().collect())
             }
-            EbiInputType::String => {
+            EbiInputType::String(_, _) => {
                 let mut x = vec![];
                 x.extend(JAVA_OBJECT_HANDLERS_STRING);
                 x
@@ -177,7 +186,10 @@ impl EbiInputType {
                 EbiInputType::AnyObject => {
                     result.extend(Self::show_file_handlers(EBI_FILE_HANDLERS.iter().collect()));
                 }
-                EbiInputType::String => {
+                EbiInputType::String(Some(allowed_values), _) => {
+                    result.insert(format!("either one of `{}`", allowed_values.join("`, `")));
+                }
+                EbiInputType::String(None, _) => {
                     result.insert("text".to_string());
                 }
                 EbiInputType::Usize(Some(min), Some(max), _) => {
@@ -243,7 +255,10 @@ impl EbiInputType {
                         EBI_FILE_HANDLERS.iter().collect(),
                     ));
                 }
-                EbiInputType::String => {
+                EbiInputType::String(Some(allowed_values), _) => {
+                    result.insert(format!("either one of `{}`", allowed_values.join("`, `")));
+                }
+                EbiInputType::String(None, _) => {
                     result.insert("text".to_string());
                 }
                 EbiInputType::Usize(Some(min), Some(max), _) => {
@@ -368,7 +383,10 @@ impl Display for EbiInputType {
             EbiInputType::Trait(t) => t.fmt(f),
             EbiInputType::Object(o) => o.fmt(f),
             EbiInputType::AnyObject => write!(f, "object"),
-            EbiInputType::String => write!(f, "text"),
+            EbiInputType::String(Some(allowed_values), _) => {
+                write!(f, "either one of `{}`", allowed_values.join("`, `"))
+            }
+            EbiInputType::String(None, _) => write!(f, "text"),
             EbiInputType::Usize(Some(min), Some(max), _) => {
                 write!(f, "integer between {} and {}", min, max)
             }
@@ -676,6 +694,7 @@ pub fn validate_object_of(
 
 pub const TEST_INPUT_TYPE_FRACTION: EbiInputType = EbiInputType::Fraction(None, None, None);
 pub const TEST_INPUT_TYPE_USIZE: EbiInputType = EbiInputType::Usize(None, None, None);
+pub const TEST_INPUT_TYPE_STRING: EbiInputType = EbiInputType::String(None, None);
 
 #[cfg(test)]
 mod tests {

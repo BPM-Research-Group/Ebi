@@ -7,7 +7,17 @@ use strum_macros::EnumIter;
 
 use crate::{
     ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, executions::Executions, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, language_of_alignments::LanguageOfAlignments, process_tree::ProcessTree, scalable_vector_graphics::ScalableVectorGraphics, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments, stochastic_process_tree::StochasticProcessTree
+        deterministic_finite_automaton::DeterministicFiniteAutomaton,
+        directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel,
+        event_log::EventLog, executions::Executions, finite_language::FiniteLanguage,
+        finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet,
+        language_of_alignments::LanguageOfAlignments, process_tree::ProcessTree,
+        scalable_vector_graphics::ScalableVectorGraphics,
+        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
+        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        stochastic_language_of_alignments::StochasticLanguageOfAlignments,
+        stochastic_process_tree::StochasticProcessTree,
     },
     ebi_traits::{
         ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
@@ -71,7 +81,7 @@ impl EbiObjectType {
             EbiObjectType::StochasticProcessTree => "a",
             EbiObjectType::Executions => "",
             EbiObjectType::DirectlyFollowsGraph => "a",
-            EbiObjectType::ScalableVectorGraphics => "a", 
+            EbiObjectType::ScalableVectorGraphics => "a",
         }
     }
 
@@ -132,7 +142,8 @@ impl Display for EbiObjectType {
                 EbiObjectType::EventLog => "event log",
                 EbiObjectType::FiniteLanguage => "finite language",
                 EbiObjectType::DirectlyFollowsModel => "directly follows model",
-                EbiObjectType::StochasticDirectlyFollowsModel => "stochastic directly follows model",
+                EbiObjectType::StochasticDirectlyFollowsModel =>
+                    "stochastic directly follows model",
                 EbiObjectType::LanguageOfAlignments => "alignments",
                 EbiObjectType::StochasticLanguageOfAlignments =>
                     "stochastic language of alignments",
@@ -179,7 +190,9 @@ impl EbiObject {
             EbiObject::EventLog(_) => EbiObjectType::EventLog,
             EbiObject::FiniteLanguage(_) => EbiObjectType::FiniteLanguage,
             EbiObject::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
-            EbiObject::StochasticDirectlyFollowsModel(_) => EbiObjectType::StochasticDirectlyFollowsModel,
+            EbiObject::StochasticDirectlyFollowsModel(_) => {
+                EbiObjectType::StochasticDirectlyFollowsModel
+            }
             EbiObject::LanguageOfAlignments(_) => EbiObjectType::LanguageOfAlignments,
             EbiObject::StochasticLanguageOfAlignments(_) => {
                 EbiObjectType::StochasticLanguageOfAlignments
@@ -279,7 +292,10 @@ mod tests {
 
     use strum::IntoEnumIterator;
 
-    use crate::ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject};
+    use crate::ebi_framework::{
+        ebi_input::{EbiInput, TEST_INPUT_TYPE_STRING},
+        ebi_trait::FromEbiTraitObject,
+    };
 
     use super::EbiObjectType;
 
@@ -292,7 +308,8 @@ mod tests {
             object_type.get_java_object_handlers_that_can_import();
         }
 
-        let _ = String::from_trait_object(EbiInput::String("xyz".to_string()));
+        let _ =
+            String::from_trait_object(EbiInput::String("xyz".to_string(), &TEST_INPUT_TYPE_STRING));
     }
 
     #[test]
