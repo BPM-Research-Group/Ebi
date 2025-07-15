@@ -888,7 +888,7 @@ impl Hash for FractionEnum {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         match self {
             FractionEnum::Exact(f) => f.hash(state),
-            FractionEnum::Approx(f) => unsafe { std::mem::transmute::<f64, u64>(*f).hash(state) },
+            FractionEnum::Approx(f) => f64::to_bits(*f).hash(state),
             Self::CannotCombineExactAndApprox => "cceaa".hash(state),
         }
     }
