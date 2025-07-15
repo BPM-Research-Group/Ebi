@@ -202,11 +202,11 @@ impl Signed for FractionF64 {
     }
 
     fn is_positive(&self) -> bool {
-        self.0 > EPSILON
+        *f != 0f64 && self.0 > EPSILON
     }
 
     fn is_negative(&self) -> bool {
-        self.0 < -EPSILON
+        *f != 0f64 && self.0 < -EPSILON
     }
 }
 
