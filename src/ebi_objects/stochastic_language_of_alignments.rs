@@ -6,19 +6,17 @@ use crate::{
     ebi_framework::{
         activity_key::{ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
-        ebi_input::{self, EbiInput, EbiObjectImporter},
+        ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
         ebi_output::{EbiObjectExporter, EbiOutput},
         ebi_trait::FromEbiTraitObject,
         exportable::Exportable,
         importable::Importable,
         infoable::Infoable,
-    },
-    line_reader::LineReader,
-    math::{
+    }, ebi_traits::ebi_trait_activities, line_reader::LineReader, math::{
         fraction::Fraction,
         traits::{One, Signed},
-    },
+    }
 };
 
 use super::language_of_alignments::Move;
@@ -50,7 +48,9 @@ pub const EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler
     is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticLanguageOfAlignments>),
-    trait_importers: &[],
+    trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<StochasticLanguageOfAlignments>),
+    ],
     object_importers: &[EbiObjectImporter::StochasticLanguageOfAlignments(
         StochasticLanguageOfAlignments::import_as_object,
     )],

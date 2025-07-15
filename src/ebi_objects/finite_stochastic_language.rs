@@ -22,6 +22,7 @@ use crate::{
         infoable::Infoable,
     },
     ebi_traits::{
+        ebi_trait_activities,
         ebi_trait_event_log::IndexTrace,
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::{self, EbiTraitFiniteStochasticLanguage},
@@ -70,6 +71,7 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<FiniteStochasticLanguage>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<FiniteStochasticLanguage>),
         EbiTraitImporter::IterableLanguage(
             ebi_trait_iterable_language::import::<FiniteStochasticLanguage>,
         ),

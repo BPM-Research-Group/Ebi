@@ -86,6 +86,7 @@ pub mod ebi_traits {
     pub mod ebi_trait_semantics;
     pub mod ebi_trait_stochastic_deterministic_semantics;
     pub mod ebi_trait_stochastic_semantics;
+    pub mod ebi_trait_activities;
 }
 pub mod math {
     pub mod astar;

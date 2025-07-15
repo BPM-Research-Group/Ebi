@@ -2,6 +2,7 @@ use anyhow::Context;
 
 use crate::{
     ebi_framework::{
+        activity_key::HasActivityKey,
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
         ebi_object::{EbiObject, EbiObjectType, EbiTraitObject},
@@ -47,28 +48,23 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA: EbiCommand = EbiCommand::Comma
     exact_arithmetic: true,
     input_types: &[&[
         &EbiInputType::Trait(EbiTrait::FiniteLanguage),
-        &EbiInputType::Trait(EbiTrait::IterableLanguage),
-        &EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage),
-        &EbiInputType::Trait(EbiTrait::Semantics),
+        &EbiInputType::Trait(EbiTrait::Activities),
     ]],
     input_names: &["FILE"],
     input_helps: &["A file with activities."],
     execute: |mut inputs, _| {
         Ok(EbiOutput::Object(EbiObject::DeterministicFiniteAutomaton(
             match inputs.remove(0) {
-                EbiInput::Trait(EbiTraitObject::FiniteLanguage(lang), _) => lang
-                    .mine_flower_dfa()
-                    .with_context(|| format!("cannot compute flower model"))?,
-                EbiInput::Trait(EbiTraitObject::IterableLanguage(lang), _) => lang
-                    .mine_flower_dfa()
-                    .with_context(|| format!("cannot compute flower model"))?,
-                EbiInput::Trait(EbiTraitObject::QueriableStochasticLanguage(lang), _) => lang
-                    .mine_flower_dfa()
-                    .with_context(|| format!("cannot compute flower model"))?,
-                EbiInput::Trait(EbiTraitObject::Semantics(sem), _) => sem
-                    .mine_flower_dfa()
-                    .with_context(|| format!("cannot compute flower model"))?,
-
+                EbiInput::Trait(EbiTraitObject::FiniteLanguage(lang), _) => {
+                    let lang: Box<dyn HasActivityKey> = lang;
+                    lang.mine_flower_dfa()
+                        .with_context(|| format!("cannot compute flower model"))?
+                }
+                EbiInput::Trait(EbiTraitObject::Activities(lang), _) => {
+                    let lang: Box<dyn HasActivityKey> = lang;
+                    lang.mine_flower_dfa()
+                        .with_context(|| format!("cannot compute flower model"))?
+                }
                 _ => unreachable!(),
             },
         )))
@@ -86,9 +82,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE: EbiCommand = EbiCommand::Comm
     exact_arithmetic: true,
     input_types: &[&[
         &EbiInputType::Trait(EbiTrait::FiniteLanguage),
-        &EbiInputType::Trait(EbiTrait::IterableLanguage),
-        &EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage),
-        &EbiInputType::Trait(EbiTrait::Semantics),
+        &EbiInputType::Trait(EbiTrait::Activities),
     ]],
     input_names: &["FILE"],
     input_helps: &["A file with activities."],
@@ -96,14 +90,10 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE: EbiCommand = EbiCommand::Comm
         Ok(EbiOutput::Object(EbiObject::ProcessTree(
             match inputs.remove(0) {
                 EbiInput::Trait(EbiTraitObject::FiniteLanguage(lang), _) => lang.mine_flower_tree(),
-                EbiInput::Trait(EbiTraitObject::IterableLanguage(lang), _) => {
+                EbiInput::Trait(EbiTraitObject::Activities(lang), _) => {
+                    let lang: Box<dyn HasActivityKey> = lang;
                     lang.mine_flower_tree()
                 }
-                EbiInput::Trait(EbiTraitObject::QueriableStochasticLanguage(lang), _) => {
-                    lang.mine_flower_tree()
-                }
-                EbiInput::Trait(EbiTraitObject::Semantics(sem), _) => sem.mine_flower_tree(),
-
                 _ => unreachable!(),
             },
         )))

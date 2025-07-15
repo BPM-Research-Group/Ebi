@@ -23,6 +23,7 @@ use crate::{
         infoable::Infoable,
     },
     ebi_traits::{
+        ebi_trait_activities,
         ebi_trait_graphable::{self, EbiTraitGraphable},
         ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
     },
@@ -55,6 +56,7 @@ pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<DirectlyFollowsModel>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<DirectlyFollowsModel>),
         EbiTraitImporter::Semantics(DirectlyFollowsModel::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<DirectlyFollowsModel>),
     ],

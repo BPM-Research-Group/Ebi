@@ -23,8 +23,7 @@ use crate::{
     },
     ebi_objects::process_tree::{Node, Operator},
     ebi_traits::{
-        ebi_trait_graphable::{self, EbiTraitGraphable},
-        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        ebi_trait_activities::EbiTraitActivities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}
     },
 };
 
@@ -76,6 +75,12 @@ impl ProcessTreeMarkupLanguage {
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let ptml = Self::import(reader)?;
         Ok(EbiObject::LabelledPetriNet(ptml.into()))
+    }
+
+    pub fn import_as_activities(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitActivities>> {
+        let ptml = Self::import(reader)?;
+        let ptree: ProcessTree = ptml.into();
+        Ok(Box::new(ptree))
     }
 }
 

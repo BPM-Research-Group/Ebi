@@ -25,6 +25,7 @@ pub enum EbiTrait {
     StochasticDeterministicSemantics,
     StochasticSemantics,
     Graphable,
+    Activities,
 }
 
 impl EbiTrait {
@@ -58,6 +59,7 @@ impl EbiTrait {
             EbiTrait::StochasticSemantics => "a",
             EbiTrait::Semantics => "a",
             EbiTrait::Graphable => "a",
+            EbiTrait::Activities => "",
         }
     }
 
@@ -106,6 +108,7 @@ impl EbiTrait {
                 "An object in which the state space can be traversed, with probabilities. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
             }
             EbiTrait::Graphable => "Can be visualised as a graph.",
+            EbiTrait::Activities => "Has activities",
         }
     }
 }
@@ -126,6 +129,7 @@ impl Display for EbiTrait {
                 EbiTrait::StochasticSemantics => "stochastic semantics",
                 EbiTrait::Semantics => "semantics",
                 EbiTrait::Graphable => "graphable",
+                EbiTrait::Activities => "activities",
             }
         )
     }

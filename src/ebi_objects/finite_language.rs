@@ -23,10 +23,7 @@ use crate::{
         infoable::Infoable,
     },
     ebi_traits::{
-        ebi_trait_event_log::IndexTrace,
-        ebi_trait_finite_language::{self, EbiTraitFiniteLanguage},
-        ebi_trait_iterable_language::{self, EbiTraitIterableLanguage},
-        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        ebi_trait_activities, ebi_trait_event_log::IndexTrace, ebi_trait_finite_language::{self, EbiTraitFiniteLanguage}, ebi_trait_iterable_language::{self, EbiTraitIterableLanguage}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}
     },
     line_reader::LineReader,
 };
@@ -56,6 +53,7 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<FiniteLanguage>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<FiniteLanguage>),
         EbiTraitImporter::IterableLanguage(ebi_trait_iterable_language::import::<FiniteLanguage>),
         EbiTraitImporter::FiniteLanguage(ebi_trait_finite_language::import::<FiniteLanguage>),
         EbiTraitImporter::Semantics(FiniteLanguage::import_as_semantics),

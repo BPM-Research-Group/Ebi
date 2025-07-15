@@ -20,15 +20,7 @@ use crate::{
         stochastic_process_tree::StochasticProcessTree,
     },
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_graphable::EbiTraitGraphable,
-        ebi_trait_iterable_language::EbiTraitIterableLanguage,
-        ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-        ebi_trait_semantics::EbiTraitSemantics,
-        ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics,
-        ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
+        ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_graphable::EbiTraitGraphable, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics
     },
 };
 
@@ -266,6 +258,7 @@ pub enum EbiTraitObject {
     StochasticSemantics(EbiTraitStochasticSemantics),
     Semantics(EbiTraitSemantics),
     Graphable(Box<dyn EbiTraitGraphable>),
+    Activities(Box<dyn EbiTraitActivities>),
 }
 
 impl EbiTraitObject {
@@ -283,6 +276,7 @@ impl EbiTraitObject {
             EbiTraitObject::StochasticSemantics(_) => EbiTrait::StochasticSemantics,
             EbiTraitObject::Semantics(_) => EbiTrait::Semantics,
             EbiTraitObject::Graphable(_) => EbiTrait::Graphable,
+            EbiTraitObject::Activities(_) => EbiTrait::Activities,
         }
     }
 }

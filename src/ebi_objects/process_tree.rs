@@ -26,9 +26,7 @@ use crate::{
         prom_link::JavaObjectHandler,
     },
     ebi_traits::{
-        ebi_trait_graphable::{self, EbiTraitGraphable},
-        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
-        ebi_trait_stochastic_semantics::TransitionIndex,
+        ebi_trait_activities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex
     },
     line_reader::LineReader,
 };
@@ -61,6 +59,7 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<ProcessTree>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<ProcessTree>),
         EbiTraitImporter::Semantics(ProcessTree::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<ProcessTree>),
     ],

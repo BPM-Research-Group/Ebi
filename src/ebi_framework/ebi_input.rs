@@ -12,7 +12,8 @@ use strum_macros::EnumIter;
 use crate::{
     ebi_framework::ebi_file_handler::EbiFileHandler,
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
+        ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_graphable::EbiTraitGraphable,
         ebi_trait_iterable_language::EbiTraitIterableLanguage,
@@ -446,6 +447,7 @@ pub enum EbiTraitImporter {
         fn(&mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics>,
     ), //can walk over states using activities, potentially forever
     Graphable(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitGraphable>>), //can produce a Dot graph
+    Activities(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitActivities>>), //has activities
 }
 
 impl EbiTraitImporter {
@@ -465,6 +467,7 @@ impl EbiTraitImporter {
                 EbiTrait::StochasticDeterministicSemantics
             }
             EbiTraitImporter::Graphable(_) => EbiTrait::Graphable,
+            EbiTraitImporter::Activities(_) => EbiTrait::Activities,
         }
     }
 
@@ -490,6 +493,7 @@ impl EbiTraitImporter {
                 EbiTraitObject::StochasticDeterministicSemantics((f)(reader)?)
             }
             EbiTraitImporter::Graphable(f) => EbiTraitObject::Graphable((f)(reader)?),
+            EbiTraitImporter::Activities(f) => EbiTraitObject::Activities((f)(reader)?),
         })
     }
 }

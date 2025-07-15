@@ -9,8 +9,7 @@ use crate::{
         importable::Importable,
     },
     ebi_traits::{
-        ebi_trait_graphable::{self, EbiTraitGraphable},
-        ebi_trait_semantics::{EbiTraitSemantics, Semantics},
+        ebi_trait_activities::EbiTraitActivities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}
     },
 };
 use anyhow::{Context, Result, anyhow};
@@ -38,6 +37,7 @@ pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<LolaNet>),
     trait_importers: &[
+        EbiTraitImporter::Activities(LolaNet::import_as_activities),
         EbiTraitImporter::Semantics(LolaNet::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<LolaNet>),
     ],
@@ -83,6 +83,12 @@ impl LolaNet {
         let lola_net = Self::import(reader)?;
         let lpn = LabelledPetriNet::from(lola_net);
         Ok(EbiTraitSemantics::Marking(Box::new(lpn)))
+    }
+
+    pub fn import_as_activities(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitActivities>> {
+        let lola_net = Self::import(reader)?;
+        let lpn = LabelledPetriNet::from(lola_net);
+        Ok(Box::new(lpn))
     }
 }
 

@@ -12,6 +12,7 @@ use crate::{
         importable::Importable,
     },
     ebi_traits::{
+        ebi_trait_activities,
         ebi_trait_graphable::{self, EbiTraitGraphable},
         ebi_trait_queriable_stochastic_language,
         ebi_trait_semantics::{Semantics, ToSemantics},
@@ -57,6 +58,7 @@ pub const EBI_STOCHASTIC_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticProcessTree>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<StochasticProcessTree>),
         EbiTraitImporter::QueriableStochasticLanguage(
             ebi_trait_queriable_stochastic_language::import::<StochasticProcessTree>,
         ),
