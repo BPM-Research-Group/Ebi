@@ -165,7 +165,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
-        &[&EbiInputType::Usize(None, None, None)],
+        &[&EbiInputType::Usize(Some(1), None, None)],
     ],
     input_names: &["LANGUAGE", "NUMBER_OF_CLUSTERS"],
     input_helps: &["The finite stochastic language.", "The number of clusters."],

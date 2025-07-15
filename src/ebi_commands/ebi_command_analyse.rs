@@ -171,7 +171,7 @@ Computation is more efficient for an object with a finite stochastic language.")
     exact_arithmetic: true,
     input_types: &[ 
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics)], 
-        &[ &EbiInputType::Usize(None, None, None)] 
+        &[ &EbiInputType::Usize(Some(1), None, None)] 
     ],
     input_names: &[ "FILE", "NUMBER_OF_TRACES"],
     input_helps: &[ "Any object with deterministic stochastic semantics.", "The number of traces that should be extracted."],

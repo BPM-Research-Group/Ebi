@@ -168,7 +168,7 @@ pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     input_types: &[
         SAMPLED_OBJECT_INPUTS,
         SAMPLED_OBJECT_INPUTS,
-        &[&EbiInputType::Usize(None, None, None)],
+        &[&EbiInputType::Usize(Some(1), None, None)],
     ],
     input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"],
     input_helps: &[
@@ -251,7 +251,7 @@ pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         SAMPLED_OBJECT_INPUTS,
-        &[&EbiInputType::Usize(None, None, None)],
+        &[&EbiInputType::Usize(Some(1), None, None)],
     ],
     input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"],
     input_helps: &[
