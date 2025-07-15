@@ -202,11 +202,11 @@ impl Signed for FractionF64 {
     }
 
     fn is_positive(&self) -> bool {
-        *f != 0f64 && self.0 > EPSILON
+        self.0 != 0f64 && self.0 > EPSILON
     }
 
     fn is_negative(&self) -> bool {
-        *f != 0f64 && self.0 < -EPSILON
+        self.0 != 0f64 && self.0 < -EPSILON
     }
 }
 
@@ -317,7 +317,7 @@ impl Hash for FractionF64 {
      * Approximate arithmetic is discouraged
      */
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        unsafe { std::mem::transmute::<f64, u64>(self.0).hash(state) }
+        f64::to_bits(self.0).hash(state)
     }
 }
 
