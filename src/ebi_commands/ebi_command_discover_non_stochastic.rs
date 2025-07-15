@@ -1,16 +1,14 @@
-use anyhow::{Context, anyhow};
+use anyhow::Context;
 
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
-        ebi_input::EbiInputType,
-        ebi_object::{EbiObject, EbiObjectType},
+        ebi_input::{EbiInput, EbiInputType},
+        ebi_object::{EbiObject, EbiObjectType, EbiTraitObject},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_traits::
-        ebi_trait_finite_language::EbiTraitFiniteLanguage
-    ,
+    ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage,
     techniques::{
         flower_miner::{FlowerMinerDFA, FlowerMinerTree},
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
@@ -31,7 +29,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
 pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER: EbiCommand = EbiCommand::Group {
     name_short: "flw",
     name_long: Some("flower"),
-    explanation_short: "Discover a model that supports any trace with the activities of the log.",
+    explanation_short: "Discover a model that supports any trace with the activities of the log or model.",
     explanation_long: None,
     children: &[
         &EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA,
@@ -47,14 +45,32 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA: EbiCommand = EbiCommand::Comma
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteLanguage)]],
-    input_names: &["LANG"],
-    input_helps: &["A finite language."],
+    input_types: &[&[
+        &EbiInputType::Trait(EbiTrait::FiniteLanguage),
+        &EbiInputType::Trait(EbiTrait::IterableLanguage),
+        &EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage),
+        &EbiInputType::Trait(EbiTrait::Semantics),
+    ]],
+    input_names: &["FILE"],
+    input_helps: &["A file with activities."],
     execute: |mut inputs, _| {
-        let lpn = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
         Ok(EbiOutput::Object(EbiObject::DeterministicFiniteAutomaton(
-            lpn.mine_flower_dfa()
-                .with_context(|| anyhow!("cannot discover flower model"))?,
+            match inputs.remove(0) {
+                EbiInput::Trait(EbiTraitObject::FiniteLanguage(lang), _) => lang
+                    .mine_flower_dfa()
+                    .with_context(|| format!("cannot compute flower model"))?,
+                EbiInput::Trait(EbiTraitObject::IterableLanguage(lang), _) => lang
+                    .mine_flower_dfa()
+                    .with_context(|| format!("cannot compute flower model"))?,
+                EbiInput::Trait(EbiTraitObject::QueriableStochasticLanguage(lang), _) => lang
+                    .mine_flower_dfa()
+                    .with_context(|| format!("cannot compute flower model"))?,
+                EbiInput::Trait(EbiTraitObject::Semantics(sem), _) => sem
+                    .mine_flower_dfa()
+                    .with_context(|| format!("cannot compute flower model"))?,
+
+                _ => unreachable!(),
+            },
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::DeterministicFiniteAutomaton),
@@ -68,13 +84,28 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE: EbiCommand = EbiCommand::Comm
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteLanguage)]],
-    input_names: &["LANG"],
-    input_helps: &["A finite language."],
+    input_types: &[&[
+        &EbiInputType::Trait(EbiTrait::FiniteLanguage),
+        &EbiInputType::Trait(EbiTrait::IterableLanguage),
+        &EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage),
+        &EbiInputType::Trait(EbiTrait::Semantics),
+    ]],
+    input_names: &["FILE"],
+    input_helps: &["A file with activities."],
     execute: |mut inputs, _| {
-        let lpn = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
         Ok(EbiOutput::Object(EbiObject::ProcessTree(
-            lpn.mine_flower_tree(),
+            match inputs.remove(0) {
+                EbiInput::Trait(EbiTraitObject::FiniteLanguage(lang), _) => lang.mine_flower_tree(),
+                EbiInput::Trait(EbiTraitObject::IterableLanguage(lang), _) => {
+                    lang.mine_flower_tree()
+                }
+                EbiInput::Trait(EbiTraitObject::QueriableStochasticLanguage(lang), _) => {
+                    lang.mine_flower_tree()
+                }
+                EbiInput::Trait(EbiTraitObject::Semantics(sem), _) => sem.mine_flower_tree(),
+
+                _ => unreachable!(),
+            },
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::ProcessTree),
