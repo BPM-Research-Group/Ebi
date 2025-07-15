@@ -32,7 +32,7 @@ use super::{labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree};
 
 pub const FORMAT_SPECIFICATION: &str = "A process tree markup language file.
 For instance:
-    \\lstinputlisting[language=xml, style=boxed]{../testfiles/a.ptml}";
+    \\lstinputlisting[language=xml, style=boxed]{../testfiles/aa-ab-ba.ptml}";
 
 pub const EBI_PROCESS_TREE_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "process tree markup language",
