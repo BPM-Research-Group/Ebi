@@ -15,10 +15,10 @@ use std::{
 use crate::{
     ebi_commands::{
         ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association,
-        ebi_command_conformance, ebi_command_convert, ebi_command_discover,
-        ebi_command_discover_non_stochastic, ebi_command_info, ebi_command_itself,
-        ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate,
-        ebi_command_visualise,
+        ebi_command_conformance, ebi_command_conformance_non_stochastic, ebi_command_convert,
+        ebi_command_discover, ebi_command_discover_non_stochastic, ebi_command_info,
+        ebi_command_itself, ebi_command_probability, ebi_command_sample, ebi_command_test,
+        ebi_command_validate, ebi_command_visualise,
     },
     ebi_framework::ebi_output,
     math::fraction::{Fraction, FractionNotParsedYet},
@@ -40,6 +40,7 @@ pub const EBI_COMMANDS: EbiCommand = EbiCommand::Group {
         &ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC,
         &ebi_command_association::EBI_ASSOCIATION,
         &ebi_command_conformance::EBI_CONFORMANCE,
+        &ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC,
         &ebi_command_convert::EBI_CONVERT,
         &ebi_command_discover::EBI_DISCOVER,
         &ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC,

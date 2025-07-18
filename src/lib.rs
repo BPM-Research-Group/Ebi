@@ -44,6 +44,7 @@ pub mod ebi_commands {
     pub mod ebi_command_validate;
     pub mod ebi_command_visualise;
     pub mod ebi_command_discover_non_stochastic;
+    pub mod ebi_command_conformance_non_stochastic;
 }
 pub mod ebi_objects {
     pub mod compressed_event_log;
@@ -192,6 +193,7 @@ pub mod techniques {
     pub mod directly_follows_graph_abstractor;
     pub mod edge_difference;
     pub mod permutation_test;
+    pub mod fitness;
 }
 pub mod optimisation_algorithms {
     pub mod network_simplex;

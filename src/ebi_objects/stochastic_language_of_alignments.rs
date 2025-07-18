@@ -13,10 +13,13 @@ use crate::{
         exportable::Exportable,
         importable::Importable,
         infoable::Infoable,
-    }, ebi_traits::ebi_trait_activities, line_reader::LineReader, math::{
+    },
+    ebi_traits::ebi_trait_activities,
+    line_reader::LineReader,
+    math::{
         fraction::Fraction,
         traits::{One, Signed},
-    }
+    },
 };
 
 use super::language_of_alignments::Move;
@@ -35,8 +38,6 @@ pub const FORMAT_SPECIFICATION: &str = "A stochastic language of alignments is a
         \\item `log move', followed by a line with the word `label', then a space, and then the activity label.
         \\item `model move', followed by a line with the word `label' followed by a space and the activity label, which is followed with a line with the index of the involved ransition.
     \\end{itemize}
-    Note that the Semantics trait of Ebi, which is what most alignment computations use, requires that every final marking is a deadlock.
-    Consequently, an implicit silent transition may be added by the Semantics trait that is not in the model.
     
     For instance:
     \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba.sali}";
@@ -48,9 +49,9 @@ pub const EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler
     is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticLanguageOfAlignments>),
-    trait_importers: &[
-        EbiTraitImporter::Activities(ebi_trait_activities::import::<StochasticLanguageOfAlignments>),
-    ],
+    trait_importers: &[EbiTraitImporter::Activities(
+        ebi_trait_activities::import::<StochasticLanguageOfAlignments>,
+    )],
     object_importers: &[EbiObjectImporter::StochasticLanguageOfAlignments(
         StochasticLanguageOfAlignments::import_as_object,
     )],
@@ -376,5 +377,31 @@ impl FromEbiTraitObject for StochasticLanguageOfAlignments {
                 object.get_type()
             )),
         }
+    }
+}
+
+impl IntoIterator for StochasticLanguageOfAlignments {
+    type Item = (Vec<Move>, Fraction);
+
+    type IntoIter = StochasticLanguageOfAlignmentsIterator;
+
+    fn into_iter(self) -> Self::IntoIter {
+        Self::IntoIter {
+            moves: self.alignments.into_iter(),
+            probabilities: self.probabilities.into_iter(),
+        }
+    }
+}
+
+pub struct StochasticLanguageOfAlignmentsIterator {
+    moves: std::vec::IntoIter<Vec<Move>>,
+    probabilities: std::vec::IntoIter<Fraction>,
+}
+
+impl Iterator for StochasticLanguageOfAlignmentsIterator {
+    type Item = (Vec<Move>, Fraction);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        Some((self.moves.next()?, self.probabilities.next()?))
     }
 }
