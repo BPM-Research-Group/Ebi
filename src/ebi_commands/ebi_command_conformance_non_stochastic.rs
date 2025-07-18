@@ -21,15 +21,15 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     explanation_short: "Compute conformance without considering a stochastic perspective.",
     explanation_long: None,
     children: &[
-        &EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENT,
-        &EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENT_SET,
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
+        &EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS,
         &EBI_CONFORMANCE_NON_STOCHASTIC_TRACE_FITNESS,
     ],
 };
 
-pub const EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS: EbiCommand = EbiCommand::Command {
     name_short: "ali",
-    name_long: Some("alignment"),
+    name_long: Some("alignments"),
     explanation_short: "Compute alignments.",
     explanation_long: Some(
         "Compute alignments.\nThe model must be able to terminate and its states must be bounded. The search performed is not optimised. For Petri nets, the ProM implementation may be more efficient.",
@@ -60,9 +60,9 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Com
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLanguageOfAlignments),
 };
 
-pub const EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENT_SET: EbiCommand = EbiCommand::Command {
-    name_short: "aliset",
-    name_long: Some("alignment-set"),
+pub const EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS: EbiCommand = EbiCommand::Command {
+    name_short: "setali",
+    name_long: Some("set-alignments"),
     explanation_short: "Compute alignments as a set.",
     explanation_long: Some(
         "Compute a non-weighted set of alignments.\nThe model must be able to terminate and its states must be bounded. The search performed is not optimised. For Petri nets, the ProM implementation may be more efficient.",
