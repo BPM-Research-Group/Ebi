@@ -14,18 +14,18 @@ use super::{
 
 #[derive(Clone, Copy, PartialEq, Eq, EnumIter, Hash, Default)]
 pub enum EbiTrait {
+    Activities,
     #[default]
     EventLog,
     FiniteLanguage,
     FiniteStochasticLanguage,
+    Graphable,
     IterableLanguage,
     IterableStochasticLanguage,
     QueriableStochasticLanguage,
     Semantics,
     StochasticDeterministicSemantics,
     StochasticSemantics,
-    Graphable,
-    Activities,
 }
 
 impl EbiTrait {
