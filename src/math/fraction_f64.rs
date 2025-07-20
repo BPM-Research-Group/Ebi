@@ -11,6 +11,7 @@ use std::{
 };
 
 use anyhow::{Error, Result, anyhow};
+use ndarray::ScalarOperand;
 use rand::Rng;
 
 use crate::{
@@ -79,6 +80,8 @@ impl FractionF64 {
         Self(self.0.recip())
     }
 }
+
+impl ScalarOperand for FractionF64 {}
 
 pub struct FractionRandomCacheF64 {
     cumulative_probabilities: Vec<FractionF64>,

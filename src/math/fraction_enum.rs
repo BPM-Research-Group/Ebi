@@ -1,5 +1,6 @@
 use anyhow::{Context, Error, Result, anyhow};
 use fraction::{BigFraction, BigUint, GenericFraction, Sign};
+use ndarray::ScalarOperand;
 use num::{BigInt, One as NumOne};
 use num_bigint::{RandBigInt, ToBigInt, ToBigUint};
 use num_rational::Ratio;
@@ -169,6 +170,8 @@ impl FractionEnum {
         }
     }
 }
+
+impl ScalarOperand for FractionEnum {}
 
 impl MaybeExact for FractionEnum {
     type Approximate = f64;
