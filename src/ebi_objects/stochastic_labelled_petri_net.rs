@@ -17,7 +17,7 @@ use crate::ebi_framework::importable::Importable;
 use crate::ebi_framework::infoable::Infoable;
 use crate::ebi_framework::prom_link::JavaObjectHandler;
 use crate::ebi_traits::ebi_trait_graphable::{self, EbiTraitGraphable};
-use crate::ebi_traits::ebi_trait_queriable_stochastic_language;
+use crate::ebi_traits::{ebi_trait_activities, ebi_trait_queriable_stochastic_language};
 use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics};
 use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::{
     EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
@@ -55,6 +55,7 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticLabelledPetriNet>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<StochasticLabelledPetriNet>),
         EbiTraitImporter::QueriableStochasticLanguage(
             ebi_trait_queriable_stochastic_language::import::<StochasticLabelledPetriNet>,
         ),

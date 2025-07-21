@@ -11,6 +11,7 @@ use std::{
 };
 
 use anyhow::{Error, Result, anyhow};
+use ndarray::ScalarOperand;
 use rand::Rng;
 
 use crate::{
@@ -79,6 +80,8 @@ impl FractionF64 {
         Self(self.0.recip())
     }
 }
+
+impl ScalarOperand for FractionF64 {}
 
 pub struct FractionRandomCacheF64 {
     cumulative_probabilities: Vec<FractionF64>,
@@ -202,11 +205,11 @@ impl Signed for FractionF64 {
     }
 
     fn is_positive(&self) -> bool {
-        self.0 > EPSILON
+        self.0 != 0f64 && self.0 > EPSILON
     }
 
     fn is_negative(&self) -> bool {
-        self.0 < -EPSILON
+        self.0 != 0f64 && self.0 < -EPSILON
     }
 }
 
@@ -317,7 +320,7 @@ impl Hash for FractionF64 {
      * Approximate arithmetic is discouraged
      */
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
-        unsafe { std::mem::transmute::<f64, u64>(self.0).hash(state) }
+        f64::to_bits(self.0).hash(state)
     }
 }
 

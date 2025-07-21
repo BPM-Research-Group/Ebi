@@ -44,7 +44,7 @@ pub const EBI_SAMPLE: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true,
     input_types: &[
         SAMPLED_OBJECT_INPUTS,
-        &[&EbiInputType::Usize(None, None, None)],
+        &[&EbiInputType::Usize(Some(1), None, None)],
     ],
     input_names: &["FILE", "NUMBER_OF_TRACES"],
     input_helps: &[

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ptml>
+  <processTree>
+    <processTree>
+      <and />
+    </processTree>
+    <processTree />
+    <and id="bla"/>
+    <and id="bla"/>
+  </processTree>
+  <ptml>
+    <and />
+  </ptml>
+</ptml>

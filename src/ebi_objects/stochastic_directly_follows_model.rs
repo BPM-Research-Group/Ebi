@@ -24,12 +24,9 @@ use crate::{
         infoable::Infoable,
     },
     ebi_traits::{
-        ebi_trait_graphable::{self, EbiTraitGraphable},
-        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
-        ebi_trait_stochastic_deterministic_semantics::{
+        ebi_trait_activities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{
             EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
-        },
-        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
+        }, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}
     },
     line_reader::LineReader,
     math::{
@@ -62,6 +59,7 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticDirectlyFollowsModel>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<StochasticDirectlyFollowsModel>),
         EbiTraitImporter::Semantics(StochasticDirectlyFollowsModel::import_as_semantics),
         EbiTraitImporter::StochasticSemantics(
             StochasticDirectlyFollowsModel::import_as_stochastic_semantics,

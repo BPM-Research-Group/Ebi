@@ -8,11 +8,10 @@ use crate::{
     },
     ebi_traits::{
         ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_semantics::EbiTraitSemantics,
     },
     techniques::{
-        align::Align, any_traces::AnyTraces, bounded::Bounded, executions::FindExecutions,
+        any_traces::AnyTraces, bounded::Bounded, executions::FindExecutions,
         infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic,
     },
 };
@@ -24,7 +23,6 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     explanation_short: "Analyse a language without considering its stochastic perspective.",
     explanation_long: None,
     children: &[
-        &EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT,
         &EBI_ANALYSE_NON_STOCHASTIC_BOUNDED,
         &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
         &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
@@ -32,39 +30,6 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
         &EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES,
         &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
     ],
-};
-
-pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command {
-    name_short: "ali",
-    name_long: Some("alignment"),
-    explanation_short: "Compute alignments.",
-    explanation_long: Some(
-        "Compute alignments.\nNB 1: the model must be able to terminate and its states must be bounded.\nNB 2: the search performed is not optimised. For Petri nets, the ProM implementation may be more efficient.",
-    ),
-    latex_link: Some(
-        "Alignments according to the method described by Adriansyah~\\cite{DBLP:conf/edoc/AdriansyahDA11}. By default, all traces are computed concurrently on all CPU cores. If this requires too much RAM, please see speed trick~\\ref{speedtrick:multithreaded} in Section~\\ref{sec:speedtricks} for how to reduce the number of CPU cores utilised.",
-    ),
-    cli_command: None,
-    exact_arithmetic: true,
-    input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
-        &[&EbiInputType::Trait(EbiTrait::Semantics)],
-    ],
-    input_names: &["FILE_1", "FILE_2"],
-    input_helps: &["The finite language.", "The model."],
-    execute: |mut objects, _| {
-        let log = objects
-            .remove(0)
-            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-        let mut model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
-
-        let result = model.align_stochastic_language(log)?;
-
-        return Ok(EbiOutput::Object(
-            EbiObject::StochasticLanguageOfAlignments(result),
-        ));
-    },
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLanguageOfAlignments),
 };
 
 pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
@@ -123,7 +88,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
             EbiInput::Trait(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
-            EbiInput::String(_) => {
+            EbiInput::String(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
             EbiInput::Usize(_, _) => {
@@ -170,7 +135,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
-        &[&EbiInputType::Usize(None, None, None)],
+        &[&EbiInputType::Usize(Some(1), None, None)],
     ],
     input_names: &["LANGUAGE", "NUMBER_OF_CLUSTERS"],
     input_helps: &["The finite stochastic language.", "The number of clusters."],
@@ -271,7 +236,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
             EbiInput::Trait(_, _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
-            EbiInput::String(_) => {
+            EbiInput::String(_, _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
             EbiInput::Usize(_, _) => {

@@ -6,14 +6,14 @@ use crate::{
     ebi_framework::{
         activity_key::{Activity, ActivityKey, ActivityKeyTranslator, TranslateActivityKey},
         ebi_file_handler::EbiFileHandler,
-        ebi_input::{self, EbiObjectImporter},
+        ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
         ebi_output::{EbiObjectExporter, EbiOutput},
         exportable::Exportable,
         importable::Importable,
         infoable::Infoable,
     },
-    ebi_traits::ebi_trait_stochastic_semantics::TransitionIndex,
+    ebi_traits::{ebi_trait_activities, ebi_trait_stochastic_semantics::TransitionIndex},
     line_reader::LineReader,
 };
 
@@ -43,7 +43,9 @@ pub const EBI_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<LanguageOfAlignments>),
-    trait_importers: &[],
+    trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<LanguageOfAlignments>),
+    ],
     object_importers: &[EbiObjectImporter::LanguageOfAlignments(
         LanguageOfAlignments::import_as_object,
     )],

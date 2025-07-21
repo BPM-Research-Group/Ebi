@@ -14,17 +14,18 @@ use super::{
 
 #[derive(Clone, Copy, PartialEq, Eq, EnumIter, Hash, Default)]
 pub enum EbiTrait {
+    Activities,
     #[default]
     EventLog,
     FiniteLanguage,
     FiniteStochasticLanguage,
+    Graphable,
     IterableLanguage,
     IterableStochasticLanguage,
     QueriableStochasticLanguage,
     Semantics,
     StochasticDeterministicSemantics,
     StochasticSemantics,
-    Graphable,
 }
 
 impl EbiTrait {
@@ -58,6 +59,7 @@ impl EbiTrait {
             EbiTrait::StochasticSemantics => "a",
             EbiTrait::Semantics => "a",
             EbiTrait::Graphable => "a",
+            EbiTrait::Activities => "",
         }
     }
 
@@ -106,6 +108,7 @@ impl EbiTrait {
                 "An object in which the state space can be traversed, with probabilities. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
             }
             EbiTrait::Graphable => "Can be visualised as a graph.",
+            EbiTrait::Activities => "Has activities",
         }
     }
 }
@@ -126,6 +129,7 @@ impl Display for EbiTrait {
                 EbiTrait::StochasticSemantics => "stochastic semantics",
                 EbiTrait::Semantics => "semantics",
                 EbiTrait::Graphable => "graphable",
+                EbiTrait::Activities => "activities",
             }
         )
     }
@@ -157,7 +161,7 @@ impl FromEbiTraitObject for usize {
 impl FromEbiTraitObject for String {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
-            EbiInput::String(e) => Ok(Box::new(e)),
+            EbiInput::String(e, _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
                 "cannot read {} {} as an integer",
                 object.get_type().get_article(),
@@ -171,7 +175,9 @@ impl FromEbiTraitObject for String {
 mod tests {
     use strum::IntoEnumIterator;
 
-    use crate::ebi_framework::ebi_input::{EbiInput, TEST_INPUT_TYPE_USIZE};
+    use crate::ebi_framework::ebi_input::{
+        EbiInput, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE,
+    };
 
     use super::{EbiTrait, FromEbiTraitObject};
 
@@ -185,7 +191,8 @@ mod tests {
             let _ = format!("{:?}", etrait);
         }
 
-        let _ = String::from_trait_object(EbiInput::String("xyz".to_string()));
+        let _ =
+            String::from_trait_object(EbiInput::String("xyz".to_string(), &TEST_INPUT_TYPE_STRING));
     }
 
     #[test]
@@ -197,6 +204,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn unreachable_usize() {
-        usize::from_trait_object(EbiInput::String("abc".to_string())).unwrap();
+        usize::from_trait_object(EbiInput::String("abc".to_string(), &TEST_INPUT_TYPE_STRING))
+            .unwrap();
     }
 }

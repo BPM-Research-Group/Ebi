@@ -44,6 +44,7 @@ pub mod ebi_commands {
     pub mod ebi_command_validate;
     pub mod ebi_command_visualise;
     pub mod ebi_command_discover_non_stochastic;
+    pub mod ebi_command_conformance_non_stochastic;
 }
 pub mod ebi_objects {
     pub mod compressed_event_log;
@@ -75,6 +76,7 @@ pub mod ebi_objects {
     pub mod portable_document_format;
     pub mod business_process_model_and_notation;
     pub mod stochastic_business_process_model_and_notation;
+    pub mod process_tree_markup_language;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_event_log;
@@ -87,6 +89,7 @@ pub mod ebi_traits {
     pub mod ebi_trait_semantics;
     pub mod ebi_trait_stochastic_deterministic_semantics;
     pub mod ebi_trait_stochastic_semantics;
+    pub mod ebi_trait_activities;
 }
 pub mod math {
     pub mod astar;
@@ -192,10 +195,12 @@ pub mod techniques {
     pub mod directly_follows_graph_abstractor;
     pub mod edge_difference;
     pub mod permutation_test;
+    pub mod fitness;
 }
 pub mod optimisation_algorithms {
     pub mod network_simplex;
     pub mod network_simplex_value_type;
+    pub mod simplex;
 }
 pub mod follower_semantics;
 pub mod json;

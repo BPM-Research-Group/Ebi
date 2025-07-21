@@ -11,21 +11,14 @@ use crate::{
         exportable::Exportable,
         importable::Importable,
         infoable::Infoable,
-    },
-    ebi_traits::{
-        ebi_trait_graphable::{self, EbiTraitGraphable},
-        ebi_trait_queriable_stochastic_language::{self},
-        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
-        ebi_trait_stochastic_deterministic_semantics::{
+    }, ebi_traits::{
+        ebi_trait_activities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_queriable_stochastic_language::{self}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{
             EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
-        },
-        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
-    },
-    json,
-    math::{
+        }, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}
+    }, json, math::{
         fraction::Fraction,
         traits::{One, Signed},
-    },
+    }
 };
 use anyhow::{Context, Error, Result, anyhow};
 use ebi_derive::ActivityKey;
@@ -65,6 +58,7 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticDeterministicFiniteAutomaton>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<StochasticDeterministicFiniteAutomaton>),
         EbiTraitImporter::QueriableStochasticLanguage(
             ebi_trait_queriable_stochastic_language::import::<StochasticDeterministicFiniteAutomaton>,
         ),

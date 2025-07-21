@@ -26,9 +26,7 @@ use crate::{
         prom_link::JavaObjectHandler,
     },
     ebi_traits::{
-        ebi_trait_graphable::{self, EbiTraitGraphable},
-        ebi_trait_semantics::{EbiTraitSemantics, Semantics},
-        ebi_trait_stochastic_semantics::TransitionIndex,
+        ebi_trait_activities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex
     },
     line_reader::LineReader,
     marking::Marking,
@@ -67,6 +65,7 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<LabelledPetriNet>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<LabelledPetriNet>),
         EbiTraitImporter::Semantics(LabelledPetriNet::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<LabelledPetriNet>),
     ],

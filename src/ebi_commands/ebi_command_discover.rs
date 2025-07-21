@@ -84,7 +84,7 @@ pub const EBI_DISCOVER_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Fraction(
             Some(ConstFraction::zero()),
             Some(ConstFraction::one()),
-            None,
+            Some(ConstFraction::one()),
         )],
     ],
     input_names: &["LANG", "MIN_FITNESS"],

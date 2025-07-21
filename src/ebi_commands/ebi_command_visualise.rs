@@ -53,7 +53,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::StochasticBusinessProcessModelAndNotation(s), _) => s.to_string(),
             EbiInput::FileHandler(_) => unreachable!(),
             EbiInput::Trait(_, _) => unreachable!(),
-            EbiInput::String(_) => unreachable!(),
+            EbiInput::String(_, _) => unreachable!(),
             EbiInput::Usize(_, _) => unreachable!(),
             EbiInput::Fraction(_, _) => unreachable!(),
         };
@@ -90,7 +90,9 @@ mod tests {
         ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT,
         ebi_framework::{
             ebi_command::EbiCommand,
-            ebi_input::{EbiInput, TEST_INPUT_TYPE_FRACTION, TEST_INPUT_TYPE_USIZE},
+            ebi_input::{
+                EbiInput, TEST_INPUT_TYPE_FRACTION, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE,
+            },
             ebi_object::EbiTraitObject,
         },
         ebi_objects::{
@@ -123,7 +125,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn unreachable_string() {
-        let object = EbiInput::String("abc".to_string());
+        let object = EbiInput::String("abc".to_string(), &TEST_INPUT_TYPE_STRING);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
             let _ = (execute)(vec![object], None);
         }

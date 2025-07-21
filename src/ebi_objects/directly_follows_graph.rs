@@ -25,12 +25,9 @@ use crate::{
         infoable::Infoable,
     },
     ebi_traits::{
-        ebi_trait_graphable::EbiTraitGraphable,
-        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
-        ebi_trait_stochastic_deterministic_semantics::{
+        ebi_trait_activities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{
             EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
-        },
-        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
+        }, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}
     },
     json,
     math::{
@@ -54,12 +51,13 @@ pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<DirectlyFollowsGraph>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<DirectlyFollowsGraph>),
         EbiTraitImporter::Semantics(DirectlyFollowsGraph::import_as_semantics),
         EbiTraitImporter::StochasticSemantics(DirectlyFollowsGraph::import_as_stochastic_semantics),
         EbiTraitImporter::StochasticDeterministicSemantics(
             DirectlyFollowsGraph::import_as_stochastic_deterministic_semantics,
         ),
-        EbiTraitImporter::Graphable(DirectlyFollowsGraph::import_as_graphable),
+        EbiTraitImporter::Graphable(ebi_trait_graphable::import::<DirectlyFollowsGraph>),
     ],
     object_importers: &[
         EbiObjectImporter::DirectlyFollowsGraph(DirectlyFollowsGraph::import_as_object),
@@ -124,11 +122,6 @@ impl DirectlyFollowsGraph {
     pub fn import_as_stochastic_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
         let dfg = Self::import(reader)?;
         Ok(EbiObject::StochasticLabelledPetriNet(dfg.into()))
-    }
-
-    pub fn import_as_graphable(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitGraphable>> {
-        let dfg = Self::import(reader)?;
-        Ok(Box::new(dfg))
     }
 
     pub fn get_max_state(&self) -> usize {

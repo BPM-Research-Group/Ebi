@@ -1,5 +1,6 @@
 use anyhow::{Error, Result, anyhow};
 use fraction::{BigFraction, BigUint, GenericFraction, Sign};
+use ndarray::ScalarOperand;
 use num::BigInt;
 use num_bigint::{RandBigInt, ToBigUint};
 use num_rational::Ratio;
@@ -82,6 +83,8 @@ impl FractionExact {
         ))
     }
 }
+
+impl ScalarOperand for FractionExact {}
 
 pub struct FractionRandomCacheExact {
     cumulative_probabilities: Vec<FractionExact>,

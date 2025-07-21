@@ -22,6 +22,9 @@ use crate::{
 };
 
 pub trait BootstrapTest {
+    /**
+     * Performs the bootstrap test. It is the responsibility of the caller to ensure that the acitvity keys match.
+     */
     fn bootstrap_test(
         &mut self,
         other: &mut dyn EbiTraitFiniteStochasticLanguage,
@@ -201,7 +204,12 @@ impl BootstrapTest for dyn EbiTraitFiniteStochasticLanguage {
 
                 //create the sample
                 let sample = self.resample(resample_cache, self.len());
-                sample.into_iter().enumerate().for_each(|(index_b, weight)| *self_self_distances.weight_b_mut(index_b) = weight);
+                sample
+                    .into_iter()
+                    .enumerate()
+                    .for_each(|(index_b, weight)| {
+                        *self_self_distances.weight_b_mut(index_b) = weight
+                    });
 
                 //compute emsc
                 let sample_conformance = self_self_distances.earth_movers_stochastic_conformance();
@@ -244,9 +252,7 @@ mod tests {
             ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         },
         math::fraction::Fraction,
-        techniques::bootstrap_test::{
-            BootstrapTest, StatisticalTestsLogCategoricalAttribute,
-        },
+        techniques::bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
     };
 
     #[test]

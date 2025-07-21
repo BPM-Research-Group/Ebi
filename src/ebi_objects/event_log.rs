@@ -23,17 +23,9 @@ use crate::{
         prom_link::JavaObjectHandler,
     },
     ebi_traits::{
-        ebi_trait_event_log::{EbiTraitEventLog, IndexTrace},
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_iterable_language::EbiTraitIterableLanguage,
-        ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
-        ebi_trait_stochastic_deterministic_semantics::{
+        ebi_trait_activities, ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{
             EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
-        },
-        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
+        }, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}
     },
     math::data_type::DataType,
 };
@@ -57,6 +49,7 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<EventLog>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<EventLog>),
         EbiTraitImporter::IterableLanguage(EventLog::read_as_iterable_language),
         EbiTraitImporter::FiniteLanguage(EventLog::read_as_finite_language),
         EbiTraitImporter::FiniteStochasticLanguage(EventLog::read_as_finite_stochastic_language),

@@ -4,16 +4,10 @@ use anyhow::{Result, anyhow};
 
 use crate::{
     ebi_framework::{
-        ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiObjectImporter, EbiTraitImporter},
-        ebi_object::EbiObject,
-        ebi_output::{EbiObjectExporter, EbiOutput},
-        exportable::Exportable,
-        importable::Importable,
+        ebi_file_handler::EbiFileHandler, ebi_input::{EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable
     },
     ebi_traits::{
-        ebi_trait_graphable::{self, EbiTraitGraphable},
-        ebi_trait_semantics::EbiTraitSemantics,
+        ebi_trait_activities::EbiTraitActivities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::EbiTraitSemantics
     },
 };
 
@@ -41,6 +35,7 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(PetriNetMarkupLanguage::validate),
     trait_importers: &[
+        EbiTraitImporter::Activities(PetriNetMarkupLanguage::import_as_activities),
         EbiTraitImporter::Semantics(PetriNetMarkupLanguage::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<PetriNetMarkupLanguage>),
     ],
@@ -91,6 +86,13 @@ impl PetriNetMarkupLanguage {
         let pnml = Self::import(reader)?;
         let lpn = LabelledPetriNet::try_from(pnml)?;
         Ok(EbiTraitSemantics::Marking(Box::new(lpn)))
+    }
+
+    pub fn import_as_activities(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitActivities>> {
+        match Self::import(reader) {
+            Ok(pnml) => Ok(Box::new(LabelledPetriNet::try_from(pnml)?)),
+            Err(x) => Err(x),
+        }
     }
 }
 

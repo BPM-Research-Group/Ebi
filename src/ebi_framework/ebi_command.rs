@@ -15,10 +15,10 @@ use std::{
 use crate::{
     ebi_commands::{
         ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association,
-        ebi_command_conformance, ebi_command_convert, ebi_command_discover,
-        ebi_command_discover_non_stochastic, ebi_command_info, ebi_command_itself,
-        ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate,
-        ebi_command_visualise,
+        ebi_command_conformance, ebi_command_conformance_non_stochastic, ebi_command_convert,
+        ebi_command_discover, ebi_command_discover_non_stochastic, ebi_command_info,
+        ebi_command_itself, ebi_command_probability, ebi_command_sample, ebi_command_test,
+        ebi_command_validate, ebi_command_visualise,
     },
     ebi_framework::ebi_output,
     math::fraction::{Fraction, FractionNotParsedYet},
@@ -40,6 +40,7 @@ pub const EBI_COMMANDS: EbiCommand = EbiCommand::Group {
         &ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC,
         &ebi_command_association::EBI_ASSOCIATION,
         &ebi_command_conformance::EBI_CONFORMANCE,
+        &ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC,
         &ebi_command_convert::EBI_CONVERT,
         &ebi_command_discover::EBI_DISCOVER,
         &ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC,
@@ -460,9 +461,18 @@ impl EbiCommand {
                         return Ok(EbiInput::FileHandler(value.clone()));
                     }
                 }
-                EbiInputType::String => {
+                EbiInputType::String(None, _) => {
                     if let Some(value) = cli_matches.get_one::<String>(&cli_id) {
-                        return Ok(EbiInput::String(value.clone()));
+                        return Ok(EbiInput::String(value.clone(), &input_type));
+                    }
+                }
+                EbiInputType::String(Some(allowed_values), _) => {
+                    if let Some(value) = cli_matches.get_one::<String>(&cli_id) {
+                        if allowed_values.contains(&value.as_str()) {
+                            return Ok(EbiInput::String(value.clone(), &input_type));
+                        } else {
+                            error = Some(anyhow!("value should be one of {:?}", allowed_values));
+                        }
                     }
                 }
                 EbiInputType::Usize(min, max, _) => {
@@ -868,7 +878,7 @@ mod tests {
     enum TestInput {
         Trait(EbiTrait, PathBuf), //a trait cannot be cloned, thus we must parse it every time in the cartesian product
         Object(EbiObject, &'static EbiFileHandler, PathBuf),
-        String(String),
+        String(String, &'static EbiInputType),
         Usize(usize, &'static EbiInputType),
         FileHandler(EbiFileHandler),
         Fraction(Fraction, &'static EbiInputType),
@@ -885,7 +895,7 @@ mod tests {
                     }
                 }
                 TestInput::Object(o, fh, _) => EbiInput::Object(o, fh),
-                TestInput::String(s) => EbiInput::String(s),
+                TestInput::String(s, input_type) => EbiInput::String(s, input_type),
                 TestInput::Usize(u, input_type) => EbiInput::Usize(u, input_type),
                 TestInput::FileHandler(fh) => EbiInput::FileHandler(fh),
                 TestInput::Fraction(f, input_type) => EbiInput::Fraction(f, input_type),
@@ -898,7 +908,7 @@ mod tests {
             match self {
                 Self::Trait(arg0, arg1) => f.debug_tuple("Trait").field(arg0).field(arg1).finish(),
                 Self::Object(_, _, arg2) => f.debug_tuple("Object").field(arg2).finish(),
-                Self::String(arg0) => f.debug_tuple("String").field(arg0).finish(),
+                Self::String(arg0, _) => f.debug_tuple("String").field(arg0).finish(),
                 Self::Usize(arg0, _) => f.debug_tuple("Usize").field(arg0).finish(),
                 Self::FileHandler(arg0) => f.debug_tuple("FileHandler").field(&arg0.name).finish(),
                 Self::Fraction(arg0, _) => f.debug_tuple("Fraction").field(arg0).finish(),
@@ -930,8 +940,17 @@ mod tests {
                 EbiInputType::Fraction(_, _, _) => {
                     result.push(TestInput::Fraction(Fraction::from((1, 2)), &input_type));
                 }
-                EbiInputType::String => {
-                    result.push(TestInput::String("no".to_string()));
+                EbiInputType::String(_, Some(default)) => {
+                    result.push(TestInput::String(default.to_string(), &input_type));
+                }
+                EbiInputType::String(Some(allowed_values), None) => {
+                    result.push(TestInput::String(
+                        allowed_values[0].to_string(),
+                        &input_type,
+                    ));
+                }
+                EbiInputType::String(None, None) => {
+                    result.push(TestInput::String("some string".to_string(), &input_type));
                 }
                 EbiInputType::Usize(_, _, Some(default)) => {
                     result.push(TestInput::Usize(*default, &input_type));

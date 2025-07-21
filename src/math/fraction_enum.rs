@@ -1,5 +1,6 @@
 use anyhow::{Context, Error, Result, anyhow};
 use fraction::{BigFraction, BigUint, GenericFraction, Sign};
+use ndarray::ScalarOperand;
 use num::{BigInt, One as NumOne};
 use num_bigint::{RandBigInt, ToBigInt, ToBigUint};
 use num_rational::Ratio;
@@ -169,6 +170,8 @@ impl FractionEnum {
         }
     }
 }
+
+impl ScalarOperand for FractionEnum {}
 
 impl MaybeExact for FractionEnum {
     type Approximate = f64;
@@ -888,7 +891,7 @@ impl Hash for FractionEnum {
     fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
         match self {
             FractionEnum::Exact(f) => f.hash(state),
-            FractionEnum::Approx(f) => unsafe { std::mem::transmute::<f64, u64>(*f).hash(state) },
+            FractionEnum::Approx(f) => f64::to_bits(*f).hash(state),
             Self::CannotCombineExactAndApprox => "cceaa".hash(state),
         }
     }
