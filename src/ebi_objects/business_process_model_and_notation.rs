@@ -42,40 +42,40 @@ pub const EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = EbiFileHandl
 
 #[derive(Debug, Clone)]
 pub struct BusinessProcessModelAndNotation {
-    nodes: Vec<BPMNNode>,
-    start_event: BPMNNode,
-    xor_gateways: Vec<BPMNGateway>,
-    and_gateways: Vec<BPMNGateway>,
-    or_gateways: Vec<BPMNGateway>,
-    end_events: Vec<BPMNNode>,
-    sequence_flows: Vec<SequenceFlow>,
-    label: HashMap<String, String>,
+    pub nodes: Vec<BPMNNode>,
+    pub start_event: BPMNNode,
+    pub xor_gateways: Vec<BPMNGateway>,
+    pub and_gateways: Vec<BPMNGateway>,
+    pub or_gateways: Vec<BPMNGateway>,
+    pub end_events: Vec<BPMNNode>,
+    pub sequence_flows: Vec<SequenceFlow>,
+    pub label: HashMap<String, String>,
 }
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
 pub struct BPMNNode {
-    id: String,
-    incoming: Vec<SequenceFlow>,
-    outgoing: Vec<SequenceFlow>,
+    pub id: String,
+    pub incoming: Vec<SequenceFlow>,
+    pub outgoing: Vec<SequenceFlow>,
 }
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
 pub struct BPMNGateway {
-    id: String,
-    direction: GatewayDirection,
-    incoming: Vec<SequenceFlow>,
-    outgoing: Vec<SequenceFlow>,
+    pub id: String,
+    pub direction: GatewayDirection,
+    pub incoming: Vec<SequenceFlow>,
+    pub outgoing: Vec<SequenceFlow>,
 }
 
 #[derive(Debug, Eq, Hash, PartialEq, Clone)]
 pub struct SequenceFlow {
-    source_id: String,
-    target_id: String,
+    pub source_id: String,
+    pub target_id: String,
 }
 
 
 #[derive(Eq, Hash, Debug, Clone, PartialEq)]
-enum GatewayDirection {
+pub enum GatewayDirection {
     Diverging,
     Converging,
 }

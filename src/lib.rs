@@ -196,6 +196,7 @@ pub mod techniques {
     pub mod edge_difference;
     pub mod permutation_test;
     pub mod fitness;
+    pub mod stochastic_bpmn_miner;
 }
 pub mod optimisation_algorithms {
     pub mod network_simplex;

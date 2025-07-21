@@ -21,6 +21,7 @@ use crate::{
             OccurrencesStochasticMinerLPN, OccurrencesStochasticMinerTree,
         },
         uniform_stochastic_miner::{UniformStochasticMinerLPN, UniformStochasticMinerTree},
+        stochastic_bpmn_miner::{frequency_estimator, weight_propagation_good_lp},
     },
 };
 
@@ -139,22 +140,26 @@ pub const EBI_DISCOVER_OCCURRENCE_BPMN: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
-        &[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)],
+        &[&EbiInputType::Object(EbiObjectType::BusinessProcessModelAndNotation)],
     ],
     input_names: &["FILE_1", "FILE_2"],
     input_helps: &[
         "A finite stochastic language (log) to get the occurrences from.",
-        "A labelled Petri net with the control flow.",
+        "A BPMN Model with the control flow.",
     ],
     execute: |mut inputs, _| {
-        let language = inputs
+        let language: Box<dyn EbiTraitFiniteStochasticLanguage> = inputs
             .remove(0)
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let bpmn = inputs
             .remove(0)
             .to_type::<BusinessProcessModelAndNotation>()?;
         
-        let sbpmn = todo!();
+        let frequencies = frequency_estimator(language.as_ref(), &bpmn);
+        let weights = frequencies;  // frequencies are already in the right format (HashMap<String, Fraction>)
+        
+        let sbpmn = weight_propagation_good_lp(&bpmn, &weights)
+            .with_context(|| "Failed to propagate flows in BPMN model")?;
 
         Ok(EbiOutput::Object(
             EbiObject::StochasticBusinessProcessModelAndNotation(sbpmn),
