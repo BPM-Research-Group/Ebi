@@ -25,11 +25,15 @@ use crate::{
         infoable::Infoable,
     },
     ebi_traits::{
-        ebi_trait_activities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{
+        ebi_trait_activities,
+        ebi_trait_graphable::{self, EbiTraitGraphable},
+        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        ebi_trait_stochastic_deterministic_semantics::{
             EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
-        }, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}
+        },
+        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
-    json,
+    format_comparison, json,
     math::{
         fraction::Fraction,
         traits::{Signed, Zero},
@@ -41,7 +45,10 @@ use super::{
     stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
 };
 
-pub const FORMAT_SPECIFICATION: &str = "A directly follows graph is a JSON structure.";
+pub const FORMAT_SPECIFICATION: &str = concat!(
+    "A directly follows graph is a JSON structure.",
+    format_comparison!()
+);
 
 pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
     name: "directly follows graph",

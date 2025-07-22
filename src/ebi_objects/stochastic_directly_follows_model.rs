@@ -24,10 +24,15 @@ use crate::{
         infoable::Infoable,
     },
     ebi_traits::{
-        ebi_trait_activities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{
+        ebi_trait_activities,
+        ebi_trait_graphable::{self, EbiTraitGraphable},
+        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        ebi_trait_stochastic_deterministic_semantics::{
             EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
-        }, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}
+        },
+        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
+    format_comparison,
     line_reader::LineReader,
     math::{
         fraction::Fraction,
@@ -37,7 +42,7 @@ use crate::{
 
 pub const HEADER: &str = "stochastic directly follows model";
 
-pub const FORMAT_SPECIFICATION: &str = "A stochstic directly follows model is a line-based structure. Lines starting with a \\# are ignored.
+pub const FORMAT_SPECIFICATION: &str = concat!("A stochstic directly follows model is a line-based structure. Lines starting with a \\# are ignored.
     This first line is exactly `directly follows model'.\\
     The second line is a boolean indicating whether the model supports empty traces.\\
     The third line is the number of activities in the model.\\
@@ -47,9 +52,7 @@ pub const FORMAT_SPECIFICATION: &str = "A stochstic directly follows model is a 
     The next line contains the number of edges, followed by, for each edge, a line with first the index of the source activity, then the `>` symbol, then the index of the target activity, then a `w`, and then the weight of the transition.
     
     For instance:
-    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba.sdfm}
-    
-    Note that a directly follows model expresses a language and may have duplicated activity labels.";
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba.sdfm}", format_comparison!());
 
 pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "stochastic directly follows model",
@@ -59,7 +62,9 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticDirectlyFollowsModel>),
     trait_importers: &[
-        EbiTraitImporter::Activities(ebi_trait_activities::import::<StochasticDirectlyFollowsModel>),
+        EbiTraitImporter::Activities(
+            ebi_trait_activities::import::<StochasticDirectlyFollowsModel>,
+        ),
         EbiTraitImporter::Semantics(StochasticDirectlyFollowsModel::import_as_semantics),
         EbiTraitImporter::StochasticSemantics(
             StochasticDirectlyFollowsModel::import_as_stochastic_semantics,
