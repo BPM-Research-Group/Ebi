@@ -127,7 +127,7 @@ pub const EBI_BOOTSTRAP_TEST: EbiCommand = EbiCommand::Command {
     input_names: &["LANG_1", "LANG_2", "SAMPLES", "P-VALUE"],
     input_helps: &[
         "The first event log for which the test is to be performed.",
-        "The first event log for which the test is to be performed.",
+        "The second event log for which the test is to be performed.",
         "The number of samples taken.",
         "The threshold p-value",
     ],
