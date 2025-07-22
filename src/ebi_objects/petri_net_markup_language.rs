@@ -4,10 +4,17 @@ use anyhow::{Result, anyhow};
 
 use crate::{
     ebi_framework::{
-        ebi_file_handler::EbiFileHandler, ebi_input::{EbiObjectImporter, EbiTraitImporter}, ebi_object::EbiObject, ebi_output::{EbiObjectExporter, EbiOutput}, exportable::Exportable, importable::Importable
+        ebi_file_handler::EbiFileHandler,
+        ebi_input::{EbiObjectImporter, EbiTraitImporter},
+        ebi_object::EbiObject,
+        ebi_output::{EbiObjectExporter, EbiOutput},
+        exportable::Exportable,
+        importable::Importable,
     },
     ebi_traits::{
-        ebi_trait_activities::EbiTraitActivities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::EbiTraitSemantics
+        ebi_trait_activities::EbiTraitActivities,
+        ebi_trait_graphable::{self, EbiTraitGraphable},
+        ebi_trait_semantics::EbiTraitSemantics,
     },
 };
 
@@ -24,7 +31,11 @@ use super::{
 pub const FORMAT_SPECIFICATION: &str =
     "A Petri net markup language file follows the ISO 15909-2:2011 format~\\cite{pnml}. 
 Parsing is performed by the Rust4PM crate~\\cite{DBLP:conf/bpm/KustersA24}.
-For instance:
+
+    Please note that Ebi ignores any final markings.
+    Instead, every deadlock is considered a final marking.
+
+    For instance:
     \\lstinputlisting[language=xml, style=boxed]{../testfiles/a.pnml}";
 
 pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
