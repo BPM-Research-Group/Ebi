@@ -46,7 +46,10 @@ use super::{
 };
 
 pub const FORMAT_SPECIFICATION: &str = concat!(
-    "A directly follows graph is a JSON structure.",
+    "A directly follows graph is a JSON structure.
+    
+    For instance:
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba.dfg}",
     format_comparison!()
 );
 
