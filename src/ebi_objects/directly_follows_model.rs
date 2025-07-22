@@ -40,7 +40,7 @@ macro_rules! format_comparison {
     
     The following table gives an overview of several directly follows-based file types and their features:
     \\begin{center}
-    \\begin{tabular}{lll}
+    \\begin{tabularx}{\\linewidth}{Xlll}
         \\toprule
         File type & stochastic & multiple nodes with the same label & file syntax \\\\
         \\midrule
@@ -48,7 +48,7 @@ macro_rules! format_comparison {
         \\hyperref[filehandler:directly follows model]{directly follows model (.dfm)} & no & yes & line-based \\\\
         \\hyperref[filehandler:stochastic directly follows model]{stochastic directly follows model (.sdfm)} & yes & yes & line-based \\\\
         \\bottomrule
-    \\end{tabular}
+    \\end{tabularx}
     \\end{center}"}
 }
 
