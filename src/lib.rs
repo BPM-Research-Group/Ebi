@@ -194,6 +194,7 @@ pub mod techniques {
     pub mod edge_difference;
     pub mod permutation_test;
     pub mod fitness;
+    pub mod escaping_edges_precision;
 }
 pub mod optimisation_algorithms {
     pub mod network_simplex;
