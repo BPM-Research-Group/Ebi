@@ -75,7 +75,8 @@ pub const EBI_SAMPLE_FOLDS: EbiCommand = EbiCommand::Command {
     name_long: None,
     explanation_short: "Randomly split a log into a given number of sub-logs, and return a specific one of these sub-logs.",
     explanation_long: Some(
-        "Randomly but reproducibly split a log into a given number of sub-logs. Each trace has a likelihood of 1/folds to end up in any of the folds. Giving the same random seed yields the same split, as long as the same build number of Ebi is used. An example use is for k-fold cross validation.",
+        "Randomly but reproducibly split a log into a given number of sub-logs. Each trace has a likelihood of 1/folds to end up in any of the folds. Giving the same random seed yields the same split, as long as the same build number of Ebi is used. 
+        \n\n For instance, one can perform k-fold cross validation: one would repeatedly apply the folds command with the same seed and the same number of folds, but vary the returned sub-logs.",
     ),
     latex_link: None,
     cli_command: None,
