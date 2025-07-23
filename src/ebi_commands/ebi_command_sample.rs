@@ -1,5 +1,4 @@
 use anyhow::{Context, Result, anyhow};
-use rand_chacha::rand_core::{RngCore, SeedableRng};
 
 use crate::{
     ebi_framework::{
@@ -10,7 +9,7 @@ use crate::{
         ebi_trait::EbiTrait,
     },
     ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage},
-    techniques::sample::Sampler,
+    techniques::{sample::Sampler, sample_folds::FoldsSampler},
 };
 
 pub const SAMPLED_OBJECT_INPUTS: &[&EbiInputType] = &[
@@ -76,7 +75,7 @@ pub const EBI_SAMPLE_FOLDS: EbiCommand = EbiCommand::Command {
     name_long: None,
     explanation_short: "Randomly split a log into a given number of sub-logs, and return a specific one of these sub-logs.",
     explanation_long: Some(
-        "Randomly but reproducibly split a log into a given number of sub-logs. Giving the same random seed yields the same split, as long as the same build number of Ebi is used. An example use is for k-fold cross validation.",
+        "Randomly but reproducibly split a log into a given number of sub-logs. Each trace has a likelihood of 1/folds to end up in any of the folds. Giving the same random seed yields the same split, as long as the same build number of Ebi is used. An example use is for k-fold cross validation.",
     ),
     latex_link: None,
     cli_command: None,
@@ -112,8 +111,7 @@ pub const EBI_SAMPLE_FOLDS: EbiCommand = EbiCommand::Command {
         let seed: u64 = seed.try_into()?;
         let return_fold: u32 = return_fold.try_into()?;
 
-        let mut rng: rand_chacha::ChaCha8Rng = rand_chacha::ChaCha8Rng::seed_from_u64(seed);
-        log.retain_traces_mut(&mut |_| return_fold == rng.next_u32() % number_of_folds);
+        log.sample_folds(number_of_folds, seed, return_fold);
         Ok(EbiOutput::Object(EbiObject::EventLog(*log)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::EventLog),

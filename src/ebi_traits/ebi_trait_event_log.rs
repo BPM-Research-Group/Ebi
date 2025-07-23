@@ -21,19 +21,19 @@ use crate::{
 pub const ATTRIBUTE_TIME: &str = "time:timestamp";
 
 pub trait EbiTraitEventLog: IndexTrace + HasActivityKey {
-    /**
-     * Provides access to the underlying Rust4pm data structure. Prefer to use other methods if possible.
-     */
+    /// Provides read-only access to the underlying Rust4pm data structure. Prefer to use other methods if possible.
     fn get_log(&self) -> &process_mining::EventLog;
 
     fn get_trace_attributes(&self) -> HashMap<String, DataType>;
 
-    /**
-     * Remove traces for which the function returns false.
-     *
-     * Note to callers: please put the closure definition inside the Box::new in the call of retain_traces.
-     * Otherwise, Rust may give weird compile errors.
-     */
+    /// Remove traces for which the function returns false.
+    ///
+    /// === Does not change the underlying rust4pm data structure. ===
+    /// That is, traces removed or altered here will still be exported in their original form.
+    /// To remove/alter traces in the underlying rust4pm data structure, use the retain_traces_mut method from the EventLog struct.
+    ///
+    /// Note to callers: please put the closure definition inside the Box::new in the call of retain_traces.
+    /// Otherwise, Rust may give weird compile errors.
     fn retain_traces<'a>(&'a mut self, f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>);
 }
 

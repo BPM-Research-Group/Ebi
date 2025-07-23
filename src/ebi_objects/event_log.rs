@@ -1,7 +1,10 @@
 use anyhow::{Error, Result, anyhow};
 use core::fmt;
 use ebi_derive::ActivityKey;
-use process_mining::{XESImportOptions, event_log::event_log_struct::EventLogClassifier};
+use process_mining::{
+    XESImportOptions,
+    event_log::{Trace, event_log_struct::EventLogClassifier},
+};
 use std::{
     collections::HashMap,
     io::{self, BufRead, Write},
@@ -96,10 +99,10 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
 
 #[derive(ActivityKey, Clone)]
 pub struct EventLog {
-    pub(crate) classifier: EventLogClassifier,
+    classifier: EventLogClassifier,
     pub(crate) activity_key: ActivityKey,
     pub(crate) traces: Vec<Vec<Activity>>,
-    rust4pm_log: process_mining::EventLog, //field is not updated with other measures -> private
+    rust4pm_log: process_mining::EventLog,
 }
 
 impl EventLog {
@@ -196,9 +199,29 @@ impl EventLog {
 
     pub fn retain_traces_mut<F>(&mut self, f: &mut F)
     where
-        F: FnMut(&Vec<Activity>) -> bool,
+        F: FnMut((&Vec<Activity>, &Trace)) -> bool,
     {
-        self.traces.retain_mut(|elem| f(elem));
+        //get our hands free to change the traces without cloning
+        let mut traces = vec![];
+        let mut rust4pm_traces = vec![];
+        std::mem::swap(&mut self.traces, &mut traces);
+        std::mem::swap(&mut self.rust4pm_log.traces, &mut rust4pm_traces);
+
+        (traces, rust4pm_traces) = traces
+            .into_iter()
+            .zip(rust4pm_traces.into_iter())
+            .filter_map(|(mut trace, mut rust4pm_trace)| {
+                if f((&mut trace, &mut rust4pm_trace)) {
+                    Some((trace, rust4pm_trace))
+                } else {
+                    None
+                }
+            })
+            .unzip();
+
+        //swap the the traces back
+        std::mem::swap(&mut self.traces, &mut traces);
+        std::mem::swap(&mut self.rust4pm_log.traces, &mut rust4pm_traces);
     }
 }
 
@@ -426,5 +449,19 @@ mod tests {
         log.retain_traces(Box::new(|_| false));
 
         assert_eq!(log.len(), 0);
+    }
+
+    #[test]
+    fn len_retain_mut() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let mut log = fin.parse::<EventLog>().unwrap();
+
+        assert_eq!(log.len(), 2);
+        assert_eq!(log.rust4pm_log.traces.len(), 2);
+
+        log.retain_traces_mut(&mut |_| false);
+
+        assert_eq!(log.len(), 0);
+        assert_eq!(log.rust4pm_log.traces.len(), 0);
     }
 }
