@@ -14,18 +14,28 @@ use crate::{
             Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
         },
         ebi_file_handler::EbiFileHandler,
-        ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
+        ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
         ebi_output::{EbiObjectExporter, EbiOutput},
+        ebi_trait::FromEbiTraitObject,
         exportable::Exportable,
         importable::Importable,
         infoable::Infoable,
         prom_link::JavaObjectHandler,
     },
     ebi_traits::{
-        ebi_trait_activities, ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{
+        ebi_trait_activities,
+        ebi_trait_event_log::{EbiTraitEventLog, IndexTrace},
+        ebi_trait_finite_language::EbiTraitFiniteLanguage,
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_trait_iterable_language::EbiTraitIterableLanguage,
+        ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage,
+        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        ebi_trait_stochastic_deterministic_semantics::{
             EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
-        }, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}
+        },
+        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
     math::data_type::DataType,
 };
@@ -183,6 +193,13 @@ impl EventLog {
             log
         )))
     }
+
+    pub fn retain_traces_mut<F>(&mut self, f: &mut F)
+    where
+        F: FnMut(&Vec<Activity>) -> bool,
+    {
+        self.traces.retain_mut(|elem| f(elem));
+    }
 }
 
 impl TranslateActivityKey for EventLog {
@@ -242,6 +259,19 @@ impl FromStr for EventLog {
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         let mut reader = io::Cursor::new(s);
         Self::import(&mut reader)
+    }
+}
+
+impl FromEbiTraitObject for EventLog {
+    fn from_trait_object(object: ebi_input::EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::EventLog(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "cannot read {} {} as an event log",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
     }
 }
 

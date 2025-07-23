@@ -155,8 +155,9 @@ impl Resampler for dyn EbiTraitFiniteStochasticLanguage {
  * Fills the given vector with uniformly random numbers in the range 0..number_of_indices
  */
 pub fn sample_indices_uniform(number_of_indices: usize, result: &mut Vec<usize>) {
+    let mut rng = rand::thread_rng();
     for i in 0..result.len() {
-        let trace_index = rand::thread_rng().gen_range(0..number_of_indices);
+        let trace_index = rng.gen_range(0..number_of_indices);
         result[i] = trace_index;
     }
 }
