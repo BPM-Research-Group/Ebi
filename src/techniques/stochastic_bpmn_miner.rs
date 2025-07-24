@@ -4,13 +4,13 @@ use crate::ebi_objects::business_process_model_and_notation::{
 use crate::ebi_objects::stochastic_business_process_model_and_notation::{
     StochasticBusinessProcessModelAndNotation, StochasticSequenceFlow, StochasticTask
 };
-use good_lp::{variables, variable, constraint, Expression, default_solver, SolverModel, Solution};
+//use good_lp::{variables, variable, constraint, Expression, default_solver, SolverModel, Solution};
 use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
 use std::collections::{HashMap, HashSet, VecDeque};
 use crate::math::fraction::MaybeExact;
 use crate::math::fraction::Fraction;
-use crate::math::traits::Zero;
-use crate::math::matrix::Matrix;
+use crate::math::traits::{Zero, One};
+use crate::optimisation_algorithms::simplex::{Simplex, SimplexConstraint};
 
 
 fn is_diverging_gateway(node: &BPMNGateway) -> bool {
@@ -285,7 +285,285 @@ pub fn pairscale_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Bu
     result
 }
 
-pub fn weight_propagation_good_lp(bpmn: &BusinessProcessModelAndNotation, weights: &HashMap<String, Fraction>) -> anyhow::Result<StochasticBusinessProcessModelAndNotation> {
+
+pub fn weight_propagation(bpmn: &BusinessProcessModelAndNotation, weights: &HashMap<String, Fraction>) -> anyhow::Result<StochasticBusinessProcessModelAndNotation> {
+    let n_flows = bpmn.sequence_flows.len();
+
+    let mut tasks: Vec<&BPMNNode> = vec![];
+    for task in &bpmn.nodes {
+        if !bpmn.start_event.id.eq(&task.id) && !bpmn.end_events.iter().any(|end| end.id == task.id) {
+            tasks.push(task);
+        }
+    }
+
+    if n_flows == 0 {
+        // No flows, return empty model
+        let tasks: Vec<StochasticTask> = bpmn.nodes.iter().map(|node| {
+            let w = weights.get(&node.id).and_then(|f| f.extract_approx().ok()).unwrap_or(0.0);
+            StochasticTask { id: node.id.clone(), weight: w }
+        }).collect();
+        
+        return Ok(StochasticBusinessProcessModelAndNotation {
+            tasks,
+            start_event: bpmn.start_event.id.clone(),
+            xor_gateways: bpmn.xor_gateways.iter().map(|g| g.id.clone()).collect(),
+            and_gateways: bpmn.and_gateways.iter().map(|g| g.id.clone()).collect(),
+            or_gateways: bpmn.or_gateways.iter().map(|g| g.id.clone()).collect(),
+            end_events: bpmn.end_events.len(),
+            sequence_flows: vec![],
+        });
+    }
+    
+    //map incoming, outgoing sequence flows to tasks/gateways
+    let mut incoming: HashMap<&str, Vec<usize>> = HashMap::new();
+    let mut outgoing: HashMap<&str, Vec<usize>> = HashMap::new();
+    for (idx, flow) in bpmn.sequence_flows.iter().enumerate() {
+        outgoing.entry(flow.source_id.as_str()).or_default().push(idx);
+        incoming.entry(flow.target_id.as_str()).or_default().push(idx);
+    }
+
+    let mut total_slack: usize = 0;
+
+    for task in &tasks {
+        let _out_flows = outgoing.get(task.id.as_str()).cloned().unwrap_or_default();
+        // Incoming implicit XOR, outgoing implicit AND
+        total_slack += 1 + _out_flows.len();
+    }
+
+    for gateway in &bpmn.and_gateways {
+        let _in_flows = incoming.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        let _out_flows = outgoing.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        // One constraint per incoming/outgoing flow
+        total_slack += _in_flows.len() + _out_flows.len();
+    }
+
+    for _gateway in &bpmn.xor_gateways {
+        // One constraint per gate
+        total_slack += 1;
+    }
+    for gateway in &bpmn.or_gateways {
+        let _in_flows = incoming.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        let _out_flows = outgoing.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        if gateway.direction == GatewayDirection::Diverging {
+            total_slack += _out_flows.len() + 1;
+        } else {
+            total_slack += _in_flows.len() + 1;
+        }
+    }
+    
+    let total_vars = n_flows + total_slack;
+    let mut constraints: Vec<SimplexConstraint> = vec![];
+    // Create objective: minimize slack (flow vars weight 0, slack vars weight 1)
+    let mut objective = vec![Fraction::from(1); total_vars];
+    for f in 0..n_flows {
+        objective[f] = Fraction::from(0);
+    }
+
+    let mut slack_count = 0;
+    
+    // Soft Task constraints:
+    //Incoming: f- slack <= w and -f-slack <= -w
+    //Outgoing: sum of f - slack <= w and -sum of f - slack <= -w
+    for task in &tasks {
+        let _in_flows = incoming.get(task.id.as_str()).cloned().unwrap_or_default();
+        let _out_flows = outgoing.get(task.id.as_str()).cloned().unwrap_or_default();
+        if let Some(task_weight) = weights.get(&task.id) {
+            let mut coeffs_pos = vec![Fraction::from(0); total_vars];
+            let mut coeffs_neg = vec![Fraction::from(0); total_vars];
+            for in_flow in _in_flows{
+                coeffs_pos[in_flow] = Fraction::from(1);
+                coeffs_neg[in_flow] = -Fraction::from(1);
+            }
+            coeffs_pos[n_flows + slack_count] = -Fraction::from(1);
+            coeffs_neg[n_flows + slack_count] = -Fraction::from(1);
+            slack_count += 1;
+            constraints.push(SimplexConstraint::LessThan(coeffs_pos, Fraction::from(task_weight.clone())));
+            constraints.push(SimplexConstraint::LessThan(coeffs_neg, -Fraction::from(task_weight.clone())));
+            for out_flow in _out_flows{
+                let mut coeffs_pos = vec![Fraction::from(0); total_vars];
+                let mut coeffs_neg = vec![Fraction::from(0); total_vars];
+                coeffs_pos[out_flow] = Fraction::from(1);
+                coeffs_neg[out_flow] = -Fraction::from(1);
+                coeffs_pos[n_flows + slack_count] = -Fraction::from(1);
+                coeffs_neg[n_flows + slack_count] = -Fraction::from(1);
+                slack_count += 1;
+                constraints.push(SimplexConstraint::LessThan(coeffs_pos, Fraction::from(task_weight.clone())));
+                constraints.push(SimplexConstraint::LessThan(coeffs_neg, -Fraction::from(task_weight.clone())));
+            }
+        }
+    }
+
+    // Soft AND Gateway constraints
+    // Constraint: For all incoming outgoing: |f-first| - slack <= 0
+    for gateway in &bpmn.and_gateways {
+        let _in_flows = incoming.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        let _out_flows = outgoing.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        let all_flows = _in_flows.iter().chain(_out_flows.iter()).cloned().collect::<Vec<_>>();
+        let first_flow = all_flows[0];
+        for flow in all_flows {
+            let mut coeffs_pos = vec![Fraction::from(0); total_vars];
+            let mut coeffs_neg = vec![Fraction::from(0); total_vars];
+            coeffs_pos[flow] = Fraction::from(1);
+            coeffs_neg[flow] = -Fraction::from(1);
+            coeffs_pos[first_flow] = -Fraction::from(1);
+            coeffs_neg[first_flow] = Fraction::from(1);
+            coeffs_pos[n_flows + slack_count] = -Fraction::from(1);
+            coeffs_neg[n_flows + slack_count] = -Fraction::from(1);
+            slack_count += 1;
+            constraints.push(SimplexConstraint::LessThan(coeffs_pos, Fraction::from(0)));
+            constraints.push(SimplexConstraint::LessThan(coeffs_neg, Fraction::from(0)))
+        }
+    }
+
+    // Soft XOR Gateway constraints
+    // Sum of incoming - sum of outgoing - slack <= 0
+    for gateway in &bpmn.xor_gateways {
+        let _in_flows = incoming.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        let _out_flows = outgoing.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        let mut coeffs_pos = vec![Fraction::from(0); total_vars];
+        let mut coeffs_neg = vec![Fraction::from(0); total_vars];
+        for in_flow in _in_flows {
+            coeffs_pos[in_flow] = Fraction::from(1);
+            coeffs_neg[in_flow] = -Fraction::from(1);
+        }
+        for out_flow in _out_flows {
+            coeffs_pos[out_flow] = -Fraction::from(1);
+            coeffs_neg[out_flow] = Fraction::from(1);
+        }
+        coeffs_pos[n_flows + slack_count] = -Fraction::from(1);
+        coeffs_neg[n_flows + slack_count] = -Fraction::from(1);
+        slack_count += 1;
+        constraints.push(SimplexConstraint::LessThan(coeffs_pos, Fraction::from(0)));
+        constraints.push(SimplexConstraint::LessThan(coeffs_neg, Fraction::from(0)));
+    }
+
+    // Soft Or Gateway constraints
+    for gateway in &bpmn.or_gateways {
+    let _in_flows = incoming.get(gateway.id.as_str()).cloned().unwrap_or_default();
+    let _out_flows = outgoing.get(gateway.id.as_str()).cloned().unwrap_or_default();
+
+    let mut coeffs_pos = vec![Fraction::from(0); total_vars];
+    let mut coeffs_neg = vec![Fraction::from(0); total_vars];
+
+    if gateway.direction == GatewayDirection::Diverging {
+        // Diverging OR: in_sum >= max(outgoing) + 1, in_sum <= sum(outgoing) - 1
+        // in_sum - max(outgoing) - 1 >= -slack
+        for out_flow in _out_flows.clone() {
+            coeffs_pos = vec![Fraction::from(0); total_vars];
+            for in_flow in _in_flows.clone() {
+                coeffs_pos[in_flow] = Fraction::from(1);
+            }
+            coeffs_pos[out_flow] = -Fraction::from(1);
+            coeffs_pos[n_flows + slack_count] = Fraction::from(-1);
+            slack_count += 1;
+            constraints.push(SimplexConstraint::GreaterThan(coeffs_pos, Fraction::from(1)));
+        }
+        // in_sum - sum(outgoing) + 1 <= slack
+        coeffs_neg = vec![Fraction::from(0); total_vars];
+        for in_flow in _in_flows {
+            coeffs_neg[in_flow] = Fraction::from(1);
+        }
+        for out_flow in _out_flows {
+            coeffs_neg[out_flow] = -Fraction::from(1);
+        }
+        coeffs_neg[n_flows + slack_count] = Fraction::from(1);
+        slack_count += 1;
+        constraints.push(SimplexConstraint::LessThan(coeffs_neg, Fraction::from(-1)));
+    } else {
+        // Converging OR: outgoing in (max(incoming)+1, sum(incoming)-1)
+
+        // out_flow - max(incoming) - 1 >= -slack
+        for in_flow in _in_flows.clone() {
+            coeffs_pos = vec![Fraction::from(0); total_vars];
+            for out_flow in _out_flows.clone() {
+                coeffs_pos[out_flow] = Fraction::from(1);
+            }
+            coeffs_pos[in_flow] = -Fraction::from(1);
+            coeffs_pos[n_flows + slack_count] = Fraction::from(-1);
+            slack_count += 1;
+            constraints.push(SimplexConstraint::GreaterThan(coeffs_pos, Fraction::from(1)));
+        }
+        // out_sum - sum(incoming) + 1 <= slack
+        coeffs_neg = vec![Fraction::from(0); total_vars];
+        for out_flow in _out_flows {
+            coeffs_neg[out_flow] = Fraction::from(1);
+        }
+        for in_flow in _in_flows {
+            coeffs_neg[in_flow] = -Fraction::from(1);
+        }
+        coeffs_neg[n_flows + slack_count] = Fraction::from(1);
+        slack_count += 1;
+        constraints.push(SimplexConstraint::LessThan(coeffs_neg, Fraction::from(-1)));
+    }
+}
+
+    /*for var in 0..(total_vars - total_slack) {
+        let mut coeffs = vec![Fraction::from(0); total_vars];
+        coeffs[var] = Fraction::from(1);
+        constraints.push(SimplexConstraint::GreaterThan(coeffs, Fraction::from(0)));
+    }*/
+
+    // Debug output
+    println!("Slack count: {}", slack_count);
+    println!("Slack + n_flows: {}", total_slack + n_flows);
+    println!("Simplex setup with split slack variables:");    println!("  Flow variables: {}", n_flows);
+    println!("  Total slack variables: {}", total_slack);
+    println!("  Total variables: {}", total_vars);
+    println!("  Constraints: {}", constraints.len());
+    println!("Objective: {:?}", objective.clone());
+    // Solve
+    let simplex_result = Simplex::minimize(objective).with(constraints);
+    let mut simplex = match simplex_result {
+        Ok(s) => s,
+        Err(e) => return Err(anyhow::anyhow!("Simplex setup failed: {}", e)),
+    };
+    
+
+
+    let solve_result = simplex.solve();
+    println!("Solve result: {:?}", solve_result);
+    for var in 0..total_vars{
+        println!("Var {}: {:?}", var, simplex.get_var(var));
+    }
+    let solve_two = simplex.solve();
+    println!("Second solve: {:?}", solve_two);
+    for var in 0..total_vars{
+        println!("Var {}: {:?}", var, simplex.get_var(var));
+    }
+
+    // Extract flow weights 
+    let mut sequence_flows = Vec::new();
+    for (idx, flow) in bpmn.sequence_flows.iter().enumerate() {
+        let var_id = idx + 1; // Simplex uses 1-based indexing
+        let val = simplex.get_var(var_id).unwrap_or_else(|| Fraction::from(0));
+        let weight = val.extract_approx().unwrap_or(0.0).max(0.0);
+        
+        sequence_flows.push(StochasticSequenceFlow {
+            source_id: flow.source_id.clone(),
+            target_id: flow.target_id.clone(),
+            weight,
+        });
+    }
+    
+    // Build tasks
+    let tasks: Vec<StochasticTask> = bpmn.nodes.iter().map(|node| {
+        let w = weights.get(&node.id).and_then(|f| f.extract_approx().ok()).unwrap_or(0.0);
+        StochasticTask { id: node.id.clone(), weight: w }
+    }).collect();
+    
+    Ok(StochasticBusinessProcessModelAndNotation {
+        tasks,
+        start_event: bpmn.start_event.id.clone(),
+        xor_gateways: bpmn.xor_gateways.iter().map(|g| g.id.clone()).collect(),
+        and_gateways: bpmn.and_gateways.iter().map(|g| g.id.clone()).collect(),
+        or_gateways: bpmn.or_gateways.iter().map(|g| g.id.clone()).collect(),
+        end_events: bpmn.end_events.len(),
+        sequence_flows,
+    })
+}
+
+
+/*pub fn weight_propagation_good_lp(bpmn: &BusinessProcessModelAndNotation, weights: &HashMap<String, Fraction>) -> anyhow::Result<StochasticBusinessProcessModelAndNotation> {
     
     // Convert task weights to node weights (convert fractions to f64 for LP solving)
     let node_weights_by_id: HashMap<String, f64> = weights.iter()
@@ -819,7 +1097,7 @@ pub fn weight_propagation_good_lp(bpmn: &BusinessProcessModelAndNotation, weight
         end_events: bpmn.end_events.len(),
         sequence_flows,
     })
-}
+}*/
 
 #[cfg(test)]
 mod tests {
@@ -830,6 +1108,7 @@ mod tests {
     use crate::ebi_objects::event_log::EventLog;
     use crate::ebi_objects::finite_stochastic_language::FiniteStochasticLanguage;
     use crate::ebi_framework::importable::Importable;
+    use crate::optimisation_algorithms::simplex::Simplex;
 
     #[test]
     fn test_basic_compilation() {
@@ -839,7 +1118,7 @@ mod tests {
         
         // Test that our main functions exist and have the right signatures
         let _f = frequency_estimator as fn(&dyn EbiTraitFiniteStochasticLanguage, &BusinessProcessModelAndNotation) -> HashMap<String, Fraction>;
-        let _h = weight_propagation_good_lp as fn(&BusinessProcessModelAndNotation, &HashMap<String, Fraction>) -> anyhow::Result<StochasticBusinessProcessModelAndNotation>;
+        let _h = weight_propagation as fn(&BusinessProcessModelAndNotation, &HashMap<String, Fraction>) -> anyhow::Result<StochasticBusinessProcessModelAndNotation>;
         
         println!("All functions compile correctly");
     }
@@ -866,9 +1145,8 @@ mod tests {
     }
 
     /// Test function that loads BPMN model and event log from files
-    /// Usage: cargo test test_weight_propagation_from_files -- --ignored
     #[test]
-    #[ignore] // Use --ignored flag to run this test
+    #[ignore]
     fn test_weight_propagation_from_files() {
         use crate::ebi_traits::ebi_trait_event_log::IndexTrace;
         
@@ -968,7 +1246,7 @@ mod tests {
         
         // Apply weight propagation
         println!("\n=== Applying weight propagation with good_lp ===");
-        let result: Result<StochasticBusinessProcessModelAndNotation, anyhow::Error> = weight_propagation_good_lp(&bpmn_model, &weights);
+        let result: Result<StochasticBusinessProcessModelAndNotation, anyhow::Error> = weight_propagation(&bpmn_model, &weights);
         
         match result {
             Ok(stochastic_bpmn) => {
