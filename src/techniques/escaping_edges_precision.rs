@@ -7,9 +7,9 @@ use crate::{
         stochastic_language_of_alignments::StochasticLanguageOfAlignments,
     },
     ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics},
-    math::{fraction::Fraction, traits::Zero},
 };
 use anyhow::{Context, Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, traits::Zero};
 
 pub const UNMATCHING: &str = "alignments and model do not belong to one another";
 
@@ -146,12 +146,13 @@ impl PrefixTreeNode {
 mod tests {
     use std::fs;
 
+    use ebi_arithmetic::fraction::Fraction;
+
     use crate::{
         ebi_objects::{
             stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
             stochastic_language_of_alignments::StochasticLanguageOfAlignments,
         },
-        math::fraction::Fraction,
         techniques::escaping_edges_precision::EscapingEdgesPrecision,
     };
 

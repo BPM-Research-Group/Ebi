@@ -1,9 +1,8 @@
 use std::fmt::{self, Display};
 
 use chrono::{DateTime, FixedOffset};
+use ebi_arithmetic::fraction::Fraction;
 use process_mining::event_log::AttributeValue;
-
-use super::fraction::Fraction;
 
 #[derive(Debug)]
 pub enum DataType {

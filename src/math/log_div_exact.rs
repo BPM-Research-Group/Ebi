@@ -1,4 +1,10 @@
 use anyhow::{Error, Result, anyhow};
+use ebi_arithmetic::{
+    exact::MaybeExact,
+    fraction::{Fraction, UInt, APPROX_DIGITS},
+    fraction_exact::FractionExact,
+    traits::{One, Zero},
+};
 use fraction::{BigFraction, BigUint, GenericFraction, Integer, Sign};
 use num_bigint::{ToBigInt, ToBigUint};
 use num_traits::Pow;
@@ -10,12 +16,6 @@ use std::{
 };
 
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
-
-use super::{
-    fraction::{APPROX_DIGITS, Fraction, MaybeExact, UInt},
-    fraction_exact::FractionExact,
-    traits::{One, Zero},
-};
 
 #[derive(Clone)]
 pub struct LogDivExact((BigFraction, UInt));
@@ -616,7 +616,9 @@ impl Display for FractionRaw {
 
 #[cfg(test)]
 mod tests {
-    use crate::math::{log_div_exact::LogDivExact, traits::Zero};
+    use ebi_arithmetic::traits::Zero;
+
+    use crate::math::log_div_exact::LogDivExact;
 
     #[test]
     fn zero_log_div() {

@@ -4,6 +4,7 @@ use std::{
 };
 
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, traits::Zero};
 use strum_macros::Display;
 
 use crate::{
@@ -12,7 +13,6 @@ use crate::{
         ebi_trait_semantics::Semantics,
         ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex},
     },
-    math::{fraction::Fraction, traits::Zero},
 };
 
 use super::{
@@ -436,6 +436,8 @@ impl IndexMut<usize> for NodeStates {
 mod tests {
     use std::fs;
 
+    use ebi_arithmetic::{fraction::Fraction, traits::One};
+
     use crate::{
         ebi_objects::{
             labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree,
@@ -444,7 +446,6 @@ mod tests {
         ebi_traits::{
             ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::StochasticSemantics,
         },
-        math::{fraction::Fraction, traits::One},
     };
 
     #[test]

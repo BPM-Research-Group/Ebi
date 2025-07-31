@@ -1,4 +1,5 @@
 use anyhow::Context;
+use ebi_arithmetic::fraction::Fraction;
 use std::io::Write;
 
 use crate::{
@@ -14,7 +15,7 @@ use crate::{
         ebi_trait_event_log::EbiTraitEventLog,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
-    math::fraction::{ConstFraction, Fraction},
+    math::constant_fraction::ConstFraction,
     techniques::{
         bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
         permutation_test::PermutationTest,

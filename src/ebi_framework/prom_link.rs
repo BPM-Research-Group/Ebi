@@ -1,3 +1,5 @@
+use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::parsing::FractionNotParsedYet;
 use itertools::Itertools;
 use std::fmt::Display;
 use std::{io::Write, path::PathBuf};
@@ -12,13 +14,11 @@ use jni::objects::{JClass, JObjectArray, JString};
 // This is just a pointer. We'll be returning it from our function. We
 // can't return one of the objects with lifetime information because the
 // lifetime checker won't let us.
+use crate::multiple_reader::MultipleReader;
 use anyhow::{Context, Result, anyhow};
 use jni::sys::jstring;
 use regex::Regex;
 use strum::IntoEnumIterator;
-
-use crate::math::fraction::Fraction;
-use crate::{math::fraction::FractionNotParsedYet, multiple_reader::MultipleReader};
 
 use super::ebi_file_handler::EBI_FILE_HANDLERS;
 use super::ebi_output::EbiOutput;

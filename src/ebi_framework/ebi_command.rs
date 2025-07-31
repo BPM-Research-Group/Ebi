@@ -1,5 +1,6 @@
 use anyhow::{Context, Result, anyhow};
 use clap::{Arg, ArgAction, ArgMatches, Command, value_parser};
+use ebi_arithmetic::{exact::set_exact_globally, fraction::Fraction, parsing::FractionNotParsedYet};
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
 use logging_timer::timer;
@@ -21,7 +22,6 @@ use crate::{
         ebi_command_validate, ebi_command_visualise,
     },
     ebi_framework::ebi_output,
-    math::fraction::{Fraction, FractionNotParsedYet},
 };
 
 use super::{
@@ -302,7 +302,7 @@ impl EbiCommand {
                 //set exact arithmetic
                 if !exact_arithmetic || cli_matches.get_flag("approx") {
                     log::info!("Use approximate arithmetic");
-                    crate::math::fraction::set_exact_globally(false);
+                    set_exact_globally(false);
                 }
 
                 //read the inputs
@@ -765,9 +765,9 @@ mod tests {
             ebi_object::EbiObject,
             ebi_trait::EbiTrait,
         },
-        math::fraction::Fraction,
         multiple_reader::MultipleReader,
     };
+    use ebi_arithmetic::fraction::Fraction;
     use itertools::Itertools;
     use ntest::timeout;
 
@@ -816,7 +816,7 @@ mod tests {
             {
                 if cli_command.is_none() // only test commands that do not use the cli directly
                     && (*exact_arithmetic // do not test approximate commands in exact mode
-                        || cfg!(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic")))
+                        || cfg!(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic")))
                 {
                     println!("command {}", EbiCommand::path_to_string(&path));
 

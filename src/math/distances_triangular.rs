@@ -2,38 +2,39 @@ use std::sync::Arc;
 
 #[cfg(any(
     all(
-        not(feature = "exactarithmetic"),
-        not(feature = "approximatearithmetic")
+        not(feature = "eexactarithmetic"),
+        not(feature = "eapproximatearithmetic")
     ),
-    all(feature = "exactarithmetic", feature = "approximatearithmetic"),
-    all(feature = "exactarithmetic", not(feature = "approximatearithmetic")),
+    all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+    all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use anyhow::Result;
+use ebi_arithmetic::{fraction::Fraction, traits::Zero};
 #[cfg(any(
     all(
-        not(feature = "exactarithmetic"),
-        not(feature = "approximatearithmetic")
+        not(feature = "eexactarithmetic"),
+        not(feature = "eapproximatearithmetic")
     ),
-    all(feature = "exactarithmetic", feature = "approximatearithmetic"),
-    all(feature = "exactarithmetic", not(feature = "approximatearithmetic")),
+    all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+    all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use num::BigInt;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 #[cfg(any(
     all(
-        not(feature = "exactarithmetic"),
-        not(feature = "approximatearithmetic")
+        not(feature = "eexactarithmetic"),
+        not(feature = "eapproximatearithmetic")
     ),
-    all(feature = "exactarithmetic", feature = "approximatearithmetic"),
-    all(feature = "exactarithmetic", not(feature = "approximatearithmetic")),
+    all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+    all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use crate::math::fraction::MaybeExact;
+use ebi_arithmetic::exact::MaybeExact;
 
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::{distances::WeightedDistances, fraction::Fraction, levenshtein, traits::Zero},
+    math::{distances::WeightedDistances, levenshtein},
 };
 
 /**
@@ -154,11 +155,11 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
 
     #[cfg(any(
         all(
-            not(feature = "exactarithmetic"),
-            not(feature = "approximatearithmetic")
+            not(feature = "eexactarithmetic"),
+            not(feature = "eapproximatearithmetic")
         ),
-        all(feature = "exactarithmetic", feature = "approximatearithmetic"),
-        all(feature = "exactarithmetic", not(feature = "approximatearithmetic")),
+        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+        all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
     fn lowest_common_multiple_denominators_distances(&self) -> Result<BigInt> {
         // 2a. Calculate the Least Common Multiple (LCM) of all denominators of distances (i.e. the elements in the DistanceMatrix).
@@ -190,11 +191,11 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
 
     #[cfg(any(
         all(
-            not(feature = "exactarithmetic"),
-            not(feature = "approximatearithmetic")
+            not(feature = "eexactarithmetic"),
+            not(feature = "eapproximatearithmetic")
         ),
-        all(feature = "exactarithmetic", feature = "approximatearithmetic"),
-        all(feature = "exactarithmetic", not(feature = "approximatearithmetic")),
+        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+        all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
     fn lowest_common_multiple_denominators_weights(&self) -> Result<BigInt> {
         use num::BigInt;

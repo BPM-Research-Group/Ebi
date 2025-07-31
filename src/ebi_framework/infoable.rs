@@ -1,3 +1,4 @@
+use ebi_arithmetic::{fraction_enum::FractionEnum, fraction_exact::FractionExact, fraction_f64::FractionF64};
 use fraction::BigFraction;
 use anyhow::Result;
 
@@ -19,6 +20,38 @@ impl Infoable for BigFraction {
             fraction::GenericFraction::NaN => write!(f, "NaN")?,
         }
         Ok(write!(f, "")?)
+    }
+}
+
+impl Infoable for FractionExact {
+    fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
+        self.0.info(f)?;
+        writeln!(f, "")?;
+        Ok(write!(f, "")?)
+    }
+}
+
+impl Infoable for FractionEnum {
+    fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
+        match self {
+            FractionEnum::Exact(v) => {
+                v.info(f)?;
+                writeln!(f, "")?;
+            }
+            FractionEnum::Approx(v) => writeln!(f, "Approximate value\t{}", v)?,
+            FractionEnum::CannotCombineExactAndApprox => writeln!(
+                f,
+                "Fraction is a result of combining exact and approximate arithmethic and therefore has no value."
+            )?,
+        };
+
+        Ok(write!(f, "")?)
+    }
+}
+
+impl Infoable for FractionF64 {
+    fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
+        Ok(writeln!(f, "Approximate value\t{}", self.0)?)
     }
 }
 

@@ -1,4 +1,5 @@
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::fraction::Fraction;
 use std::io::BufRead;
 
 use crate::{
@@ -7,7 +8,6 @@ use crate::{
         ebi_trait::FromEbiTraitObject, importable::Importable,
     },
     ebi_objects::{labelled_petri_net::LPNMarking, stochastic_process_tree_semantics::NodeStates},
-    math::fraction::Fraction,
 };
 
 use super::ebi_trait_semantics::Semantics;

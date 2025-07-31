@@ -1,4 +1,5 @@
 use anyhow::{Context, anyhow};
+use ebi_arithmetic::fraction::Fraction;
 
 use crate::{
     ebi_framework::{
@@ -10,7 +11,7 @@ use crate::{
     },
     ebi_objects::{labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree},
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::fraction::{ConstFraction, Fraction},
+    math::constant_fraction::ConstFraction,
     techniques::{
         alignment_stochastic_miner::AlignmentMiner,
         directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,

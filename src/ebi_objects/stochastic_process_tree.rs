@@ -22,10 +22,10 @@ use crate::{
         ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
     line_reader::LineReader,
-    math::{fraction::Fraction, traits::Signed},
 };
 
 use anyhow::{Context, Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, traits::Signed};
 use ebi_derive::ActivityKey;
 use layout::{adt::dag::NodeHandle, topo::layout::VisualGraph};
 

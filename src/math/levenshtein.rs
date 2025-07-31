@@ -1,7 +1,6 @@
+use ebi_arithmetic::fraction::Fraction;
+
 use crate::ebi_framework::activity_key::Activity;
-
-use super::fraction::Fraction;
-
 
 
 pub fn normalised(trace1: &Vec<Activity>, trace2: &Vec<Activity>) -> Fraction {

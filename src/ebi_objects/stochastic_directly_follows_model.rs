@@ -6,6 +6,7 @@ use std::{
 };
 
 use anyhow::{Context, Error, Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, traits::{Signed, Zero}};
 use ebi_derive::ActivityKey;
 use itertools::Itertools;
 use layout::topo::layout::VisualGraph;
@@ -34,10 +35,6 @@ use crate::{
     },
     format_comparison,
     line_reader::LineReader,
-    math::{
-        fraction::Fraction,
-        traits::{Signed, Zero},
-    },
 };
 
 pub const HEADER: &str = "stochastic directly follows model";

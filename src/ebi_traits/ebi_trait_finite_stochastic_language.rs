@@ -1,4 +1,5 @@
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::fraction::Fraction;
 use std::{fmt::Debug, io::BufRead};
 
 use crate::{
@@ -10,7 +11,6 @@ use crate::{
         importable::Importable,
     },
     ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
-    math::fraction::Fraction,
 };
 
 use super::{

@@ -84,6 +84,8 @@ pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command {
 #[cfg(test)]
 mod tests {
 
+    use ebi_arithmetic::{fraction::Fraction, traits::One};
+
     use crate::{
         ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT,
         ebi_framework::{
@@ -97,7 +99,6 @@ mod tests {
             finite_language::FiniteLanguage,
             stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
         },
-        math::{fraction::Fraction, traits::One},
     };
 
     #[test]

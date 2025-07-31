@@ -1,6 +1,7 @@
 use std::collections::{HashMap, hash_map::Entry};
 
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::{choose_randomly::{ChooseRandomly, FractionRandomCache}, fraction::Fraction, traits::One};
 use num::Zero;
 use rand::Rng;
 
@@ -10,10 +11,6 @@ use crate::{
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics},
-    },
-    math::{
-        fraction::{ChooseRandomly, Fraction, FractionRandomCache},
-        traits::One,
     },
 };
 

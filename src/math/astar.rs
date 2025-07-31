@@ -3,6 +3,7 @@
 // The original code has been modified to support the Fraction type in this project.
 // For more information, see https://github.com/evenfurther/pathfinding?tab=readme-ov-file#license
 
+use ebi_arithmetic::traits::Zero;
 use indexmap::map::Entry::{Occupied, Vacant};
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
@@ -11,8 +12,6 @@ use std::hash::BuildHasherDefault;
 use std::ops::AddAssign;
 use indexmap::IndexMap;
 use rustc_hash::FxHasher;
-
-use super::traits::Zero;
 
 type FxIndexMap<K, V> = IndexMap<K, V, BuildHasherDefault<FxHasher>>;
 

@@ -1,4 +1,8 @@
 use anyhow::Result;
+use ebi_arithmetic::{
+    fraction::Fraction,
+    traits::{One, Signed, Zero},
+};
 use std::collections::HashMap;
 use std::collections::hash_map::DefaultHasher;
 use std::collections::hash_map::Entry;
@@ -16,11 +20,7 @@ use crate::ebi_objects::stochastic_process_tree_semantics::NodeStates;
 use crate::ebi_traits::ebi_trait_semantics::Semantics;
 use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics;
 use crate::ebi_traits::ebi_trait_stochastic_semantics::StochasticSemantics;
-use crate::math::fraction::Fraction;
 use crate::math::markov_model::MarkovModel;
-use crate::math::traits::One;
-use crate::math::traits::Signed;
-use crate::math::traits::Zero;
 
 use super::non_decreasing_livelock::NonDecreasingLivelock;
 
@@ -414,11 +414,12 @@ impl<S: Displayable> Displayable for MarkovMarking<S> {}
 
 #[cfg(test)]
 mod tests {
+    use ebi_arithmetic::{fraction::Fraction, traits::Zero};
+
     use crate::{
         ebi_framework::activity_key::HasActivityKey,
         ebi_objects::stochastic_labelled_petri_net::StochasticLabelledPetriNet,
         ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
-        math::{fraction::Fraction, traits::Zero},
     };
     use std::fs;
 

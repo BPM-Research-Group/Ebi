@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use ebi_arithmetic::fraction::Fraction;
 use std::{
     collections::{BTreeSet, HashSet},
     fmt::{self, Display},
@@ -37,7 +38,7 @@ use crate::{
         },
         stochastic_process_tree::{EBI_STOCHASTIC_PROCESS_TREE, StochasticProcessTree},
     },
-    math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv},
+    math::{log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv},
 };
 
 use super::{
@@ -501,6 +502,10 @@ impl Display for EbiObjectExporter {
 mod tests {
     use std::{io::Cursor, path::PathBuf};
 
+    use ebi_arithmetic::{
+        fraction::Fraction,
+        traits::{One, Zero},
+    };
     use strum::IntoEnumIterator;
 
     use crate::{
@@ -509,11 +514,9 @@ mod tests {
             ebi_output::EbiOutput,
         },
         math::{
-            fraction::Fraction,
             log_div::LogDiv,
             root::{ContainsRoot, Root},
             root_log_div::RootLogDiv,
-            traits::{One, Zero},
         },
     };
 

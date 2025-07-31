@@ -1,4 +1,5 @@
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::fraction::Fraction;
 use std::{
     collections::{BTreeSet, HashSet},
     fmt::{Debug, Display},
@@ -143,6 +144,19 @@ impl Debug for EbiTrait {
 
 pub trait FromEbiTraitObject {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>>;
+}
+
+impl FromEbiTraitObject for Fraction {
+    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Fraction(e, _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "cannot read {} {} as a fraction",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
+    }
 }
 
 impl FromEbiTraitObject for usize {

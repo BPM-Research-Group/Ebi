@@ -1,4 +1,5 @@
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, traits::{One, Zero}};
 
 use crate::{
     ebi_framework::activity_key::{Activity, HasActivityKey},
@@ -6,10 +7,6 @@ use crate::{
         ebi_trait_semantics::Semantics,
         ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
         ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex},
-    },
-    math::{
-        fraction::Fraction,
-        traits::{One, Zero},
     },
     techniques::non_decreasing_livelock::NonDecreasingLivelock,
 };

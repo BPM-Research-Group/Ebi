@@ -1,10 +1,8 @@
+use ebi_arithmetic::{fraction::Fraction, traits::{Signed, Zero}};
+
 use crate::{
     ebi_framework::activity_key::TranslateActivityKey,
     ebi_objects::directly_follows_graph::DirectlyFollowsGraph,
-    math::{
-        fraction::Fraction,
-        traits::{Signed, Zero},
-    },
 };
 
 pub trait EdgeDifference {

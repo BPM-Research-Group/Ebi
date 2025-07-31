@@ -5,11 +5,8 @@ use std::{
 };
 
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, traits::{One, Zero}};
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefMutIterator, ParallelIterator};
-
-use crate::math::traits::{One, Zero};
-
-use super::fraction::Fraction;
 
 /**
  * It is rather unfortunate, but there doesn't seem to be a Rust library that supports matrix operations (inversion) on fractional data types.
@@ -434,7 +431,9 @@ impl Mul<Vec<Fraction>> for Matrix {
 #[cfg(test)]
 mod tests {
 
-    use crate::math::{fraction::Fraction, matrix::Matrix};
+    use ebi_arithmetic::fraction::Fraction;
+
+    use crate::math::matrix::Matrix;
 
     #[test]
     fn matrix_vector_multiplication() {

@@ -1,5 +1,6 @@
 use anyhow::{Result, anyhow};
 use chrono::{DateTime, FixedOffset};
+use ebi_arithmetic::fraction::Fraction;
 use process_mining::event_log::{AttributeValue, Event, XESEditableAttribute};
 use std::{
     borrow::Borrow,
@@ -15,7 +16,7 @@ use crate::{
         ebi_object::EbiTraitObject,
         ebi_trait::FromEbiTraitObject,
     },
-    math::{data_type::DataType, fraction::Fraction},
+    math::data_type::DataType,
 };
 
 pub const ATTRIBUTE_TIME: &str = "time:timestamp";

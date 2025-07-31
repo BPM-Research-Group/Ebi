@@ -1,23 +1,25 @@
 #[cfg(any(
     all(
-        not(feature = "exactarithmetic"),
-        not(feature = "approximatearithmetic")
+        not(feature = "eexactarithmetic"),
+        not(feature = "eapproximatearithmetic")
     ),
-    all(feature = "exactarithmetic", feature = "approximatearithmetic"),
-    all(feature = "exactarithmetic", not(feature = "approximatearithmetic")),
+    all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+    all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use anyhow::Result;
+use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::traits::Zero;
 use std::fmt;
 use std::fmt::Debug;
 use std::{iter::FusedIterator, sync::Arc};
 
 #[cfg(any(
     all(
-        not(feature = "exactarithmetic"),
-        not(feature = "approximatearithmetic")
+        not(feature = "eexactarithmetic"),
+        not(feature = "eapproximatearithmetic")
     ),
-    all(feature = "exactarithmetic", feature = "approximatearithmetic"),
-    all(feature = "exactarithmetic", not(feature = "approximatearithmetic")),
+    all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+    all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use num::BigInt;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
@@ -27,9 +29,7 @@ use crate::ebi_traits::{
     ebi_trait_event_log::IndexTrace,
     ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
 };
-use crate::math::fraction::Fraction;
 use crate::math::levenshtein;
-use crate::math::traits::Zero;
 
 pub trait WeightedDistances: Send + Sync {
     fn len_a(&self) -> usize;
@@ -52,11 +52,11 @@ pub trait WeightedDistances: Send + Sync {
 
     #[cfg(any(
         all(
-            not(feature = "exactarithmetic"),
-            not(feature = "approximatearithmetic")
+            not(feature = "eexactarithmetic"),
+            not(feature = "eapproximatearithmetic")
         ),
-        all(feature = "exactarithmetic", feature = "approximatearithmetic"),
-        all(feature = "exactarithmetic", not(feature = "approximatearithmetic")),
+        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+        all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
     /**
      * Only call in exact mode.
@@ -65,11 +65,11 @@ pub trait WeightedDistances: Send + Sync {
 
     #[cfg(any(
         all(
-            not(feature = "exactarithmetic"),
-            not(feature = "approximatearithmetic")
+            not(feature = "eexactarithmetic"),
+            not(feature = "eapproximatearithmetic")
         ),
-        all(feature = "exactarithmetic", feature = "approximatearithmetic"),
-        all(feature = "exactarithmetic", not(feature = "approximatearithmetic")),
+        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+        all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
     /**
      * Only call in exact mode.

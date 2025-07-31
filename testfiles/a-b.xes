@@ -12,14 +12,14 @@
   <classifier name="Activity" keys="Activity"/>
   <trace>
     <string key="concept:name" value="first trace"/>
-    <string key="attribute" value="a"/>
+    <int key="attribute" value="1"/>
     <event>
       <string key="concept:name" value="a"/>
     </event>
   </trace>
   <trace>
     <string key="concept:name" value="second trace"/>
-    <string key="attribute" value="b"/>
+    <int key="attribute" value="2"/>
     <event>
       <string key="concept:name" value="b"/>
     </event>

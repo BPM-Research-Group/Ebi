@@ -1,4 +1,5 @@
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, traits::Zero};
 use ebi_derive::ActivityKey;
 use std::collections::HashMap;
 
@@ -15,7 +16,6 @@ use crate::{
         ebi_trait_semantics::Semantics,
         ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex},
     },
-    math::{fraction::Fraction, traits::Zero},
 };
 
 use super::finite_stochastic_language::FiniteStochasticLanguage;

@@ -1,9 +1,9 @@
 use crate::math::distances::WeightedDistances;
-use crate::math::fraction::MaybeExact;
-use crate::math::fraction_exact::FractionExact;
-use crate::math::traits::One;
 use crate::optimisation_algorithms::network_simplex::NetworkSimplex;
 use anyhow::{Context, Result};
+use ebi_arithmetic::exact::MaybeExact;
+use ebi_arithmetic::fraction_exact::FractionExact;
+use ebi_arithmetic::traits::One;
 use fraction::{BigInt, ToPrimitive};
 use num_bigint::ToBigInt;
 use rayon::iter::ParallelIterator;
@@ -285,13 +285,11 @@ impl dyn WeightedDistances {
 
 #[cfg(test)]
 mod tests {
+    use ebi_arithmetic::{fraction::Fraction, traits::{One, Zero}};
+
     use crate::{
         ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        math::{
-            fraction::Fraction,
-            traits::{One, Zero},
-        },
         techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
     };
     use std::fs;

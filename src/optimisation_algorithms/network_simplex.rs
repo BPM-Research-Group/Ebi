@@ -1,7 +1,7 @@
 use super::network_simplex_value_type::{MulWithFloat, ToBigInt};
-use crate::math::traits::{One, Signed, Zero};
-use crate::optimisation_algorithms::network_simplex_value_type::IsFloat;
 use core::convert::From;
+use ebi_arithmetic::exact::MaybeExact;
+use ebi_arithmetic::traits::{One, Signed, Zero};
 use fraction::BigInt;
 use rand::{seq::SliceRandom, thread_rng};
 use rayon::ThreadPool;
@@ -224,7 +224,7 @@ impl<T> NetworkSimplex<T>
 where
     T: Zero
         + One
-        + IsFloat // Custom trait to check if the type is a float during runtime
+        + MaybeExact
         + MulWithFloat
         + Clone
         + for<'a> AddAssign<&'a T>
@@ -525,7 +525,7 @@ where
         // check feasibility: any remaining flow on artificial arcs?
         if !guarantee_network_feasibility {
             // for floating point types T, check if flow is close to zero; for integer types, check if flow is zero
-            if T::is_float(&self.sum_supply) {
+            if !T::is_exact(&self.sum_supply) {
                 for e in self.search_arc_num..self.all_arc_num {
                     // there might be some rounding errors. Increase/scale the epsilon if necessary
                     if self.flow[e] > T::one().mul_with_float(&EPSILON) {
@@ -588,7 +588,7 @@ where
             count -= 1;
             // block exhausted, check if a valid arc was found
             if count == 0 {
-                if T::is_float(&min_cost) {
+                if !T::is_exact(&min_cost) {
                     // Floating-point specific logic
                     let source_value = self.pi[self.source[self.in_arc]].abs();
                     let target_value = self.pi[self.target[self.in_arc]].abs();
@@ -648,7 +648,7 @@ where
             }
             // block exhausted, check if a valid arc was found
             if count == 0 {
-                if T::is_float(&min_cost) {
+                if !T::is_exact(&min_cost) {
                     // Floating-point specific logic
                     let source_value = self.pi[self.source[self.in_arc]].abs();
                     let target_value = self.pi[self.target[self.in_arc]].abs();
@@ -679,7 +679,7 @@ where
 
         // Check if a valid arc was found
 
-        if T::is_float(&min_cost) {
+        if !T::is_exact(&min_cost) {
             // Floating-point specific logic
             let source_value = self.pi[self.source[self.in_arc]].abs();
             let target_value = self.pi[self.target[self.in_arc]].abs();
@@ -789,7 +789,7 @@ where
         self.in_arc = final_min_arc;
 
         // Check if a valid arc was found
-        let valid_arc_found = if T::is_float(&final_min_cost) {
+        let valid_arc_found = if !T::is_exact(&final_min_cost) {
             let source_value = self.pi[self.source[self.in_arc]].abs();
             let target_value = self.pi[self.target[self.in_arc]].abs();
             let cost_value = self.cost[self.in_arc].abs();

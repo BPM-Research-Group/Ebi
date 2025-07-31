@@ -4,14 +4,11 @@ use crate::{
     ebi_traits::ebi_trait_stochastic_semantics::{
         EbiTraitStochasticSemantics, StochasticSemantics,
     },
-    math::{
-        astar,
-        fraction::Fraction,
-        traits::{One, Zero},
-    },
+    math::astar,
     techniques::align::transform_alignment,
 };
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, traits::{One, Zero}};
 use std::ops::{Add, AddAssign};
 
 #[derive(Clone, Debug)]

@@ -1,4 +1,5 @@
 use anyhow::{Context, Error, Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, traits::{One, Signed}};
 use ebi_derive::ActivityKey;
 use std::{fmt::Display, str::FromStr};
 
@@ -16,10 +17,6 @@ use crate::{
     },
     ebi_traits::ebi_trait_activities,
     line_reader::LineReader,
-    math::{
-        fraction::Fraction,
-        traits::{One, Signed},
-    },
 };
 
 use super::language_of_alignments::Move;
