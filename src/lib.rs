@@ -90,7 +90,6 @@ pub mod ebi_traits {
     pub mod ebi_trait_stochastic_semantics;
 }
 pub mod math {
-    pub mod astar;
     pub mod average;
 
     pub mod log_div;
@@ -186,6 +185,7 @@ pub mod techniques {
 pub mod optimisation_algorithms {
     pub mod network_simplex;
     pub mod network_simplex_value_type;
+    pub mod astar;
     // pub mod mixed_integer_linear_programming;
     // pub mod mixed_integer_linear_programming_solver;
     // pub mod mixed_integer_linear_programming_lu;
