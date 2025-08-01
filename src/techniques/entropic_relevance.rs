@@ -10,7 +10,10 @@ use crate::{
     math::log_div::LogDiv,
 };
 use anyhow::{Context, Result};
-use ebi_arithmetic::{fraction::Fraction, traits::{One, Zero}};
+use ebi_arithmetic::{
+    ebi_number::{One, Zero},
+    fraction::Fraction,
+};
 
 pub trait EntropicRelvance {
     fn entropic_relevance(
@@ -128,7 +131,7 @@ fn h(x: &Fraction) -> LogDiv {
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::traits::One;
+    use ebi_arithmetic::ebi_number::One;
 
     use crate::{
         ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage},

@@ -1,7 +1,11 @@
 use std::collections::{HashMap, hash_map::Entry};
 
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{choose_randomly::{ChooseRandomly, FractionRandomCache}, fraction::Fraction, traits::One};
+use ebi_arithmetic::{
+    choose_randomly::{ChooseRandomly, FractionRandomCache},
+    ebi_number::One,
+    fraction::Fraction,
+};
 use num::Zero;
 use rand::Rng;
 

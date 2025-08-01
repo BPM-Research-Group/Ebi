@@ -1,6 +1,6 @@
 use std::collections::{HashMap, hash_map::Entry};
 
-use ebi_arithmetic::{fraction::Fraction, traits::One};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::One};
 
 use crate::{
     ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage}

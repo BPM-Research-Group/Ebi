@@ -1,5 +1,5 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, traits::Zero};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
 
 use crate::math::root::Root;
 

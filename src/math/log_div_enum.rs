@@ -3,7 +3,7 @@ use ebi_arithmetic::{
     exact::{MaybeExact, is_exact_globally},
     fraction::{APPROX_DIGITS, UInt},
     fraction_enum::FractionEnum,
-    traits::{One, Zero},
+    ebi_number::{One, Zero},
 };
 use fraction::{BigFraction, BigUint, GenericFraction, Integer, Sign};
 use num_bigint::{ToBigInt, ToBigUint};
@@ -762,7 +762,7 @@ impl Display for FractionRaw {
 
 #[cfg(test)]
 mod tests {
-    use ebi_arithmetic::traits::Zero;
+    use ebi_arithmetic::ebi_number::Zero;
 
     use crate::math::log_div_enum::LogDivEnum;
 

@@ -9,8 +9,8 @@ use crate::{
 };
 use anyhow::{Result, anyhow};
 use ebi_arithmetic::{
+    ebi_number::{One, Zero},
     fraction::Fraction,
-    traits::{One, Zero},
 };
 use std::ops::{Add, AddAssign};
 

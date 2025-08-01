@@ -1,12 +1,9 @@
 use std::cmp::Ordering;
 
+use ebi_arithmetic::{fraction::Fraction, traits::{Signed, Zero}};
 use log::trace;
 
 use crate::{
-    math::{
-        fraction::Fraction,
-        traits::{Signed, Zero},
-    },
     optimisation_algorithms::{
         mixed_integer_linear_programming_ordering::order_simple,
         mixed_integer_linear_programming_sparse::{
@@ -223,6 +220,7 @@ pub fn lu_factorize<'a>(
                 return Err(Error::SingularMatrix);
             }
 
+            microlp::lu::LUFactors;
             assert!(max_abs.is_normal());
 
             // Choose among eligible pivot rows one with the least elements.
@@ -236,7 +234,7 @@ pub fn lu_factorize<'a>(
                     continue;
                 }
 
-                if Fraction::abs(&scratch.rhs.values[orig_r]) >= stability_coeff * max_abs {
+                if Fraction::abs(&scratch.rhs.values[orig_r]) >= &stability_coeff * &max_abs {
                     let elt_count = orig_row2elt_count[orig_r];
                     if best_elt_count.is_none() || best_elt_count.unwrap() > elt_count {
                         best_orig_r = Some(orig_r);
@@ -479,11 +477,11 @@ fn tri_solve_process_col(tri_mat: &TriangleMat, col: usize, rhs: &mut [Fraction]
 mod tests {
     use super::*;
     use crate::{
-        f,
         optimisation_algorithms::mixed_integer_linear_programming_helpers::{
             assert_matrix_eq, to_dense, to_sparse,
         },
     };
+    use ebi_arithmetic::f;
     use sprs::{CsMat, CsVec, TriMat};
 
     fn init() {
@@ -673,7 +671,7 @@ mod tests {
         let lu = lu_factorize(
             size,
             |c| mat.outer_view(cols[c]).unwrap().into_raw_storage(),
-            0.1,
+            f!(1, 10),
             &mut scratch,
         )
         .unwrap();

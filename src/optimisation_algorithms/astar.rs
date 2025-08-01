@@ -3,7 +3,7 @@
 // The original code has been modified to support the Fraction type in this project.
 // For more information, see https://github.com/evenfurther/pathfinding?tab=readme-ov-file#license
 
-use ebi_arithmetic::traits::Zero;
+use ebi_arithmetic::ebi_number::Zero;
 use indexmap::map::Entry::{Occupied, Vacant};
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;

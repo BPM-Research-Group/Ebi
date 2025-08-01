@@ -708,7 +708,7 @@ mod tests {
         path::PathBuf,
     };
 
-    use ebi_arithmetic::{fraction::Fraction, traits::Zero};
+    use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
     use strum::IntoEnumIterator;
 
     use crate::{

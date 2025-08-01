@@ -76,7 +76,7 @@ impl UnitEarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLangua
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::{fraction::Fraction, traits::One};
+    use ebi_arithmetic::{ebi_number::One, fraction::Fraction};
 
     use crate::{
         ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,

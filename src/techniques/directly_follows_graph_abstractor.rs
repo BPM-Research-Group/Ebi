@@ -1,4 +1,4 @@
-use ebi_arithmetic::{fraction::Fraction, traits::One};
+use ebi_arithmetic::{ebi_number::One, fraction::Fraction};
 
 use crate::{
     ebi_objects::directly_follows_graph::DirectlyFollowsGraph,

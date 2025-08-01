@@ -1,7 +1,6 @@
+use ebi_arithmetic::{fraction::Fraction, traits::Zero};
 use sprs::{CsVecBase, CsVecView};
 use std::ops::Deref;
-
-use crate::math::{fraction::Fraction, traits::Zero};
 
 pub(crate) fn resized_view<IStorage, DStorage>(
     vec: &CsVecBase<IStorage, DStorage, Fraction>,
@@ -45,6 +44,8 @@ use sprs::{CsMat, CsVec};
 pub(crate) fn to_sparse(slice: &[Fraction]) -> CsVec<Fraction> {
     let mut res = CsVec::empty(slice.len());
     for (i, val) in slice.iter().enumerate() {
+        use ebi_arithmetic::traits::Zero;
+
         if !val.is_zero() {
             res.append(i, val.clone());
         }

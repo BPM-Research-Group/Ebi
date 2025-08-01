@@ -1,6 +1,9 @@
 use anyhow::{Result, anyhow};
 use core::hash::Hash;
-use ebi_arithmetic::{fraction::Fraction, traits::{One, Signed, Zero}};
+use ebi_arithmetic::{
+    ebi_number::{One, Signed, Zero},
+    fraction::Fraction,
+};
 use priority_queue::PriorityQueue;
 use std::{
     cmp::Ordering,
@@ -560,8 +563,8 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
 mod tests {
     use std::fs;
 
+    use ebi_arithmetic::ebi_number::{One, Zero};
     use ebi_arithmetic::fraction::Fraction;
-    use ebi_arithmetic::traits::{One, Zero};
 
     use crate::ebi_framework::activity_key::HasActivityKey;
     use crate::ebi_objects::finite_stochastic_language::FiniteStochasticLanguage;

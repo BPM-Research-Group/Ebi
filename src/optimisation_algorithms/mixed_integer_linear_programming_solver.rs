@@ -1,18 +1,13 @@
+use ebi_arithmetic::{fraction::Fraction, traits::{Infinite, Signed, Zero}};
 use log::debug;
 use microlp::{ComparisonOp, Error, OptimizationDirection, VarDomain};
 use sprs::CompressedStorage;
 
-use crate::{
-    math::{
-        fraction::Fraction,
-        traits::{Infinite, One, Signed, Zero},
-    },
-    optimisation_algorithms::{
-        mixed_integer_linear_programming::{CsVec, Solution, Variable},
-        mixed_integer_linear_programming_helpers::{resized_view, to_dense},
-        mixed_integer_linear_programming_lu::{lu_factorize, ScratchSpace},
-        mixed_integer_linear_programming_sparse::{ScatteredVec, SparseVec},
-    },
+use crate::optimisation_algorithms::{
+    mixed_integer_linear_programming::{CsVec, Solution, Variable},
+    mixed_integer_linear_programming_helpers::{resized_view, to_dense},
+    mixed_integer_linear_programming_lu::{ScratchSpace, lu_factorize},
+    mixed_integer_linear_programming_sparse::{ScatteredVec, SparseVec},
 };
 
 type CsMat = sprs::CsMatI<Fraction, usize>;
@@ -455,8 +450,8 @@ impl Solver {
 
             let cur_val = self.nb_var_vals[col];
             self.nb_var_states[col] = NonBasicVarState {
-                at_min: float_eq(cur_val, self.orig_var_mins[var]),
-                at_max: float_eq(cur_val, self.orig_var_maxs[var]),
+                at_min: cur_val == self.orig_var_mins[var],
+                at_max: cur_val == self.orig_var_maxs[var],
             };
 
             // Shouldn't result in error, presumably problem was solvable before this variable

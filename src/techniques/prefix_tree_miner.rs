@@ -1,4 +1,4 @@
-use ebi_arithmetic::traits::Zero;
+use ebi_arithmetic::ebi_number::Zero;
 
 use crate::{
     ebi_objects::{

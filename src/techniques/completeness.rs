@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use ebi_arithmetic::{fraction::Fraction, traits::{One, Zero}};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::{One, Zero}};
 
 pub trait Completeness {
     /*

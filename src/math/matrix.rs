@@ -5,7 +5,7 @@ use std::{
 };
 
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, traits::{One, Zero}};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::{One, Zero}};
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefMutIterator, ParallelIterator};
 
 /**

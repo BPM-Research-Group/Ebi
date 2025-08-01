@@ -9,7 +9,7 @@ use std::sync::Arc;
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use anyhow::Result;
-use ebi_arithmetic::{fraction::Fraction, traits::Zero};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),

@@ -4,7 +4,7 @@ use std::{
 };
 
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, traits::Zero};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
 use strum_macros::Display;
 
 use crate::{
@@ -436,7 +436,7 @@ impl IndexMut<usize> for NodeStates {
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::{fraction::Fraction, traits::One};
+    use ebi_arithmetic::{fraction::Fraction, ebi_number::One};
 
     use crate::{
         ebi_objects::{

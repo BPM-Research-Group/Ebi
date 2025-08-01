@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 
-use ebi_arithmetic::{fraction::Fraction, traits::{One, Zero}};
+use ebi_arithmetic::{
+    ebi_number::{One, Zero},
+    fraction::Fraction,
+};
 
 use crate::{
     ebi_framework::activity_key::{ActivityKeyTranslator, HasActivityKey},

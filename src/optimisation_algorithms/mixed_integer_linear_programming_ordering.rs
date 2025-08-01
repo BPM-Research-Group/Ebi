@@ -1,3 +1,5 @@
+use log::trace;
+
 use crate::optimisation_algorithms::mixed_integer_linear_programming_sparse::{Error, Perm};
 
 /// Simplest preordering: order columns based on their size

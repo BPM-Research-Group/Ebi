@@ -1,6 +1,6 @@
 use std::{borrow::Borrow, ops::{AddAssign, Mul}, sync::Arc};
 
-use ebi_arithmetic::{exact::is_exact_globally, fraction_enum::FractionEnum, traits::Zero};
+use ebi_arithmetic::{exact::is_exact_globally, fraction_enum::FractionEnum, ebi_number::Zero};
 use fraction::{BigUint, GenericFraction, Integer, Ratio, Sign};
 use anyhow::{anyhow, Result};
 

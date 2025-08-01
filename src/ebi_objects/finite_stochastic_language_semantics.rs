@@ -1,5 +1,5 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, traits::Zero};
+use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
 use ebi_derive::ActivityKey;
 use std::collections::HashMap;
 

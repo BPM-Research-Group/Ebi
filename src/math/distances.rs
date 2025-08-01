@@ -8,7 +8,7 @@
 ))]
 use anyhow::Result;
 use ebi_arithmetic::fraction::Fraction;
-use ebi_arithmetic::traits::Zero;
+use ebi_arithmetic::ebi_number::Zero;
 use std::fmt;
 use std::fmt::Debug;
 use std::{iter::FusedIterator, sync::Arc};

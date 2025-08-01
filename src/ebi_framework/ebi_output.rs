@@ -503,8 +503,8 @@ mod tests {
     use std::{io::Cursor, path::PathBuf};
 
     use ebi_arithmetic::{
+        ebi_number::{One, Zero},
         fraction::Fraction,
-        traits::{One, Zero},
     };
     use strum::IntoEnumIterator;
 

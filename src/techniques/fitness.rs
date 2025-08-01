@@ -1,4 +1,4 @@
-use ebi_arithmetic::{fraction::Fraction, traits::Zero};
+use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
 
 use crate::ebi_objects::{
     language_of_alignments::Move, stochastic_language_of_alignments::StochasticLanguageOfAlignments,

@@ -1,7 +1,11 @@
 use crate::math::distances::WeightedDistances;
 use crate::optimisation_algorithms::network_simplex::NetworkSimplex;
 use anyhow::{Context, Result};
-use ebi_arithmetic::{exact::{is_exact_globally, MaybeExact}, fraction_enum::FractionEnum, traits::One};
+use ebi_arithmetic::{
+    ebi_number::One,
+    exact::{MaybeExact, is_exact_globally},
+    fraction_enum::FractionEnum,
+};
 use fraction::{BigInt, ToPrimitive};
 use num_bigint::ToBigInt;
 use rayon::prelude::*;
@@ -352,7 +356,10 @@ impl dyn WeightedDistances {
 
 #[cfg(test)]
 mod tests {
-    use ebi_arithmetic::{fraction::Fraction, traits::{One, Zero}};
+    use ebi_arithmetic::{
+        ebi_number::{One, Zero},
+        fraction::Fraction,
+    };
 
     use crate::{
         ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,

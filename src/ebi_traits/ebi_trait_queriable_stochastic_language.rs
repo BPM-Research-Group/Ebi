@@ -100,7 +100,7 @@ pub fn import<X: 'static + Importable + EbiTraitQueriableStochasticLanguage>(
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::{fraction::Fraction, traits::Zero};
+    use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
 
     use crate::{
         ebi_objects::{

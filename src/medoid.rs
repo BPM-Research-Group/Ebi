@@ -1,5 +1,5 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, traits::{One, Zero}};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::{One, Zero}};
 
 use crate::{
     ebi_objects::finite_language::FiniteLanguage,

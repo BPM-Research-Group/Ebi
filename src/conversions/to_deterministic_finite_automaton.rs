@@ -1,4 +1,4 @@
-use ebi_arithmetic::traits::{Signed, Zero};
+use ebi_arithmetic::ebi_number::{Signed, Zero};
 
 use crate::{ebi_framework::activity_key::HasActivityKey, ebi_objects::{
     deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton

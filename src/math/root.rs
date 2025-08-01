@@ -1,5 +1,5 @@
 use anyhow::Result;
-use ebi_arithmetic::{fraction::Fraction, traits::{Signed, Zero}};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::{Signed, Zero}};
 use fraction::Sign;
 use std::{
     fmt::{Debug, Display},

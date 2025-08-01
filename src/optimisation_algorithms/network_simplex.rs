@@ -1,7 +1,7 @@
 use super::network_simplex_value_type::{MulWithFloat, ToBigInt};
 use core::convert::From;
 use ebi_arithmetic::exact::MaybeExact;
-use ebi_arithmetic::traits::{One, Signed, Zero};
+use ebi_arithmetic::ebi_number::{One, Signed, Zero};
 use fraction::BigInt;
 use rand::{seq::SliceRandom, thread_rng};
 use rayon::ThreadPool;

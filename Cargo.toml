@@ -25,7 +25,7 @@ eapproximatearithmetic = []
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ebi_arithmetic = "0.1.5"
+ebi_arithmetic = "0.1.7"
 ebi_derive = "0.1.0"
 bitvec = "1.0.1"
 num-integer = "0.1.46"

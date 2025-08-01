@@ -1,5 +1,8 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, traits::{Signed, Zero}};
+use ebi_arithmetic::{
+    ebi_number::{Signed, Zero},
+    fraction::Fraction,
+};
 use num::One as _;
 use std::sync::Arc;
 

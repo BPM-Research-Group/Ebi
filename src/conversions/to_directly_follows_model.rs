@@ -1,4 +1,4 @@
-use ebi_arithmetic::traits::Signed;
+use ebi_arithmetic::ebi_number::Signed;
 
 use crate::{
     ebi_framework::activity_key::HasActivityKey,

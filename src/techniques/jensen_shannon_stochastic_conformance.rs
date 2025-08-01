@@ -1,7 +1,7 @@
 use anyhow::Result;
 use ebi_arithmetic::{
+    ebi_number::{Signed, Zero},
     fraction::Fraction,
-    traits::{Signed, Zero},
 };
 
 use crate::{
@@ -97,7 +97,7 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::{f, fraction::Fraction, traits::Zero};
+    use ebi_arithmetic::{ebi_number::Zero, f, fraction::Fraction};
 
     use crate::{
         ebi_objects::{

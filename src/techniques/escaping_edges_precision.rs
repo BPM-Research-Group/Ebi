@@ -9,7 +9,7 @@ use crate::{
     ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics},
 };
 use anyhow::{Context, Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, traits::Zero};
+use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
 
 pub const UNMATCHING: &str = "alignments and model do not belong to one another";
 
