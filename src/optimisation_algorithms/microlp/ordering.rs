@@ -1,4 +1,5 @@
-use super::sparse::{Error, Perm};
+use crate::optimisation_algorithms::microlp::sparse::{Error, Perm};
+use log::trace;
 
 /// Simplest preordering: order columns based on their size
 pub fn order_simple<'a>(size: usize, get_col: impl Fn(usize) -> &'a [usize]) -> Perm {

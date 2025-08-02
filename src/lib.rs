@@ -202,8 +202,8 @@ pub mod optimisation_algorithms {
     pub mod network_simplex;
     pub mod network_simplex_value_type;
     pub mod simplex;
-    pub mod micro_lp{
-        pub mod lib;
+    pub mod microlp{
+        pub mod microlp;
         pub mod helpers;
         pub mod lu;
         pub mod ordering;
