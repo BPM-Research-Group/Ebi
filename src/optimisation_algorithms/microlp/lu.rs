@@ -1,5 +1,7 @@
-use crate::optimisation_algorithms::microlp::solver::EPS;
-use crate::optimisation_algorithms::microlp::sparse::{Error, Perm, ScatteredVec, SparseMat, TriangleMat};
+use crate::{
+    optimisation_algorithms::microlp::sparse::{Error, Perm, ScatteredVec, SparseMat, TriangleMat},
+    math::{fraction::Fraction, traits::{One, Zero, Signed}},
+};
 use std::cmp::Ordering;
 use log::trace;
 
@@ -14,7 +16,7 @@ pub struct LUFactors {
 #[derive(Clone, Debug)]
 pub struct ScratchSpace {
     rhs: ScatteredVec,
-    dense_rhs: Vec<f64>,
+    dense_rhs: Vec<Fraction>,
     mark_nonzero: MarkNonzero,
 }
 
@@ -22,7 +24,7 @@ impl ScratchSpace {
     pub fn with_capacity(n: usize) -> ScratchSpace {
         ScratchSpace {
             rhs: ScatteredVec::empty(n),
-            dense_rhs: vec![0.0; n],
+            dense_rhs: vec![Fraction::zero(); n],
             mark_nonzero: MarkNonzero::with_capacity(n),
         }
     }
@@ -56,15 +58,15 @@ impl LUFactors {
         self.lower.nondiag.nnz() + self.upper.nondiag.nnz() + self.lower.cols()
     }
 
-    pub fn solve_dense(&self, rhs: &mut [f64], scratch: &mut ScratchSpace) {
-        scratch.dense_rhs.resize(rhs.len(), 0.0);
+    pub fn solve_dense(&self, rhs: &mut [Fraction], scratch: &mut ScratchSpace) {
+        scratch.dense_rhs.resize(rhs.len(), Fraction::zero());
 
         if let Some(row_perm) = &self.row_perm {
             for (i, rhs_el) in rhs.iter().enumerate() {
-                scratch.dense_rhs[row_perm.orig2new[i]] = *rhs_el;
+                scratch.dense_rhs[row_perm.orig2new[i]] = rhs_el.clone();
             }
         } else {
-            scratch.dense_rhs.copy_from_slice(rhs);
+            scratch.dense_rhs.clone_from_slice(rhs);
         }
 
         tri_solve_dense(&self.lower, Triangle::Lower, &mut scratch.dense_rhs);
@@ -72,10 +74,10 @@ impl LUFactors {
 
         if let Some(col_perm) = &self.col_perm {
             for i in 0..rhs.len() {
-                rhs[col_perm.new2orig[i]] = scratch.dense_rhs[i];
+                rhs[col_perm.new2orig[i]] = scratch.dense_rhs[i].clone();
             }
         } else {
-            rhs.copy_from_slice(&scratch.dense_rhs);
+            rhs.clone_from_slice(&scratch.dense_rhs);
         }
     }
 
@@ -86,7 +88,7 @@ impl LUFactors {
                 let new_i = row_perm.orig2new[i];
                 scratch.rhs.nonzero.push(new_i);
                 scratch.rhs.is_nonzero[new_i] = true;
-                scratch.rhs.values[new_i] = rhs.values[i];
+                scratch.rhs.values[new_i] = rhs.values[i].clone();
             }
         } else {
             std::mem::swap(&mut scratch.rhs, rhs);
@@ -101,7 +103,7 @@ impl LUFactors {
                 let new_i = col_perm.new2orig[i];
                 rhs.nonzero.push(new_i);
                 rhs.is_nonzero[new_i] = true;
-                rhs.values[new_i] = scratch.rhs.values[i];
+                rhs.values[new_i] = scratch.rhs.values[i].clone();
             }
         } else {
             std::mem::swap(rhs, &mut scratch.rhs);
@@ -120,8 +122,8 @@ impl LUFactors {
 
 pub fn lu_factorize<'a>(
     size: usize,
-    get_col: impl Fn(usize) -> (&'a [usize], &'a [f64]),
-    stability_coeff: f64,
+    get_col: impl Fn(usize) -> (&'a [usize], &'a [Fraction]),
+    stability_coeff: Fraction,
     scratch: &mut ScratchSpace,
 ) -> Result<LUFactors, Error> {
     // Implementation of the Gilbert-Peierls algorithm:
@@ -183,9 +185,9 @@ pub fn lu_factorize<'a>(
             // values[orig_i] is already fully calculated, diag coeff = 1.0.
             let new_i = orig2new_row[orig_i];
             if new_i < i_col {
-                let x_val = scratch.rhs.values[orig_i];
+                let x_val = scratch.rhs.values[orig_i].clone();
                 for (orig_r, coeff) in lower.col_iter(new_i) {
-                    scratch.rhs.values[orig_r] -= x_val * coeff;
+                    scratch.rhs.values[orig_r] -= &x_val * coeff;
                 }
             }
         }
@@ -195,23 +197,21 @@ pub fn lu_factorize<'a>(
         // but bad for sparseness, so we do threshold pivoting instead.
 
         let pivot_orig_r = {
-            let mut max_abs = 0.0;
+            let mut max_abs = Fraction::zero();
             for &orig_r in &scratch.rhs.nonzero {
                 if orig2new_row[orig_r] < i_col {
                     continue;
                 }
 
-                let abs = f64::abs(scratch.rhs.values[orig_r]);
+                let abs = scratch.rhs.values[orig_r].abs();
                 if abs > max_abs {
                     max_abs = abs;
                 }
             }
 
-            if max_abs < EPS {
+            if max_abs.is_zero() {
                 return Err(Error::SingularMatrix);
             }
-
-            assert!(max_abs.is_normal());
 
             // Choose among eligible pivot rows one with the least elements.
             // Gilbert-Peierls suggest to choose row with least elements *to the right*,
@@ -224,7 +224,7 @@ pub fn lu_factorize<'a>(
                     continue;
                 }
 
-                if f64::abs(scratch.rhs.values[orig_r]) >= stability_coeff * max_abs {
+                if scratch.rhs.values[orig_r].abs() >= &stability_coeff * &max_abs {
                     let elt_count = orig_row2elt_count[orig_r];
                     if best_elt_count.is_none() || best_elt_count.unwrap() > elt_count {
                         best_orig_r = Some(orig_r);
@@ -235,7 +235,7 @@ pub fn lu_factorize<'a>(
             best_orig_r.unwrap()
         };
 
-        let pivot_val = scratch.rhs.values[pivot_orig_r];
+        let pivot_val = scratch.rhs.values[pivot_orig_r].clone();
 
         {
             // Keep track of row permutations.
@@ -249,17 +249,17 @@ pub fn lu_factorize<'a>(
         // Gather the values of x into lower and upper matrices.
 
         for &orig_r in &scratch.rhs.nonzero {
-            let val = scratch.rhs.values[orig_r];
+            let val = scratch.rhs.values[orig_r].clone();
 
-            if val == 0.0 {
+            if val.is_zero() {
                 continue;
             }
 
             let new_r = orig2new_row[orig_r];
             match new_r.cmp(&i_col) {
                 Ordering::Less => upper.push(new_r, val),
-                Ordering::Equal => upper_diag.push(pivot_val),
-                Ordering::Greater => lower.push(orig_r, val / pivot_val),
+                Ordering::Equal => upper_diag.push(pivot_val.clone()),
+                Ordering::Greater => lower.push(orig_r, &val / &pivot_val),
             }
         }
 
@@ -412,7 +412,7 @@ enum Triangle {
     Upper,
 }
 
-fn tri_solve_dense(tri_mat: &TriangleMat, triangle: Triangle, rhs: &mut [f64]) {
+fn tri_solve_dense(tri_mat: &TriangleMat, triangle: Triangle, rhs: &mut [Fraction]) {
     assert_eq!(tri_mat.rows(), rhs.len());
     match triangle {
         Triangle::Lower => {
@@ -448,18 +448,18 @@ fn tri_solve_sparse(tri_mat: &TriangleMat, scratch: &mut ScratchSpace) {
     }
 }
 
-fn tri_solve_process_col(tri_mat: &TriangleMat, col: usize, rhs: &mut [f64]) {
+fn tri_solve_process_col(tri_mat: &TriangleMat, col: usize, rhs: &mut [Fraction]) {
     // all other variables in this row (multiplied by their coeffs)
     // are already subtracted from rhs[col].
     let x_val = if let Some(diag) = tri_mat.diag.as_ref() {
-        rhs[col] / diag[col]
+        &rhs[col] / &diag[col]
     } else {
-        rhs[col]
+        rhs[col].clone()
     };
 
-    rhs[col] = x_val;
-    for (r, &coeff) in tri_mat.nondiag.col_iter(col) {
-        rhs[r] -= x_val * coeff;
+    rhs[col] = x_val.clone();
+    for (r, coeff) in tri_mat.nondiag.col_iter(col) {
+        rhs[r] = &rhs[r] - &(&x_val * coeff);
     }
 }
 
