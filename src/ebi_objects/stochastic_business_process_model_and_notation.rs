@@ -1,7 +1,7 @@
 use anyhow::{Result, anyhow};
 use quick_xml::Reader as XmlReader;
 use quick_xml::events::Event;
-use std::collections::HashMap;
+use crate::math::fraction::Fraction;
 use std::fmt::Display;
 
 use crate::ebi_framework::{
@@ -45,14 +45,14 @@ pub const EBI_STOCHASTIC_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = E
 #[derive(Debug, Clone)]
 pub struct StochasticTask {
     pub id: String,
-    pub weight: f64,
+    pub weight: Fraction,
 }
 
 #[derive(Debug, Clone)]
 pub struct StochasticSequenceFlow {
     pub source_id: String,
     pub target_id: String,
-    pub weight: f64,
+    pub weight: Fraction,
 }
 
 #[derive(Clone, Debug)]
@@ -106,12 +106,12 @@ impl Importable for StochasticBusinessProcessModelAndNotation {
                         }
                         "task" => {
                             let mut id = String::new();
-                            let mut weight = 1.0;
+                            let mut weight = Fraction::from(1);
                             for attr in e.attributes().flatten() {
                                 match attr.key.as_ref() {
                                     b"id" => id = attr.unescape_value().unwrap().to_string(),
                                     b"weight" => {
-                                        weight = attr.unescape_value().unwrap().parse().unwrap_or(1.0)
+                                        weight = attr.unescape_value().unwrap().parse().unwrap_or(Fraction::from(1))
                                     }
                                     _ => {}
                                 }
@@ -142,13 +142,13 @@ impl Importable for StochasticBusinessProcessModelAndNotation {
                         "sequenceFlow" => {
                             let mut source_id = String::new();
                             let mut target_id = String::new();
-                            let mut weight = 1.0;
+                            let mut weight = Fraction::from(1);
                             for attr in e.attributes().flatten() {
                                 match attr.key.as_ref() {
                                     b"sourceRef" => source_id = attr.unescape_value().unwrap().to_string(),
                                     b"targetRef" => target_id = attr.unescape_value().unwrap().to_string(),
                                     b"weight" => {
-                                        weight = attr.unescape_value().unwrap().parse().unwrap_or(1.0)
+                                        weight = attr.unescape_value().unwrap().parse().unwrap_or(Fraction::from(1));
                                     }
                                     _ => {}
                                 }
