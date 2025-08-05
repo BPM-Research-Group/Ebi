@@ -4,13 +4,13 @@ use crate::ebi_objects::business_process_model_and_notation::{
 use crate::ebi_objects::stochastic_business_process_model_and_notation::{
     StochasticBusinessProcessModelAndNotation, StochasticSequenceFlow, StochasticTask
 };
-//use good_lp::{variables, variable, constraint, Expression, default_solver, SolverModel, Solution};
 use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
+use crate::optimisation_algorithms::microlp::microlp::{ComparisonOp, OptimizationDirection, Problem };
 use std::collections::{HashMap, HashSet, VecDeque};
 use crate::math::fraction::MaybeExact;
 use crate::math::fraction::Fraction;
 use crate::math::traits::{Zero, One};
-use crate::optimisation_algorithms::simplex::{Simplex, SimplexConstraint};
+use good_lp::{variables, variable, constraint, Expression, default_solver, SolverModel, Solution};
 
 
 fn is_diverging_gateway(node: &BPMNGateway) -> bool {
@@ -90,23 +90,21 @@ pub fn frequency_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Bu
     let mut activity_counts: HashMap<String, Fraction> = HashMap::new();
     
     for (trace, probability) in log.iter_trace_probability() {
-        if probability.is_exact() {
-            if let Ok(exact_fraction) = probability.extract_exact() {
-                // Count each activity in the trace, weighted by trace probability
-                for activity in trace {
-                    let activity_name = activity_key.get_activity_label(activity).to_string();
-                    let current_count = activity_counts.get(&activity_name).cloned().unwrap_or_else(|| Fraction::from((0, 1)));
-                    let fraction_to_add = match exact_fraction {
-                        fraction::GenericFraction::Rational(sign, ratio) => {
-                            Fraction::Exact(fraction::GenericFraction::Rational(
-                                sign.clone(),
-                                ratio.clone()
-                            ))
-                        }
-                        _ => Fraction::zero()
-                    };
-                    activity_counts.insert(activity_name, &current_count + &fraction_to_add);
-                }
+        if let Ok(exact_fraction) = probability.extract_exact() {
+            // Count each activity in the trace, weighted by trace probability
+            for activity in trace {
+                let activity_name = activity_key.get_activity_label(activity).to_string();
+                let current_count = activity_counts.get(&activity_name).cloned().unwrap_or_else(|| Fraction::from((0, 1)));
+                let fraction_to_add = match exact_fraction {
+                    fraction::GenericFraction::Rational(sign, ratio) => {
+                        Fraction::Exact(fraction::GenericFraction::Rational(
+                            sign.clone(),
+                            ratio.clone()
+                        ))
+                    }
+                    _ => Fraction::zero()
+                };
+                activity_counts.insert(activity_name, &current_count + &fraction_to_add);
             }
         }
     }
@@ -117,12 +115,8 @@ pub fn frequency_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Bu
             .find(|(_id, label)| **label == activity_name)
             .map(|(id, _label)| id) {
             count.insert(node_id.clone(), frequency);
-        } else {
-            // Fallback: assume activity name is the node ID
-            count.insert(activity_name, frequency);
         }
     }
-    
     count
 }
 
@@ -153,16 +147,14 @@ pub fn lhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Busin
                 
                 // Count left-hand pairs
                 for window in trace.windows(2) {
-                    let current = &window[0];
-                    let next = &window[1];
-                    let current_str = current.to_string();
-                    let next_str = next.to_string();
+                    let current_str = &window[0].to_string();
+                    let next_str = &window[1].to_string();
                     // Skip if the model indicates they can be concurrent or are the same
                     if concurrent.contains(&(current_str.clone(), next_str.clone())) || next_str == current_str || concurrent.contains(&(next_str.clone(), current_str.clone())) {
                         continue;
                     }
-                    let current_count = counts.get(&next_str).cloned().unwrap_or_else(|| Fraction::from((0, 1)));
-                    counts.insert(next_str, &current_count + &fraction_to_add);
+                    let current_count = counts.get(next_str).cloned().unwrap_or_else(|| Fraction::from((0, 1)));
+                    counts.insert(next_str.clone(), &current_count + &fraction_to_add);
                 }
             }
         }
@@ -212,16 +204,14 @@ pub fn rhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Busin
                 
                 // Count right-hand pairs
                 for window in trace.windows(2) {
-                    let current = &window[0];
-                    let next = &window[1];
-                    let current_str = current.to_string();
-                    let next_str = next.to_string();
+                    let current_str = &window[0].to_string();
+                    let next_str = &window[1].to_string();
                     // Skip if the model indicates they can be concurrent or are the same
                     if concurrent.contains(&(current_str.clone(), next_str.clone())) || next_str == current_str {
                         continue;
                     }
-                    let current_count = counts.get(&current_str).cloned().unwrap_or_else(|| Fraction::from((0, 1)));
-                    counts.insert(current_str, &current_count + &fraction_to_add);
+                    let current_count = counts.get(current_str).cloned().unwrap_or_else(|| Fraction::from((0, 1)));
+                    counts.insert(current_str.clone(), &current_count + &fraction_to_add);
                 }
             }
         }
@@ -286,7 +276,7 @@ pub fn pairscale_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Bu
 }
 
 
-pub fn weight_propagation(bpmn: &BusinessProcessModelAndNotation, weights: &HashMap<String, Fraction>) -> anyhow::Result<StochasticBusinessProcessModelAndNotation> {
+/*pub fn weight_propagation(bpmn: &BusinessProcessModelAndNotation, weights: &HashMap<String, Fraction>) -> anyhow::Result<StochasticBusinessProcessModelAndNotation> {
     let n_flows = bpmn.sequence_flows.len();
 
     let mut tasks: Vec<&BPMNNode> = vec![];
@@ -510,6 +500,7 @@ pub fn weight_propagation(bpmn: &BusinessProcessModelAndNotation, weights: &Hash
     println!("  Total slack variables: {}", total_slack);
     println!("  Total variables: {}", total_vars);
     println!("  Constraints: {}", constraints.len());
+    println!("All constraints {:?}", constraints);
     println!("Objective: {:?}", objective.clone());
     // Solve
     let simplex_result = Simplex::minimize(objective).with(constraints);
@@ -560,7 +551,7 @@ pub fn weight_propagation(bpmn: &BusinessProcessModelAndNotation, weights: &Hash
         end_events: bpmn.end_events.len(),
         sequence_flows,
     })
-}
+} */
 
 
 /*pub fn weight_propagation_good_lp(bpmn: &BusinessProcessModelAndNotation, weights: &HashMap<String, Fraction>) -> anyhow::Result<StochasticBusinessProcessModelAndNotation> {
@@ -699,6 +690,7 @@ pub fn weight_propagation(bpmn: &BusinessProcessModelAndNotation, weights: &Hash
         }
     }
 
+    // All slack variables have the same weight in the objective
     // Prioritize slack variables
     let mut objective = Expression::from(0.0);
     // Keep or gateways more flexible: lower penalty
@@ -709,6 +701,7 @@ pub fn weight_propagation(bpmn: &BusinessProcessModelAndNotation, weights: &Hash
     for &idx in &other_slack_indices {
         objective = objective + slack_vars[idx] * 10.0;
     }
+
 
     let mut model = vars.minimise(objective).using(default_solver);
 
@@ -1056,9 +1049,8 @@ pub fn weight_propagation(bpmn: &BusinessProcessModelAndNotation, weights: &Hash
             if !unscaled_flows.is_empty() {
                 for flow_id in &unscaled_flows {
                     if let Some(weight) = flow_weights.get_mut(*flow_id) {
-                        *weight = 1.0;
+                        *weight = Fraction::from(1);
                         scaled_flows.insert((*flow_id).clone());
-                        println!("Setting converging OR gateway {} outgoing flow to 1.0", gateway.id);
                     }
                 }
             }
@@ -1069,7 +1061,7 @@ pub fn weight_propagation(bpmn: &BusinessProcessModelAndNotation, weights: &Hash
     let mut sequence_flows = Vec::new();
     for flow in &bpmn.sequence_flows {
         let flow_id = format!("flow_{}_{}", flow.source_id, flow.target_id);
-        let weight = flow_weights.get(&flow_id).copied().unwrap_or(1.0);
+        let weight = flow_weights.get(&flow_id).copied().unwrap_or(Fraction::from(1));
         
         sequence_flows.push(StochasticSequenceFlow {
             source_id: flow.source_id.clone(),
@@ -1097,7 +1089,258 @@ pub fn weight_propagation(bpmn: &BusinessProcessModelAndNotation, weights: &Hash
         end_events: bpmn.end_events.len(),
         sequence_flows,
     })
-}*/
+}
+*/
+
+pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weights: &HashMap<String, Fraction>) -> anyhow::Result<StochasticBusinessProcessModelAndNotation>{
+    let n_flows = bpmn.sequence_flows.len();
+
+    //List of tasks without start, end
+    let mut tasks: Vec<&BPMNNode> = vec![];
+    for task in &bpmn.nodes {
+        if !bpmn.start_event.id.eq(&task.id) && !bpmn.end_events.iter().any(|end| end.id == task.id) {
+            tasks.push(task);
+        }
+    }
+
+    if n_flows == 0 {
+        // No flows, return empty model
+        let tasks: Vec<StochasticTask> = bpmn.nodes.iter().map(|node| {
+            let w = weights.get(&node.id).cloned().unwrap_or(Fraction::from(0));
+            StochasticTask { id: node.id.clone(), weight: w }
+        }).collect();
+        
+        return Ok(StochasticBusinessProcessModelAndNotation {
+            tasks,
+            start_event: bpmn.start_event.id.clone(),
+            xor_gateways: bpmn.xor_gateways.iter().map(|g| g.id.clone()).collect(),
+            and_gateways: bpmn.and_gateways.iter().map(|g| g.id.clone()).collect(),
+            or_gateways: bpmn.or_gateways.iter().map(|g| g.id.clone()).collect(),
+            end_events: bpmn.end_events.len(),
+            sequence_flows: vec![],
+        });
+    }
+
+    //map incoming, outgoing sequence flows to tasks/gateways
+    // Build incoming/outgoing maps for each node
+    let mut incoming: HashMap<String, Vec<String>> = HashMap::new();
+    let mut outgoing: HashMap<String, Vec<String>> = HashMap::new();
+    for flow in &bpmn.sequence_flows {
+        let flow_id = format!("flow_{}_{}", flow.source_id, flow.target_id);
+        outgoing.entry(flow.source_id.clone()).or_default().push(flow_id.clone());
+        incoming.entry(flow.target_id.clone()).or_default().push(flow_id);
+    }
+
+    //Setup Problem: Minimize sum of absolute slacks, ignore flow weights in optimization
+    let mut problem = Problem::new(OptimizationDirection::Minimize);
+
+    //Setup variable per sequence flow
+    let mut flow_vars = HashMap::new();
+    for (i, flow) in bpmn.sequence_flows.iter().enumerate(){
+        let flow_id = format!("flow_{}_{}", flow.source_id, flow.target_id);
+        // 0 <= v <= infinity, coefficient = 0
+        let v = problem.add_var(Fraction::from(0), (Fraction::from(0), Fraction::infinity()));
+        flow_vars.insert(flow_id, v);
+    }
+
+    // Add constraints based on nodetype
+
+    //Soft task constraints:
+    //Incoming: f - slack <= w and f + slack >= w
+    //Outgoing: sum of f - slack <= w and sum of f + slack >= w
+    for task in &tasks {
+        let in_flows = incoming.get(task.id.as_str()).cloned().unwrap_or_default();
+        let out_flows = outgoing.get(task.id.as_str()).cloned().unwrap_or_default();
+
+        if let Some(task_weight) = weights.get(&task.id){
+            //Inflows, add one constraint per flow
+            for f in &in_flows{
+                if let Some(&flow_var) = flow_vars.get(f)  {
+                    let slack = problem.add_var(Fraction::from(1), (Fraction::from(0), Fraction::infinity()));
+                    problem.add_constraint([(flow_var, Fraction::from(1)), (slack, -Fraction::from(1))], ComparisonOp::Le, Fraction::from(task_weight));
+                    problem.add_constraint([(flow_var, Fraction::from(1)), (slack, Fraction::from(1))], ComparisonOp::Ge, Fraction::from(task_weight));
+                }
+            }
+            //Outflows, add one constraint for all flows
+            let slack = problem.add_var(Fraction::from(1), (Fraction::from(0), Fraction::infinity()));
+            let mut sum_vars = vec![];
+            for f in &out_flows{
+                if let Some(&flow_var) = flow_vars.get(f){
+                    sum_vars.push((flow_var, Fraction::from(1)));
+                }
+            }
+
+            let mut con_le = sum_vars.clone();
+            con_le.push((slack, -Fraction::from(1))); 
+            let mut con_ge = sum_vars.clone();
+            con_ge.push((slack, Fraction::from(1)));
+            
+            problem.add_constraint(con_le, ComparisonOp::Le, Fraction::from(task_weight));
+            problem.add_constraint(con_ge, ComparisonOp::Ge, Fraction::from(task_weight));
+        }
+    }
+
+    //Soft And constraints:
+    // For all incoming, outgoing:
+    // flow - first - slack <= 0
+    // flow - first + slack >= 0
+    for gateway in &bpmn.and_gateways{
+        let in_flows = incoming.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        let out_flows = outgoing.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        let mut all_flows = in_flows.clone();
+        all_flows.extend(out_flows.clone());
+        if let Some(&first_var) = flow_vars.get(&all_flows[0]){
+            for f in &all_flows[1..]{
+                if let Some(&flow_var) = flow_vars.get(f){
+                    let slack = problem.add_var(Fraction::from(1), (Fraction::from(0), Fraction::infinity()));
+                    problem.add_constraint([(flow_var, Fraction::from(1)), (first_var, -Fraction::from(1)), (slack, -Fraction::from(1))], ComparisonOp::Le, Fraction::from(0));
+                    problem.add_constraint([(flow_var, Fraction::from(1)), (first_var, -Fraction::from(1)), (slack, Fraction::from(1))], ComparisonOp::Ge, Fraction::from(0));
+                }
+            }
+        }
+    }
+
+    //Soft XOR constraints:
+    // Sum of incoming - Sum of outgoing - slack <= 0
+    // Sum of incoming - Sum of outgoing + slack >= 0
+    for gateway in &bpmn.xor_gateways{
+        let in_flows = incoming.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        let out_flows = outgoing.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        let mut sum_vars = vec![];
+        for f in &in_flows{
+            if let Some(&flow_var) = flow_vars.get(f){
+                sum_vars.push((flow_var, Fraction::from(1)));
+            }
+        }
+        for f in &out_flows{
+            if let Some(&flow_var) = flow_vars.get(f){
+                sum_vars.push((flow_var, -Fraction::from(1)));
+            }
+        }
+        let slack = problem.add_var(Fraction::from(1), (Fraction::from(0), Fraction::infinity()));
+
+        let mut con_le = sum_vars.clone();
+        con_le.push((slack, -Fraction::from(1)));
+        let mut con_ge = sum_vars.clone();
+        con_ge.push((slack, Fraction::from(1)));
+        problem.add_constraint(con_le, ComparisonOp::Le, Fraction::from(0));
+        problem.add_constraint(con_ge, ComparisonOp::Ge, Fraction::from(0));
+    }
+
+    //Soft OR constraints
+    //Diverging: incoming - each outgoing + slack >= 1 (implies  incoming - max(outgoing) + slack >= 1), incoming - sum of outgoing - slack <= -1
+    //Converging: outgoing - each incoming + slack >= 1 (implies outgoing . max(incoming) + slack >= 1), outgoing - sum of incoming - slack <= -1
+    for gateway in &bpmn.or_gateways{
+        let in_flows = incoming.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        let out_flows = outgoing.get(gateway.id.as_str()).cloned().unwrap_or_default();
+        if gateway.direction == GatewayDirection::Diverging{
+            if let Some(&in_var) = flow_vars.get(&in_flows[0]){
+                let mut sum_vars = vec![];
+                for out_flow in out_flows{
+                    if let Some(&out_var) = flow_vars.get(&out_flow){
+                        let slack = problem.add_var(Fraction::from(1), (Fraction::from(0), Fraction::infinity()));
+                        problem.add_constraint([(in_var, Fraction::from(1)), (out_var, -Fraction::from(1)), (slack, Fraction::from(1))], ComparisonOp::Ge, Fraction::from(1));
+                        sum_vars.push((out_var, -Fraction::from(1)))
+                    }
+                }
+                let slack = problem.add_var(Fraction::from(1), (Fraction::from(0), Fraction::infinity()));
+                sum_vars.push((in_var, Fraction::from(1)));
+                sum_vars.push((slack, -Fraction::from(1)));
+                problem.add_constraint(sum_vars, ComparisonOp::Le, -Fraction::from(1));
+            }
+        }else{
+            if let Some(&out_var) = flow_vars.get(&out_flows[0]){
+                let mut sum_vars = vec![];
+                for in_flow in in_flows{
+                    if let Some(&in_var) = flow_vars.get(&in_flow){
+                        let slack = problem.add_var(Fraction::from(1), (Fraction::from(0), Fraction::infinity()));
+                        problem.add_constraint([(out_var, Fraction::from(1)), (in_var, -Fraction::from(1)), (slack, Fraction::from(1))], ComparisonOp::Ge, Fraction::from(1));
+                        sum_vars.push((in_var, -Fraction::from(1)))
+                    }
+                }
+                let slack = problem.add_var(Fraction::from(1), (Fraction::from(0), Fraction::infinity()));
+                sum_vars.push((out_var, Fraction::from(1)));
+                sum_vars.push((slack, -Fraction::from(1)));
+                problem.add_constraint(sum_vars, ComparisonOp::Le, -Fraction::from(1));
+            }
+            }
+        }
+    let solution = problem.solve().unwrap();
+    println!("Solution Objective {}", solution.objective());
+    
+    let mut flow_weights: HashMap<String, Fraction> = HashMap::new();
+    for flow in &bpmn.sequence_flows{
+        let flow_id = format!("flow_{}_{}", flow.source_id, flow.target_id);
+        if let Some(&flow_var) = flow_vars.get(&flow_id){
+            flow_weights.insert(flow_id, solution[flow_var].clone());
+        }
+     }
+
+    /*let mut scaled_flows = HashSet::new();
+    //Scale flow weights
+    for gateway in &bpmn.xor_gateways{
+        let out_flows = outgoing.get(&gateway.id).cloned().unwrap_or_default();
+        if gateway.direction == GatewayDirection::Diverging {
+            let sum: Fraction = out_flows.iter()
+                .filter_map(|flow_id| flow_weights.get(flow_id))
+                .sum();
+            let factor = &Fraction::from(1) / &sum;
+            for flow_id in &out_flows{
+                if let Some(weight) = flow_weights.get_mut(flow_id){
+                    *weight *= factor.clone();
+                    scaled_flows.insert(flow_id.clone());
+                }
+            }
+        }
+    }
+
+    for gateway in &bpmn.and_gateways{
+        let out_flows = outgoing.get(&gateway.id).cloned().unwrap_or_default();
+        if gateway.direction == GatewayDirection::Diverging{
+            let max_weight = out_flows.iter()
+                .filter_map(|flow_id| flow_weights.get(flow_id))
+                .fold(Fraction::from(0), |acc, w| acc.max(w.clone()));
+            let factor = &Fraction::from(1) / &max_weight;
+            for flow_id in &out_flows{
+                if let Some(weight) = flow_weights.get_mut(flow_id){
+                    *weight *= factor.clone();
+                    scaled_flows.insert(flow_id.clone());
+                }
+            }
+        }
+
+    }*/
+
+    let mut sequence_flows = Vec::new();
+    for flow in &bpmn.sequence_flows {
+        let flow_id = format!("flow_{}_{}", flow.source_id, flow.target_id);
+        let weight = flow_weights.get(&flow_id).cloned().unwrap_or(Fraction::from(1));
+        
+        sequence_flows.push(StochasticSequenceFlow {
+            source_id: flow.source_id.clone(),
+            target_id: flow.target_id.clone(),
+            weight,
+        });
+    }
+
+    let mut stoch_tasks = Vec::new();
+    for node in &bpmn.nodes {
+        stoch_tasks.push(StochasticTask {
+            id: node.id.clone(),
+            weight: Fraction::from(0),
+        });
+    }
+
+    return Ok(StochasticBusinessProcessModelAndNotation {
+        tasks: stoch_tasks,
+        start_event: bpmn.start_event.id.clone(),
+        xor_gateways: bpmn.xor_gateways.iter().map(|g| g.id.clone()).collect(),
+        and_gateways: bpmn.and_gateways.iter().map(|g| g.id.clone()).collect(),
+        or_gateways: bpmn.or_gateways.iter().map(|g| g.id.clone()).collect(),
+        end_events: bpmn.end_events.len(),
+        sequence_flows: sequence_flows,
+    });
+}
 
 #[cfg(test)]
 mod tests {
@@ -1108,7 +1351,6 @@ mod tests {
     use crate::ebi_objects::event_log::EventLog;
     use crate::ebi_objects::finite_stochastic_language::FiniteStochasticLanguage;
     use crate::ebi_framework::importable::Importable;
-    use crate::optimisation_algorithms::simplex::Simplex;
 
     #[test]
     fn test_basic_compilation() {
@@ -1118,7 +1360,7 @@ mod tests {
         
         // Test that our main functions exist and have the right signatures
         let _f = frequency_estimator as fn(&dyn EbiTraitFiniteStochasticLanguage, &BusinessProcessModelAndNotation) -> HashMap<String, Fraction>;
-        let _h = weight_propagation as fn(&BusinessProcessModelAndNotation, &HashMap<String, Fraction>) -> anyhow::Result<StochasticBusinessProcessModelAndNotation>;
+        //let _h = weight_propagation as fn(&BusinessProcessModelAndNotation, &HashMap<String, Fraction>) -> anyhow::Result<StochasticBusinessProcessModelAndNotation>;
         
         println!("All functions compile correctly");
     }
@@ -1145,6 +1387,81 @@ mod tests {
     }
 
     /// Test function that loads BPMN model and event log from files
+    
+    #[test]
+    #[ignore]
+    fn solve_minimal_example(){
+        use crate::optimisation_algorithms::simplex::{Simplex, SimplexConstraint};
+        let program = Simplex::minimize(vec![Fraction::from(0), Fraction::from(0), Fraction::from(1), Fraction::from(1)])
+        .with(vec![
+            SimplexConstraint::LessThan(vec![Fraction::from(1), Fraction::from(0), -Fraction::from(1), Fraction::from(0)], Fraction::from(1)),
+            SimplexConstraint::LessThan(vec![-Fraction::from(1), Fraction::from(0), -Fraction::from(1), Fraction::from(0)], -Fraction::from(1)),
+            SimplexConstraint::LessThan(vec![Fraction::from(0), Fraction::from(1), Fraction::from(0), -Fraction::from(1)], Fraction::from(1)),
+            SimplexConstraint::LessThan(vec![Fraction::from(0), -Fraction::from(1), Fraction::from(0), -Fraction::from(1)], -Fraction::from(1)),
+        ]);
+        let mut simplex = program.unwrap();
+        println!("Result: {:?}", simplex.solve());
+        for var in 1..5{
+            println!("Var {}: {:?}", var, simplex.get_var(var));
+        }
+
+    }
+
+
+    #[test]
+    #[ignore]
+    fn test_simplex(){
+        use simplex::*;
+        let program = Simplex::minimize(&vec![0.0, 0.0, 1.0, 1.0])
+        .with(vec![
+            SimplexConstraint::LessThan(vec![1.0, 0.0, -1.0, 0.0], 1.0),
+            SimplexConstraint::LessThan(vec![-1.0, 0.0, -1.0, 0.0], -1.0),
+            SimplexConstraint::LessThan(vec![0.0, 1.0, 0.0, -1.0], 1.0),
+            SimplexConstraint::LessThan(vec![0.0, -1.0, 0.0, -1.0], -1.0),
+        ]);
+        let mut simplex = program.unwrap();
+        println!("Result: {:?}", simplex.solve());
+        for var in 0..5{
+            println!("Var {}: {:?}", var, simplex.get_var(var));
+        }
+    }
+    
+    #[test]
+    #[ignore]
+    fn test_good_lp(){
+        use good_lp::{variables, variable, constraint, Expression, default_solver, SolverModel, Solution};
+        variables! { 
+            vars:
+                x1 >= 0.0;
+                x2 >= 0.0;
+                s1 >= 0.0;
+                s2 >= 0.0;
+        }
+
+        // Objective: Minimize s1 + s2
+        let objective = s1 + s2;
+
+        // Constraints:
+        // x1 - s1 <= 1
+        // x1 + s1 >= 1
+        // x2 - s2 <= 1
+        // x2 + s2 >= 1
+        let mut model = vars.minimise(objective).using(default_solver);
+
+        model = model
+            .with(constraint!(x1 - s1 <= 1.0))
+            .with(constraint!(-x1 - s1 <= -1.0))
+            .with(constraint!(x2 - s2 <= 1.0))
+            .with(constraint!(-x2 + -s2 <= -1.0));
+
+        let solution = model.solve().unwrap();
+        println!("x1: {:?}", solution.value(x1));
+        println!("x2: {:?}", solution.value(x2));
+        println!("s1: {:?}", solution.value(s1));
+        println!("s2: {:?}", solution.value(s2));
+    }
+
+
     #[test]
     #[ignore]
     fn test_weight_propagation_from_files() {
@@ -1246,7 +1563,7 @@ mod tests {
         
         // Apply weight propagation
         println!("\n=== Applying weight propagation with good_lp ===");
-        let result: Result<StochasticBusinessProcessModelAndNotation, anyhow::Error> = weight_propagation(&bpmn_model, &weights);
+        let result: Result<StochasticBusinessProcessModelAndNotation, anyhow::Error> = weight_propagtion_micro_lp(&bpmn_model, &weights);
         
         match result {
             Ok(stochastic_bpmn) => {
