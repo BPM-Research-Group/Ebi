@@ -1084,7 +1084,7 @@ pub fn pairscale_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Bu
         xor_gateways: bpmn.xor_gateways.iter().map(|g| g.id.clone()).collect(),
         and_gateways: bpmn.and_gateways.iter().map(|g| g.id.clone()).collect(),
         or_gateways: bpmn.or_gateways.iter().map(|g| g.id.clone()).collect(),
-        end_events: bpmin.end_events.len(),
+        end_events: bpmn.end_events.len(),
         sequence_flows,
     })
 }
@@ -1275,30 +1275,48 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
      }
 
 
-        //Scale flow weights
+    //Scale flow weights
+    // All the outgoing flows of a gateway/task are scaled
+    // For XOR the sum is scaled to 1
+    // For And the max is scaled to 1
+    // For OR if max > 0, max is scaled to 1
+    // For Tasks the max is scaled to 1
+
     let mut scaled_flows = HashSet::new();
     for gateway in &bpmn.xor_gateways{
         let out_flows = outgoing.get(&gateway.id).cloned().unwrap_or_default();
-        //if gateway.direction == GatewayDirection::Diverging {
-            let sum: Fraction = out_flows.iter()
-                .filter_map(|flow_id| flow_weights.get(flow_id))
-                .sum();
-            let factor = &Fraction::from(1) / &sum;
-            for flow_id in &out_flows{
-                if let Some(weight) = flow_weights.get_mut(flow_id){
-                    *weight *= factor.clone();
-                    scaled_flows.insert(flow_id.clone());
-                }
+        let sum: Fraction = out_flows.iter()
+            .filter_map(|flow_id| flow_weights.get(flow_id))
+            .sum();
+        let factor = &Fraction::from(1) / &sum;
+        for flow_id in &out_flows{
+            if let Some(weight) = flow_weights.get_mut(flow_id){
+                *weight *= factor.clone();
+                scaled_flows.insert(flow_id.clone());
             }
-        //}
+        }
     }
 
     for gateway in &bpmn.and_gateways{
         let out_flows = outgoing.get(&gateway.id).cloned().unwrap_or_default();
-        //if gateway.direction == GatewayDirection::Diverging{
-            let max_weight = out_flows.iter()
-                .filter_map(|flow_id| flow_weights.get(flow_id))
-                .fold(Fraction::from(0), |acc, w| acc.max(w.clone()));
+        let max_weight = out_flows.iter()
+            .filter_map(|flow_id| flow_weights.get(flow_id))
+            .fold(Fraction::from(0), |acc, w| acc.max(w.clone()));
+        let factor = &Fraction::from(1) / &max_weight;
+        for flow_id in &out_flows{
+            if let Some(weight) = flow_weights.get_mut(flow_id){
+                *weight *= factor.clone();
+                scaled_flows.insert(flow_id.clone());
+            }
+        }
+    }
+
+    for gateway in &bpmn.or_gateways{
+                let out_flows = outgoing.get(&gateway.id).cloned().unwrap_or_default();
+        let max_weight = out_flows.iter()
+            .filter_map(|flow_id| flow_weights.get(flow_id))
+            .fold(Fraction::from(0), |acc, w| acc.max(w.clone()));
+        if max_weight > Fraction::from(1){
             let factor = &Fraction::from(1) / &max_weight;
             for flow_id in &out_flows{
                 if let Some(weight) = flow_weights.get_mut(flow_id){
@@ -1306,7 +1324,7 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
                     scaled_flows.insert(flow_id.clone());
                 }
             }
-        //}
+        }
     }
 
     for task in &tasks{
@@ -1481,8 +1499,8 @@ mod tests {
         use crate::ebi_traits::ebi_trait_event_log::IndexTrace;
         
         // File paths
-        let bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\test_models\runningExample.bpmn";
-        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\Eventlogs\runningExample.xes";
+        let bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\test_models\traffic_fine.bpmn";
+        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\Eventlogs\road_traffic_fine_management_process.xes";
         
         
         println!("=== Loading files for weight propagation test ===");
