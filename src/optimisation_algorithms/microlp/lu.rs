@@ -1,6 +1,6 @@
 use crate::{
     optimisation_algorithms::microlp::sparse::{Error, Perm, ScatteredVec, SparseMat, TriangleMat},
-    math::{fraction::Fraction, traits::{One, Zero, Signed}},
+    math::{fraction::Fraction, traits::{Zero, Signed}},
 };
 use std::cmp::Ordering;
 use log::trace;

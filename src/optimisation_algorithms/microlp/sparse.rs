@@ -1,8 +1,8 @@
 use crate::{
     optimisation_algorithms::microlp::microlp::to_dense,
-    math::{fraction::Fraction, traits::{One, Zero}},
+    math::{fraction::Fraction, traits::{Zero}},
 };
-use sprs::{CsMat, CsVec};
+use sprs::{CsMat};
 use std::fmt::{Display, Formatter};
 
 #[derive(Clone, Debug, Default)]
@@ -24,10 +24,7 @@ impl SparseVec {
         self.values.clear();
     }
 
-    pub(crate) fn push(&mut self, i: usize, val: Fraction) {
-        self.indices.push(i);
-        self.values.push(val);
-    }
+
 
     pub(crate) fn iter(&self) -> impl Iterator<Item = (usize, &Fraction)> {
         self.indices.iter().copied().zip(&self.values)
@@ -37,10 +34,7 @@ impl SparseVec {
         self.values.iter().map(|v| v * v).sum()
     }
 
-    pub(crate) fn into_csvec(self, len: usize) -> CsVec<Fraction> {
-        //guaranteed to not panic
-        CsVec::new_from_unsorted(len, self.indices, self.values).unwrap()
-    }
+
 }
 
 #[derive(Clone, Debug)]
@@ -125,20 +119,6 @@ impl ScatteredVec {
         }
     }
 
-    #[cfg(test)]
-    pub(crate) fn to_csvec(&self) -> CsVec<Fraction> {
-        let mut indices = vec![];
-        let mut data = vec![];
-        for &i in &self.nonzero {
-            let val = &self.values[i];
-            if !val.is_zero() {
-                indices.push(i);
-                data.push(val.clone());
-            }
-        }
-        //guaranteed to be sorted, in range and with same size
-        CsVec::new_from_unsorted(self.values.len(), indices, data).unwrap()
-    }
 }
 
 /// Unordered sparse matrix with elements stored by columns

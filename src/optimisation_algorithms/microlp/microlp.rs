@@ -45,35 +45,12 @@ use crate::{
     optimisation_algorithms::microlp::sparse,
     optimisation_algorithms::microlp::solver,
     optimisation_algorithms::microlp::solver::Solver,
-    math::{fraction::Fraction, traits::{Zero, One}},
+    math::{fraction::Fraction, traits::{Zero}},
 };
 use sprs::errors::StructureError;
-use sprs::{CsVecBase, CsVecView};
+use sprs::{CsVecBase};
 use std::ops::Deref;
 
-// Helper functions merged from helpers.rs
-pub(crate) fn resized_view<IStorage, DStorage>(
-    vec: &CsVecBase<IStorage, DStorage, Fraction>,
-    len: usize,
-) -> CsVecView<Fraction>
-where
-    IStorage: Deref<Target = [usize]>,
-    DStorage: Deref<Target = [Fraction]>,
-{
-    let mut indices = vec.indices();
-    let mut data = vec.data();
-    while let Some(&i) = indices.last() {
-        if i < len {
-            // TODO: binary search
-            break;
-        }
-
-        indices = &indices[..(indices.len() - 1)];
-        data = &data[..(data.len() - 1)];
-    }
-
-    CsVecView::new(len, indices, data)
-}
 
 pub(crate) fn to_dense<IStorage, DStorage>(vec: &CsVecBase<IStorage, DStorage, Fraction>) -> Vec<Fraction>
 where
@@ -462,7 +439,7 @@ impl<'a> IntoIterator for &'a Solution {
 #[cfg(test)]
 mod tests {
     use super::*;
-
+    use crate::math::{fraction::Fraction, traits::{Zero, One}};
     fn init() {
         let _ = env_logger::builder().is_test(true).try_init();
     }
@@ -536,15 +513,15 @@ mod tests {
         init();
         // This is the example from the documentation
         let mut problem = Problem::new(OptimizationDirection::Maximize);
-        let x = problem.add_var(Fraction::one(), (Fraction::zero(), Fraction::infinity()));
+        let x = problem.add_var(Fraction::from(1), (Fraction::zero(), Fraction::infinity()));
         let y = problem.add_var(Fraction::from(2), (Fraction::zero(), Fraction::from(3)));
 
-        problem.add_constraint(&[(x, Fraction::one()), (y, Fraction::one())], ComparisonOp::Le, Fraction::from(4));
-        problem.add_constraint(&[(x, Fraction::from(2)), (y, Fraction::one())], ComparisonOp::Ge, Fraction::from(2));
+        problem.add_constraint(&[(x, Fraction::from(1)), (y, Fraction::from(1))], ComparisonOp::Le, Fraction::from(4));
+        problem.add_constraint(&[(x, Fraction::from(2)), (y, Fraction::from(1))], ComparisonOp::Ge, Fraction::from(2));
 
         let solution = problem.solve().unwrap();
         assert_eq!(solution.objective(), Fraction::from(7));
-        assert_eq!(solution[x], Fraction::one());
+        assert_eq!(solution[x], Fraction::from(1));
         assert_eq!(solution[y], Fraction::from(3));
     }
 

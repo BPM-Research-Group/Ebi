@@ -204,7 +204,6 @@ pub mod optimisation_algorithms {
     pub mod simplex;
     pub mod microlp{
         pub mod microlp;
-        pub mod helpers;
         pub mod lu;
         pub mod ordering;
         pub mod solver;

@@ -1,5 +1,4 @@
 use anyhow::{Result, anyhow};
-use clap::builder::Str;
 use std::fmt::Display;
 use std::collections::HashMap;
 use quick_xml::Reader;

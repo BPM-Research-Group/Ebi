@@ -6,7 +6,7 @@ use crate::math::{
 
 
 use crate::optimisation_algorithms::microlp::{
-    microlp::{resized_view, to_dense, ComparisonOp, Error, VarDomain},
+    microlp::{to_dense, ComparisonOp, Error, VarDomain},
     lu::{lu_factorize, LUFactors, ScratchSpace},
     sparse::{ScatteredVec, SparseMat, SparseVec},
 };
@@ -411,10 +411,6 @@ impl Solver {
         self.orig_constraints.rows()
     }
 
-    fn num_total_vars(&self) -> usize {
-        self.num_vars + self.num_constraints()
-    }
-
     pub(crate) fn initial_solve(&mut self) -> Result<(), Error> {
         if !self.is_primal_feasible {
             self.restore_feasibility()?;
@@ -494,92 +490,7 @@ impl Solver {
         Ok(())
     }
 
-    pub(crate) fn add_constraint(
-        &mut self,
-        mut coeffs: CsVec,
-        cmp_op: ComparisonOp,
-        rhs: Fraction,
-    ) -> Result<(), Error> {
-        assert!(self.is_primal_feasible);
-        assert!(self.is_dual_feasible);
 
-        if coeffs.indices().is_empty() {
-            let is_tautological = match cmp_op {
-                ComparisonOp::Eq => fraction_eq(&rhs, &Fraction::zero()),
-                ComparisonOp::Le => Fraction::zero() <= rhs,
-                ComparisonOp::Ge => Fraction::zero() >= rhs,
-            };
-
-            return if is_tautological {
-                Ok(())
-            } else {
-                Err(Error::Infeasible)
-            };
-        }
-
-        let slack_var = self.num_total_vars();
-        let (slack_var_min, slack_var_max) = match cmp_op {
-            ComparisonOp::Le => (Fraction::zero(), Fraction::infinity()),
-            ComparisonOp::Ge => (Fraction::neg_infinity(), Fraction::zero()),
-            ComparisonOp::Eq => (Fraction::zero(), Fraction::zero()),
-        };
-
-        self.orig_obj_coeffs.push(Fraction::zero());
-        self.orig_var_mins.push(slack_var_min.clone());
-        self.orig_var_maxs.push(slack_var_max.clone());
-        self.var_states.push(VarState::Basic(self.basic_vars.len()));
-        self.basic_vars.push(slack_var);
-        self.basic_var_mins.push(slack_var_min);
-        self.basic_var_maxs.push(slack_var_max);
-
-        let mut lhs_val = Fraction::zero();
-        for (var, coeff) in coeffs.iter() {
-            let val = match self.var_states[var] {
-                VarState::Basic(idx) => &self.basic_var_vals[idx],
-                VarState::NonBasic(idx) => &self.nb_var_vals[idx],
-            };
-            lhs_val += val * coeff;
-        }
-        self.basic_var_vals.push(&rhs - &lhs_val);
-
-        let new_num_total_vars = self.num_total_vars() + 1;
-        let mut new_orig_constraints = CsMat::empty(CompressedStorage::CSR, new_num_total_vars);
-        for row in self.orig_constraints.outer_iterator() {
-            new_orig_constraints =
-                new_orig_constraints.append_outer_csvec(resized_view(&row, new_num_total_vars));
-        }
-        coeffs = into_resized(coeffs, new_num_total_vars);
-        coeffs.append(slack_var, Fraction::one());
-        new_orig_constraints = new_orig_constraints.append_outer_csvec(coeffs.view());
-
-        self.orig_rhs.push(rhs);
-
-        self.orig_constraints = new_orig_constraints;
-        self.orig_constraints_csc = self.orig_constraints.to_csc();
-
-        self.basis_solver
-            .reset(&self.orig_constraints_csc, &self.basic_vars)?;
-
-        if self.enable_primal_steepest_edge || self.enable_dual_steepest_edge {
-            // existing tableau rows didn't change, so we calc the last row
-            // and add its contribution to the sq. norms.
-            self.calc_row_coeffs(self.num_constraints() - 1);
-
-            if self.enable_primal_steepest_edge {
-                for (c, coeff) in self.row_coeffs.iter() {
-                    self.primal_edge_sq_norms[c] += coeff * coeff;
-                }
-            }
-
-            if self.enable_dual_steepest_edge {
-                self.dual_edge_sq_norms
-                    .push(self.inv_basis_row_coeffs.sq_norm());
-            }
-        }
-
-        self.is_primal_feasible = false;
-        self.restore_feasibility()
-    }
 
     /// Number of infeasible basic vars and sum of their infeasibilities.
     fn calc_primal_infeasibility(&self) -> (usize, Fraction) {
@@ -1386,7 +1297,7 @@ fn into_resized(vec: CsVec, len: usize) -> CsVec {
 mod tests {
     use super::*;
     use crate::optimisation_algorithms::microlp::microlp::to_dense;
-    use sprs::{CsVec, TriMat};
+    use sprs::{CsVec};
 
     fn to_sparse(indices: &[usize], values: &[f64]) -> CsVec<Fraction> {
         assert_eq!(indices.len(), values.len());

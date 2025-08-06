@@ -9,9 +9,7 @@ use crate::optimisation_algorithms::microlp::microlp::{ComparisonOp, Optimizatio
 use std::collections::{HashMap, HashSet, VecDeque};
 use crate::math::fraction::MaybeExact;
 use crate::math::fraction::Fraction;
-use crate::math::traits::{Zero, One};
-use good_lp::{variables, variable, constraint, Expression, default_solver, SolverModel, Solution};
-
+use crate::math::traits::{Zero};
 
 fn is_diverging_gateway(node: &BPMNGateway) -> bool {
     node.direction == GatewayDirection::Diverging
@@ -1086,7 +1084,7 @@ pub fn pairscale_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Bu
         xor_gateways: bpmn.xor_gateways.iter().map(|g| g.id.clone()).collect(),
         and_gateways: bpmn.and_gateways.iter().map(|g| g.id.clone()).collect(),
         or_gateways: bpmn.or_gateways.iter().map(|g| g.id.clone()).collect(),
-        end_events: bpmn.end_events.len(),
+        end_events: bpmin.end_events.len(),
         sequence_flows,
     })
 }
@@ -1136,7 +1134,7 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
 
     //Setup variable per sequence flow
     let mut flow_vars = HashMap::new();
-    for (i, flow) in bpmn.sequence_flows.iter().enumerate(){
+    for (_i, flow) in bpmn.sequence_flows.iter().enumerate(){
         let flow_id = format!("flow_{}_{}", flow.source_id, flow.target_id);
         // 0 <= v <= infinity, coefficient = 0
         let v = problem.add_var(Fraction::from(0), (Fraction::from(0), Fraction::infinity()));
@@ -1266,8 +1264,8 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
             }
         }
     let solution = problem.solve().unwrap();
-    println!("Solution Objective {}", solution.objective());
     
+    //Retreive result
     let mut flow_weights: HashMap<String, Fraction> = HashMap::new();
     for flow in &bpmn.sequence_flows{
         let flow_id = format!("flow_{}_{}", flow.source_id, flow.target_id);
@@ -1276,11 +1274,12 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
         }
      }
 
-    /*let mut scaled_flows = HashSet::new();
-    //Scale flow weights
+
+        //Scale flow weights
+    let mut scaled_flows = HashSet::new();
     for gateway in &bpmn.xor_gateways{
         let out_flows = outgoing.get(&gateway.id).cloned().unwrap_or_default();
-        if gateway.direction == GatewayDirection::Diverging {
+        //if gateway.direction == GatewayDirection::Diverging {
             let sum: Fraction = out_flows.iter()
                 .filter_map(|flow_id| flow_weights.get(flow_id))
                 .sum();
@@ -1291,12 +1290,12 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
                     scaled_flows.insert(flow_id.clone());
                 }
             }
-        }
+        //}
     }
 
     for gateway in &bpmn.and_gateways{
         let out_flows = outgoing.get(&gateway.id).cloned().unwrap_or_default();
-        if gateway.direction == GatewayDirection::Diverging{
+        //if gateway.direction == GatewayDirection::Diverging{
             let max_weight = out_flows.iter()
                 .filter_map(|flow_id| flow_weights.get(flow_id))
                 .fold(Fraction::from(0), |acc, w| acc.max(w.clone()));
@@ -1307,9 +1306,22 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
                     scaled_flows.insert(flow_id.clone());
                 }
             }
-        }
+        //}
+    }
 
-    }*/
+    for task in &tasks{
+        let out_flows = outgoing.get(&task.id).cloned().unwrap_or_default();
+            let max_weight = out_flows.iter()
+                .filter_map(|flow_id| flow_weights.get(flow_id))
+                .fold(Fraction::from(0), |acc, w| acc.max(w.clone()));
+            let factor = &Fraction::from(1) / &max_weight;
+            for flow_id in &out_flows{
+                if let Some(weight) = flow_weights.get_mut(flow_id){
+                    *weight *= factor.clone();
+                    scaled_flows.insert(flow_id.clone());
+                }
+            }
+    }
 
     let mut sequence_flows = Vec::new();
     for flow in &bpmn.sequence_flows {
@@ -1325,9 +1337,10 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
 
     let mut stoch_tasks = Vec::new();
     for node in &bpmn.nodes {
+        let weight = weights.get(&node.id).cloned().unwrap_or(Fraction::from(0));
         stoch_tasks.push(StochasticTask {
             id: node.id.clone(),
-            weight: Fraction::from(0),
+            weight,
         });
     }
 
@@ -1429,7 +1442,7 @@ mod tests {
     #[test]
     #[ignore]
     fn test_good_lp(){
-        use good_lp::{variables, variable, constraint, Expression, default_solver, SolverModel, Solution};
+        use good_lp::{variables, constraint, default_solver, SolverModel, Solution};
         variables! { 
             vars:
                 x1 >= 0.0;
