@@ -21,7 +21,7 @@ use crate::{
             OccurrencesStochasticMinerLPN, OccurrencesStochasticMinerTree,
         },
         uniform_stochastic_miner::{UniformStochasticMinerLPN, UniformStochasticMinerTree},
-        stochastic_bpmn_miner::{frequency_estimator, weight_propagation_good_lp},
+        stochastic_bpmn_miner::{frequency_estimator, weight_propagtion_micro_lp},
     },
 };
 
@@ -156,9 +156,9 @@ pub const EBI_DISCOVER_OCCURRENCE_BPMN: EbiCommand = EbiCommand::Command {
             .to_type::<BusinessProcessModelAndNotation>()?;
         
         let frequencies = frequency_estimator(language.as_ref(), &bpmn);
-        let weights = frequencies;  // frequencies are already in the right format (HashMap<String, Fraction>)
+        let weights = frequencies;
         
-        let sbpmn = weight_propagation_good_lp(&bpmn, &weights)
+        let sbpmn = weight_propagtion_micro_lp(&bpmn, &weights)
             .with_context(|| "Failed to propagate flows in BPMN model")?;
 
         Ok(EbiOutput::Object(
