@@ -35,7 +35,7 @@ checksum = "4f823d037a7ec6ea2197046bafd4ae150e6bc36f9ca347404f46a46823fa84f2"
 dependencies = [
  "approx",
  "num-complex 0.2.4",
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -115,7 +115,7 @@ version = "0.3.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f0e60b75072ecd4168020818c0107f2857bb6c4e64252d8d3983f6263b40a5c3"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -229,7 +229,7 @@ dependencies = [
  "android-tzdata",
  "iana-time-zone",
  "js-sys",
- "num-traits",
+ "num-traits 0.2.19",
  "serde",
  "wasm-bindgen",
  "windows-link",
@@ -237,9 +237,9 @@ dependencies = [
 
 [[package]]
 name = "clap"
-version = "4.5.42"
+version = "4.5.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ed87a9d530bb41a67537289bafcac159cb3ee28460e0a4571123d2a778a6a882"
+checksum = "1c1f056bae57e3e54c3375c41ff79619ddd13460a17d7438712bd0d83fda4ff8"
 dependencies = [
  "clap_builder",
  "clap_derive",
@@ -257,9 +257,9 @@ dependencies = [
 
 [[package]]
 name = "clap_builder"
-version = "4.5.42"
+version = "4.5.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64f4f3f3c77c94aff3c7e9aac9a2ca1974a5adf392a8bb751e827d6d127ab966"
+checksum = "b3e7f4214277f3c7aa526a59dd3fbe306a370daee1f8b7b8c987069cd8e888a8"
 dependencies = [
  "anstream",
  "anstyle",
@@ -506,19 +506,19 @@ dependencies = [
  "layout-rs",
  "log",
  "logging_timer",
- "microlp",
- "ndarray",
+ "minilp",
+ "ndarray 0.16.1",
  "ntest",
  "num",
  "num-bigint",
  "num-integer",
  "num-rational",
- "num-traits",
+ "num-traits 0.2.19",
  "parking_lot",
  "pathfinding",
  "priority-queue",
  "process_mining",
- "quick-xml 0.38.0",
+ "quick-xml 0.38.1",
  "rand",
  "rand_chacha 0.9.0",
  "rayon",
@@ -526,7 +526,7 @@ dependencies = [
  "rustc-hash",
  "serde",
  "serde_json",
- "sprs",
+ "sprs 0.11.3",
  "strsim",
  "strum",
  "strum_macros",
@@ -536,16 +536,16 @@ dependencies = [
 
 [[package]]
 name = "ebi_arithmetic"
-version = "0.1.7"
+version = "0.1.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9efd88029e7ad3475edf0480141a02830e110557c75a8ac7c113299259ca65f2"
+checksum = "4b8f10d110d5fc8dbe6d13e389a30db673d5acbd44af450d17a3fd572aca2d47"
 dependencies = [
  "anyhow",
  "fraction",
  "num",
  "num-bigint",
  "num-rational",
- "num-traits",
+ "num-traits 0.2.19",
  "rand",
 ]
 
@@ -617,7 +617,7 @@ version = "0.22.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ad9cdb4b747e485a12abb0e6566612956c7a1bafa3bdb8d682c5b6d403589e48"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -831,7 +831,7 @@ dependencies = [
  "byteorder-lite",
  "color_quant",
  "gif",
- "num-traits",
+ "num-traits 0.2.19",
  "png",
  "zune-core",
  "zune-jpeg",
@@ -894,7 +894,7 @@ version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "276ec31bcb4a9ee45f58bec6f9ec700ae4cf4f4f8f2fa7e06cb406bd5ffdd770"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -1077,6 +1077,15 @@ dependencies = [
 
 [[package]]
 name = "matrixmultiply"
+version = "0.2.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "916806ba0031cd542105d916a97c8572e1fa6dd79c9c51e7eb43a09ec2dd84c1"
+dependencies = [
+ "rawpointer",
+]
+
+[[package]]
+name = "matrixmultiply"
 version = "0.3.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a06de3016e9fae57a36fd14dba131fccf49f74b40b7fbdb472f96e361ec71a08"
@@ -1101,13 +1110,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "microlp"
-version = "0.2.11"
+name = "minilp"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "51d1790c73b93164ff65868f63164497cb32339458a9297e17e212d91df62258"
+checksum = "82a7750a9e5076c660b7bec5e6457b4dbff402b9863c8d112891434e18fd5385"
 dependencies = [
  "log",
- "sprs",
+ "sprs 0.7.1",
 ]
 
 [[package]]
@@ -1122,14 +1131,27 @@ dependencies = [
 
 [[package]]
 name = "ndarray"
+version = "0.13.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac06db03ec2f46ee0ecdca1a1c34a99c0d188a0d83439b84bf0cb4b386e4ab09"
+dependencies = [
+ "matrixmultiply 0.2.4",
+ "num-complex 0.2.4",
+ "num-integer",
+ "num-traits 0.2.19",
+ "rawpointer",
+]
+
+[[package]]
+name = "ndarray"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "882ed72dce9365842bf196bdeedf5055305f11fc8c03dee7bb0194a6cad34841"
 dependencies = [
- "matrixmultiply",
+ "matrixmultiply 0.3.10",
  "num-complex 0.4.6",
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
  "portable-atomic",
  "portable-atomic-util",
  "rawpointer",
@@ -1179,7 +1201,7 @@ dependencies = [
  "num-integer",
  "num-iter",
  "num-rational",
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -1189,7 +1211,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a5e44f723f1133c9deac646763579fdb3ac745e418f2a7af9cd0c431da1f20b9"
 dependencies = [
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
  "rand",
 ]
 
@@ -1200,7 +1222,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b6b19411a9719e753aff12e5187b74d60d3dc449ec3f4dc21e3989c3f554bc95"
 dependencies = [
  "autocfg",
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -1209,7 +1231,7 @@ version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "73f88a1307638156682bada9d7604135552957b7818057dcef22705b4d509495"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -1224,7 +1246,7 @@ version = "0.1.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7969661fd2958a5cb096e56c8e1ad0444ac2bbcd0061bd28660485a44879858f"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -1235,7 +1257,7 @@ checksum = "1429034a0490724d0075ebb2bc9e875d6503c3cf69e235a8941aa757d83ef5bf"
 dependencies = [
  "autocfg",
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -1246,7 +1268,16 @@ checksum = "f83d14da390562dca69fc84082e73e548e1ad308d24accdedd2720017cb37824"
 dependencies = [
  "num-bigint",
  "num-integer",
- "num-traits",
+ "num-traits 0.2.19",
+]
+
+[[package]]
+name = "num-traits"
+version = "0.1.43"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "92e5113e9fd4cc14ded8e499429f396a20f98c772a47cc8622a736e1ec843c31"
+dependencies = [
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -1287,7 +1318,7 @@ version = "4.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7bb71e1b3fa6ca1c61f383464aaf2bb0e2f8e772a1f01d486832464de363b951"
 dependencies = [
- "num-traits",
+ "num-traits 0.2.19",
 ]
 
 [[package]]
@@ -1322,7 +1353,7 @@ dependencies = [
  "deprecate-until",
  "indexmap 2.10.0",
  "integer-sqrt",
- "num-traits",
+ "num-traits 0.2.19",
  "rustc-hash",
  "thiserror 2.0.12",
 ]
@@ -1507,9 +1538,9 @@ dependencies = [
 
 [[package]]
 name = "quick-xml"
-version = "0.38.0"
+version = "0.38.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8927b0664f5c5a98265138b7e3f90aa19a6b21353182469ace36d4ac527b7b1b"
+checksum = "9845d9dccf565065824e69f9f235fafba1587031eda353c1f1561cd6a6be78f4"
 dependencies = [
  "memchr",
  "serde",
@@ -1817,9 +1848,9 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.141"
+version = "1.0.142"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "30b9eff21ebe718216c6ec64e1d9ac57087aad11efc64e32002bce4a0d4c03d3"
+checksum = "030fedb782600dcbd6f02d479bf0d817ac3bb40d644745b769d6a96bc3afc5a7"
 dependencies = [
  "itoa",
  "memchr",
@@ -1914,14 +1945,25 @@ checksum = "67b1b7a3b5fe4f1376887184045fcf45c69e92af734b7aaddc05fb777b6fbd03"
 
 [[package]]
 name = "sprs"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ec63571489873d4506683915840eeb1bb16b3198ee4894cc6f2fe3013d505e56"
+dependencies = [
+ "ndarray 0.13.1",
+ "num-complex 0.2.4",
+ "num-traits 0.1.43",
+]
+
+[[package]]
+name = "sprs"
 version = "0.11.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8bff8419009a08f6cb7519a602c5590241fbff1446bcc823c07af15386eb801b"
 dependencies = [
  "alga",
- "ndarray",
+ "ndarray 0.16.1",
  "num-complex 0.4.6",
- "num-traits",
+ "num-traits 0.2.19",
  "num_cpus",
  "rayon",
  "smallvec",
@@ -2279,9 +2321,9 @@ checksum = "06abde3611657adf66d383f00b093d7faecc7fa57071cce2578660c9f1010821"
 
 [[package]]
 name = "uuid"
-version = "1.17.0"
+version = "1.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3cf4199d1e5d15ddd86a694e4d0dffa9c323ce759fea589f00fef9d81cc1931d"
+checksum = "f33196643e165781c20a5ead5582283a7dacbb87855d867fbc2df3f81eddc1be"
 dependencies = [
  "getrandom 0.3.3",
  "js-sys",

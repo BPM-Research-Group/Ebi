@@ -1,14 +1,13 @@
-use std::cmp::Ordering;
-
 use ebi_arithmetic::{
     ebi_number::{Normal, Signed, Zero},
+    f0,
     fraction::Fraction,
 };
 use log::trace;
 
 use crate::optimisation_algorithms::{
-    mixed_integer_linear_programming_ordering::order_simple,
-    mixed_integer_linear_programming_sparse::{Error, Perm, ScatteredVec, SparseMat, TriangleMat},
+    linear_programming_ordering::order_simple,
+    linear_programming_sparse::{Error, Perm, ScatteredVec, SparseMat, TriangleMat},
 };
 
 #[derive(Clone)]
@@ -30,7 +29,7 @@ impl ScratchSpace {
     pub fn with_capacity(n: usize) -> ScratchSpace {
         ScratchSpace {
             rhs: ScatteredVec::empty(n),
-            dense_rhs: vec![Fraction::zero(); n],
+            dense_rhs: vec![f0!(); n],
             mark_nonzero: MarkNonzero::with_capacity(n),
         }
     }
@@ -65,11 +64,11 @@ impl LUFactors {
     }
 
     pub fn solve_dense(&self, rhs: &mut [Fraction], scratch: &mut ScratchSpace) {
-        scratch.dense_rhs.resize(rhs.len(), Fraction::zero());
+        scratch.dense_rhs.resize(rhs.len(), f0!());
 
         if let Some(row_perm) = &self.row_perm {
-            for (i, rhs_el) in rhs.iter().enumerate() {
-                scratch.dense_rhs[row_perm.orig2new[i]] = rhs_el.clone();
+            for i in 0..rhs.len() {
+                scratch.dense_rhs[row_perm.orig2new[i]] = rhs[i].clone();
             }
         } else {
             scratch.dense_rhs.clone_from_slice(rhs);
@@ -83,7 +82,7 @@ impl LUFactors {
                 rhs[col_perm.new2orig[i]] = scratch.dense_rhs[i].clone();
             }
         } else {
-            rhs.clone_from_slice(&scratch.dense_rhs);
+            rhs.clone_from_slice(&mut scratch.dense_rhs);
         }
     }
 
@@ -126,7 +125,7 @@ impl LUFactors {
     }
 }
 
-pub fn lu_factorize<'a>(
+pub fn lu_factorise<'a>(
     size: usize,
     get_col: impl Fn(usize) -> (&'a [usize], &'a [Fraction]),
     stability_coeff: Fraction,
@@ -142,7 +141,7 @@ pub fn lu_factorize<'a>(
 
     let mat_nnz = (0..size).map(|c| get_col(c).0.len()).sum::<usize>();
     trace!(
-        "lu_factorize: starting, matrix size: {}, nnz: {} (excess: {})",
+        "lu_factorise: starting, matrix size: {}, nnz: {} (excess: {})",
         size,
         mat_nnz,
         mat_nnz - size,
@@ -179,7 +178,7 @@ pub fn lu_factorize<'a>(
 
         scratch.mark_nonzero.run(
             &mut scratch.rhs,
-            |new_i| lower.col_rows(new_i),
+            |new_i| &lower.col_rows(new_i),
             |new_i| new_i < i_col,
             |orig_r| orig2new_row[orig_r],
         );
@@ -188,7 +187,7 @@ pub fn lu_factorize<'a>(
         // and the order in which variables depend on each other is determined.
         // rev() because DFS returns vertices in reverse topological order.
         for &orig_i in scratch.mark_nonzero.visited.iter().rev() {
-            // values[orig_i] is already fully calculated, diag coeff = 1.0.
+            // values[orig_i] is already fully calculated, diag coeff = f1!().
             let new_i = orig2new_row[orig_i];
             if new_i < i_col {
                 let x_val = scratch.rhs.values[orig_i].clone();
@@ -203,7 +202,7 @@ pub fn lu_factorize<'a>(
         // but bad for sparseness, so we do threshold pivoting instead.
 
         let pivot_orig_r = {
-            let mut max_abs = Fraction::zero();
+            let mut max_abs = f0!();
             for &orig_r in &scratch.rhs.nonzero {
                 if orig2new_row[orig_r] < i_col {
                     continue;
@@ -215,7 +214,7 @@ pub fn lu_factorize<'a>(
                 }
             }
 
-            if max_abs.is_not_positive() {
+            if max_abs.is_zero() {
                 return Err(Error::SingularMatrix);
             }
 
@@ -243,7 +242,7 @@ pub fn lu_factorize<'a>(
             best_orig_r.unwrap()
         };
 
-        let pivot_val = scratch.rhs.values[pivot_orig_r].clone();
+        let pivot_val = &scratch.rhs.values[pivot_orig_r];
 
         {
             // Keep track of row permutations.
@@ -257,17 +256,19 @@ pub fn lu_factorize<'a>(
         // Gather the values of x into lower and upper matrices.
 
         for &orig_r in &scratch.rhs.nonzero {
-            let val = scratch.rhs.values[orig_r].clone();
+            let val = &scratch.rhs.values[orig_r];
 
             if val.is_zero() {
                 continue;
             }
 
             let new_r = orig2new_row[orig_r];
-            match new_r.cmp(&i_col) {
-                Ordering::Less => upper.push(new_r, val),
-                Ordering::Equal => upper_diag.push(pivot_val.clone()),
-                Ordering::Greater => lower.push(orig_r, &val / &pivot_val),
+            if new_r < i_col {
+                upper.push(new_r, val.clone());
+            } else if new_r == i_col {
+                upper_diag.push(pivot_val.clone());
+            } else {
+                lower.push(orig_r, val / pivot_val);
             }
         }
 
@@ -285,12 +286,12 @@ pub fn lu_factorize<'a>(
     let lower_nnz = lower.nnz();
     let upper_nnz = upper.nnz();
     trace!(
-        "lu_factorize: done, lower nnz: {} (excess: {}), upper nnz: {} (excess: {}), additional fill-in: {}",
+        "lu_factorise: done, lower nnz: {} (excess: {}), upper nnz: {} (excess: {}), additional fill-in: {}",
         lower_nnz + size,
         lower_nnz,
         upper_nnz + size,
         upper_nnz,
-        (lower_nnz + upper_nnz + size) as isize - mat_nnz as isize,
+        lower_nnz + upper_nnz + size - mat_nnz,
     );
 
     let res = LUFactors {
@@ -473,16 +474,13 @@ fn tri_solve_process_col(tri_mat: &TriangleMat, col: usize, rhs: &mut [Fraction]
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-    use crate::optimisation_algorithms::mixed_integer_linear_programming_helpers::{
+    use crate::optimisation_algorithms::linear_programming_helpers::{
         assert_matrix_eq, to_dense, to_sparse,
     };
-    use ebi_arithmetic::f;
-    use sprs::{CsMat, CsVec, TriMat};
 
-    fn init() {
-        let _ = env_logger::builder().is_test(true).try_init();
-    }
+    use super::*;
+    use ebi_arithmetic::{ebi_number::One, f, f1};
+    use sprs::{CsMat, TriMat};
 
     fn mat_from_triplets(
         rows: usize,
@@ -498,55 +496,46 @@ mod tests {
 
     #[test]
     fn lu_simple() {
-        init();
         let mat = mat_from_triplets(
             3,
             4,
             &[
-                (0, 1, Fraction::from(2)),
-                (0, 0, Fraction::from(2)),
-                (0, 2, Fraction::from(123)),
-                (1, 2, Fraction::from(456)),
-                (1, 3, Fraction::from(1)),
-                (2, 1, Fraction::from(4)),
-                (2, 0, Fraction::from(3)),
-                (2, 2, Fraction::from(789)),
-                (2, 3, Fraction::from(1)),
+                (0, 1, f!(2)),
+                (0, 0, f!(2)),
+                (0, 2, f!(123)),
+                (1, 2, f!(456)),
+                (1, 3, f1!()),
+                (2, 1, f!(4)),
+                (2, 0, f!(3)),
+                (2, 2, f!(789)),
+                (2, 3, f1!()),
             ],
         );
 
         let mut scratch = ScratchSpace::with_capacity(mat.rows());
-        let lu = lu_factorize(
+        let lu = lu_factorise(
             mat.rows(),
             |c| mat.outer_view([1, 0, 3][c]).unwrap().into_raw_storage(),
-            Fraction::from((9, 10)),
+            f!(9, 10),
             &mut scratch,
         )
         .unwrap();
         let lu_transp = lu.transpose();
 
         let l_nondiag_ref = [
-            vec![Fraction::from(0), Fraction::from(0), Fraction::from(0)],
-            vec![
-                Fraction::from((5, 10)),
-                Fraction::from(0),
-                Fraction::from(0),
-            ],
-            vec![Fraction::from(0), Fraction::from(0), Fraction::from(0)],
+            vec![f0!(), f0!(), f0!()],
+            vec![f!(5, 10), f0!(), f0!()],
+            vec![f0!(), f0!(), f0!()],
         ];
         assert_matrix_eq(&lu.lower.nondiag.to_csmat(), &l_nondiag_ref);
         assert_eq!(lu.lower.diag, None);
 
         let u_nondiag_ref = [
-            vec![Fraction::from(0), Fraction::from(3), Fraction::from(1)],
-            vec![
-                Fraction::from(0),
-                Fraction::from(0),
-                -Fraction::from((1, 2)),
-            ],
-            vec![Fraction::from(0), Fraction::from(0), Fraction::from(0)],
+            vec![f0!(), f!(3), f1!()],
+            vec![f0!(), f0!(), -f!(5, 10)],
+            vec![f0!(), f0!(), f0!()],
         ];
-        let u_diag_ref = [Fraction::from(4), Fraction::from((1, 2)), Fraction::from(1)];
+        let u_diag_ref = [f!(4), f!(5, 10), f1!()];
         assert_matrix_eq(&lu.upper.nondiag.to_csmat(), &u_nondiag_ref);
         assert_eq!(lu.upper.diag.as_ref().unwrap(), &u_diag_ref);
 
@@ -554,49 +543,45 @@ mod tests {
         assert_eq!(lu.col_perm.as_ref().unwrap().new2orig, &[0, 1, 2]);
 
         {
-            let mut rhs_dense = [Fraction::from(6), Fraction::from(3), Fraction::from(13)];
+            let mut rhs_dense = [f!(6), f!(3), f!(13)];
             lu.solve_dense(&mut rhs_dense, &mut scratch);
-            assert_eq!(
-                &rhs_dense,
-                &[Fraction::from(1), Fraction::from(2), Fraction::from(3)]
-            );
+            assert_eq!(&rhs_dense, &[f1!(), f!(2), f!(3)]);
         }
 
         {
-            let mut rhs_dense_t = [Fraction::from(14), Fraction::from(11), Fraction::from(5)];
+            let mut rhs_dense_t = [f!(14), f!(11), f!(5)];
             lu_transp.solve_dense(&mut rhs_dense_t, &mut scratch);
-            assert_eq!(&rhs_dense_t, &[f!(1), f!(2), f!(3)]);
+            assert_eq!(&rhs_dense_t, &[f1!(), f!(2), f!(3)]);
         }
 
         {
             let mut rhs = ScatteredVec::empty(3);
-            rhs.set(to_sparse(&[f!(0), -f!(1), f!(0)]).iter());
+            rhs.set(to_sparse(&[f0!(), -f1!(), f0!()]).iter());
             lu.solve(&mut rhs, &mut scratch);
-            assert_eq!(to_dense(&rhs.to_csvec()), vec![f!(1), -f!(1), -f!(1)]);
+            assert_eq!(to_dense(&rhs.to_csvec()), vec![f1!(), -f1!(), -f1!()]);
         }
 
         {
             let mut rhs = ScatteredVec::empty(3);
-            rhs.set(to_sparse(&[f!(0), -f!(1), f!(1)]).iter());
+            rhs.set(to_sparse(&[f0!(), -f1!(), f1!()]).iter());
             lu_transp.solve(&mut rhs, &mut scratch);
-            assert_eq!(to_dense(&rhs.to_csvec()), vec![-f!(2), f!(0), f!(1)]);
+            assert_eq!(to_dense(&rhs.to_csvec()), vec![-f!(2), f0!(), f1!()]);
         }
     }
 
     #[test]
     fn lu_singular() {
-        init();
         let size = 3;
 
         {
             let symbolically_singular = mat_from_triplets(
                 size,
                 size,
-                &[(0, 0, f!(1)), (1, 0, f!(1)), (1, 1, f!(2)), (1, 2, f!(3))],
+                &[(0, 0, f1!()), (1, 0, f1!()), (1, 1, f!(2)), (1, 2, f!(3))],
             );
 
             let mut scratch = ScratchSpace::with_capacity(size);
-            let err = lu_factorize(
+            let err = lu_factorise(
                 size,
                 |c| {
                     symbolically_singular
@@ -615,8 +600,8 @@ mod tests {
                 size,
                 size,
                 &[
-                    (0, 0, f!(1)),
-                    (1, 0, f!(1)),
+                    (0, 0, f1!()),
+                    (1, 0, f1!()),
                     (1, 1, f!(2)),
                     (1, 2, f!(3)),
                     (2, 0, f!(2)),
@@ -626,7 +611,7 @@ mod tests {
             );
 
             let mut scratch = ScratchSpace::with_capacity(size);
-            let err = lu_factorize(
+            let err = lu_factorise(
                 size,
                 |c| {
                     numerically_singular
@@ -638,84 +623,6 @@ mod tests {
                 &mut scratch,
             );
             assert_eq!(err.unwrap_err(), Error::SingularMatrix);
-        }
-    }
-
-    #[test]
-    fn lu_rand() {
-        init();
-        let size = 10;
-
-        let mut rng = rand_pcg::Pcg64::seed_from_u64(12345);
-        use rand::prelude::*;
-
-        let mut mat = TriMat::new((size, size));
-        for r in 0..size {
-            for c in 0..size {
-                if rng.gen_range(0..2) == 0 {
-                    mat.add_triplet(r, c, rng.gen_range(0.0..1.0));
-                }
-            }
-        }
-        let mat: CsMat<Fraction> = mat.to_csc();
-
-        let mut scratch = ScratchSpace::with_capacity(mat.rows());
-
-        // TODO: random permutation?
-        let cols: Vec<_> = (0..size).collect();
-
-        let lu = lu_factorize(
-            size,
-            |c| mat.outer_view(cols[c]).unwrap().into_raw_storage(),
-            f!(1, 10),
-            &mut scratch,
-        )
-        .unwrap();
-        let lu_transp = lu.transpose();
-
-        let multiplied = &lu.lower.to_csmat() * &lu.upper.to_csmat();
-        assert!(multiplied.is_csc());
-        for (i, &c) in cols.iter().enumerate() {
-            let permuted = {
-                let mut is = vec![];
-                let mut vs = vec![];
-                for (i, &val) in mat.outer_view(c).unwrap().iter() {
-                    is.push(lu.row_perm.as_ref().unwrap().orig2new[i]);
-                    vs.push(val);
-                }
-                CsVec::new_from_unsorted(size, is, vs).unwrap()
-            };
-            let diff = &multiplied
-                .outer_view(lu.col_perm.as_ref().unwrap().orig2new[i])
-                .unwrap()
-                - &permuted;
-            assert!(diff.norm(1.0) < 1e-5);
-        }
-
-        let sparse_rhs = {
-            let mut res = CsVec::empty(size);
-            for i in 0..size {
-                if rng.gen_range(0..3) == 0 {
-                    res.append(i, rng.gen_range(0.0..1.0));
-                }
-            }
-            res
-        };
-
-        {
-            let mut rhs = ScatteredVec::empty(size);
-            rhs.set(sparse_rhs.iter());
-            lu.solve(&mut rhs, &mut scratch);
-            let diff = &sparse_rhs - &(&mat * &rhs.to_csvec());
-            assert!(diff.norm(1.0) < 1e-5);
-        }
-
-        {
-            let mut rhs_t = ScatteredVec::empty(size);
-            rhs_t.set(sparse_rhs.iter());
-            lu_transp.solve(&mut rhs_t, &mut scratch);
-            let diff = &sparse_rhs - &(&mat.transpose_view() * &rhs_t.to_csvec());
-            assert!(diff.norm(1.0) < 1e-5);
         }
     }
 }

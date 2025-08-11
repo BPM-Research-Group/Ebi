@@ -1,9 +1,12 @@
+use ebi_arithmetic::{
+    ebi_number::{One, Zero},
+    fraction::Fraction,
+};
 use microlp::{ComparisonOp, Error, OptimizationDirection, VarDomain};
 
-use crate::{math::{
-    fraction::Fraction,
-    traits::{One, Zero},
-}, optimisation_algorithms::{mixed_integer_linear_programming_solver::Solver, mixed_integer_linear_programming_sparse}};
+use crate::optimisation_algorithms::{
+    mixed_integer_linear_programming_solver::Solver, mixed_integer_linear_programming_sparse,
+};
 
 pub type CsVec = sprs::CsVecI<Fraction, usize>;
 
@@ -432,12 +435,10 @@ impl<'a> IntoIterator for &'a Solution {
 #[cfg(test)]
 mod tests {
 
+    use ebi_arithmetic::fraction::Fraction;
     use microlp::{ComparisonOp, OptimizationDirection};
 
-    use crate::{
-        math::fraction::Fraction,
-        optimisation_algorithms::mixed_integer_linear_programming::Problem,
-    };
+    use crate::optimisation_algorithms::mixed_integer_linear_programming::Problem;
 
     #[test]
     fn test_micro_lp() {

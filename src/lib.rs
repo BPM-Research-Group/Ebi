@@ -192,6 +192,12 @@ pub mod optimisation_algorithms {
     // pub mod mixed_integer_linear_programming_sparse;
     // pub mod mixed_integer_linear_programming_helpers;
     // pub mod mixed_integer_linear_programming_ordering;
+    pub mod linear_programming;
+    pub mod linear_programming_solver;
+    pub mod linear_programming_lu;
+    pub mod linear_programming_sparse;
+    pub mod linear_programming_helpers;
+    pub mod linear_programming_ordering;
 }
 pub mod follower_semantics;
 pub mod json;

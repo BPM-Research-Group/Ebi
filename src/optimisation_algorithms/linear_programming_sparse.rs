@@ -1,8 +1,7 @@
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::{ebi_number::Zero, f0, fraction::Fraction};
 use sprs::{CsMat, CsVec};
-use std::fmt::{Display, Formatter};
 
-use crate::optimisation_algorithms::mixed_integer_linear_programming_helpers::to_dense;
+use crate::optimisation_algorithms::linear_programming_helpers::to_dense;
 
 #[derive(Clone, Debug, Default)]
 pub(crate) struct SparseVec {
@@ -33,11 +32,10 @@ impl SparseVec {
     }
 
     pub(crate) fn sq_norm(&self) -> Fraction {
-        self.values.iter().map(|&v| v * v).sum()
+        self.values.iter().map(|v| v * v).sum()
     }
 
     pub(crate) fn into_csvec(self, len: usize) -> CsVec<Fraction> {
-        //guaranteed to not panic
         CsVec::new_from_unsorted(len, self.indices, self.values).unwrap()
     }
 }
@@ -52,7 +50,7 @@ pub struct ScatteredVec {
 impl ScatteredVec {
     pub fn empty(n: usize) -> ScatteredVec {
         ScatteredVec {
-            values: vec![0.0; n],
+            values: vec![f0!(); n],
             is_nonzero: vec![false; n],
             nonzero: vec![],
         }
@@ -86,13 +84,13 @@ impl ScatteredVec {
     pub fn sq_norm(&self) -> Fraction {
         self.nonzero
             .iter()
-            .map(|&i| self.values[i] * self.values[i])
+            .map(|&i| &self.values[i] * &self.values[i])
             .sum()
     }
 
     pub fn clear(&mut self) {
         for &i in &self.nonzero {
-            self.values[i] = Fraction::zero();
+            self.values[i] = f0!();
             self.is_nonzero[i] = false;
         }
         self.nonzero.clear();
@@ -100,7 +98,7 @@ impl ScatteredVec {
 
     pub fn clear_and_resize(&mut self, n: usize) {
         self.clear();
-        self.values.resize(n, Fraction::zero());
+        self.values.resize(n, f0!());
         self.is_nonzero.resize(n, false);
     }
 
@@ -109,10 +107,10 @@ impl ScatteredVec {
         T: IntoIterator<Item = (usize, &'a Fraction)>,
     {
         self.clear();
-        for (i, &val) in rhs {
+        for (i, val) in rhs {
             self.is_nonzero[i] = true;
             self.nonzero.push(i);
-            self.values[i] = val;
+            self.values[i] = val.clone();
         }
     }
 
@@ -129,20 +127,18 @@ impl ScatteredVec {
         let mut indices = vec![];
         let mut data = vec![];
         for &i in &self.nonzero {
-            let val = self.values[i];
-            if val != 0.0 {
+            if !self.values[i].is_zero() {
                 indices.push(i);
-                data.push(val);
+                data.push(self.values[i].clone());
             }
         }
-        //guaranteed to be sorted, in range and with same size
         CsVec::new_from_unsorted(self.values.len(), indices, data).unwrap()
     }
 }
 
 /// Unordered sparse matrix with elements stored by columns
 #[derive(Clone, Debug)]
-pub struct SparseMat {
+pub(crate) struct SparseMat {
     n_rows: usize,
     indptr: Vec<usize>,
     indices: Vec<usize>,
@@ -259,16 +255,15 @@ impl SparseMat {
         out.indices.clear();
         out.indices.resize(self.nnz(), 0);
         out.data.clear();
-        out.data.resize(self.nnz(), Fraction::zero());
+        out.data.resize(self.nnz(), f0!());
         for c in 0..self.cols() {
-            for (r, &val) in self.col_iter(c) {
+            for (r, val) in self.col_iter(c) {
                 out.indptr[r] -= 1;
                 out.indices[out.indptr[r]] = c;
-                out.data[out.indptr[r]] = val;
+                out.data[out.indptr[r]] = val.clone();
             }
         }
 
-        //guaranteed to have at least one element
         *out.indptr.last_mut().unwrap() = self.nnz();
 
         out
@@ -299,23 +294,24 @@ impl TriangleMat {
     }
 
     #[cfg(test)]
-    pub(crate) fn to_csmat(&self) -> CsMat<Fraction> {
+    #[allow(dead_code)]
+    fn to_csmat(&self) -> CsMat<Fraction> {
         let mut tri_mat = sprs::TriMat::new((self.rows(), self.cols()));
         if let Some(diag) = self.diag.as_ref() {
-            for (i, &val) in diag.iter().enumerate() {
-                tri_mat.add_triplet(i, i, val);
+            for (i, val) in diag.iter().enumerate() {
+                tri_mat.add_triplet(i, i, val.clone());
             }
         } else {
             for i in 0..self.rows() {
-                use crate::math::traits::One;
+                use ebi_arithmetic::{ebi_number::One, f1};
 
-                tri_mat.add_triplet(i, i, Fraction::one());
+                tri_mat.add_triplet(i, i, f1!());
             }
         }
 
         for c in 0..self.nondiag.cols() {
-            for (r, &val) in self.nondiag.col_iter(c) {
-                tri_mat.add_triplet(r, c, val);
+            for (r, val) in self.nondiag.col_iter(c) {
+                tri_mat.add_triplet(r, c, val.clone());
             }
         }
 
@@ -325,11 +321,11 @@ impl TriangleMat {
 
 impl std::fmt::Debug for TriangleMat {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        writeln!(f, "nondiag:")?;
+        write!(f, "nondiag:\n")?;
         for row in self.nondiag.to_csmat().to_csr().outer_iterator() {
-            writeln!(f, "{:?}", to_dense(&row))?
+            write!(f, "{:?}\n", to_dense(&row))?
         }
-        writeln!(f, "diag: {:?}", self.diag)?;
+        write!(f, "diag: {:?}\n", self.diag)?;
         Ok(())
     }
 }
@@ -344,33 +340,22 @@ pub struct Perm {
 pub enum Error {
     SingularMatrix,
 }
-impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        let r = match self {
-            Error::SingularMatrix => "Singular matrix",
-        };
-        write!(f, "{}", r)
-    }
-}
 
 #[cfg(test)]
 mod tests {
-    use super::*;
+    use ebi_arithmetic::f;
 
-    fn init() {
-        let _ = env_logger::builder().is_test(true).try_init();
-    }
+    use super::*;
 
     #[test]
     fn mat_transpose() {
-        init();
         let mut mat = SparseMat::new(2);
-        mat.push(0, Fraction::from((11, 10)));
-        mat.push(1, Fraction::from((22, 10)));
+        mat.push(0, f!(11, 10));
+        mat.push(1, f!(22, 10));
         mat.seal_column();
-        mat.push(1, Fraction::from((33, 10)));
+        mat.push(1, f!(33, 10));
         mat.seal_column();
-        mat.push(0, Fraction::from((44, 10)));
+        mat.push(0, f!(44, 10));
         mat.seal_column();
 
         let transp = mat.transpose();
@@ -378,12 +363,7 @@ mod tests {
         assert_eq!(&transp.indices, &[2, 0, 1, 0]);
         assert_eq!(
             &transp.data,
-            &[
-                Fraction::from((44, 10)),
-                Fraction::from((11, 10)),
-                Fraction::from((33, 10)),
-                Fraction::from((22, 10))
-            ]
+            &[f!(44, 10), f!(11, 10), f!(33, 10), f!(22, 10)]
         );
     }
 }

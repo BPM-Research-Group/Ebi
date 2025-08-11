@@ -1,6 +1,6 @@
 use log::trace;
 
-use crate::optimisation_algorithms::mixed_integer_linear_programming_sparse::{Error, Perm};
+use crate::optimisation_algorithms::linear_programming_sparse::{Error, Perm};
 
 /// Simplest preordering: order columns based on their size
 pub fn order_simple<'a>(size: usize, get_col: impl Fn(usize) -> &'a [usize]) -> Perm {
@@ -10,12 +10,8 @@ pub fn order_simple<'a>(size: usize, get_col: impl Fn(usize) -> &'a [usize]) -> 
     }
 
     let mut new2orig = Vec::with_capacity(size);
-
-    //TODO should this be refactored?
     while new2orig.len() < size {
-        let min = cols_queue.pop_min();
-        //guaranteed to exist
-        new2orig.push(min.unwrap());
+        new2orig.push(cols_queue.pop_min().unwrap());
     }
 
     let mut orig2new = vec![0; size];
@@ -26,7 +22,6 @@ pub fn order_simple<'a>(size: usize, get_col: impl Fn(usize) -> &'a [usize]) -> 
     Perm { orig2new, new2orig }
 }
 
-#[allow(dead_code)]
 pub fn order_colamd<'a>(
     size: usize,
     get_col: impl Fn(usize) -> &'a [usize],
@@ -109,8 +104,8 @@ pub fn order_colamd<'a>(
             rows[i].end += prev_end;
         }
 
-        for (c, col) in cols.iter().enumerate().take(size) {
-            for &r in col.elems(&row_storage) {
+        for c in 0..size {
+            for &r in cols[c].elems(&row_storage) {
                 let row = &mut rows[r];
                 col_storage[row.begin] = c;
                 row.begin += 1;
@@ -138,12 +133,12 @@ pub fn order_colamd<'a>(
             // all columns on the stack are of size 1
             stack.clear();
             stack.push(c);
-            while let Some(c) = stack.pop() {
+            while !stack.is_empty() {
+                let c = stack.pop().unwrap();
                 let r = *cols[c]
                     .elems(&row_storage)
                     .iter()
                     .find(|&&r| !is_absorbed_row[r])
-                    //guaranteed to exist, it is never non empty
                     .unwrap();
                 for &other_c in rows[r].elems(&col_storage) {
                     col_rows_len[other_c] -= 1;
@@ -218,7 +213,6 @@ pub fn order_colamd<'a>(
         // order dense columns at the end.
         let cols_queue_len = cols_queue.len();
         for i in 0..cols_queue_len {
-            //guaranteed to exist
             let dense_c = cols_queue.pop_min().unwrap();
             new2orig[size - cols_queue_len + i] = dense_c;
             is_ordered_col[dense_c] = true;
@@ -260,7 +254,6 @@ pub fn order_colamd<'a>(
     let mut num_mass_eliminated = 0;
 
     while cols_queue.len() > 0 {
-        //guaranteed to exist
         let pivot_c = cols_queue.pop_min().unwrap();
         let pivot_row_begin = col_storage.len();
 
@@ -281,7 +274,6 @@ pub fn order_colamd<'a>(
                 }
             }
         }
-        //TODO check unwrap
         let pivot_r = pivot_r.unwrap();
 
         // clear for next iteration.
@@ -382,14 +374,7 @@ pub fn order_colamd<'a>(
 
     trace!(
         "COLAMD: ordered {} cols, singletons: {} (cheap: {}), dense_rows: {}, dense_cols: {}, cols_only_dense_rows: {}, mass_eliminated: {}",
-        size,
-        num_singletons,
-        num_cheap_singletons,
-        num_dense_rows,
-        num_dense_cols,
-        num_cols_only_dense_rows,
-        num_mass_eliminated
-    );
+        size, num_singletons, num_cheap_singletons, num_dense_rows, num_dense_cols, num_cols_only_dense_rows, num_mass_eliminated);
 
     Ok(Perm { orig2new, new2orig })
 }
@@ -433,7 +418,6 @@ impl ColsQueue {
     fn pop_min(&mut self) -> Option<usize> {
         let col = loop {
             if self.min_score >= self.score2head.len() {
-                //TODO this branch is not hit
                 return None;
             }
             if let Some(col) = self.score2head[self.min_score] {
@@ -469,8 +453,6 @@ impl ColsQueue {
         } else {
             self.next[self.prev[col]] = self.next[col];
             self.prev[self.next[col]] = self.prev[col];
-
-            //will panic if score is not valid
             if self.score2head[score].unwrap() == col {
                 self.score2head[score] = Some(self.next[col]);
             }
@@ -506,7 +488,6 @@ pub fn find_diag_matching<'a>(
         });
 
         'dfs_loop: while !dfs_stack.is_empty() {
-            //guaranteed to exist
             let cur_step = dfs_stack.last_mut().unwrap();
             let c = cur_step.col;
             let col_rows = get_col(c);
@@ -563,153 +544,27 @@ pub fn find_diag_matching<'a>(
 /// Lower block triangular form of a matrix.
 #[derive(Clone, Debug)]
 pub struct BlockDiagForm {
-    #[allow(unused)]
     /// Row permutation: for each original row its new row number so that diag is nonzero.
     pub row2col: Vec<usize>,
-    #[allow(unused)]
     /// For each block its set of columns (the order of blocks is lower block triangular)
     pub block_cols: Vec<Vec<usize>>,
 }
 
-#[allow(dead_code)]
-pub fn find_block_diag_form<'a>(
-    size: usize,
-    get_col: impl Fn(usize) -> &'a [usize],
-) -> BlockDiagForm {
-    //TODO check unwrap
-    let row2col = find_diag_matching(size, &get_col).unwrap();
-
-    struct Step {
-        col: usize,
-        cur_i: usize,
-    }
-
-    let mut dfs_stack = vec![];
-    let mut visited = vec![];
-    let mut is_visited = vec![false; size];
-    for start_c in 0..size {
-        if is_visited[start_c] {
-            continue;
-        }
-
-        dfs_stack.clear();
-        dfs_stack.push(Step {
-            col: start_c,
-            cur_i: 0,
-        });
-        while !dfs_stack.is_empty() {
-            //guaranteed to exist
-            let cur_step = dfs_stack.last_mut().unwrap();
-            let c = cur_step.col;
-            if !is_visited[c] {
-                is_visited[c] = true;
-            } else {
-                cur_step.cur_i += 1;
-            }
-
-            let col_rows = get_col(c);
-            while cur_step.cur_i < col_rows.len() {
-                let next_c = row2col[col_rows[cur_step.cur_i]];
-                if !is_visited[next_c] {
-                    break;
-                }
-                cur_step.cur_i += 1;
-            }
-
-            if cur_step.cur_i < col_rows.len() {
-                let col = row2col[col_rows[cur_step.cur_i]];
-                dfs_stack.push(Step { col, cur_i: 0 });
-            } else {
-                visited.push(c);
-                dfs_stack.pop();
-            }
-        }
-    }
-
-    // Prepare transposed graph
-    // TODO: more efficient transpose without allocating each row.
-    let mut rows = vec![vec![]; size];
-    for c in 0..size {
-        for &r in get_col(c) {
-            rows[row2col[r]].push(c);
-        }
-    }
-
-    is_visited.clear();
-    is_visited.resize(size, false);
-
-    let mut block_cols = vec![];
-
-    // DFS on the transposed graph
-    for &start_c in visited.iter().rev() {
-        if is_visited[start_c] {
-            continue;
-        }
-
-        block_cols.push(vec![]);
-
-        dfs_stack.clear();
-        dfs_stack.push(Step {
-            col: start_c,
-            cur_i: 0,
-        });
-        while !dfs_stack.is_empty() {
-            //guaranteed to exist
-            let cur_step = dfs_stack.last_mut().unwrap();
-            let c = cur_step.col;
-            if !is_visited[c] {
-                is_visited[c] = true;
-                //guaranteed to exist, has at least one element
-                block_cols.last_mut().unwrap().push(c);
-            } else {
-                cur_step.cur_i += 1;
-            }
-
-            let next = &rows[c];
-            while cur_step.cur_i < next.len() {
-                if !is_visited[next[cur_step.cur_i]] {
-                    break;
-                }
-                cur_step.cur_i += 1;
-            }
-
-            if cur_step.cur_i < next.len() {
-                let col = next[cur_step.cur_i];
-                dfs_stack.push(Step { col, cur_i: 0 });
-            } else {
-                dfs_stack.pop();
-            }
-        }
-    }
-
-    BlockDiagForm {
-        row2col,
-        block_cols,
-    }
-}
-
 #[cfg(test)]
 mod tests {
-
     use super::*;
-    use ebi_arithmetic::{f, fraction::Fraction};
     use sprs::{CsMat, TriMat};
 
-    fn init() {
-        let _ = env_logger::builder().is_test(true).try_init();
-    }
-
-    fn mat_from_triplets(rows: usize, cols: usize, triplets: &[(usize, usize)]) -> CsMat<Fraction> {
+    fn mat_from_triplets(rows: usize, cols: usize, triplets: &[(usize, usize)]) -> CsMat<f64> {
         let mut mat = TriMat::with_capacity((rows, cols), triplets.len());
         for (r, c) in triplets {
-            mat.add_triplet(*r, *c, f!(1));
+            mat.add_triplet(*r, *c, 1.0);
         }
         mat.to_csc()
     }
 
     #[test]
     fn colamd() {
-        init();
         let mat = mat_from_triplets(
             4,
             5,
@@ -740,7 +595,6 @@ mod tests {
 
     #[test]
     fn colamd_singular() {
-        init();
         {
             let empty_col_mat = mat_from_triplets(3, 3, &[(0, 0), (1, 0), (1, 1), (1, 2)]);
             let res = order_colamd(3, |c| {
@@ -760,7 +614,6 @@ mod tests {
 
     #[test]
     fn diag_matching() {
-        init();
         let size = 3;
         let mat = mat_from_triplets(
             size,
@@ -771,21 +624,5 @@ mod tests {
         let matching =
             find_diag_matching(size, |c| mat.outer_view(c).unwrap().into_raw_storage().0);
         assert_eq!(matching, Some(vec![1, 2, 0]));
-    }
-
-    #[test]
-    fn block_diag_form() {
-        init();
-        let size = 3;
-        let mat = mat_from_triplets(
-            size,
-            size,
-            &[(1, 0), (2, 0), (0, 1), (1, 1), (2, 1), (0, 2)],
-        );
-
-        let bd_form =
-            find_block_diag_form(size, |c| mat.outer_view(c).unwrap().into_raw_storage().0);
-        assert_eq!(bd_form.row2col, &[2, 0, 1]);
-        assert_eq!(bd_form.block_cols, vec![vec![0, 1], vec![2]]);
     }
 }

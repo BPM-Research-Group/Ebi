@@ -1,4 +1,4 @@
-use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
+use ebi_arithmetic::{f0, ebi_number::Zero, fraction::Fraction};
 use sprs::{CsVecBase, CsVecView};
 use std::ops::Deref;
 
@@ -22,17 +22,18 @@ where
         data = &data[..(data.len() - 1)];
     }
 
-    CsVecView::new(len, indices, data)
+    // Safety: new indices and data are the same size,indices are still sorted and all indices
+    // are less than the new length. Thus, all CsVecView invariants are satisfied.
+    unsafe { CsVecView::new_uncheked(len, indices, data) }
+    // unsafe { CsVecView::new_view_raw(len, data.len(), indices.as_ptr(), data.as_ptr()) }
 }
 
-pub(crate) fn to_dense<IStorage, DStorage>(
-    vec: &CsVecBase<IStorage, DStorage, Fraction>,
-) -> Vec<Fraction>
+pub(crate) fn to_dense<IStorage, DStorage>(vec: &CsVecBase<IStorage, DStorage, Fraction>) -> Vec<Fraction>
 where
     IStorage: Deref<Target = [usize]>,
     DStorage: Deref<Target = [Fraction]>,
 {
-    let mut dense = vec![Fraction::zero(); vec.dim()];
+    let mut dense = vec![f0!(); vec.dim()];
     vec.scatter(&mut dense);
     dense
 }
