@@ -1,9 +1,9 @@
 use anyhow::{Error, Result, anyhow};
 use ebi_arithmetic::{
+    ebi_number::{One, Zero},
     exact::MaybeExact,
-    fraction::{Fraction, UInt, APPROX_DIGITS},
+    fraction::{APPROX_DIGITS, Fraction, UInt},
     fraction_exact::FractionExact,
-    traits::{One, Zero},
 };
 use fraction::{BigFraction, BigUint, GenericFraction, Integer, Sign};
 use num_bigint::{ToBigInt, ToBigUint};
@@ -616,7 +616,7 @@ impl Display for FractionRaw {
 
 #[cfg(test)]
 mod tests {
-    use ebi_arithmetic::traits::Zero;
+    use ebi_arithmetic::ebi_number::Zero;
 
     use crate::math::log_div_exact::LogDivExact;
 

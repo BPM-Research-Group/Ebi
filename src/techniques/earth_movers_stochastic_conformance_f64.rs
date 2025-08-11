@@ -1,8 +1,8 @@
 use crate::math::distances::WeightedDistances;
-use crate::optimisation_algorithms::network_simplex::NetworkSimplex;
+use ebi_optimisation::network_simplex::NetworkSimplex;
 use anyhow::{Context, Result};
 use ebi_arithmetic::fraction_f64::FractionF64;
-use ebi_arithmetic::traits::Zero;
+use ebi_arithmetic::ebi_number::Zero;
 use rayon::iter::ParallelIterator;
 use rayon::prelude::*;
 

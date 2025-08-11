@@ -5,7 +5,7 @@ use std::{
 };
 
 use anyhow::{anyhow, Result};
-use ebi_arithmetic::{fraction_exact::FractionExact, traits::Zero};
+use ebi_arithmetic::{ebi_number::Zero, fraction_exact::FractionExact};
 use fraction::{BigUint, GenericFraction, Integer, Ratio, Sign};
 
 #[derive(Clone)]

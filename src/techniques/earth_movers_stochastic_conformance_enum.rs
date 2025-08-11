@@ -1,5 +1,5 @@
 use crate::math::distances::WeightedDistances;
-use crate::optimisation_algorithms::network_simplex::NetworkSimplex;
+use ebi_optimisation::network_simplex::NetworkSimplex;
 use anyhow::{Context, Result};
 use ebi_arithmetic::{
     ebi_number::One,

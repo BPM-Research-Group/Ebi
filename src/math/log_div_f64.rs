@@ -1,5 +1,5 @@
 use anyhow::Result;
-use ebi_arithmetic::{exact::MaybeExact, fraction::UInt, fraction_f64::FractionF64, traits::{One, Zero}};
+use ebi_arithmetic::{exact::MaybeExact, fraction::UInt, fraction_f64::FractionF64, ebi_number::{One, Zero}};
 use num_bigint::ToBigInt;
 use num_traits::Pow;
 use std::{
@@ -273,7 +273,7 @@ impl std::fmt::Debug for LogDivF64 {
 
 #[cfg(test)]
 mod tests {
-    use ebi_arithmetic::traits::Zero;
+    use ebi_arithmetic::ebi_number::Zero;
 
     use crate::math::{log_div_f64::LogDivF64};
 

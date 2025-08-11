@@ -182,23 +182,6 @@ pub mod techniques {
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
 }
-pub mod optimisation_algorithms {
-    pub mod network_simplex;
-    pub mod network_simplex_value_type;
-    pub mod astar;
-    // pub mod mixed_integer_linear_programming;
-    // pub mod mixed_integer_linear_programming_solver;
-    // pub mod mixed_integer_linear_programming_lu;
-    // pub mod mixed_integer_linear_programming_sparse;
-    // pub mod mixed_integer_linear_programming_helpers;
-    // pub mod mixed_integer_linear_programming_ordering;
-    pub mod linear_programming;
-    pub mod linear_programming_solver;
-    pub mod linear_programming_lu;
-    pub mod linear_programming_sparse;
-    pub mod linear_programming_helpers;
-    pub mod linear_programming_ordering;
-}
 pub mod follower_semantics;
 pub mod json;
 pub mod line_reader;

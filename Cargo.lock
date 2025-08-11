@@ -495,6 +495,7 @@ dependencies = [
  "clap-verbosity-flag",
  "ebi_arithmetic",
  "ebi_derive",
+ "ebi_optimisation",
  "env_logger",
  "flate2",
  "fnv",
@@ -536,9 +537,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_arithmetic"
-version = "0.1.10"
+version = "0.1.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4b8f10d110d5fc8dbe6d13e389a30db673d5acbd44af450d17a3fd572aca2d47"
+checksum = "12ce54aff949fcb247c63fc1566144dbdfb671674c509237828c4565ab2e39f2"
 dependencies = [
  "anyhow",
  "fraction",
@@ -558,6 +559,27 @@ dependencies = [
  "darling",
  "quote",
  "syn 2.0.104",
+]
+
+[[package]]
+name = "ebi_optimisation"
+version = "0.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3716e1a93516a61dd08b8d01e9b3e8500e13d6e64d3c302dea7d1170d72a38ec"
+dependencies = [
+ "anyhow",
+ "ebi_arithmetic",
+ "fraction",
+ "indexmap 2.10.0",
+ "log",
+ "ndarray 0.16.1",
+ "num",
+ "parking_lot",
+ "pathfinding",
+ "rand",
+ "rayon",
+ "rustc-hash",
+ "sprs 0.11.3",
 ]
 
 [[package]]
