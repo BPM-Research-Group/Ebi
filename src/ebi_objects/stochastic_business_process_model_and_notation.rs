@@ -1,7 +1,7 @@
 use anyhow::{Result, anyhow};
 use quick_xml::Reader as XmlReader;
 use quick_xml::events::Event;
-use crate::math::fraction::Fraction;
+use ebi_arithmetic::fraction::Fraction;
 use std::fmt::Display;
 
 use crate::ebi_framework::{

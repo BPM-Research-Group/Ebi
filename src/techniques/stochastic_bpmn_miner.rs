@@ -5,11 +5,17 @@ use crate::ebi_objects::stochastic_business_process_model_and_notation::{
     StochasticBusinessProcessModelAndNotation, StochasticSequenceFlow, StochasticTask
 };
 use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
-use crate::optimisation_algorithms::microlp::microlp::{ComparisonOp, OptimizationDirection, Problem };
+//use crate::optimisation_algorithms::microlp::microlp::{ComparisonOp, OptimizationDirection, Problem};
+
+use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::exact::MaybeExact;
+
+use ebi_optimisation::linear_programming::{OptimisationDirection, ComparisonOp, Problem};
+
 use std::collections::{HashMap, HashSet, VecDeque};
-use crate::math::fraction::MaybeExact;
-use crate::math::fraction::Fraction;
-use crate::math::traits::{Zero};
+//use crate::math::fraction::MaybeExact;
+//use crate::math::fraction::Fraction;
+//use crate::math::traits::{Zero};
 
 fn is_diverging_gateway(node: &BPMNGateway) -> bool {
     node.direction == GatewayDirection::Diverging
@@ -100,7 +106,7 @@ pub fn frequency_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Bu
                             ratio.clone()
                         ))
                     }
-                    _ => Fraction::zero()
+                    _ => Fraction::from(0)
                 };
                 activity_counts.insert(activity_name, &current_count + &fraction_to_add);
             }
@@ -133,7 +139,7 @@ pub fn lhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Busin
                             ratio.clone()
                         ))
                     }
-                    _ => Fraction::zero()
+                    _ => Fraction::from(0)
                 };
                 
                 // Count first activity
@@ -188,7 +194,7 @@ pub fn rhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Busin
                             ratio.clone()
                         ))
                     }
-                    _ => Fraction::zero()
+                    _ => Fraction::from(0)
                 };
                 let len = trace.len();
                 if len == 0 {
@@ -249,7 +255,7 @@ pub fn pairscale_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Bu
                             ratio.clone()
                         ))
                     }
-                    _ => Fraction::zero()
+                    _ => Fraction::from(0)
                 };
                 trace_total = &trace_total + &(&trace_length * &fraction_to_add);
                 trace_count += 1;
@@ -312,8 +318,8 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
         incoming.entry(flow.target_id.clone()).or_default().push(flow_id);
     }
 
-    //Setup Problem: Minimize sum of absolute slacks, ignore flow weights in optimization
-    let mut problem = Problem::new(OptimizationDirection::Minimize);
+    //Setup Problem: Minimize sum of absolute slacks, ignore flow weights in optimisation
+    let mut problem = Problem::new(OptimisationDirection::Minimise);
 
     //Setup variable per sequence flow
     let mut flow_vars = HashMap::new();
@@ -374,8 +380,13 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
             for f in &all_flows[1..]{
                 if let Some(&flow_var) = flow_vars.get(f){
                     let slack = problem.add_var(Fraction::from(1), (Fraction::from(0), Fraction::infinity()));
-                    problem.add_constraint([(flow_var, Fraction::from(1)), (first_var, -Fraction::from(1)), (slack, -Fraction::from(1))], ComparisonOp::Le, Fraction::from(0));
-                    problem.add_constraint([(flow_var, Fraction::from(1)), (first_var, -Fraction::from(1)), (slack, Fraction::from(1))], ComparisonOp::Ge, Fraction::from(0));
+                    let mut con_le = [(first_var, -Fraction::from(1)), (flow_var, Fraction::from(1)), (slack, -Fraction::from(1))];
+                    con_le.sort_by_key(|(var, _)| var.idx());
+                    let mut con_re = [(first_var, -Fraction::from(1)), (flow_var, Fraction::from(1)), (slack, Fraction::from(1))];
+                    con_re.sort_by_key(|(var, _)| var.idx());
+
+                    problem.add_constraint(con_le, ComparisonOp::Le, Fraction::from(0));
+                    problem.add_constraint(con_re, ComparisonOp::Ge, Fraction::from(0));
                 }
             }
         }
@@ -402,8 +413,10 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
 
         let mut con_le = sum_vars.clone();
         con_le.push((slack, -Fraction::from(1)));
+        con_le.sort_by_key(|(var, _)| var.idx());
         let mut con_ge = sum_vars.clone();
         con_ge.push((slack, Fraction::from(1)));
+        con_ge.sort_by_key(|(var, _)| var.idx());
         problem.add_constraint(con_le, ComparisonOp::Le, Fraction::from(0));
         problem.add_constraint(con_ge, ComparisonOp::Ge, Fraction::from(0));
     }
@@ -420,13 +433,16 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
                 for out_flow in out_flows{
                     if let Some(&out_var) = flow_vars.get(&out_flow){
                         let slack = problem.add_var(Fraction::from(1), (Fraction::from(0), Fraction::infinity()));
-                        problem.add_constraint([(in_var, Fraction::from(1)), (out_var, -Fraction::from(1)), (slack, Fraction::from(1))], ComparisonOp::Ge, Fraction::from(1));
+                        let mut con = [(in_var, Fraction::from(1)), (out_var, -Fraction::from(1)), (slack, Fraction::from(1))];
+                        con.sort_by_key(|(var, _)| var.idx());
+                        problem.add_constraint(con, ComparisonOp::Ge, Fraction::from(1));
                         sum_vars.push((out_var, -Fraction::from(1)))
                     }
                 }
                 let slack = problem.add_var(Fraction::from(1), (Fraction::from(0), Fraction::infinity()));
                 sum_vars.push((in_var, Fraction::from(1)));
                 sum_vars.push((slack, -Fraction::from(1)));
+                sum_vars.sort_by_key(|(var, _)| var.idx());
                 problem.add_constraint(sum_vars, ComparisonOp::Le, -Fraction::from(1));
             }
         }else{
@@ -435,13 +451,16 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
                 for in_flow in in_flows{
                     if let Some(&in_var) = flow_vars.get(&in_flow){
                         let slack = problem.add_var(Fraction::from(1), (Fraction::from(0), Fraction::infinity()));
-                        problem.add_constraint([(out_var, Fraction::from(1)), (in_var, -Fraction::from(1)), (slack, Fraction::from(1))], ComparisonOp::Ge, Fraction::from(1));
+                        let mut con = [(out_var, Fraction::from(1)), (in_var, -Fraction::from(1)), (slack, Fraction::from(1))];
+                        con.sort_by_key(|(var, _)| var.idx());
+                        problem.add_constraint(con, ComparisonOp::Ge, Fraction::from(1));
                         sum_vars.push((in_var, -Fraction::from(1)))
                     }
                 }
                 let slack = problem.add_var(Fraction::from(1), (Fraction::from(0), Fraction::infinity()));
                 sum_vars.push((out_var, Fraction::from(1)));
                 sum_vars.push((slack, -Fraction::from(1)));
+                sum_vars.sort_by_key(|(var, _)| var.idx());
                 problem.add_constraint(sum_vars, ComparisonOp::Le, -Fraction::from(1));
             }
             }
@@ -600,90 +619,14 @@ mod tests {
         assert!(!is_diverging_gateway(&converging_gateway));
     }
 
-    /// Test function that loads BPMN model and event log from files
-    
-    #[test]
-    #[ignore]
-    fn solve_minimal_example(){
-        use crate::optimisation_algorithms::simplex::{Simplex, SimplexConstraint};
-        let program = Simplex::minimize(vec![Fraction::from(0), Fraction::from(0), Fraction::from(1), Fraction::from(1)])
-        .with(vec![
-            SimplexConstraint::LessThan(vec![Fraction::from(1), Fraction::from(0), -Fraction::from(1), Fraction::from(0)], Fraction::from(1)),
-            SimplexConstraint::LessThan(vec![-Fraction::from(1), Fraction::from(0), -Fraction::from(1), Fraction::from(0)], -Fraction::from(1)),
-            SimplexConstraint::LessThan(vec![Fraction::from(0), Fraction::from(1), Fraction::from(0), -Fraction::from(1)], Fraction::from(1)),
-            SimplexConstraint::LessThan(vec![Fraction::from(0), -Fraction::from(1), Fraction::from(0), -Fraction::from(1)], -Fraction::from(1)),
-        ]);
-        let mut simplex = program.unwrap();
-        println!("Result: {:?}", simplex.solve());
-        for var in 1..5{
-            println!("Var {}: {:?}", var, simplex.get_var(var));
-        }
-
-    }
-
-
-    #[test]
-    #[ignore]
-    fn test_simplex(){
-        use simplex::*;
-        let program = Simplex::minimize(&vec![0.0, 0.0, 1.0, 1.0])
-        .with(vec![
-            SimplexConstraint::LessThan(vec![1.0, 0.0, -1.0, 0.0], 1.0),
-            SimplexConstraint::LessThan(vec![-1.0, 0.0, -1.0, 0.0], -1.0),
-            SimplexConstraint::LessThan(vec![0.0, 1.0, 0.0, -1.0], 1.0),
-            SimplexConstraint::LessThan(vec![0.0, -1.0, 0.0, -1.0], -1.0),
-        ]);
-        let mut simplex = program.unwrap();
-        println!("Result: {:?}", simplex.solve());
-        for var in 0..5{
-            println!("Var {}: {:?}", var, simplex.get_var(var));
-        }
-    }
-    
-    #[test]
-    #[ignore]
-    fn test_good_lp(){
-        use good_lp::{variables, constraint, default_solver, SolverModel, Solution};
-        variables! { 
-            vars:
-                x1 >= 0.0;
-                x2 >= 0.0;
-                s1 >= 0.0;
-                s2 >= 0.0;
-        }
-
-        // Objective: Minimize s1 + s2
-        let objective = s1 + s2;
-
-        // Constraints:
-        // x1 - s1 <= 1
-        // x1 + s1 >= 1
-        // x2 - s2 <= 1
-        // x2 + s2 >= 1
-        let mut model = vars.minimise(objective).using(default_solver);
-
-        model = model
-            .with(constraint!(x1 - s1 <= 1.0))
-            .with(constraint!(-x1 - s1 <= -1.0))
-            .with(constraint!(x2 - s2 <= 1.0))
-            .with(constraint!(-x2 + -s2 <= -1.0));
-
-        let solution = model.solve().unwrap();
-        println!("x1: {:?}", solution.value(x1));
-        println!("x2: {:?}", solution.value(x2));
-        println!("s1: {:?}", solution.value(s1));
-        println!("s2: {:?}", solution.value(s2));
-    }
-
-
     #[test]
     #[ignore]
     fn test_weight_propagation_from_files() {
         use crate::ebi_traits::ebi_trait_event_log::IndexTrace;
         
         // File paths
-        let bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\test_models\airline.bpmn";
-        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\Eventlogs\airline.xes";
+        let bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\test_models\traffic_fine.bpmn";
+        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\Eventlogs\Road_Traffic_Fine_Management_Process.xes";
         
         
         println!("=== Loading files for weight propagation test ===");
@@ -776,7 +719,7 @@ mod tests {
         let weights: HashMap<String, Fraction> = frequencies;
         
         // Apply weight propagation
-        println!("\n=== Applying weight propagation with good_lp ===");
+        println!("\n===micro_lpng weight propagation with good_lp ===");
         let result: Result<StochasticBusinessProcessModelAndNotation, anyhow::Error> = weight_propagtion_micro_lp(&bpmn_model, &weights);
         
         match result {
