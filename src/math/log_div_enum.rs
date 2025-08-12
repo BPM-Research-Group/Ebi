@@ -1,4 +1,10 @@
 use anyhow::{Error, Result, anyhow};
+use ebi_arithmetic::{
+    exact::{MaybeExact, is_exact_globally},
+    fraction::{APPROX_DIGITS, UInt},
+    fraction_enum::FractionEnum,
+    ebi_number::{One, Zero},
+};
 use fraction::{BigFraction, BigUint, GenericFraction, Integer, Sign};
 use num_bigint::{ToBigInt, ToBigUint};
 use num_traits::Pow;
@@ -10,12 +16,6 @@ use std::{
 };
 
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
-
-use super::{
-    fraction::{APPROX_DIGITS, MaybeExact, UInt},
-    fraction_enum::FractionEnum,
-    traits::{One, Zero},
-};
 
 #[derive(Clone)]
 pub enum LogDivEnum {
@@ -233,7 +233,7 @@ impl MaybeExact for LogDivEnum {
 
 impl Zero for LogDivEnum {
     fn zero() -> Self {
-        if FractionEnum::create_exact() {
+        if is_exact_globally() {
             Self::Exact((BigFraction::one(), UInt::from(1u32)))
         } else {
             Self::Approx(0.0)
@@ -251,7 +251,7 @@ impl Zero for LogDivEnum {
 
 impl One for LogDivEnum {
     fn one() -> Self {
-        if FractionEnum::create_exact() {
+        if is_exact_globally() {
             Self::Exact((BigFraction::from(2), UInt::from(1u32)))
         } else {
             Self::Approx(1.0)
@@ -295,7 +295,7 @@ impl One for LogDivEnum {
                     None => return false,
                 }
             }
-            LogDivEnum::Approx(f) => crate::math::traits::One::is_one(f),
+            LogDivEnum::Approx(f) => One::is_one(f),
             _ => false,
         }
     }
@@ -762,7 +762,9 @@ impl Display for FractionRaw {
 
 #[cfg(test)]
 mod tests {
-    use crate::math::{log_div_enum::LogDivEnum, traits::Zero};
+    use ebi_arithmetic::ebi_number::Zero;
+
+    use crate::math::log_div_enum::LogDivEnum;
 
     #[test]
     fn zero_log_div() {

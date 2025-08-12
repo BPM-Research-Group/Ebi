@@ -1,6 +1,7 @@
 use std::collections::HashSet;
 
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::{ebi_number::One, fraction::Fraction};
 
 use crate::{
     ebi_framework::activity_key::Activity,
@@ -9,7 +10,6 @@ use crate::{
         ebi_trait_event_log::EbiTraitEventLog,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
-    math::{fraction::Fraction, traits::One},
 };
 
 use super::directly_follows_graph_abstractor::DirectlyFollowsAbstractor;
@@ -190,13 +190,14 @@ fn get_edges_to_filter(
 mod tests {
     use std::fs;
 
+    use ebi_arithmetic::{ebi_number::One, fraction::Fraction};
+
     use crate::{
         ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
         ebi_traits::{
             ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
             ebi_trait_semantics::Semantics,
         },
-        math::{fraction::Fraction, traits::One},
         techniques::directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
     };
 

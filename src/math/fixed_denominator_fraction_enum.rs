@@ -1,9 +1,8 @@
 use std::{borrow::Borrow, ops::{AddAssign, Mul}, sync::Arc};
 
+use ebi_arithmetic::{exact::is_exact_globally, fraction_enum::FractionEnum, ebi_number::Zero};
 use fraction::{BigUint, GenericFraction, Integer, Ratio, Sign};
 use anyhow::{anyhow, Result};
-
-use super::{fraction_enum::FractionEnum, traits::Zero};
 
 #[derive(Clone)]
 pub enum FixedDenominatorFractionEnum {
@@ -96,7 +95,7 @@ impl FixedDenominatorFractionEnum {
 
 impl Zero for FixedDenominatorFractionEnum {
     fn zero() -> Self {
-        if crate::math::fraction::is_exaxt_globally() {
+        if is_exact_globally() {
             Self::Zero
         } else {
             Self::Approximate(0.0)

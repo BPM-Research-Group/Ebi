@@ -682,8 +682,8 @@ mod tests {
         use crate::ebi_traits::ebi_trait_event_log::IndexTrace;
         
         // File paths
-        let bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\test_models\traffic_fine.bpmn";
-        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\Eventlogs\road_traffic_fine_management_process.xes";
+        let bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\test_models\airline.bpmn";
+        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\Eventlogs\airline.xes";
         
         
         println!("=== Loading files for weight propagation test ===");
@@ -715,7 +715,7 @@ mod tests {
                 return;
             }
         };
-        
+
         // Load BPMN model using the Importable trait
         println!("Loading BPMN model from: {}", bpmn_file);
         let bpmn_result = File::open(bpmn_file)

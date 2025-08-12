@@ -1,5 +1,9 @@
 use anyhow::{Result, anyhow};
 use core::hash::Hash;
+use ebi_arithmetic::{
+    ebi_number::{One, Signed, Zero},
+    fraction::Fraction,
+};
 use priority_queue::PriorityQueue;
 use std::{
     cmp::Ordering,
@@ -16,10 +20,6 @@ use crate::{
         ebi_trait_stochastic_deterministic_semantics::{
             EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics,
         },
-    },
-    math::{
-        fraction::Fraction,
-        traits::{One, Signed, Zero},
     },
 };
 
@@ -284,13 +284,17 @@ impl<DState: Displayable, LState: Displayable> dyn StochasticDeterministicSemant
                     //check whether we can terminate
                     let termination_probability =
                         self.get_deterministic_termination_probability(&q_state);
-                        log::debug!("\ttermination probability {:.4}", termination_probability);
+                    log::debug!("\ttermination probability {:.4}", termination_probability);
                     if termination_probability.is_positive() {
                         let mut trace_probability = termination_probability;
                         trace_probability *= &prefix_probability;
                         queue.push(Z::Trace(prefix.clone()), trace_probability);
 
-                        log::debug!("\tpush trace of length {} to queue, queue length {}", prefix.len(), queue.len());
+                        log::debug!(
+                            "\tpush trace of length {} to queue, queue length {}",
+                            prefix.len(),
+                            queue.len()
+                        );
                     }
 
                     //follow outgoing activities
@@ -559,6 +563,9 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
 mod tests {
     use std::fs;
 
+    use ebi_arithmetic::ebi_number::{One, Zero};
+    use ebi_arithmetic::fraction::Fraction;
+
     use crate::ebi_framework::activity_key::HasActivityKey;
     use crate::ebi_objects::finite_stochastic_language::FiniteStochasticLanguage;
     use crate::ebi_objects::labelled_petri_net::LPNMarking;
@@ -570,8 +577,6 @@ mod tests {
         EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics,
         ToStochasticDeterministicSemantics,
     };
-    use crate::math::fraction::Fraction;
-    use crate::math::traits::{One, Zero};
     use crate::techniques::deterministic_semantics_for_stochastic_semantics::PMarking;
     use crate::techniques::probability_queries::ProbabilityQueries;
 

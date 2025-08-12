@@ -1,3 +1,5 @@
+use ebi_arithmetic::ebi_number::Zero;
+
 use crate::{
     ebi_objects::{
         deterministic_finite_automaton::DeterministicFiniteAutomaton,
@@ -6,7 +8,6 @@ use crate::{
     ebi_traits::{
         ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::Semantics,
     },
-    math::traits::Zero,
 };
 
 pub trait PrefixTreeMinerDFA {

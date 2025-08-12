@@ -1,10 +1,11 @@
+use ebi_arithmetic::{ebi_number::One, fraction::Fraction};
+
 use crate::{
     ebi_objects::directly_follows_graph::DirectlyFollowsGraph,
     ebi_traits::{
         ebi_trait_event_log::EbiTraitEventLog,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
-    math::{fraction::Fraction, traits::One},
 };
 
 pub trait DirectlyFollowsAbstractor {

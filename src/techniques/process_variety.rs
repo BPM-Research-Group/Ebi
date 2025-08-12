@@ -1,8 +1,9 @@
+use ebi_arithmetic::fraction::Fraction;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::{fraction::Fraction, levenshtein},
+    math::levenshtein,
 };
 
 pub trait ProcessVariety {
@@ -11,18 +12,24 @@ pub trait ProcessVariety {
 
 impl ProcessVariety for dyn EbiTraitFiniteStochasticLanguage {
     fn rao_stirling_diversity(&self) -> Fraction {
-        (0..self.len()).into_par_iter().map(|i| {
-            let trace_i = self.get_trace(i).unwrap();
-            let probability_i = self.get_trace_probability(i).unwrap();
-            (i+1..self.len()).into_par_iter().map(|j| {
-                let trace_j = self.get_trace(j).unwrap();
-                let probability_j = self.get_trace_probability(j).unwrap();
-                let mut d = Fraction::from(levenshtein::distance(trace_i, trace_j));
-                d *= probability_i;
-                d *= probability_j;
-                d
-            }).sum::<Fraction>()
-        }).sum()
+        (0..self.len())
+            .into_par_iter()
+            .map(|i| {
+                let trace_i = self.get_trace(i).unwrap();
+                let probability_i = self.get_trace_probability(i).unwrap();
+                (i + 1..self.len())
+                    .into_par_iter()
+                    .map(|j| {
+                        let trace_j = self.get_trace(j).unwrap();
+                        let probability_j = self.get_trace_probability(j).unwrap();
+                        let mut d = Fraction::from(levenshtein::distance(trace_i, trace_j));
+                        d *= probability_i;
+                        d *= probability_j;
+                        d
+                    })
+                    .sum::<Fraction>()
+            })
+            .sum()
     }
 }
 
@@ -30,9 +37,14 @@ impl ProcessVariety for dyn EbiTraitFiniteStochasticLanguage {
 mod tests {
     use std::fs;
 
-    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::fraction::Fraction, techniques::process_variety::ProcessVariety};
+    use ebi_arithmetic::fraction::Fraction;
 
-    
+    use crate::{
+        ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
+        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        techniques::process_variety::ProcessVariety,
+    };
+
     #[test]
     fn variety() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();

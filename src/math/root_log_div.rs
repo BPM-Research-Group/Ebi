@@ -1,9 +1,10 @@
 use std::fmt::Display;
 use anyhow::Result;
+use ebi_arithmetic::fraction::Fraction;
 
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable};
 
-use super::{fraction::Fraction, log_div::LogDiv};
+use super::{log_div::LogDiv};
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct RootLogDiv {

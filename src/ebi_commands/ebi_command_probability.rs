@@ -1,5 +1,6 @@
 use anyhow::{Context, anyhow};
 use clap::{Arg, ArgAction, value_parser};
+use ebi_arithmetic::fraction::Fraction;
 
 use crate::{
     ebi_framework::{
@@ -15,7 +16,7 @@ use crate::{
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
     follower_semantics::FollowerSemantics,
-    math::fraction::{ConstFraction, Fraction},
+    math::constant_fraction::ConstFraction,
     techniques::explain_trace::ExplainTrace,
 };
 

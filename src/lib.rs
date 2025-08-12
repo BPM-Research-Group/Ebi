@@ -1,6 +1,7 @@
 pub mod conversions {
     pub mod to_compressed_event_log;
     pub mod to_deterministic_finite_automaton;
+    pub mod to_directly_follows_model;
     pub mod to_event_log;
     pub mod to_finite_language;
     pub mod to_finite_stochastic_language;
@@ -8,11 +9,10 @@ pub mod conversions {
     pub mod to_language_of_alignments;
     pub mod to_lola_net;
     pub mod to_petri_net_markup_language;
-    pub mod to_stochastic_deterministic_finite_automaton;
-    pub mod to_stochastic_labelled_petri_net;
     pub mod to_process_tree;
-    pub mod to_directly_follows_model;
+    pub mod to_stochastic_deterministic_finite_automaton;
     pub mod to_stochastic_directly_follows_model;
+    pub mod to_stochastic_labelled_petri_net;
 }
 pub mod ebi_framework {
     pub mod activity_key;
@@ -34,8 +34,10 @@ pub mod ebi_commands {
     pub mod ebi_command_analyse_non_stochastic;
     pub mod ebi_command_association;
     pub mod ebi_command_conformance;
+    pub mod ebi_command_conformance_non_stochastic;
     pub mod ebi_command_convert;
     pub mod ebi_command_discover;
+    pub mod ebi_command_discover_non_stochastic;
     pub mod ebi_command_info;
     pub mod ebi_command_itself;
     pub mod ebi_command_probability;
@@ -43,15 +45,13 @@ pub mod ebi_commands {
     pub mod ebi_command_test;
     pub mod ebi_command_validate;
     pub mod ebi_command_visualise;
-    pub mod ebi_command_discover_non_stochastic;
-    pub mod ebi_command_conformance_non_stochastic;
 }
 pub mod ebi_objects {
     pub mod compressed_event_log;
     pub mod deterministic_finite_automaton;
+    pub mod directly_follows_graph;
+    pub mod directly_follows_graph_semantics;
     pub mod directly_follows_model;
-    pub mod stochastic_directly_follows_model;
-    pub mod stochastic_directly_follows_graph_semantics;
     pub mod event_log;
     pub mod executions;
     pub mod finite_language;
@@ -62,23 +62,24 @@ pub mod ebi_objects {
     pub mod language_of_alignments;
     pub mod lola_net;
     pub mod petri_net_markup_language;
+    pub mod portable_document_format;
     pub mod process_tree;
-    pub mod stochastic_process_tree_semantics;
+    pub mod process_tree_markup_language;
+    pub mod scalable_vector_graphics;
     pub mod stochastic_deterministic_finite_automaton;
     pub mod stochastic_deterministic_finite_automaton_semantics;
+    pub mod stochastic_directly_follows_graph_semantics;
+    pub mod stochastic_directly_follows_model;
     pub mod stochastic_labelled_petri_net;
     pub mod stochastic_labelled_petri_net_semantics;
     pub mod stochastic_language_of_alignments;
     pub mod stochastic_process_tree;
-    pub mod scalable_vector_graphics;
-    pub mod directly_follows_graph;
-    pub mod directly_follows_graph_semantics;
-    pub mod portable_document_format;
+    pub mod stochastic_process_tree_semantics;
     pub mod business_process_model_and_notation;
     pub mod stochastic_business_process_model_and_notation;
-    pub mod process_tree_markup_language;
 }
 pub mod ebi_traits {
+    pub mod ebi_trait_activities;
     pub mod ebi_trait_event_log;
     pub mod ebi_trait_finite_language;
     pub mod ebi_trait_finite_stochastic_language;
@@ -89,65 +90,49 @@ pub mod ebi_traits {
     pub mod ebi_trait_semantics;
     pub mod ebi_trait_stochastic_deterministic_semantics;
     pub mod ebi_trait_stochastic_semantics;
-    pub mod ebi_trait_activities;
 }
 pub mod math {
-    pub mod astar;
     pub mod average;
-
-    pub mod fraction;
-    #[cfg(any(
-        all(
-            not(feature = "exactarithmetic"),
-            not(feature = "approximatearithmetic")
-        ),
-        all(feature = "exactarithmetic", feature = "approximatearithmetic")
-    ))]
-    pub mod fraction_enum;
-    #[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
-    pub mod fraction_exact;
-    #[cfg(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic"))]
-    pub mod fraction_f64;
 
     pub mod log_div;
     #[cfg(any(
         all(
-            not(feature = "exactarithmetic"),
-            not(feature = "approximatearithmetic")
+            not(feature = "eexactarithmetic"),
+            not(feature = "eapproximatearithmetic")
         ),
-        all(feature = "exactarithmetic", feature = "approximatearithmetic")
+        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic")
     ))]
     pub mod log_div_enum;
-    #[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
+    #[cfg(all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")))]
     pub mod log_div_exact;
-    #[cfg(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic"))]
+    #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
     pub mod log_div_f64;
 
     pub mod fixed_denominator_fraction;
     #[cfg(any(
         all(
-            not(feature = "exactarithmetic"),
-            not(feature = "approximatearithmetic")
+            not(feature = "eexactarithmetic"),
+            not(feature = "eapproximatearithmetic")
         ),
-        all(feature = "exactarithmetic", feature = "approximatearithmetic")
+        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic")
     ))]
     pub mod fixed_denominator_fraction_enum;
-    #[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
+    #[cfg(all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")))]
     pub mod fixed_denominator_fraction_exact;
-    #[cfg(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic"))]
+    #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
     pub mod fixed_denominator_fraction_f64;
 
+    pub mod constant_fraction;
     pub mod correlation;
     pub mod data_type;
+    pub mod distances;
+    pub mod distances_matrix;
+    pub mod distances_triangular;
     pub mod levenshtein;
     pub mod markov_model;
     pub mod matrix;
     pub mod root;
     pub mod root_log_div;
-    pub mod traits;
-    pub mod distances;
-    pub mod distances_triangular;
-    pub mod distances_matrix;
 }
 
 pub mod techniques {
@@ -160,55 +145,45 @@ pub mod techniques {
     pub mod earth_movers_stochastic_conformance;
     #[cfg(any(
         all(
-            not(feature = "exactarithmetic"),
-            not(feature = "approximatearithmetic")
+            not(feature = "eexactarithmetic"),
+            not(feature = "eapproximatearithmetic")
         ),
-        all(feature = "exactarithmetic", feature = "approximatearithmetic")
+        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic")
     ))]
     pub mod earth_movers_stochastic_conformance_enum;
-    #[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
+    #[cfg(all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")))]
     pub mod earth_movers_stochastic_conformance_exact;
-    #[cfg(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic"))]
+    #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
     pub mod earth_movers_stochastic_conformance_f64;
 
     pub mod any_traces;
+    pub mod bootstrap_test;
     pub mod bounded;
+    pub mod directly_follows_graph_abstractor;
+    pub mod directly_follows_model_miner;
+    pub mod edge_difference;
     pub mod entropic_relevance;
+    pub mod escaping_edges_precision;
     pub mod executions;
     pub mod explain_trace;
+    pub mod fitness;
+    pub mod flower_miner;
     pub mod infinitely_many_traces;
     pub mod jensen_shannon_stochastic_conformance;
     pub mod livelock;
     pub mod medoid_non_stochastic;
     pub mod non_decreasing_livelock;
     pub mod occurrences_stochastic_miner;
+    pub mod permutation_test;
+    pub mod prefix_tree_miner;
     pub mod probability_queries;
     pub mod process_variety;
     pub mod sample;
-    pub mod bootstrap_test;
+    pub mod sample_folds;
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
-    pub mod flower_miner;
-    pub mod prefix_tree_miner;
-    pub mod directly_follows_model_miner;
-    pub mod directly_follows_graph_abstractor;
-    pub mod edge_difference;
-    pub mod permutation_test;
-    pub mod fitness;
     pub mod stochastic_bpmn_miner;
-}
-pub mod optimisation_algorithms {
-    pub mod network_simplex;
-    pub mod network_simplex_value_type;
-    pub mod simplex;
-    pub mod microlp{
-        pub mod microlp;
-        pub mod lu;
-        pub mod ordering;
-        pub mod solver;
-        pub mod sparse;
-    }
 }
 pub mod follower_semantics;
 pub mod json;

@@ -1,4 +1,5 @@
 use anyhow::{Context, Result, anyhow};
+use ebi_arithmetic::fraction::Fraction;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::sync::{
     Arc,
@@ -16,7 +17,6 @@ use crate::{
         distances::{TriangularDistanceMatrix, WeightedDistances},
         distances_matrix::WeightedDistanceMatrix,
         distances_triangular::WeightedTriangularDistanceMatrix,
-        fraction::Fraction,
     },
     techniques::sample::{self, Resampler},
 };
@@ -245,13 +245,14 @@ impl BootstrapTest for dyn EbiTraitFiniteStochasticLanguage {
 mod tests {
     use std::fs;
 
+    use ebi_arithmetic::fraction::Fraction;
+
     use crate::{
         ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage},
         ebi_traits::{
             ebi_trait_event_log::EbiTraitEventLog,
             ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         },
-        math::fraction::Fraction,
         techniques::bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
     };
 

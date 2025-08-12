@@ -1,4 +1,8 @@
 use anyhow::Result;
+use ebi_arithmetic::{
+    ebi_number::{Signed, Zero},
+    fraction::Fraction,
+};
 
 use crate::{
     ebi_framework::activity_key::ActivityKeyTranslator,
@@ -7,12 +11,7 @@ use crate::{
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
     follower_semantics::FollowerSemantics,
-    math::{
-        fraction::Fraction,
-        log_div::LogDiv,
-        root_log_div::RootLogDiv,
-        traits::{Signed, Zero},
-    },
+    math::{log_div::LogDiv, root_log_div::RootLogDiv},
 };
 
 pub trait JensenShannonStochasticConformance {
@@ -98,13 +97,15 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
 mod tests {
     use std::fs;
 
+    use ebi_arithmetic::{ebi_number::Zero, f, fraction::Fraction};
+
     use crate::{
         ebi_objects::{
             event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage,
             stochastic_labelled_petri_net::StochasticLabelledPetriNet,
         },
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        math::{fraction::Fraction, log_div::LogDiv, root_log_div::RootLogDiv, traits::Zero},
+        math::{log_div::LogDiv, root_log_div::RootLogDiv},
         techniques::jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
     };
 
@@ -119,7 +120,7 @@ mod tests {
         let slang: Box<dyn EbiTraitFiniteStochasticLanguage> =
             Box::new(Into::<FiniteStochasticLanguage>::into(log));
 
-        let mut x = LogDiv::from(Fraction::from(2));
+        let mut x = LogDiv::from(f!(2));
         x /= 2;
         let answer = RootLogDiv::sqrt(x).one_minus();
 

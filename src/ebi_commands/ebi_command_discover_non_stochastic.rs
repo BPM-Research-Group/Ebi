@@ -1,4 +1,5 @@
-use anyhow::Context;
+use anyhow::{Context, anyhow};
+
 
 use crate::{
     ebi_framework::{
@@ -46,27 +47,14 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA: EbiCommand = EbiCommand::Comma
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[&[
-        &EbiInputType::Trait(EbiTrait::FiniteLanguage),
-        &EbiInputType::Trait(EbiTrait::Activities),
-    ]],
-    input_names: &["FILE"],
-    input_helps: &["A file with activities."],
+    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteLanguage)]],
+    input_names: &["LANG"],
+    input_helps: &["A finite language."],
     execute: |mut inputs, _| {
+        let lpn = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
         Ok(EbiOutput::Object(EbiObject::DeterministicFiniteAutomaton(
-            match inputs.remove(0) {
-                EbiInput::Trait(EbiTraitObject::FiniteLanguage(lang), _) => {
-                    let lang: Box<dyn HasActivityKey> = lang;
-                    lang.mine_flower_dfa()
-                        .with_context(|| format!("cannot compute flower model"))?
-                }
-                EbiInput::Trait(EbiTraitObject::Activities(lang), _) => {
-                    let lang: Box<dyn HasActivityKey> = lang;
-                    lang.mine_flower_dfa()
-                        .with_context(|| format!("cannot compute flower model"))?
-                }
-                _ => unreachable!(),
-            },
+            lpn.mine_flower_dfa()
+                .with_context(|| anyhow!("cannot discover flower model"))?,
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::DeterministicFiniteAutomaton),
@@ -80,22 +68,13 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE: EbiCommand = EbiCommand::Comm
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[&[
-        &EbiInputType::Trait(EbiTrait::FiniteLanguage),
-        &EbiInputType::Trait(EbiTrait::Activities),
-    ]],
-    input_names: &["FILE"],
-    input_helps: &["A file with activities."],
+    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteLanguage)]],
+    input_names: &["LANG"],
+    input_helps: &["A finite language."],
     execute: |mut inputs, _| {
+        let lpn = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
         Ok(EbiOutput::Object(EbiObject::ProcessTree(
-            match inputs.remove(0) {
-                EbiInput::Trait(EbiTraitObject::FiniteLanguage(lang), _) => lang.mine_flower_tree(),
-                EbiInput::Trait(EbiTraitObject::Activities(lang), _) => {
-                    let lang: Box<dyn HasActivityKey> = lang;
-                    lang.mine_flower_tree()
-                }
-                _ => unreachable!(),
-            },
+            lpn.mine_flower_tree(),
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::ProcessTree),

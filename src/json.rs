@@ -1,7 +1,6 @@
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::fraction::Fraction;
 use serde_json::{Map, Value};
-
-use crate::math::fraction::Fraction;
 
 pub fn read_field_number(json: &Value, field: &str) -> Result<usize> {
     match &json[field] {

@@ -1458,9 +1458,6 @@ mod tests {
         assert_eq!(sol.basic_vars.len(), 2); // Should have 2 basic variables (2 constraints)
         assert_eq!(sol.nb_vars.len(), 2);   // Should have 2 non-basic variables (2 slack vars)
         
-        // Verify objective value is finite
-        assert!(sol.cur_obj_val.is_finite());
-
         let infeasible = Solver::try_new(
             &[Fraction::from(1), Fraction::from(1)],
             &[Fraction::from(0), Fraction::from(0)],

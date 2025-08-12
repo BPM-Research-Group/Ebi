@@ -3,17 +3,20 @@
  * In return, the denominator is fixed and operations are much cheaper.
  */
 
- #[cfg(any(
+#[cfg(any(
     all(
-        not(feature = "exactarithmetic"),
-        not(feature = "approximatearithmetic")
+        not(feature = "eexactarithmetic"),
+        not(feature = "eapproximatearithmetic")
     ),
-    all(feature = "exactarithmetic", feature = "approximatearithmetic")
+    all(feature = "eexactarithmetic", feature = "eapproximatearithmetic")
 ))]
-pub type FixedDenominatorFraction = super::fixed_denominator_fraction_enum::FixedDenominatorFractionEnum;
+pub type FixedDenominatorFraction =
+    super::fixed_denominator_fraction_enum::FixedDenominatorFractionEnum;
 
-#[cfg(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic"))]
-pub type FixedDenominatorFraction = super::fixed_denominator_fraction_f64::FixedDenominatorFractionF64;
+#[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
+pub type FixedDenominatorFraction =
+    super::fixed_denominator_fraction_f64::FixedDenominatorFractionF64;
 
-#[cfg(all(feature = "exactarithmetic", not(feature = "approximatearithmetic")))]
-pub type FixedDenominatorFraction = super::fixed_denominator_fraction_exact::FixedDenominatorFractionExact;
+#[cfg(all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")))]
+pub type FixedDenominatorFraction =
+    super::fixed_denominator_fraction_exact::FixedDenominatorFractionExact;

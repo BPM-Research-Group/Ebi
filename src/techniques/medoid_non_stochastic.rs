@@ -1,4 +1,8 @@
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::{
+    ebi_number::{Signed, Zero},
+    fraction::Fraction,
+};
 use num::One as _;
 use std::sync::Arc;
 
@@ -6,10 +10,6 @@ use crate::{
     ebi_objects::finite_language::FiniteLanguage,
     ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage,
     math::distances::TriangularDistanceMatrix,
-    math::{
-        fraction::Fraction,
-        traits::{Signed, Zero},
-    },
 };
 
 pub trait MedoidNonStochastic {

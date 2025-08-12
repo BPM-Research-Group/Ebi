@@ -1,7 +1,8 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::{One, Signed, Zero}};
 use std::fmt::{Debug, Display};
 
-use super::{fraction::Fraction, matrix::Matrix, traits::{One, Signed, Zero}};
+use super::matrix::Matrix;
 
 pub struct MarkovModel<S> {
     edges: Matrix,

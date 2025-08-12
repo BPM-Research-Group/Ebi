@@ -8,11 +8,12 @@ use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::{
         distances::WeightedDistances, distances_matrix::WeightedDistanceMatrix,
-        distances_triangular::WeightedTriangularDistanceMatrix, fraction::Fraction,
+        distances_triangular::WeightedTriangularDistanceMatrix,
     },
     techniques::sample::Resampler,
 };
 use anyhow::{Context, Result, anyhow};
+use ebi_arithmetic::fraction::Fraction;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 pub trait PermutationTest {

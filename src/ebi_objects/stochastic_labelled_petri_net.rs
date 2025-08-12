@@ -1,4 +1,5 @@
 use anyhow::{Context, Error, Result, anyhow};
+use ebi_arithmetic::fraction::Fraction;
 use ebi_derive::ActivityKey;
 use layout::topo::layout::VisualGraph;
 use std::io;
@@ -27,7 +28,6 @@ use crate::ebi_traits::ebi_trait_stochastic_semantics::{
 };
 use crate::line_reader::LineReader;
 use crate::marking::Marking;
-use crate::math::fraction::Fraction;
 
 use super::labelled_petri_net::LabelledPetriNet;
 

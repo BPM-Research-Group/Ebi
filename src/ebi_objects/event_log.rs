@@ -1,7 +1,10 @@
 use anyhow::{Error, Result, anyhow};
 use core::fmt;
 use ebi_derive::ActivityKey;
-use process_mining::{XESImportOptions, event_log::event_log_struct::EventLogClassifier};
+use process_mining::{
+    XESImportOptions,
+    event_log::{Trace, event_log_struct::EventLogClassifier},
+};
 use std::{
     collections::HashMap,
     io::{self, BufRead, Write},
@@ -14,18 +17,28 @@ use crate::{
             Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
         },
         ebi_file_handler::EbiFileHandler,
-        ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
+        ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
         ebi_output::{EbiObjectExporter, EbiOutput},
+        ebi_trait::FromEbiTraitObject,
         exportable::Exportable,
         importable::Importable,
         infoable::Infoable,
         prom_link::JavaObjectHandler,
     },
     ebi_traits::{
-        ebi_trait_activities, ebi_trait_event_log::{EbiTraitEventLog, IndexTrace}, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{
+        ebi_trait_activities,
+        ebi_trait_event_log::{EbiTraitEventLog, IndexTrace},
+        ebi_trait_finite_language::EbiTraitFiniteLanguage,
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_trait_iterable_language::EbiTraitIterableLanguage,
+        ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage,
+        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        ebi_trait_stochastic_deterministic_semantics::{
             EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
-        }, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}
+        },
+        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
     math::data_type::DataType,
 };
@@ -86,10 +99,10 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
 
 #[derive(ActivityKey, Clone)]
 pub struct EventLog {
-    pub(crate) classifier: EventLogClassifier,
+    classifier: EventLogClassifier,
     pub(crate) activity_key: ActivityKey,
     pub(crate) traces: Vec<Vec<Activity>>,
-    rust4pm_log: process_mining::EventLog, //field is not updated with other measures -> private
+    rust4pm_log: process_mining::EventLog,
 }
 
 impl EventLog {
@@ -183,6 +196,33 @@ impl EventLog {
             log
         )))
     }
+
+    pub fn retain_traces_mut<F>(&mut self, f: &mut F)
+    where
+        F: FnMut((&Vec<Activity>, &Trace)) -> bool,
+    {
+        //get our hands free to change the traces without cloning
+        let mut traces = vec![];
+        let mut rust4pm_traces = vec![];
+        std::mem::swap(&mut self.traces, &mut traces);
+        std::mem::swap(&mut self.rust4pm_log.traces, &mut rust4pm_traces);
+
+        (traces, rust4pm_traces) = traces
+            .into_iter()
+            .zip(rust4pm_traces.into_iter())
+            .filter_map(|(mut trace, mut rust4pm_trace)| {
+                if f((&mut trace, &mut rust4pm_trace)) {
+                    Some((trace, rust4pm_trace))
+                } else {
+                    None
+                }
+            })
+            .unzip();
+
+        //swap the the traces back
+        std::mem::swap(&mut self.traces, &mut traces);
+        std::mem::swap(&mut self.rust4pm_log.traces, &mut rust4pm_traces);
+    }
 }
 
 impl TranslateActivityKey for EventLog {
@@ -242,6 +282,19 @@ impl FromStr for EventLog {
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         let mut reader = io::Cursor::new(s);
         Self::import(&mut reader)
+    }
+}
+
+impl FromEbiTraitObject for EventLog {
+    fn from_trait_object(object: ebi_input::EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::EventLog(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "cannot read {} {} as an event log",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
     }
 }
 
@@ -396,5 +449,19 @@ mod tests {
         log.retain_traces(Box::new(|_| false));
 
         assert_eq!(log.len(), 0);
+    }
+
+    #[test]
+    fn len_retain_mut() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let mut log = fin.parse::<EventLog>().unwrap();
+
+        assert_eq!(log.len(), 2);
+        assert_eq!(log.rust4pm_log.traces.len(), 2);
+
+        log.retain_traces_mut(&mut |_| false);
+
+        assert_eq!(log.len(), 0);
+        assert_eq!(log.rust4pm_log.traces.len(), 0);
     }
 }

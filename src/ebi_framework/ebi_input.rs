@@ -1,5 +1,6 @@
 use anyhow::{Context, Result, anyhow};
 use clap::{ArgMatches, builder::ValueParser, value_parser};
+use ebi_arithmetic::{fraction::Fraction, parsing::FractionNotParsedYet};
 use std::{
     collections::{BTreeSet, HashSet},
     fmt::Display,
@@ -24,7 +25,7 @@ use crate::{
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
     ebi_validate,
-    math::fraction::{ConstFraction, Fraction, FractionNotParsedYet},
+    math::constant_fraction::ConstFraction,
     multiple_reader::MultipleReader,
     text::Joiner,
 };
@@ -717,6 +718,7 @@ mod tests {
         path::PathBuf,
     };
 
+    use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
     use strum::IntoEnumIterator;
 
     use crate::{
@@ -725,7 +727,6 @@ mod tests {
             ebi_input::{EbiInput, TEST_INPUT_TYPE_FRACTION, TEST_INPUT_TYPE_USIZE},
         },
         ebi_objects::compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
-        math::{fraction::Fraction, traits::Zero},
         multiple_reader::MultipleReader,
     };
 

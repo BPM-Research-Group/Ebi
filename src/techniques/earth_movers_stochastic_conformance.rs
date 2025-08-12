@@ -1,10 +1,9 @@
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::{
-        distances::WeightedDistances, distances_matrix::WeightedDistanceMatrix, fraction::Fraction,
-    },
+    math::{distances::WeightedDistances, distances_matrix::WeightedDistanceMatrix},
 };
 use anyhow::Result;
+use ebi_arithmetic::fraction::Fraction;
 
 pub trait EarthMoversStochasticConformance {
     fn earth_movers_stochastic_conformance(

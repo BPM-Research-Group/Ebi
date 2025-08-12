@@ -1,14 +1,12 @@
+use ebi_arithmetic::{fraction::Fraction, ebi_number::{One, Signed}};
+
 use crate::{
     ebi_framework::activity_key::{ActivityKeyTranslator, HasActivityKey},
     ebi_objects::{
         directly_follows_graph::DirectlyFollowsGraph, labelled_petri_net::LabelledPetriNet, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet
     },
     ebi_traits::ebi_trait_semantics::Semantics,
-    marking::Marking,
-    math::{
-        fraction::Fraction,
-        traits::{One, Signed},
-    },
+    marking::Marking
 };
 
 impl From<StochasticDeterministicFiniteAutomaton> for StochasticLabelledPetriNet {

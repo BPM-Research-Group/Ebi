@@ -1,7 +1,8 @@
+use ebi_arithmetic::ebi_number::Signed;
+
 use crate::{
     ebi_framework::activity_key::Activity,
     ebi_traits::{ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::TransitionIndex},
-    math::traits::Signed,
 };
 
 use super::directly_follows_graph::DirectlyFollowsGraph;

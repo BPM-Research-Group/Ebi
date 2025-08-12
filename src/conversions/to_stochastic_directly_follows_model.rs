@@ -1,13 +1,11 @@
+use ebi_arithmetic::{f, fraction::Fraction, ebi_number::{Signed, Zero}};
+
 use crate::{
     ebi_framework::activity_key::HasActivityKey,
     ebi_objects::{
         directly_follows_graph::DirectlyFollowsGraph,
         stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
-    },
-    math::{
-        fraction::Fraction,
-        traits::{Signed, Zero},
-    },
+    }
 };
 
 impl From<DirectlyFollowsGraph> for StochasticDirectlyFollowsModel {
@@ -24,7 +22,7 @@ impl From<DirectlyFollowsGraph> for StochasticDirectlyFollowsModel {
             end_activities,
         } = value;
 
-        let zero = Fraction::zero();
+        let zero = f!(0);
         let mut node_2_activity =
             vec![activity_key.get_activities()[0].clone(); activity_key.get_number_of_activities()];
         let mut start_node_weights = vec![Fraction::zero(); node_2_activity.len()];

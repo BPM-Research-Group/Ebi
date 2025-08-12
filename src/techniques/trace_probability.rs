@@ -1,4 +1,8 @@
 use anyhow::{Context, Result};
+use ebi_arithmetic::{
+    ebi_number::{One, Zero},
+    fraction::Fraction,
+};
 use std::{
     collections::{HashMap, HashSet},
     fmt::{self, Display},
@@ -11,18 +15,16 @@ use crate::{
     ebi_objects::{
         labelled_petri_net::LPNMarking,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree, stochastic_process_tree_semantics::NodeStates,
+        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        stochastic_process_tree::StochasticProcessTree,
+        stochastic_process_tree_semantics::NodeStates,
     },
     ebi_traits::{
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
         ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::StochasticSemantics,
     },
     follower_semantics::FollowerSemantics,
-    math::{
-        fraction::Fraction,
-        matrix::Matrix,
-        traits::{One, Zero},
-    },
+    math::matrix::Matrix,
 };
 
 //generic implementation
@@ -469,15 +471,17 @@ struct Y {
 mod tests {
     use std::fs;
 
+    use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
+
     use crate::{
         ebi_framework::activity_key::HasActivityKey,
         ebi_objects::{
             stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-            stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree,
+            stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+            stochastic_process_tree::StochasticProcessTree,
         },
         ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
         follower_semantics::FollowerSemantics,
-        math::{fraction::Fraction, traits::Zero},
     };
 
     #[test]
@@ -701,6 +705,5 @@ mod tests {
         let trace_follower = FollowerSemantics::Trace(&trace);
         let probability = tree.get_probability(&trace_follower).unwrap();
         assert_eq!(probability, Fraction::from((2, 3)));
-        
     }
 }

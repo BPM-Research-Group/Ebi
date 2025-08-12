@@ -1,5 +1,10 @@
 use std::collections::HashMap;
 
+use ebi_arithmetic::{
+    ebi_number::{One, Zero},
+    fraction::Fraction,
+};
+
 use crate::{
     ebi_framework::activity_key::{ActivityKeyTranslator, HasActivityKey},
     ebi_objects::{
@@ -11,10 +16,6 @@ use crate::{
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_semantics::Semantics,
-    },
-    math::{
-        fraction::Fraction,
-        traits::{One, Zero},
     },
 };
 
@@ -122,12 +123,10 @@ impl OccurrencesStochasticMinerTree for ProcessTree {
 mod tests {
     use std::fs;
 
-    use crate::{
-        ebi_objects::{
-            finite_stochastic_language::FiniteStochasticLanguage,
-            labelled_petri_net::LabelledPetriNet,
-        },
-        math,
+    use ebi_arithmetic::exact::is_exact_globally;
+
+    use crate::ebi_objects::{
+        finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet,
     };
 
     use super::OccurrencesStochasticMinerLPN;
@@ -139,7 +138,7 @@ mod tests {
         let fin2 = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin2.parse::<FiniteStochasticLanguage>().unwrap();
         let slpn = lpn.mine_occurrences_stochastic_lpn(Box::new(slang));
-        if math::fraction::is_exaxt_globally() {
+        if is_exact_globally() {
             //with approximate arithmetic, this test is too fragile
             let fout = fs::read_to_string("testfiles/aa-ab-ba_occ.slpn").unwrap();
             assert_eq!(fout, slpn.to_string())

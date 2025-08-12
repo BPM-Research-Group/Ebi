@@ -1,4 +1,5 @@
 use anyhow::Context;
+use ebi_arithmetic::fraction::Fraction;
 use std::io::Write;
 
 use crate::{
@@ -14,7 +15,7 @@ use crate::{
         ebi_trait_event_log::EbiTraitEventLog,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
-    math::fraction::{ConstFraction, Fraction},
+    math::constant_fraction::ConstFraction,
     techniques::{
         bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
         permutation_test::PermutationTest,
@@ -127,7 +128,7 @@ pub const EBI_BOOTSTRAP_TEST: EbiCommand = EbiCommand::Command {
     input_names: &["LANG_1", "LANG_2", "SAMPLES", "P-VALUE"],
     input_helps: &[
         "The first event log for which the test is to be performed.",
-        "The first event log for which the test is to be performed.",
+        "The second event log for which the test is to be performed.",
         "The number of samples taken.",
         "The threshold p-value",
     ],

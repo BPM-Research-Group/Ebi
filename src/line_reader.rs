@@ -1,7 +1,6 @@
 use std::io::BufRead;
 use anyhow::{anyhow, Result, Context};
-
-use crate::math::fraction::Fraction;
+use ebi_arithmetic::fraction::Fraction;
 
 pub struct LineReader<'a> {
     reader: &'a mut dyn BufRead,

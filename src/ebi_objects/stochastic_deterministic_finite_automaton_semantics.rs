@@ -1,4 +1,8 @@
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::{
+    ebi_number::{One, Zero},
+    fraction::Fraction,
+};
 
 use crate::{
     ebi_framework::activity_key::{Activity, HasActivityKey},
@@ -6,10 +10,6 @@ use crate::{
         ebi_trait_semantics::Semantics,
         ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
         ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex},
-    },
-    math::{
-        fraction::Fraction,
-        traits::{One, Zero},
     },
     techniques::non_decreasing_livelock::NonDecreasingLivelock,
 };
@@ -194,7 +194,10 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
 mod tests {
     use std::fs;
 
-    use crate::{ebi_objects::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, ebi_traits::ebi_trait_semantics::Semantics};
+    use crate::{
+        ebi_objects::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+        ebi_traits::ebi_trait_semantics::Semantics,
+    };
 
     #[test]
     fn sdfa_zero_edge() {

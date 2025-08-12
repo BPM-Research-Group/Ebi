@@ -7,8 +7,8 @@ use crate::{
         ebi_trait::EbiTrait,
     },
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_semantics::EbiTraitSemantics,
+        ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics,
     },
     techniques::{
         any_traces::AnyTraces, bounded::Bounded, executions::FindExecutions,
@@ -16,6 +16,7 @@ use crate::{
     },
 };
 use anyhow::anyhow;
+use std::io::Write;
 
 pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     name_short: "anans",
@@ -23,6 +24,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     explanation_short: "Analyse a language without considering its stochastic perspective.",
     explanation_long: None,
     children: &[
+        &EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES,
         &EBI_ANALYSE_NON_STOCHASTIC_BOUNDED,
         &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
         &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
@@ -30,6 +32,28 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
         &EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES,
         &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
     ],
+};
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES: EbiCommand = EbiCommand::Command {
+    name_short: "act",
+    name_long: Some("activities"),
+    explanation_short: "Shows the activities that are declared in the object.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[&EbiInputType::Trait(EbiTrait::Activities)]],
+    input_names: &["FILE"],
+    input_helps: &["Any object with activities"],
+    execute: |mut objects, _| {
+        let activities = objects.remove(0).to_type::<dyn EbiTraitActivities>()?;
+        let mut f = vec![];
+        for label in &activities.get_activity_key().activity2name {
+            writeln!(f, "{}", label)?;
+        }
+        Ok(EbiOutput::String(String::from_utf8(f)?))
+    },
+    output_type: &EbiOutputType::String,
 };
 
 pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {

@@ -1,9 +1,11 @@
 use crate::math::distances::WeightedDistances;
-use crate::math::fraction::MaybeExact;
-use crate::math::fraction_enum::FractionEnum;
-use crate::math::traits::One;
-use crate::optimisation_algorithms::network_simplex::NetworkSimplex;
+use ebi_optimisation::network_simplex::NetworkSimplex;
 use anyhow::{Context, Result};
+use ebi_arithmetic::{
+    ebi_number::One,
+    exact::{MaybeExact, is_exact_globally},
+    fraction_enum::FractionEnum,
+};
 use fraction::{BigInt, ToPrimitive};
 use num_bigint::ToBigInt;
 use rayon::prelude::*;
@@ -38,7 +40,7 @@ impl dyn WeightedDistances {
     ///     b. Run the `NetworkSimplex` algorithm to find the optimal flow between the supply and demand nodes.<br>
     ///     c. Calculate the EMSC value as `1 - result`.
     pub fn earth_movers_stochastic_conformance(&self) -> Result<FractionEnum> {
-        if crate::math::fraction::is_exaxt_globally() {
+        if is_exact_globally() {
             //exact mode
             // 2. Is exact arithmetic required?
             log::info!("Calculating exact EMSC value");
@@ -354,13 +356,14 @@ impl dyn WeightedDistances {
 
 #[cfg(test)]
 mod tests {
+    use ebi_arithmetic::{
+        ebi_number::{One, Zero},
+        fraction::Fraction,
+    };
+
     use crate::{
         ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        math::{
-            fraction::Fraction,
-            traits::{One, Zero},
-        },
         techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
     };
     use std::fs;
