@@ -21,45 +21,42 @@ fn is_diverging_gateway(node: &BPMNGateway) -> bool {
     node.direction == GatewayDirection::Diverging
 }
 
-fn get_gateway_by_id<'a>(gateways: &'a [BPMNGateway], id: &str) -> Option<&'a BPMNGateway> {
-    gateways.iter().find(|g| g.id == id)
-}
-
 /// Detects pairs of node IDs that are concurrent in the BPMN model.
 pub fn detect_concurrent_pairs(_log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &BusinessProcessModelAndNotation) -> HashSet<(String, String)> {
-    let mut id_to_node: HashMap<String, &BPMNNode> = HashMap::new();
     let mut source_to_targets: HashMap<String, Vec<String>> = HashMap::new();
-    for node in &bpmn.nodes {
-        id_to_node.insert(node.id.clone(), node);
-    }
     for flow in &bpmn.sequence_flows {
         source_to_targets.entry(flow.source_id.clone()).or_default().push(flow.target_id.clone());
     }
+    
+    // Create sets to identify different node types
+    let mut activity_nodes = HashSet::new();
+    for node in &bpmn.nodes {
+        activity_nodes.insert(node.id.clone());
+    }
+    
+    let mut gateway_nodes = HashSet::new();
+    for gateway in bpmn.and_gateways.iter().chain(bpmn.or_gateways.iter()).chain(bpmn.xor_gateways.iter()) {
+        gateway_nodes.insert(gateway.id.clone());
+    }
+    
     let mut concurrent_pairs = HashSet::new();
+    
     for gateway in bpmn.and_gateways.iter().chain(bpmn.or_gateways.iter()) {
         if is_diverging_gateway(gateway) && gateway.outgoing.len() > 1 {
+            // Collect all reachable nodes for each branch
             let mut branches: Vec<HashSet<String>> = Vec::with_capacity(gateway.outgoing.len());
+            
             for out_flow in &gateway.outgoing {
                 let mut visited = HashSet::new();
                 let mut queue = VecDeque::new();
                 queue.push_back(out_flow.target_id.clone());
+                
                 while let Some(current_id) = queue.pop_front() {
                     if !visited.insert(current_id.clone()) {
                         continue;
                     }
-                    // Stop BFS at join (parallel or inclusive) gateway
-                    if let Some(_current_node) = id_to_node.get(&current_id) {
-                        if let Some(join_gateway) = get_gateway_by_id(&bpmn.and_gateways, &current_id) {
-                            if !is_diverging_gateway(join_gateway) && join_gateway.incoming.len() > 1 {
-                                continue;
-                            }
-                        }
-                        if let Some(join_gateway) = get_gateway_by_id(&bpmn.or_gateways, &current_id) {
-                            if !is_diverging_gateway(join_gateway) && join_gateway.incoming.len() > 1 {
-                                continue;
-                            }
-                        }
-                    }
+                    
+                    // Continue traversal to all reachable nodes
                     if let Some(next_targets) = source_to_targets.get(&current_id) {
                         for next_id in next_targets {
                             queue.push_back(next_id.clone());
@@ -68,13 +65,38 @@ pub fn detect_concurrent_pairs(_log: &dyn EbiTraitFiniteStochasticLanguage, bpmn
                 }
                 branches.push(visited);
             }
-            //Collect unicque pairs between branches
+            
+            // For each pair of branches, find concurrent activities
             for (i, branch_i) in branches.iter().enumerate() {
                 for branch_j in branches.iter().skip(i + 1) {
-                    for a in branch_i {
-                        for b in branch_j {
-                            if a != b {
-                                concurrent_pairs.insert((a.clone(), b.clone()));
+                    // Find the merge points between these two branches
+                    let branch_merge_points: HashSet<String> = branch_i.intersection(branch_j).cloned().collect();
+                    
+                    // Filter to only include activities (not gateways) and exclude merge points
+                    let concurrent_activities_i: HashSet<String> = branch_i
+                        .iter()
+                        .filter(|node_id| activity_nodes.contains(*node_id))
+                        .filter(|node_id| !branch_merge_points.contains(*node_id))
+                        .cloned()
+                        .collect();
+                    
+                    let concurrent_activities_j: HashSet<String> = branch_j
+                        .iter()
+                        .filter(|node_id| activity_nodes.contains(*node_id))
+                        .filter(|node_id| !branch_merge_points.contains(*node_id))
+                        .cloned()
+                        .collect();
+                    
+                    // Convert node IDs to activity names and add concurrent pairs
+                    for node_id_a in &concurrent_activities_i {
+                        for node_id_b in &concurrent_activities_j {
+                            if node_id_a != node_id_b {
+                                // Convert node IDs to activity names
+                                if let Some(activity_name_a) = bpmn.label.get(node_id_a) {
+                                    if let Some(activity_name_b) = bpmn.label.get(node_id_b) {
+                                        concurrent_pairs.insert((activity_name_a.clone(), activity_name_b.clone()));
+                                    }
+                                }
                             }
                         }
                     }
@@ -127,7 +149,9 @@ pub fn frequency_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Bu
 /// Estimates left-hand pair frequencies, excluding concurrent pairs, for a BPMN model using fractions.
 pub fn lhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &BusinessProcessModelAndNotation) -> HashMap<String, Fraction> {
     let mut counts: HashMap<String, Fraction> = HashMap::new();
-    let concurrent = detect_concurrent_pairs(log, bpmn);
+    let concurrent: HashSet<(String, String)> = detect_concurrent_pairs(log, bpmn);
+    println!("Concurrent {:#?}", concurrent);
+    let activity_key = log.get_activity_key();
     
     for (trace, probability) in log.iter_trace_probability() {
         if probability.is_exact() {
@@ -144,20 +168,20 @@ pub fn lhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Busin
                 
                 // Count first activity
                 if let Some(first) = trace.first() {
-                    let first_str = first.to_string();
-                    let current_count = counts.get(&first_str).cloned().unwrap_or_else(|| Fraction::from((0, 1)));
+                    let first_str = activity_key.get_activity_label(first).to_string();
+                    let current_count = counts.get(&first_str).cloned().unwrap_or_else(|| Fraction::from(0));
                     counts.insert(first_str, &current_count + &fraction_to_add);
                 }
                 
                 // Count left-hand pairs
                 for window in trace.windows(2) {
-                    let current_str = &window[0].to_string();
-                    let next_str = &window[1].to_string();
+                    let current_str = activity_key.get_activity_label(&window[0]).to_string();
+                    let next_str = activity_key.get_activity_label(&window[1]).to_string();
                     // Skip if the model indicates they can be concurrent or are the same
                     if concurrent.contains(&(current_str.clone(), next_str.clone())) || next_str == current_str || concurrent.contains(&(next_str.clone(), current_str.clone())) {
                         continue;
                     }
-                    let current_count = counts.get(next_str).cloned().unwrap_or_else(|| Fraction::from((0, 1)));
+                    let current_count = counts.get(&next_str).cloned().unwrap_or_else(|| Fraction::from(0));
                     counts.insert(next_str.clone(), &current_count + &fraction_to_add);
                 }
             }
@@ -176,6 +200,7 @@ pub fn lhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Busin
             result.insert(activity_name, frequency);
         }
     }
+    println!("Result {:#?}", result);
     result
 }
 
@@ -183,6 +208,7 @@ pub fn lhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Busin
 pub fn rhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &BusinessProcessModelAndNotation) -> HashMap<String, Fraction> {
     let mut counts: HashMap<String, Fraction> = HashMap::new();
     let concurrent = detect_concurrent_pairs(log, bpmn);
+    let activity_key = log.get_activity_key();
     
     for (trace, probability) in log.iter_trace_probability() {
         if probability.is_exact() {
@@ -202,19 +228,19 @@ pub fn rhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Busin
                 }
 
                 // Count last activity
-                let last_str = trace[len - 1].to_string();
-                let current_count = counts.get(&last_str).cloned().unwrap_or_else(|| Fraction::from((0, 1)));
+                let last_str = activity_key.get_activity_label(&trace[len - 1]).to_string();
+                let current_count = counts.get(&last_str).cloned().unwrap_or_else(|| Fraction::from(0));
                 counts.insert(last_str, &current_count + &fraction_to_add);
                 
                 // Count right-hand pairs
                 for window in trace.windows(2) {
-                    let current_str = &window[0].to_string();
-                    let next_str = &window[1].to_string();
+                    let current_str = activity_key.get_activity_label(&window[0]).to_string();
+                    let next_str = activity_key.get_activity_label(&window[1]).to_string();
                     // Skip if the model indicates they can be concurrent or are the same
                     if concurrent.contains(&(current_str.clone(), next_str.clone())) || next_str == current_str {
                         continue;
                     }
-                    let current_count = counts.get(current_str).cloned().unwrap_or_else(|| Fraction::from((0, 1)));
+                    let current_count = counts.get(&current_str).cloned().unwrap_or_else(|| Fraction::from(0));
                     counts.insert(current_str.clone(), &current_count + &fraction_to_add);
                 }
             }
@@ -584,6 +610,8 @@ mod tests {
     use crate::ebi_objects::event_log::EventLog;
     use crate::ebi_objects::finite_stochastic_language::FiniteStochasticLanguage;
     use crate::ebi_framework::importable::Importable;
+    use std::time::Instant;
+
 
     #[test]
     fn test_basic_compilation() {
@@ -625,12 +653,13 @@ mod tests {
         use crate::ebi_traits::ebi_trait_event_log::IndexTrace;
         
         // File paths
-        let bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\test_models\traffic_fine.bpmn";
-        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\Eventlogs\Road_Traffic_Fine_Management_Process.xes";
+        let  bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\test_models\runningExample.bpmn";
+        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\eventlogs\runningExample.xes";
         
         
         println!("=== Loading files for weight propagation test ===");
         
+        let mut start = Instant::now();
         // Load XES eventlog, transform to FIniteStochasticLanguage
         println!("Loading event log from: {}", log_file);
         let log_result = File::open(log_file)
@@ -658,6 +687,7 @@ mod tests {
                 return;
             }
         };
+
 
         // Load BPMN model using the Importable trait
         println!("Loading BPMN model from: {}", bpmn_file);
@@ -689,13 +719,14 @@ mod tests {
                 return;
             }
         };
-        
+        let duration = start.elapsed();
+        println!("Time conversion: {:?}", duration);
+
+        start = Instant::now();
         // Estimate frequencies from the event log
-        println!("\n=== Analyzing event log ===");
-        let frequencies = frequency_estimator(&event_log as &dyn EbiTraitFiniteStochasticLanguage, &bpmn_model);
-        
-        println!("Activity frequencies:");
-        for (node_id, fraction) in &frequencies {
+        let frequencies = lhpair_estimator(&event_log as &dyn EbiTraitFiniteStochasticLanguage, &bpmn_model);
+
+        /*for (node_id, fraction) in &frequencies {
             // Try to get the activity name from the label mapping
             let activity_name = bpmn_model.label.get(node_id).unwrap_or(node_id);
             if let Ok(exact_fraction) = fraction.extract_exact() {
@@ -713,15 +744,16 @@ mod tests {
             } else {
                 println!("   {} ({}): {}", activity_name, node_id, fraction);
             }
-        }
+        }*/
         
         // Use frequencies directly as weights (already mapped to node IDs)
         let weights: HashMap<String, Fraction> = frequencies;
         
         // Apply weight propagation
-        println!("\n===micro_lpng weight propagation with good_lp ===");
         let result: Result<StochasticBusinessProcessModelAndNotation, anyhow::Error> = weight_propagtion_micro_lp(&bpmn_model, &weights);
-        
+        let duration = start.elapsed();
+        println!("Estimator + Propagation time: {:?}", duration);
+
         match result {
             Ok(stochastic_bpmn) => {
                 println!("Weight propagation completed successfully!");
@@ -787,5 +819,135 @@ mod tests {
                 panic!("Weight propagation failed: {:?}", e);
             }
         }
+    }
+    
+    #[test]
+    #[ignore]
+    fn evaluation() {        
+        // File paths
+        let  bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\evaluation\hospital.bpmn";
+        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\evaluation\hospital.xes";
+        
+        let mut start = Instant::now();
+        // Load XES eventlog, transform to FIniteStochasticLanguage
+        let log_result = File::open(log_file)
+            .map_err(|e| anyhow::anyhow!("Failed to open log file: {}", e))
+            .and_then(|file| {
+                let mut reader = BufReader::new(file);
+                // Step 1: Import as EventLog (handles XES format)
+                EventLog::import(&mut reader)
+                    .map_err(|e| anyhow::anyhow!("Failed to parse XES: {}", e))
+            })
+            .map(|event_log| {
+                // Step 2: Convert EventLog to FiniteStochasticLanguage
+                FiniteStochasticLanguage::from(event_log)
+            });
+        
+        let event_log = match log_result {
+            Ok(log) => {
+                log
+            }
+            Err(e) => {
+                return;
+            }
+        };
+
+
+        // Load BPMN model using the Importable trait
+        let bpmn_result = File::open(bpmn_file)
+            .map_err(|e| anyhow::anyhow!("Failed to open BPMN file: {}", e))
+            .and_then(|file| {
+                let mut reader = BufReader::new(file);
+                BusinessProcessModelAndNotation::import(&mut reader)
+            });
+        
+        let bpmn_model = match bpmn_result {
+            Ok(model) => {
+                model
+            }
+            Err(e) => {
+                return;
+            }
+        };
+        let duration = start.elapsed();
+        println!("Time conversion: {:?}", duration);
+
+        start = Instant::now();
+        // Estimate frequencies from the event log
+        let frequencies = frequency_estimator(&event_log as &dyn EbiTraitFiniteStochasticLanguage, &bpmn_model);
+
+        // Use frequencies directly as weights (already mapped to node IDs)
+        let weights: HashMap<String, Fraction> = frequencies;
+        
+        // Apply weight propagation
+        let result: Result<StochasticBusinessProcessModelAndNotation, anyhow::Error> = weight_propagtion_micro_lp(&bpmn_model, &weights);
+        let duration = start.elapsed();
+        println!("Estimator + Propagation time: {:?}", duration);
+
+        /*match result {
+            Ok(stochastic_bpmn) => {
+                println!("Weight propagation completed successfully!");
+                println!("SBPMN: {}", stochastic_bpmn);
+                println!("\n--- Results ---");
+                println!("Stochastic BPMN model created with:");
+                println!("  - {} tasks", stochastic_bpmn.tasks.len());
+                println!("  - {} sequence flows", stochastic_bpmn.sequence_flows.len());
+                println!("  - {} AND gateways", stochastic_bpmn.and_gateways.len());
+                println!("  - {} XOR gateways", stochastic_bpmn.xor_gateways.len());
+                println!("  - {} OR gateways", stochastic_bpmn.or_gateways.len());
+                
+                // Create a mapping from node ID to node name for better display
+                let mut id_to_name: HashMap<String, String> = HashMap::new();
+                for (node_id, label) in &bpmn_model.label {
+                    id_to_name.insert(node_id.clone(), label.clone());
+                }
+                
+                // Add gateway type mappings
+                for gw in &bpmn_model.and_gateways {
+                    id_to_name.insert(gw.id.clone(), "and_gateway".to_string());
+                }
+                for gw in &bpmn_model.xor_gateways {
+                    id_to_name.insert(gw.id.clone(), "xor_gateway".to_string());
+                }
+                for gw in &bpmn_model.or_gateways {
+                    id_to_name.insert(gw.id.clone(), "or_gateway".to_string());
+                }
+                
+                println!("\n--- Stochastic BPMN Model (with readable names) ---");
+                println!("Tasks:");
+                for task in &stochastic_bpmn.tasks {
+                    let name = id_to_name.get(&task.id).unwrap_or(&task.id);
+                    println!("  - {}: weight {:.2}", name, task.weight);
+                }
+                
+                println!("\nSequence Flows:");
+                for flow in &stochastic_bpmn.sequence_flows {
+                    let source_name = id_to_name.get(&flow.source_id).unwrap_or(&flow.source_id);
+                    let target_name = id_to_name.get(&flow.target_id).unwrap_or(&flow.target_id);
+                    println!("  - {} --> {}: weight {:.2}", source_name, target_name, flow.weight);
+                }
+                
+                println!("\nGateways:");
+                for gw_id in &stochastic_bpmn.and_gateways {
+                    println!("  - and_gateway ({})", gw_id);
+                }
+                for gw_id in &stochastic_bpmn.xor_gateways {
+                    println!("  - xor_gateway ({})", gw_id);
+                }
+                for gw_id in &stochastic_bpmn.or_gateways {
+                    println!("  - or_gateway ({})", gw_id);
+                }
+                
+                println!("\n Test completed successfully!");
+                println!("Note: The model includes {} gateways total", 
+                    stochastic_bpmn.and_gateways.len() + 
+                    stochastic_bpmn.xor_gateways.len() + 
+                    stochastic_bpmn.or_gateways.len());
+            }
+            Err(e) => {
+                println!("Weight propagation failed: {:?}", e);
+                panic!("Weight propagation failed: {:?}", e);
+            }
+        }*/
     }
 }
