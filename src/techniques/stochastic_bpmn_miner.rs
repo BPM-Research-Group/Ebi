@@ -21,90 +21,110 @@ fn is_diverging_gateway(node: &BPMNGateway) -> bool {
     node.direction == GatewayDirection::Diverging
 }
 
-/// Detects pairs of node IDs that are concurrent in the BPMN model.
+/// Detects pairs of activity names that are concurrent in the BPMN model.
+/// For each diverging AND/OR gateway, find the nearest converging join of the same type
+/// that is reachable from all branches, then take activities up to (but not beyond) the join
+/// as concurrent across branches. Returns pairs of activity names to match estimators.
 pub fn detect_concurrent_pairs(_log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &BusinessProcessModelAndNotation) -> HashSet<(String, String)> {
-    let mut source_to_targets: HashMap<String, Vec<String>> = HashMap::new();
-    for flow in &bpmn.sequence_flows {
-        source_to_targets.entry(flow.source_id.clone()).or_default().push(flow.target_id.clone());
-    }
-    
-    // Create sets to identify different node types
-    let mut activity_nodes = HashSet::new();
-    for node in &bpmn.nodes {
-        activity_nodes.insert(node.id.clone());
-    }
-    
-    let mut gateway_nodes = HashSet::new();
-    for gateway in bpmn.and_gateways.iter().chain(bpmn.or_gateways.iter()).chain(bpmn.xor_gateways.iter()) {
-        gateway_nodes.insert(gateway.id.clone());
-    }
-    
-    let mut concurrent_pairs = HashSet::new();
-    
-    for gateway in bpmn.and_gateways.iter().chain(bpmn.or_gateways.iter()) {
-        if is_diverging_gateway(gateway) && gateway.outgoing.len() > 1 {
-            // Collect all reachable nodes for each branch
-            let mut branches: Vec<HashSet<String>> = Vec::with_capacity(gateway.outgoing.len());
-            
-            for out_flow in &gateway.outgoing {
-                let mut visited = HashSet::new();
-                let mut queue = VecDeque::new();
-                queue.push_back(out_flow.target_id.clone());
-                
-                while let Some(current_id) = queue.pop_front() {
-                    if !visited.insert(current_id.clone()) {
-                        continue;
-                    }
-                    
-                    // Continue traversal to all reachable nodes
-                    if let Some(next_targets) = source_to_targets.get(&current_id) {
-                        for next_id in next_targets {
-                            queue.push_back(next_id.clone());
-                        }
-                    }
+    // Adjacency
+    let mut succ: HashMap<String, Vec<String>> = HashMap::new();
+    for f in &bpmn.sequence_flows { succ.entry(f.source_id.clone()).or_default().push(f.target_id.clone()); }
+
+    // Sets and counts
+    let activity_ids: HashSet<String> = bpmn.nodes.iter().map(|n| n.id.clone()).collect();
+    let and_ids: HashSet<String> = bpmn.and_gateways.iter().map(|g| g.id.clone()).collect();
+    let or_ids: HashSet<String> = bpmn.or_gateways.iter().map(|g| g.id.clone()).collect();
+    let mut in_deg: HashMap<String, usize> = HashMap::new();
+    for f in &bpmn.sequence_flows { *in_deg.entry(f.target_id.clone()).or_default() += 1; in_deg.entry(f.source_id.clone()).or_default(); }
+
+    // BFS that halts expansion at stop nodes (but includes them in visited)
+    let mut bfs_until = |start: &str, stop: &HashSet<String>| -> (HashSet<String>, HashMap<String, usize>) {
+        let mut vis = HashSet::new();
+        let mut dist: HashMap<String, usize> = HashMap::new();
+        let mut q = VecDeque::new();
+        q.push_back(start.to_string());
+        dist.insert(start.to_string(), 0);
+        while let Some(u) = q.pop_front() {
+            if !vis.insert(u.clone()) { continue; }
+            if stop.contains(&u) { continue; }
+            if let Some(ns) = succ.get(&u) {
+                let du = dist.get(&u).cloned().unwrap_or(0) + 1;
+                for v in ns {
+                    if !dist.contains_key(v) { dist.insert(v.clone(), du); }
+                    if !vis.contains(v) { q.push_back(v.clone()); }
                 }
-                branches.push(visited);
             }
-            
-            // For each pair of branches, find concurrent activities
-            for (i, branch_i) in branches.iter().enumerate() {
-                for branch_j in branches.iter().skip(i + 1) {
-                    // Find the merge points between these two branches
-                    let branch_merge_points: HashSet<String> = branch_i.intersection(branch_j).cloned().collect();
-                    
-                    // Filter to only include activities (not gateways) and exclude merge points
-                    let concurrent_activities_i: HashSet<String> = branch_i
-                        .iter()
-                        .filter(|node_id| activity_nodes.contains(*node_id))
-                        .filter(|node_id| !branch_merge_points.contains(*node_id))
-                        .cloned()
-                        .collect();
-                    
-                    let concurrent_activities_j: HashSet<String> = branch_j
-                        .iter()
-                        .filter(|node_id| activity_nodes.contains(*node_id))
-                        .filter(|node_id| !branch_merge_points.contains(*node_id))
-                        .cloned()
-                        .collect();
-                    
-                    // Convert node IDs to activity names and add concurrent pairs
-                    for node_id_a in &concurrent_activities_i {
-                        for node_id_b in &concurrent_activities_j {
-                            if node_id_a != node_id_b {
-                                // Convert node IDs to activity names
-                                if let Some(activity_name_a) = bpmn.label.get(node_id_a) {
-                                    if let Some(activity_name_b) = bpmn.label.get(node_id_b) {
-                                        concurrent_pairs.insert((activity_name_a.clone(), activity_name_b.clone()));
-                                    }
-                                }
+        }
+        (vis, dist)
+    };
+
+    let mut pairs: HashSet<(String, String)> = HashSet::new();
+
+    // Helper to process a diverging gateway set (AND or OR)
+    let mut process_diverging = |gateways: &Vec<BPMNGateway>, is_and: bool| {
+        for gw in gateways {
+            if !is_diverging_gateway(gw) || gw.outgoing.len() <= 1 { continue; }
+
+            // Gather per-branch reachable nodes and distances (no stop initially)
+            let mut branch_joins: Vec<HashSet<String>> = Vec::new();
+            let mut branch_dist: Vec<HashMap<String, usize>> = Vec::new();
+            for of in &gw.outgoing {
+                let empty: HashSet<String> = HashSet::new();
+                let (vis, dist) = bfs_until(&of.target_id, &empty);
+                let joins: HashSet<String> = vis.into_iter()
+                    .filter(|nid| if is_and { and_ids.contains(nid) } else { or_ids.contains(nid) })
+                    .filter(|nid| in_deg.get(nid).cloned().unwrap_or(0) > 1)
+                    .collect();
+                branch_joins.push(joins);
+                branch_dist.push(dist);
+            }
+
+            if branch_joins.is_empty() { continue; }
+            // Common joins across all branches
+            let mut common = branch_joins[0].clone();
+            for s in &branch_joins[1..] { common = common.intersection(s).cloned().collect(); }
+            if common.is_empty() { continue; }
+
+            // Pick nearest join by minimizing max distance over branches
+            let mut best: Option<(String, usize)> = None;
+            for jid in common {
+                let mut ok = true; let mut maxd = 0usize;
+                for dist in &branch_dist {
+                    match dist.get(&jid) { Some(d) => { if *d > maxd { maxd = *d; } }, None => { ok = false; break; } }
+                }
+                if ok { match best { Some((_, cur)) if cur <= maxd => {}, _ => best = Some((jid.clone(), maxd)) } }
+            }
+            let join_id = if let Some((jid, _)) = best { jid } else { continue; };
+
+            // Collect activities up to the join for each branch
+            let stop: HashSet<String> = vec![join_id.clone()].into_iter().collect();
+            let mut branch_acts: Vec<HashSet<String>> = Vec::new();
+            for of in &gw.outgoing {
+                let (vis, _d) = bfs_until(&of.target_id, &stop);
+                branch_acts.push(vis.into_iter().filter(|nid| activity_ids.contains(nid)).collect());
+            }
+
+            // Add cross-branch activity-name pairs
+            for i in 0..branch_acts.len() {
+                for j in (i+1)..branch_acts.len() {
+                    for a in &branch_acts[i] {
+                        for b in &branch_acts[j] {
+                            if a == b { continue; }
+                            if let (Some(na), Some(nb)) = (bpmn.label.get(a), bpmn.label.get(b)) {
+                                pairs.insert((na.clone(), nb.clone()));
                             }
                         }
                     }
                 }
             }
         }
-    }
-    concurrent_pairs
+    };
+
+    process_diverging(&bpmn.and_gateways, true);
+    process_diverging(&bpmn.or_gateways, false);
+
+    println!("Concurrent pairs: {:#?}", pairs);
+    pairs
 }
 
 // Estimates the frequency of each activity in the log and maps it to node IDs using fractions.
@@ -150,7 +170,6 @@ pub fn frequency_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Bu
 pub fn lhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &BusinessProcessModelAndNotation) -> HashMap<String, Fraction> {
     let mut counts: HashMap<String, Fraction> = HashMap::new();
     let concurrent: HashSet<(String, String)> = detect_concurrent_pairs(log, bpmn);
-    println!("Concurrent {:#?}", concurrent);
     let activity_key = log.get_activity_key();
     
     for (trace, probability) in log.iter_trace_probability() {
@@ -200,7 +219,6 @@ pub fn lhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Busin
             result.insert(activity_name, frequency);
         }
     }
-    println!("Result {:#?}", result);
     result
 }
 
@@ -653,8 +671,8 @@ mod tests {
         use crate::ebi_traits::ebi_trait_event_log::IndexTrace;
         
         // File paths
-        let  bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\test_models\runningExample.bpmn";
-        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\eventlogs\runningExample.xes";
+        let  bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\evaluation\Road_Traffic_Fine_Management_Process.bpmn";
+        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\evaluation\Road_Traffic_Fine_Management_Process.xes";
         
         
         println!("=== Loading files for weight propagation test ===");
@@ -825,10 +843,9 @@ mod tests {
     #[ignore]
     fn evaluation() {        
         // File paths
-        let  bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\evaluation\hospital.bpmn";
-        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\evaluation\hospital.xes";
+        let  bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\test_models\airline.bpmn";
+        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\eventlogs\airline.xes";
         
-        let mut start = Instant::now();
         // Load XES eventlog, transform to FIniteStochasticLanguage
         let log_result = File::open(log_file)
             .map_err(|e| anyhow::anyhow!("Failed to open log file: {}", e))
@@ -869,22 +886,24 @@ mod tests {
                 return;
             }
         };
-        let duration = start.elapsed();
-        println!("Time conversion: {:?}", duration);
 
-        start = Instant::now();
+
+        let start = Instant::now();
         // Estimate frequencies from the event log
-        let frequencies = frequency_estimator(&event_log as &dyn EbiTraitFiniteStochasticLanguage, &bpmn_model);
+        let frequencies = lhpair_estimator(&event_log as &dyn EbiTraitFiniteStochasticLanguage, &bpmn_model);
+        let duration = start.elapsed();
+        println!("Estimator: {:?}", duration);
 
+        let start = Instant::now();
         // Use frequencies directly as weights (already mapped to node IDs)
         let weights: HashMap<String, Fraction> = frequencies;
         
         // Apply weight propagation
         let result: Result<StochasticBusinessProcessModelAndNotation, anyhow::Error> = weight_propagtion_micro_lp(&bpmn_model, &weights);
         let duration = start.elapsed();
-        println!("Estimator + Propagation time: {:?}", duration);
+        println!("Propagation time: {:?}", duration);
 
-        /*match result {
+        match result {
             Ok(stochastic_bpmn) => {
                 println!("Weight propagation completed successfully!");
                 println!("SBPMN: {}", stochastic_bpmn);
@@ -948,6 +967,6 @@ mod tests {
                 println!("Weight propagation failed: {:?}", e);
                 panic!("Weight propagation failed: {:?}", e);
             }
-        }*/
+        }
     }
 }
