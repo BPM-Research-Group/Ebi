@@ -5,9 +5,8 @@ use std::{
 };
 
 use anyhow::{anyhow, Result};
+use ebi_arithmetic::{ebi_number::Zero, fraction_exact::FractionExact};
 use fraction::{BigUint, GenericFraction, Integer, Ratio, Sign};
-
-use super::{fraction_exact::FractionExact, traits::Zero};
 
 #[derive(Clone)]
 pub struct FixedDenominatorFractionExact(BigUint, Arc<BigUint>);
@@ -69,7 +68,7 @@ impl FixedDenominatorFractionExact {
     }
 }
 
-impl crate::math::traits::Zero for FixedDenominatorFractionExact {
+impl Zero for FixedDenominatorFractionExact {
     fn zero() -> Self {
         let zero = num::Zero::zero();
         let one = Arc::new(num::One::one());

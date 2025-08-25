@@ -1,13 +1,11 @@
+use ebi_arithmetic::{f, fraction::Fraction, ebi_number::{Signed, Zero}};
+
 use crate::{
     ebi_framework::activity_key::HasActivityKey,
     ebi_objects::{
         directly_follows_graph::DirectlyFollowsGraph,
         stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
-    },
-    math::{
-        fraction::Fraction,
-        traits::{Signed, Zero},
-    },
+    }
 };
 
 impl From<DirectlyFollowsGraph> for StochasticDirectlyFollowsModel {
@@ -24,26 +22,19 @@ impl From<DirectlyFollowsGraph> for StochasticDirectlyFollowsModel {
             end_activities,
         } = value;
 
-        let node_2_activity = activity_key
-            .get_activities()
-            .iter()
-            .cloned()
-            .cloned()
-            .collect::<Vec<_>>();
-
+        let zero = f!(0);
+        let mut node_2_activity =
+            vec![activity_key.get_activities()[0].clone(); activity_key.get_number_of_activities()];
         let mut start_node_weights = vec![Fraction::zero(); node_2_activity.len()];
-        start_activities.into_iter().for_each(|(activity, weight)| {
-            if weight.is_positive() {
-                start_node_weights[activity_key.get_id_from_activity(activity)] = weight.into();
-            }
-        });
-
         let mut end_node_weights = vec![Fraction::zero(); node_2_activity.len()];
-        end_activities.into_iter().for_each(|(activity, weight)| {
-            if weight.is_positive() {
-                end_node_weights[activity_key.get_id_from_activity(activity)] = weight.into();
-            }
-        });
+
+        for activity in activity_key.get_activities() {
+            let node = activity_key.get_id_from_activity(activity);
+
+            node_2_activity[node] = activity.clone();
+            start_node_weights[node] = start_activities.get(activity).unwrap_or(&zero).clone();
+            end_node_weights[node] = end_activities.get(activity).unwrap_or(&zero).clone();
+        }
 
         let mut result = Self {
             activity_key: activity_key,

@@ -12,28 +12,41 @@ use crate::{
         importable::Importable,
     },
     ebi_traits::{
+        ebi_trait_activities::EbiTraitActivities,
         ebi_trait_graphable::{self, EbiTraitGraphable},
         ebi_trait_semantics::EbiTraitSemantics,
     },
 };
 
 use super::{
-    deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
+    deterministic_finite_automaton::DeterministicFiniteAutomaton,
+    directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel,
+    labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree,
+    stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+    stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
+    stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+    stochastic_process_tree::StochasticProcessTree,
 };
 
 pub const FORMAT_SPECIFICATION: &str =
     "A Petri net markup language file follows the ISO 15909-2:2011 format~\\cite{pnml}. 
 Parsing is performed by the Rust4PM crate~\\cite{DBLP:conf/bpm/KustersA24}.
-For instance:
+
+    Please note that Ebi ignores any final markings.
+    Instead, every deadlock is considered a final marking.
+
+    For instance:
     \\lstinputlisting[language=xml, style=boxed]{../testfiles/a.pnml}";
 
 pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "Petri net markup language",
     article: "a",
     file_extension: "pnml",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(PetriNetMarkupLanguage::validate),
     trait_importers: &[
+        EbiTraitImporter::Activities(PetriNetMarkupLanguage::import_as_activities),
         EbiTraitImporter::Semantics(PetriNetMarkupLanguage::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<PetriNetMarkupLanguage>),
     ],
@@ -43,7 +56,9 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     object_exporters: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::DirectlyFollowsModel(PetriNetMarkupLanguage::export_from_object),
-        EbiObjectExporter::StochasticDirectlyFollowsModel(PetriNetMarkupLanguage::export_from_object),
+        EbiObjectExporter::StochasticDirectlyFollowsModel(
+            PetriNetMarkupLanguage::export_from_object,
+        ),
         EbiObjectExporter::DirectlyFollowsGraph(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::LabelledPetriNet(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::ProcessTree(PetriNetMarkupLanguage::export_from_object),
@@ -82,6 +97,13 @@ impl PetriNetMarkupLanguage {
         let pnml = Self::import(reader)?;
         let lpn = LabelledPetriNet::try_from(pnml)?;
         Ok(EbiTraitSemantics::Marking(Box::new(lpn)))
+    }
+
+    pub fn import_as_activities(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitActivities>> {
+        match Self::import(reader) {
+            Ok(pnml) => Ok(Box::new(LabelledPetriNet::try_from(pnml)?)),
+            Err(x) => Err(x),
+        }
     }
 }
 
@@ -143,9 +165,7 @@ impl Exportable for PetriNetMarkupLanguage {
             EbiOutput::ContainsRoot(_) => Err(anyhow!("Cannot export ContainsRoot as PNML.")),
             EbiOutput::Fraction(_) => Err(anyhow!("Cannot export fraction as PNML.")),
             EbiOutput::LogDiv(_) => Err(anyhow!("Cannot export LogDiv as PNML.")),
-            EbiOutput::PDF(_) => Err(anyhow!("Cannot export PDF as PNML.")),
             EbiOutput::RootLogDiv(_) => Err(anyhow!("Cannot export RootLogDiv as PNML.")),
-            EbiOutput::SVG(_) => Err(anyhow!("Cannot export SVG as PNML.")),
             EbiOutput::String(_) => Err(anyhow!("Cannot export string as PNML.")),
             EbiOutput::Usize(_) => Err(anyhow!("Cannot export integer as PNML.")),
             EbiOutput::Object(EbiObject::EventLog(_)) => {
@@ -165,6 +185,9 @@ impl Exportable for PetriNetMarkupLanguage {
             }
             EbiOutput::Object(EbiObject::StochasticLanguageOfAlignments(_)) => Err(anyhow!(
                 "Cannot export stochastic language of alignments as PNML."
+            )),
+            EbiOutput::Object(EbiObject::ScalableVectorGraphics(_)) => Err(anyhow!(
+                "Cannot export scalable vector graphics as PNML."
             )),
         }
     }

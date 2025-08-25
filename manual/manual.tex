@@ -63,7 +63,7 @@
 
 \title{Ebi - a stochastic process mining tool\\{\small\version}\\Manual}
 \author{The BPM group at RWTH Aachen University\\
-Sander J.J. Leemans, Tian Li}
+Sander J.J. Leemans, Tian Li, Leonhard Mühlmeyer}
 \date{\today}
 
 \DeclareMathOperator{\logdiv}{logdiv}
@@ -104,7 +104,7 @@ Sander J.J. Leemans, Tian Li}
 		
 	\subsection{ProM plug-in}
 		Ebi can be used as a plug-in of the ProM framework~\cite{DBLP:conf/bpm/VerbeekBDA10} (\url{https://promtools.org}) on Windows and Linux. 
-		ProM does not support Mac OS X.
+		ProM has limited support for Mac OS X.
 		
 		To install, open the ProM Package Manager and install the \verb=Ebi= package.
 		Then, a selection of Ebi commands can be run, just as any other ProM plug-in.
@@ -230,7 +230,7 @@ Sander J.J. Leemans, Tian Li}
             \begin{itemize}
                 \item a trait;
                 \item an object type;
-                \item a basic data type such as fraction, integer or string;
+                \item a basic data type such as fraction, integer or string. A fraction and an integer can have a minimum, a maximum and a default value; a string can have a list of allowed values and a default value;
                 \item the ``any object" input type, which denotes that any object type will be accepted;
                 \item a ``file handler", which indicates the (name of) a file handler (for instance used in the \ebiCommand{validate} command).
             \end{itemize}

@@ -1,4 +1,5 @@
 use anyhow::Result;
+use ebi_arithmetic::{exact::MaybeExact, fraction::UInt, fraction_f64::FractionF64, ebi_number::{One, Zero}};
 use num_bigint::ToBigInt;
 use num_traits::Pow;
 use std::{
@@ -10,8 +11,6 @@ use std::{
 use fraction::{BigFraction, BigUint, GenericFraction, Integer};
 
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
-
-use super::{fraction::{MaybeExact, UInt}, fraction_f64::FractionF64, traits::{One, Zero}};
 
 #[derive(Clone)]
 pub struct LogDivF64(FractionF64);
@@ -159,7 +158,7 @@ impl Add for LogDivF64 {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        Self(self.0.add(&rhs.0))
+        Self(self.0.add(rhs.0.0))
     }
 }
 
@@ -181,7 +180,7 @@ impl Sub for LogDivF64 {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        Self(self.0.sub(&rhs.0))
+        Self(self.0.sub(rhs.0.0))
     }
 }
 
@@ -274,7 +273,9 @@ impl std::fmt::Debug for LogDivF64 {
 
 #[cfg(test)]
 mod tests {
-    use crate::math::{log_div_f64::LogDivF64, traits::Zero};
+    use ebi_arithmetic::ebi_number::Zero;
+
+    use crate::math::{log_div_f64::LogDivF64};
 
 
     #[test]

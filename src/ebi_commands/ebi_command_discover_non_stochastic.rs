@@ -1,20 +1,16 @@
-use anyhow::{Context, anyhow};
+use anyhow::Context;
 
 use crate::{
     ebi_framework::{
+        activity_key::HasActivityKey,
         ebi_command::EbiCommand,
-        ebi_input::EbiInputType,
-        ebi_object::{EbiObject, EbiObjectType},
+        ebi_input::{EbiInput, EbiInputType},
+        ebi_object::{EbiObject, EbiObjectType, EbiTraitObject},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_traits::{
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
-    math::fraction::Fraction,
+    ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage,
     techniques::{
-        directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
         flower_miner::{FlowerMinerDFA, FlowerMinerTree},
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
     },
@@ -26,46 +22,15 @@ pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     explanation_short: "Discover a non-stochastic process model.",
     explanation_long: None,
     children: &[
-        &EBI_DISCOVER_NON_STOCHASTIC_DIRECTLY_FOLLOWS,
         &EBI_DISCOVER_NON_STOCHASTIC_FLOWER,
         &EBI_DISCOVER_NON_STOCHASTIC_PREFIX,
     ],
 };
 
-pub const EBI_DISCOVER_NON_STOCHASTIC_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
-    name_short: "dfm",
-    name_long: Some("directly-follows-model"),
-    library_name: "ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_DIRECTLY_FOLLOWS",
-    explanation_short: "Discover a directly follows model.",
-    explanation_long: None,
-    latex_link: Some("~\\cite{DBLP:conf/icpm/LeemansPW19}"),
-    cli_command: None,
-    exact_arithmetic: true,
-    input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
-        &[&EbiInputType::Fraction],
-    ],
-    input_names: &["LANG", "MIN_FITNESS"],
-    input_helps: &[
-        "A finite stochastic language.",
-        "The minimum fitness of the resulting model.",
-    ],
-    execute: |mut inputs, _| {
-        let mut lang = inputs
-            .remove(0)
-            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-        let minimum_fitness = inputs.remove(0).to_type::<Fraction>()?;
-        Ok(EbiOutput::Object(EbiObject::DirectlyFollowsModel(
-            lang.mine_directly_follows_model_filtering(&minimum_fitness)?.into(),
-        )))
-    },
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsModel),
-};
-
 pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER: EbiCommand = EbiCommand::Group {
     name_short: "flw",
     name_long: Some("flower"),
-    explanation_short: "Discover a model that supports any trace with the activities of the log.",
+    explanation_short: "Discover a model that supports any trace with the activities of the log or model.",
     explanation_long: None,
     children: &[
         &EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA,
@@ -82,14 +47,27 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA: EbiCommand = EbiCommand::Comma
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteLanguage)]],
-    input_names: &["LANG"],
-    input_helps: &["A finite language."],
+    input_types: &[&[
+        &EbiInputType::Trait(EbiTrait::FiniteLanguage),
+        &EbiInputType::Trait(EbiTrait::Activities),
+    ]],
+    input_names: &["FILE"],
+    input_helps: &["A file with activities."],
     execute: |mut inputs, _| {
-        let lpn = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
         Ok(EbiOutput::Object(EbiObject::DeterministicFiniteAutomaton(
-            lpn.mine_flower_dfa()
-                .with_context(|| anyhow!("cannot discover flower model"))?,
+            match inputs.remove(0) {
+                EbiInput::Trait(EbiTraitObject::FiniteLanguage(lang), _) => {
+                    let lang: Box<dyn HasActivityKey> = lang;
+                    lang.mine_flower_dfa()
+                        .with_context(|| format!("cannot compute flower model"))?
+                }
+                EbiInput::Trait(EbiTraitObject::Activities(lang), _) => {
+                    let lang: Box<dyn HasActivityKey> = lang;
+                    lang.mine_flower_dfa()
+                        .with_context(|| format!("cannot compute flower model"))?
+                }
+                _ => unreachable!(),
+            },
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::DeterministicFiniteAutomaton),
@@ -104,13 +82,22 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE: EbiCommand = EbiCommand::Comm
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteLanguage)]],
-    input_names: &["LANG"],
-    input_helps: &["A finite language."],
+    input_types: &[&[
+        &EbiInputType::Trait(EbiTrait::FiniteLanguage),
+        &EbiInputType::Trait(EbiTrait::Activities),
+    ]],
+    input_names: &["FILE"],
+    input_helps: &["A file with activities."],
     execute: |mut inputs, _| {
-        let lpn = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
         Ok(EbiOutput::Object(EbiObject::ProcessTree(
-            lpn.mine_flower_tree(),
+            match inputs.remove(0) {
+                EbiInput::Trait(EbiTraitObject::FiniteLanguage(lang), _) => lang.mine_flower_tree(),
+                EbiInput::Trait(EbiTraitObject::Activities(lang), _) => {
+                    let lang: Box<dyn HasActivityKey> = lang;
+                    lang.mine_flower_tree()
+                }
+                _ => unreachable!(),
+            },
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::ProcessTree),

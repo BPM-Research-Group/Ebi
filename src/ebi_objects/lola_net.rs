@@ -9,8 +9,7 @@ use crate::{
         importable::Importable,
     },
     ebi_traits::{
-        ebi_trait_graphable::{self, EbiTraitGraphable},
-        ebi_trait_semantics::{EbiTraitSemantics, Semantics},
+        ebi_trait_activities::EbiTraitActivities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}
     },
 };
 use anyhow::{Context, Result, anyhow};
@@ -21,16 +20,24 @@ use std::{
 };
 
 use super::{
-    deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
+    deterministic_finite_automaton::DeterministicFiniteAutomaton,
+    directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel,
+    labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree,
+    stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
+    stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
+    stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+    stochastic_process_tree::StochasticProcessTree,
 };
 
 pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
     name: "LoLa Petri net",
     article: "a",
     file_extension: "lola",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<LolaNet>),
     trait_importers: &[
+        EbiTraitImporter::Activities(LolaNet::import_as_activities),
         EbiTraitImporter::Semantics(LolaNet::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<LolaNet>),
     ],
@@ -77,6 +84,12 @@ impl LolaNet {
         let lpn = LabelledPetriNet::from(lola_net);
         Ok(EbiTraitSemantics::Marking(Box::new(lpn)))
     }
+
+    pub fn import_as_activities(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitActivities>> {
+        let lola_net = Self::import(reader)?;
+        let lpn = LabelledPetriNet::from(lola_net);
+        Ok(Box::new(lpn))
+    }
 }
 
 impl Importable for LolaNet {
@@ -98,13 +111,13 @@ impl Importable for LolaNet {
             .read_places(&mut lpn)
             .with_context(|| "Parsing places.")?;
 
-        // println!("places {:?}", place_id_2_place);
+        // log::debug!("places {:?}", place_id_2_place);
 
         tokeniser
             .read_initial_marking(&place_id_2_place, &mut lpn)
             .with_context(|| "Parsing initial marking.")?;
 
-        // println!("marking {:?}", lpn.get_initial_marking());
+        // log::debug!("marking {:?}", lpn.get_initial_marking());
 
         tokeniser
             .read_transitions(place_id_2_place, &mut lpn)
@@ -146,9 +159,7 @@ impl Exportable for LolaNet {
             EbiOutput::ContainsRoot(_) => Err(anyhow!("Cannot export ContainsRoot as Lolanet.")),
             EbiOutput::Fraction(_) => Err(anyhow!("Cannot export fraction as Lolanet.")),
             EbiOutput::LogDiv(_) => Err(anyhow!("Cannot export LogDiv as Lolanet.")),
-            EbiOutput::PDF(_) => Err(anyhow!("Cannot export PDF as Lolanet.")),
             EbiOutput::RootLogDiv(_) => Err(anyhow!("Cannot export RootLogDiv as Lolanet.")),
-            EbiOutput::SVG(_) => Err(anyhow!("Cannot export SVG as Lolanet.")),
             EbiOutput::String(_) => Err(anyhow!("Cannot export string as Lolanet.")),
             EbiOutput::Usize(_) => Err(anyhow!("Cannot export integer as Lolanet.")),
             EbiOutput::Object(EbiObject::EventLog(_)) => {
@@ -168,6 +179,9 @@ impl Exportable for LolaNet {
             }
             EbiOutput::Object(EbiObject::StochasticLanguageOfAlignments(_)) => Err(anyhow!(
                 "Cannot export stochastic language of alignments as Lolanet."
+            )),
+            EbiOutput::Object(EbiObject::ScalableVectorGraphics(_)) => Err(anyhow!(
+                "Cannot export scalable vector graphics as Lolanet."
             )),
         }
     }
@@ -278,7 +292,7 @@ impl<'a> Tokeniser<'a> {
             if index == 0 {
                 //, and ; are tokens, so preserve them (note that trim has been applied as an invariant)
                 if let Some((pos_next, _)) = self.remainder.char_indices().nth(2) {
-                    // println!("\tfound , or ' at {}, pos {}", index, pos_next);
+                    // log::debug!("\tfound , or ' at {}, pos {}", index, pos_next);
                     index = pos_next;
                     (token, remainder) = self.remainder.split_at(index);
                     token = token.trim_end();
@@ -291,13 +305,13 @@ impl<'a> Tokeniser<'a> {
                 (token, remainder) = self.remainder.split_at(index);
             }
             self.remainder = remainder.trim_start();
-            // println!("token {}", token);
+            // log::debug!("token {}", token);
             Some(token)
         } else {
             //last token
             let token = self.remainder;
             self.remainder = "";
-            // println!("token {}", token);
+            // log::debug!("token {}", token);
             Some(token)
         }
     }

@@ -6,7 +6,7 @@ use bitvec::bitvec;
 use crate::{
     ebi_framework::activity_key::{ActivityKeyTranslator, HasActivityKey},
     ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::{LPNMarking, LabelledPetriNet}, lola_net::LolaNet, petri_net_markup_language::PetriNetMarkupLanguage, process_tree::{Node, Operator, ProcessTree}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
+        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::{LPNMarking, LabelledPetriNet}, lola_net::LolaNet, petri_net_markup_language::PetriNetMarkupLanguage, process_tree::{Node, Operator, ProcessTree}, process_tree_markup_language::ProcessTreeMarkupLanguage, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
     },
     ebi_traits::ebi_trait_semantics::Semantics,
     marking::Marking,
@@ -241,6 +241,13 @@ macro_rules! tree {
 
 tree!(ProcessTree);
 tree!(StochasticProcessTree);
+
+impl From<ProcessTreeMarkupLanguage> for LabelledPetriNet {
+    fn from(value: ProcessTreeMarkupLanguage) -> Self {
+        log::info!("convert process tree markup language to LPN");
+        value.tree.into()
+    }
+}
 
 impl From<LolaNet> for LabelledPetriNet {
     fn from(value: LolaNet) -> Self {

@@ -1,34 +1,9 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
 
-use super::{fraction::Fraction, root::Root, traits::Zero};
+use crate::math::root::Root;
 
 pub fn correlation(pairs: &[(Fraction, Fraction)]) -> Result<Root> {
-    //method 1
-
-    // let mut sum_x = zero();
-    // let mut sum_y = zero();
-
-    // for (x, y) in pairs {
-    //     sum_x += x;
-    //     sum_y += y;
-    // }
-
-    // let mean_x = sum_x / pairs.len();
-    // let mean_y = sum_y / pairs.len();
-
-    // let mut sum_denom = zero();
-    // let mut sum_nom_x = zero();
-    // let mut sum_nom_y = zero();
-
-    // for (x, y) in pairs {
-    //     sum_denom += (x - &mean_x) * (y - &mean_y);
-    //     sum_nom_x += (x - &mean_x) * (x - &mean_x);
-    //     sum_nom_y += (y - &mean_y) * (y - &mean_y);
-    // }
-
-    // let result1 = Root::from(sum_denom) / (Root::of(sum_nom_x) * Root::of(sum_nom_y));
-
-    //method 2
 
     let mut sum_xy = Fraction::zero();
     let mut sum_x = Fraction::zero();

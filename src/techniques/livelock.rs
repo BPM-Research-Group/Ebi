@@ -121,10 +121,10 @@ macro_rules! dfm_cache {
                     }
                 });
 
-                // eprintln!("queue {:?}, result {:?}", queue, result);
+                // log::debug!("queue {:?}, result {:?}", queue, result);
 
                 while let Some(state) = queue.pop() {
-                    // eprintln!("queue {:?}, result {:?}, state {}", queue, result, state);
+                    // log::debug!("queue {:?}, result {:?}, state {}", queue, result, state);
 
                     //walk over the edges that go into state (expensive :'( )
                     for (source, target) in dfm.sources.iter().zip(dfm.targets.iter()) {
@@ -185,10 +185,10 @@ impl DirectlyFollowsGraphLiveLockCache {
                 }
             });
 
-        // eprintln!("queue {:?}, result {:?}", queue, result);
+        // log::debug!("queue {:?}, result {:?}", queue, result);
 
         while let Some(state) = queue.pop() {
-            // eprintln!("queue {:?}, result {:?}, state {}", queue, result, state);
+            // log::debug!("queue {:?}, result {:?}, state {}", queue, result, state);
 
             //walk over the edges that go into state (expensive :'( )
             for (source, target) in dfm.sources.iter().zip(dfm.targets.iter()) {

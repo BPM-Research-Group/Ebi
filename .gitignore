@@ -1,6 +1,7 @@
 /target
 /data
 /.vscode
+/builds
 
 # Added by cargo
 #

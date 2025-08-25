@@ -1,17 +1,23 @@
-use std::collections::{hash_map::Entry, HashMap};
+use std::collections::{HashMap, hash_map::Entry};
 
-use crate::{ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage}, math::{fraction::Fraction, traits::One}};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::One};
+
+use crate::{
+    ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage}
+};
 
 impl From<EventLog> for FiniteStochasticLanguage {
     fn from(value: EventLog) -> Self {
         log::info!("create stochastic language");
         let mut map = HashMap::new();
-        for t in &value.log.traces {
-            let trace = t
-                .events
-                .iter()
-                .map(|event| value.classifier.get_class_identity(event))
-                .collect::<Vec<String>>();
+
+        let EventLog {
+            activity_key,
+            traces,
+            ..
+        } = value;
+
+        for trace in traces {
             match map.entry(trace) {
                 Entry::Occupied(mut e) => {
                     *e.get_mut() += Fraction::one();
@@ -24,6 +30,6 @@ impl From<EventLog> for FiniteStochasticLanguage {
             }
         }
 
-        map.into()
+        (activity_key, map).into()
     }
 }

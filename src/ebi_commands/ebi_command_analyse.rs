@@ -1,6 +1,7 @@
 use anyhow::Context;
+use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
 use crate::{ebi_framework::{ebi_command::EbiCommand, 
-    ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_objects::directly_follows_graph::DirectlyFollowsGraph, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::{fraction::Fraction, traits::Zero}, medoid, techniques::{completeness::Completeness, edge_difference::EdgeDifference, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}};
+    ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_objects::directly_follows_graph::DirectlyFollowsGraph, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::{constant_fraction::ConstFraction}, medoid, techniques::{completeness::Completeness, edge_difference::EdgeDifference, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}};
 
 pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
     name_short: "ana",
@@ -24,9 +25,8 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
     name_short: "all", 
     name_long: Some("all-traces"),
     library_name: "ebi_commands::ebi_command_analyse::EBI_ANALYSE_ALL", 
-    explanation_short: "Find all traces.", 
-    explanation_long: Some("List all traces of a stohastic language.
-Models containing loops and unbounded models are not supported and the computation will run forever."),
+    explanation_short: "Find all traces of a stochastic model.", 
+    explanation_long: Some("List all traces of a stohastic model. Models containing loops and unbounded models are not supported and the computation will run forever."),
     cli_command: None, 
     latex_link: None,
     exact_arithmetic: true,
@@ -57,7 +57,7 @@ pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
     name_short: "comp", 
     name_long: Some("completeness"), 
     library_name: "ebi_commands::ebi_command_analyse::EBI_ANALYSE_COMPLETENESS",
-    explanation_short: "Estimate the completeness of a finite language using species discovery.", 
+    explanation_short: "Estimate the completeness of an event log using species discovery.", 
     explanation_long: None,
     cli_command: None, 
     latex_link: Some("~\\cite{DBLP:conf/icpm/KabierskiRW23}"),
@@ -88,7 +88,7 @@ The computation may not terminate if the model has non-decreasing livelocks, or 
     exact_arithmetic: true,
     input_types: &[ 
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics) ], 
-        &[ &EbiInputType::Fraction]
+        &[ &EbiInputType::Fraction(Some(ConstFraction::zero()), Some(ConstFraction::one()), None)]
     ],
     input_names: &[ "FILE", "MINIMUM_COVERAGE"],
     input_helps: &[ "Any object with deterministic stochastic semantics.", "The minimum probability that a trace should have to be included."],
@@ -150,7 +150,7 @@ The computation may not terminate if the model is unbounded and this unboundedne
     exact_arithmetic: true,
     input_types: &[ 
         &[ &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics) ], 
-        &[ &EbiInputType::Fraction]
+        &[ &EbiInputType::Fraction(Some(ConstFraction::zero()), Some(ConstFraction::one()), None)]
     ],
     input_names: &[ "FILE", "MINIMUM_PROBABILITY"],
     input_helps: &[ "Any object with deterministic stochastic semantics.", "The minimum probability that a trace should have to be included."],
@@ -177,7 +177,7 @@ Computation is more efficient for an object with a finite stochastic language.")
     exact_arithmetic: true,
     input_types: &[ 
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics)], 
-        &[ &EbiInputType::Usize] 
+        &[ &EbiInputType::Usize(Some(1), None, None)] 
     ],
     input_names: &[ "FILE", "NUMBER_OF_TRACES"],
     input_helps: &[ "Any object with deterministic stochastic semantics.", "The number of traces that should be extracted."],
@@ -202,7 +202,7 @@ pub const EBI_ANALYSE_MODE: EbiCommand = EbiCommand::Command {
     name_short: "mode", 
     name_long: None,
     library_name: "ebi_commands::ebi_command_analyse::EBI_ANALYSE_MODE",
-    explanation_short: "Find the trace with the highest probability.", 
+    explanation_short: "Find a trace with the highest probability in a stochastic model.", 
     explanation_long: Some("Find the trace with the highest probability.
 If there is more than one trace with the highest probability, an arbitrary choice is made which one to return.
 The computation may run forever if the model is unbounded.
@@ -244,7 +244,7 @@ If there are more than one such trace, an arbitrary one is returned."),
     exact_arithmetic: true, 
     input_types: &[ 
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)], 
-        &[ &EbiInputType::Usize] 
+        &[ &EbiInputType::Usize(None, None, Some(1))],
     ],
     input_names: &[ "FILE", "NUMBER_OF_TRACES"],
     input_helps: &[ "Any object with a finite stochastic language.", "The number of traces that should be extracted."],

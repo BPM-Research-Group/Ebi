@@ -7,17 +7,15 @@ use crate::{
         compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
         deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
         directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
-        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL,
-        event_log::EBI_EVENT_LOG,
-        executions::EBI_EXECUTIONS,
-        finite_language::EBI_FINITE_LANGUAGE,
+        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log::EBI_EVENT_LOG,
+        executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE,
         finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
         labelled_petri_net::EBI_LABELLED_PETRI_NET,
-        language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS,
-        lola_net::EBI_LOLA_NET,
+        language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS, lola_net::EBI_LOLA_NET,
         petri_net_markup_language::EBI_PETRI_NET_MARKUP_LANGUAGE,
-        process_tree::EBI_PROCESS_TREE,
-        scalable_vector_graphics::{EBI_PORTABLE_DOCUMENT_FORMAT, EBI_SCALABLE_VECTOR_GRAPHICS},
+        portable_document_format::EBI_PORTABLE_DOCUMENT_FORMAT, process_tree::EBI_PROCESS_TREE,
+        process_tree_markup_language::EBI_PROCESS_TREE_MARKUP_LANGUAGE,
+        scalable_vector_graphics::EBI_SCALABLE_VECTOR_GRAPHICS,
         stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON,
         stochastic_directly_follows_model::EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL,
         stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
@@ -34,8 +32,13 @@ use super::{
     prom_link::JavaObjectHandler,
 };
 
+/**
+ * The order of this list is important: for the "any object" input type and for trait importers,
+ * they are attempted in order. Thus, the more restrictive formats should come first.
+ */
 pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_COMPRESSED_EVENT_LOG,
+    EBI_DIRECTLY_FOLLOWS_GRAPH,
     EBI_DETERMINISTIC_FINITE_AUTOMATON,
     EBI_DIRECTLY_FOLLOWS_MODEL,
     EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL,
@@ -54,7 +57,7 @@ pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_SCALABLE_VECTOR_GRAPHICS,
     EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
     EBI_STOCHASTIC_PROCESS_TREE,
-    EBI_DIRECTLY_FOLLOWS_GRAPH,
+    EBI_PROCESS_TREE_MARKUP_LANGUAGE,
 ];
 
 #[derive(Clone, Debug)]
@@ -62,11 +65,12 @@ pub struct EbiFileHandler {
     pub name: &'static str,
     pub article: &'static str, //a or an
     pub file_extension: &'static str,
+    pub is_binary: bool,
     pub format_specification: &'static str,
     pub validator: Option<fn(&mut dyn BufRead) -> Result<()>>,
     pub trait_importers: &'static [EbiTraitImporter],
     pub object_importers: &'static [EbiObjectImporter],
-    pub object_exporters: &'static [EbiObjectExporter], //the order matters, as if multiple file handlers can export an object, the one that mentions the object earliest is preferred.
+    pub object_exporters: &'static [EbiObjectExporter], //the order matters, because if multiple file handlers can export an object, the one that mentions the object earliest is preferred.
     pub java_object_handlers: &'static [JavaObjectHandler],
 }
 
@@ -202,7 +206,6 @@ mod tests {
                 .is_lt()
         );
 
-        EbiFileHandler::from_trait_object(EbiInput::Usize(0)).unwrap_err();
         EbiFileHandler::from_trait_object(EbiInput::FileHandler(EBI_EXECUTIONS)).unwrap();
     }
 }

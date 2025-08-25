@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 
 use anyhow::{Error, anyhow};
-use num::ToPrimitive;
 use process_mining::{
     PetriNet,
     petri_net::petri_net_struct::{self, ArcType},
@@ -80,7 +79,8 @@ impl TryFrom<LabelledPetriNet> for PetriNetMarkupLanguage {
                         .ok_or(anyhow!("Non-existing place referenced."))?;
                     result.add_arc(
                         ArcType::transition_to_place(new_transition, *new_place),
-                        Some(weight.to_u32().ok_or(anyhow!("value out of bounds"))?),
+                        // Some(weight.to_u32().ok_or(anyhow!("value out of bounds"))?),
+                        Some(weight),
                     );
                 }
             }

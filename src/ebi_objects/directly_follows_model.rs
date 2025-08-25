@@ -1,4 +1,5 @@
 use anyhow::{Context, Error, Result, anyhow};
+use ebi_derive::ActivityKey;
 use itertools::Itertools;
 use layout::topo::layout::VisualGraph;
 use std::{
@@ -22,6 +23,7 @@ use crate::{
         infoable::Infoable,
     },
     ebi_traits::{
+        ebi_trait_activities,
         ebi_trait_graphable::{self, EbiTraitGraphable},
         ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
     },
@@ -32,7 +34,25 @@ use super::stochastic_directly_follows_model::NodeIndex;
 
 pub const HEADER: &str = "directly follows model";
 
-pub const FORMAT_SPECIFICATION: &str = "A directly follows model is a line-based structure. Lines starting with a \\# are ignored.
+#[macro_export]
+macro_rules! format_comparison {
+    () => {"
+    
+    The following table gives an overview of several directly follows-based file types and their features:
+    \\begin{center}
+    \\begin{tabularx}{\\linewidth}{Xlll}
+        \\toprule
+        File type & stochastic & multiple nodes with the same label & file syntax \\\\
+        \\midrule
+        \\hyperref[filehandler:directly follows graph]{directly follows graph (.dfg)} & yes & no & JSON \\\\
+        \\hyperref[filehandler:directly follows model]{directly follows model (.dfm)} & no & yes & line-based \\\\
+        \\hyperref[filehandler:stochastic directly follows model]{stochastic directly follows model (.sdfm)} & yes & yes & line-based \\\\
+        \\bottomrule
+    \\end{tabularx}
+    \\end{center}"}
+}
+
+pub const FORMAT_SPECIFICATION: &str = concat!("A directly follows model is a line-based structure. Lines starting with a \\# are ignored.
     This first line is exactly `directly follows model'.\\
     The second line is a boolean indicating whether the model supports empty traces.\\
     The third line is the number of activities in the model.\\
@@ -42,17 +62,17 @@ pub const FORMAT_SPECIFICATION: &str = "A directly follows model is a line-based
     The next line contains the number of edges, followed by, for each edge, a line with first the index of the source activity, then the `>` symbol, then the index of the target activity.
     
     For instance:
-    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/a-b_star.dfm}
-    
-    Note that a directly follows model expresses a language and may have duplicated activity labels.";
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/a-b_star.dfm}", format_comparison!());
 
 pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "directly follows model",
     article: "a",
     file_extension: "dfm",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<DirectlyFollowsModel>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<DirectlyFollowsModel>),
         EbiTraitImporter::Semantics(DirectlyFollowsModel::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<DirectlyFollowsModel>),
     ],
@@ -60,9 +80,11 @@ pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
         EbiObjectImporter::DirectlyFollowsModel(DirectlyFollowsModel::import_as_object),
         EbiObjectImporter::LabelledPetriNet(DirectlyFollowsModel::import_as_labelled_petri_net),
     ],
-    object_exporters: &[EbiObjectExporter::DirectlyFollowsModel(
-        DirectlyFollowsModel::export_from_object,
-    )],
+    object_exporters: &[
+        EbiObjectExporter::DirectlyFollowsModel(DirectlyFollowsModel::export_from_object),
+        EbiObjectExporter::StochasticDirectlyFollowsModel(DirectlyFollowsModel::export_from_object),
+        EbiObjectExporter::DirectlyFollowsGraph(DirectlyFollowsModel::export_from_object),
+    ],
     java_object_handlers: &[],
 };
 
@@ -79,7 +101,7 @@ pub struct DirectlyFollowsModel {
 
 impl DirectlyFollowsModel {
     /**
-     * Creates a new stochastic directly follows model without any states or edges. This has the empty stochastic language, until a state or an empty trace is added.
+     * Creates a new directly follows model without any states or edges. This has the empty language, until a state or an empty trace is added.
      */
     pub fn new(activity_key: ActivityKey) -> Self {
         Self {
@@ -422,6 +444,13 @@ impl Exportable for DirectlyFollowsModel {
     fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
             EbiOutput::Object(EbiObject::DirectlyFollowsModel(dfm)) => Self::export(&dfm, f),
+            EbiOutput::Object(EbiObject::DirectlyFollowsGraph(dfg)) => {
+                Self::export(&Into::<DirectlyFollowsModel>::into(dfg), f)
+            }
+            EbiOutput::Object(EbiObject::StochasticDirectlyFollowsModel(sdfm)) => {
+                Self::export(&Into::<DirectlyFollowsModel>::into(sdfm), f)
+            }
+
             _ => unreachable!(),
         }
     }

@@ -6,6 +6,11 @@ use std::{
 };
 
 use anyhow::{Context, Error, Result, anyhow};
+use ebi_arithmetic::{
+    ebi_number::{Signed, Zero},
+    fraction::Fraction,
+};
+use ebi_derive::ActivityKey;
 use itertools::Itertools;
 use layout::topo::layout::VisualGraph;
 
@@ -23,6 +28,7 @@ use crate::{
         infoable::Infoable,
     },
     ebi_traits::{
+        ebi_trait_activities,
         ebi_trait_graphable::{self, EbiTraitGraphable},
         ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
         ebi_trait_stochastic_deterministic_semantics::{
@@ -30,16 +36,13 @@ use crate::{
         },
         ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
+    format_comparison,
     line_reader::LineReader,
-    math::{
-        fraction::Fraction,
-        traits::{Signed, Zero},
-    },
 };
 
 pub const HEADER: &str = "stochastic directly follows model";
 
-pub const FORMAT_SPECIFICATION: &str = "A stochstic directly follows model is a line-based structure. Lines starting with a \\# are ignored.
+pub const FORMAT_SPECIFICATION: &str = concat!("A stochstic directly follows model is a line-based structure. Lines starting with a \\# are ignored.
     This first line is exactly `directly follows model'.\\
     The second line is a boolean indicating whether the model supports empty traces.\\
     The third line is the number of activities in the model.\\
@@ -49,17 +52,19 @@ pub const FORMAT_SPECIFICATION: &str = "A stochstic directly follows model is a 
     The next line contains the number of edges, followed by, for each edge, a line with first the index of the source activity, then the `>` symbol, then the index of the target activity, then a `w`, and then the weight of the transition.
     
     For instance:
-    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/a-b_star.dfm}
-    
-    Note that a directly follows model expresses a language and may have duplicated activity labels.";
+    \\lstinputlisting[language=ebilines, style=boxed]{../testfiles/aa-ab-ba.sdfm}", format_comparison!());
 
 pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "stochastic directly follows model",
     article: "a",
     file_extension: "sdfm",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticDirectlyFollowsModel>),
     trait_importers: &[
+        EbiTraitImporter::Activities(
+            ebi_trait_activities::import::<StochasticDirectlyFollowsModel>,
+        ),
         EbiTraitImporter::Semantics(StochasticDirectlyFollowsModel::import_as_semantics),
         EbiTraitImporter::StochasticSemantics(
             StochasticDirectlyFollowsModel::import_as_stochastic_semantics,
@@ -70,7 +75,12 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<StochasticDirectlyFollowsModel>),
     ],
     object_importers: &[
-        EbiObjectImporter::DirectlyFollowsModel(StochasticDirectlyFollowsModel::import_as_object),
+        EbiObjectImporter::StochasticDirectlyFollowsModel(
+            StochasticDirectlyFollowsModel::import_as_object,
+        ),
+        EbiObjectImporter::DirectlyFollowsModel(
+            StochasticDirectlyFollowsModel::import_as_directly_follows_model,
+        ),
         EbiObjectImporter::LabelledPetriNet(
             StochasticDirectlyFollowsModel::import_as_labelled_petri_net,
         ),
@@ -116,6 +126,11 @@ impl StochasticDirectlyFollowsModel {
             start_node_weights: vec![],
             end_node_weights: vec![],
         }
+    }
+
+    pub fn import_as_directly_follows_model(reader: &mut dyn BufRead) -> Result<EbiObject> {
+        let dfg = Self::import(reader)?;
+        Ok(EbiObject::DirectlyFollowsModel(dfg.into()))
     }
 
     pub fn import_as_labelled_petri_net(reader: &mut dyn BufRead) -> Result<EbiObject> {
@@ -486,10 +501,10 @@ impl EbiTraitGraphable for StochasticDirectlyFollowsModel {
 
         //nodes
         let mut nodes = vec![];
-        for n in &self.node_2_activity {
+        for node in &self.node_2_activity {
             nodes.push(<dyn EbiTraitGraphable>::create_transition(
                 &mut graph,
-                self.activity_key.get_activity_label(n),
+                self.activity_key.get_activity_label(node),
                 "",
             ));
         }

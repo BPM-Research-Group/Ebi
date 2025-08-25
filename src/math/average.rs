@@ -1,17 +1,18 @@
-use std::{sync::Arc, fmt::Debug};
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
+use std::{fmt::Debug, sync::Arc};
 
-use crate::distances::TriangularDistanceMatrix;
+use crate::math::distances::TriangularDistanceMatrix;
 
-use super::{fixed_denominator_fraction::FixedDenominatorFraction, fraction::Fraction, traits::Zero};
+use super::fixed_denominator_fraction::FixedDenominatorFraction;
 
 /**
  * Class to compute the weighted average distance over distances, where these weights are integers and all distances are not negative.
- * 
+ *
  * Internally, makes all the denominators equal, such that addition can be done without gcd computations.
  */
 #[derive(Clone)]
- pub struct Average {
+pub struct Average {
     distances: Arc<MatchedDistances>,
     cardinality: Vec<Vec<u64>>,
 }
@@ -21,14 +22,14 @@ impl Average {
         let len = matrix.len();
         Ok(Self {
             distances: Arc::new(MatchedDistances::new(matrix)?),
-            cardinality: vec![vec![0; len]; len]
+            cardinality: vec![vec![0; len]; len],
         })
     }
 
     pub fn from_matched_distances(distances: &Arc<MatchedDistances>) -> Self {
         Self {
             distances: Arc::clone(distances),
-            cardinality: vec![vec![0; distances.len()]; distances.len()]
+            cardinality: vec![vec![0; distances.len()]; distances.len()],
         }
     }
 
@@ -61,23 +62,24 @@ impl Average {
 
 impl Debug for Average {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("Average").field("cardinality", &self.cardinality).finish()
+        f.debug_struct("Average")
+            .field("cardinality", &self.cardinality)
+            .finish()
     }
 }
 
 pub struct MatchedDistances {
-    distances: Vec<Arc<FixedDenominatorFraction>>, 
+    distances: Vec<Arc<FixedDenominatorFraction>>,
     zero: Arc<FixedDenominatorFraction>,
-    len: usize
+    len: usize,
 }
 
 impl MatchedDistances {
-
     pub fn new(matrix: TriangularDistanceMatrix) -> Result<Self> {
         Ok(Self {
             distances: FixedDenominatorFraction::create(&matrix.distances)?,
             zero: Arc::new(FixedDenominatorFraction::zero()),
-            len: matrix.len()
+            len: matrix.len(),
         })
     }
 
@@ -88,16 +90,19 @@ impl MatchedDistances {
         self.len
     }
 
-
     fn get_index(i: usize, j: usize) -> usize {
-        (i * (i-1)) / 2 + j
+        (i * (i - 1)) / 2 + j
     }
 
     pub fn get(&self, i: usize, j: usize) -> &Arc<FixedDenominatorFraction> {
         if i == j {
             &self.zero
         } else {
-            let index = if i > j { Self::get_index(i, j) } else { Self::get_index(j, i)};
+            let index = if i > j {
+                Self::get_index(i, j)
+            } else {
+                Self::get_index(j, i)
+            };
             &self.distances[index]
         }
     }

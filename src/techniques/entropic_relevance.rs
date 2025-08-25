@@ -7,16 +7,26 @@ use crate::{
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
     follower_semantics::FollowerSemantics,
-    math::{fraction::Fraction, log_div::LogDiv, traits::{One, Zero}},
+    math::log_div::LogDiv,
 };
 use anyhow::{Context, Result};
+use ebi_arithmetic::{
+    ebi_number::{One, Zero},
+    fraction::Fraction,
+};
 
 pub trait EntropicRelvance {
-    fn entropic_relevance(&self, model: Box<dyn EbiTraitQueriableStochasticLanguage>) -> Result<LogDiv>;
+    fn entropic_relevance(
+        &self,
+        model: Box<dyn EbiTraitQueriableStochasticLanguage>,
+    ) -> Result<LogDiv>;
 }
 
 impl EntropicRelvance for dyn EbiTraitFiniteStochasticLanguage {
-    fn entropic_relevance(&self, mut model: Box<dyn EbiTraitQueriableStochasticLanguage>) -> Result<LogDiv> {
+    fn entropic_relevance(
+        &self,
+        mut model: Box<dyn EbiTraitQueriableStochasticLanguage>,
+    ) -> Result<LogDiv> {
         let mut rho = Fraction::zero(); // the overall probability that a trace in the event log E is possible in the stochastic language of model A
         let mut sum = LogDiv::zero();
 
@@ -66,7 +76,8 @@ impl dyn EbiTraitFiniteStochasticLanguage {
 
         for (trace, probability_log) in self.iter_trace_probability() {
             let translated_trace = translator.translate_trace(&trace);
-            let probability_model = model.get_probability(&FollowerSemantics::Trace(&translated_trace))?;
+            let probability_model =
+                model.get_probability(&FollowerSemantics::Trace(&translated_trace))?;
             if probability_model.is_zero() {
                 //trace not in model
                 let l = 1 + number_of_activities_in_log;
@@ -116,12 +127,20 @@ fn h(x: &Fraction) -> LogDiv {
     return result;
 }
 
-
- #[cfg(test)]
+#[cfg(test)]
 mod tests {
     use std::fs;
 
-    use crate::{ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage}, ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage}, math::traits::One, techniques::entropic_relevance::EntropicRelvance};
+    use ebi_arithmetic::ebi_number::One;
+
+    use crate::{
+        ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage},
+        ebi_traits::{
+            ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+            ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+        },
+        techniques::entropic_relevance::EntropicRelvance,
+    };
 
     #[test]
     fn entropic_relevance() {
@@ -131,8 +150,10 @@ mod tests {
         let fin2 = fs::read_to_string("testfiles/a-b.xes").unwrap();
         let log2 = fin2.parse::<EventLog>().unwrap();
 
-        let lang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(Into::<FiniteStochasticLanguage>::into(log));
-        let lang2: Box<dyn EbiTraitQueriableStochasticLanguage> = Box::new(Into::<FiniteStochasticLanguage>::into(log2));
+        let lang: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(Into::<FiniteStochasticLanguage>::into(log));
+        let lang2: Box<dyn EbiTraitQueriableStochasticLanguage> =
+            Box::new(Into::<FiniteStochasticLanguage>::into(log2));
         let er = lang.entropic_relevance(lang2).unwrap();
 
         assert!(er.is_one());

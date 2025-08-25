@@ -1,6 +1,10 @@
 use anyhow::{Error, Result, anyhow};
 use core::fmt;
-use process_mining::{XESImportOptions, event_log::event_log_struct::EventLogClassifier};
+use ebi_derive::ActivityKey;
+use process_mining::{
+    XESImportOptions,
+    event_log::{Trace, event_log_struct::EventLogClassifier},
+};
 use std::{
     collections::HashMap,
     io::{self, BufRead, Write},
@@ -13,15 +17,17 @@ use crate::{
             Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
         },
         ebi_file_handler::EbiFileHandler,
-        ebi_input::{self, EbiObjectImporter, EbiTraitImporter},
+        ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
         ebi_output::{EbiObjectExporter, EbiOutput},
+        ebi_trait::FromEbiTraitObject,
         exportable::Exportable,
         importable::Importable,
         infoable::Infoable,
         prom_link::JavaObjectHandler,
     },
     ebi_traits::{
+        ebi_trait_activities,
         ebi_trait_event_log::{EbiTraitEventLog, IndexTrace},
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
@@ -52,9 +58,11 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     name: "event log",
     article: "an",
     file_extension: "xes",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<EventLog>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<EventLog>),
         EbiTraitImporter::IterableLanguage(EventLog::read_as_iterable_language),
         EbiTraitImporter::FiniteLanguage(EventLog::read_as_finite_language),
         EbiTraitImporter::FiniteStochasticLanguage(EventLog::read_as_finite_stochastic_language),
@@ -91,24 +99,24 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
 
 #[derive(ActivityKey, Clone)]
 pub struct EventLog {
-    pub(crate) classifier: EventLogClassifier,
-    pub(crate) log: process_mining::EventLog,
-    activity_key: ActivityKey,
-    traces: Vec<Vec<Activity>>,
+    classifier: EventLogClassifier,
+    pub(crate) activity_key: ActivityKey,
+    pub(crate) traces: Vec<Vec<Activity>>,
+    rust4pm_log: process_mining::EventLog,
 }
 
 impl EventLog {
     pub fn new(log: process_mining::EventLog, classifier: EventLogClassifier) -> Self {
         let mut result = Self {
             classifier: classifier,
-            log: log,
+            rust4pm_log: log,
             activity_key: ActivityKey::new(),
             traces: vec![],
         };
 
-        for trace_index in 0..result.log.traces.len() {
+        for trace_index in 0..result.rust4pm_log.traces.len() {
             result.traces.push(
-                result.log.traces[trace_index]
+                result.rust4pm_log.traces[trace_index]
                     .events
                     .iter()
                     .map(|event| {
@@ -188,6 +196,33 @@ impl EventLog {
             log
         )))
     }
+
+    pub fn retain_traces_mut<F>(&mut self, f: &mut F)
+    where
+        F: FnMut((&Vec<Activity>, &Trace)) -> bool,
+    {
+        //get our hands free to change the traces without cloning
+        let mut traces = vec![];
+        let mut rust4pm_traces = vec![];
+        std::mem::swap(&mut self.traces, &mut traces);
+        std::mem::swap(&mut self.rust4pm_log.traces, &mut rust4pm_traces);
+
+        (traces, rust4pm_traces) = traces
+            .into_iter()
+            .zip(rust4pm_traces.into_iter())
+            .filter_map(|(mut trace, mut rust4pm_trace)| {
+                if f((&mut trace, &mut rust4pm_trace)) {
+                    Some((trace, rust4pm_trace))
+                } else {
+                    None
+                }
+            })
+            .unzip();
+
+        //swap the the traces back
+        std::mem::swap(&mut self.traces, &mut traces);
+        std::mem::swap(&mut self.rust4pm_log.traces, &mut rust4pm_traces);
+    }
 }
 
 impl TranslateActivityKey for EventLog {
@@ -250,6 +285,19 @@ impl FromStr for EventLog {
     }
 }
 
+impl FromEbiTraitObject for EventLog {
+    fn from_trait_object(object: ebi_input::EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::EventLog(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "cannot read {} {} as an event log",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
+    }
+}
+
 impl Exportable for EventLog {
     fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
         match object {
@@ -259,28 +307,24 @@ impl Exportable for EventLog {
     }
 
     fn export(&self, f: &mut dyn std::io::Write) -> Result<()> {
-        process_mining::event_log::export_xes::export_xes_event_log(f, &self.log)?;
+        process_mining::event_log::export_xes::export_xes_event_log(f, &self.rust4pm_log)?;
         Ok(())
     }
 }
 
 impl fmt::Display for EventLog {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "event log with {} traces", self.log.traces.len())
+        write!(f, "event log with {} traces", self.len())
     }
 }
 
 impl Infoable for EventLog {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
-        writeln!(f, "Number of traces\t{}", self.log.traces.len())?;
+        writeln!(f, "Number of traces\t{}", self.len())?;
         writeln!(
             f,
             "Number of events\t{}",
-            self.log
-                .traces
-                .iter()
-                .map(|t| t.events.len())
-                .sum::<usize>()
+            self.traces.iter().map(|trace| trace.len()).sum::<usize>()
         )?;
         writeln!(
             f,
@@ -305,12 +349,12 @@ impl Infoable for EventLog {
 
 impl EbiTraitEventLog for EventLog {
     fn get_log(&self) -> &process_mining::EventLog {
-        &self.log
+        &self.rust4pm_log
     }
 
     fn get_trace_attributes(&self) -> HashMap<String, DataType> {
         let mut map: HashMap<String, DataType> = HashMap::new();
-        for trace in &self.log.traces {
+        for trace in &self.rust4pm_log.traces {
             for attribute in &trace.attributes {
                 match map.entry(attribute.key.clone()) {
                     std::collections::hash_map::Entry::Occupied(mut e) => {
@@ -334,7 +378,7 @@ impl EbiTraitEventLog for EventLog {
 
 impl IndexTrace for EventLog {
     fn len(&self) -> usize {
-        self.log.traces.len()
+        self.traces.len()
     }
 
     fn get_trace(&self, trace_index: usize) -> Option<&Vec<Activity>> {
@@ -349,7 +393,10 @@ mod tests {
     use crate::{
         ebi_framework::activity_key::{ActivityKey, TranslateActivityKey},
         ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
-        ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        ebi_traits::{
+            ebi_trait_event_log::{EbiTraitEventLog, IndexTrace},
+            ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        },
     };
 
     use super::EventLog;
@@ -390,5 +437,31 @@ mod tests {
         if let EbiTraitSemantics::Usize(semantics) = log.to_semantics() {
             assert!(semantics.get_initial_state().is_none());
         }
+    }
+
+    #[test]
+    fn len_retain() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let mut log = fin.parse::<EventLog>().unwrap();
+
+        assert_eq!(log.len(), 2);
+
+        log.retain_traces(Box::new(|_| false));
+
+        assert_eq!(log.len(), 0);
+    }
+
+    #[test]
+    fn len_retain_mut() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let mut log = fin.parse::<EventLog>().unwrap();
+
+        assert_eq!(log.len(), 2);
+        assert_eq!(log.rust4pm_log.traces.len(), 2);
+
+        log.retain_traces_mut(&mut |_| false);
+
+        assert_eq!(log.len(), 0);
+        assert_eq!(log.rust4pm_log.traces.len(), 0);
     }
 }

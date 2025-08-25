@@ -1,7 +1,27 @@
+#[cfg(any(
+    all(
+        not(feature = "eexactarithmetic"),
+        not(feature = "eapproximatearithmetic")
+    ),
+    all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+    all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
+))]
+use anyhow::Result;
+use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::ebi_number::Zero;
 use std::fmt;
 use std::fmt::Debug;
 use std::{iter::FusedIterator, sync::Arc};
 
+#[cfg(any(
+    all(
+        not(feature = "eexactarithmetic"),
+        not(feature = "eapproximatearithmetic")
+    ),
+    all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+    all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
+))]
+use num::BigInt;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::ebi_framework::ebi_command::EbiCommand;
@@ -9,12 +29,56 @@ use crate::ebi_traits::{
     ebi_trait_event_log::IndexTrace,
     ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
 };
-use crate::math::fraction::Fraction;
 use crate::math::levenshtein;
-use crate::math::traits::Zero;
+
+pub trait WeightedDistances: Send + Sync {
+    fn len_a(&self) -> usize;
+
+    fn len_b(&self) -> usize;
+
+    fn weight_a(&self, index_a: usize) -> &Fraction;
+
+    fn weight_a_mut(&mut self, index_a: usize) -> &mut Fraction;
+
+    fn weight_b(&self, index_b: usize) -> &Fraction;
+
+    fn weight_b_mut(&mut self, index_b: usize) -> &mut Fraction;
+
+    fn distance(&self, index_a: usize, index_b: usize) -> &Fraction;
+
+    fn iter(&self) -> Box<dyn Iterator<Item = (usize, usize, &Fraction)> + '_>;
+
+    fn clone(&self) -> Box<dyn WeightedDistances>;
+
+    #[cfg(any(
+        all(
+            not(feature = "eexactarithmetic"),
+            not(feature = "eapproximatearithmetic")
+        ),
+        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+        all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
+    ))]
+    /**
+     * Only call in exact mode.
+     */
+    fn lowest_common_multiple_denominators_distances(&self) -> Result<BigInt>;
+
+    #[cfg(any(
+        all(
+            not(feature = "eexactarithmetic"),
+            not(feature = "eapproximatearithmetic")
+        ),
+        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+        all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
+    ))]
+    /**
+     * Only call in exact mode.
+     */
+    fn lowest_common_multiple_denominators_weights(&self) -> Result<BigInt>;
+}
 
 pub struct TriangularDistanceMatrix {
-    len: usize, //lenght of one side of the matrix
+    len: usize, //length of one side of the matrix
     pub(crate) distances: Vec<Arc<Fraction>>,
     zero: Arc<Fraction>,
 }
@@ -183,7 +247,6 @@ pub struct DistanceMatrix {
 }
 
 impl DistanceMatrix {
-
     pub fn new<L, K>(lang_a: &mut L, lang_b: &mut K) -> Self
     where
         L: EbiTraitFiniteStochasticLanguage + ?Sized,
@@ -200,16 +263,11 @@ impl DistanceMatrix {
         let mut distances = Vec::with_capacity(len_a);
 
         // Create thread pool with custom configuration
-        let pool = rayon::ThreadPoolBuilder::new()
-            .num_threads(16)
-            .build()
-            .unwrap();
+        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
 
         // Pre-fetch all traces to avoid repeated get_trace calls
         let traces_a: Vec<_> = (0..len_a).map(|i| lang_a.get_trace(i).unwrap()).collect();
-        let traces_b: Vec<_> = (0..len_b)
-            .map(|j| lang_b.get_trace(j).unwrap())
-            .collect();
+        let traces_b: Vec<_> = (0..len_b).map(|j| lang_b.get_trace(j).unwrap()).collect();
 
         let progress_bar = EbiCommand::get_progress_bar_ticks((len_a * len_b).try_into().unwrap());
 

@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use ebi_arithmetic::fraction::Fraction;
 use std::{
     collections::{BTreeSet, HashSet},
     fmt::{self, Display},
@@ -22,6 +23,7 @@ use crate::{
         labelled_petri_net::{EBI_LABELLED_PETRI_NET, LabelledPetriNet},
         language_of_alignments::{EBI_LANGUAGE_OF_ALIGNMENTS, LanguageOfAlignments},
         process_tree::{EBI_PROCESS_TREE, ProcessTree},
+        scalable_vector_graphics::{EBI_SCALABLE_VECTOR_GRAPHICS, ScalableVectorGraphics},
         stochastic_deterministic_finite_automaton::{
             EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON, StochasticDeterministicFiniteAutomaton,
         },
@@ -34,9 +36,9 @@ use crate::{
         stochastic_language_of_alignments::{
             EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS, StochasticLanguageOfAlignments,
         },
-        stochastic_process_tree::StochasticProcessTree,
+        stochastic_process_tree::{EBI_STOCHASTIC_PROCESS_TREE, StochasticProcessTree},
     },
-    math::{fraction::Fraction, log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv},
+    math::{log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv},
 };
 
 use super::{
@@ -46,9 +48,9 @@ use super::{
     exportable::Exportable,
     prom_link::{
         JAVA_OBJECT_HANDLERS_BOOL, JAVA_OBJECT_HANDLERS_CONTAINSROOT,
-        JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV, JAVA_OBJECT_HANDLERS_PDF,
-        JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_SVG,
-        JAVA_OBJECT_HANDLERS_USIZE, JavaObjectHandler,
+        JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV,
+        JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE,
+        JavaObjectHandler,
     },
 };
 
@@ -56,8 +58,6 @@ use super::{
 pub enum EbiOutput {
     Object(EbiObject),
     String(String),
-    SVG(String),
-    PDF(Vec<u8>),
     Usize(usize),
     Fraction(Fraction),
     LogDiv(LogDiv),
@@ -71,8 +71,6 @@ impl EbiOutput {
         match self {
             EbiOutput::Object(o) => EbiOutputType::ObjectType(o.get_type()),
             EbiOutput::String(_) => EbiOutputType::String,
-            EbiOutput::SVG(_) => EbiOutputType::SVG,
-            EbiOutput::PDF(_) => EbiOutputType::PDF,
             EbiOutput::Usize(_) => EbiOutputType::Usize,
             EbiOutput::Fraction(_) => EbiOutputType::Fraction,
             EbiOutput::LogDiv(_) => EbiOutputType::LogDiv,
@@ -87,8 +85,6 @@ impl EbiOutput {
 pub enum EbiOutputType {
     ObjectType(EbiObjectType),
     String,
-    SVG,
-    PDF,
     Usize,
     Fraction,
     LogDiv,
@@ -135,8 +131,6 @@ impl EbiOutputType {
                 result
             }
             EbiOutputType::String => vec![EbiExporter::String],
-            EbiOutputType::SVG => vec![EbiExporter::SVG],
-            EbiOutputType::PDF => vec![EbiExporter::PDF],
             EbiOutputType::Usize => vec![EbiExporter::Usize],
             EbiOutputType::Fraction => vec![EbiExporter::Fraction],
             EbiOutputType::LogDiv => vec![EbiExporter::LogDiv],
@@ -232,11 +226,17 @@ impl EbiOutputType {
                 &&EbiObjectExporter::StochasticProcessTree(
                     StochasticProcessTree::export_from_object,
                 ),
-                &EBI_PROCESS_TREE,
+                &EBI_STOCHASTIC_PROCESS_TREE,
             ),
+            EbiOutputType::ObjectType(EbiObjectType::ScalableVectorGraphics) => {
+                EbiExporter::Object(
+                    &&EbiObjectExporter::ScalableVectorGraphics(
+                        ScalableVectorGraphics::export_from_object,
+                    ),
+                    &EBI_SCALABLE_VECTOR_GRAPHICS,
+                )
+            }
             EbiOutputType::String => EbiExporter::String,
-            EbiOutputType::SVG => EbiExporter::SVG,
-            EbiOutputType::PDF => EbiExporter::PDF,
             EbiOutputType::Usize => EbiExporter::Usize,
             EbiOutputType::Fraction => EbiExporter::Fraction,
             EbiOutputType::LogDiv => EbiExporter::LogDiv,
@@ -264,8 +264,6 @@ impl Display for EbiOutputType {
         match self {
             EbiOutputType::ObjectType(t) => t.fmt(f),
             EbiOutputType::String => Display::fmt(&"text", f),
-            EbiOutputType::SVG => Display::fmt(&"svg", f),
-            EbiOutputType::PDF => Display::fmt(&"pdf", f),
             EbiOutputType::Usize => Display::fmt(&"integer", f),
             EbiOutputType::Fraction => Display::fmt(&"fraction", f),
             EbiOutputType::LogDiv => Display::fmt(&"logarithm", f),
@@ -280,8 +278,6 @@ impl Display for EbiOutputType {
 pub enum EbiExporter {
     Object(&'static EbiObjectExporter, &'static EbiFileHandler),
     String,
-    SVG,
-    PDF,
     Usize,
     Fraction,
     LogDiv,
@@ -296,10 +292,6 @@ impl EbiExporter {
             (EbiExporter::Object(exporter, _), object) => exporter.export(object, f),
             (EbiExporter::String, EbiOutput::String(object)) => object.export(f),
             (EbiExporter::String, _) => unreachable!(),
-            (EbiExporter::SVG, EbiOutput::SVG(object)) => object.export(f),
-            (EbiExporter::SVG, _) => unreachable!(),
-            (EbiExporter::PDF, EbiOutput::PDF(object)) => Ok(f.write_all(&object)?),
-            (EbiExporter::PDF, _) => unreachable!(),
             (EbiExporter::Usize, EbiOutput::Usize(object)) => object.export(f),
             (EbiExporter::Usize, _) => unreachable!(),
             (EbiExporter::Fraction, EbiOutput::Fraction(object)) => object.export(f),
@@ -319,8 +311,6 @@ impl EbiExporter {
         match self {
             EbiExporter::Object(_, file_handler) => file_handler.article,
             EbiExporter::String => "",
-            EbiExporter::SVG => "an",
-            EbiExporter::PDF => "a",
             EbiExporter::Usize => "an",
             EbiExporter::Fraction => "a",
             EbiExporter::LogDiv => "a",
@@ -334,8 +324,6 @@ impl EbiExporter {
         match self {
             EbiExporter::Object(_, file_handler) => file_handler.name,
             EbiExporter::String => "string",
-            EbiExporter::SVG => "SVG",
-            EbiExporter::PDF => "PDF",
             EbiExporter::Usize => "integer",
             EbiExporter::Fraction => "fraction",
             EbiExporter::LogDiv => "logdiv",
@@ -349,8 +337,6 @@ impl EbiExporter {
         match self {
             EbiExporter::Object(_, file_handler) => file_handler.java_object_handlers,
             EbiExporter::String => JAVA_OBJECT_HANDLERS_STRING,
-            EbiExporter::SVG => JAVA_OBJECT_HANDLERS_SVG,
-            EbiExporter::PDF => JAVA_OBJECT_HANDLERS_PDF,
             EbiExporter::Usize => JAVA_OBJECT_HANDLERS_USIZE,
             EbiExporter::Fraction => JAVA_OBJECT_HANDLERS_FRACTION,
             EbiExporter::LogDiv => JAVA_OBJECT_HANDLERS_LOGDIV,
@@ -364,8 +350,6 @@ impl EbiExporter {
         match self {
             EbiExporter::Object(_, file_handler) => file_handler.file_extension,
             EbiExporter::String => "txt",
-            EbiExporter::SVG => "svg",
-            EbiExporter::PDF => "pdf",
             EbiExporter::Usize => "int",
             EbiExporter::Fraction => "frac",
             EbiExporter::LogDiv => "logdiv",
@@ -377,10 +361,8 @@ impl EbiExporter {
 
     pub fn is_binary(&self) -> bool {
         match self {
-            EbiExporter::Object(_, _) => false,
+            EbiExporter::Object(_, file_handler) => file_handler.is_binary,
             EbiExporter::String => false,
-            EbiExporter::SVG => false,
-            EbiExporter::PDF => true,
             EbiExporter::Usize => false,
             EbiExporter::Fraction => false,
             EbiExporter::LogDiv => false,
@@ -396,8 +378,6 @@ impl Display for EbiExporter {
         match self {
             EbiExporter::Object(_, file_handler) => Display::fmt(file_handler, f),
             EbiExporter::String => Display::fmt(&"text", f),
-            EbiExporter::SVG => Display::fmt(&"svg", f),
-            EbiExporter::PDF => Display::fmt(&"pdf", f),
             EbiExporter::Usize => Display::fmt(&"integer", f),
             EbiExporter::Fraction => Display::fmt(&"fraction", f),
             EbiExporter::LogDiv => Display::fmt(&"logarithm", f),
@@ -427,6 +407,7 @@ pub enum EbiObjectExporter {
     StochasticProcessTree(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     Executions(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
     DirectlyFollowsGraph(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
+    ScalableVectorGraphics(fn(object: EbiOutput, &mut dyn std::io::Write) -> Result<()>),
 }
 
 impl EbiObjectExporter {
@@ -459,6 +440,7 @@ impl EbiObjectExporter {
             EbiObjectExporter::StochasticProcessTree(_) => EbiObjectType::StochasticProcessTree,
             EbiObjectExporter::Executions(_) => EbiObjectType::Executions,
             EbiObjectExporter::DirectlyFollowsGraph(_) => EbiObjectType::DirectlyFollowsGraph,
+            EbiObjectExporter::ScalableVectorGraphics(_) => EbiObjectType::ScalableVectorGraphics,
         }
     }
 
@@ -481,6 +463,7 @@ impl EbiObjectExporter {
             EbiObjectExporter::StochasticProcessTree(exporter) => (exporter)(object, f),
             EbiObjectExporter::Executions(exporter) => (exporter)(object, f),
             EbiObjectExporter::DirectlyFollowsGraph(exporter) => (exporter)(object, f),
+            EbiObjectExporter::ScalableVectorGraphics(exporter) => (exporter)(object, f),
         }
     }
 }
@@ -519,6 +502,10 @@ impl Display for EbiObjectExporter {
 mod tests {
     use std::{io::Cursor, path::PathBuf};
 
+    use ebi_arithmetic::{
+        ebi_number::{One, Zero},
+        fraction::Fraction,
+    };
     use strum::IntoEnumIterator;
 
     use crate::{
@@ -527,11 +514,9 @@ mod tests {
             ebi_output::EbiOutput,
         },
         math::{
-            fraction::Fraction,
             log_div::LogDiv,
             root::{ContainsRoot, Root},
             root_log_div::RootLogDiv,
-            traits::{One, Zero},
         },
     };
 
@@ -539,11 +524,12 @@ mod tests {
 
     #[test]
     fn all_exporters() {
-        for (object, importer, _, _) in crate::tests::get_all_test_files() {
+        for (object, importer, _, f) in crate::tests::get_all_test_files() {
             if let EbiInput::Object(object, _) = object {
                 for file_handler2 in EBI_FILE_HANDLERS {
                     for exporter in file_handler2.object_exporters {
                         if exporter.get_type() == importer.clone().unwrap().get_type() {
+                            println!("file {} importer {:?} exporter {}", f, importer, exporter);
                             let mut c = Cursor::new(Vec::new());
                             exporter
                                 .export(EbiOutput::Object(object.clone()), &mut c)
@@ -559,8 +545,6 @@ mod tests {
     fn ebi_output() {
         let mut outputs = vec![
             (EbiOutput::String("bla".to_string()), "bla".to_string()),
-            (EbiOutput::SVG("xyz".to_string()), "xyz".to_string()),
-            (EbiOutput::PDF(vec![]), "[]".to_string()),
             (EbiOutput::Usize(0), "0".to_string()),
             (EbiOutput::Fraction(Fraction::one()), "1".to_string()),
             (EbiOutput::LogDiv(LogDiv::zero()), "0".to_string()),
@@ -622,20 +606,6 @@ mod tests {
     fn unreachable_usize() {
         let mut f = vec![];
         let _ = EbiExporter::Usize.export_from_object(EbiOutput::String("a".to_string()), &mut f);
-    }
-
-    #[test]
-    #[should_panic]
-    fn unreachable_svg() {
-        let mut f = vec![];
-        let _ = EbiExporter::SVG.export_from_object(EbiOutput::Usize(10), &mut f);
-    }
-
-    #[test]
-    #[should_panic]
-    fn unreachable_pdf() {
-        let mut f = vec![];
-        let _ = EbiExporter::PDF.export_from_object(EbiOutput::Usize(10), &mut f);
     }
 
     #[test]

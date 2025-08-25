@@ -2,10 +2,10 @@ use std::{collections::HashMap, io::Write};
 use clap::Command;
 use anyhow::Result;
 use inflector::Inflector;
-use layout::{backends::svg::SVGWriter, core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
+use layout::{core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
-use crate::{ebi_framework::{ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType, ebi_object::EbiObjectType, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, ebi_objects::scalable_vector_graphics::svg_to_pdf, text::Joiner};
+use crate::{ebi_framework::{    ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::{self, EbiInputType}, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, ebi_objects::scalable_vector_graphics::ToSVGMut, text::Joiner};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
  □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
@@ -31,9 +31,10 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[ 
         &EBI_ITSELF_GRAPH,
-        &EBI_ITSELF_MANUAL,
+        &EBI_ITSELF_HTML,
         &EBI_ITSELF_JAVA,
         &EBI_ITSELF_LOGO,
+        &EBI_ITSELF_MANUAL,
         &EBI_ITSELF_GENERATE_PM4PY,
      ]
 };
@@ -83,13 +84,10 @@ pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command {
     input_names: &[],
     input_helps: &[],
     execute: |_, _| {
-        let mut graph = graph()?;
-        let mut svg = SVGWriter::new();
-        graph.do_it(false, false, false, &mut svg);
-        let svg_string = svg.finalize();
-        Ok(EbiOutput::PDF(svg_to_pdf(&svg_string)?))
+        let svg = graph()?.to_svg_mut()?;
+        Ok(EbiOutput::Object(EbiObject::ScalableVectorGraphics(svg)))
     }, 
-    output_type: &EbiOutputType::PDF
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::ScalableVectorGraphics)
 };
 
 pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command { 
@@ -105,6 +103,21 @@ pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command {
     input_names: &[],
     input_helps: &[],
     execute: |_, _| Ok(prom_link::print_java_plugins()?), 
+    output_type: &EbiOutputType::String
+};
+pub const EBI_ITSELF_HTML: EbiCommand = EbiCommand::Command { 
+    name_short: "html", 
+    name_long: None, 
+    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_HTML",
+    explanation_short: "Print parts of the website.", 
+    explanation_long: None, 
+    cli_command: None, 
+    latex_link: None, 
+    exact_arithmetic: false, 
+    input_types: &[], 
+    input_names: &[],
+    input_helps: &[],
+    execute: |_, _| Ok(EbiOutput::String(html())), 
     output_type: &EbiOutputType::String
 };
 
@@ -179,7 +192,11 @@ fn manual() -> Result<EbiOutput> {
                 writeln!(f, "&{}\\\\", input_help)?;
 
                 //mandatoryness
-                writeln!(f, "&\\textit{{Mandatory:}} \\quad yes, though it can be given on STDIN by giving a `-' on the command line.\\\\")?;
+                if let Some(default) = ebi_input::default(input_types) {
+                    writeln!(f, "&\\textit{{Mandatory:}} \\quad no: if no value is provided, a default of {} will be used. It can also be provided on STDIN by giving a `-' on the command line.\\\\", default)?;
+                } else {
+                    writeln!(f, "&\\textit{{Mandatory:}} \\quad yes, though it can be given on STDIN by giving a `-' on the command line.\\\\")?;
+                }
 
                 //accepted values
                 writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", EbiInputType::get_possible_inputs_with_latex(input_types).join_with(", ", " and "))?;
@@ -205,8 +222,11 @@ fn manual() -> Result<EbiOutput> {
 
                     if arg.get_short().is_none() && arg.get_long().is_none() {
                         //custom argument
-
-                        writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes"} else {"no"} )?;
+                        if let Some(default) = arg.get_default_values().iter().next() {
+                            writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes".to_owned()} else {format!("no; if not provided, a default value of {} will be used", default.to_string_lossy())} )?;
+                        } else {
+                            writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes"} else {"no"} )?;
+                        }
                     } else {
                         writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
                     }
@@ -520,6 +540,48 @@ pub fn graph() -> Result<VisualGraph> {
 pub fn scale(point: &mut Point) {
     point.x *= 0.5;
 }
+
+pub fn html() -> String {
+    let commands_html = EBI_COMMANDS
+        .get_command_paths()
+        .iter()
+        .filter_map(|path| {
+            if path[1].long_name() != EBI_ITSELF.long_name() {
+                Some(format!(
+                    "<i>{}</i>. {}",
+                    EbiCommand::path_to_string(&path[1..]).to_sentence_case(),
+                    path.last().unwrap().explanation_short()
+                ))
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>()
+        .join("</li><li>");
+
+    let file_formats_html = EBI_FILE_HANDLERS
+        .iter()
+        .map(|file_handler| {
+            format!(
+                "{} (.{})",
+                file_handler.name.to_sentence_case(),
+                file_handler.file_extension
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("</li><li>");
+
+    format!(
+        "<h2>Commands</h2>\
+        Ebi offers the following comands and techniques. \
+        Please refer to the <a href=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true\">manual</a> for more information. \
+        <ul><li>{}</li></ul>\
+        <h2>Supported file formats</h2>\
+        <ul><li>{}</li></ul>",
+        commands_html, file_formats_html
+    )
+}
+
 
 pub fn generate_pm4py_module() -> Result<EbiOutput> {
     let mut imports = format!("#![allow(unsafe_op_in_unsafe_fn)]

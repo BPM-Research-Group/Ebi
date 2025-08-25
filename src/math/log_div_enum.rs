@@ -1,4 +1,10 @@
 use anyhow::{Error, Result, anyhow};
+use ebi_arithmetic::{
+    exact::{MaybeExact, is_exact_globally},
+    fraction::{APPROX_DIGITS, UInt},
+    fraction_enum::FractionEnum,
+    ebi_number::{One, Zero},
+};
 use fraction::{BigFraction, BigUint, GenericFraction, Integer, Sign};
 use num_bigint::{ToBigInt, ToBigUint};
 use num_traits::Pow;
@@ -11,15 +17,9 @@ use std::{
 
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
-use super::{
-    fraction::{APPROX_DIGITS, MaybeExact, UInt},
-    fraction_enum::FractionEnum,
-    traits::{One, Zero},
-};
-
 #[derive(Clone)]
 pub enum LogDivEnum {
-    Exact(BigFraction, UInt), //fraction cannot be negative, but zero and NaN are ok, UInt is the denominator
+    Exact((BigFraction, UInt)), //fraction cannot be negative, but zero and NaN are ok, UInt is the denominator
     Approx(f64),
     CannotCombineExactAndApprox,
 }
@@ -30,7 +30,7 @@ impl LogDivEnum {
      */
     pub(crate) fn matches(&self, rhs: &Self) -> bool {
         match (self, rhs) {
-            (Self::Exact(_, _), Self::Exact(_, _)) => true,
+            (Self::Exact(_), Self::Exact(_)) => true,
             (Self::Approx(_), Self::Approx(_)) => true,
             _ => false,
         }
@@ -41,7 +41,7 @@ impl LogDivEnum {
      */
     pub(crate) fn matches_f(&self, rhs: &FractionEnum) -> bool {
         match (self, rhs.is_exact()) {
-            (Self::Exact(_, _), true) => true,
+            (Self::Exact(_), true) => true,
             (Self::Approx(_), false) => true,
             _ => false,
         }
@@ -53,7 +53,7 @@ impl LogDivEnum {
         }
 
         match log_of {
-            FractionEnum::Exact(f) => Self::Exact(f, divide_by.into()),
+            FractionEnum::Exact(f) => Self::Exact((f, divide_by.into())),
             FractionEnum::Approx(f) => Self::Approx(f.log2() / divide_by as f64),
             FractionEnum::CannotCombineExactAndApprox => Self::CannotCombineExactAndApprox,
         }
@@ -65,7 +65,7 @@ impl LogDivEnum {
         }
 
         match log_of {
-            FractionEnum::Exact(f) => Self::Exact(f, 1u32.into()),
+            FractionEnum::Exact(f) => Self::Exact((f, 1u32.into())),
             FractionEnum::Approx(f) => Self::Approx(f.log2()),
             FractionEnum::CannotCombineExactAndApprox => Self::CannotCombineExactAndApprox,
         }
@@ -81,7 +81,7 @@ impl LogDivEnum {
         }
 
         match self {
-            LogDivEnum::Exact(ab_log, c_denom) => {
+            LogDivEnum::Exact((ab_log, c_denom)) => {
                 let raw: FractionRaw = ab_log.clone().try_into().unwrap();
                 let mut approx = raw.approximate_log2().unwrap();
                 approx /= FractionEnum::try_from(c_denom)?;
@@ -95,7 +95,7 @@ impl LogDivEnum {
     }
 
     pub fn n_log_n(n: &FractionEnum) -> Self {
-        // println!("n log n of {}", n);
+        // log::debug!("n log n of {}", n);
 
         if n.is_sign_negative() {
             return Self::nan(n);
@@ -108,10 +108,10 @@ impl LogDivEnum {
         }
 
         match n {
-            FractionEnum::Exact(f) => Self::Exact(
+            FractionEnum::Exact(f) => Self::Exact((
                 Self::power_f_u(f, f.numer().unwrap()),
                 f.denom().unwrap().clone(),
-            ),
+            )),
             FractionEnum::Approx(f) => Self::Approx(f * f.log2()),
             FractionEnum::CannotCombineExactAndApprox => Self::CannotCombineExactAndApprox,
         }
@@ -123,7 +123,7 @@ impl LogDivEnum {
 
     fn nan_b(exact: bool) -> Self {
         if exact {
-            Self::Exact(BigFraction::nan(), 1.to_biguint().unwrap())
+            Self::Exact((BigFraction::nan(), 1.to_biguint().unwrap()))
         } else {
             Self::Approx(f64::NAN)
         }
@@ -131,7 +131,7 @@ impl LogDivEnum {
 
     pub fn is_nan(&self) -> bool {
         match self {
-            LogDivEnum::Exact(f, _) => f.is_nan(),
+            LogDivEnum::Exact((f, _)) => f.is_nan(),
             LogDivEnum::Approx(f) => f.is_nan(),
             LogDivEnum::CannotCombineExactAndApprox => false,
         }
@@ -147,7 +147,7 @@ impl LogDivEnum {
 
     pub fn is_infinite(&self) -> bool {
         match self {
-            LogDivEnum::Exact(f, _) => f.is_infinite(),
+            LogDivEnum::Exact((f, _)) => f.is_infinite(),
             LogDivEnum::Approx(f) => f.is_infinite(),
             LogDivEnum::CannotCombineExactAndApprox => false,
         }
@@ -171,7 +171,7 @@ impl LogDivEnum {
      * Internally uses i32 powers for approximate arithmetic
      */
     pub fn power_f_u(base: &BigFraction, power: &UInt) -> BigFraction {
-        // println!("power_f_u of {} and {}", base, power);
+        // log::debug!("power_f_u of {} and {}", base, power);
         match base {
             GenericFraction::Rational(sign, ratio) => {
                 let numer = ratio.numer().to_bigint().unwrap();
@@ -204,7 +204,7 @@ impl MaybeExact for LogDivEnum {
 
     fn is_exact(&self) -> bool {
         match self {
-            LogDivEnum::Exact(_, _) => true,
+            LogDivEnum::Exact(_) => true,
             LogDivEnum::Approx(_) => false,
             LogDivEnum::CannotCombineExactAndApprox => false,
         }
@@ -212,7 +212,7 @@ impl MaybeExact for LogDivEnum {
 
     fn extract_approx(&self) -> Result<Self::Approximate> {
         match self {
-            LogDivEnum::Exact(_, _) => Err(anyhow!("cannot extract a float from fractions")),
+            LogDivEnum::Exact(_) => Err(anyhow!("cannot extract a float from fractions")),
             LogDivEnum::Approx(f) => Ok(*f),
             LogDivEnum::CannotCombineExactAndApprox => {
                 Err(anyhow!("cannot combine exact and approximate arithmetic"))
@@ -220,9 +220,9 @@ impl MaybeExact for LogDivEnum {
         }
     }
 
-    fn extract_exact(&self) -> Result<<LogDivEnum as MaybeExact>::Exact> {
+    fn extract_exact(&self) -> Result<&<LogDivEnum as MaybeExact>::Exact> {
         match self {
-            LogDivEnum::Exact(a, b) => Ok((a.clone(), b.clone())),
+            LogDivEnum::Exact(a) => Ok(a),
             LogDivEnum::Approx(_) => Err(anyhow!("cannot extract fractions from a float")),
             LogDivEnum::CannotCombineExactAndApprox => {
                 Err(anyhow!("cannot combine exact and approximate arithmetic"))
@@ -233,8 +233,8 @@ impl MaybeExact for LogDivEnum {
 
 impl Zero for LogDivEnum {
     fn zero() -> Self {
-        if FractionEnum::create_exact() {
-            Self::Exact(BigFraction::one(), UInt::from(1u32))
+        if is_exact_globally() {
+            Self::Exact((BigFraction::one(), UInt::from(1u32)))
         } else {
             Self::Approx(0.0)
         }
@@ -242,7 +242,7 @@ impl Zero for LogDivEnum {
 
     fn is_zero(&self) -> bool {
         match self {
-            LogDivEnum::Exact(f, _) => f.is_one(),
+            LogDivEnum::Exact((f, _)) => f.is_one(),
             LogDivEnum::Approx(f) => <f64 as Zero>::is_zero(f),
             LogDivEnum::CannotCombineExactAndApprox => false,
         }
@@ -251,8 +251,8 @@ impl Zero for LogDivEnum {
 
 impl One for LogDivEnum {
     fn one() -> Self {
-        if FractionEnum::create_exact() {
-            Self::Exact(BigFraction::from(2), UInt::from(1u32))
+        if is_exact_globally() {
+            Self::Exact((BigFraction::from(2), UInt::from(1u32)))
         } else {
             Self::Approx(1.0)
         }
@@ -263,7 +263,7 @@ impl One for LogDivEnum {
          * logdiv = 1 <=> c = log(a/b)
          */
         match self {
-            LogDivEnum::Exact(f, c) => {
+            LogDivEnum::Exact((f, c)) => {
                 //if f.denom is not 1 (given that f is always reduced), then a/b is not an integer and thus the result is false
                 match f.denom() {
                     Some(denom) => {
@@ -295,7 +295,7 @@ impl One for LogDivEnum {
                     None => return false,
                 }
             }
-            LogDivEnum::Approx(f) => crate::math::traits::One::is_one(f),
+            LogDivEnum::Approx(f) => One::is_one(f),
             _ => false,
         }
     }
@@ -304,7 +304,7 @@ impl One for LogDivEnum {
 impl PartialEq for LogDivEnum {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (Self::Exact(l0, l1), Self::Exact(r0, r1)) => {
+            (Self::Exact((l0, l1)), Self::Exact((r0, r1))) => {
                 if self.is_zero() && other.is_zero() {
                     return true;
                 }
@@ -332,7 +332,7 @@ impl From<FractionEnum> for LogDivEnum {
                     match f {
                         GenericFraction::Rational(_, f) => {
                             let g = BigFraction::new(Self::power_2_u(f.numer()), BigUint::one());
-                            Self::Exact(g, f.denom().clone())
+                            Self::Exact((g, f.denom().clone()))
                         }
                         GenericFraction::Infinity(_) => Self::infinity(),
                         GenericFraction::NaN => Self::nan_b(true),
@@ -350,12 +350,13 @@ impl Add for LogDivEnum {
 
     fn add(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (LogDivEnum::Exact(ab_log, c_denom), LogDivEnum::Exact(rhs_ab_log, rhs_c_denom)) => {
-                Self::Exact(
-                    Self::power_f_u(&ab_log, &rhs_c_denom) * Self::power_f_u(&rhs_ab_log, &c_denom),
-                    c_denom * rhs_c_denom,
-                )
-            }
+            (
+                LogDivEnum::Exact((ab_log, c_denom)),
+                LogDivEnum::Exact((rhs_ab_log, rhs_c_denom)),
+            ) => Self::Exact((
+                Self::power_f_u(&ab_log, &rhs_c_denom) * Self::power_f_u(&rhs_ab_log, &c_denom),
+                c_denom * rhs_c_denom,
+            )),
             (LogDivEnum::Approx(f), LogDivEnum::Approx(g)) => Self::Approx(f.add(g)),
             _ => LogDivEnum::CannotCombineExactAndApprox,
         }
@@ -377,8 +378,8 @@ impl AddAssign for LogDivEnum {
         } else {
             match (self, rhs) {
                 (
-                    LogDivEnum::Exact(ab_log, c_denom),
-                    LogDivEnum::Exact(rhs_ab_log, rhs_c_denom),
+                    LogDivEnum::Exact((ab_log, c_denom)),
+                    LogDivEnum::Exact((rhs_ab_log, rhs_c_denom)),
                 ) => {
                     *ab_log = Self::power_f_u(&ab_log, &rhs_c_denom)
                         * Self::power_f_u(&rhs_ab_log, &c_denom);
@@ -396,12 +397,13 @@ impl Sub for LogDivEnum {
 
     fn sub(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (LogDivEnum::Exact(ab_log, c_denom), LogDivEnum::Exact(rhs_ab_log, rhs_c_denom)) => {
-                Self::Exact(
-                    Self::power_f_u(&ab_log, &rhs_c_denom) / Self::power_f_u(&rhs_ab_log, &c_denom),
-                    c_denom * rhs_c_denom,
-                )
-            }
+            (
+                LogDivEnum::Exact((ab_log, c_denom)),
+                LogDivEnum::Exact((rhs_ab_log, rhs_c_denom)),
+            ) => Self::Exact((
+                Self::power_f_u(&ab_log, &rhs_c_denom) / Self::power_f_u(&rhs_ab_log, &c_denom),
+                c_denom * rhs_c_denom,
+            )),
             (LogDivEnum::Approx(f), LogDivEnum::Approx(g)) => Self::Approx(f.sub(g)),
             _ => LogDivEnum::CannotCombineExactAndApprox,
         }
@@ -415,8 +417,8 @@ impl SubAssign for LogDivEnum {
         } else {
             match (self, rhs) {
                 (
-                    LogDivEnum::Exact(ab_log, c_denom),
-                    LogDivEnum::Exact(rhs_ab_log, rhs_c_denom),
+                    LogDivEnum::Exact((ab_log, c_denom)),
+                    LogDivEnum::Exact((rhs_ab_log, rhs_c_denom)),
                 ) => {
                     *ab_log = Self::power_f_u(&ab_log, &rhs_c_denom)
                         / Self::power_f_u(&rhs_ab_log, &c_denom);
@@ -435,7 +437,7 @@ impl MulAssign<FractionEnum> for LogDivEnum {
             *self = LogDivEnum::CannotCombineExactAndApprox
         } else {
             match (self, rhs) {
-                (LogDivEnum::Exact(ab_log, c), FractionEnum::Exact(f)) => {
+                (LogDivEnum::Exact((ab_log, c)), FractionEnum::Exact(f)) => {
                     *ab_log = Self::power_f_u(&ab_log, &f.numer().unwrap());
                     *c *= f.denom().unwrap()
                 }
@@ -452,7 +454,7 @@ impl MulAssign<&FractionEnum> for LogDivEnum {
             *self = Self::CannotCombineExactAndApprox
         }
         match (self, rhs) {
-            (LogDivEnum::Exact(ab_log, c), FractionEnum::Exact(f)) => {
+            (LogDivEnum::Exact((ab_log, c)), FractionEnum::Exact(f)) => {
                 *ab_log = Self::power_f_u(&ab_log, &f.numer().unwrap());
                 *c *= f.denom().unwrap()
             }
@@ -465,7 +467,7 @@ impl MulAssign<&FractionEnum> for LogDivEnum {
 impl MulAssign<usize> for LogDivEnum {
     fn mul_assign(&mut self, rhs: usize) {
         match self {
-            LogDivEnum::Exact(ab_log, _) => {
+            LogDivEnum::Exact((ab_log, _)) => {
                 *ab_log = Self::power_f_u(&ab_log, &rhs.to_biguint().unwrap())
             }
             LogDivEnum::Approx(f) => *f *= rhs as f64,
@@ -477,7 +479,7 @@ impl MulAssign<usize> for LogDivEnum {
 impl MulAssign<u64> for LogDivEnum {
     fn mul_assign(&mut self, rhs: u64) {
         match self {
-            LogDivEnum::Exact(ab_log, _) => {
+            LogDivEnum::Exact((ab_log, _)) => {
                 *ab_log = Self::power_f_u(&ab_log, &rhs.to_biguint().unwrap())
             }
             LogDivEnum::Approx(f) => *f *= rhs as f64,
@@ -527,7 +529,7 @@ impl Exportable for LogDivEnum {
 impl Infoable for LogDivEnum {
     fn info(&self, f: &mut impl Write) -> Result<()> {
         match self {
-            LogDivEnum::Exact(ab_log, c_denom) => {
+            LogDivEnum::Exact((ab_log, c_denom)) => {
                 write!(f, "log(")?;
                 ab_log.info(f)?;
                 writeln!(f, ") / {} bits", c_denom.bits())?;
@@ -545,7 +547,7 @@ impl Infoable for LogDivEnum {
 impl Display for LogDivEnum {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            LogDivEnum::Exact(ab_log, c_denom) => write!(f, "log({})/{}", ab_log, c_denom),
+            LogDivEnum::Exact((ab_log, c_denom)) => write!(f, "log({})/{}", ab_log, c_denom),
             LogDivEnum::Approx(fr) => write!(f, "{}", fr),
             LogDivEnum::CannotCombineExactAndApprox => {
                 write!(f, "cannot combine exact and approximate arithmetic")
@@ -557,7 +559,7 @@ impl Display for LogDivEnum {
 impl std::fmt::Debug for LogDivEnum {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            LogDivEnum::Exact(ab_log, c_denom) => {
+            LogDivEnum::Exact((ab_log, c_denom)) => {
                 write!(f, "logdiv of ({:?}/{}) bits", ab_log, c_denom.bits())
             }
             LogDivEnum::Approx(fr) => write!(f, "logdiv approx {}", fr),
@@ -760,7 +762,9 @@ impl Display for FractionRaw {
 
 #[cfg(test)]
 mod tests {
-    use crate::math::{log_div_enum::LogDivEnum, traits::Zero};
+    use ebi_arithmetic::ebi_number::Zero;
+
+    use crate::math::log_div_enum::LogDivEnum;
 
     #[test]
     fn zero_log_div() {

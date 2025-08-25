@@ -1,0 +1,10 @@
+{
+	"activities": {"a":"6/5","b":"4/5"},
+	"directly_follows_relations": [
+		[["a", "a"], "1/5"],
+		[["a", "b"], "1/5"],
+		[["b", "a"], "3/5"]
+	],
+	"end_activities": ["a", "b"],
+	"start_activities": ["a", "b"]
+}

@@ -1,5 +1,6 @@
 use anyhow::{Context, Error, Ok, Result, anyhow};
 use bitvec::vec::BitVec;
+use ebi_derive::ActivityKey;
 use layout::topo::layout::VisualGraph;
 use std::{
     fmt::{self, Debug},
@@ -25,9 +26,7 @@ use crate::{
         prom_link::JavaObjectHandler,
     },
     ebi_traits::{
-        ebi_trait_graphable::{self, EbiTraitGraphable},
-        ebi_trait_semantics::{EbiTraitSemantics, Semantics},
-        ebi_trait_stochastic_semantics::TransitionIndex,
+        ebi_trait_activities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics}, ebi_trait_stochastic_semantics::TransitionIndex
     },
     line_reader::LineReader,
     marking::Marking,
@@ -56,9 +55,11 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "labelled Petri net",
     article: "a",
     file_extension: "lpn",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<LabelledPetriNet>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<LabelledPetriNet>),
         EbiTraitImporter::Semantics(LabelledPetriNet::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<LabelledPetriNet>),
     ],
@@ -334,9 +335,7 @@ impl Exportable for LabelledPetriNet {
             EbiOutput::ContainsRoot(_) => Err(anyhow!("Cannot export ContainsRoot as LPN.")),
             EbiOutput::Fraction(_) => Err(anyhow!("Cannot export fraction as LPN.")),
             EbiOutput::LogDiv(_) => Err(anyhow!("Cannot export LogDiv as LPN.")),
-            EbiOutput::PDF(_) => Err(anyhow!("Cannot export PDF as LPN.")),
             EbiOutput::RootLogDiv(_) => Err(anyhow!("Cannot export RootLogDiv as LPN.")),
-            EbiOutput::SVG(_) => Err(anyhow!("Cannot export SVG as LPN.")),
             EbiOutput::String(_) => Err(anyhow!("Cannot export string as LPN.")),
             EbiOutput::Usize(_) => Err(anyhow!("Cannot export integer as LPN.")),
             EbiOutput::Object(EbiObject::EventLog(_)) => {
@@ -356,6 +355,9 @@ impl Exportable for LabelledPetriNet {
             }
             EbiOutput::Object(EbiObject::StochasticLanguageOfAlignments(_)) => Err(anyhow!(
                 "Cannot export stochastic language of alignments as LPN."
+            )),
+            EbiOutput::Object(EbiObject::ScalableVectorGraphics(_)) => Err(anyhow!(
+                "Cannot export scalable vector graphics as LPN."
             )),
         }
     }

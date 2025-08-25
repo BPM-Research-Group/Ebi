@@ -1,5 +1,6 @@
 use anyhow::{Context, anyhow};
 use bitvec::bitvec;
+use ebi_arithmetic::{fraction::Fraction, ebi_number::{Signed, Zero}};
 
 use crate::{
     ebi_framework::activity_key::Activity,
@@ -9,10 +10,6 @@ use crate::{
     ebi_traits::{
         ebi_trait_semantics::Semantics,
         ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex},
-    },
-    math::{
-        fraction::Fraction,
-        traits::{Signed, Zero},
     },
 };
 

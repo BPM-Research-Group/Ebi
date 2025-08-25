@@ -7,9 +7,9 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_semantics::Semantics,
     },
-    math::{fraction::Fraction, traits::Zero},
 };
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
 
 use super::align::Align;
 
@@ -57,7 +57,13 @@ impl AlignmentMiner for LabelledPetriNet {
 mod tests {
     use std::fs;
 
-    use crate::{ebi_objects::{finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet}, techniques::alignment_stochastic_miner::AlignmentMiner};
+    use crate::{
+        ebi_objects::{
+            finite_stochastic_language::FiniteStochasticLanguage,
+            labelled_petri_net::LabelledPetriNet,
+        },
+        techniques::alignment_stochastic_miner::AlignmentMiner,
+    };
 
     #[test]
     fn lpn_uniform() {
@@ -65,7 +71,8 @@ mod tests {
         let lpn = Box::new(fin.parse::<LabelledPetriNet>().unwrap());
 
         let fin2 = fs::read_to_string("testfiles/ba.slang").unwrap();
-        let slang: Box<FiniteStochasticLanguage> = Box::new(fin2.parse::<FiniteStochasticLanguage>().unwrap());
+        let slang: Box<FiniteStochasticLanguage> =
+            Box::new(fin2.parse::<FiniteStochasticLanguage>().unwrap());
 
         let slpn = lpn.mine_stochastic_alignment(slang).unwrap();
         let fout = fs::read_to_string("testfiles/aa-ab-ba_ali.slpn").unwrap();

@@ -1,10 +1,15 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
+use ebi_arithmetic::{
+    ebi_number::{Signed, Zero},
+    fraction::Fraction,
+};
 use num::One as _;
 use std::sync::Arc;
 
 use crate::{
-    distances::TriangularDistanceMatrix, ebi_objects::finite_language::FiniteLanguage,
-    ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage, math::{fraction::Fraction, traits::{Signed, Zero}},
+    ebi_objects::finite_language::FiniteLanguage,
+    ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage,
+    math::distances::TriangularDistanceMatrix,
 };
 
 pub trait MedoidNonStochastic {
@@ -508,7 +513,10 @@ where
 mod tests {
     use std::fs;
 
-    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, techniques::medoid_non_stochastic::MedoidNonStochastic};
+    use crate::{
+        ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
+        techniques::medoid_non_stochastic::MedoidNonStochastic,
+    };
 
     #[test]
     fn non_stochastic_clustering() {

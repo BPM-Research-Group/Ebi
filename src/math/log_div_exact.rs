@@ -1,4 +1,10 @@
-use anyhow::{anyhow, Error, Result};
+use anyhow::{Error, Result, anyhow};
+use ebi_arithmetic::{
+    ebi_number::{One, Zero},
+    exact::MaybeExact,
+    fraction::{APPROX_DIGITS, Fraction, UInt},
+    fraction_exact::FractionExact,
+};
 use fraction::{BigFraction, BigUint, GenericFraction, Integer, Sign};
 use num_bigint::{ToBigInt, ToBigUint};
 use num_traits::Pow;
@@ -11,12 +17,8 @@ use std::{
 
 use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
-use super::{
-    fraction::{Fraction, MaybeExact, UInt, APPROX_DIGITS}, fraction_exact::FractionExact, traits::{One, Zero}
-};
-
 #[derive(Clone)]
-pub struct LogDivExact(BigFraction, UInt);
+pub struct LogDivExact((BigFraction, UInt));
 
 impl LogDivExact {
     pub fn log2_div(log_of: Fraction, divide_by: u64) -> Self {
@@ -25,7 +27,7 @@ impl LogDivExact {
         }
 
         match log_of {
-            FractionExact(f) => LogDivExact(f, divide_by.into()),
+            FractionExact(f) => LogDivExact((f, divide_by.into())),
         }
     }
 
@@ -35,7 +37,7 @@ impl LogDivExact {
         }
 
         match log_of {
-            FractionExact(f) => LogDivExact(f, 1u32.into()),
+            FractionExact(f) => LogDivExact((f, 1u32.into())),
         }
     }
 
@@ -49,7 +51,7 @@ impl LogDivExact {
         }
 
         match self {
-            LogDivExact(ab_log, c_denom) => {
+            LogDivExact((ab_log, c_denom)) => {
                 let raw: FractionRaw = ab_log.clone().try_into().unwrap();
                 let mut approx = raw.approximate_log2().unwrap();
                 approx /= FractionExact::try_from(c_denom)?;
@@ -70,10 +72,10 @@ impl LogDivExact {
         }
 
         match n {
-            FractionExact(f) => LogDivExact(
+            FractionExact(f) => LogDivExact((
                 Self::power_f_u(f, f.numer().unwrap()),
                 f.denom().unwrap().clone(),
-            ),
+            )),
         }
     }
 
@@ -82,26 +84,26 @@ impl LogDivExact {
     }
 
     fn nan_b(_: bool) -> Self {
-        LogDivExact(BigFraction::nan(), num::One::one())
+        LogDivExact((BigFraction::nan(), num::One::one()))
     }
 
     pub fn is_nan(&self) -> bool {
         match self {
-            LogDivExact(f, _) => f.is_nan(),
+            LogDivExact((f, _)) => f.is_nan(),
         }
     }
 
     pub fn neg_infinity() -> Self {
-        Self(GenericFraction::Infinity(Sign::Minus), num::One::one())
+        Self((GenericFraction::Infinity(Sign::Minus), num::One::one()))
     }
 
     pub fn infinity() -> Self {
-        Self(GenericFraction::Infinity(Sign::Plus), num::One::one())
+        Self((GenericFraction::Infinity(Sign::Plus), num::One::one()))
     }
 
     pub fn is_infinite(&self) -> bool {
         match self {
-            LogDivExact(f, _) => f.is_infinite(),
+            LogDivExact((f, _)) => f.is_infinite(),
         }
     }
 
@@ -151,26 +153,26 @@ impl MaybeExact for LogDivExact {
         Err(anyhow!("cannot extract a float from fractions"))
     }
 
-    fn extract_exact(&self) -> Result<Self::Exact> {
-        Ok((self.0.clone(), self.1.clone()))
+    fn extract_exact(&self) -> Result<&Self::Exact> {
+        Ok(&self.0)
     }
 }
 
 impl Zero for LogDivExact {
     fn zero() -> Self {
-        LogDivExact(num::One::one(), UInt::from(1u32))
+        LogDivExact((num::One::one(), UInt::from(1u32)))
     }
 
     fn is_zero(&self) -> bool {
         match self {
-            LogDivExact(f, _) => num::One::is_one(f),
+            LogDivExact((f, _)) => num::One::is_one(f),
         }
     }
 }
 
 impl One for LogDivExact {
     fn one() -> Self {
-        Self(BigFraction::from(2), UInt::from(1u32))
+        Self((BigFraction::from(2), UInt::from(1u32)))
     }
 
     fn is_one(&self) -> bool {
@@ -178,7 +180,7 @@ impl One for LogDivExact {
          * logdiv = 1 <=> c = log(a/b)
          */
         match self {
-            LogDivExact(f, c) => {
+            LogDivExact((f, c)) => {
                 //if f.denom is not 1 (given that f is always reduced), then a/b is not an integer and thus the result is false
                 match f.denom() {
                     Some(denom) => {
@@ -217,7 +219,7 @@ impl One for LogDivExact {
 impl PartialEq for LogDivExact {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
-            (Self(l0, l1), Self(r0, r1)) => {
+            (Self((l0, l1)), Self((r0, r1))) => {
                 if self.is_zero() && other.is_zero() {
                     return true;
                 }
@@ -241,7 +243,7 @@ impl From<Fraction> for LogDivExact {
                     match f {
                         GenericFraction::Rational(_, f) => {
                             let g = BigFraction::new(Self::power_s_u(2, f.numer()), BigUint::one());
-                            Self(g, f.denom().clone())
+                            Self((g, f.denom().clone()))
                         }
                         GenericFraction::Infinity(_) => Self::infinity(),
                         GenericFraction::NaN => Self::nan_b(true),
@@ -257,10 +259,10 @@ impl Add for LogDivExact {
 
     fn add(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (LogDivExact(ab_log, c_denom), LogDivExact(rhs_ab_log, rhs_c_denom)) => Self(
+            (LogDivExact((ab_log, c_denom)), LogDivExact((rhs_ab_log, rhs_c_denom))) => Self((
                 Self::power_f_u(&ab_log, &rhs_c_denom) * Self::power_f_u(&rhs_ab_log, &c_denom),
                 c_denom * rhs_c_denom,
-            ),
+            )),
         }
     }
 }
@@ -276,7 +278,7 @@ impl Add<Fraction> for LogDivExact {
 impl AddAssign for LogDivExact {
     fn add_assign(&mut self, rhs: Self) {
         match (self, rhs) {
-            (LogDivExact(ab_log, c_denom), LogDivExact(rhs_ab_log, rhs_c_denom)) => {
+            (LogDivExact((ab_log, c_denom)), LogDivExact((rhs_ab_log, rhs_c_denom))) => {
                 *ab_log =
                     Self::power_f_u(&ab_log, &rhs_c_denom) * Self::power_f_u(&rhs_ab_log, &c_denom);
                 *c_denom *= &rhs_c_denom;
@@ -290,10 +292,10 @@ impl Sub for LogDivExact {
 
     fn sub(self, rhs: Self) -> Self::Output {
         match (self, rhs) {
-            (LogDivExact(ab_log, c_denom), LogDivExact(rhs_ab_log, rhs_c_denom)) => Self(
+            (LogDivExact((ab_log, c_denom)), LogDivExact((rhs_ab_log, rhs_c_denom))) => Self((
                 Self::power_f_u(&ab_log, &rhs_c_denom) / Self::power_f_u(&rhs_ab_log, &c_denom),
                 c_denom * rhs_c_denom,
-            ),
+            )),
         }
     }
 }
@@ -301,7 +303,7 @@ impl Sub for LogDivExact {
 impl SubAssign for LogDivExact {
     fn sub_assign(&mut self, rhs: Self) {
         match (self, rhs) {
-            (LogDivExact(ab_log, c_denom), LogDivExact(rhs_ab_log, rhs_c_denom)) => {
+            (LogDivExact((ab_log, c_denom)), LogDivExact((rhs_ab_log, rhs_c_denom))) => {
                 *ab_log =
                     Self::power_f_u(&ab_log, &rhs_c_denom) / Self::power_f_u(&rhs_ab_log, &c_denom);
                 *c_denom *= &rhs_c_denom;
@@ -312,19 +314,19 @@ impl SubAssign for LogDivExact {
 
 impl MulAssign<FractionExact> for LogDivExact {
     fn mul_assign(&mut self, rhs: FractionExact) {
-            match (self, rhs) {
-                (LogDivExact(ab_log, c), FractionExact(f)) => {
-                    *ab_log = Self::power_f_u(&ab_log, &f.numer().unwrap());
-                    *c *= f.denom().unwrap()
-                }
+        match (self, rhs) {
+            (LogDivExact((ab_log, c)), FractionExact(f)) => {
+                *ab_log = Self::power_f_u(&ab_log, &f.numer().unwrap());
+                *c *= f.denom().unwrap()
             }
+        }
     }
 }
 
 impl MulAssign<&FractionExact> for LogDivExact {
     fn mul_assign(&mut self, rhs: &FractionExact) {
         match (self, rhs) {
-            (LogDivExact(ab_log, c), FractionExact(f)) => {
+            (LogDivExact((ab_log, c)), FractionExact(f)) => {
                 *ab_log = Self::power_f_u(&ab_log, &f.numer().unwrap());
                 *c *= f.denom().unwrap()
             }
@@ -335,7 +337,7 @@ impl MulAssign<&FractionExact> for LogDivExact {
 impl MulAssign<usize> for LogDivExact {
     fn mul_assign(&mut self, rhs: usize) {
         match self {
-            LogDivExact(ab_log, _) => {
+            LogDivExact((ab_log, _)) => {
                 *ab_log = Self::power_f_u(&ab_log, &rhs.to_biguint().unwrap())
             }
         }
@@ -345,7 +347,7 @@ impl MulAssign<usize> for LogDivExact {
 impl MulAssign<u64> for LogDivExact {
     fn mul_assign(&mut self, rhs: u64) {
         match self {
-            LogDivExact(ab_log, _) => {
+            LogDivExact((ab_log, _)) => {
                 *ab_log = Self::power_f_u(&ab_log, &rhs.to_biguint().unwrap())
             }
         }
@@ -393,7 +395,7 @@ impl Exportable for LogDivExact {
 impl Infoable for LogDivExact {
     fn info(&self, f: &mut impl Write) -> Result<()> {
         match self {
-            LogDivExact(ab_log, c_denom) => {
+            LogDivExact((ab_log, c_denom)) => {
                 write!(f, "log(")?;
                 ab_log.info(f)?;
                 writeln!(f, ") / {} bits", c_denom.bits())?;
@@ -407,7 +409,7 @@ impl Infoable for LogDivExact {
 impl Display for LogDivExact {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            LogDivExact(ab_log, c_denom) => write!(f, "log({})/{}", ab_log, c_denom),
+            LogDivExact((ab_log, c_denom)) => write!(f, "log({})/{}", ab_log, c_denom),
         }
     }
 }
@@ -415,7 +417,7 @@ impl Display for LogDivExact {
 impl std::fmt::Debug for LogDivExact {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            LogDivExact(ab_log, c_denom) => {
+            LogDivExact((ab_log, c_denom)) => {
                 write!(f, "logdiv of ({:?}/{}) bits", ab_log, c_denom.bits())
             }
         }
@@ -614,7 +616,9 @@ impl Display for FractionRaw {
 
 #[cfg(test)]
 mod tests {
-    use crate::math::{log_div_exact::LogDivExact, traits::Zero};
+    use ebi_arithmetic::ebi_number::Zero;
+
+    use crate::math::log_div_exact::LogDivExact;
 
     #[test]
     fn zero_log_div() {

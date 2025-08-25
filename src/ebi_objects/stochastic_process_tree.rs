@@ -12,6 +12,7 @@ use crate::{
         importable::Importable,
     },
     ebi_traits::{
+        ebi_trait_activities,
         ebi_trait_graphable::{self, EbiTraitGraphable},
         ebi_trait_queriable_stochastic_language,
         ebi_trait_semantics::{Semantics, ToSemantics},
@@ -21,10 +22,11 @@ use crate::{
         ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
     line_reader::LineReader,
-    math::{fraction::Fraction, traits::Signed},
 };
 
 use anyhow::{Context, Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::Signed};
+use ebi_derive::ActivityKey;
 use layout::{adt::dag::NodeHandle, topo::layout::VisualGraph};
 
 use super::process_tree::{Node, Operator, ProcessTree};
@@ -52,9 +54,11 @@ pub const EBI_STOCHASTIC_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     name: "stochastic process tree",
     article: "a",
     file_extension: "sptree",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticProcessTree>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<StochasticProcessTree>),
         EbiTraitImporter::QueriableStochasticLanguage(
             ebi_trait_queriable_stochastic_language::import::<StochasticProcessTree>,
         ),

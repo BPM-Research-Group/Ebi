@@ -1,5 +1,6 @@
 use anyhow::{Context, Result, anyhow};
 use clap::{ArgMatches, builder::ValueParser, value_parser};
+use ebi_arithmetic::{fraction::Fraction, parsing::FractionNotParsedYet};
 use std::{
     collections::{BTreeSet, HashSet},
     fmt::Display,
@@ -12,7 +13,8 @@ use strum_macros::EnumIter;
 use crate::{
     ebi_framework::ebi_file_handler::EbiFileHandler,
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
+        ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_graphable::EbiTraitGraphable,
         ebi_trait_iterable_language::EbiTraitIterableLanguage,
@@ -23,7 +25,7 @@ use crate::{
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
     ebi_validate,
-    math::fraction::{Fraction, FractionNotParsedYet},
+    math::constant_fraction::ConstFraction,
     multiple_reader::MultipleReader,
     text::Joiner,
 };
@@ -43,10 +45,10 @@ use super::{
 pub enum EbiInput {
     Trait(EbiTraitObject, &'static EbiFileHandler),
     Object(EbiObject, &'static EbiFileHandler),
-    String(String),
-    Usize(usize),
+    String(String, &'static EbiInputType),
+    Usize(usize, &'static EbiInputType),
     FileHandler(EbiFileHandler),
-    Fraction(Fraction),
+    Fraction(Fraction, &'static EbiInputType),
 }
 
 impl EbiInput {
@@ -58,35 +60,66 @@ impl EbiInput {
         match self {
             EbiInput::Trait(t, _) => EbiInputType::Trait(t.get_trait()),
             EbiInput::Object(o, _) => EbiInputType::Object(o.get_type()),
-            EbiInput::String(_) => EbiInputType::String,
-            EbiInput::Usize(_) => EbiInputType::Usize,
+            EbiInput::String(_, input_type) => (*input_type).clone(),
+            EbiInput::Usize(_, input_type) => (*input_type).clone(),
             EbiInput::FileHandler(_) => EbiInputType::FileHandler,
-            EbiInput::Fraction(_) => EbiInputType::Fraction,
+            EbiInput::Fraction(_, input_type) => (*input_type).clone(),
         }
     }
 }
 
-#[derive(PartialEq, Eq, EnumIter)]
+#[derive(PartialEq, Eq, EnumIter, Clone)]
 pub enum EbiInputType {
     Trait(EbiTrait),
     Object(EbiObjectType),
     AnyObject,
     FileHandler,
-    String,
-    Usize,
-    Fraction,
+
+    ///Fields: allowed values, default value.
+    String(Option<&'static [&'static str]>, Option<&'static str>),
+
+    //Fields: minimum, maximum, default value.
+    Usize(Option<usize>, Option<usize>, Option<usize>),
+
+    //Fields: minimum, maximum, default value.
+    Fraction(
+        Option<ConstFraction>,
+        Option<ConstFraction>,
+        Option<ConstFraction>,
+    ),
 }
 
 impl EbiInputType {
+    pub fn default(&self) -> Option<String> {
+        match self {
+            EbiInputType::Trait(_) => None,
+            EbiInputType::Object(_) => None,
+            EbiInputType::AnyObject => None,
+            EbiInputType::FileHandler => None,
+            EbiInputType::String(_, string) => match string {
+                Some(string) => Some(string.to_string()),
+                None => None,
+            },
+            EbiInputType::Usize(_, _, integer) => match integer {
+                Some(integer) => Some(integer.to_string()),
+                None => None,
+            },
+            EbiInputType::Fraction(_, _, default) => match default {
+                Some(fraction) => Some(fraction.to_string()),
+                None => None,
+            },
+        }
+    }
+
     pub fn get_article(&self) -> &str {
         match self {
             EbiInputType::Trait(t) => t.get_article(),
             EbiInputType::Object(o) => o.get_article(),
             EbiInputType::AnyObject => "an",
-            EbiInputType::String => "a",
-            EbiInputType::Usize => "an",
+            EbiInputType::String(_, _) => "a",
+            EbiInputType::Usize(_, _, _) => "an",
             EbiInputType::FileHandler => "a",
-            EbiInputType::Fraction => "a",
+            EbiInputType::Fraction(_, _, _) => "a",
         }
     }
 
@@ -95,10 +128,10 @@ impl EbiInputType {
             EbiInputType::Trait(_) => value_parser!(PathBuf),
             EbiInputType::Object(_) => value_parser!(PathBuf),
             EbiInputType::AnyObject => value_parser!(PathBuf),
-            EbiInputType::String => value_parser!(String).into(),
-            EbiInputType::Usize => value_parser!(usize).into(),
+            EbiInputType::String(_, _) => value_parser!(String).into(),
+            EbiInputType::Usize(_, _, _) => value_parser!(usize).into(),
             EbiInputType::FileHandler => value_parser!(EbiFileHandler).into(),
-            EbiInputType::Fraction => value_parser!(FractionNotParsedYet).into(),
+            EbiInputType::Fraction(_, _, _) => value_parser!(FractionNotParsedYet).into(),
         }
     }
 
@@ -109,12 +142,12 @@ impl EbiInputType {
             EbiInputType::AnyObject => {
                 Self::get_file_handlers_java(EBI_FILE_HANDLERS.iter().collect())
             }
-            EbiInputType::String => {
+            EbiInputType::String(_, _) => {
                 let mut x = vec![];
                 x.extend(JAVA_OBJECT_HANDLERS_STRING);
                 x
             }
-            EbiInputType::Usize => {
+            EbiInputType::Usize(_, _, _) => {
                 let mut x = vec![];
                 x.extend(JAVA_OBJECT_HANDLERS_USIZE);
                 x
@@ -123,7 +156,7 @@ impl EbiInputType {
                 //not supported in Java;
                 vec![]
             }
-            EbiInputType::Fraction => {
+            EbiInputType::Fraction(_, _, _) => {
                 let mut x = vec![];
                 x.extend(JAVA_OBJECT_HANDLERS_FRACTION);
                 x
@@ -155,10 +188,22 @@ impl EbiInputType {
                 EbiInputType::AnyObject => {
                     result.extend(Self::show_file_handlers(EBI_FILE_HANDLERS.iter().collect()));
                 }
-                EbiInputType::String => {
+                EbiInputType::String(Some(allowed_values), _) => {
+                    result.insert(format!("either one of `{}`", allowed_values.join("`, `")));
+                }
+                EbiInputType::String(None, _) => {
                     result.insert("text".to_string());
                 }
-                EbiInputType::Usize => {
+                EbiInputType::Usize(Some(min), Some(max), _) => {
+                    result.insert(format!("integer between {} and {}", min, max));
+                }
+                EbiInputType::Usize(None, Some(max), _) => {
+                    result.insert(format!("integer below {}", max));
+                }
+                EbiInputType::Usize(Some(min), _, _) => {
+                    result.insert(format!("integer above {}", min));
+                }
+                EbiInputType::Usize(_, _, _) => {
                     result.insert("integer".to_string());
                 }
                 EbiInputType::FileHandler => {
@@ -178,7 +223,16 @@ impl EbiInputType {
                             + ")",
                     );
                 }
-                EbiInputType::Fraction => {
+                EbiInputType::Fraction(Some(min), Some(max), _) => {
+                    result.insert(format!("fraction between {} and {}", min, max));
+                }
+                EbiInputType::Fraction(None, Some(max), _) => {
+                    result.insert(format!("fraction below {}", max));
+                }
+                EbiInputType::Fraction(Some(min), _, _) => {
+                    result.insert(format!("fraction above {}", min));
+                }
+                EbiInputType::Fraction(_, _, _) => {
                     result.insert("fraction".to_string());
                 }
             };
@@ -203,10 +257,22 @@ impl EbiInputType {
                         EBI_FILE_HANDLERS.iter().collect(),
                     ));
                 }
-                EbiInputType::String => {
+                EbiInputType::String(Some(allowed_values), _) => {
+                    result.insert(format!("either one of `{}`", allowed_values.join("`, `")));
+                }
+                EbiInputType::String(None, _) => {
                     result.insert("text".to_string());
                 }
-                EbiInputType::Usize => {
+                EbiInputType::Usize(Some(min), Some(max), _) => {
+                    result.insert(format!("integer between {} and {}", min, max));
+                }
+                EbiInputType::Usize(None, Some(max), _) => {
+                    result.insert(format!("integer below {}", max));
+                }
+                EbiInputType::Usize(Some(min), _, _) => {
+                    result.insert(format!("integer above {}", min));
+                }
+                EbiInputType::Usize(_, _, _) => {
                     result.insert("integer".to_string());
                 }
                 EbiInputType::FileHandler => {
@@ -226,7 +292,16 @@ impl EbiInputType {
                             + ")",
                     );
                 }
-                EbiInputType::Fraction => {
+                EbiInputType::Fraction(Some(min), Some(max), _) => {
+                    result.insert(format!("fraction between {} and {}", min, max));
+                }
+                EbiInputType::Fraction(None, Some(max), _) => {
+                    result.insert(format!("fraction below {}", max));
+                }
+                EbiInputType::Fraction(Some(min), _, _) => {
+                    result.insert(format!("fraction above {}", min));
+                }
+                EbiInputType::Fraction(_, _, _) => {
                     result.insert("fraction".to_string());
                 }
             };
@@ -310,12 +385,47 @@ impl Display for EbiInputType {
             EbiInputType::Trait(t) => t.fmt(f),
             EbiInputType::Object(o) => o.fmt(f),
             EbiInputType::AnyObject => write!(f, "object"),
-            EbiInputType::String => write!(f, "text"),
-            EbiInputType::Usize => write!(f, "integer"),
+            EbiInputType::String(Some(allowed_values), _) => {
+                write!(f, "either one of `{}`", allowed_values.join("`, `"))
+            }
+            EbiInputType::String(None, _) => write!(f, "text"),
+            EbiInputType::Usize(Some(min), Some(max), _) => {
+                write!(f, "integer between {} and {}", min, max)
+            }
+            EbiInputType::Usize(None, Some(max), _) => {
+                write!(f, "integer below {}", max)
+            }
+            EbiInputType::Usize(Some(min), _, _) => {
+                write!(f, "integer above {}", min)
+            }
+            EbiInputType::Usize(_, _, _) => {
+                write!(f, "integer")
+            }
             EbiInputType::FileHandler => write!(f, "file"),
-            EbiInputType::Fraction => write!(f, "fraction"),
+            EbiInputType::Fraction(Some(min), Some(max), _) => {
+                write!(f, "fraction between {} and {}", min, max)
+            }
+            EbiInputType::Fraction(None, Some(max), _) => {
+                write!(f, "fraction below {}", max)
+            }
+            EbiInputType::Fraction(Some(min), _, _) => {
+                write!(f, "fraction above {}", min)
+            }
+            EbiInputType::Fraction(_, _, _) => {
+                write!(f, "fraction")
+            }
         }
     }
+}
+
+/**
+ * Returns true if one of the input types has a default.
+ */
+pub fn default(input_types: &[&EbiInputType]) -> Option<String> {
+    input_types
+        .iter()
+        .filter_map(|input_type| input_type.default())
+        .next()
 }
 
 #[derive(Debug, Clone)]
@@ -338,6 +448,7 @@ pub enum EbiTraitImporter {
         fn(&mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics>,
     ), //can walk over states using activities, potentially forever
     Graphable(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitGraphable>>), //can produce a Dot graph
+    Activities(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitActivities>>), //has activities
 }
 
 impl EbiTraitImporter {
@@ -357,6 +468,7 @@ impl EbiTraitImporter {
                 EbiTrait::StochasticDeterministicSemantics
             }
             EbiTraitImporter::Graphable(_) => EbiTrait::Graphable,
+            EbiTraitImporter::Activities(_) => EbiTrait::Activities,
         }
     }
 
@@ -382,6 +494,7 @@ impl EbiTraitImporter {
                 EbiTraitObject::StochasticDeterministicSemantics((f)(reader)?)
             }
             EbiTraitImporter::Graphable(f) => EbiTraitObject::Graphable((f)(reader)?),
+            EbiTraitImporter::Activities(f) => EbiTraitObject::Activities((f)(reader)?),
         })
     }
 }
@@ -501,7 +614,9 @@ pub fn get_reader(cli_matches: &ArgMatches, cli_id: &str) -> Result<MultipleRead
             return Ok(MultipleReader::from_file(file));
         }
     } else {
-        return MultipleReader::from_stdin();
+        return Err(anyhow!(
+            "No argument given, or it could not be parsed as a path."
+        ));
     }
 }
 
@@ -543,7 +658,9 @@ pub fn read_as_object(
             }
         }
     }
-    Err(anyhow!("File could not be recognised."))
+    Err(anyhow!(
+        "File could not be recognised. If you know the file format, try validating it with `Ebi validate [file type]'."
+    ))
 }
 
 pub fn read_as_any_object(
@@ -560,7 +677,9 @@ pub fn read_as_any_object(
             }
         }
     }
-    Err(anyhow!("File could not be recognised."))
+    Err(anyhow!(
+        "File could not be recognised. If you know the file type, try validating it with `Ebi validate [file type]'."
+    ))
 }
 
 pub fn validate_object_of(
@@ -578,6 +697,10 @@ pub fn validate_object_of(
     }
 }
 
+pub const TEST_INPUT_TYPE_FRACTION: EbiInputType = EbiInputType::Fraction(None, None, None);
+pub const TEST_INPUT_TYPE_USIZE: EbiInputType = EbiInputType::Usize(None, None, None);
+pub const TEST_INPUT_TYPE_STRING: EbiInputType = EbiInputType::String(None, None);
+
 #[cfg(test)]
 mod tests {
     use std::{
@@ -585,12 +708,15 @@ mod tests {
         path::PathBuf,
     };
 
+    use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
     use strum::IntoEnumIterator;
 
     use crate::{
-        ebi_framework::{ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInput},
+        ebi_framework::{
+            ebi_file_handler::EBI_FILE_HANDLERS,
+            ebi_input::{EbiInput, TEST_INPUT_TYPE_FRACTION, TEST_INPUT_TYPE_USIZE},
+        },
         ebi_objects::compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
-        math::{fraction::Fraction, traits::Zero},
         multiple_reader::MultipleReader,
     };
 
@@ -600,8 +726,8 @@ mod tests {
     #[test]
     fn input_primitives() {
         EbiInput::FileHandler(EBI_COMPRESSED_EVENT_LOG).get_type();
-        EbiInput::Fraction(Fraction::zero()).get_type();
-        EbiInput::Usize(0).get_type();
+        EbiInput::Fraction(Fraction::zero(), &TEST_INPUT_TYPE_FRACTION).get_type();
+        EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE).get_type();
     }
 
     #[test]

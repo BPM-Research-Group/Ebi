@@ -1,7 +1,8 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::{One, Signed, Zero}};
 use std::fmt::{Debug, Display};
 
-use super::{fraction::Fraction, matrix::Matrix, traits::{One, Signed, Zero}};
+use super::matrix::Matrix;
 
 pub struct MarkovModel<S> {
     edges: Matrix,
@@ -210,8 +211,8 @@ impl<S: PartialEq + Clone> MarkovModel<S> {
         //construct the full matrix ((0, 0), (A, B))
         {
             //set the transient -> transient fields to 0
-            for (x, transient_state1) in transient_states.iter().enumerate() {
-                for transient_state2 in transient_states.iter().skip(x) {
+            for transient_state1 in transient_states.iter() {
+                for transient_state2 in transient_states.iter() {
                     self.edges[*transient_state1][*transient_state2] = Fraction::zero();
                 }
             }

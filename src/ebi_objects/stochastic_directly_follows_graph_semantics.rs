@@ -4,12 +4,12 @@ use crate::{
         ebi_trait_semantics::Semantics,
         ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex},
     },
-    math::{
-        fraction::Fraction,
-        traits::{Signed, Zero},
-    },
 };
 use anyhow::Result;
+use ebi_arithmetic::{
+    ebi_number::{Signed, Zero},
+    fraction::Fraction,
+};
 
 use super::{
     directly_follows_model::DirectlyFollowsModel,
@@ -93,7 +93,7 @@ macro_rules! semantics_for_automaton {
                     }
 
                     if self.has_empty_traces() {
-                        result.push(self.sources.len())    
+                        result.push(self.sources.len())
                     }
 
                     result

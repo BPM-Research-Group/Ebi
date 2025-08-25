@@ -1,16 +1,16 @@
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::fraction::Fraction;
 use std::{fmt::Debug, io::BufRead};
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey},
+        activity_key::{Activity, ActivityKey, TranslateActivityKey},
         ebi_input::EbiInput,
         ebi_object::EbiTraitObject,
         ebi_trait::FromEbiTraitObject,
         importable::Importable,
     },
     ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
-    math::fraction::Fraction,
 };
 
 use super::{
@@ -19,10 +19,8 @@ use super::{
 };
 
 pub trait EbiTraitFiniteStochasticLanguage:
-    EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync + Debug
+    EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync + Debug + TranslateActivityKey
 {
-    fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction>;
-
     fn get_probability_sum(&self) -> Fraction;
 
     // necessary for translations where order traces must be maintained

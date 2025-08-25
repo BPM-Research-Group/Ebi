@@ -1,4 +1,9 @@
 use anyhow::{Context, Error, Result, anyhow};
+use ebi_arithmetic::{
+    ebi_number::{One, Signed, Zero},
+    fraction::Fraction,
+};
+use ebi_derive::ActivityKey;
 use std::{
     collections::HashMap,
     fmt,
@@ -8,7 +13,9 @@ use std::{
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
+        activity_key::{
+            Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
+        },
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -19,6 +26,7 @@ use crate::{
         infoable::Infoable,
     },
     ebi_traits::{
+        ebi_trait_activities,
         ebi_trait_event_log::IndexTrace,
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::{self, EbiTraitFiniteStochasticLanguage},
@@ -33,10 +41,6 @@ use crate::{
     },
     follower_semantics::FollowerSemantics,
     line_reader::LineReader,
-    math::{
-        fraction::Fraction,
-        traits::{One, Signed, Zero},
-    },
 };
 
 use super::{
@@ -63,9 +67,11 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "finite stochastic language",
     article: "a",
     file_extension: "slang",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<FiniteStochasticLanguage>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<FiniteStochasticLanguage>),
         EbiTraitImporter::IterableLanguage(
             ebi_trait_iterable_language::import::<FiniteStochasticLanguage>,
         ),
@@ -210,10 +216,6 @@ impl EbiTraitIterableLanguage for FiniteStochasticLanguage {
 impl EbiTraitFiniteLanguage for FiniteStochasticLanguage {}
 
 impl EbiTraitFiniteStochasticLanguage for FiniteStochasticLanguage {
-    fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction> {
-        Some(self.traces.iter().nth(trace_index)?.1)
-    }
-
     fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage {
         self.clone()
     }
@@ -300,14 +302,14 @@ impl From<HashMap<Vec<String>, Fraction>> for FiniteStochasticLanguage {
     }
 }
 
-impl From<(HashMap<Vec<Activity>, Fraction>, ActivityKey)> for FiniteStochasticLanguage {
+impl From<(ActivityKey, HashMap<Vec<Activity>, Fraction>)> for FiniteStochasticLanguage {
     /**
      * Normalises the distribution. Use new_raw to avoid normalisation.
      */
-    fn from(value: (HashMap<Vec<Activity>, Fraction>, ActivityKey)) -> Self {
+    fn from(value: (ActivityKey, HashMap<Vec<Activity>, Fraction>)) -> Self {
         let mut result = Self {
-            activity_key: value.1,
-            traces: value.0,
+            activity_key: value.0,
+            traces: value.1,
         };
         result.normalise();
         result
@@ -509,7 +511,7 @@ impl EbiTraitIterableStochasticLanguage for FiniteStochasticLanguage {
         Box::new(self.traces.iter())
     }
 
-    fn get_probability(&self, trace_index: usize) -> Option<&Fraction> {
+    fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction> {
         Some(self.traces.iter().nth(trace_index)?.1)
     }
 }
@@ -531,13 +533,14 @@ impl EbiTraitQueriableStochasticLanguage for FiniteStochasticLanguage {
 mod tests {
     use std::fs;
 
+    use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
+
     use crate::{
         ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
         ebi_traits::{
             ebi_trait_event_log::IndexTrace,
             ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         },
-        math::{fraction::Fraction, traits::Zero},
     };
 
     #[test]

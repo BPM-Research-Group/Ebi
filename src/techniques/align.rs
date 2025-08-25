@@ -175,7 +175,7 @@ where
 
                 let trace = log.get_trace(trace_index).unwrap();
                 let trace_translated = translator.translate_trace(trace);
-                let probability = log.get_probability(trace_index).unwrap().clone();
+                let probability = log.get_trace_probability(trace_index).unwrap().clone();
 
                 // log::debug!("align trace {:?}", trace);
                 let result = self2

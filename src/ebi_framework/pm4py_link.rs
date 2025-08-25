@@ -14,7 +14,7 @@ use std::iter::Peekable;
 
 use crate::ebi_objects::finite_language::FiniteLanguage;
 use crate::ebi_objects::process_tree::ProcessTree;
-use crate::math::fraction::Fraction;
+use ebi_arithmetic::fraction::Fraction;
 use super::ebi_output::EbiOutput;
 use crate::ebi_framework::ebi_object::EbiTraitObject;
 use crate::ebi_framework::{ebi_command::EbiCommand, prom_link::attempt_parse};
@@ -23,12 +23,11 @@ use crate::ebi_objects::event_log::{EventLog, EBI_EVENT_LOG};
 use crate::ebi_objects::labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET};
 use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};
 use crate::ebi_objects::{stochastic_labelled_petri_net::StochasticLabelledPetriNet, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, process_tree::EBI_PROCESS_TREE, finite_language::EBI_FINITE_LANGUAGE};
-use crate::math::fraction_enum::FractionEnum;
 use crate::marking::Marking;
 use process_mining::event_log::{event_log_struct::{EventLogClassifier, to_attributes}, Attributes, AttributeValue};
 use process_mining::event_log::{EventLog as ProcessMiningEventLog, Trace, Event};
 
-type Importer = fn(&PyAny, &[&EbiInputType]) -> PyResult<EbiInput>;
+type Importer = fn(&PyAny, &[&'static EbiInputType]) -> PyResult<EbiInput>;
 pub const IMPORTERS: &[Importer] = &[
     usize::import_from_pm4py,
     Fraction::import_from_pm4py,
@@ -39,7 +38,7 @@ pub const IMPORTERS: &[Importer] = &[
 
 pub trait ImportableFromPM4Py {
     /// Imports a PM4Py Object as its Ebi equivalent.
-    fn import_from_pm4py(object: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput>;
+    fn import_from_pm4py(object: &PyAny, input_types: &[&'static EbiInputType]) -> PyResult<EbiInput>;
 }
 pub trait ExportableToPM4Py {
     /// Exports an Ebi Object as its PM4Py equivalent.
@@ -61,8 +60,6 @@ impl ExportableToPM4Py for EbiOutput {
             // default: no exporter available (not implemented yet or no equivalent in PM4Py) -> return string representation
             EbiOutput::Object(_)
             | EbiOutput::String(_)
-            | EbiOutput::SVG(_)
-            | EbiOutput::PDF(_)
             | EbiOutput::LogDiv(_)
             | EbiOutput::ContainsRoot(_)
             | EbiOutput::RootLogDiv(_) => {
@@ -91,16 +88,16 @@ impl ExportableToPM4Py for bool {
 }
 
 impl ImportableFromPM4Py for usize {
-    fn import_from_pm4py(integer: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput> {
+    fn import_from_pm4py(integer: &PyAny, input_types: &[&'static EbiInputType]) -> PyResult<EbiInput> {
         let value: usize = integer.extract().map_err(|_| {
             PyValueError::new_err("Expected a Python integer to convert to Rust usize")
         })?;
         for &itype in input_types {
             match itype {
-                EbiInputType::Usize => {
-                    return Ok(EbiInput::Usize(value));
-                },
-                _ => { /* skip other input types */ }
+                EbiInputType::Usize(..) => {
+                    return Ok(EbiInput::Usize(value, itype));
+                }
+                _ => {}
             }
         }
         Err(PyValueError::new_err(
@@ -117,7 +114,7 @@ impl ExportableToPM4Py for usize {
 }
 
 impl ImportableFromPM4Py for Fraction {
-    fn import_from_pm4py(double: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput> {
+    fn import_from_pm4py(double: &PyAny, input_types: &[&'static EbiInputType]) -> PyResult<EbiInput> {
         let value: f64 = double.extract().map_err(|_| {
             PyValueError::new_err("Expected a Python double to convert to Rust usize")
         })?;
@@ -125,8 +122,8 @@ impl ImportableFromPM4Py for Fraction {
             .map_err(|_| PyValueError::new_err("Failed to convert f64 to BigFraction"))?;
         for &itype in input_types {
             match itype {
-                EbiInputType::Fraction => {
-                    return Ok(EbiInput::Fraction(FractionEnum::Exact(frac)));
+                EbiInputType::Fraction(..) => {
+                    return Ok(EbiInput::Fraction(Fraction::Exact(frac), itype));
                 },
                 _ => { /* skip other input types */ }
             }
@@ -141,7 +138,7 @@ impl ExportableToPM4Py for Fraction {
     fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
         match self {
             // Case: Exact fraction (BigFraction)
-            FractionEnum::Exact(big_fraction) => match big_fraction {
+            Fraction::Exact(big_fraction) => match big_fraction {
                 fraction::GenericFraction::Rational(sign, ratio) => {
                     let numer = ratio.numer().to_u128().ok_or_else(|| {
                         PyValueError::new_err("Failed to convert numerator to u128")
@@ -168,10 +165,10 @@ impl ExportableToPM4Py for Fraction {
             },
 
             // Case: Approximation as f64
-            FractionEnum::Approx(value) => Ok(value.to_object(py)),
+            Fraction::Approx(value) => Ok(value.to_object(py)),
 
             // Case: Invalid state
-            FractionEnum::CannotCombineExactAndApprox => {
+            Fraction::CannotCombineExactAndApprox => {
                 Err(PyValueError::new_err(
                     "Cannot export a Fraction that combines Exact and Approx",
                 ))
@@ -182,7 +179,7 @@ impl ExportableToPM4Py for Fraction {
 
 
 impl ImportableFromPM4Py for EventLog {
-    fn import_from_pm4py(event_log: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput> {
+    fn import_from_pm4py(event_log: &PyAny, input_types: &[&'static EbiInputType]) -> PyResult<EbiInput> {
         // Extract the list of traces from the PM4Py event log.
         let py_traces = event_log.getattr("_list")?.downcast::<PyList>()?;
         let mut traces = Vec::new();
@@ -256,7 +253,7 @@ impl ImportableFromPM4Py for EventLog {
 
 
 impl ImportableFromPM4Py for LabelledPetriNet {
-    fn import_from_pm4py(pn: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput> {
+    fn import_from_pm4py(pn: &PyAny, input_types: &[&'static EbiInputType]) -> PyResult<EbiInput> {
         // Retrieve "places", "transitions", and "arcs" attributes as sets.
         let py_places = get_collection_as_set(pn, "places")
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Failed to get places: {}", e)))?;
@@ -398,7 +395,7 @@ impl ImportableFromPM4Py for LabelledPetriNet {
 /// StochasticPetriNets are not fully integrated into PM4Py (yet)
 /// this function will remain useless until PM4Py has a proper implementation of Stochastic Petri Nets
 impl ImportableFromPM4Py for StochasticLabelledPetriNet {
-    fn import_from_pm4py(pn: &PyAny, input_types: &[&EbiInputType]) -> PyResult<EbiInput> {
+    fn import_from_pm4py(pn: &PyAny, input_types: &[&'static EbiInputType]) -> PyResult<EbiInput> {
         // Retrieve "places", "transitions", and "arcs" attributes as sets.
         let py_places = get_collection_as_set(pn, "places")
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Failed to get places: {}", e)))?;
@@ -442,7 +439,7 @@ impl ImportableFromPM4Py for StochasticLabelledPetriNet {
             }
 
             let trans_weight = trans.getattr("weight")?.extract::<f64>()
-                .map(|float_weight| crate::math::fraction::Fraction::Approx(float_weight))
+                .map(|float_weight| Fraction::Approx(float_weight))
                 .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Failed to retrieve transition weight: {}", e)))?;
             weights.push(trans_weight);
         }
@@ -524,7 +521,7 @@ impl ImportableFromPM4Py for StochasticLabelledPetriNet {
 impl ImportableFromPM4Py for ProcessTree {
     fn import_from_pm4py(
         ptree: &PyAny,
-        input_types: &[&EbiInputType],
+        input_types: &[&'static EbiInputType],
     ) -> PyResult<EbiInput> {
         // 1) Get the `.ptree` text via Python's repr/to_string
         let repr: String = ptree
@@ -733,7 +730,7 @@ impl EbiCommand {
 // helper: try import via PM4Py importer, else if it's a str, treat as file path
 pub fn import_or_load(
     py_obj: &PyAny,
-    input_types: &[&EbiInputType],
+    input_types: &[&'static EbiInputType],
     index: usize,
 ) -> PyResult<EbiInput> {
     // 1) try all in‑memory importers

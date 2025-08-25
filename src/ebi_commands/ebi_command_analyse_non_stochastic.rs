@@ -7,16 +7,16 @@ use crate::{
         ebi_trait::EbiTrait,
     },
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_semantics::EbiTraitSemantics,
+        ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics,
     },
     techniques::{
-        align::Align, any_traces::AnyTraces, bounded::Bounded, executions::FindExecutions,
+        any_traces::AnyTraces, bounded::Bounded, executions::FindExecutions,
         infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic,
     },
 };
 use anyhow::anyhow;
+use std::io::Write;
 
 pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     name_short: "anans",
@@ -24,7 +24,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     explanation_short: "Analyse a language without considering its stochastic perspective.",
     explanation_long: None,
     children: &[
-        &EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT,
+        &EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES,
         &EBI_ANALYSE_NON_STOCHASTIC_BOUNDED,
         &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
         &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
@@ -34,38 +34,27 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     ],
 };
 
-pub const EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT: EbiCommand = EbiCommand::Command {
-    name_short: "ali",
-    name_long: Some("alignment"),
-    library_name: "ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ALIGNMENT",
-    explanation_short: "Compute alignments.",
-    explanation_long: Some(
-        "Compute alignments.\nNB 1: the model must be able to terminate and its states must be bounded.\nNB 2: the search performed is not optimised. For Petri nets, the ProM implementation may be more efficient.",
-    ),
-    latex_link: Some(
-        "Alignments according to the method described by Adriansyah~\\cite{DBLP:conf/edoc/AdriansyahDA11}. By default, all traces are computed concurrently on all CPU cores. If this requires too much RAM, please see speed trick~\\ref{speedtrick:multithreaded} in Section~\\ref{sec:speedtricks} for how to reduce the number of CPU cores utilised.",
-    ),
+pub const EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES: EbiCommand = EbiCommand::Command {
+    name_short: "act",
+    name_long: Some("activities"),
+    library_name: "ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES",
+    explanation_short: "Shows the activities that are declared in the object.",
+    explanation_long: None,
+    latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
-        &[&EbiInputType::Trait(EbiTrait::Semantics)],
-    ],
-    input_names: &["FILE_1", "FILE_2"],
-    input_helps: &["The finite language.", "The model."],
+    input_types: &[&[&EbiInputType::Trait(EbiTrait::Activities)]],
+    input_names: &["FILE"],
+    input_helps: &["Any object with activities"],
     execute: |mut objects, _| {
-        let log = objects
-            .remove(0)
-            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-        let mut model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
-
-        let result = model.align_stochastic_language(log)?;
-
-        return Ok(EbiOutput::Object(
-            EbiObject::StochasticLanguageOfAlignments(result),
-        ));
+        let activities = objects.remove(0).to_type::<dyn EbiTraitActivities>()?;
+        let mut f = vec![];
+        for label in &activities.get_activity_key().activity2name {
+            writeln!(f, "{}", label)?;
+        }
+        Ok(EbiOutput::String(String::from_utf8(f)?))
     },
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLanguageOfAlignments),
+    output_type: &EbiOutputType::String,
 };
 
 pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
@@ -116,19 +105,20 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
                 object.bounded()?
             }
             EbiInput::Object(EbiObject::DirectlyFollowsGraph(object), _) => object.bounded()?,
+
             EbiInput::Trait(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
-            EbiInput::String(_) => {
+            EbiInput::String(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
-            EbiInput::Usize(_) => {
+            EbiInput::Usize(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
             EbiInput::FileHandler(_) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
-            EbiInput::Fraction(_) => {
+            EbiInput::Fraction(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
             EbiInput::Object(EbiObject::Executions(_), _) => {
@@ -138,6 +128,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
             EbiInput::Object(EbiObject::StochasticLanguageOfAlignments(_), _) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
+            EbiInput::Object(EbiObject::ScalableVectorGraphics(_), _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
         };
@@ -164,7 +157,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
-        &[&EbiInputType::Usize],
+        &[&EbiInputType::Usize(Some(1), None, None)],
     ],
     input_names: &["LANGUAGE", "NUMBER_OF_CLUSTERS"],
     input_helps: &["The finite stochastic language.", "The number of clusters."],
@@ -261,16 +254,16 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
             EbiInput::Trait(_, _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
-            EbiInput::String(_) => {
+            EbiInput::String(_, _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
-            EbiInput::Usize(_) => {
+            EbiInput::Usize(_, _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
             EbiInput::FileHandler(_) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
-            EbiInput::Fraction(_) => {
+            EbiInput::Fraction(_, _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
             EbiInput::Object(EbiObject::Executions(_), _) => {
@@ -280,6 +273,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
             EbiInput::Object(EbiObject::StochasticLanguageOfAlignments(_), _) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
+            EbiInput::Object(EbiObject::ScalableVectorGraphics(_), _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
         };
@@ -382,7 +378,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
-        &[&EbiInputType::Usize],
+        &[&EbiInputType::Usize(None, None, Some(1))],
     ],
     input_names: &["FILE", "NUMBER_OF_TRACES"],
     input_helps: &[

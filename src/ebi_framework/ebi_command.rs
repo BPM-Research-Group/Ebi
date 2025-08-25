@@ -1,5 +1,6 @@
 use anyhow::{Context, Result, anyhow};
 use clap::{Arg, ArgAction, ArgMatches, Command, value_parser};
+use ebi_arithmetic::{exact::set_exact_globally, fraction::Fraction, parsing::FractionNotParsedYet};
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
 use logging_timer::timer;
@@ -14,10 +15,13 @@ use std::{
 
 use crate::{
     ebi_commands::{
-        ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association, ebi_command_conformance, ebi_command_convert, ebi_command_discover, ebi_command_discover_non_stochastic, ebi_command_info, ebi_command_itself, ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate, ebi_command_visualise
+        ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association,
+        ebi_command_conformance, ebi_command_conformance_non_stochastic, ebi_command_convert,
+        ebi_command_discover, ebi_command_discover_non_stochastic, ebi_command_info,
+        ebi_command_itself, ebi_command_probability, ebi_command_sample, ebi_command_test,
+        ebi_command_validate, ebi_command_visualise,
     },
     ebi_framework::ebi_output,
-    math::fraction::FractionNotParsedYet,
 };
 
 use super::{
@@ -36,6 +40,7 @@ pub const EBI_COMMANDS: EbiCommand = EbiCommand::Group {
         &ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC,
         &ebi_command_association::EBI_ASSOCIATION,
         &ebi_command_conformance::EBI_CONFORMANCE,
+        &ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC,
         &ebi_command_convert::EBI_CONVERT,
         &ebi_command_discover::EBI_DISCOVER,
         &ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC,
@@ -147,15 +152,20 @@ impl EbiCommand {
                     .zip(input_types.iter().zip(input_help.iter()))
                     .enumerate()
                 {
-                    let arg = Arg::new(format!("{}x{}", input_name, i))
+                    let mut arg = Arg::new(format!("{}x{}", input_name, i))
                         .action(ArgAction::Set)
                         .value_name(input_name)
                         .help(input_help)
-                        .required(true)
                         .value_parser(EbiInputType::get_parser_of_list(input_type))
                         .long_help(EbiInputType::possible_inputs_as_strings_with_articles(
                             input_type, " and ",
                         ));
+
+                    if let Some(default) = ebi_input::default(input_type) {
+                        arg = arg.required(false).default_value(default);
+                    } else {
+                        arg = arg.required(true);
+                    }
 
                     command = command.arg(arg);
                 }
@@ -220,6 +230,18 @@ impl EbiCommand {
         }
     }
 
+    pub fn explanation_short(&self) -> &str {
+        match self {
+            EbiCommand::Group {
+                explanation_short, ..
+            } => &explanation_short,
+
+            EbiCommand::Command {
+                explanation_short, ..
+            } => &explanation_short,
+        }
+    }
+
     pub fn explanation_long(&self) -> &str {
         match self {
             EbiCommand::Group {
@@ -281,7 +303,7 @@ impl EbiCommand {
                 //set exact arithmetic
                 if !exact_arithmetic || cli_matches.get_flag("approx") {
                     log::info!("Use approximate arithmetic");
-                    crate::math::fraction::set_exact_globally(false);
+                    set_exact_globally(false);
                 }
 
                 //read the inputs
@@ -379,7 +401,7 @@ impl EbiCommand {
      * Attempt to parse an input as any of the given input types. Returns the last error if unsuccessful.
      */
     pub fn attempt_parse(
-        input_types: &[&EbiInputType],
+        input_types: &[&'static EbiInputType],
         cli_matches: &ArgMatches,
         cli_id: &str,
     ) -> Result<EbiInput> {
@@ -440,19 +462,82 @@ impl EbiCommand {
                         return Ok(EbiInput::FileHandler(value.clone()));
                     }
                 }
-                EbiInputType::String => {
+                EbiInputType::String(None, _) => {
                     if let Some(value) = cli_matches.get_one::<String>(&cli_id) {
-                        return Ok(EbiInput::String(value.clone()));
+                        return Ok(EbiInput::String(value.clone(), &input_type));
                     }
                 }
-                EbiInputType::Usize => {
+                EbiInputType::String(Some(allowed_values), _) => {
+                    if let Some(value) = cli_matches.get_one::<String>(&cli_id) {
+                        if allowed_values.contains(&value.as_str()) {
+                            return Ok(EbiInput::String(value.clone(), &input_type));
+                        } else {
+                            error = Some(anyhow!("value should be one of {:?}", allowed_values));
+                        }
+                    }
+                }
+                EbiInputType::Usize(min, max, _) => {
                     if let Some(value) = cli_matches.get_one::<usize>(&cli_id) {
-                        return Ok(EbiInput::Usize(value.clone()));
+                        match (min, max) {
+                            (Some(min), Some(max)) => {
+                                if value < min || value > max {
+                                    error =
+                                        Some(anyhow!("Value must be between {} and {}.", min, max))
+                                } else {
+                                    return Ok(EbiInput::Usize(value.clone(), input_type));
+                                }
+                            }
+                            (Some(min), None) => {
+                                if value < min {
+                                    error = Some(anyhow!("Value must be below {}.", min))
+                                } else {
+                                    return Ok(EbiInput::Usize(value.clone(), input_type));
+                                }
+                            }
+                            (None, Some(max)) => {
+                                if value > max {
+                                    error = Some(anyhow!("Value must be above {}.", max))
+                                } else {
+                                    return Ok(EbiInput::Usize(value.clone(), input_type));
+                                }
+                            }
+                            (None, None) => {
+                                return Ok(EbiInput::Usize(value.clone(), input_type));
+                            }
+                        }
                     }
                 }
-                EbiInputType::Fraction => {
+                EbiInputType::Fraction(min, max, _) => {
                     if let Some(value) = cli_matches.get_one::<FractionNotParsedYet>(&cli_id) {
-                        return Ok(EbiInput::Fraction(value.try_into()?));
+                        let value: Fraction = value.try_into()?;
+
+                        match (min, max) {
+                            (Some(min), Some(max)) => {
+                                if min > &value || max < &value {
+                                    error =
+                                        Some(anyhow!("Value must be between {} and {}.", min, max))
+                                } else {
+                                    return Ok(EbiInput::Fraction(value, input_type));
+                                }
+                            }
+                            (Some(min), None) => {
+                                if min > &value {
+                                    error = Some(anyhow!("Value must be below {}.", min))
+                                } else {
+                                    return Ok(EbiInput::Fraction(value, input_type));
+                                }
+                            }
+                            (None, Some(max)) => {
+                                if max > &value {
+                                    error = Some(anyhow!("Value must be above {}.", max))
+                                } else {
+                                    return Ok(EbiInput::Fraction(value, input_type));
+                                }
+                            }
+                            (None, None) => {
+                                return Ok(EbiInput::Fraction(value, input_type));
+                            }
+                        }
                     }
                 }
             }
@@ -464,7 +549,7 @@ impl EbiCommand {
         }
     }
 
-    pub fn path_to_string(path: &Vec<&EbiCommand>) -> String {
+    pub fn path_to_string(path: &[&EbiCommand]) -> String {
         let result: Vec<&str> = path.iter().map(|command| command.long_name()).collect();
         result.join(" ")
     }
@@ -684,9 +769,9 @@ mod tests {
             ebi_object::EbiObject,
             ebi_trait::EbiTrait,
         },
-        math::fraction::Fraction,
         multiple_reader::MultipleReader,
     };
+    use ebi_arithmetic::fraction::Fraction;
     use itertools::Itertools;
     use ntest::timeout;
 
@@ -735,7 +820,7 @@ mod tests {
             {
                 if cli_command.is_none() // only test commands that do not use the cli directly
                     && (*exact_arithmetic // do not test approximate commands in exact mode
-                        || cfg!(all(not(feature = "exactarithmetic"), feature = "approximatearithmetic")))
+                        || cfg!(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic")))
                 {
                     println!("command {}", EbiCommand::path_to_string(&path));
 
@@ -761,7 +846,7 @@ mod tests {
         }
     }
 
-    fn find_inputs(input_typess: &[&[&EbiInputType]]) -> Vec<Vec<TestInput>> {
+    fn find_inputs(input_typess: &[&[&'static EbiInputType]]) -> Vec<Vec<TestInput>> {
         let mut it = input_typess.iter();
         let mut result = if let Some(input_types) = it.next() {
             find_inputs_for_position(input_types)
@@ -797,10 +882,10 @@ mod tests {
     enum TestInput {
         Trait(EbiTrait, PathBuf), //a trait cannot be cloned, thus we must parse it every time in the cartesian product
         Object(EbiObject, &'static EbiFileHandler, PathBuf),
-        String(String),
-        Usize(usize),
+        String(String, &'static EbiInputType),
+        Usize(usize, &'static EbiInputType),
         FileHandler(EbiFileHandler),
-        Fraction(Fraction),
+        Fraction(Fraction, &'static EbiInputType),
     }
 
     impl TestInput {
@@ -814,10 +899,10 @@ mod tests {
                     }
                 }
                 TestInput::Object(o, fh, _) => EbiInput::Object(o, fh),
-                TestInput::String(s) => EbiInput::String(s),
-                TestInput::Usize(u) => EbiInput::Usize(u),
+                TestInput::String(s, input_type) => EbiInput::String(s, input_type),
+                TestInput::Usize(u, input_type) => EbiInput::Usize(u, input_type),
                 TestInput::FileHandler(fh) => EbiInput::FileHandler(fh),
-                TestInput::Fraction(f) => EbiInput::Fraction(f),
+                TestInput::Fraction(f, input_type) => EbiInput::Fraction(f, input_type),
             }
         }
     }
@@ -827,15 +912,15 @@ mod tests {
             match self {
                 Self::Trait(arg0, arg1) => f.debug_tuple("Trait").field(arg0).field(arg1).finish(),
                 Self::Object(_, _, arg2) => f.debug_tuple("Object").field(arg2).finish(),
-                Self::String(arg0) => f.debug_tuple("String").field(arg0).finish(),
-                Self::Usize(arg0) => f.debug_tuple("Usize").field(arg0).finish(),
+                Self::String(arg0, _) => f.debug_tuple("String").field(arg0).finish(),
+                Self::Usize(arg0, _) => f.debug_tuple("Usize").field(arg0).finish(),
                 Self::FileHandler(arg0) => f.debug_tuple("FileHandler").field(&arg0.name).finish(),
-                Self::Fraction(arg0) => f.debug_tuple("Fraction").field(arg0).finish(),
+                Self::Fraction(arg0, _) => f.debug_tuple("Fraction").field(arg0).finish(),
             }
         }
     }
 
-    fn find_inputs_for_position(input_types: &[&EbiInputType]) -> Vec<TestInput> {
+    fn find_inputs_for_position(input_types: &[&'static EbiInputType]) -> Vec<TestInput> {
         let mut result = vec![];
         for input_type in input_types {
             match input_type {
@@ -847,14 +932,41 @@ mod tests {
                             .collect::<Vec<_>>(),
                     );
                 }
-                EbiInputType::Fraction => {
-                    result.push(TestInput::Fraction(Fraction::from((1, 2))));
+                EbiInputType::Fraction(_, _, Some(default)) => {
+                    result.push(TestInput::Fraction(default.to_fraction(), &input_type));
                 }
-                EbiInputType::String => {
-                    result.push(TestInput::String("no".to_string()));
+                EbiInputType::Fraction(Some(min), _, _) => {
+                    result.push(TestInput::Fraction(min.to_fraction(), &input_type));
                 }
-                EbiInputType::Usize => {
-                    result.push(TestInput::Usize(10));
+                EbiInputType::Fraction(_, Some(max), _) => {
+                    result.push(TestInput::Fraction(max.to_fraction(), &input_type));
+                }
+                EbiInputType::Fraction(_, _, _) => {
+                    result.push(TestInput::Fraction(Fraction::from((1, 2)), &input_type));
+                }
+                EbiInputType::String(_, Some(default)) => {
+                    result.push(TestInput::String(default.to_string(), &input_type));
+                }
+                EbiInputType::String(Some(allowed_values), None) => {
+                    result.push(TestInput::String(
+                        allowed_values[0].to_string(),
+                        &input_type,
+                    ));
+                }
+                EbiInputType::String(None, None) => {
+                    result.push(TestInput::String("some string".to_string(), &input_type));
+                }
+                EbiInputType::Usize(_, _, Some(default)) => {
+                    result.push(TestInput::Usize(*default, &input_type));
+                }
+                EbiInputType::Usize(Some(min), _, _) => {
+                    result.push(TestInput::Usize(*min, &input_type));
+                }
+                EbiInputType::Usize(_, Some(max), _) => {
+                    result.push(TestInput::Usize(*max, &input_type));
+                }
+                EbiInputType::Usize(_, _, _) => {
+                    result.push(TestInput::Usize(10, &input_type));
                 }
                 _ => {
                     //look through all files

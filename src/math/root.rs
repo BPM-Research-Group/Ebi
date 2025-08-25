@@ -1,4 +1,5 @@
 use anyhow::Result;
+use ebi_arithmetic::{fraction::Fraction, ebi_number::{Signed, Zero}};
 use fraction::Sign;
 use std::{
     fmt::{Debug, Display},
@@ -6,9 +7,7 @@ use std::{
     ops::{Div, Mul, Neg},
 };
 
-use crate::{ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable}, math::traits::Signed};
-
-use super::{fraction::Fraction, traits::Zero};
+use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
 #[derive(Clone)]
 pub struct ContainsRoot {
@@ -95,7 +94,7 @@ pub struct Root {
 
 impl Root {
     pub fn of(r: Fraction) -> Self {
-        assert!(!r.is_negative());
+        assert!(r.is_not_negative());
         Self {
             sign: Sign::Plus,
             r: r,

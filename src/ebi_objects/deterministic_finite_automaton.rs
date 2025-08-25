@@ -1,4 +1,5 @@
 use anyhow::{Context, Error, Result, anyhow};
+use ebi_derive::ActivityKey;
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
 use std::{
@@ -20,8 +21,7 @@ use crate::{
         infoable::Infoable,
     },
     ebi_traits::{
-        ebi_trait_graphable::{self, EbiTraitGraphable},
-        ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics},
+        ebi_trait_activities::{self, EbiTraitActivities}, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics}
     },
     json,
 };
@@ -44,9 +44,11 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     name: "deterministic finite automaton",
     article: "a",
     file_extension: "dfa",
+    is_binary: false,
     format_specification: FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<DeterministicFiniteAutomaton>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<DeterministicFiniteAutomaton>),
         EbiTraitImporter::Semantics(DeterministicFiniteAutomaton::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<DeterministicFiniteAutomaton>),
     ],
@@ -99,6 +101,11 @@ impl DeterministicFiniteAutomaton {
             activities: vec![],
             final_states: vec![false],
         }
+    }
+
+    pub fn import_as_activities(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitActivities>> {
+        let object = Self::import(reader)?;
+        Ok(Box::new(object))
     }
 
     pub fn get_sources(&self) -> &Vec<usize> {

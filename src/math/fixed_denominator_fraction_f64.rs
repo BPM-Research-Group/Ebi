@@ -1,8 +1,7 @@
 use std::{borrow::Borrow, ops::{AddAssign, Mul}, sync::Arc};
 
 use anyhow::Result;
-
-use super::{fraction_f64::FractionF64, traits::Zero};
+use ebi_arithmetic::{fraction_f64::FractionF64, ebi_number::Zero};
 
 #[derive(Clone)]
 pub struct FixedDenominatorFractionF64(f64);

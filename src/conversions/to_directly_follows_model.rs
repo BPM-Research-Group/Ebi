@@ -1,9 +1,11 @@
+use ebi_arithmetic::ebi_number::Signed;
+
 use crate::{
-    ebi_framework::activity_key::HasActivityKey, ebi_objects::{
-        directly_follows_graph::DirectlyFollowsGraph,
-        directly_follows_model::DirectlyFollowsModel,
+    ebi_framework::activity_key::HasActivityKey,
+    ebi_objects::{
+        directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel,
         stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
-    }, math::traits::Signed
+    },
 };
 
 impl From<DirectlyFollowsGraph> for DirectlyFollowsModel {

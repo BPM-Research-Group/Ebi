@@ -1,6 +1,8 @@
+use ebi_arithmetic::ebi_number::{Signed, Zero};
+
 use crate::{ebi_framework::activity_key::HasActivityKey, ebi_objects::{
     deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton
-}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_semantics::Semantics}, math::traits::{Signed, Zero}};
+}, ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_semantics::Semantics}};
 
 impl From<FiniteLanguage> for DeterministicFiniteAutomaton {
     fn from(value: FiniteLanguage) -> Self {

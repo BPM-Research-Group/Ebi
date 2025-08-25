@@ -1,5 +1,7 @@
 use std::collections::{HashMap, hash_map::Entry};
 
+use ebi_arithmetic::{fraction::Fraction, ebi_number::{One, Zero}};
+
 use crate::{
     ebi_framework::activity_key::HasActivityKey,
     ebi_objects::{
@@ -7,10 +9,6 @@ use crate::{
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
     },
     ebi_traits::ebi_trait_event_log::IndexTrace,
-    math::{
-        fraction::Fraction,
-        traits::{One, Zero},
-    },
 };
 
 impl From<FiniteStochasticLanguage> for StochasticDeterministicFiniteAutomaton {
@@ -70,7 +68,7 @@ impl From<EventLog> for StochasticDeterministicFiniteAutomaton {
             let mut final_states = HashMap::new();
 
             //create automaton
-            for trace_index in 0..value.log.traces.len() {
+            for trace_index in 0..value.len() {
                 let trace = value.get_trace(trace_index).unwrap();
                 let mut state = result.get_initial_state().unwrap();
 

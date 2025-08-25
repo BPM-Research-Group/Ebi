@@ -1,10 +1,16 @@
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::{One, Zero}};
 
-use crate::{distances::TriangularDistanceMatrix, ebi_objects::finite_language::FiniteLanguage, ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, math::{fraction::Fraction, traits::{One, Zero}}};
+use crate::{
+    ebi_objects::finite_language::FiniteLanguage,
+    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    math::distances::TriangularDistanceMatrix,
+};
 
-
-pub fn medoid<T>(log: &T, number_of_traces: &usize) -> Result<FiniteLanguage> where T: EbiTraitFiniteStochasticLanguage + ?Sized {
-
+pub fn medoid<T>(log: &T, number_of_traces: &usize) -> Result<FiniteLanguage>
+where
+    T: EbiTraitFiniteStochasticLanguage + ?Sized,
+{
     let activity_key = log.get_activity_key().clone();
     let mut result = FiniteLanguage::new_hashmap();
 
@@ -15,21 +21,26 @@ pub fn medoid<T>(log: &T, number_of_traces: &usize) -> Result<FiniteLanguage> wh
     if number_of_traces.is_one() {
         let trace_number = medoid_single(log, &distances);
         if trace_number.is_none() {
-            return Err(anyhow!("1 trace was requested, but the stochastic language contains none."));
+            return Err(anyhow!(
+                "1 trace was requested, but the stochastic language contains none."
+            ));
         }
         result.insert(log.get_trace(trace_number.unwrap()).unwrap().to_owned());
         return Ok((activity_key, result).into());
     }
 
     if log.len() < *number_of_traces {
-        return Err(anyhow!("{} traces were requested, but the stochastic language contains only {} traces.", number_of_traces, log.len()));
+        return Err(anyhow!(
+            "{} traces were requested, but the stochastic language contains only {} traces.",
+            number_of_traces,
+            log.len()
+        ));
     }
 
     let mut sum_distance = sum_distances(log, &distances);
 
     let mut list = Vec::new();
     while list.len() < *number_of_traces {
-
         //find the position of the minimum value
         let mut min_pos = 0;
         for i in 1..sum_distance.len() {
@@ -59,7 +70,10 @@ pub fn medoid<T>(log: &T, number_of_traces: &usize) -> Result<FiniteLanguage> wh
 /**
  * Returns the index of the weighted medoid, if there is one.
  */
-pub fn medoid_single<T>(log: &T, distances: &TriangularDistanceMatrix) -> Option<usize> where T: EbiTraitFiniteStochasticLanguage + ?Sized {
+pub fn medoid_single<T>(log: &T, distances: &TriangularDistanceMatrix) -> Option<usize>
+where
+    T: EbiTraitFiniteStochasticLanguage + ?Sized,
+{
     let sum_distance = sum_distances(log, distances);
 
     //report the minimum value
@@ -71,20 +85,23 @@ pub fn medoid_single<T>(log: &T, distances: &TriangularDistanceMatrix) -> Option
             min_value = value;
         }
     }
-    
+
     return Some(min_pos);
 }
 
-pub fn sum_distances<T>(log: &T, distances: &TriangularDistanceMatrix) -> Vec<Fraction> where T: EbiTraitFiniteStochasticLanguage + ?Sized {
+pub fn sum_distances<T>(log: &T, distances: &TriangularDistanceMatrix) -> Vec<Fraction>
+where
+    T: EbiTraitFiniteStochasticLanguage + ?Sized,
+{
     let mut sum_distance = vec![Fraction::zero(); log.len()];
 
     for (i, j, _, distance) in distances {
         let mut distance_i = distance.as_ref().clone();
-        distance_i *= log.get_probability(j).unwrap();
+        distance_i *= log.get_trace_probability(j).unwrap();
         sum_distance[i] += &distance_i;
 
         let mut distance_j = distance.as_ref().clone();
-        distance_j *= log.get_probability(i).unwrap();
+        distance_j *= log.get_trace_probability(i).unwrap();
         sum_distance[j] += distance_j;
     }
 
@@ -92,12 +109,11 @@ pub fn sum_distances<T>(log: &T, distances: &TriangularDistanceMatrix) -> Vec<Fr
 }
 
 #[cfg(test)]
-mod tests{
+mod tests {
     use std::fs;
 
     use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, medoid};
 
-    
     #[test]
     fn medoid() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();

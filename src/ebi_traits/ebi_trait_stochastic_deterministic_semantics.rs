@@ -1,6 +1,7 @@
 use std::io::BufRead;
 
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::fraction::Fraction;
 
 use crate::{
     ebi_framework::{
@@ -12,7 +13,6 @@ use crate::{
         importable::Importable,
     },
     ebi_objects::{labelled_petri_net::LPNMarking, stochastic_process_tree_semantics::NodeStates},
-    math::fraction::Fraction,
     techniques::{
         deterministic_semantics_for_stochastic_semantics::PMarking,
         infinitely_many_traces::InfinitelyManyTraces,
@@ -21,7 +21,9 @@ use crate::{
 
 pub enum EbiTraitStochasticDeterministicSemantics {
     Usize(Box<dyn StochasticDeterministicSemantics<DetState = usize, LivState = usize>>),
-    UsizeDistribution(Box<dyn StochasticDeterministicSemantics<DetState = PMarking<usize>, LivState = usize>>),
+    UsizeDistribution(
+        Box<dyn StochasticDeterministicSemantics<DetState = PMarking<usize>, LivState = usize>>,
+    ),
     LPNMarkingDistribution(
         Box<
             dyn StochasticDeterministicSemantics<

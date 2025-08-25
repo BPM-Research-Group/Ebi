@@ -1,3 +1,5 @@
+use ebi_arithmetic::{ebi_number::One, fraction::Fraction};
+
 use crate::{
     ebi_objects::{
         labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree,
@@ -5,7 +7,6 @@ use crate::{
         stochastic_process_tree::StochasticProcessTree,
     },
     ebi_traits::ebi_trait_semantics::Semantics,
-    math::{fraction::Fraction, traits::One},
 };
 
 pub trait UniformStochasticMinerLPN {
@@ -36,7 +37,9 @@ mod tests {
 
     use crate::{
         ebi_objects::{labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree},
-        techniques::uniform_stochastic_miner::{UniformStochasticMinerLPN, UniformStochasticMinerTree},
+        techniques::uniform_stochastic_miner::{
+            UniformStochasticMinerLPN, UniformStochasticMinerTree,
+        },
     };
 
     #[test]

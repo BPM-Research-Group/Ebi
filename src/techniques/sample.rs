@@ -1,6 +1,11 @@
 use std::collections::{HashMap, hash_map::Entry};
 
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::{
+    choose_randomly::{ChooseRandomly, FractionRandomCache},
+    ebi_number::One,
+    fraction::Fraction,
+};
 use num::Zero;
 use rand::Rng;
 
@@ -11,14 +16,15 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics},
     },
-    math::{
-        fraction::{ChooseRandomly, Fraction},
-        traits::One,
-    },
 };
 
 pub trait Sampler {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage>;
+}
+
+pub trait Resampler {
+    fn resample_cache_init(&self) -> Result<FractionRandomCache>;
+    fn resample(&self, cache: &FractionRandomCache, number_of_traces: usize) -> Vec<Fraction>;
 }
 
 impl Sampler for EbiTraitStochasticSemantics {
@@ -35,12 +41,14 @@ impl Sampler for dyn EbiTraitFiniteStochasticLanguage {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage> {
         let mut result = HashMap::new();
 
+        let cache = self.resample_cache_init()?;
+
         if self.len().is_zero() {
             return Err(anyhow!("Cannot sample from empty language."));
         }
 
         for _ in 0..number_of_traces {
-            let trace_index = rand::thread_rng().gen_range(0..self.len());
+            let trace_index = Fraction::choose_randomly_cached(&cache);
 
             match result.entry(self.get_trace(trace_index).unwrap().clone()) {
                 Entry::Occupied(mut e) => *e.get_mut() += 1,
@@ -50,7 +58,7 @@ impl Sampler for dyn EbiTraitFiniteStochasticLanguage {
             };
         }
 
-        Ok((result, self.get_activity_key().clone()).into())
+        Ok((self.get_activity_key().clone(), result).into())
     }
 }
 
@@ -110,19 +118,47 @@ where
 
             // log::debug!("Sampled {:?} traces", result);
 
-            Ok((result, self.get_activity_key().clone()).into())
+            Ok((self.get_activity_key().clone(), result).into())
         } else {
             return Err(anyhow!("Language contains no traces, so cannot sample."));
         }
     }
 }
 
+impl Resampler for dyn EbiTraitFiniteStochasticLanguage {
+    fn resample_cache_init(&self) -> Result<FractionRandomCache> {
+        if self.len().is_zero() {
+            return Err(anyhow!("Cannot sample from empty language."));
+        }
+
+        let probabilities = self.iter_trace_probability().map(|(_, p)| p);
+        let cache = Fraction::choose_randomly_create_cache(probabilities)?;
+
+        Ok(cache)
+    }
+
+    fn resample(&self, cache: &FractionRandomCache, number_of_traces: usize) -> Vec<Fraction> {
+        let mut result = vec![0usize; self.len()];
+        for _ in 0..number_of_traces {
+            let trace_index = Fraction::choose_randomly_cached(&cache);
+            result[trace_index] += 1;
+        }
+
+        //normalise vector
+        result
+            .into_iter()
+            .map(|c| Fraction::from((c, number_of_traces)))
+            .collect()
+    }
+}
+
 /**
- * Fills the given vector with random numbers in the range 0..number_of_indices
+ * Fills the given vector with uniformly random numbers in the range 0..number_of_indices
  */
-pub fn sample_indices(number_of_indices: usize, result: &mut Vec<usize>) {
+pub fn sample_indices_uniform(number_of_indices: usize, result: &mut Vec<usize>) {
+    let mut rng = rand::thread_rng();
     for i in 0..result.len() {
-        let trace_index = rand::thread_rng().gen_range(0..number_of_indices);
+        let trace_index = rng.gen_range(0..number_of_indices);
         result[i] = trace_index;
     }
 }

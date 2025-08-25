@@ -2,11 +2,11 @@ use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
-        ebi_object::EbiObject,
+        ebi_object::{EbiObject, EbiObjectType},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_objects::scalable_vector_graphics::{svg_to_pdf, to_svg_string_box},
+    ebi_objects::scalable_vector_graphics::ScalableVectorGraphics,
     ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
 };
 
@@ -15,14 +15,14 @@ pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
     name_long: Some("visualise"),
     explanation_short: "Visualse an object.",
     explanation_long: None,
-    children: &[&EBI_VISUALISE_PDF, &EBI_VISUALISE_SVG, &EBI_VISUALISE_TEXT],
+    children: &[&EBI_VISUALISE_GRAPH, &EBI_VISUALISE_TEXT],
 };
 
 pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
     name_short: "txt",
     name_long: Some("text"),
     library_name: "ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT",
-    explanation_short: "Visualise an object as text.",
+    explanation_short: "Visualise a file as text.",
     explanation_long: None,
     latex_link: None,
     cli_command: None,
@@ -49,22 +49,23 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::StochasticProcessTree(pt), _) => pt.to_string(),
             EbiInput::Object(EbiObject::Executions(s), _) => s.to_string(),
             EbiInput::Object(EbiObject::DirectlyFollowsGraph(s), _) => s.to_string(),
+            EbiInput::Object(EbiObject::ScalableVectorGraphics(s), _) => s.to_string(),
             EbiInput::FileHandler(_) => unreachable!(),
             EbiInput::Trait(_, _) => unreachable!(),
-            EbiInput::String(_) => unreachable!(),
-            EbiInput::Usize(_) => unreachable!(),
-            EbiInput::Fraction(_) => unreachable!(),
+            EbiInput::String(_, _) => unreachable!(),
+            EbiInput::Usize(_, _) => unreachable!(),
+            EbiInput::Fraction(_, _) => unreachable!(),
         };
         Ok(EbiOutput::String(result))
     },
     output_type: &EbiOutputType::String,
 };
 
-pub const EBI_VISUALISE_SVG: EbiCommand = EbiCommand::Command { 
-    name_short: "svg", 
+pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command { 
+    name_short: "graph", 
     name_long: None, 
-    library_name: "ebi_commands::ebi_command_visualise::EBI_VISUALISE_SVG",
-    explanation_short: "Visualise an object as scalable vector graphics.",
+    library_name: "ebi_commands::ebi_command_visualise::EBI_VISUALISE_GRAPH",
+    explanation_short: "Visualise a file as a graph.",
     explanation_long: None,
     latex_link: None,
     cli_command: None,
@@ -76,46 +77,30 @@ pub const EBI_VISUALISE_SVG: EbiCommand = EbiCommand::Command {
         let result: Box<dyn EbiTraitGraphable + 'static> =
             inputs.remove(0).to_type::<dyn EbiTraitGraphable>()?;
 
-        let svg_string = to_svg_string_box(result)?;
-        return Ok(EbiOutput::SVG(svg_string));
+        let svg = ScalableVectorGraphics::from_graphable(result)?;
+        return Ok(EbiOutput::Object(EbiObject::ScalableVectorGraphics(svg)));
     },
-    output_type: &EbiOutputType::SVG,
-};
-
-pub const EBI_VISUALISE_PDF: EbiCommand = EbiCommand::Command { 
-    name_short: "pdf", 
-    name_long: None, 
-    library_name: "ebi_commands::ebi_command_visualise::EBI_VISUALISE_PDF",
-    explanation_short: "Visualise an object as portable document format.",
-    explanation_long: None,
-    latex_link: None,
-    cli_command: None,
-    exact_arithmetic: true,
-    input_types: &[&[&EbiInputType::Trait(EbiTrait::Graphable)]],
-    input_names: &["FILE"],
-    input_helps: &["Any file that can be visualised as a graph."],
-    execute: |mut inputs, _| {
-        let result = inputs.remove(0).to_type::<dyn EbiTraitGraphable>()?;
-
-        let svg_string = to_svg_string_box(result)?;
-        let pdf = svg_to_pdf(&svg_string)?;
-
-        return Ok(EbiOutput::PDF(pdf));
-    },
-    output_type: &EbiOutputType::PDF,
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::ScalableVectorGraphics),
 };
 
 #[cfg(test)]
 mod tests {
 
+    use ebi_arithmetic::{ebi_number::One, fraction::Fraction};
+
     use crate::{
         ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT,
-        ebi_framework::{ebi_command::EbiCommand, ebi_input::EbiInput, ebi_object::EbiTraitObject},
+        ebi_framework::{
+            ebi_command::EbiCommand,
+            ebi_input::{
+                EbiInput, TEST_INPUT_TYPE_FRACTION, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE,
+            },
+            ebi_object::EbiTraitObject,
+        },
         ebi_objects::{
             finite_language::FiniteLanguage,
             stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
         },
-        math::{fraction::Fraction, traits::One},
     };
 
     #[test]
@@ -141,7 +126,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn unreachable_string() {
-        let object = EbiInput::String("abc".to_string());
+        let object = EbiInput::String("abc".to_string(), &TEST_INPUT_TYPE_STRING);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
             let _ = (execute)(vec![object], None);
         }
@@ -150,7 +135,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn unreachable_usize() {
-        let object = EbiInput::Usize(10);
+        let object = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
             let _ = (execute)(vec![object], None);
         }
@@ -159,7 +144,7 @@ mod tests {
     #[test]
     #[should_panic]
     fn unreachable_fraction() {
-        let object = EbiInput::Fraction(Fraction::one());
+        let object = EbiInput::Fraction(Fraction::one(), &TEST_INPUT_TYPE_FRACTION);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
             let _ = (execute)(vec![object], None);
         }

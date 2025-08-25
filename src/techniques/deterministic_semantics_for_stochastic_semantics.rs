@@ -1,4 +1,8 @@
 use anyhow::Result;
+use ebi_arithmetic::{
+    ebi_number::{One, Signed, Zero},
+    fraction::Fraction,
+};
 use std::collections::HashMap;
 use std::collections::hash_map::DefaultHasher;
 use std::collections::hash_map::Entry;
@@ -16,11 +20,7 @@ use crate::ebi_objects::stochastic_process_tree_semantics::NodeStates;
 use crate::ebi_traits::ebi_trait_semantics::Semantics;
 use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics;
 use crate::ebi_traits::ebi_trait_stochastic_semantics::StochasticSemantics;
-use crate::math::fraction::Fraction;
 use crate::math::markov_model::MarkovModel;
-use crate::math::traits::One;
-use crate::math::traits::Signed;
-use crate::math::traits::Zero;
 
 use super::non_decreasing_livelock::NonDecreasingLivelock;
 
@@ -121,25 +121,31 @@ macro_rules! default_stochastic_deterministic_semantics {
              * Compute the next q-state.
              */
             fn compute_next(&self, q_state: &mut PMarking<$s>) -> Result<()> {
-                // log::debug!("\t\t\tcompute next q-states for {:?}", q_state);
+                // log::debug!("\ncompute next q-states for {:?}", q_state);
 
                 //create the extended matrix
                 let mut markov_model = self.create_markov_model(&q_state)?;
 
-                // log::debug!("\t\t\t\tT {}", markov_model);
+                // log::debug!("\tT {}", markov_model);
                 // log::debug!("T {:?}", markov_model);
 
                 //replace livelock states by absorbing states
-                let progress_states = Self::get_progress_states(&markov_model);
-                // log::debug!("\t\t\t\tprogress states {:?}", progress_states);
-                let silent_livelock_states =
-                    markov_model.get_states_that_cannot_reach(progress_states);
-                // log::debug!("\t\t\t\tstates that cannot reach a progress state {:?}", silent_livelock_states);
-                markov_model.make_states_absorbing(&silent_livelock_states);
-                markov_model.set_states(&silent_livelock_states, MarkovMarking::SilentLiveLock());
+                {
+                    let progress_states = Self::get_progress_states(&markov_model);
+                    // log::debug!("\tprogress states {:?}", progress_states);
+                    let silent_livelock_states =
+                        markov_model.get_states_that_cannot_reach(progress_states);
+                    // log::debug!(
+                    //     "\tstates that cannot reach a progress state {:?}",
+                    //     silent_livelock_states
+                    // );
+                    markov_model.make_states_absorbing(&silent_livelock_states);
+                    markov_model
+                        .set_states(&silent_livelock_states, MarkovMarking::SilentLiveLock());
 
-                // log::debug!("T made absorbing {}", markov_model);
-                // log::debug!("T made absorbing {:?}", markov_model);
+                    // log::debug!("\tT made absorbing {}", markov_model);
+                    // log::debug!("\tT made absorbing {:?}", markov_model);
+                }
 
                 //if there are no states at all, we are in a final state (final states were filtered out in the creation of the Markov model)
                 if markov_model.get_states().is_empty() {
@@ -148,7 +154,10 @@ macro_rules! default_stochastic_deterministic_semantics {
                 }
 
                 let new_state_vector = markov_model.pow_infty()?;
-                // log::debug!("new state vector {}", crate::math::matrix::Matrix::into(new_state_vector.clone()));
+                // log::debug!(
+                //     "\tnew state vector {}",
+                //     crate::math::matrix::Matrix::into(new_state_vector.clone())
+                // );
 
                 //create the next q-states
                 for (probability, state) in new_state_vector
@@ -157,13 +166,18 @@ macro_rules! default_stochastic_deterministic_semantics {
                 {
                     if probability.is_positive() {
                         match state {
-                            MarkovMarking::ReachableWithSilentTransitions(_) => {
+                            MarkovMarking::ReachableWithSilentTransitions(marking) => {
                                 /*
                                  * Final state reachable after silent transitions.
                                  */
+                                log::debug!(
+                                    "bug: state reachable with silent transitions {}, p={}",
+                                    marking, probability
+                                );
                                 q_state.termination_probability += probability;
+                                unreachable!("This is a bug. A state was encountered that should not be assigned a non-zero probability.");
                             }
-                            MarkovMarking::AfterExecutingAcrivity(marking, activity) => {
+                            MarkovMarking::AfterExecutingActivity(marking, activity) => {
                                 match q_state.activity_2_probability.entry(activity) {
                                     Entry::Occupied(mut x) => *x.get_mut() += &probability,
                                     Entry::Vacant(x) => {
@@ -185,9 +199,11 @@ macro_rules! default_stochastic_deterministic_semantics {
                                 }
                             }
                             MarkovMarking::Final(_) => {
+                                log::debug!("final state {}", probability);
                                 q_state.termination_probability += probability;
                             }
                             MarkovMarking::SilentLiveLock() => {
+                                log::debug!("silent livelock {}", probability);
                                 q_state.silent_livelock_probability += probability;
                             }
                         };
@@ -228,7 +244,7 @@ macro_rules! default_stochastic_deterministic_semantics {
                     .enumerate()
                     .filter_map(|(i, state)| match state {
                         MarkovMarking::ReachableWithSilentTransitions(_) => None,
-                        MarkovMarking::AfterExecutingAcrivity(_, _) => Some(i),
+                        MarkovMarking::AfterExecutingActivity(_, _) => Some(i),
                         MarkovMarking::Final(_) => Some(i),
                         MarkovMarking::SilentLiveLock() => None,
                     })
@@ -298,7 +314,7 @@ macro_rules! default_stochastic_deterministic_semantics {
                             //we follow a labelled transition, and then we end up in an absorbing state
                             let activity = self.get_transition_activity(transition).unwrap();
                             let (new_markov_index, _) = markov.add_or_find_state(
-                                MarkovMarking::AfterExecutingAcrivity(new_marking, activity),
+                                MarkovMarking::AfterExecutingActivity(new_marking, activity),
                                 Fraction::zero(),
                             );
                             markov.set_flow(markov_index, new_markov_index, &probability);
@@ -329,8 +345,8 @@ where
     pub p_marking: HashMap<S, Fraction>,
     pub termination_probability: Fraction,
     pub silent_livelock_probability: Fraction,
-    pub activity_2_p_markings: HashMap<Activity, HashMap<S, Fraction>>,
-    pub activity_2_probability: HashMap<Activity, Fraction>,
+    pub activity_2_p_markings: HashMap<Activity, HashMap<S, Fraction>>, //next-activity cache
+    pub activity_2_probability: HashMap<Activity, Fraction>,            //next-activity cache
 }
 
 impl<S: Displayable> PMarking<S> {
@@ -389,9 +405,100 @@ impl<S: Displayable> Displayable for PMarking<S> {}
 #[derive(Clone, Hash, Eq, PartialEq, Debug, Display)]
 enum MarkovMarking<S: Displayable> {
     ReachableWithSilentTransitions(S),
-    AfterExecutingAcrivity(S, Activity),
+    AfterExecutingActivity(S, Activity),
     Final(S),
     SilentLiveLock(),
 }
 
 impl<S: Displayable> Displayable for MarkovMarking<S> {}
+
+#[cfg(test)]
+mod tests {
+    use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
+
+    use crate::{
+        ebi_framework::activity_key::HasActivityKey,
+        ebi_objects::stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
+    };
+    use std::fs;
+
+    #[test]
+    fn deterministic_semantics() {
+        let fin1 = fs::read_to_string("testfiles/a-loop-c-unbounded.slpn").unwrap();
+        let mut slpn: StochasticLabelledPetriNet =
+            fin1.parse::<StochasticLabelledPetriNet>().unwrap();
+
+        let a = slpn.get_activity_key_mut().process_activity("a");
+
+        //emtpy prefix
+        let mut state = slpn.get_deterministic_initial_state().unwrap().unwrap();
+        assert_eq!(state.p_marking.len(), 1);
+        assert_eq!(state.termination_probability, Fraction::zero());
+        assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
+        assert!(
+            slpn.get_deterministic_enabled_activities(&state)
+                .contains(&a)
+        );
+
+        //prefix <a>
+        state = slpn.execute_deterministic_activity(&state, a).unwrap();
+        assert_eq!(state.p_marking.len(), 1);
+        assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
+        assert!(
+            slpn.get_deterministic_enabled_activities(&state)
+                .contains(&a)
+        );
+        assert_eq!(state.termination_probability, Fraction::zero());
+
+        //prefix <a, a>
+        state = slpn.execute_deterministic_activity(&state, a).unwrap();
+        assert_eq!(state.p_marking.len(), 2);
+        assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
+        assert!(
+            slpn.get_deterministic_enabled_activities(&state)
+                .contains(&a)
+        );
+        assert_eq!(state.termination_probability, Fraction::from((1, 4)));
+
+        //prefix <a, a, a>
+        state = slpn.execute_deterministic_activity(&state, a).unwrap();
+        assert_eq!(state.p_marking.len(), 3);
+        assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
+        assert!(
+            slpn.get_deterministic_enabled_activities(&state)
+                .contains(&a)
+        );
+        assert_eq!(state.termination_probability, Fraction::zero());
+
+        //prefix <a, a, a, a>
+        state = slpn.execute_deterministic_activity(&state, a).unwrap();
+        assert_eq!(state.p_marking.len(), 4);
+        assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
+        assert!(
+            slpn.get_deterministic_enabled_activities(&state)
+                .contains(&a)
+        );
+        assert_eq!(state.termination_probability, Fraction::zero());
+
+        //prefix <a, a, a, a, a>
+        state = slpn.execute_deterministic_activity(&state, a).unwrap();
+        assert_eq!(state.p_marking.len(), 6);
+        assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
+        assert!(
+            slpn.get_deterministic_enabled_activities(&state)
+                .contains(&a)
+        );
+        assert_eq!(state.termination_probability, Fraction::from((1, 16)));
+
+        //prefix <a, a, a, a, a, a>
+        state = slpn.execute_deterministic_activity(&state, a).unwrap();
+        assert_eq!(state.p_marking.len(), 7);
+        assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
+        assert!(
+            slpn.get_deterministic_enabled_activities(&state)
+                .contains(&a)
+        );
+        assert_eq!(state.termination_probability, Fraction::zero());
+    }
+}

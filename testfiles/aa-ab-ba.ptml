@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<ptml>
+  <processTree root="n1">
+    <xor id="n1"/>
+      <sequence id="n2"/>
+        <manualTask id="n3" name="b"/>
+        <manualTask id="n4" name="a"/>
+      <sequence id="n5"/>
+        <manualTask id="n6" name="a"/>
+        <xor id="n7"/>
+          <manualTask id="n8" name="a"/>
+          <manualTask id="n9" name="b"/>
+      
+    <parentsNode sourceId="n1" targetId="n2"/>
+    <parentsNode sourceId="n2" targetId="n3"/>
+    <parentsNode sourceId="n2" targetId="n4"/>
+    <parentsNode sourceId="n1" targetId="n5"/>
+    <parentsNode sourceId="n5" targetId="n6"/>
+    <parentsNode sourceId="n5" targetId="n7"/>
+    <parentsNode sourceId="n7" targetId="n8"/>
+    <parentsNode sourceId="n7" targetId="n9"/>
+
+  </processTree>
+  <ptml>
+    <and />
+  </ptml>
+</ptml>

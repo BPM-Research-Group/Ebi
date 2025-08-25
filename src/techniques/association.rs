@@ -1,10 +1,9 @@
 use crate::{
     ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
-    math::{
-        correlation::correlation, data_type::DataType, fraction::Fraction, levenshtein, root::ContainsRoot, traits::{Signed, Zero}
-    },
+    math::{correlation::correlation, data_type::DataType, levenshtein, root::ContainsRoot},
 };
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::{Signed, Zero}};
 use rand::Rng;
 use rayon::prelude::*;
 
@@ -32,7 +31,9 @@ impl Associations for dyn EbiTraitEventLog {
         log::info!("number of samples {}", number_of_samples);
         match data_type {
             Some(d_type) => self.association_type(number_of_samples, attribute, d_type),
-            None => Err(anyhow!("attribute type is not consistent or not supported")),
+            None => Err(anyhow!(
+                "attribute is missing, attribute type is not consistent, or attribute type is not supported"
+            )),
         }
     }
 
@@ -65,9 +66,9 @@ impl dyn EbiTraitEventLog {
             DataType::Categorical => self.association_categorical(&attribute, number_of_samples),
             DataType::Numerical(_, _) => self.association_numerical(&attribute, number_of_samples),
             DataType::Time(_, _) => self.association_time(&attribute, number_of_samples),
-            DataType::Undefined => {
-                Err(anyhow!("attribute type is not consistent or not supported"))
-            }
+            DataType::Undefined => Err(anyhow!(
+                "attribute is missing, attribute type is not consistent, or attribute type is not supported"
+            )),
         };
         log::info!("association {:?}", result);
         result

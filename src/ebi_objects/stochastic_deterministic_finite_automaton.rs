@@ -1,6 +1,8 @@
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey},
+        activity_key::{
+            Activity, ActivityKey, ActivityKeyTranslator, HasActivityKey, TranslateActivityKey,
+        },
         ebi_file_handler::EbiFileHandler,
         ebi_input::{self, EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_object::EbiObject,
@@ -11,6 +13,7 @@ use crate::{
         infoable::Infoable,
     },
     ebi_traits::{
+        ebi_trait_activities,
         ebi_trait_graphable::{self, EbiTraitGraphable},
         ebi_trait_queriable_stochastic_language::{self},
         ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
@@ -20,12 +23,13 @@ use crate::{
         ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     },
     json,
-    math::{
-        fraction::Fraction,
-        traits::{One, Signed},
-    },
 };
 use anyhow::{Context, Error, Result, anyhow};
+use ebi_arithmetic::{
+    ebi_number::{One, Signed},
+    fraction::Fraction,
+};
+use ebi_derive::ActivityKey;
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;
 use std::{
@@ -58,9 +62,13 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
     name: "stochastic deterministic finite automaton",
     article: "a",
     file_extension: "sdfa",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<StochasticDeterministicFiniteAutomaton>),
     trait_importers: &[
+        EbiTraitImporter::Activities(
+            ebi_trait_activities::import::<StochasticDeterministicFiniteAutomaton>,
+        ),
         EbiTraitImporter::QueriableStochasticLanguage(
             ebi_trait_queriable_stochastic_language::import::<StochasticDeterministicFiniteAutomaton>,
         ),

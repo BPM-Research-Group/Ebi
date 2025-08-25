@@ -5,6 +5,7 @@ use std::{
 };
 
 use anyhow::{Context, Error, Result, anyhow};
+use ebi_derive::ActivityKey;
 use layout::{adt::dag::NodeHandle, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 use strum_macros::EnumIter;
@@ -25,9 +26,7 @@ use crate::{
         prom_link::JavaObjectHandler,
     },
     ebi_traits::{
-        ebi_trait_graphable::{self, EbiTraitGraphable},
-        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
-        ebi_trait_stochastic_semantics::TransitionIndex,
+        ebi_trait_activities, ebi_trait_graphable::{self, EbiTraitGraphable}, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_semantics::TransitionIndex
     },
     line_reader::LineReader,
 };
@@ -56,9 +55,11 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     name: "process tree",
     article: "a",
     file_extension: "ptree",
+    is_binary: false,
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(ebi_input::validate::<ProcessTree>),
     trait_importers: &[
+        EbiTraitImporter::Activities(ebi_trait_activities::import::<ProcessTree>),
         EbiTraitImporter::Semantics(ProcessTree::import_as_semantics),
         EbiTraitImporter::Graphable(ebi_trait_graphable::import::<ProcessTree>),
     ],
@@ -70,7 +71,7 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
         ProcessTree::export_from_object,
     )],
     java_object_handlers: &[JavaObjectHandler {
-        name: "process tree",
+        name: "ProcessTree",
         java_class: "org.processmining.plugins.InductiveMiner.efficienttree.EfficientTree",
         translator_ebi_to_java: Some(
             "org.processmining.ebi.objects.EbiProcessTree.EbiString2EfficientTree",
@@ -312,7 +313,7 @@ macro_rules! tree {
                 self.tree.get(node)
             }
 
-            pub fn get_root(&self) -> usize {
+            pub fn root(&self) -> usize {
                 0
             }
 
@@ -676,6 +677,15 @@ impl Node {
         match self {
             Self::Tau | Self::Activity(_) => true,
             Self::Operator(_, _) => false,
+        }
+    }
+
+    pub fn set_number_of_children(&mut self, number_of_children: usize) -> Result<()> {
+        if let Self::Operator(_, old_number_of_children) = self {
+            *old_number_of_children = number_of_children;
+            Ok(())
+        } else {
+            Err(anyhow!("attempted to alter the number of children of an activity or a tau"))
         }
     }
 }

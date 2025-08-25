@@ -4,6 +4,7 @@ use std::{
 };
 
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
 use strum_macros::Display;
 
 use crate::{
@@ -12,7 +13,6 @@ use crate::{
         ebi_trait_semantics::Semantics,
         ebi_trait_stochastic_semantics::{StochasticSemantics, TransitionIndex},
     },
-    math::{fraction::Fraction, traits::Zero},
 };
 
 use super::{
@@ -33,7 +33,7 @@ macro_rules! tree {
                         states: vec![NodeState::Closed; self.get_number_of_nodes()],
                         terminated: false,
                     };
-                    self.enable_node(&mut state, self.get_root());
+                    self.enable_node(&mut state, self.root());
                     Some(state)
                 }
             }
@@ -96,7 +96,7 @@ macro_rules! tree {
                     }
                 }
 
-                if !state.terminated && self.can_terminate(state, self.get_root()) {
+                if !state.terminated && self.can_terminate(state, self.root()) {
                     result.push(self.transition2node.len());
                 }
 
@@ -377,7 +377,7 @@ impl StochasticSemantics for StochasticProcessTree {
         &self,
         state: &<Self as StochasticSemantics>::StoSemState,
     ) -> Result<Fraction> {
-        let mut sum = if !state.terminated && self.can_terminate(state, self.get_root()) {
+        let mut sum = if !state.terminated && self.can_terminate(state, self.root()) {
             self.termination_weight.clone()
         } else {
             Fraction::zero()
@@ -436,6 +436,8 @@ impl IndexMut<usize> for NodeStates {
 mod tests {
     use std::fs;
 
+    use ebi_arithmetic::{fraction::Fraction, ebi_number::One};
+
     use crate::{
         ebi_objects::{
             labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree,
@@ -444,7 +446,6 @@ mod tests {
         ebi_traits::{
             ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::StochasticSemantics,
         },
-        math::{fraction::Fraction, traits::One},
     };
 
     #[test]

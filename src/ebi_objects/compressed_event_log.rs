@@ -12,17 +12,9 @@ use crate::{
         importable::Importable,
     },
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog,
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_iterable_language::EbiTraitIterableLanguage,
-        ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-        ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
-        ebi_trait_stochastic_deterministic_semantics::{
+        ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, ebi_trait_stochastic_deterministic_semantics::{
             EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
-        },
-        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
+        }, ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics}
     },
 };
 
@@ -39,8 +31,10 @@ pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "xes.gz",
     format_specification: &FORMAT_SPECIFICATION,
+    is_binary: true,
     validator: Some(ebi_input::validate::<CompressedEventLog>),
     trait_importers: &[
+        EbiTraitImporter::Activities(CompressedEventLog::read_as_activities),
         EbiTraitImporter::IterableLanguage(CompressedEventLog::read_as_iterable_language),
         EbiTraitImporter::FiniteLanguage(CompressedEventLog::read_as_finite_language),
         EbiTraitImporter::FiniteStochasticLanguage(
@@ -117,6 +111,11 @@ impl CompressedEventLog {
     }
 
     pub fn read_as_event_log(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLog>> {
+        let event_log = Self::import(reader)?;
+        Ok(Box::new(event_log.log))
+    }
+
+    pub fn read_as_activities(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitActivities>> {
         let event_log = Self::import(reader)?;
         Ok(Box::new(event_log.log))
     }
