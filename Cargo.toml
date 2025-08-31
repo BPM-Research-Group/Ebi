@@ -69,9 +69,8 @@ ntest = "0.9.3"
 regex = "1.11.1"
 quick-xml = {version="0.38.3", features=["serialize"]}
 ndarray = "0.16.1"
-minilp = "*"
 sprs = "0.11.3"
-malachite = "*"
+malachite = "0.6.1"
 
 [dependencies.num-rational]
 version = "0.4.1"
