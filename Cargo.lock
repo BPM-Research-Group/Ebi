@@ -560,9 +560,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_optimisation"
-version = "0.0.5"
+version = "0.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d75b6ad66127fedc6f2df3f891ab4fcaa33ff16c6b1cfe70219377a6f8237c8f"
+checksum = "2d7edaa264273b526c61f3cbf8bdf8a64ebffcfeaf5e5737412145c3efd0860b"
 dependencies = [
  "anyhow",
  "ebi_arithmetic",
