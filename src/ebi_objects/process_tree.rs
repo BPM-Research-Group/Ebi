@@ -368,11 +368,11 @@ macro_rules! tree {
                 None
             }
 
-            pub fn get_children(&self, node: usize) -> $u {
+            pub fn get_children(&self, node: usize) -> $u<'_> {
                 $u::new(self, node)
             }
 
-            pub fn get_parents(&self, node: usize) -> $v {
+            pub fn get_parents(&self, node: usize) -> $v<'_> {
                 $v::new(self, node)
             }
 
