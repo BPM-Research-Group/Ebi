@@ -1,5 +1,5 @@
 use anyhow::Result;
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 
 use super::ebi_output::EbiOutput;
 

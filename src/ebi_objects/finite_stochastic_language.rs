@@ -1,8 +1,5 @@
 use anyhow::{Context, Error, Result, anyhow};
-use ebi_arithmetic::{
-    ebi_number::{One, Signed, Zero},
-    fraction::Fraction,
-};
+use ebi_arithmetic::{Fraction, One, Signed, Zero};
 use ebi_derive::ActivityKey;
 use std::{
     collections::HashMap,
@@ -533,7 +530,7 @@ impl EbiTraitQueriableStochasticLanguage for FiniteStochasticLanguage {
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
+    use ebi_arithmetic::{Fraction, Zero};
 
     use crate::{
         ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,

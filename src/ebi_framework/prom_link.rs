@@ -1,4 +1,4 @@
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 use ebi_arithmetic::parsing::FractionNotParsedYet;
 use itertools::Itertools;
 use std::fmt::Display;

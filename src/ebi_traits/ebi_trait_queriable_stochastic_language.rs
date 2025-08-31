@@ -1,5 +1,5 @@
 use anyhow::{Context, Error, Result, anyhow};
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::{
     io::BufRead,
@@ -100,7 +100,7 @@ pub fn import<X: 'static + Importable + EbiTraitQueriableStochasticLanguage>(
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
+    use ebi_arithmetic::{Fraction, Zero};
 
     use crate::{
         ebi_objects::{

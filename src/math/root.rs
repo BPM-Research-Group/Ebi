@@ -1,5 +1,5 @@
 use anyhow::Result;
-use ebi_arithmetic::{fraction::Fraction, ebi_number::{Signed, Zero}};
+use ebi_arithmetic::{Fraction, OneMinus, Signed, Sqrt, Zero};
 use fraction::Sign;
 use std::{
     fmt::{Debug, Display},
@@ -31,7 +31,7 @@ impl ContainsRoot {
     }
 
     pub fn approximate(&self) -> String {
-        let mut x = self.root.r.sqrt_abs(6);
+        let mut x = self.root.r.clone().approx_abs_sqrt(6);
         if self.one_minus {
             x = x.one_minus();
         }

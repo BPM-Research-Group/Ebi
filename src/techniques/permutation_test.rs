@@ -13,7 +13,7 @@ use crate::{
     techniques::sample::Resampler,
 };
 use anyhow::{Context, Result, anyhow};
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::{Fraction, OneMinus};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 pub trait PermutationTest {

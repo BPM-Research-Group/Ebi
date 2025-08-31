@@ -1,6 +1,6 @@
 use anyhow::{Context, Result, anyhow};
 use clap::{ArgMatches, builder::ValueParser, value_parser};
-use ebi_arithmetic::{fraction::Fraction, parsing::FractionNotParsedYet};
+use ebi_arithmetic::{Fraction, parsing::FractionNotParsedYet};
 use std::{
     collections::{BTreeSet, HashSet},
     fmt::Display,
@@ -708,7 +708,7 @@ mod tests {
         path::PathBuf,
     };
 
-    use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
+    use ebi_arithmetic::{Zero, Fraction};
     use strum::IntoEnumIterator;
 
     use crate::{

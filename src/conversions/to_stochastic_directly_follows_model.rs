@@ -1,11 +1,11 @@
-use ebi_arithmetic::{f, fraction::Fraction, ebi_number::{Signed, Zero}};
+use ebi_arithmetic::{Fraction, Signed, Zero, f};
 
 use crate::{
     ebi_framework::activity_key::HasActivityKey,
     ebi_objects::{
         directly_follows_graph::DirectlyFollowsGraph,
         stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
-    }
+    },
 };
 
 impl From<DirectlyFollowsGraph> for StochasticDirectlyFollowsModel {

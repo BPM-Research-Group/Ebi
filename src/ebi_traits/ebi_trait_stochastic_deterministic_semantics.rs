@@ -1,7 +1,7 @@
 use std::io::BufRead;
 
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 
 use crate::{
     ebi_framework::{

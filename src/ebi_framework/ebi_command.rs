@@ -1,6 +1,6 @@
 use anyhow::{Context, Result, anyhow};
 use clap::{Arg, ArgAction, ArgMatches, Command, value_parser};
-use ebi_arithmetic::{exact::set_exact_globally, fraction::Fraction, parsing::FractionNotParsedYet};
+use ebi_arithmetic::{exact::set_exact_globally, Fraction, parsing::FractionNotParsedYet};
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
 use logging_timer::timer;
@@ -767,7 +767,7 @@ mod tests {
         },
         multiple_reader::MultipleReader,
     };
-    use ebi_arithmetic::fraction::Fraction;
+    use ebi_arithmetic::Fraction;
     use itertools::Itertools;
     use ntest::timeout;
 

@@ -7,21 +7,21 @@
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use anyhow::Result;
-use ebi_arithmetic::fraction::Fraction;
-use ebi_arithmetic::ebi_number::Zero;
+use ebi_arithmetic::Fraction;
+use ebi_arithmetic::Zero;
+#[cfg(any(
+        all(
+            not(feature = "eexactarithmetic"),
+            not(feature = "eapproximatearithmetic")
+        ),
+        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
+        all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
+    ))]
+use malachite::Natural;
 use std::fmt;
 use std::fmt::Debug;
 use std::{iter::FusedIterator, sync::Arc};
 
-#[cfg(any(
-    all(
-        not(feature = "eexactarithmetic"),
-        not(feature = "eapproximatearithmetic")
-    ),
-    all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
-    all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
-))]
-use num::BigInt;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::ebi_framework::ebi_command::EbiCommand;
@@ -61,7 +61,7 @@ pub trait WeightedDistances: Send + Sync {
     /**
      * Only call in exact mode.
      */
-    fn lowest_common_multiple_denominators_distances(&self) -> Result<BigInt>;
+    fn lowest_common_multiple_denominators_distances(&self) -> Result<Natural>;
 
     #[cfg(any(
         all(
@@ -74,7 +74,7 @@ pub trait WeightedDistances: Send + Sync {
     /**
      * Only call in exact mode.
      */
-    fn lowest_common_multiple_denominators_weights(&self) -> Result<BigInt>;
+    fn lowest_common_multiple_denominators_weights(&self) -> Result<Natural>;
 }
 
 pub struct TriangularDistanceMatrix {

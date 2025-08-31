@@ -1,5 +1,5 @@
 use anyhow::Context;
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 use std::io::Write;
 
 use crate::{

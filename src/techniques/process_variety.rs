@@ -1,4 +1,4 @@
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::{
@@ -37,7 +37,7 @@ impl ProcessVariety for dyn EbiTraitFiniteStochasticLanguage {
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::fraction::Fraction;
+    use ebi_arithmetic::Fraction;
 
     use crate::{
         ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,

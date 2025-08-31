@@ -9,7 +9,7 @@ use crate::{
     ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics},
 };
 use anyhow::{Context, Result, anyhow};
-use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
+use ebi_arithmetic::{Fraction, Zero};
 
 pub const UNMATCHING: &str = "alignments and model do not belong to one another";
 
@@ -146,7 +146,7 @@ impl PrefixTreeNode {
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::fraction::Fraction;
+    use ebi_arithmetic::Fraction;
 
     use crate::{
         ebi_objects::{

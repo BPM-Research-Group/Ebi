@@ -1,6 +1,6 @@
 use anyhow::{Context, anyhow};
 use bitvec::bitvec;
-use ebi_arithmetic::{fraction::Fraction, ebi_number::{Signed, Zero}};
+use ebi_arithmetic::{Fraction, Signed, Zero};
 
 use crate::{
     ebi_framework::activity_key::Activity,

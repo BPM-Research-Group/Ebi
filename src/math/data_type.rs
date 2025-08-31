@@ -1,7 +1,7 @@
 use std::fmt::{self, Display};
 
 use chrono::{DateTime, FixedOffset};
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 use process_mining::event_log::AttributeValue;
 
 #[derive(Debug)]

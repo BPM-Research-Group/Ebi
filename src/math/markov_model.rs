@@ -1,5 +1,5 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, ebi_number::{One, Signed, Zero}};
+use ebi_arithmetic::{Fraction, One, Signed, Zero};
 use std::fmt::{Debug, Display};
 
 use super::matrix::Matrix;

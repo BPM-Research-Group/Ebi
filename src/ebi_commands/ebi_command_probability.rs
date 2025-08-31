@@ -1,6 +1,6 @@
 use anyhow::{Context, anyhow};
 use clap::{Arg, ArgAction, value_parser};
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 
 use crate::{
     ebi_framework::{

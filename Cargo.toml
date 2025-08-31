@@ -16,7 +16,7 @@ name = "ebi"
 crate-type = ["cdylib", "lib"]
 
 [features]
-default = []
+default = [ ]
 eexactarithmetic = []
 exactarithmetic = [ "eexactarithmetic", "ebi_arithmetic/exactarithmetic" ]
 approximatearithmetic = [ "eapproximatearithmetic", "ebi_arithmetic/approximatearithmetic" ]
@@ -25,8 +25,8 @@ eapproximatearithmetic = []
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ebi_arithmetic = "0.1.11"
-ebi_optimisation = "0.0.1"
+ebi_arithmetic = "0.2.14"
+ebi_optimisation = "0.0.5"
 ebi_derive = "0.1.0"
 bitvec = "1.0.1"
 num-integer = "0.1.46"
@@ -54,7 +54,7 @@ Inflector = "0.11.4"
 strum = "0.27.1"
 strum_macros = "0.27.1"
 indicatif = "0.18.0"
-indexmap = "2.10.0"
+indexmap = "2.11.0"
 rustc-hash="2.1.1"
 pathfinding="4.14.0"
 fnv = "1.0.7"
@@ -67,10 +67,11 @@ uuid = "1.18.0"
 cfg-if = "1.0.1"
 ntest = "0.9.3"
 regex = "1.11.1"
-quick-xml = {version="0.38.1", features=["serialize"]}
+quick-xml = {version="0.38.3", features=["serialize"]}
 ndarray = "0.16.1"
 minilp = "*"
 sprs = "0.11.3"
+malachite = "*"
 
 [dependencies.num-rational]
 version = "0.4.1"

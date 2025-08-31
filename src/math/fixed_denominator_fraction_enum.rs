@@ -1,70 +1,82 @@
-use std::{borrow::Borrow, ops::{AddAssign, Mul}, sync::Arc};
+use std::{
+    borrow::Borrow,
+    ops::{AddAssign, Mul},
+    sync::Arc,
+};
 
-use ebi_arithmetic::{exact::is_exact_globally, fraction_enum::FractionEnum, ebi_number::Zero};
-use fraction::{BigUint, GenericFraction, Integer, Ratio, Sign};
-use anyhow::{anyhow, Result};
+use anyhow::{Result, anyhow};
+use ebi_arithmetic::{
+    ebi_number::Zero, exact::is_exact_globally, fraction::fraction_enum::FractionEnum,
+};
+use malachite::base::num::arithmetic::traits::Lcm;
+use malachite::{Natural, rational::Rational};
 
 #[derive(Clone)]
 pub enum FixedDenominatorFractionEnum {
     Zero, //an exact zero value for which the denominator is not known (yet)
-    Exact(BigUint, Arc<BigUint>),
+    Exact(Natural, Arc<Natural>),
     Approximate(f64),
-    CannotCombineExactAndApprox
+    CannotCombineExactAndApprox,
 }
 
 impl FixedDenominatorFractionEnum {
-
     pub fn create(fractions: &Vec<Arc<FractionEnum>>) -> Result<Vec<Arc<Self>>> {
         match fractions.iter().next() {
-            None => {
-                Ok(vec![])
-            },
+            None => Ok(vec![]),
             Some(x) => match x.as_ref() {
                 FractionEnum::CannotCombineExactAndApprox => {
                     Err(anyhow!("cannot combine exact and approximate arithmetic"))
-                },
+                }
                 FractionEnum::Approx(_) => {
                     //approximate mode
-                    Ok(fractions.into_iter().map(|f| {
-                        match f.as_ref() {
+                    Ok(fractions
+                        .into_iter()
+                        .map(|f| match f.as_ref() {
                             FractionEnum::Approx(f) => Arc::new(Self::Approximate(f.clone())),
-                            _ => Arc::new(Self::CannotCombineExactAndApprox)
-                        }
-                    }).collect::<Vec<_>>())
-                },
+                            _ => Arc::new(Self::CannotCombineExactAndApprox),
+                        })
+                        .collect::<Vec<_>>())
+                }
                 FractionEnum::Exact(_) => {
                     //exact mode
-                    let denominators = fractions.iter().filter_map(|f| match f.as_ref() {
-                        FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, r)) => Some(r.denom()),
-                        _ => None,
-                    }).collect::<Vec<_>>();
+                    let denominators = fractions
+                        .iter()
+                        .filter_map(|f| match f.as_ref() {
+                            FractionEnum::Exact(r) => Some(r.to_denominator()),
+                            _ => None,
+                        })
+                        .collect::<Vec<_>>();
 
-                    let lowest_common_multiple= Arc::new(Self::lowest_common_multiple(&denominators)?);
-                    
-                    Ok(fractions.iter().map(|f| match f.as_ref() {
-                        FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, r)) => {
-                            let mut x = r.numer() * lowest_common_multiple.as_ref();
-                            x /= r.denom();
-                            Arc::new(Self::Exact(x, lowest_common_multiple.clone()))
-                        },
-                        _ => Arc::new(Self::CannotCombineExactAndApprox)
-                    }).collect::<Vec<_>>())
+                    let lowest_common_multiple =
+                        Arc::new(Self::lowest_common_multiple(&denominators)?);
+
+                    Ok(fractions
+                        .iter()
+                        .map(|f| match f.as_ref() {
+                            FractionEnum::Exact(r) => {
+                                let mut x = r.to_numerator() * lowest_common_multiple.as_ref();
+                                x /= r.to_denominator();
+                                Arc::new(Self::Exact(x, lowest_common_multiple.clone()))
+                            }
+                            _ => Arc::new(Self::CannotCombineExactAndApprox),
+                        })
+                        .collect::<Vec<_>>())
                 }
-            }
+            },
         }
     }
 
-    pub fn lowest_common_multiple(numbers: &[&BigUint]) -> Result<BigUint> {
+    pub fn lowest_common_multiple(numbers: &[Natural]) -> Result<Natural> {
         if numbers.is_empty() {
             return Err(anyhow!("cannot compute lcm on empty list"));
         }
-    
+
         let mut it = numbers.iter();
         let mut result = it.next().unwrap().to_owned().to_owned();
         while let Some(number) = it.next() {
             result = result.lcm(number);
         }
-    
+
         Ok(result)
     }
 
@@ -78,17 +90,18 @@ impl FixedDenominatorFractionEnum {
             (Self::Zero, Self::Zero) => true,
             (Self::Exact(_, denom1), Self::Exact(_, denom2)) => denom1 == denom2,
             (Self::Approximate(_), Self::Approximate(_)) => true,
-            _ => false
+            _ => false,
         }
     }
 
     pub fn to_fraction(self) -> FractionEnum {
         match self {
-            Self::Exact(numer, denom) => 
-                FractionEnum::Exact(GenericFraction::Rational(Sign::Plus, Ratio::new(numer, denom.as_ref().clone()))),
+            Self::Exact(numer, denom) => {
+                FractionEnum::Exact(Rational::from(numer) / Rational::from(denom.as_ref()))
+            }
             Self::Approximate(f) => FractionEnum::Approx(f),
             Self::Zero => FractionEnum::zero(),
-            _ => FractionEnum::CannotCombineExactAndApprox
+            _ => FractionEnum::CannotCombineExactAndApprox,
         }
     }
 }
@@ -112,7 +125,10 @@ impl Zero for FixedDenominatorFractionEnum {
     }
 }
 
-impl <T> AddAssign<T> for FixedDenominatorFractionEnum where T: Borrow<FixedDenominatorFractionEnum> {
+impl<T> AddAssign<T> for FixedDenominatorFractionEnum
+where
+    T: Borrow<FixedDenominatorFractionEnum>,
+{
     fn add_assign(&mut self, rhs: T) {
         if let Self::Zero = self {
             *self = rhs.borrow().clone()
@@ -154,8 +170,14 @@ impl Mul<u64> for FixedDenominatorFractionEnum {
     fn mul(self, rhs: u64) -> Self::Output {
         match self {
             Self::Zero => Self::Zero,
-            Self::Exact(mut x, denom) => {x *= rhs; Self::Exact(x, denom)},
-            Self::Approximate(mut x) => {x *= rhs as f64; Self::Approximate(x)},
+            Self::Exact(mut x, denom) => {
+                x *= Natural::from(rhs);
+                Self::Exact(x, denom)
+            }
+            Self::Approximate(mut x) => {
+                x *= rhs as f64;
+                Self::Approximate(x)
+            }
             Self::CannotCombineExactAndApprox => Self::CannotCombineExactAndApprox,
         }
     }

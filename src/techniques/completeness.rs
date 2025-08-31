@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use ebi_arithmetic::{fraction::Fraction, ebi_number::{One, Zero}};
+use ebi_arithmetic::{f, Fraction, One, Zero};
 
 pub trait Completeness {
     /*
@@ -50,9 +50,9 @@ fn estimate_species_richness_chao<T>(multiset: &HashMap<T, usize>) -> Fraction {
     let f_2: Fraction = get_doubletons(multiset).into();
 
     if !f_2.is_zero() {
-        obs_species_count += &(&f_1 * &f_1) / &(&Fraction::two() * &f_2);
+        obs_species_count += &(&f_1 * &f_1) / &(&f!(2) * &f_2);
     } else {
-        obs_species_count += &(&f_1 * &(&f_1 - &Fraction::one())) / &Fraction::two();
+        obs_species_count += &(&f_1 * &(&f_1 - &Fraction::one())) / &f!(2);
     }
     obs_species_count
 }

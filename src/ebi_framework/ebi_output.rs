@@ -1,5 +1,5 @@
 use anyhow::{Context, Result};
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 use std::{
     collections::{BTreeSet, HashSet},
     fmt::{self, Display},
@@ -502,10 +502,7 @@ impl Display for EbiObjectExporter {
 mod tests {
     use std::{io::Cursor, path::PathBuf};
 
-    use ebi_arithmetic::{
-        ebi_number::{One, Zero},
-        fraction::Fraction,
-    };
+    use ebi_arithmetic::{Fraction, One, Zero};
     use strum::IntoEnumIterator;
 
     use crate::{

@@ -10,10 +10,7 @@ use crate::{
     math::log_div::LogDiv,
 };
 use anyhow::{Context, Result};
-use ebi_arithmetic::{
-    ebi_number::{One, Zero},
-    fraction::Fraction,
-};
+use ebi_arithmetic::{Fraction, One, Zero};
 
 pub trait EntropicRelvance {
     fn entropic_relevance(
@@ -55,13 +52,13 @@ impl EntropicRelvance for dyn EbiTraitFiniteStochasticLanguage {
             }
 
             if !model_probability.is_zero() {
-                sum -= LogDiv::log2(model_probability);
+                sum -= LogDiv::log2(model_probability)?;
             } else {
-                sum += bits(trace, number_of_activities_in_log);
+                sum += bits(trace, number_of_activities_in_log)?;
             }
         }
 
-        return Ok(sum_j - h(&rho));
+        return Ok(sum_j - h(&rho)?);
     }
 }
 
@@ -81,7 +78,7 @@ impl dyn EbiTraitFiniteStochasticLanguage {
             if probability_model.is_zero() {
                 //trace not in model
                 let l = 1 + number_of_activities_in_log;
-                let mut log_div = LogDiv::log2(l.into());
+                let mut log_div = LogDiv::log2(l.into())?;
 
                 log_div *= trace.len() + 1;
 
@@ -94,7 +91,7 @@ impl dyn EbiTraitFiniteStochasticLanguage {
                 //log(pm^a) / b
                 // = a log(pm) / b
                 // = a/b log(pm)
-                let mut logdiv = LogDiv::log2(probability_model);
+                let mut logdiv = LogDiv::log2(probability_model)?;
                 logdiv *= probability_log;
 
                 // let log_of = LogDiv::power_f_u(&probability_model, &a_log);
@@ -107,24 +104,24 @@ impl dyn EbiTraitFiniteStochasticLanguage {
     }
 }
 
-fn bits(trace: &Vec<Activity>, number_of_activities_in_log: usize) -> LogDiv {
-    let mut result = LogDiv::log2(Fraction::from(number_of_activities_in_log + 1));
+fn bits(trace: &Vec<Activity>, number_of_activities_in_log: usize) -> Result<LogDiv> {
+    let mut result = LogDiv::log2(Fraction::from(number_of_activities_in_log + 1))?;
     result *= trace.len() + 1;
-    result
+    Ok(result)
 }
 
-fn h(x: &Fraction) -> LogDiv {
+fn h(x: &Fraction) -> Result<LogDiv> {
     if x.is_zero() || x.is_one() {
-        return LogDiv::zero();
+        return Ok(LogDiv::zero());
     }
 
-    let xlogx = LogDiv::n_log_n(x);
+    let xlogx = LogDiv::n_log_n(x)?;
     let mut n = Fraction::one();
     n -= x;
-    let nlogn = LogDiv::n_log_n(&n);
+    let nlogn = LogDiv::n_log_n(&n)?;
 
     let result = xlogx + nlogn;
-    return result;
+    return Ok(result);
 }
 
 #[cfg(test)]

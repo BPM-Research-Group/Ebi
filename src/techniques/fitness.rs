@@ -1,4 +1,4 @@
-use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
+use ebi_arithmetic::{Fraction, Zero};
 
 use crate::ebi_objects::{
     language_of_alignments::Move, stochastic_language_of_alignments::StochasticLanguageOfAlignments,
@@ -36,7 +36,7 @@ impl Fitness for StochasticLanguageOfAlignments {
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::fraction::Fraction;
+    use ebi_arithmetic::Fraction;
 
     use crate::{
         ebi_objects::stochastic_language_of_alignments::StochasticLanguageOfAlignments,

@@ -1,5 +1,5 @@
 use anyhow::{Context, Error, Result, anyhow};
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 use ebi_derive::ActivityKey;
 use layout::topo::layout::VisualGraph;
 use std::io;
@@ -18,7 +18,6 @@ use crate::ebi_framework::importable::Importable;
 use crate::ebi_framework::infoable::Infoable;
 use crate::ebi_framework::prom_link::JavaObjectHandler;
 use crate::ebi_traits::ebi_trait_graphable::{self, EbiTraitGraphable};
-use crate::ebi_traits::{ebi_trait_activities, ebi_trait_queriable_stochastic_language};
 use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics};
 use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::{
     EbiTraitStochasticDeterministicSemantics, ToStochasticDeterministicSemantics,
@@ -26,6 +25,7 @@ use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::{
 use crate::ebi_traits::ebi_trait_stochastic_semantics::{
     EbiTraitStochasticSemantics, ToStochasticSemantics, TransitionIndex,
 };
+use crate::ebi_traits::{ebi_trait_activities, ebi_trait_queriable_stochastic_language};
 use crate::line_reader::LineReader;
 use crate::marking::Marking;
 

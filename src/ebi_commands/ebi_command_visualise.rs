@@ -84,7 +84,7 @@ pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command {
 #[cfg(test)]
 mod tests {
 
-    use ebi_arithmetic::{ebi_number::One, fraction::Fraction};
+    use ebi_arithmetic::{One, Fraction};
 
     use crate::{
         ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT,

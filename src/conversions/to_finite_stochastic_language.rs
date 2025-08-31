@@ -1,9 +1,9 @@
 use std::collections::{HashMap, hash_map::Entry};
 
-use ebi_arithmetic::{fraction::Fraction, ebi_number::One};
+use ebi_arithmetic::{Fraction, One};
 
-use crate::{
-    ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage}
+use crate::ebi_objects::{
+    event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage,
 };
 
 impl From<EventLog> for FiniteStochasticLanguage {

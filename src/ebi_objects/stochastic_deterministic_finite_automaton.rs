@@ -25,10 +25,7 @@ use crate::{
     json,
 };
 use anyhow::{Context, Error, Result, anyhow};
-use ebi_arithmetic::{
-    ebi_number::{One, Signed},
-    fraction::Fraction,
-};
+use ebi_arithmetic::{Fraction, One, Signed};
 use ebi_derive::ActivityKey;
 use layout::topo::layout::VisualGraph;
 use serde_json::Value;

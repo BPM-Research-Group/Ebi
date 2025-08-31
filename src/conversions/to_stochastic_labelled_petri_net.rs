@@ -1,4 +1,4 @@
-use ebi_arithmetic::{fraction::Fraction, ebi_number::{One, Signed}};
+use ebi_arithmetic::{Fraction, One, Signed};
 
 use crate::{
     ebi_framework::activity_key::{ActivityKeyTranslator, HasActivityKey},

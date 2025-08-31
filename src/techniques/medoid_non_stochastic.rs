@@ -1,9 +1,5 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{
-    ebi_number::{Signed, Zero},
-    fraction::Fraction,
-};
-use num::One as _;
+use ebi_arithmetic::{Fraction, One, Signed, Zero, f};
 use std::sync::Arc;
 
 use crate::{
@@ -64,7 +60,7 @@ where
 
             //report the minimum value
             list.push(min_pos);
-            sum_distance[min_pos] = Fraction::two();
+            sum_distance[min_pos] = f!(2);
         }
         list.sort();
 

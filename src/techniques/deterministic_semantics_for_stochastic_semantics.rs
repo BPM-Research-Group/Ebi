@@ -1,8 +1,5 @@
 use anyhow::Result;
-use ebi_arithmetic::{
-    ebi_number::{One, Signed, Zero},
-    fraction::Fraction,
-};
+use ebi_arithmetic::{Fraction, One, Signed, Zero};
 use std::collections::HashMap;
 use std::collections::hash_map::DefaultHasher;
 use std::collections::hash_map::Entry;
@@ -414,7 +411,7 @@ impl<S: Displayable> Displayable for MarkovMarking<S> {}
 
 #[cfg(test)]
 mod tests {
-    use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
+    use ebi_arithmetic::{Fraction, Zero};
 
     use crate::{
         ebi_framework::activity_key::HasActivityKey,

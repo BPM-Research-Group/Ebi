@@ -4,7 +4,7 @@ use std::{
 };
 
 use anyhow::Result;
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::{Fraction, OneMinus};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::{
@@ -76,7 +76,7 @@ impl UnitEarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLangua
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::{ebi_number::One, fraction::Fraction};
+    use ebi_arithmetic::{Fraction, One};
 
     use crate::{
         ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,

@@ -1,8 +1,5 @@
 use anyhow::{Context, Result};
-use ebi_arithmetic::{
-    ebi_number::{One, Zero},
-    fraction::Fraction,
-};
+use ebi_arithmetic::{Fraction, One, Zero};
 use std::{
     collections::{HashMap, HashSet},
     fmt::{self, Display},
@@ -471,7 +468,7 @@ struct Y {
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
+    use ebi_arithmetic::{Fraction, Zero};
 
     use crate::{
         ebi_framework::activity_key::HasActivityKey,

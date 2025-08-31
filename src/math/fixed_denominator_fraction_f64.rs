@@ -1,19 +1,25 @@
-use std::{borrow::Borrow, ops::{AddAssign, Mul}, sync::Arc};
+use std::{
+    borrow::Borrow,
+    ops::{AddAssign, Mul},
+    sync::Arc,
+};
 
 use anyhow::Result;
-use ebi_arithmetic::{fraction_f64::FractionF64, ebi_number::Zero};
+use ebi_arithmetic::{MaybeExact, Zero, fraction::fraction_f64::FractionF64};
 
 #[derive(Clone)]
 pub struct FixedDenominatorFractionF64(f64);
 
 impl FixedDenominatorFractionF64 {
-
     pub fn create(fractions: &Vec<Arc<FractionF64>>) -> Result<Vec<Arc<Self>>> {
-        Ok(fractions.iter().map(|f| Arc::new(Self(f.0.clone()))).collect())
+        Ok(fractions
+            .iter()
+            .map(|f| Arc::new(Self(*f.extract_approx().unwrap())))
+            .collect())
     }
 
     pub fn to_fraction(self) -> FractionF64 {
-        FractionF64(self.0)
+        FractionF64::from(self.0)
     }
 }
 
@@ -21,13 +27,16 @@ impl Zero for FixedDenominatorFractionF64 {
     fn zero() -> Self {
         Self(0.0)
     }
-    
+
     fn is_zero(&self) -> bool {
         self.0.is_zero()
     }
 }
 
-impl <T> AddAssign<T> for FixedDenominatorFractionF64 where T: Borrow<FixedDenominatorFractionF64> {
+impl<T> AddAssign<T> for FixedDenominatorFractionF64
+where
+    T: Borrow<FixedDenominatorFractionF64>,
+{
     fn add_assign(&mut self, rhs: T) {
         self.0.add_assign(rhs.borrow().0);
     }

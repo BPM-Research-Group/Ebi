@@ -4,12 +4,12 @@ use std::{
     sync::Arc,
 };
 
-use anyhow::{anyhow, Result};
-use ebi_arithmetic::{ebi_number::Zero, fraction_exact::FractionExact};
-use fraction::{BigUint, GenericFraction, Integer, Ratio, Sign};
+use anyhow::{Result, anyhow};
+use ebi_arithmetic::{MaybeExact, One, Zero, fraction::fraction_exact::FractionExact};
+use malachite::{Natural, base::num::arithmetic::traits::Lcm, rational::Rational};
 
 #[derive(Clone)]
-pub struct FixedDenominatorFractionExact(BigUint, Arc<BigUint>);
+pub struct FixedDenominatorFractionExact(Natural, Arc<Natural>);
 
 impl FixedDenominatorFractionExact {
     pub fn create(fractions: &Vec<Arc<FractionExact>>) -> Result<Vec<Arc<Self>>> {
@@ -19,32 +19,28 @@ impl FixedDenominatorFractionExact {
                 //exact mode
                 let denominators = fractions
                     .iter()
-                    .filter_map(|f| match f.as_ref() {
-                        FractionExact(GenericFraction::Rational(Sign::Plus, r)) => {
-                            Some(r.denom())
-                        }
-                        _ => None,
-                    })
+                    .map(|f| f.as_ref().extract_exact().unwrap().to_numerator())
                     .collect::<Vec<_>>();
 
                 let lowest_common_multiple = Arc::new(Self::lowest_common_multiple(&denominators)?);
 
                 Ok(fractions
                     .iter()
-                    .map(|f| match f.as_ref() {
-                        FractionExact(GenericFraction::Rational(Sign::Plus, r)) => {
-                            let mut x = r.numer() * lowest_common_multiple.as_ref();
-                            x /= r.denom();
-                            Arc::new(FixedDenominatorFractionExact(x, lowest_common_multiple.clone()))
-                        }
-                        _ => panic!("cannot combine exact and approximate arithmetic"),
+                    .map(|f| {
+                        let r = f.as_ref().extract_exact().unwrap();
+                        let mut x = r.numerator_ref() * lowest_common_multiple.as_ref();
+                        x /= r.denominator_ref();
+                        Arc::new(FixedDenominatorFractionExact(
+                            x,
+                            lowest_common_multiple.clone(),
+                        ))
                     })
                     .collect::<Vec<_>>())
             }
         }
     }
 
-    pub fn lowest_common_multiple(numbers: &[&BigUint]) -> Result<BigUint> {
+    pub fn lowest_common_multiple(numbers: &[Natural]) -> Result<Natural> {
         if numbers.is_empty() {
             return Err(anyhow!("cannot compute lcm on empty list"));
         }
@@ -60,23 +56,22 @@ impl FixedDenominatorFractionExact {
 
     pub fn to_fraction(self) -> FractionExact {
         match self {
-            Self(numer, denom) => FractionExact(GenericFraction::Rational(
-                Sign::Plus,
-                Ratio::new(numer, denom.as_ref().clone()),
-            ))
+            Self(numer, denom) => {
+                FractionExact::from(Rational::from(numer) / Rational::from(denom.as_ref()))
+            }
         }
     }
 }
 
 impl Zero for FixedDenominatorFractionExact {
     fn zero() -> Self {
-        let zero = num::Zero::zero();
-        let one = Arc::new(num::One::one());
+        let zero = Natural::zero();
+        let one = Arc::new(Natural::one());
         Self(zero, one)
     }
 
     fn is_zero(&self) -> bool {
-        num::Zero::is_zero(&self.0)
+        self.0.is_zero()
     }
 }
 
@@ -91,7 +86,9 @@ where
             //do nothing
         } else {
             match (self, rhs.borrow()) {
-                (FixedDenominatorFractionExact(x, _), FixedDenominatorFractionExact(y, _)) => x.add_assign(y),
+                (FixedDenominatorFractionExact(x, _), FixedDenominatorFractionExact(y, _)) => {
+                    x.add_assign(y)
+                }
             };
         }
     }
@@ -101,11 +98,17 @@ impl AddAssign<&Arc<FixedDenominatorFractionExact>> for FixedDenominatorFraction
     fn add_assign(&mut self, rhs: &Arc<FixedDenominatorFractionExact>) {
         if self.is_zero() {
             *self = rhs.as_ref().clone()
-        } else if <std::sync::Arc<FixedDenominatorFractionExact> as Borrow<FixedDenominatorFractionExact>>::borrow(rhs).is_zero() {
+        } else if <std::sync::Arc<FixedDenominatorFractionExact> as Borrow<
+            FixedDenominatorFractionExact,
+        >>::borrow(rhs)
+        .is_zero()
+        {
             //do nothing
         } else {
             match (self, rhs.borrow()) {
-                (FixedDenominatorFractionExact(x, _), FixedDenominatorFractionExact(y, _)) => x.add_assign(y),
+                (FixedDenominatorFractionExact(x, _), FixedDenominatorFractionExact(y, _)) => {
+                    x.add_assign(y)
+                }
             };
         }
     }
@@ -120,7 +123,7 @@ impl Mul<u64> for FixedDenominatorFractionExact {
         } else {
             match self {
                 FixedDenominatorFractionExact(mut x, denom) => {
-                    x *= rhs;
+                    x *= Natural::from(rhs);
                     FixedDenominatorFractionExact(x, denom)
                 }
             }

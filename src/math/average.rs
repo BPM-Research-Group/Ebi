@@ -1,5 +1,5 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
+use ebi_arithmetic::{Fraction, Zero};
 use std::{fmt::Debug, sync::Arc};
 
 use crate::math::distances::TriangularDistanceMatrix;

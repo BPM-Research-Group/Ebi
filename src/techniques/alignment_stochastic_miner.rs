@@ -9,7 +9,7 @@ use crate::{
     },
 };
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
+use ebi_arithmetic::{Fraction, Zero};
 
 use super::align::Align;
 

@@ -7,10 +7,7 @@ use crate::{
     techniques::align::transform_alignment,
 };
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{
-    ebi_number::{One, Zero},
-    fraction::Fraction,
-};
+use ebi_arithmetic::{Fraction, One, OneMinus, Zero};
 use ebi_optimisation::astar;
 use std::ops::{Add, AddAssign};
 

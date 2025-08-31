@@ -1,7 +1,7 @@
 use std::collections::HashSet;
 
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{ebi_number::One, fraction::Fraction};
+use ebi_arithmetic::{Fraction, One};
 
 use crate::{
     ebi_framework::activity_key::Activity,
@@ -190,7 +190,7 @@ fn get_edges_to_filter(
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::{ebi_number::One, fraction::Fraction};
+    use ebi_arithmetic::{Fraction, One};
 
     use crate::{
         ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,

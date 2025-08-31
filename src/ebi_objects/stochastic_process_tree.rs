@@ -25,7 +25,7 @@ use crate::{
 };
 
 use anyhow::{Context, Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, ebi_number::Signed};
+use ebi_arithmetic::{Fraction, Signed};
 use ebi_derive::ActivityKey;
 use layout::{adt::dag::NodeHandle, topo::layout::VisualGraph};
 

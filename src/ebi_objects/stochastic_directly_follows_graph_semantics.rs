@@ -6,10 +6,7 @@ use crate::{
     },
 };
 use anyhow::Result;
-use ebi_arithmetic::{
-    ebi_number::{Signed, Zero},
-    fraction::Fraction,
-};
+use ebi_arithmetic::{Fraction, Signed, Zero};
 
 use super::{
     directly_follows_model::DirectlyFollowsModel,

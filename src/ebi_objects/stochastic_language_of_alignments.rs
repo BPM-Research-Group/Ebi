@@ -1,8 +1,5 @@
 use anyhow::{Context, Error, Result, anyhow};
-use ebi_arithmetic::{
-    ebi_number::{One, Signed},
-    fraction::Fraction,
-};
+use ebi_arithmetic::{Fraction, One, Signed};
 use ebi_derive::ActivityKey;
 use std::{fmt::Display, str::FromStr};
 

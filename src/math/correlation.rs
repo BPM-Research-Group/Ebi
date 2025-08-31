@@ -1,10 +1,9 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
+use ebi_arithmetic::{Fraction, Zero};
 
 use crate::math::root::Root;
 
 pub fn correlation(pairs: &[(Fraction, Fraction)]) -> Result<Root> {
-
     let mut sum_xy = Fraction::zero();
     let mut sum_x = Fraction::zero();
     let mut sum_y = Fraction::zero();

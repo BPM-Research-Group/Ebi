@@ -1,5 +1,5 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, ebi_number::{One, Zero}};
+use ebi_arithmetic::{f, Fraction, One, Zero};
 
 use crate::{
     ebi_objects::finite_language::FiniteLanguage,
@@ -51,7 +51,7 @@ where
 
         //report the minimum value
         list.push(min_pos);
-        sum_distance[min_pos] = Fraction::two();
+        sum_distance[min_pos] = f!(2);
     }
     list.sort();
 

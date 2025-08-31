@@ -1,5 +1,5 @@
 use anyhow::{Context, Result, anyhow};
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::{Fraction, OneMinus};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::sync::{
     Arc,
@@ -245,7 +245,7 @@ impl BootstrapTest for dyn EbiTraitFiniteStochasticLanguage {
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::fraction::Fraction;
+    use ebi_arithmetic::Fraction;
 
     use crate::{
         ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage},

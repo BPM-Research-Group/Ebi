@@ -1,6 +1,6 @@
 use anyhow::{Result, anyhow};
 use chrono::{DateTime, FixedOffset};
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 use process_mining::event_log::{AttributeValue, Event, XESEditableAttribute};
 use std::{
     borrow::Borrow,

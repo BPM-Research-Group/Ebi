@@ -5,7 +5,7 @@ use std::{
 };
 
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, ebi_number::{One, Zero}};
+use ebi_arithmetic::{Fraction, One, Recip, Zero};
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefMutIterator, ParallelIterator};
 
 /**
@@ -92,7 +92,7 @@ impl Matrix {
                 return Err(anyhow!("matrix is not invertible"));
             }
 
-            self.rows[0][0] = self.rows[0][0].recip();
+            self.rows[0][0] = self.rows[0][0].clone().recip();
             return Ok(());
         }
 
@@ -204,7 +204,7 @@ impl Matrix {
             }
         }
 
-        // log::debug!("\t\trow-reduced echelon{}", self);
+        println!("row-reduced echelon{}", self);
 
         // log::info!("number of columns {}", self.get_number_of_columns());
 
@@ -431,7 +431,7 @@ impl Mul<Vec<Fraction>> for Matrix {
 #[cfg(test)]
 mod tests {
 
-    use ebi_arithmetic::fraction::Fraction;
+    use ebi_arithmetic::Fraction;
 
     use crate::math::matrix::Matrix;
 
@@ -462,6 +462,8 @@ mod tests {
         ]
         .into();
 
+        println!("matrix {}", m);
+
         let i = vec![
             vec![1.into(), 0.into(), 0.into(), 0.into()],
             vec![0.into(), 1.into(), 0.into(), Fraction::from((3, 5))],
@@ -477,8 +479,8 @@ mod tests {
 
         m.inverse().unwrap();
 
-        log::debug!("\t\tinverted matrix    {:?}", m);
-        log::debug!("\t\tcorrect inverse    {:?}", i);
+        println!("inverted matrix {}", m);
+        println!("correct inverse {}", i);
 
         assert_eq!(m, i);
     }

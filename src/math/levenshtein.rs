@@ -1,4 +1,4 @@
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 
 use crate::ebi_framework::activity_key::Activity;
 
