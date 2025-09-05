@@ -94,7 +94,7 @@ where
         }
 
         let distances = TriangularDistanceMatrix::new(self);
-        let mut rng = rand::thread_rng();
+        let mut rng = rand::rng();
         let mut medoids = random_initialization(self.len(), number_of_clusters, &mut rng);
 
         fasterpam(&distances, &mut medoids, 500);

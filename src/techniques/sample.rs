@@ -1,8 +1,7 @@
 use std::collections::{HashMap, hash_map::Entry};
 
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One};
-use num::Zero;
+use ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One, Zero};
 use rand::Rng;
 
 use crate::{
@@ -152,9 +151,9 @@ impl Resampler for dyn EbiTraitFiniteStochasticLanguage {
  * Fills the given vector with uniformly random numbers in the range 0..number_of_indices
  */
 pub fn sample_indices_uniform(number_of_indices: usize, result: &mut Vec<usize>) {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
     for i in 0..result.len() {
-        let trace_index = rng.gen_range(0..number_of_indices);
+        let trace_index = rng.random_range(0..number_of_indices);
         result[i] = trace_index;
     }
 }

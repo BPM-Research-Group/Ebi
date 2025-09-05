@@ -153,7 +153,7 @@ impl dyn EbiTraitEventLog {
                 let mut sample = vec![];
                 //create sample
                 for _ in 0..sample_size {
-                    let i = rand::thread_rng().gen_range(0..pairs.len());
+                    let i = rand::rng().random_range(0..pairs.len());
                     sample.push(i);
                 }
 
@@ -280,8 +280,8 @@ impl<'a> Iterator for SamplePairsSpaceIterator<'a> {
             if self.done >= self.sample_space.number_of_samples {
                 None
             } else {
-                let i = rand::thread_rng().gen_range(0..self.sample_space.len);
-                let j = rand::thread_rng().gen_range(0..self.sample_space.len);
+                let i = rand::rng().random_range(0..self.sample_space.len);
+                let j = rand::rng().random_range(0..self.sample_space.len);
                 self.done += 1;
                 Some((i, j))
             }
