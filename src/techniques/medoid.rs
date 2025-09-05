@@ -112,7 +112,7 @@ where
 mod tests {
     use std::fs;
 
-    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, medoid};
+    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, techniques::medoid};
 
     #[test]
     fn medoid() {

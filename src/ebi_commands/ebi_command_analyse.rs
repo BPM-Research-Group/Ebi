@@ -1,7 +1,7 @@
 use anyhow::Context;
 use ebi_arithmetic::{Fraction, Zero};
 use crate::{ebi_framework::{ebi_command::EbiCommand, 
-    ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_objects::directly_follows_graph::DirectlyFollowsGraph, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::{constant_fraction::ConstFraction}, medoid, techniques::{completeness::Completeness, edge_difference::EdgeDifference, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}};
+    ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType, EbiTraitObject}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, ebi_objects::directly_follows_graph::DirectlyFollowsGraph, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, math::constant_fraction::ConstFraction,  techniques::{completeness::Completeness, edge_difference::EdgeDifference, medoid, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}};
 
 pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
     name_short: "ana",
