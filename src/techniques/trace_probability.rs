@@ -469,9 +469,7 @@ mod tests {
     use crate::{
         ebi_framework::activity_key::HasActivityKey,
         ebi_objects::{
-            stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-            stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-            stochastic_process_tree::StochasticProcessTree,
+            finite_language::FiniteLanguage, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree
         },
         ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
         follower_semantics::FollowerSemantics,
@@ -698,5 +696,19 @@ mod tests {
         let trace_follower = FollowerSemantics::Trace(&trace);
         let probability = tree.get_probability(&trace_follower).unwrap();
         assert_eq!(probability, Fraction::from((2, 3)));
+    }
+    
+    #[test]
+    fn emsc() {
+        let fin1 = fs::read_to_string("testfiles/aa-ab-ba_ali.slpn").unwrap();
+        let mut slpn: StochasticLabelledPetriNet =
+            fin1.parse::<StochasticLabelledPetriNet>().unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/aa.lang").unwrap();
+        let slang2 = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
+
+        let probability = slpn.get_probability_language(slang2).unwrap();
+
+        assert_eq!(probability, Fraction::zero());
     }
 }

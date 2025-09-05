@@ -482,7 +482,9 @@ impl Infoable for DirectlyFollowsModel {
 
 #[cfg(test)]
 mod tests {
-    use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable};
+    use std::fs;
+
+    use crate::ebi_framework::{activity_key::{ActivityKey, HasActivityKey, TranslateActivityKey}, ebi_output::EbiOutput, exportable::Exportable};
 
     use super::DirectlyFollowsModel;
 
@@ -491,5 +493,21 @@ mod tests {
     fn unreachable() {
         let mut f = vec![];
         DirectlyFollowsModel::export_from_object(EbiOutput::Usize(0), &mut f).unwrap_err();
+    }
+
+    #[test]
+    fn activity_key_translating() {
+        let fin = fs::read_to_string("testfiles/a-b_star.dfm").unwrap();
+        let mut dfm = fin.parse::<DirectlyFollowsModel>().unwrap();
+
+        let mut activity_key = ActivityKey::new();
+        let x = activity_key.process_activity("xyz");
+
+        dfm.translate_using_activity_key(&mut activity_key);
+
+        assert_eq!(
+            dfm.get_activity_key().get_activity_label(&x),
+            activity_key.get_activity_label(&x)
+        );
     }
 }
