@@ -171,7 +171,7 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
             .par_iter()
             .flat_map(|row| {
                 row.par_iter()
-                    .map(|value| value.extract_exact().unwrap().to_denominator())
+                    .map(|value| value.exact_ref().unwrap().to_denominator())
             })
             .collect();
 
@@ -192,20 +192,20 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
         all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
     fn lowest_common_multiple_denominators_weights(&self) -> Result<Natural> {
-        use malachite::base::num::basic::traits::One;
         use malachite::base::num::arithmetic::traits::Lcm;
+        use malachite::base::num::basic::traits::One;
         use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
         let self_denominators: Vec<Natural> = self
             .weights_a
             .par_iter()
-            .map(|frac| frac.extract_exact().unwrap().to_denominator())
+            .map(|frac| frac.exact_ref().unwrap().to_denominator())
             .collect();
 
         let lang_b_denominators: Vec<Natural> = self
             .weights_b
             .par_iter()
-            .map(|frac| frac.extract_exact().unwrap().to_denominator())
+            .map(|frac| frac.exact_ref().unwrap().to_denominator())
             .collect();
 
         // Combine and calculate LCM

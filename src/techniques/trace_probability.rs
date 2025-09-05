@@ -1,5 +1,5 @@
-use anyhow::{Context, Result};
-use ebi_arithmetic::{Fraction, One, Zero};
+use anyhow::{Context, Result, anyhow};
+use ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, GaussJordan, One, Zero};
 use std::{
     collections::{HashMap, HashSet},
     fmt::{self, Display},
@@ -21,7 +21,6 @@ use crate::{
         ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::StochasticSemantics,
     },
     follower_semantics::FollowerSemantics,
-    math::matrix::Matrix,
 };
 
 //generic implementation
@@ -390,34 +389,31 @@ impl CrossProductResultImpl {
             return Ok(Fraction::zero());
         }
 
-        let mut matrix = Matrix::new_sized(
-            self.number_of_states(),
-            self.number_of_states() + 1,
-            Fraction::zero(),
-        );
+        let mut matrix = FractionMatrix::new(self.number_of_states(), self.number_of_states() + 1);
 
         for state_index in 0..self.number_of_states() {
-            matrix[state_index] = vec![Fraction::zero(); self.number_of_states() + 1];
-            matrix[state_index][state_index] = Fraction::one();
+            matrix.set(state_index, state_index, Fraction::one());
 
             if state_index == self.dead_state {
                 //a dead state has a 0 probability to end up in a final state
             } else if self.final_states.contains(&state_index) {
                 //a final state has a 1 probability to end up in a final state
-                matrix[state_index][self.number_of_states()] = Fraction::one();
+                matrix.set(state_index, self.number_of_states(), Fraction::one());
             } else {
                 //any other state has a probability equal to the weighted sum of its next states, to end up in a final state
                 for i in 0..self.next_states[state_index].len() {
                     let state_index_2 = self.next_states[state_index][i];
                     let coeff = &self.next_state_probabilities[state_index][i];
-                    matrix[state_index][state_index_2] = -coeff;
+                    matrix.set(state_index, state_index_2, -coeff);
                 }
             }
         }
 
-        matrix.solve()?;
+        matrix = matrix.gauss_jordan_reduced()?;
 
-        Ok(matrix[self.initial_state][self.number_of_states()].to_owned())
+        matrix
+            .get(self.initial_state, self.number_of_states())
+            .ok_or_else(|| anyhow!("item not found"))
     }
 }
 

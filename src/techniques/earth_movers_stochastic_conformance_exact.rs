@@ -76,7 +76,7 @@ impl dyn WeightedDistances {
                         let idx = chunk_idx * 1024 + i;
                         *s = if idx < n {
                             (self.weight_a(idx) * &lcm_probability_fraction)
-                                .extract_exact()
+                                .exact_ref()
                                 .unwrap()
                                 .numerator_ref()
                                 .try_into()
@@ -84,7 +84,7 @@ impl dyn WeightedDistances {
                         } else if idx < n + m {
                             -TryInto::<i64>::try_into(
                                 (self.weight_b(idx - n) * &lcm_probability_fraction)
-                                    .extract_exact()
+                                    .exact_ref()
                                     .unwrap()
                                     .numerator_ref(),
                             )
@@ -102,7 +102,7 @@ impl dyn WeightedDistances {
                 for j in 0..m {
                     let product = self.distance(i, j) * &lcm_distance_fraction;
                     let i64 = product
-                        .extract_exact()
+                        .exact_ref()
                         .unwrap()
                         .numerator_ref()
                         .try_into()
@@ -150,7 +150,7 @@ impl dyn WeightedDistances {
                         let idx = chunk_idx * 1024 + i;
                         *s = if idx < n {
                             (self.weight_a(idx) * &lcm_probability_fraction)
-                                .extract_exact()
+                                .exact_ref()
                                 .unwrap()
                                 .numerator_ref()
                                 .try_into()
@@ -158,7 +158,7 @@ impl dyn WeightedDistances {
                         } else if idx < n + m {
                             -TryInto::<i128>::try_into(
                                 (self.weight_b(idx - n) * &lcm_probability_fraction)
-                                    .extract_exact()
+                                    .exact_ref()
                                     .unwrap()
                                     .numerator_ref(),
                             )
@@ -176,7 +176,7 @@ impl dyn WeightedDistances {
                 for j in 0..m {
                     let product = self.distance(i, j) * &lcm_distance_fraction;
                     let i128 = product
-                        .extract_exact()
+                        .exact_ref()
                         .unwrap()
                         .numerator_ref()
                         .try_into()
@@ -219,14 +219,14 @@ impl dyn WeightedDistances {
                         let idx = chunk_idx * 1024 + i;
                         *s = if idx < n {
                             (self.weight_a(idx) * &lcm_probability_fraction)
-                                .extract_exact()
+                                .exact_ref()
                                 .unwrap()
                                 .numerator_ref()
                                 .into()
                         } else if idx < n + m {
                             -Into::<Integer>::into(
                                 (self.weight_b(idx - n) * &lcm_probability_fraction)
-                                    .extract_exact()
+                                    .exact_ref()
                                     .unwrap()
                                     .numerator_ref(),
                             )
@@ -242,7 +242,7 @@ impl dyn WeightedDistances {
             for index_a in 0..n {
                 for index_b in 0..m {
                     let product = self.distance(index_a, index_b) * &lcm_distance_fraction;
-                    let bigint = product.extract_exact().unwrap().signed_numerator();
+                    let bigint = product.exact_ref().unwrap().signed_numerator();
                     graph_and_costs[index_a][index_b + n] = Some(bigint);
                 }
             }

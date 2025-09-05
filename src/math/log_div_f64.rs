@@ -19,7 +19,7 @@ impl LogDivF64 {
         }
 
         Ok(Self(FractionF64::from(
-            log_of.extract_approx().unwrap().log2() / divide_by as f64,
+            log_of.approx().unwrap().log2() / divide_by as f64,
         )))
     }
 
@@ -29,7 +29,7 @@ impl LogDivF64 {
         }
 
         Ok(Self(FractionF64::from(
-            log_of.extract_approx().unwrap().log2(),
+            log_of.approx().unwrap().log2(),
         )))
     }
 
@@ -46,7 +46,7 @@ impl LogDivF64 {
             return Err(anyhow!("cannot take log of negative value"));
         }
 
-        let n0 = n.extract_approx().unwrap();
+        let n0 = n.approx().unwrap();
         Ok(Self(FractionF64::from(n0 * n0.log2())))
     }
 
@@ -105,7 +105,7 @@ impl Add for LogDivF64 {
     type Output = Self;
 
     fn add(self, rhs: Self) -> Self::Output {
-        let f = rhs.0.to_approx().unwrap();
+        let f = rhs.0.approx().unwrap();
         Self(self.0.add(f))
     }
 }
@@ -128,7 +128,7 @@ impl Sub for LogDivF64 {
     type Output = Self;
 
     fn sub(self, rhs: Self) -> Self::Output {
-        let f = rhs.0.to_approx().unwrap();
+        let f = rhs.0.approx().unwrap();
         Self(self.0.sub(f))
     }
 }

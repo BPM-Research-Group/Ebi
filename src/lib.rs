@@ -128,7 +128,6 @@ pub mod math {
     pub mod distances_triangular;
     pub mod levenshtein;
     pub mod markov_model;
-    pub mod matrix;
     pub mod root;
     pub mod root_log_div;
 }

@@ -34,7 +34,7 @@ impl LogDivExact {
             return Err(anyhow!("cannot take log of negative value"));
         }
 
-        let f = log_of.to_exact().unwrap();
+        let f = log_of.exact().unwrap();
         Ok(LogDivExact((f, divide_by.into())))
     }
 
@@ -43,7 +43,7 @@ impl LogDivExact {
             return Err(anyhow!("cannot take log of negative value"));
         }
 
-        let f = log_of.to_exact().unwrap();
+        let f = log_of.exact().unwrap();
         Ok(LogDivExact((f, 1u32.into())))
     }
 
@@ -67,7 +67,7 @@ impl LogDivExact {
             return Err(anyhow!("cannot take log of negative value"));
         }
 
-        let f = n.extract_exact().unwrap();
+        let f = n.exact_ref().unwrap();
         Ok(LogDivExact((
             Self::power_f_u(f, f.numerator_ref()),
             f.to_denominator(),
@@ -103,19 +103,19 @@ impl MaybeExact for LogDivExact {
         true
     }
 
-    fn extract_approx(&self) -> Result<&Self::Approximate> {
+    fn approx_ref(&self) -> Result<&Self::Approximate> {
         Err(anyhow!("cannot extract a float from fractions"))
     }
 
-    fn extract_exact(&self) -> Result<&Self::Exact> {
+    fn exact_ref(&self) -> Result<&Self::Exact> {
         Ok(&self.0)
     }
 
-    fn to_approx(self) -> Result<Self::Approximate> {
+    fn approx(self) -> Result<Self::Approximate> {
         Err(anyhow!("cannot extract a float from fractions"))
     }
 
-    fn to_exact(self) -> Result<Self::Exact> {
+    fn exact(self) -> Result<Self::Exact> {
         Ok(self.0)
     }
 }
@@ -189,7 +189,7 @@ impl TryFrom<Fraction> for LogDivExact {
     type Error = Error;
 
     fn try_from(value: Fraction) -> Result<Self> {
-        let f = value.to_exact()?;
+        let f = value.exact()?;
         if f.is_zero() {
             Ok(Self::zero())
         } else if f.is_negative() {
@@ -266,7 +266,7 @@ impl SubAssign for LogDivExact {
 impl MulAssign<FractionExact> for LogDivExact {
     fn mul_assign(&mut self, rhs: FractionExact) {
         let LogDivExact((ab_log, c)) = self;
-        let f = rhs.extract_exact().unwrap();
+        let f = rhs.exact_ref().unwrap();
         *ab_log = Self::power_f_u(&ab_log, &f.numerator_ref());
         *c *= f.denominator_ref();
     }
@@ -275,7 +275,7 @@ impl MulAssign<FractionExact> for LogDivExact {
 impl MulAssign<&FractionExact> for LogDivExact {
     fn mul_assign(&mut self, rhs: &FractionExact) {
         let LogDivExact((ab_log, c)) = self;
-        let f = rhs.extract_exact().unwrap();
+        let f = rhs.exact_ref().unwrap();
         *ab_log = Self::power_f_u(&ab_log, f.numerator_ref());
         *c *= f.denominator_ref();
     }

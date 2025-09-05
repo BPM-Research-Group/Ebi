@@ -1,7 +1,9 @@
 use crate::math::distances::WeightedDistances;
 use anyhow::{Context, Result};
 use ebi_arithmetic::{
-    exact::{is_exact_globally, MaybeExact}, fraction::{fraction_enum::FractionEnum, signed::Numerator}, One
+    One,
+    exact::{MaybeExact, is_exact_globally},
+    fraction::{fraction_enum::FractionEnum, signed::Numerator},
 };
 use ebi_optimisation::network_simplex::NetworkSimplex;
 use malachite::{
@@ -83,7 +85,7 @@ impl dyn WeightedDistances {
                             let idx = chunk_idx * 1024 + i;
                             *s = if idx < n {
                                 (self.weight_a(idx) * &lcm_probability_fraction)
-                                    .extract_exact()
+                                    .exact_ref()
                                     .unwrap()
                                     .numerator_ref()
                                     .try_into()
@@ -91,7 +93,7 @@ impl dyn WeightedDistances {
                             } else if idx < n + m {
                                 -TryInto::<i64>::try_into(
                                     (self.weight_b(idx - n) * &lcm_probability_fraction)
-                                        .extract_exact()
+                                        .exact_ref()
                                         .unwrap()
                                         .numerator_ref(),
                                 )
@@ -109,7 +111,7 @@ impl dyn WeightedDistances {
                     for j in 0..m {
                         let product = self.distance(i, j) * &lcm_distance_fraction;
                         let i64 = product
-                            .extract_exact()
+                            .exact_ref()
                             .unwrap()
                             .numerator_ref()
                             .try_into()
@@ -157,7 +159,7 @@ impl dyn WeightedDistances {
                             let idx = chunk_idx * 1024 + i;
                             *s = if idx < n {
                                 (self.weight_a(idx) * &lcm_probability_fraction)
-                                    .extract_exact()
+                                    .exact_ref()
                                     .unwrap()
                                     .numerator_ref()
                                     .try_into()
@@ -165,7 +167,7 @@ impl dyn WeightedDistances {
                             } else if idx < n + m {
                                 -TryInto::<i128>::try_into(
                                     (self.weight_b(idx - n) * &lcm_probability_fraction)
-                                        .extract_exact()
+                                        .exact_ref()
                                         .unwrap()
                                         .numerator_ref(),
                                 )
@@ -183,7 +185,7 @@ impl dyn WeightedDistances {
                     for j in 0..m {
                         let product = self.distance(i, j) * &lcm_distance_fraction;
                         let i128 = product
-                            .extract_exact()
+                            .exact_ref()
                             .unwrap()
                             .numerator_ref()
                             .try_into()
@@ -226,12 +228,13 @@ impl dyn WeightedDistances {
                             let idx = chunk_idx * 1024 + i;
                             *s = if idx < n {
                                 (self.weight_a(idx) * &lcm_probability_fraction)
-                                    .extract_exact()
+                                    .exact_ref()
                                     .unwrap()
-                                    .to_numerator().into()
+                                    .to_numerator()
+                                    .into()
                             } else if idx < n + m {
                                 -(self.weight_b(idx - n) * &lcm_probability_fraction)
-                                    .extract_exact()
+                                    .exact_ref()
                                     .unwrap()
                                     .to_numerator()
                             } else {
@@ -246,7 +249,7 @@ impl dyn WeightedDistances {
                 for index_a in 0..n {
                     for index_b in 0..m {
                         let product = self.distance(index_a, index_b) * &lcm_distance_fraction;
-                        let bigint = product.extract_exact().unwrap().signed_numerator();
+                        let bigint = product.exact_ref().unwrap().signed_numerator();
                         graph_and_costs[index_a][index_b + n] = Some(bigint);
                     }
                 }
@@ -292,7 +295,7 @@ impl dyn WeightedDistances {
                 .enumerate()
                 .take(n)
                 .for_each(|(i, supply)| {
-                    *supply = *self.weight_a(i).extract_approx().unwrap();
+                    *supply = *self.weight_a(i).approx_ref().unwrap();
                 });
             // 3a(ii). For each trace in the second language, create a demand node with the corresponding trace probability as demand (i.e. negative supply).
             supply
@@ -301,14 +304,14 @@ impl dyn WeightedDistances {
                 .skip(n)
                 .take(m)
                 .for_each(|(i, supply)| {
-                    *supply = -self.weight_b(i - n).extract_approx().unwrap();
+                    *supply = -self.weight_b(i - n).approx_ref().unwrap();
                 });
 
             // 3a(iii). Create an edge between each pair of traces with the respective distance as cost.
             let mut graph_and_costs = vec![vec![None; n + m]; n + m];
             // Populate the top-right n x m part of graph_and_costs with scaled_distances
             self.iter().for_each(|(i, j, f)| {
-                graph_and_costs[i][j + n] = Some(*f.extract_approx().unwrap())
+                graph_and_costs[i][j + n] = Some(*f.approx_ref().unwrap())
             });
 
             // 3b. Run the NetworkSimplex algorithm to find the optimal flow between the supply and demand nodes.

@@ -19,7 +19,7 @@ impl FixedDenominatorFractionExact {
                 //exact mode
                 let denominators = fractions
                     .iter()
-                    .map(|f| f.as_ref().extract_exact().unwrap().to_numerator())
+                    .map(|f| f.as_ref().exact_ref().unwrap().to_numerator())
                     .collect::<Vec<_>>();
 
                 let lowest_common_multiple = Arc::new(Self::lowest_common_multiple(&denominators)?);
@@ -27,7 +27,7 @@ impl FixedDenominatorFractionExact {
                 Ok(fractions
                     .iter()
                     .map(|f| {
-                        let r = f.as_ref().extract_exact().unwrap();
+                        let r = f.as_ref().exact_ref().unwrap();
                         let mut x = r.numerator_ref() * lowest_common_multiple.as_ref();
                         x /= r.denominator_ref();
                         Arc::new(FixedDenominatorFractionExact(

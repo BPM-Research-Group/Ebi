@@ -546,7 +546,7 @@ mod tests {
             (EbiOutput::Fraction(Fraction::one()), "1".to_string()),
             (EbiOutput::LogDiv(LogDiv::zero()), "0".to_string()),
             (
-                EbiOutput::ContainsRoot(ContainsRoot::of(Root::of(Fraction::one()))),
+                EbiOutput::ContainsRoot(ContainsRoot::of(Root::of(Fraction::one()).unwrap())),
                 "1".to_string(),
             ),
             (

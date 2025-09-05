@@ -14,7 +14,7 @@ impl FixedDenominatorFractionF64 {
     pub fn create(fractions: &Vec<Arc<FractionF64>>) -> Result<Vec<Arc<Self>>> {
         Ok(fractions
             .iter()
-            .map(|f| Arc::new(Self(*f.extract_approx().unwrap())))
+            .map(|f| Arc::new(Self(f.approx().unwrap())))
             .collect())
     }
 

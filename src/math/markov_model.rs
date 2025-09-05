@@ -1,11 +1,9 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, One, Signed, Zero};
+use ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, IdentityMinus, Inversion, Signed, Zero};
 use std::fmt::{Debug, Display};
 
-use super::matrix::Matrix;
-
 pub struct MarkovModel<S> {
-    edges: Matrix,
+    edges: FractionMatrix,
     states: Vec<S>,
     initial_vector: Vec<Fraction>,
 }
@@ -13,7 +11,7 @@ pub struct MarkovModel<S> {
 impl<S: PartialEq + Clone> MarkovModel<S> {
     pub fn new() -> Self {
         Self {
-            edges: Matrix::new(),
+            edges: FractionMatrix::new(0, 0),
             states: vec![],
             initial_vector: vec![],
         }
@@ -26,12 +24,9 @@ impl<S: PartialEq + Clone> MarkovModel<S> {
         } else {
             //not yet present
             let state_index = self.states.len();
-            self.edges.ensure_capacity(
-                self.states.len() + 1,
-                self.states.len() + 1,
-                &Fraction::zero(),
-            );
-            self.edges[state_index][state_index] = Fraction::one();
+            self.edges
+                .increase_size_to(self.states.len() + 1, self.states.len() + 1);
+            self.edges.set_one(state_index, state_index);
             self.states.push(state);
             self.initial_vector.push(initial_value);
 
@@ -55,8 +50,8 @@ impl<S: PartialEq + Clone> MarkovModel<S> {
      * Redirects flow from source -> source to source -> target
      */
     pub fn set_flow(&mut self, source: usize, target: usize, flow: &Fraction) {
-        self.edges[source][source] -= flow;
-        self.edges[source][target] += flow;
+        self.edges.decrease(source, source, flow);
+        self.edges.increase(source, target, flow);
     }
 
     pub fn normalise_initial_vector(&mut self) -> Result<()> {
@@ -92,8 +87,8 @@ impl<S: PartialEq + Clone> MarkovModel<S> {
     pub fn make_states_absorbing(&mut self, states: &Vec<bool>) {
         for (state, maybe) in states.iter().enumerate() {
             if *maybe {
-                self.edges[state] = vec![Fraction::zero(); self.states.len()];
-                self.edges[state][state] = Fraction::one();
+                self.edges.set_row_zero(state);
+                self.edges.set_one(state, state);
             }
         }
     }
@@ -104,7 +99,7 @@ impl<S: PartialEq + Clone> MarkovModel<S> {
 
         while let Some(state) = states_to_reach.pop() {
             for state2 in 0..self.states.len() {
-                if notseen[state2] && self.edges[state2][state].is_positive() {
+                if notseen[state2] && self.edges.is_positive(state2, state) {
                     notseen[state2] = false;
                     states_to_reach.push(state2);
                 }
@@ -117,72 +112,72 @@ impl<S: PartialEq + Clone> MarkovModel<S> {
      * Raise the edge matrix to infinity / solve the Markov chain.
      */
     pub fn pow_infty(&mut self) -> Result<Vec<Fraction>> {
-        // log::debug!("solve Markov model {}", self.edges);
+        // println!("solve Markov model {}", self.edges);
 
         //create matrices A and B
-        let mut a = Matrix::new(); //transient -> absorbing
-        let mut b = Matrix::new(); //transient -> transient
+        let mut a = FractionMatrix::new(0, 0); //transient -> absorbing
+        let mut b = FractionMatrix::new(0, 0); //transient -> transient
         let mut absorbing_states = vec![]; //absorbing
         let mut transient_states = vec![]; //transient
         for state in 0..self.states.len() {
-            if self.edges[state][state] == Fraction::one() {
+            if self.edges.is_one(state, state) {
                 //absorbing state
-                // log::debug!("\tabsorbing state {}", state);
+                // println!("\tabsorbing state {}", state);
 
                 absorbing_states.push(state);
 
-                // log::debug!("\t\tabsorbing states: {:?}", absorbing_states);
-                // log::debug!("\t\ttransient states: {:?}", transient_states);
+                // println!("\t\tabsorbing states: {:?}", absorbing_states);
+                // println!("\t\ttransient states: {:?}", transient_states);
 
                 //add column to A
-                let column = a.get_number_of_columns();
-                a.ensure_capacity(
-                    a.get_number_of_rows(),
-                    a.get_number_of_columns() + 1,
-                    &Fraction::zero(),
-                );
+                let column = a.number_of_columns();
+                a.push_columns(1);
                 for row_a in 0..transient_states.len() {
                     let transient_state = transient_states[row_a];
-                    a.element_add(&row_a, &column, &self.edges[transient_state][state]);
+                    a.increase(
+                        row_a,
+                        column,
+                        &self.edges.get(transient_state, state).unwrap(),
+                    );
                 }
             } else {
                 //transient state
-                // log::debug!("\ttransient state {}", state);
+                // println!("\ttransient state {}", state);
 
                 transient_states.push(state);
 
-                // log::debug!("\t\tabsorbing states: {:?}", absorbing_states);
-                // log::debug!("\t\ttransient states: {:?}", transient_states);
+                // println!("\t\tabsorbing states: {:?}", absorbing_states);
+                // println!("\t\ttransient states: {:?}", transient_states);
 
                 //add row to A
-                let row = a.get_number_of_rows();
-                a.ensure_capacity(
-                    a.get_number_of_rows() + 1,
-                    a.get_number_of_columns(),
-                    &Fraction::zero(),
-                );
+                let row = a.number_of_rows();
+                a.push_rows(1);
                 for column_a in 0..absorbing_states.len() {
                     let absorbing_state = absorbing_states[column_a];
-                    a.element_add(&row, &column_a, &self.edges[state][absorbing_state]);
+                    a.increase(
+                        row,
+                        column_a,
+                        &self.edges.get(state, absorbing_state).unwrap(),
+                    );
                 }
 
                 //add column to B
-                let row = b.get_number_of_rows();
-                let column = b.get_number_of_columns();
-                b.ensure_capacity(
-                    transient_states.len(),
-                    transient_states.len(),
-                    &Fraction::zero(),
-                );
+                let row = b.number_of_rows();
+                let column = b.number_of_columns();
+                b.increase_size_to(transient_states.len(), transient_states.len());
                 for i_b in 0..transient_states.len() {
                     let transient_state = transient_states[i_b];
 
                     // log::debug!("\t\tset matrix B for {},{}", transient_state, state);
-                    b.element_add(&row, &i_b, &self.edges[state][transient_state]);
+                    b.increase(row, i_b, &self.edges.get(state, transient_state).unwrap());
 
                     if i_b != transient_states.len() - 1 {
                         //avoid doubly adding to the corner cell
-                        b.element_add(&i_b, &column, &self.edges[transient_state][state]);
+                        b.increase(
+                            i_b,
+                            column,
+                            &self.edges.get(transient_state, state).unwrap(),
+                        );
                     }
                 }
             }
@@ -193,43 +188,51 @@ impl<S: PartialEq + Clone> MarkovModel<S> {
             // log::debug!("\t\tlen B = {}x{}", b.get_number_of_rows(), b.get_number_of_columns());
         }
 
-        // log::debug!("matrix A = {}", a);
-        // log::debug!("matrix B = {}", b);
+        // println!("matrix A = {}", a);
+        // println!("matrix B = {}", b);
 
         b.identity_minus();
 
-        // log::debug!("matrix I - B = {}", b);
+        // println!("matrix I - B = {}", b);
 
-        b.inverse()?;
+        b = b.invert()?;
 
-        // log::debug!("matrix F = inv(I-B) = {}", b);
+        // println!("matrix F = inv(I-B) = {}", b);
 
-        let p = b * a;
+        let p = (&b * &a)?;
 
-        // log::debug!("matrix P = FA = {}", p);
+        // println!("matrix P = FA = {}", p);
 
         //construct the full matrix ((0, 0), (A, B))
         {
             //set the transient -> transient fields to 0
             for transient_state1 in transient_states.iter() {
                 for transient_state2 in transient_states.iter() {
-                    self.edges[*transient_state1][*transient_state2] = Fraction::zero();
+                    self.edges.set_zero(*transient_state1, *transient_state2);
                 }
             }
 
             //substitute the fundamental matrix
             for (i_tra, transient_state) in transient_states.iter().enumerate() {
                 for (i_abs, absorbing_state) in absorbing_states.iter().enumerate() {
-                    self.edges[*transient_state][*absorbing_state] = p[i_tra][i_abs].clone();
+                    self.edges.set(
+                        *transient_state,
+                        *absorbing_state,
+                        p.get(i_tra, i_abs).unwrap(),
+                    );
                 }
             }
         }
 
-        // log::debug!("solved matrix {}", self.edges);
+        // println!("solved matrix {}", self.edges);
+        // println!(
+        //     "initial vector {}",
+        //     Matrix::into(self.initial_vector.clone())
+        // );
 
-        let x = self.edges.multiply_vector_matrix(&self.initial_vector);
+        let x = (&self.initial_vector * &self.edges)?;
 
-        // log::debug!("result {}", Matrix::into(x.clone()));
+        // println!("result {}", Matrix::into(x.clone()));
 
         Ok(x)
     }
@@ -247,7 +250,10 @@ impl<S: Debug> Debug for MarkovModel<S> {
 
 impl<S: Display> Display for MarkovModel<S> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "matrix {}, initial vector ", self.edges)?;
-        Matrix::display_vector(f, &self.initial_vector)
+        write!(
+            f,
+            "matrix {}, initial vector {:?}",
+            self.edges, self.initial_vector
+        )
     }
 }

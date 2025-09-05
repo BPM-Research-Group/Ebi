@@ -158,7 +158,7 @@ impl MaybeExact for LogDivEnum {
         }
     }
 
-    fn extract_approx(&self) -> Result<&Self::Approximate> {
+    fn approx_ref(&self) -> Result<&Self::Approximate> {
         match self {
             LogDivEnum::Exact(_) => Err(anyhow!("cannot extract a float from fractions")),
             LogDivEnum::Approx(f) => Ok(f),
@@ -168,7 +168,7 @@ impl MaybeExact for LogDivEnum {
         }
     }
 
-    fn extract_exact(&self) -> Result<&<LogDivEnum as MaybeExact>::Exact> {
+    fn exact_ref(&self) -> Result<&<LogDivEnum as MaybeExact>::Exact> {
         match self {
             LogDivEnum::Exact(a) => Ok(a),
             LogDivEnum::Approx(_) => Err(anyhow!("cannot extract fractions from a float")),
@@ -178,7 +178,7 @@ impl MaybeExact for LogDivEnum {
         }
     }
 
-    fn to_approx(self) -> Result<Self::Approximate> {
+    fn approx(self) -> Result<Self::Approximate> {
         match self {
             LogDivEnum::Exact(_) => Err(anyhow!("cannot extract a float from fractions")),
             LogDivEnum::Approx(f) => Ok(f),
@@ -188,7 +188,7 @@ impl MaybeExact for LogDivEnum {
         }
     }
 
-    fn to_exact(self) -> Result<<LogDivEnum as MaybeExact>::Exact> {
+    fn exact(self) -> Result<<LogDivEnum as MaybeExact>::Exact> {
         match self {
             LogDivEnum::Exact(a) => Ok(a),
             LogDivEnum::Approx(_) => Err(anyhow!("cannot extract fractions from a float")),

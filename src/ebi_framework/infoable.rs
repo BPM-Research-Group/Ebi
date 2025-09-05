@@ -39,7 +39,7 @@ impl Infoable for Rational {
 
 impl Infoable for Fraction {
     fn info(&self, f: &mut impl std::io::Write) -> Result<()> {
-        match (self.extract_approx(), self.extract_exact()) {
+        match (self.approx_ref(), self.exact_ref()) {
             (Ok(_), Ok(_)) => todo!(),
             (Ok(fr), Err(_)) => Ok(writeln!(f, "Approximate value\t{}", fr)?),
             (Err(_), Ok(fr)) => {

@@ -123,16 +123,16 @@ macro_rules! default_stochastic_deterministic_semantics {
                 //create the extended matrix
                 let mut markov_model = self.create_markov_model(&q_state)?;
 
-                // log::debug!("\tT {}", markov_model);
-                // log::debug!("T {:?}", markov_model);
+                // println!("\tT {}", markov_model);
+                // println!("T {:?}", markov_model);
 
                 //replace livelock states by absorbing states
                 {
                     let progress_states = Self::get_progress_states(&markov_model);
-                    // log::debug!("\tprogress states {:?}", progress_states);
+                    // println!("\tprogress states {:?}", progress_states);
                     let silent_livelock_states =
                         markov_model.get_states_that_cannot_reach(progress_states);
-                    // log::debug!(
+                    // println!(
                     //     "\tstates that cannot reach a progress state {:?}",
                     //     silent_livelock_states
                     // );
@@ -140,8 +140,8 @@ macro_rules! default_stochastic_deterministic_semantics {
                     markov_model
                         .set_states(&silent_livelock_states, MarkovMarking::SilentLiveLock());
 
-                    // log::debug!("\tT made absorbing {}", markov_model);
-                    // log::debug!("\tT made absorbing {:?}", markov_model);
+                    // println!("\tT made absorbing {}", markov_model);
+                    // println!("\tT made absorbing {:?}", markov_model);
                 }
 
                 //if there are no states at all, we are in a final state (final states were filtered out in the creation of the Markov model)
@@ -151,7 +151,7 @@ macro_rules! default_stochastic_deterministic_semantics {
                 }
 
                 let new_state_vector = markov_model.pow_infty()?;
-                // log::debug!(
+                // println!(
                 //     "\tnew state vector {}",
                 //     crate::math::matrix::Matrix::into(new_state_vector.clone())
                 // );

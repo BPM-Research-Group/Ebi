@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Result, anyhow};
 use ebi_arithmetic::{Fraction, OneMinus, Signed, Sqrt, Zero};
 use fraction::Sign;
 use std::{
@@ -93,12 +93,14 @@ pub struct Root {
 }
 
 impl Root {
-    pub fn of(r: Fraction) -> Self {
-        assert!(r.is_not_negative());
-        Self {
+    pub fn of(r: Fraction) -> Result<Self> {
+        if !r.is_not_negative() {
+            return Err(anyhow!("cannot take the root of a negative number"));
+        }
+        Ok(Self {
             sign: Sign::Plus,
             r: r,
-        }
+        })
     }
 
     // pub fn approximate(&self) -> String {

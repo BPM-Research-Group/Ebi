@@ -9,20 +9,20 @@ use rayon::prelude::*;
 
 pub trait Associations {
     fn association(
-        self: &mut Box<Self>,
+        self: &Box<Self>,
         number_of_samples: usize,
         attribute: &String,
     ) -> Result<ContainsRoot>;
 
     fn associations(
-        self: &mut Box<Self>,
+        self: &Box<Self>,
         number_of_samples: usize,
     ) -> Vec<(String, Result<ContainsRoot>)>;
 }
 
 impl Associations for dyn EbiTraitEventLog {
     fn association(
-        self: &mut Box<Self>,
+        self: &Box<Self>,
         number_of_samples: usize,
         attribute: &String,
     ) -> Result<ContainsRoot> {
@@ -38,7 +38,7 @@ impl Associations for dyn EbiTraitEventLog {
     }
 
     fn associations(
-        self: &mut Box<Self>,
+        self: &Box<Self>,
         number_of_samples: usize,
     ) -> Vec<(String, Result<ContainsRoot>)> {
         let attributes = self.get_trace_attributes();
@@ -296,5 +296,23 @@ impl<'a> Iterator for SamplePairsSpaceIterator<'a> {
                 Some((i, j))
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use crate::{
+        ebi_objects::event_log::EventLog, ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
+        techniques::association::Associations,
+    };
+
+    #[test]
+    fn zero() {
+        let fin = fs::read_to_string("testfiles/a-b-double.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+        let log: Box<dyn EbiTraitEventLog> = Box::new(log);
+        log.associations(500);
     }
 }

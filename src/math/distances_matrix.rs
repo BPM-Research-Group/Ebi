@@ -182,7 +182,7 @@ impl WeightedDistances for WeightedDistanceMatrix {
                 row.par_iter().map(|value| {
                     use ebi_arithmetic::exact::MaybeExact;
 
-                    value.extract_exact().unwrap().to_denominator()
+                    value.exact_ref().unwrap().to_denominator()
                 })
             })
             .collect();
@@ -211,13 +211,13 @@ impl WeightedDistances for WeightedDistanceMatrix {
         let self_denominators: Vec<Natural> = self
             .weights_a
             .par_iter()
-            .map(|frac| frac.extract_exact().unwrap().to_denominator())
+            .map(|frac| frac.exact_ref().unwrap().to_denominator())
             .collect();
 
         let lang_b_denominators: Vec<Natural> = self
             .weights_b
             .par_iter()
-            .map(|frac| frac.extract_exact().unwrap().to_denominator())
+            .map(|frac| frac.exact_ref().unwrap().to_denominator())
             .collect();
 
         // Combine and calculate LCM
