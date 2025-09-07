@@ -5,6 +5,7 @@ use ebi_arithmetic::{
     exact::{MaybeExact, is_exact_globally},
     fraction::{fraction::APPROX_DIGITS, fraction_enum::FractionEnum},
 };
+use ebi_objects::Infoable;
 use fraction::Sign;
 use malachite::{
     Natural,
@@ -21,8 +22,6 @@ use std::{
     mem,
     ops::{Add, AddAssign, DivAssign, MulAssign, Neg, Sub, SubAssign},
 };
-
-use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
 #[derive(Clone)]
 pub enum LogDivEnum {
@@ -143,6 +142,13 @@ impl LogDivEnum {
             .expect("overflow of u64: this is beyond the capability of computers");
 
         base.pow(p)
+    }
+
+    pub fn export(&self, f: &mut dyn Write) -> Result<()> {
+        if self.is_exact() {
+            writeln!(f, "{}", self)?;
+        }
+        Ok(writeln!(f, "Approximately {:.4}", self.approximate())?)
     }
 }
 
@@ -461,22 +467,6 @@ impl DivAssign<FractionEnum> for LogDivEnum {
 impl DivAssign<&FractionEnum> for LogDivEnum {
     fn div_assign(&mut self, rhs: &FractionEnum) {
         self.mul_assign(rhs.clone().recip())
-    }
-}
-
-impl Exportable for LogDivEnum {
-    fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
-        match object {
-            EbiOutput::LogDiv(fr) => fr.export(f),
-            _ => unreachable!(),
-        }
-    }
-
-    fn export(&self, f: &mut dyn Write) -> Result<()> {
-        if self.is_exact() {
-            writeln!(f, "{}", self)?;
-        }
-        Ok(writeln!(f, "Approximately {:.4}", self.approximate())?)
     }
 }
 

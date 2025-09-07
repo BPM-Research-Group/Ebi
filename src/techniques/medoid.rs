@@ -1,8 +1,8 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{f, Fraction, One, Zero};
+use ebi_arithmetic::{Fraction, One, Zero, f};
+use ebi_objects::FiniteLanguage;
 
 use crate::{
-    ebi_objects::finite_language::FiniteLanguage,
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::distances::TriangularDistanceMatrix,
 };
@@ -11,7 +11,7 @@ pub fn medoid<T>(log: &T, number_of_traces: &usize) -> Result<FiniteLanguage>
 where
     T: EbiTraitFiniteStochasticLanguage + ?Sized,
 {
-    let activity_key = log.get_activity_key().clone();
+    let activity_key = log.activity_key().clone();
     let mut result = FiniteLanguage::new_hashmap();
 
     log::info!("Computing {} medoid traces", number_of_traces);
@@ -29,11 +29,11 @@ where
         return Ok((activity_key, result).into());
     }
 
-    if log.len() < *number_of_traces {
+    if log.number_of_traces() < *number_of_traces {
         return Err(anyhow!(
             "{} traces were requested, but the stochastic language contains only {} traces.",
             number_of_traces,
-            log.len()
+            log.number_of_traces()
         ));
     }
 
@@ -93,7 +93,7 @@ pub fn sum_distances<T>(log: &T, distances: &TriangularDistanceMatrix) -> Vec<Fr
 where
     T: EbiTraitFiniteStochasticLanguage + ?Sized,
 {
-    let mut sum_distance = vec![Fraction::zero(); log.len()];
+    let mut sum_distance = vec![Fraction::zero(); log.number_of_traces()];
 
     for (i, j, _, distance) in distances {
         let mut distance_i = distance.as_ref().clone();
@@ -112,7 +112,9 @@ where
 mod tests {
     use std::fs;
 
-    use crate::{ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, techniques::medoid};
+    use ebi_objects::FiniteStochasticLanguage;
+
+    use crate::techniques::medoid;
 
     #[test]
     fn medoid() {

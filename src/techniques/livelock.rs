@@ -1,20 +1,16 @@
-use crate::{
-    ebi_framework::{activity_key::HasActivityKey, displayable::Displayable},
-    ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton,
-        directly_follows_graph::DirectlyFollowsGraph,
-        directly_follows_model::DirectlyFollowsModel,
-        labelled_petri_net::{LPNMarking, LabelledPetriNet},
-        process_tree::ProcessTree,
-        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        stochastic_process_tree_semantics::NodeStates,
-    },
-    ebi_traits::ebi_trait_semantics::Semantics,
-};
 use anyhow::{Result, anyhow};
+use ebi_objects::{
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, HasActivityKey, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet
+};
 use std::collections::{HashMap, HashSet, hash_map::Entry};
+
+use crate::{
+    ebi_framework::displayable::Displayable,
+    semantics::{
+        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
+        semantics::Semantics,
+    },
+};
 
 pub trait IsPartOfLivelock {
     type LivState: Displayable;
@@ -175,15 +171,12 @@ impl DirectlyFollowsGraphLiveLockCache {
         let mut result = vec![true; dfm.activity_key.get_number_of_activities() + 2];
         let mut queue = vec![];
         result[dfm.activity_key.get_number_of_activities()] = false;
-        dfm.get_activity_key()
-            .get_activities()
-            .iter()
-            .for_each(|node| {
-                if dfm.is_end_node(**node) {
-                    result[dfm.get_activity_key().get_id_from_activity(*node)] = false;
-                    queue.push(*node)
-                }
-            });
+        dfm.activity_key().get_activities().iter().for_each(|node| {
+            if dfm.is_end_node(**node) {
+                result[dfm.activity_key().get_id_from_activity(*node)] = false;
+                queue.push(*node)
+            }
+        });
 
         // log::debug!("queue {:?}, result {:?}", queue, result);
 
@@ -199,7 +192,7 @@ impl DirectlyFollowsGraphLiveLockCache {
             }
         }
 
-        if (0..dfm.get_activity_key().get_number_of_activities())
+        if (0..dfm.activity_key().get_number_of_activities())
             .into_iter()
             .any(|node| !result[node])
         {
@@ -388,16 +381,13 @@ dfa!(
 mod tests {
     use std::fs;
 
+    use ebi_objects::{
+        DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet, ProcessTree,
+        StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
+    };
+
     use crate::{
-        ebi_objects::{
-            deterministic_finite_automaton::DeterministicFiniteAutomaton,
-            directly_follows_model::DirectlyFollowsModel, labelled_petri_net::LabelledPetriNet,
-            process_tree::ProcessTree,
-            stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-            stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-            stochastic_process_tree_semantics::NodeStates,
-        },
-        ebi_traits::ebi_trait_semantics::Semantics,
+        semantics::{process_tree_semantics::NodeStates, semantics::Semantics},
         techniques::livelock::IsPartOfLivelock,
     };
 

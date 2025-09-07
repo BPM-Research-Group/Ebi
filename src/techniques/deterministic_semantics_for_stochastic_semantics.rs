@@ -1,25 +1,37 @@
 use anyhow::Result;
 use ebi_arithmetic::{Fraction, One, Signed, Zero};
-use std::collections::HashMap;
-use std::collections::hash_map::DefaultHasher;
-use std::collections::hash_map::Entry;
-use std::fmt::{self, Debug};
-use std::hash::{Hash, Hasher};
+use ebi_objects::{
+    Activity, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
+};
+use std::{
+    collections::{HashMap, hash_map::Entry},
+    fmt::{self, Debug},
+    hash::{DefaultHasher, Hash, Hasher},
+};
 use strum_macros::Display;
 
-use crate::ebi_framework::activity_key::Activity;
-use crate::ebi_framework::displayable::Displayable;
-use crate::ebi_objects::labelled_petri_net::LPNMarking;
-use crate::ebi_objects::stochastic_directly_follows_model::StochasticDirectlyFollowsModel;
-use crate::ebi_objects::stochastic_labelled_petri_net::StochasticLabelledPetriNet;
-use crate::ebi_objects::stochastic_process_tree::StochasticProcessTree;
-use crate::ebi_objects::stochastic_process_tree_semantics::NodeStates;
-use crate::ebi_traits::ebi_trait_semantics::Semantics;
-use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics;
-use crate::ebi_traits::ebi_trait_stochastic_semantics::StochasticSemantics;
-use crate::math::markov_model::MarkovModel;
+use crate::{
+    ebi_framework::displayable::Displayable,
+    ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
+    math::markov_model::MarkovModel,
+    semantics::{
+        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
+        semantics::Semantics,
+    },
+    stochastic_semantics::stochastic_semantics::StochasticSemantics,
+};
 
 use super::non_decreasing_livelock::NonDecreasingLivelock;
+
+trait Helper<S: Displayable> {
+    fn compute_next(&self, q_state: &mut PMarking<S>) -> Result<()>;
+
+    fn get_progress_states<X: Displayable>(
+        markov_model: &MarkovModel<MarkovMarking<X>>,
+    ) -> Vec<usize>;
+
+    fn create_markov_model(&self, q_state: &PMarking<S>) -> Result<MarkovModel<MarkovMarking<S>>>;
+}
 
 macro_rules! default_stochastic_deterministic_semantics {
     ($t:ident, $s:ident) => {
@@ -112,7 +124,7 @@ macro_rules! default_stochastic_deterministic_semantics {
             }
         }
 
-        impl $t {
+        impl Helper<$s> for $t {
             // impl StochasticLabelledPetriNet {
             /**
              * Compute the next q-state.
@@ -412,12 +424,9 @@ impl<S: Displayable> Displayable for MarkovMarking<S> {}
 #[cfg(test)]
 mod tests {
     use ebi_arithmetic::{Fraction, Zero};
+    use ebi_objects::{HasActivityKey, StochasticLabelledPetriNet};
 
-    use crate::{
-        ebi_framework::activity_key::HasActivityKey,
-        ebi_objects::stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
-    };
+    use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics;
     use std::fs;
 
     #[test]
@@ -426,7 +435,7 @@ mod tests {
         let mut slpn: StochasticLabelledPetriNet =
             fin1.parse::<StochasticLabelledPetriNet>().unwrap();
 
-        let a = slpn.get_activity_key_mut().process_activity("a");
+        let a = slpn.activity_key_mut().process_activity("a");
 
         //emtpy prefix
         let mut state = slpn.get_deterministic_initial_state().unwrap().unwrap();

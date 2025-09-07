@@ -1,6 +1,8 @@
 use ebi_arithmetic::Fraction;
 use ebi_arithmetic::parsing::FractionNotParsedYet;
+use ebi_objects::EbiObjectType;
 use itertools::Itertools;
+use std::collections::HashSet;
 use std::fmt::Display;
 use std::{io::Write, path::PathBuf};
 
@@ -11,6 +13,7 @@ use jni::JNIEnv;
 // this context and getting used after being GC'd.
 use jni::objects::{JClass, JObjectArray, JString};
 
+use crate::ebi_framework::ebi_output::EbiOutputType;
 // This is just a pointer. We'll be returning it from our function. We
 // can't return one of the objects with lifetime information because the
 // lifetime checker won't let us.
@@ -643,6 +646,18 @@ impl Display for JavaObjectHandler {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         writeln!(f, "{}", self.name)
     }
+}
+
+pub fn get_java_object_handlers_that_can_export(
+    object_type: &EbiObjectType,
+) -> HashSet<JavaObjectHandler> {
+    EbiOutputType::ObjectType(object_type.clone()).get_java_object_handlers_that_can_export()
+}
+
+pub fn get_java_object_handlers_that_can_import(
+    object_type: &EbiObjectType,
+) -> HashSet<JavaObjectHandler> {
+    EbiInputType::Object(object_type.clone()).get_java_object_handlers_that_can_import()
 }
 
 pub const JAVA_OBJECT_HANDLERS_STRING: &[JavaObjectHandler] = &[JavaObjectHandler {

@@ -2,15 +2,16 @@ use std::collections::{HashMap, hash_map::Entry};
 
 use anyhow::{Result, anyhow};
 use ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One, Zero};
+use ebi_objects::FiniteStochasticLanguage;
 use rand::Rng;
 
 use crate::{
     ebi_framework::displayable::Displayable,
-    ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, StochasticSemantics},
+        ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
+    stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
 
 pub trait Sampler {
@@ -38,7 +39,7 @@ impl Sampler for dyn EbiTraitFiniteStochasticLanguage {
 
         let cache = self.resample_cache_init()?;
 
-        if self.len().is_zero() {
+        if self.number_of_traces().is_zero() {
             return Err(anyhow!("Cannot sample from empty language."));
         }
 
@@ -53,7 +54,7 @@ impl Sampler for dyn EbiTraitFiniteStochasticLanguage {
             };
         }
 
-        Ok((self.get_activity_key().clone(), result).into())
+        Ok((self.activity_key().clone(), result).into())
     }
 }
 
@@ -113,7 +114,7 @@ where
 
             // log::debug!("Sampled {:?} traces", result);
 
-            Ok((self.get_activity_key().clone(), result).into())
+            Ok((self.activity_key().clone(), result).into())
         } else {
             return Err(anyhow!("Language contains no traces, so cannot sample."));
         }
@@ -122,7 +123,7 @@ where
 
 impl Resampler for dyn EbiTraitFiniteStochasticLanguage {
     fn resample_cache_init(&self) -> Result<FractionRandomCache> {
-        if self.len().is_zero() {
+        if self.number_of_traces().is_zero() {
             return Err(anyhow!("Cannot sample from empty language."));
         }
 
@@ -133,7 +134,7 @@ impl Resampler for dyn EbiTraitFiniteStochasticLanguage {
     }
 
     fn resample(&self, cache: &FractionRandomCache, number_of_traces: usize) -> Vec<Fraction> {
-        let mut result = vec![0usize; self.len()];
+        let mut result = vec![0usize; self.number_of_traces()];
         for _ in 0..number_of_traces {
             let trace_index = Fraction::choose_randomly_cached(&cache);
             result[trace_index] += 1;
@@ -162,12 +163,11 @@ pub fn sample_indices_uniform(number_of_indices: usize, result: &mut Vec<usize>)
 mod tests {
     use std::fs;
 
-    use crate::{
-        ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
-        ebi_traits::{
-            ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-            ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
-        },
+    use ebi_objects::FiniteStochasticLanguage;
+
+    use crate::ebi_traits::{
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
     };
 
     use super::Sampler;

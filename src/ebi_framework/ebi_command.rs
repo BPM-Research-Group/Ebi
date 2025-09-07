@@ -1,6 +1,7 @@
 use anyhow::{Context, Result, anyhow};
 use clap::{Arg, ArgAction, ArgMatches, Command, value_parser};
-use ebi_arithmetic::{exact::set_exact_globally, Fraction, parsing::FractionNotParsedYet};
+use ebi_arithmetic::{Fraction, exact::set_exact_globally, parsing::FractionNotParsedYet};
+use ebi_objects::EbiObjectType;
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
 use logging_timer::timer;
@@ -748,6 +749,25 @@ impl Hash for EbiCommand {
     }
 }
 
+pub fn get_applicable_commands(object_type: &EbiObjectType) -> BTreeSet<Vec<&'static EbiCommand>> {
+    let mut result = EBI_COMMANDS.get_command_paths();
+    result.retain(|path| {
+        if let EbiCommand::Command { input_types, .. } = path[path.len() - 1] {
+            for input_typess in input_types.iter() {
+                for input_typesss in input_typess.iter() {
+                    if input_typesss == &&EbiInputType::AnyObject
+                        || input_typesss == &&EbiInputType::Object(object_type.clone())
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+        false
+    });
+    result
+}
+
 #[cfg(test)]
 mod tests {
     use std::{
@@ -762,12 +782,12 @@ mod tests {
         ebi_framework::{
             ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
             ebi_input::{self, EbiInput, EbiInputType},
-            ebi_object::EbiObject,
             ebi_trait::EbiTrait,
         },
         multiple_reader::MultipleReader,
     };
     use ebi_arithmetic::Fraction;
+    use ebi_objects::EbiObject;
     use itertools::Itertools;
     use ntest::timeout;
 

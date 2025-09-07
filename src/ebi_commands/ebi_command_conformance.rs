@@ -5,9 +5,8 @@ use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
-        ebi_object::EbiTraitObject,
         ebi_output::{EbiOutput, EbiOutputType},
-        ebi_trait::EbiTrait,
+        ebi_trait::EbiTrait, ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,

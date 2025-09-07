@@ -1,12 +1,14 @@
+use ebi_objects::{
+    EbiObject, EbiObjectType, ebi_objects::scalable_vector_graphics::ToSVG,
+};
+
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
-        ebi_object::{EbiObject, EbiObjectType},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_objects::scalable_vector_graphics::ScalableVectorGraphics,
     ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
 };
 
@@ -75,8 +77,9 @@ pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command {
         let result: Box<dyn EbiTraitGraphable + 'static> =
             inputs.remove(0).to_type::<dyn EbiTraitGraphable>()?;
 
-        let svg = ScalableVectorGraphics::from_graphable(result)?;
-        return Ok(EbiOutput::Object(EbiObject::ScalableVectorGraphics(svg)));
+        return Ok(EbiOutput::Object(EbiObject::ScalableVectorGraphics(
+            result.to_svg()?,
+        )));
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::ScalableVectorGraphics),
 };
@@ -84,20 +87,18 @@ pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command {
 #[cfg(test)]
 mod tests {
 
-    use ebi_arithmetic::{One, Fraction};
+    use ebi_arithmetic::{Fraction, One};
+    use ebi_objects::FiniteLanguage;
 
     use crate::{
         ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT,
+        ebi_file_handlers::stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
         ebi_framework::{
             ebi_command::EbiCommand,
             ebi_input::{
                 EbiInput, TEST_INPUT_TYPE_FRACTION, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE,
             },
-            ebi_object::EbiTraitObject,
-        },
-        ebi_objects::{
-            finite_language::FiniteLanguage,
-            stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
+            ebi_trait_object::EbiTraitObject,
         },
     };
 

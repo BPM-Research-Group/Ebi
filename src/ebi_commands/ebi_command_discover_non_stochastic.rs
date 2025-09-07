@@ -1,13 +1,13 @@
 use anyhow::Context;
+use ebi_objects::{EbiObject, EbiObjectType, HasActivityKey};
 
 use crate::{
     ebi_framework::{
-        activity_key::HasActivityKey,
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
-        ebi_object::{EbiObject, EbiObjectType, EbiTraitObject},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
+        ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage,
     techniques::{

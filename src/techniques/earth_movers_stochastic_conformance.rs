@@ -28,7 +28,7 @@ impl EarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
         &mut self,
         lang_b: &mut dyn EbiTraitFiniteStochasticLanguage,
     ) -> Result<Fraction> {
-        lang_b.translate_using_activity_key(self.get_activity_key_mut());
+        lang_b.translate_using_activity_key(self.activity_key_mut());
         let distances = WeightedDistanceMatrix::new(self, lang_b);
         let distances: Box<dyn WeightedDistances> = Box::new(distances);
         distances.earth_movers_stochastic_conformance()

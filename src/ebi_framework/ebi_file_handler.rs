@@ -1,9 +1,10 @@
 use anyhow::{Error, Result, anyhow};
+use ebi_objects::EbiObjectType;
 use std::{collections::BTreeSet, fmt::Display, hash::Hash, io::BufRead, str::FromStr};
 
 use crate::{
     ebi_commands::ebi_command_validate::EBI_VALIDATE,
-    ebi_objects::{
+    ebi_file_handlers::{
         compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
         deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
         directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
@@ -22,6 +23,7 @@ use crate::{
         stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
         stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE,
     },
+    ebi_framework::ebi_command::get_applicable_commands,
 };
 
 use super::{
@@ -82,7 +84,7 @@ impl EbiFileHandler {
             result.extend(importer.get_trait().get_applicable_commands());
         }
         for importer in self.object_importers {
-            result.extend(importer.get_type().get_applicable_commands());
+            result.extend(get_applicable_commands(&importer.get_type()));
         }
         if self.validator.is_some() {
             result.insert(vec![&EBI_COMMANDS, &EBI_VALIDATE]);
@@ -174,18 +176,31 @@ impl Display for EbiFileHandler {
     }
 }
 
+pub fn get_file_handlers(object_type: &EbiObjectType) -> Vec<&'static EbiFileHandler> {
+    let mut result = vec![];
+    for file_handler in EBI_FILE_HANDLERS.iter() {
+        for importer in file_handler.object_importers {
+            if &importer.get_type() == object_type {
+                result.push(file_handler);
+                break;
+            }
+        }
+    }
+    result
+}
+
 #[cfg(test)]
 mod tests {
     use std::str::FromStr;
 
     use crate::{
-        ebi_framework::{
-            ebi_file_handler::EbiFileHandler, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
-        },
-        ebi_objects::{
+        ebi_file_handlers::{
             executions::EBI_EXECUTIONS, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
             process_tree::EBI_PROCESS_TREE,
             stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
+        },
+        ebi_framework::{
+            ebi_file_handler::EbiFileHandler, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
         },
     };
 

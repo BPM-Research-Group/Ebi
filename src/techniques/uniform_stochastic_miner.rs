@@ -1,13 +1,9 @@
 use ebi_arithmetic::{Fraction, One};
-
-use crate::{
-    ebi_objects::{
-        labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        stochastic_process_tree::StochasticProcessTree,
-    },
-    ebi_traits::ebi_trait_semantics::Semantics,
+use ebi_objects::{
+    LabelledPetriNet, ProcessTree, StochasticLabelledPetriNet, StochasticProcessTree,
 };
+
+use crate::semantics::semantics::Semantics;
 
 pub trait UniformStochasticMinerLPN {
     fn mine_uniform_stochastic_lpn(self) -> StochasticLabelledPetriNet;
@@ -27,7 +23,7 @@ impl UniformStochasticMinerLPN for LabelledPetriNet {
 impl UniformStochasticMinerTree for ProcessTree {
     fn mine_uniform_stochastic_tree(self) -> StochasticProcessTree {
         let len = self.get_number_of_transitions() - 1;
-        (self, vec![Fraction::one(); len], Fraction::one()).into()
+        (self, vec![Fraction::one(); len], Fraction::one()).try_into().unwrap()
     }
 }
 
@@ -35,11 +31,10 @@ impl UniformStochasticMinerTree for ProcessTree {
 mod tests {
     use std::fs;
 
-    use crate::{
-        ebi_objects::{labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree},
-        techniques::uniform_stochastic_miner::{
-            UniformStochasticMinerLPN, UniformStochasticMinerTree,
-        },
+    use ebi_objects::{LabelledPetriNet, ProcessTree};
+
+    use crate::techniques::uniform_stochastic_miner::{
+        UniformStochasticMinerLPN, UniformStochasticMinerTree,
     };
 
     #[test]

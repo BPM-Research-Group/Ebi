@@ -1,8 +1,8 @@
 use anyhow::Result;
 use ebi_arithmetic::{Fraction, OneMinus, Signed, Zero};
+use ebi_objects::ActivityKeyTranslator;
 
 use crate::{
-    ebi_framework::activity_key::ActivityKeyTranslator,
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
@@ -28,9 +28,9 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
         &self,
         event_log2: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<RootLogDiv> {
-        let mut activity_key1 = self.get_activity_key().clone();
+        let mut activity_key1 = self.activity_key().clone();
         let translator =
-            ActivityKeyTranslator::new(&event_log2.get_activity_key(), &mut activity_key1);
+            ActivityKeyTranslator::new(&event_log2.activity_key(), &mut activity_key1);
 
         let mut sum = LogDiv::zero();
 
@@ -67,7 +67,7 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
         let mut sum4model = Fraction::zero();
         let mut sum4log = Fraction::zero();
         let translator =
-            ActivityKeyTranslator::new(self.get_activity_key(), language2.get_activity_key_mut());
+            ActivityKeyTranslator::new(self.activity_key(), language2.activity_key_mut());
 
         for (trace, probability1) in self.iter_trace_probability() {
             let probability2 = language2.get_probability(&FollowerSemantics::Trace(
@@ -95,12 +95,9 @@ mod tests {
     use std::fs;
 
     use ebi_arithmetic::{Fraction, ebi_number::Zero, f};
+    use ebi_objects::{EventLog, FiniteStochasticLanguage, StochasticLabelledPetriNet};
 
     use crate::{
-        ebi_objects::{
-            event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage,
-            stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        },
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         math::{log_div::LogDiv, root_log_div::RootLogDiv},
         techniques::jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,

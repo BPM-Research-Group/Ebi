@@ -1,7 +1,6 @@
 use std::collections::HashSet;
 
 use crate::{
-    ebi_framework::activity_key::{Activity, ActivityKeyTranslator},
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
@@ -11,6 +10,7 @@ use crate::{
 };
 use anyhow::{Context, Result};
 use ebi_arithmetic::{Fraction, One, Zero};
+use ebi_objects::{Activity, ActivityKeyTranslator};
 
 pub trait EntropicRelvance {
     fn entropic_relevance(
@@ -38,7 +38,7 @@ impl EntropicRelvance for dyn EbiTraitFiniteStochasticLanguage {
         };
 
         let translator =
-            ActivityKeyTranslator::new(self.get_activity_key(), model.get_activity_key_mut());
+            ActivityKeyTranslator::new(self.activity_key(), model.activity_key_mut());
         let sum_j = self.j(&mut model, number_of_activities_in_log, &translator)?;
 
         for (trace, log_probability) in self.iter_trace_probability() {
@@ -129,9 +129,9 @@ mod tests {
     use std::fs;
 
     use ebi_arithmetic::ebi_number::One;
+    use ebi_objects::{EventLog, FiniteStochasticLanguage};
 
     use crate::{
-        ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage},
         ebi_traits::{
             ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
             ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,

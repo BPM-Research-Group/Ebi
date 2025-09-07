@@ -1,5 +1,10 @@
 use anyhow::{Context, Error, Result, anyhow};
-use ebi_arithmetic::Fraction;
+use ebi_arithmetic::{Fraction, Zero};
+use ebi_objects::{
+    ActivityKeyTranslator, CompressedEventLog, DirectlyFollowsGraph, EventLog,
+    FiniteStochasticLanguage, HasActivityKey, Importable, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet,
+};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::{
     io::BufRead,
@@ -8,12 +13,8 @@ use std::{
 
 use crate::{
     ebi_framework::{
-        activity_key::{ActivityKeyTranslator, HasActivityKey},
-        ebi_command::EbiCommand,
-        ebi_input::EbiInput,
-        ebi_object::EbiTraitObject,
-        ebi_trait::FromEbiTraitObject,
-        importable::Importable,
+        ebi_command::EbiCommand, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
+        ebi_trait_object::EbiTraitObject,
     },
     follower_semantics::FollowerSemantics,
 };
@@ -34,13 +35,12 @@ pub trait EbiTraitQueriableStochasticLanguage: HasActivityKey + Sync {
         &mut self,
         log: Box<dyn EbiTraitFiniteLanguage>,
     ) -> Result<Fraction> {
-        let translator =
-            ActivityKeyTranslator::new(log.get_activity_key(), self.get_activity_key_mut());
+        let translator = ActivityKeyTranslator::new(log.activity_key(), self.activity_key_mut());
 
-        let progress_bar = EbiCommand::get_progress_bar_ticks(log.len());
+        let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
 
-        let sum = (0..log.len())
+        let sum = (0..log.number_of_traces())
             .into_par_iter()
             .filter_map(|trace_index| {
                 let trace = translator.translate_trace(log.get_trace(trace_index).unwrap());
@@ -87,28 +87,77 @@ impl FromEbiTraitObject for dyn EbiTraitQueriableStochasticLanguage {
     }
 }
 
-pub fn import<X: 'static + Importable + EbiTraitQueriableStochasticLanguage>(
-    reader: &mut dyn BufRead,
-) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>> {
-    match X::import(reader) {
-        Ok(x) => Ok(Box::new(x)),
-        Err(x) => Err(x),
+impl EbiTraitQueriableStochasticLanguage for FiniteStochasticLanguage {
+    fn get_probability(&self, follower: &FollowerSemantics) -> Result<Fraction> {
+        match follower {
+            FollowerSemantics::Trace(trace) => {
+                return match self.traces.get(*trace) {
+                    Some(x) => Ok(x.clone()),
+                    None => Ok(Fraction::zero()),
+                };
+            }
+        }
     }
 }
+
+pub trait ToQueriableStochasticLanguage: Importable + Sized {
+    fn to_queriable_stochastic_language(self) -> Box<dyn EbiTraitQueriableStochasticLanguage>;
+
+    fn import_as_queriable_stochastic_language(
+        reader: &mut dyn BufRead,
+    ) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>> {
+        Ok(Self::import(reader)?.to_queriable_stochastic_language())
+    }
+}
+
+impl<T> ToQueriableStochasticLanguage for T
+where
+    T: EbiTraitQueriableStochasticLanguage + Importable + 'static,
+{
+    fn to_queriable_stochastic_language(self) -> Box<dyn EbiTraitQueriableStochasticLanguage> {
+        Box::new(self)
+    }
+}
+
+macro_rules! queriable_via_slpn {
+    ($t:ident) => {
+        impl ToQueriableStochasticLanguage for $t {
+            fn to_queriable_stochastic_language(
+                self,
+            ) -> Box<dyn EbiTraitQueriableStochasticLanguage> {
+                let lpn: StochasticLabelledPetriNet = self.into();
+                Box::new(lpn)
+            }
+        }
+    };
+}
+
+macro_rules! queriable_via_slang {
+    ($t:ident) => {
+        impl ToQueriableStochasticLanguage for $t {
+            fn to_queriable_stochastic_language(
+                self,
+            ) -> Box<dyn EbiTraitQueriableStochasticLanguage> {
+                let lpn: FiniteStochasticLanguage = self.into();
+                Box::new(lpn)
+            }
+        }
+    };
+}
+
+queriable_via_slpn!(DirectlyFollowsGraph);
+queriable_via_slpn!(StochasticDirectlyFollowsModel);
+queriable_via_slang!(EventLog);
+queriable_via_slang!(CompressedEventLog);
 
 #[cfg(test)]
 mod tests {
     use std::fs;
 
     use ebi_arithmetic::{Fraction, Zero};
+    use ebi_objects::{FiniteLanguage, StochasticLabelledPetriNet};
 
-    use crate::{
-        ebi_objects::{
-            finite_language::FiniteLanguage,
-            stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        },
-        ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-    };
+    use crate::ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage;
 
     #[test]
     fn emsc() {

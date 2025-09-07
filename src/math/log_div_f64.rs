@@ -1,5 +1,6 @@
 use anyhow::{Result, anyhow};
 use ebi_arithmetic::{MaybeExact, One, Recip, Signed, Zero, fraction::fraction_f64::FractionF64};
+use ebi_objects::Infoable;
 use malachite::{Natural, base::num::arithmetic::traits::Pow, rational::Rational};
 use std::{
     fmt::Display,
@@ -7,7 +8,6 @@ use std::{
     ops::{Add, AddAssign, DivAssign, MulAssign, Sub, SubAssign},
 };
 
-use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct LogDivF64(FractionF64);
@@ -72,6 +72,13 @@ impl LogDivF64 {
 
     pub(crate) fn is_exact(&self) -> bool {
         false
+    }
+
+    pub fn export(&self, f: &mut dyn Write) -> Result<()> {
+        if self.is_exact() {
+            writeln!(f, "{}", self)?;
+        }
+        Ok(writeln!(f, "Approximately {:.4}", self.approximate())?)
     }
 }
 
@@ -178,22 +185,6 @@ impl DivAssign<FractionF64> for LogDivF64 {
 impl DivAssign<&FractionF64> for LogDivF64 {
     fn div_assign(&mut self, rhs: &FractionF64) {
         self.mul_assign(rhs.recip())
-    }
-}
-
-impl Exportable for LogDivF64 {
-    fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
-        match object {
-            EbiOutput::LogDiv(fr) => fr.export(f),
-            _ => unreachable!(),
-        }
-    }
-
-    fn export(&self, f: &mut dyn Write) -> Result<()> {
-        if self.is_exact() {
-            writeln!(f, "{}", self)?;
-        }
-        Ok(writeln!(f, "Approximately {:.4}", self.approximate())?)
     }
 }
 

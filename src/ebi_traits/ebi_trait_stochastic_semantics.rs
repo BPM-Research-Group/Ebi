@@ -1,16 +1,22 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::Fraction;
+use ebi_objects::{
+    ActivityKey, DirectlyFollowsGraph, EventLog, FiniteStochasticLanguage, HasActivityKey,
+    Importable, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticProcessTree, TranslateActivityKey,
+    ebi_objects::compressed_event_log::CompressedEventLog,
+};
 use std::io::BufRead;
 
 use crate::{
     ebi_framework::{
-        activity_key::ActivityKey, ebi_input::EbiInput, ebi_object::EbiTraitObject,
-        ebi_trait::FromEbiTraitObject, importable::Importable,
+        ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
     },
-    ebi_objects::{labelled_petri_net::LPNMarking, stochastic_process_tree_semantics::NodeStates},
+    semantics::{
+        finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
+        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
+    },
+    stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
-
-use super::ebi_trait_semantics::Semantics;
 
 pub enum EbiTraitStochasticSemantics {
     Usize(Box<dyn StochasticSemantics<StoSemState = usize, SemState = usize, AliState = usize>>),
@@ -47,52 +53,39 @@ impl FromEbiTraitObject for EbiTraitStochasticSemantics {
     }
 }
 
-impl EbiTraitStochasticSemantics {
-    pub fn get_activity_key(&self) -> &ActivityKey {
+impl HasActivityKey for EbiTraitStochasticSemantics {
+    fn activity_key(&self) -> &ActivityKey {
         match self {
-            EbiTraitStochasticSemantics::Marking(sem) => sem.get_activity_key(),
-            EbiTraitStochasticSemantics::Usize(sem) => sem.get_activity_key(),
-            EbiTraitStochasticSemantics::NodeStates(sem) => sem.get_activity_key(),
+            EbiTraitStochasticSemantics::Marking(semantics) => semantics.activity_key(),
+            EbiTraitStochasticSemantics::Usize(semantics) => semantics.activity_key(),
+            EbiTraitStochasticSemantics::NodeStates(semantics) => semantics.activity_key(),
         }
     }
 
-    pub fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
+    fn activity_key_mut(&mut self) -> &mut ActivityKey {
         match self {
-            EbiTraitStochasticSemantics::Marking(sem) => sem.get_activity_key_mut(),
-            EbiTraitStochasticSemantics::Usize(sem) => sem.get_activity_key_mut(),
-            EbiTraitStochasticSemantics::NodeStates(sem) => sem.get_activity_key_mut(),
+            EbiTraitStochasticSemantics::Marking(semantics) => semantics.activity_key_mut(),
+            EbiTraitStochasticSemantics::Usize(semantics) => semantics.activity_key_mut(),
+            EbiTraitStochasticSemantics::NodeStates(semantics) => semantics.activity_key_mut(),
         }
     }
 }
 
-pub trait StochasticSemantics:
-    Semantics<SemState = <Self as StochasticSemantics>::StoSemState>
-{
-    type StoSemState;
-
-    /**
-     *
-     * @param transition
-     * @return the weight of the transition. This might depend on the state.
-     */
-    fn get_transition_weight(
-        &self,
-        state: &<Self as StochasticSemantics>::StoSemState,
-        transition: TransitionIndex,
-    ) -> &Fraction;
-
-    /**
-     *
-     * @param enabledTransitions
-     * @return the sum of the weight of the enabled transitions
-     */
-    fn get_total_weight_of_enabled_transitions(
-        &self,
-        state: &<Self as StochasticSemantics>::StoSemState,
-    ) -> anyhow::Result<Fraction>;
+impl TranslateActivityKey for EbiTraitStochasticSemantics {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        match self {
+            EbiTraitStochasticSemantics::Marking(semantics) => {
+                semantics.translate_using_activity_key(to_activity_key)
+            }
+            EbiTraitStochasticSemantics::Usize(semantics) => {
+                semantics.translate_using_activity_key(to_activity_key)
+            }
+            EbiTraitStochasticSemantics::NodeStates(semantics) => {
+                semantics.translate_using_activity_key(to_activity_key)
+            }
+        }
+    }
 }
-
-pub type TransitionIndex = usize;
 
 pub trait ToStochasticSemantics: Importable + Sized {
     fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics;
@@ -101,5 +94,56 @@ pub trait ToStochasticSemantics: Importable + Sized {
         reader: &mut dyn BufRead,
     ) -> Result<EbiTraitStochasticSemantics> {
         Ok(Self::import(reader)?.to_stochastic_semantics())
+    }
+}
+
+impl ToStochasticSemantics for CompressedEventLog {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        self.log.to_stochastic_semantics()
+    }
+}
+
+impl ToStochasticSemantics for StochasticProcessTree {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        EbiTraitStochasticSemantics::NodeStates(Box::new(self))
+    }
+}
+
+impl ToStochasticSemantics for StochasticLabelledPetriNet {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        EbiTraitStochasticSemantics::Marking(Box::new(self))
+    }
+}
+
+impl ToStochasticSemantics for DirectlyFollowsGraph {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        let dfm: StochasticDirectlyFollowsModel = self.into();
+        EbiTraitStochasticSemantics::Usize(Box::new(dfm))
+    }
+}
+
+impl ToStochasticSemantics for StochasticDirectlyFollowsModel {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        EbiTraitStochasticSemantics::Usize(Box::new(self))
+    }
+}
+
+impl ToStochasticSemantics for StochasticDeterministicFiniteAutomaton {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        EbiTraitStochasticSemantics::Usize(Box::new(self))
+    }
+}
+
+impl ToStochasticSemantics for EventLog {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        Into::<FiniteStochasticLanguage>::into(self).to_stochastic_semantics()
+    }
+}
+
+impl ToStochasticSemantics for FiniteStochasticLanguage {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        EbiTraitStochasticSemantics::Usize(Box::new(
+            FiniteStochasticLanguageSemantics::from_language(&self),
+        ))
     }
 }

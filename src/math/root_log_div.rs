@@ -1,8 +1,5 @@
-use anyhow::Result;
 use ebi_arithmetic::{Fraction, OneMinus, Sqrt};
 use std::fmt::Display;
-
-use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable};
 
 use super::log_div::LogDiv;
 
@@ -33,17 +30,8 @@ impl RootLogDiv {
         }
         r
     }
-}
 
-impl Exportable for RootLogDiv {
-    fn export_from_object(object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
-        match object {
-            EbiOutput::RootLogDiv(fr) => fr.export(f),
-            _ => unreachable!(),
-        }
-    }
-
-    fn export(&self, f: &mut dyn std::io::Write) -> anyhow::Result<()> {
+    pub fn export(&self, f: &mut dyn std::io::Write) -> anyhow::Result<()> {
         if self.one_minus {
             write!(f, "1-")?;
         }

@@ -81,7 +81,7 @@ impl dyn EbiTraitEventLog {
     ) -> Result<ContainsRoot> {
         //gather pairs
         let mut pairs = vec![];
-        for trace_index in 0..self.len() {
+        for trace_index in 0..self.number_of_traces() {
             if let Some(t) = self.get_trace_attribute_time(trace_index, case_attribute) {
                 pairs.push(t);
             }
@@ -122,11 +122,11 @@ impl dyn EbiTraitEventLog {
         case_attribute: &String,
         number_of_samples: usize,
     ) -> Result<ContainsRoot> {
-        let sample_size = self.len();
+        let sample_size = self.number_of_traces();
 
         //gather pairs
         let mut pairs = vec![];
-        for trace_index in 0..self.len() {
+        for trace_index in 0..self.number_of_traces() {
             if let Some(t) = self.get_trace_attribute_categorical(trace_index, case_attribute) {
                 pairs.push((t, trace_index));
             }
@@ -201,7 +201,7 @@ impl dyn EbiTraitEventLog {
     ) -> Result<ContainsRoot> {
         //gather pairs
         let mut pairs = vec![];
-        for trace_index in 0..self.len() {
+        for trace_index in 0..self.number_of_traces() {
             if let Some(t) = self.get_trace_attribute_numeric(trace_index, case_attribute) {
                 pairs.push((t, trace_index));
             }
@@ -303,9 +303,10 @@ impl<'a> Iterator for SamplePairsSpaceIterator<'a> {
 mod tests {
     use std::fs;
 
+    use ebi_objects::EventLog;
+
     use crate::{
-        ebi_objects::event_log::EventLog, ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
-        techniques::association::Associations,
+        ebi_traits::ebi_trait_event_log::EbiTraitEventLog, techniques::association::Associations,
     };
 
     #[test]

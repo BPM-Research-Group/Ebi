@@ -1,32 +1,14 @@
-pub mod conversions {
-    pub mod to_compressed_event_log;
-    pub mod to_deterministic_finite_automaton;
-    pub mod to_directly_follows_model;
-    pub mod to_event_log;
-    pub mod to_finite_language;
-    pub mod to_finite_stochastic_language;
-    pub mod to_labelled_petri_net;
-    pub mod to_language_of_alignments;
-    pub mod to_lola_net;
-    pub mod to_petri_net_markup_language;
-    pub mod to_process_tree;
-    pub mod to_stochastic_deterministic_finite_automaton;
-    pub mod to_stochastic_directly_follows_model;
-    pub mod to_stochastic_labelled_petri_net;
-}
 pub mod ebi_framework {
-    pub mod activity_key;
     pub mod displayable;
     pub mod ebi_command;
     pub mod ebi_file_handler;
     pub mod ebi_input;
-    pub mod ebi_object;
     pub mod ebi_output;
     pub mod ebi_trait;
-    pub mod exportable;
-    pub mod importable;
-    pub mod infoable;
+    pub mod ebi_trait_object;
+    pub mod object_importers;
     pub mod prom_link;
+    pub mod validate;
     // pub mod pm4py_link;
 }
 pub mod ebi_commands {
@@ -46,19 +28,16 @@ pub mod ebi_commands {
     pub mod ebi_command_validate;
     pub mod ebi_command_visualise;
 }
-pub mod ebi_objects {
+pub mod ebi_file_handlers {
     pub mod compressed_event_log;
     pub mod deterministic_finite_automaton;
     pub mod directly_follows_graph;
-    pub mod directly_follows_graph_semantics;
     pub mod directly_follows_model;
     pub mod event_log;
     pub mod executions;
     pub mod finite_language;
     pub mod finite_stochastic_language;
-    pub mod finite_stochastic_language_semantics;
     pub mod labelled_petri_net;
-    pub mod labelled_petri_net_semantics;
     pub mod language_of_alignments;
     pub mod lola_net;
     pub mod petri_net_markup_language;
@@ -67,14 +46,10 @@ pub mod ebi_objects {
     pub mod process_tree_markup_language;
     pub mod scalable_vector_graphics;
     pub mod stochastic_deterministic_finite_automaton;
-    pub mod stochastic_deterministic_finite_automaton_semantics;
-    pub mod stochastic_directly_follows_graph_semantics;
     pub mod stochastic_directly_follows_model;
     pub mod stochastic_labelled_petri_net;
-    pub mod stochastic_labelled_petri_net_semantics;
     pub mod stochastic_language_of_alignments;
     pub mod stochastic_process_tree;
-    pub mod stochastic_process_tree_semantics;
 }
 pub mod ebi_traits {
     pub mod ebi_trait_activities;
@@ -131,7 +106,25 @@ pub mod math {
     pub mod root;
     pub mod root_log_div;
 }
-
+pub mod semantics {
+    pub mod directly_follows_graph_semantics;
+    pub mod finite_stochastic_language_semantics;
+    pub mod labelled_petri_net_semantics;
+    pub mod process_tree_semantics;
+    pub mod semantics;
+    pub mod stochastic_deterministic_finite_automaton_semantics;
+    pub mod stochastic_directly_follows_graph_semantics;
+    pub mod stochastic_labelled_petri_net_semantics;
+    pub mod stochastic_process_tree_semantics;
+}
+pub mod stochastic_semantics {
+    pub mod finite_stochastic_language_semantics;
+    pub mod stochastic_deterministic_finite_automaton_semantics;
+    pub mod stochastic_directly_follows_graph_semantics;
+    pub mod stochastic_labelled_petri_net_semantics;
+    pub mod stochastic_process_tree_semantics;
+    pub mod stochastic_semantics;
+}
 pub mod techniques {
     pub mod align;
     pub mod alignment_stochastic_miner;
@@ -168,6 +161,7 @@ pub mod techniques {
     pub mod infinitely_many_traces;
     pub mod jensen_shannon_stochastic_conformance;
     pub mod livelock;
+    pub mod medoid;
     pub mod medoid_non_stochastic;
     pub mod non_decreasing_livelock;
     pub mod occurrences_stochastic_miner;
@@ -180,12 +174,10 @@ pub mod techniques {
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
-    pub mod medoid;
 }
 pub mod follower_semantics;
 pub mod json;
 pub mod line_reader;
-pub mod marking;
 pub mod multiple_reader;
 pub mod tests;
 pub mod text;

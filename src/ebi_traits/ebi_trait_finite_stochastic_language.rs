@@ -1,16 +1,13 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::Fraction;
+use ebi_arithmetic::{Fraction, Zero};
+use ebi_objects::{
+    Activity, Importable, TranslateActivityKey,
+    ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
+};
 use std::{fmt::Debug, io::BufRead};
 
-use crate::{
-    ebi_framework::{
-        activity_key::{Activity, ActivityKey, TranslateActivityKey},
-        ebi_input::EbiInput,
-        ebi_object::EbiTraitObject,
-        ebi_trait::FromEbiTraitObject,
-        importable::Importable,
-    },
-    ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
+use crate::ebi_framework::{
+    ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
 };
 
 use super::{
@@ -22,9 +19,6 @@ pub trait EbiTraitFiniteStochasticLanguage:
     EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync + Debug + TranslateActivityKey
 {
     fn get_probability_sum(&self) -> Fraction;
-
-    // necessary for translations where order traces must be maintained
-    fn translate(&mut self, target_activity_key: &mut ActivityKey);
 
     fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage;
 
@@ -53,11 +47,44 @@ impl FromEbiTraitObject for dyn EbiTraitFiniteStochasticLanguage {
     }
 }
 
-pub fn import<X: 'static + Importable + EbiTraitFiniteStochasticLanguage>(
-    reader: &mut dyn BufRead,
-) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>> {
-    match X::import(reader) {
-        Ok(x) => Ok(Box::new(x)),
-        Err(x) => Err(x),
+impl EbiTraitFiniteStochasticLanguage for FiniteStochasticLanguage {
+    fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage {
+        self.clone()
+    }
+
+    fn get_probability_sum(&self) -> Fraction {
+        self.traces.values().fold(Fraction::zero(), |mut x, y| {
+            x += y;
+            x
+        })
+    }
+
+    fn retain_traces<'a>(
+        &'a mut self,
+        f: Box<dyn Fn(&Vec<Activity>, &mut Fraction) -> bool + 'static>,
+    ) {
+        self.traces.retain(f);
+    }
+}
+
+pub trait ToFiniteStochasticLanguage: Importable {
+    fn to_finite_stochastic_language(self) -> Box<dyn EbiTraitFiniteStochasticLanguage>;
+
+    fn import_as_finite_stochastic_language(
+        reader: &mut dyn BufRead,
+    ) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>>
+    where
+        Self: Sized,
+    {
+        Ok(Self::import(reader)?.to_finite_stochastic_language())
+    }
+}
+
+impl<T> ToFiniteStochasticLanguage for T
+where
+    T: Into<FiniteStochasticLanguage> + Importable,
+{
+    fn to_finite_stochastic_language(self) -> Box<dyn EbiTraitFiniteStochasticLanguage> {
+        Box::new(Into::<FiniteStochasticLanguage>::into(self))
     }
 }

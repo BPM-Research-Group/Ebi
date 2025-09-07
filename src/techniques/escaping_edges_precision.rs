@@ -1,15 +1,12 @@
 use std::collections::{HashMap, hash_map::Entry};
 
 use crate::{
-    ebi_framework::displayable::Displayable,
-    ebi_objects::{
-        language_of_alignments::Move,
-        stochastic_language_of_alignments::StochasticLanguageOfAlignments,
-    },
-    ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics},
+    ebi_framework::displayable::Displayable, ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
+    semantics::semantics::Semantics,
 };
 use anyhow::{Context, Result, anyhow};
 use ebi_arithmetic::{Fraction, Zero};
+use ebi_objects::{StochasticLanguageOfAlignments, ebi_objects::language_of_alignments::Move};
 
 pub const UNMATCHING: &str = "alignments and model do not belong to one another";
 
@@ -147,14 +144,9 @@ mod tests {
     use std::fs;
 
     use ebi_arithmetic::Fraction;
+    use ebi_objects::{StochasticDeterministicFiniteAutomaton, StochasticLanguageOfAlignments};
 
-    use crate::{
-        ebi_objects::{
-            stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-            stochastic_language_of_alignments::StochasticLanguageOfAlignments,
-        },
-        techniques::escaping_edges_precision::EscapingEdgesPrecision,
-    };
+    use crate::techniques::escaping_edges_precision::EscapingEdgesPrecision;
 
     #[test]
     fn precision_test() {

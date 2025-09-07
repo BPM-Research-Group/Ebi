@@ -1,6 +1,6 @@
 use rand_chacha::rand_core::{RngCore, SeedableRng};
 
-use crate::ebi_objects::event_log::EventLog;
+use ebi_objects::EventLog;
 
 pub trait FoldsSampler {
     /// Peform fold splitting:
@@ -21,21 +21,20 @@ impl FoldsSampler for EventLog {
 mod tests {
     use std::fs;
 
-    use crate::{
-        ebi_objects::event_log::EventLog, ebi_traits::ebi_trait_event_log::IndexTrace,
-        techniques::sample_folds::FoldsSampler,
-    };
+    use ebi_objects::{EventLog, IndexTrace};
+
+    use crate::techniques::sample_folds::FoldsSampler;
 
     #[test]
     fn sample_folds() {
         let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
         let mut log = fin.parse::<EventLog>().unwrap();
         log.sample_folds(2, 10, 0);
-        assert_eq!(log.len(), 0);
+        assert_eq!(log.number_of_traces(), 0);
 
         let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
         let mut log = fin.parse::<EventLog>().unwrap();
         log.sample_folds(2, 10, 1);
-        assert_eq!(log.len(), 2);
+        assert_eq!(log.number_of_traces(), 2);
     }
 }

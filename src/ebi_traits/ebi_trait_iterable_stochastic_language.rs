@@ -1,10 +1,10 @@
 use anyhow::{Result, anyhow};
 use ebi_arithmetic::Fraction;
+use ebi_objects::{Activity, FiniteStochasticLanguage, Importable};
 use std::io::BufRead;
 
 use crate::ebi_framework::{
-    activity_key::Activity, ebi_input::EbiInput, ebi_object::EbiTraitObject,
-    ebi_trait::FromEbiTraitObject, importable::Importable,
+    ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
 };
 
 pub trait EbiTraitIterableStochasticLanguage {
@@ -19,7 +19,7 @@ impl FromEbiTraitObject for dyn EbiTraitIterableStochasticLanguage {
         match object {
             EbiInput::Trait(EbiTraitObject::IterableStochasticLanguage(e), _) => Ok(e),
             _ => Err(anyhow!(
-                "Cannot read {} {} as an iterable stochastic language.",
+                "cannot read {} {} as an iterable stochastic language",
                 object.get_type().get_article(),
                 object.get_type()
             )),
@@ -27,11 +27,34 @@ impl FromEbiTraitObject for dyn EbiTraitIterableStochasticLanguage {
     }
 }
 
-pub fn import<X: 'static + Importable + EbiTraitIterableStochasticLanguage>(
-    reader: &mut dyn BufRead,
-) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>> {
-    match X::import(reader) {
-        Ok(x) => Ok(Box::new(x)),
-        Err(x) => Err(x),
+impl EbiTraitIterableStochasticLanguage for FiniteStochasticLanguage {
+    fn iter_trace_probability(&self) -> Box<dyn Iterator<Item = (&Vec<Activity>, &Fraction)> + '_> {
+        Box::new(self.traces.iter())
+    }
+
+    fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction> {
+        Some(self.traces.iter().nth(trace_index)?.1)
+    }
+}
+
+pub trait ToIterableStochasticLanguage: Importable {
+    fn to_iterable_stochastic_language(self) -> Box<dyn EbiTraitIterableStochasticLanguage>;
+
+    fn import_as_iterable_stochastic_language(
+        reader: &mut dyn BufRead,
+    ) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>>
+    where
+        Self: Sized,
+    {
+        Ok(Self::import(reader)?.to_iterable_stochastic_language())
+    }
+}
+
+impl<T> ToIterableStochasticLanguage for T
+where
+    T: Into<FiniteStochasticLanguage> + Importable,
+{
+    fn to_iterable_stochastic_language(self) -> Box<dyn EbiTraitIterableStochasticLanguage> {
+        Box::new(Into::<FiniteStochasticLanguage>::into(self))
     }
 }

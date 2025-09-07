@@ -22,12 +22,11 @@ exactarithmetic = [ "eexactarithmetic", "ebi_arithmetic/exactarithmetic" ]
 approximatearithmetic = [ "eapproximatearithmetic", "ebi_arithmetic/approximatearithmetic" ]
 eapproximatearithmetic = []
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-ebi_arithmetic = "0.2.22"
-ebi_optimisation = "0.0.9"
-ebi_derive = "0.1.0"
+ebi_derive = "0.2.2"
+ebi_arithmetic = "0.2.23"
+ebi_optimisation = "0.0.10"
+ebi_objects = "0.0.9"
 bitvec = "1.0.1"
 clap = { version = "4.5.47", features = ["derive", "cargo", "string"] }
 anyhow = "1.0.98"
@@ -63,9 +62,7 @@ ntest = "0.9.3"
 regex = "1.11.1"
 quick-xml = {version="0.38.3", features=["serialize"]}
 malachite = "0.6.1"
-
-[dependencies.num-rational]
-version = "0.4.1"
+pastey = "0.1.1"
 
 [profile.release]
 debug = false

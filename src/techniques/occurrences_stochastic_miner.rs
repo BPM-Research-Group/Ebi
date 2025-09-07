@@ -1,19 +1,13 @@
 use std::collections::HashMap;
 
 use ebi_arithmetic::{Fraction, One, Zero};
+use ebi_objects::{
+    ebi_objects::process_tree::Node, ActivityKeyTranslator, HasActivityKey, LabelledPetriNet, ProcessTree, StochasticLabelledPetriNet, StochasticProcessTree
+};
 
 use crate::{
-    ebi_framework::activity_key::{ActivityKeyTranslator, HasActivityKey},
-    ebi_objects::{
-        labelled_petri_net::LabelledPetriNet,
-        process_tree::{Node, ProcessTree},
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        stochastic_process_tree::StochasticProcessTree,
-    },
-    ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_semantics::Semantics,
-    },
+    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    semantics::semantics::Semantics,
 };
 
 pub trait OccurrencesStochasticMinerLPN {
@@ -36,10 +30,10 @@ impl OccurrencesStochasticMinerLPN for LabelledPetriNet {
         language: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> StochasticLabelledPetriNet {
         let translator =
-            ActivityKeyTranslator::new(language.get_activity_key(), self.get_activity_key_mut());
+            ActivityKeyTranslator::new(language.activity_key(), self.activity_key_mut());
 
         let mut model_activity2frequency = HashMap::new();
-        for activity in self.get_activity_key().get_activities() {
+        for activity in self.activity_key().get_activities() {
             model_activity2frequency.insert(*activity, Fraction::zero());
         }
         for (trace, probability) in language.iter_trace_probability() {
@@ -77,10 +71,10 @@ impl OccurrencesStochasticMinerTree for ProcessTree {
         language: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> StochasticProcessTree {
         let translator =
-            ActivityKeyTranslator::new(language.get_activity_key(), self.get_activity_key_mut());
+            ActivityKeyTranslator::new(language.activity_key(), self.activity_key_mut());
 
         let mut model_activity2frequency = HashMap::new();
-        for activity in self.get_activity_key().get_activities() {
+        for activity in self.activity_key().get_activities() {
             model_activity2frequency.insert(*activity, Fraction::zero());
         }
         for (trace, probability) in language.iter_trace_probability() {
@@ -112,7 +106,7 @@ impl OccurrencesStochasticMinerTree for ProcessTree {
             }
         }
 
-        (self, weights, Fraction::one()).into()
+        (self, weights, Fraction::one()).try_into().unwrap()
     }
 }
 
@@ -121,10 +115,7 @@ mod tests {
     use std::fs;
 
     use ebi_arithmetic::exact::is_exact_globally;
-
-    use crate::ebi_objects::{
-        finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet,
-    };
+    use ebi_objects::{FiniteStochasticLanguage, LabelledPetriNet};
 
     use super::OccurrencesStochasticMinerLPN;
 

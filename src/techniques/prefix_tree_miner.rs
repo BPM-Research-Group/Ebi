@@ -1,13 +1,11 @@
 use ebi_arithmetic::ebi_number::Zero;
+use ebi_objects::{
+    DeterministicFiniteAutomaton, ProcessTree,
+    ebi_objects::process_tree::{Node, Operator},
+};
 
 use crate::{
-    ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton,
-        process_tree::{Node, Operator, ProcessTree},
-    },
-    ebi_traits::{
-        ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::Semantics,
-    },
+    ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage, semantics::semantics::Semantics,
 };
 
 pub trait PrefixTreeMinerDFA {
@@ -21,9 +19,9 @@ pub trait PrefixTreeMinerTree {
 impl PrefixTreeMinerDFA for dyn EbiTraitFiniteLanguage {
     fn mine_prefix_tree_dfa(&self) -> DeterministicFiniteAutomaton {
         let mut result = DeterministicFiniteAutomaton::new();
-        result.set_activity_key(self.get_activity_key().clone());
+        result.set_activity_key(self.activity_key().clone());
 
-        if self.len().is_zero() {
+        if self.number_of_traces().is_zero() {
             result.set_initial_state(None);
         } else {
             for trace in self.iter() {
@@ -43,11 +41,11 @@ impl PrefixTreeMinerDFA for dyn EbiTraitFiniteLanguage {
 
 impl PrefixTreeMinerTree for dyn EbiTraitFiniteLanguage {
     fn mine_prefix_tree_tree(&self) -> ProcessTree {
-        if self.len().is_zero() {
+        if self.number_of_traces().is_zero() {
             //empty language; empty tree
-            return (self.get_activity_key().clone(), vec![]).into();
+            return (self.activity_key().clone(), vec![]).into();
         } else {
-            let mut tree = vec![Node::Operator(Operator::Xor, self.len())];
+            let mut tree = vec![Node::Operator(Operator::Xor, self.number_of_traces())];
 
             for trace in self.iter() {
                 if trace.len().is_zero() {
@@ -65,7 +63,7 @@ impl PrefixTreeMinerTree for dyn EbiTraitFiniteLanguage {
                 }
             }
 
-            return (self.get_activity_key().clone(), tree).into();
+            return (self.activity_key().clone(), tree).into();
         }
     }
 }

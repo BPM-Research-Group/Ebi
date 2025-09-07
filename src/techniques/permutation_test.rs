@@ -63,7 +63,7 @@ impl PermutationTest for dyn EbiTraitFiniteStochasticLanguage {
                 let resample_cache = resample_cache.as_ref();
 
                 //create the sample
-                let sample = self.resample(resample_cache, self.len());
+                let sample = self.resample(resample_cache, self.number_of_traces());
                 sample
                     .into_iter()
                     .enumerate()

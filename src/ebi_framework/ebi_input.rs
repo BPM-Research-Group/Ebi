@@ -1,6 +1,7 @@
 use anyhow::{Context, Result, anyhow};
 use clap::{ArgMatches, builder::ValueParser, value_parser};
 use ebi_arithmetic::{Fraction, parsing::FractionNotParsedYet};
+use ebi_objects::{EbiObject, EbiObjectType};
 use std::{
     collections::{BTreeSet, HashSet},
     fmt::Display,
@@ -11,7 +12,10 @@ use std::{
 use strum_macros::EnumIter;
 
 use crate::{
-    ebi_framework::ebi_file_handler::EbiFileHandler,
+    ebi_framework::{
+        ebi_file_handler::{EbiFileHandler, get_file_handlers},
+        ebi_trait_object::EbiTraitObject,
+    },
     ebi_traits::{
         ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
@@ -33,9 +37,7 @@ use crate::{
 use super::{
     ebi_command::{EBI_COMMANDS, EbiCommand},
     ebi_file_handler::EBI_FILE_HANDLERS,
-    ebi_object::{EbiObject, EbiObjectType, EbiTraitObject},
     ebi_trait::{EbiTrait, FromEbiTraitObject},
-    importable::Importable,
     prom_link::{
         JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE,
         JavaObjectHandler,
@@ -138,7 +140,7 @@ impl EbiInputType {
     pub fn get_java_object_handlers(&self) -> Vec<&JavaObjectHandler> {
         match self {
             EbiInputType::Trait(t) => Self::get_file_handlers_java(t.get_file_handlers()),
-            EbiInputType::Object(o) => Self::get_file_handlers_java(o.get_file_handlers()),
+            EbiInputType::Object(o) => Self::get_file_handlers_java(get_file_handlers(o)),
             EbiInputType::AnyObject => {
                 Self::get_file_handlers_java(EBI_FILE_HANDLERS.iter().collect())
             }
@@ -183,7 +185,7 @@ impl EbiInputType {
                     result.extend(Self::show_file_handlers(t.get_file_handlers()));
                 }
                 EbiInputType::Object(o) => {
-                    result.extend(Self::show_file_handlers(o.get_file_handlers()));
+                    result.extend(Self::show_file_handlers(get_file_handlers(o)));
                 }
                 EbiInputType::AnyObject => {
                     result.extend(Self::show_file_handlers(EBI_FILE_HANDLERS.iter().collect()));
@@ -250,7 +252,7 @@ impl EbiInputType {
                     result.extend(Self::show_file_handlers_latex(t.get_file_handlers()));
                 }
                 EbiInputType::Object(o) => {
-                    result.extend(Self::show_file_handlers_latex(o.get_file_handlers()));
+                    result.extend(Self::show_file_handlers_latex(get_file_handlers(o)));
                 }
                 EbiInputType::AnyObject => {
                     result.extend(Self::show_file_handlers_latex(
@@ -584,16 +586,6 @@ impl Display for EbiObjectImporter {
     }
 }
 
-/**
- * This is a convenience method: if the object can be imported, then it validates.
- */
-pub fn validate<X: Importable>(reader: &mut dyn BufRead) -> Result<()> {
-    match X::import(reader) {
-        Ok(_) => Ok(()),
-        Err(x) => Err(x),
-    }
-}
-
 pub fn get_reader_file(from_file: &PathBuf) -> Result<MultipleReader> {
     if from_file.as_os_str() == "-" {
         return MultipleReader::from_stdin();
@@ -708,15 +700,15 @@ mod tests {
         path::PathBuf,
     };
 
-    use ebi_arithmetic::{Zero, Fraction};
+    use ebi_arithmetic::{Fraction, Zero};
     use strum::IntoEnumIterator;
 
     use crate::{
+        ebi_file_handlers::compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
         ebi_framework::{
             ebi_file_handler::EBI_FILE_HANDLERS,
             ebi_input::{EbiInput, TEST_INPUT_TYPE_FRACTION, TEST_INPUT_TYPE_USIZE},
         },
-        ebi_objects::compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
         multiple_reader::MultipleReader,
     };
 

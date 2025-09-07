@@ -5,6 +5,7 @@ use ebi_arithmetic::{
     exact::MaybeExact,
     fraction::{fraction::APPROX_DIGITS, fraction_exact::FractionExact},
 };
+use ebi_objects::Infoable;
 use fraction::Sign;
 use malachite::{
     Natural,
@@ -22,8 +23,6 @@ use std::{
     mem,
     ops::{Add, AddAssign, DivAssign, MulAssign, Neg, Sub, SubAssign},
 };
-
-use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
 #[derive(Clone)]
 pub struct LogDivExact((Rational, Natural));
@@ -92,6 +91,13 @@ impl LogDivExact {
             .expect("overflow of u64: this is beyond the capability of computers");
 
         base.pow(p)
+    }
+
+    pub fn export(&self, f: &mut dyn Write) -> Result<()> {
+        if self.is_exact() {
+            writeln!(f, "{}", self)?;
+        }
+        Ok(writeln!(f, "Approximately {:.4}", self.approximate())?)
     }
 }
 
@@ -310,22 +316,6 @@ impl DivAssign<Fraction> for LogDivExact {
 impl DivAssign<&Fraction> for LogDivExact {
     fn div_assign(&mut self, rhs: &Fraction) {
         self.mul_assign(rhs.clone().recip())
-    }
-}
-
-impl Exportable for LogDivExact {
-    fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
-        match object {
-            EbiOutput::LogDiv(fr) => fr.export(f),
-            _ => unreachable!(),
-        }
-    }
-
-    fn export(&self, f: &mut dyn Write) -> Result<()> {
-        if self.is_exact() {
-            writeln!(f, "{}", self)?;
-        }
-        Ok(writeln!(f, "Approximately {:.4}", self.approximate())?)
     }
 }
 

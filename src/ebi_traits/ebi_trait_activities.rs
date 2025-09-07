@@ -1,10 +1,10 @@
 use std::io::BufRead;
 
 use crate::ebi_framework::{
-    activity_key::HasActivityKey, ebi_input::EbiInput, ebi_object::EbiTraitObject,
-    ebi_trait::FromEbiTraitObject, importable::Importable,
+    ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
 };
 use anyhow::{Result, anyhow};
+use ebi_objects::{HasActivityKey, Importable};
 
 pub trait EbiTraitActivities: HasActivityKey {}
 
@@ -23,11 +23,39 @@ impl FromEbiTraitObject for dyn EbiTraitActivities {
     }
 }
 
-pub fn import<X: 'static + Importable + EbiTraitActivities>(
-    reader: &mut dyn BufRead,
-) -> Result<Box<dyn EbiTraitActivities>> {
-    match X::import(reader) {
-        Ok(x) => Ok(Box::new(x)),
-        Err(x) => Err(x),
+pub trait ToActivities: Importable {
+    fn to_activities(self) -> Box<dyn EbiTraitActivities>;
+
+    fn import_as_activities(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitActivities>>
+    where
+        Self: Sized,
+    {
+        Ok(Self::import(reader)?.to_activities())
+    }
+}
+
+impl<T> ToActivities for T
+where
+    T: HasActivityKey + Importable + 'static,
+{
+    fn to_activities(self) -> Box<dyn EbiTraitActivities> {
+        Box::new(self)
+    }
+}
+
+#[cfg(test)]
+pub mod tests {
+
+    use crate::ebi_framework::{ebi_input::EbiInput, ebi_trait_object::EbiTraitObject};
+
+    #[test]
+    fn all_activities() {
+        for (input, _, _, _) in crate::tests::get_all_test_files() {
+            if let EbiInput::Trait(object, _) = input {
+                if let EbiTraitObject::Activities(object) = object {
+                    object.activity_key();
+                }
+            }
+        }
     }
 }

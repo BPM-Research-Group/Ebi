@@ -83,7 +83,6 @@ use crate::{
         ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
         ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
     },
-    ebi_objects::process_tree::EBI_PROCESS_TREE,
     multiple_reader::MultipleReader,
 };
 
@@ -171,6 +170,8 @@ pub fn should_file_be_tested(
     file_handler: &EbiFileHandler,
 ) -> bool {
     //special case: empty.ptree and empty_2.ptree cannot be imported as an LPN, but it is not invalid
+
+    use crate::ebi_file_handlers::process_tree::EBI_PROCESS_TREE;
     let special = if let EbiObjectImporter::LabelledPetriNet(_) = importer {
         true
     } else {
@@ -187,20 +188,29 @@ pub mod tests {
 
     use std::fs::{self, File};
 
+    use ebi_objects::{
+        DeterministicFiniteAutomaton, EbiObjectType, EventLog, FiniteLanguage, IndexTrace,
+        Infoable, PetriNetMarkupLanguage, ProcessTreeMarkupLanguage,
+        StochasticDeterministicFiniteAutomaton,
+    };
     use strum::IntoEnumIterator;
 
     use crate::{
         ebi_framework::{
+            ebi_file_handler::get_file_handlers,
             ebi_input::{EbiInput, TEST_INPUT_TYPE_STRING},
-            ebi_object::{EbiObjectType, EbiTraitObject},
             ebi_trait::FromEbiTraitObject,
-            infoable::Infoable,
+            ebi_trait_object::EbiTraitObject,
+            prom_link::{
+                get_java_object_handlers_that_can_export, get_java_object_handlers_that_can_import,
+            },
         },
-        ebi_objects::{
-            deterministic_finite_automaton::DeterministicFiniteAutomaton, event_log::EventLog, finite_language::FiniteLanguage, petri_net_markup_language::PetriNetMarkupLanguage, process_tree_markup_language::ProcessTreeMarkupLanguage, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton
+        ebi_traits::{
+            ebi_trait_event_log::EbiTraitEventLog,
+            ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
         },
-        ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, Semantics, ToSemantics},
         multiple_reader::MultipleReader,
+        semantics::semantics::Semantics,
     };
 
     #[test]
@@ -218,9 +228,9 @@ pub mod tests {
     fn object_types() {
         for object_type in EbiObjectType::iter() {
             object_type.get_article();
-            object_type.get_file_handlers();
-            object_type.get_java_object_handlers_that_can_export();
-            object_type.get_java_object_handlers_that_can_import();
+            get_file_handlers(&object_type);
+            get_java_object_handlers_that_can_export(&object_type);
+            get_java_object_handlers_that_can_import(&object_type);
         }
 
         let _ =
@@ -317,5 +327,17 @@ pub mod tests {
         } else {
             assert!(false);
         }
+    }
+
+    #[test]
+    fn len_retain() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let mut log = fin.parse::<EventLog>().unwrap();
+
+        assert_eq!(log.number_of_traces(), 2);
+
+        log.retain_traces(Box::new(|_| false));
+
+        assert_eq!(log.number_of_traces(), 0);
     }
 }

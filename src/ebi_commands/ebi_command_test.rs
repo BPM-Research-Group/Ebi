@@ -143,7 +143,7 @@ pub const EBI_BOOTSTRAP_TEST: EbiCommand = EbiCommand::Command {
         let number_of_samples = inputs.remove(0).to_type::<usize>()?;
         let p_value = inputs.remove(0).to_type::<Fraction>()?;
 
-        log1.translate_using_activity_key(log2.get_activity_key_mut());
+        log1.translate_using_activity_key(log2.activity_key_mut());
 
         let (value, sustained) = log1
             .bootstrap_test(log2.as_mut(), *number_of_samples, &p_value)

@@ -58,13 +58,13 @@ impl WeightedTriangularDistanceMatrix {
         log::info!("Compute triangular distances");
 
         // Pre-allocate the entire matrix
-        let mut distances = Vec::with_capacity(lang.len() - 1);
+        let mut distances = Vec::with_capacity(lang.number_of_traces() - 1);
 
         // Create thread pool with custom configuration
         let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
 
         // Create weights vectors
-        let weights_a = (0..lang.len())
+        let weights_a = (0..lang.number_of_traces())
             .filter_map(|trace_index| lang.get_trace_probability(trace_index))
             .cloned()
             .collect::<Vec<_>>();
@@ -73,16 +73,19 @@ impl WeightedTriangularDistanceMatrix {
         // log::debug!("weights_a {:?}", weights_a);
         // log::debug!("weights_b {:?}", weights_b);
 
-        let progress_bar =
-            EbiCommand::get_progress_bar_ticks((lang.len() * lang.len()).try_into().unwrap());
+        let progress_bar = EbiCommand::get_progress_bar_ticks(
+            (lang.number_of_traces() * lang.number_of_traces())
+                .try_into()
+                .unwrap(),
+        );
 
         // Compute in chunks for better cache utilisation
         pool.install(|| {
-            distances = (0..lang.len() - 1)
+            distances = (0..lang.number_of_traces() - 1)
                 .into_par_iter()
                 .map(|i| {
                     let trace_a = lang.get_trace(i).unwrap();
-                    let row: Vec<Arc<Fraction>> = (0..lang.len() - 1)
+                    let row: Vec<Arc<Fraction>> = (0..lang.number_of_traces() - 1)
                         .into_par_iter()
                         .map(|j| {
                             let trace_b = lang.get_trace(j).unwrap();

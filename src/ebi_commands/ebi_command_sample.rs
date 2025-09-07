@@ -1,14 +1,14 @@
 use anyhow::{Context, Result, anyhow};
+use ebi_objects::{EbiObject, EbiObjectType, EventLog, FiniteStochasticLanguage};
 
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
-        ebi_object::{EbiObject, EbiObjectType, EbiTraitObject},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
+        ebi_trait_object::EbiTraitObject,
     },
-    ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage},
     techniques::{sample::Sampler, sample_folds::FoldsSampler},
 };
 

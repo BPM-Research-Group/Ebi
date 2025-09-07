@@ -1,13 +1,12 @@
 use crate::{
-    ebi_framework::{activity_key::Activity, displayable::Displayable},
-    ebi_objects::language_of_alignments::LanguageOfAlignments,
-    ebi_traits::ebi_trait_stochastic_semantics::{
-        EbiTraitStochasticSemantics, StochasticSemantics,
-    },
+    ebi_framework::displayable::Displayable,
+    ebi_traits::ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
+    stochastic_semantics::stochastic_semantics::StochasticSemantics,
     techniques::align::transform_alignment,
 };
 use anyhow::{Result, anyhow};
 use ebi_arithmetic::{Fraction, One, OneMinus, Zero};
+use ebi_objects::{Activity, LanguageOfAlignments};
 use ebi_optimisation::astar;
 use std::ops::{Add, AddAssign};
 
@@ -198,7 +197,7 @@ impl<State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState =
             match astar::astar(&start, successors, heuristic, success) {
                 Some((path, _cost)) => {
                     let moves = transform_alignment(self, &trace, path)?;
-                    let mut alignments = LanguageOfAlignments::new(self.get_activity_key().clone());
+                    let mut alignments = LanguageOfAlignments::new(self.activity_key().clone());
                     alignments.push(moves);
                     // log::debug!("cost:{:.4},", cost, prefix_cost, prefix_probability);
                     Ok(alignments)

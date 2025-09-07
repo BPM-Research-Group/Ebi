@@ -1,13 +1,12 @@
 use anyhow::{Result, anyhow};
 use ebi_arithmetic::{Fraction, OneMinus, Signed, Sqrt, Zero};
+use ebi_objects::Infoable;
 use fraction::Sign;
 use std::{
     fmt::{Debug, Display},
     io::Write,
     ops::{Div, Mul, Neg},
 };
-
-use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
 #[derive(Clone)]
 pub struct ContainsRoot {
@@ -41,17 +40,8 @@ impl ContainsRoot {
             format!("-{:.4}", x)
         }
     }
-}
 
-impl Exportable for ContainsRoot {
-    fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
-        match object {
-            EbiOutput::ContainsRoot(fr) => fr.export(f),
-            _ => unreachable!(),
-        }
-    }
-
-    fn export(&self, f: &mut dyn Write) -> Result<()> {
+    pub fn export(&self, f: &mut dyn Write) -> Result<()> {
         writeln!(f, "{}", self)?;
         Ok(writeln!(f, "Approximately {:.4}", self.approximate())?)
     }

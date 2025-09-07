@@ -66,39 +66,42 @@ impl WeightedDistanceMatrix {
         log::info!("Compute distances");
 
         // Pre-allocate the entire matrix
-        let mut distances = Vec::with_capacity(lang_a.len());
+        let mut distances = Vec::with_capacity(lang_a.number_of_traces());
 
         // Create thread pool with custom configuration
         let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
 
         // Pre-fetch all traces to avoid repeated get_trace calls
-        let traces_a: Vec<_> = (0..lang_a.len())
+        let traces_a: Vec<_> = (0..lang_a.number_of_traces())
             .map(|i| lang_a.get_trace(i).unwrap())
             .collect();
-        let traces_b: Vec<_> = (0..lang_b.len())
+        let traces_b: Vec<_> = (0..lang_b.number_of_traces())
             .map(|j| lang_b.get_trace(j).unwrap())
             .collect();
 
         // Create weights vectors
-        let weights_a = (0..lang_a.len())
+        let weights_a = (0..lang_a.number_of_traces())
             .filter_map(|trace_index| lang_a.get_trace_probability(trace_index))
             .cloned()
             .collect();
-        let weights_b = (0..lang_b.len())
+        let weights_b = (0..lang_b.number_of_traces())
             .filter_map(|trace_index| lang_b.get_trace_probability(trace_index))
             .cloned()
             .collect();
 
-        let progress_bar =
-            EbiCommand::get_progress_bar_ticks((lang_a.len() * lang_b.len()).try_into().unwrap());
+        let progress_bar = EbiCommand::get_progress_bar_ticks(
+            (lang_a.number_of_traces() * lang_b.number_of_traces())
+                .try_into()
+                .unwrap(),
+        );
 
         // Compute in chunks for better cache utilisation
         pool.install(|| {
-            distances = (0..lang_a.len())
+            distances = (0..lang_a.number_of_traces())
                 .into_par_iter()
                 .map(|i| {
                     let trace_a = &traces_a[i];
-                    let row: Vec<Fraction> = (0..lang_b.len())
+                    let row: Vec<Fraction> = (0..lang_b.number_of_traces())
                         .into_par_iter()
                         .map(|j| {
                             let trace_b = &traces_b[j];

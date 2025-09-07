@@ -2,14 +2,11 @@ use std::collections::HashSet;
 
 use anyhow::{Result, anyhow};
 use ebi_arithmetic::{Fraction, One};
+use ebi_objects::{Activity, DirectlyFollowsGraph};
 
-use crate::{
-    ebi_framework::activity_key::Activity,
-    ebi_objects::directly_follows_graph::DirectlyFollowsGraph,
-    ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
+use crate::ebi_traits::{
+    ebi_trait_event_log::EbiTraitEventLog,
+    ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
 };
 
 use super::directly_follows_graph_abstractor::DirectlyFollowsAbstractor;
@@ -40,7 +37,7 @@ impl DirectlyFollowsModelMinerFiltering for dyn EbiTraitEventLog {
         }
 
         let mut minimum_fitness = minimum_fitness.clone();
-        minimum_fitness *= self.len();
+        minimum_fitness *= self.number_of_traces();
 
         loop {
             //gather the edges to be filtered
@@ -52,7 +49,7 @@ impl DirectlyFollowsModelMinerFiltering for dyn EbiTraitEventLog {
             //filter the log
             self.remove_traces_with_directly_follows_edge(edges_to_filter);
 
-            if Fraction::from(self.len()) < minimum_fitness {
+            if Fraction::from(self.number_of_traces()) < minimum_fitness {
                 return Ok(dfg);
             }
 
@@ -191,13 +188,11 @@ mod tests {
     use std::fs;
 
     use ebi_arithmetic::{Fraction, One};
+    use ebi_objects::FiniteStochasticLanguage;
 
     use crate::{
-        ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
-        ebi_traits::{
-            ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-            ebi_trait_semantics::Semantics,
-        },
+        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        semantics::semantics::Semantics,
         techniques::directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
     };
 

@@ -2,12 +2,18 @@ use std::collections::{HashMap, hash_map::Entry};
 
 use crate::{
     ebi_framework::displayable::Displayable,
-    ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree, stochastic_process_tree_semantics::NodeStates
+    semantics::{
+        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
+        semantics::Semantics,
     },
-    ebi_traits::ebi_trait_semantics::Semantics,
 };
 use anyhow::Result;
+use ebi_objects::{
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
+    FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, ProcessTree,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticProcessTree,
+};
 
 pub trait Bounded {
     type LivState: Displayable;
@@ -167,12 +173,12 @@ LPNMarking!(StochasticLabelledPetriNet);
 mod tests {
     use std::fs;
 
-    use crate::{
-        ebi_objects::{
-            deterministic_finite_automaton::DeterministicFiniteAutomaton, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_labelled_petri_net::StochasticLabelledPetriNet
-        },
-        techniques::bounded::Bounded,
+    use ebi_objects::{
+        DeterministicFiniteAutomaton, FiniteStochasticLanguage, LabelledPetriNet, ProcessTree,
+        StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
     };
+
+    use crate::techniques::bounded::Bounded;
 
     #[test]
     fn bounded_tree() {
@@ -194,7 +200,7 @@ mod tests {
     fn bounded_slpn() {
         let fin = fs::read_to_string("testfiles/unbounded_empty.slpn").unwrap();
         let slpn = fin.parse::<StochasticLabelledPetriNet>().unwrap();
-        
+
         assert!(!slpn.bounded().unwrap());
     }
 
