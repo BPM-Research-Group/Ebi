@@ -4,6 +4,7 @@ use ebi_arithmetic::{Fraction, exact::set_exact_globally, parsing::FractionNotPa
 use ebi_objects::EbiObjectType;
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
+use log::Level;
 use logging_timer::timer;
 use std::{
     collections::BTreeSet,
@@ -320,9 +321,9 @@ impl EbiCommand {
                     inputs.push(input);
                 }
 
-                log::info!("Starting {}", self.long_name());
+                log::info!("Starting {} command", self.long_name());
                 let result = {
-                    let _tmr = timer!(self.long_name());
+                    let _tmr = timer!(Level::Info; self.long_name());
 
                     (execute)(inputs, Some(cli_matches))?
                 };
