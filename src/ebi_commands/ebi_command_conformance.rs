@@ -17,6 +17,8 @@ use crate::{
         entropic_relevance::EntropicRelvance,
         jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
         unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
+        hellinger_stochastic_conformance::HellingerStochasticConformance,
+        chi_square_stochastic_conformance::ChiSquareStochasticConformance,
     },
 };
 
@@ -32,6 +34,8 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
         &CONFORMANCE_JSSC,
         &CONFORMANCE_JSSC_SAMPLE,
         &CONFORMANCE_UEMSC,
+        &CONFORMANCE_HSC,
+        &CONFORMANCE_CSSC,
     ],
 };
 
@@ -281,3 +285,72 @@ pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     },
     output_type: &EbiOutputType::Fraction,
 };
+
+pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
+    name_short: "hsc",
+    name_long: Some("hellinger-stochastic-conformance"),
+    explanation_short: "Compute Hellinger stochastic conformance.",
+    explanation_long: Some(
+        "Compute Hellinger stochastic conformance, also known as the Hellinger distance.",
+    ),
+    latex_link: Some(""),
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
+    ],
+    input_names: &["FILE_1", "FILE_2"],
+    input_helps: &[
+        "A finite stochastic language (log) to compare.",
+        "A queriable stochastic language (model) to compare.",
+    ],
+    execute: |mut inputs, _| {
+        let log = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let model = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
+        let hsc = log
+            .hellinger_stochastic_conformance(model)
+            .context("cannot compute HSC")?;
+        Ok(EbiOutput::Fraction(hsc))
+    },
+    output_type: &EbiOutputType::Fraction,
+};
+
+pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
+    name_short: "cssc",
+    name_long: Some("chi-square-stochastic-conformance"),
+    explanation_short: "Compute Chi-Square stochastic conformance.",
+    explanation_long: Some(
+        "Compute Chi-Square stochastic conformance, also known as the Chi-Square distance.",
+    ),
+    latex_link: Some(""),
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
+    ],
+    input_names: &["FILE_1", "FILE_2"],
+    input_helps: &[
+        "A finite stochastic language (log) to compare.",
+        "A queriable stochastic language (model) to compare.",
+    ],
+    execute: |mut inputs, _| {
+        let log = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let model = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
+        let cssc = log
+            .chi_square_stochastic_conformance(model)
+            .context("cannot compute CSSC")?;
+        Ok(EbiOutput::Fraction(cssc))
+    },
+    output_type: &EbiOutputType::Fraction,
+};
+
