@@ -60,7 +60,8 @@ impl HellingerStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 }
             }
         }
-
+        sum /= 2usize;
+        sum = sum.approx_abs_sqrt(10);
         sum = sum.one_minus();
         return Ok(sum);
     }
