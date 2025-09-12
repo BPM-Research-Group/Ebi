@@ -24,7 +24,7 @@ eapproximatearithmetic = []
 
 [dependencies]
 ebi_derive = "0.2.2"
-ebi_arithmetic = "0.2.23"
+ebi_arithmetic = "0.2.24"
 ebi_optimisation = "0.0.10"
 ebi_objects = "0.0.9"
 bitvec = "1.0.1"
