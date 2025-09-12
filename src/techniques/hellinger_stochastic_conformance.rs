@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
 use anyhow::Result;
-use ebi_arithmetic::{Fraction, OneMinus, Sqrt};
+use ebi_arithmetic::{Fraction, OneMinus, Sqrt, Zero, One};
 use ebi_objects::ActivityKeyTranslator;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
@@ -61,6 +61,9 @@ impl HellingerStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
             }
         }
         sum /= 2usize;
+        if sum.is_zero() {
+            return Ok(Fraction::one());
+        }
         sum = sum.approx_abs_sqrt(10);
         sum = sum.one_minus();
         return Ok(sum);
