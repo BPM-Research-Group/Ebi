@@ -40,11 +40,9 @@ impl ChiSquareStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                 )) {
                     Ok(mut probability2) => {
                         let mut probability_temp1 = probability.clone();
-                        probability_temp1 -= probability2.clone();
-                        probability_temp1 *= probability_temp1.clone();
+                        probability_temp1 -= &probability2;
                         probability2 += probability;
-                        probability_temp1 /= probability2;
-                        Some(probability_temp1)
+                        Some(&probability_temp1 * &probability_temp1 / probability2)
                     }
                     Err(err) => {
                         *Arc::clone(&error).lock().unwrap() = Some(err);

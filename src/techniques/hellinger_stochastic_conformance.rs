@@ -41,8 +41,7 @@ impl HellingerStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
                     Ok(probability2) => {
                         let mut probability2 = probability2.approx_abs_sqrt(10);
                         probability2 -=  probability.clone().approx_abs_sqrt(10);
-                        probability2 *= probability2.clone();
-                        Some(probability2)
+                        Some(&probability2 * &probability2)
                     }
                     Err(err) => {
                         *Arc::clone(&error).lock().unwrap() = Some(err);

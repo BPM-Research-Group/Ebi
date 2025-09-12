@@ -28,14 +28,14 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
     explanation_short: "Check the conformance of two stochastic languages.",
     explanation_long: None,
     children: &[
+        &CONFORMANCE_CSSC,
         &CONFORMANCE_EMSC,
         &CONFORMANCE_EMSC_SAMPLE,
         &CONFORMANCE_ER,
+        &CONFORMANCE_HSC,
         &CONFORMANCE_JSSC,
         &CONFORMANCE_JSSC_SAMPLE,
         &CONFORMANCE_UEMSC,
-        &CONFORMANCE_HSC,
-        &CONFORMANCE_CSSC,
     ],
 };
 
@@ -293,9 +293,9 @@ pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
     explanation_long: Some(
         "Compute Hellinger stochastic conformance, also known as the Hellinger distance.",
     ),
-    latex_link: Some(""),
+    latex_link: None,
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
@@ -327,9 +327,9 @@ pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
     explanation_long: Some(
         "Compute Chi-Square stochastic conformance, also known as the Chi-Square distance.",
     ),
-    latex_link: Some(""),
+    latex_link: None,
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
