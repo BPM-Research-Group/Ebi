@@ -1,9 +1,7 @@
 use anyhow::{Result, anyhow};
 use core::hash::Hash;
-use ebi_arithmetic::{
-    ebi_number::{One, Signed, Zero},
-    fraction::Fraction,
-};
+use ebi_arithmetic::{Fraction, One, OneMinus, Signed, Zero};
+use ebi_objects::{Activity, FiniteStochasticLanguage};
 use priority_queue::PriorityQueue;
 use std::{
     cmp::Ordering,
@@ -13,8 +11,7 @@ use std::{
 };
 
 use crate::{
-    ebi_framework::{activity_key::Activity, displayable::Displayable, ebi_command::EbiCommand},
-    ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
+    ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_stochastic_deterministic_semantics::{
@@ -108,8 +105,8 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
         &self,
         number_of_traces: &usize,
     ) -> Result<FiniteStochasticLanguage> {
-        if self.len() == 0 {
-            Ok((self.get_activity_key().clone(), HashMap::new()).into())
+        if self.number_of_traces() == 0 {
+            Ok((self.activity_key().clone(), HashMap::new()).into())
         } else if number_of_traces.is_one() {
             let mut result = HashMap::new();
 
@@ -127,7 +124,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
 
             result.insert(max_trace.clone(), max_probability.clone());
 
-            Ok((self.get_activity_key().clone(), result).into())
+            Ok((self.activity_key().clone(), result).into())
         } else {
             let mut result = vec![];
             for (trace, probability) in self.iter_trace_probability() {
@@ -152,7 +149,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
                 result2.insert(trace.clone(), probability.clone());
             }
 
-            Ok((self.get_activity_key().clone(), result2).into())
+            Ok((self.activity_key().clone(), result2).into())
         }
     }
 
@@ -169,7 +166,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
             result2.insert(trace.clone(), probability.clone());
         }
 
-        Ok((self.get_activity_key().clone(), result2).into())
+        Ok((self.activity_key().clone(), result2).into())
     }
 
     fn analyse_probability_coverage(
@@ -177,8 +174,8 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
         coverage: &Fraction,
     ) -> Result<FiniteStochasticLanguage> {
         if coverage.is_zero() {
-            return Ok((self.get_activity_key().clone(), HashMap::new()).into());
-        } else if self.len() == 0 {
+            return Ok((self.activity_key().clone(), HashMap::new()).into());
+        } else if self.number_of_traces() == 0 {
             return Err(anyhow!(
                 "A coverage of {:.4} is unattainable as the stochastic language is empty.",
                 coverage
@@ -229,7 +226,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
             result2.insert(trace.clone(), probability.clone());
         }
 
-        Ok((self.get_activity_key().clone(), result2).into())
+        Ok((self.activity_key().clone(), result2).into())
     }
 }
 
@@ -304,7 +301,7 @@ impl<DState: Displayable, LState: Displayable> dyn StochasticDeterministicSemant
                         log::debug!(
                             "\t\tconsider activity {:?} {}",
                             activity,
-                            self.get_activity_key().deprocess_activity(&activity)
+                            self.activity_key().deprocess_activity(&activity)
                         );
 
                         let new_q_state =
@@ -480,7 +477,7 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
         progress_bar.finish_and_clear();
 
         let map: HashMap<_, _> = s.into_iter().collect();
-        Ok((self.get_activity_key().clone(), map).into())
+        Ok((self.activity_key().clone(), map).into())
     }
 
     fn analyse_most_likely_traces(
@@ -507,7 +504,7 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
         progress_bar.finish_and_clear();
 
         let map: HashMap<_, _> = s.into_iter().collect();
-        Ok((self.get_activity_key().clone(), map).into())
+        Ok((self.activity_key().clone(), map).into())
     }
 
     fn analyse_probability_coverage(
@@ -555,7 +552,7 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
         progress_bar.finish_and_clear();
 
         let map: HashMap<_, _> = s.into_iter().collect();
-        Ok((self.get_activity_key().clone(), map).into())
+        Ok((self.activity_key().clone(), map).into())
     }
 }
 
@@ -563,22 +560,25 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::ebi_number::{One, Zero};
-    use ebi_arithmetic::fraction::Fraction;
-
-    use crate::ebi_framework::activity_key::HasActivityKey;
-    use crate::ebi_objects::finite_stochastic_language::FiniteStochasticLanguage;
-    use crate::ebi_objects::labelled_petri_net::LPNMarking;
-    use crate::ebi_objects::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton;
-    use crate::ebi_objects::stochastic_labelled_petri_net::StochasticLabelledPetriNet;
-    use crate::ebi_traits::ebi_trait_event_log::IndexTrace;
-    use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
-    use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::{
-        EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics,
-        ToStochasticDeterministicSemantics,
+    use ebi_arithmetic::{Fraction, One, Zero};
+    use ebi_objects::{
+        FiniteStochasticLanguage, HasActivityKey, IndexTrace, StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet
     };
-    use crate::techniques::deterministic_semantics_for_stochastic_semantics::PMarking;
-    use crate::techniques::probability_queries::ProbabilityQueries;
+
+    use crate::{
+        ebi_traits::{
+            ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+            ebi_trait_stochastic_deterministic_semantics::{
+                EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics,
+                ToStochasticDeterministicSemantics,
+            },
+        },
+        semantics::labelled_petri_net_semantics::LPNMarking,
+        techniques::{
+            deterministic_semantics_for_stochastic_semantics::PMarking,
+            probability_queries::ProbabilityQueries,
+        },
+    };
 
     #[test]
     fn slpn_cover_prefix() {
@@ -594,7 +594,7 @@ mod tests {
         let enabled1 = slpn.get_deterministic_enabled_activities(&state1);
         assert_eq!(enabled1.len(), 2);
 
-        let a = slpn.get_activity_key_mut().process_activity("a");
+        let a = slpn.activity_key_mut().process_activity("a");
 
         let state2 = slpn.execute_deterministic_activity(&state1, a).unwrap();
         let enabled2 = slpn.get_deterministic_enabled_activities(&state2);
@@ -613,7 +613,7 @@ mod tests {
         assert_eq!(
             slpn.analyse_probability_coverage(&Fraction::from((1, 1)))
                 .unwrap()
-                .len(),
+                .number_of_traces(),
             3
         );
     }
@@ -630,7 +630,7 @@ mod tests {
         assert_eq!(
             slpn.analyse_probability_coverage(&Fraction::from((4, 10)))
                 .unwrap()
-                .len(),
+                .number_of_traces(),
             1
         );
     }
@@ -647,7 +647,7 @@ mod tests {
         assert_eq!(
             slpn.analyse_minimum_probability(&Fraction::from((51, 100)))
                 .unwrap()
-                .len(),
+                .number_of_traces(),
             0
         );
     }
@@ -679,7 +679,7 @@ mod tests {
             .analyse_probability_coverage(&Fraction::zero())
             .unwrap();
 
-        assert_eq!(slang2.len(), 0);
+        assert_eq!(slang2.number_of_traces(), 0);
     }
 
     #[test]
@@ -703,7 +703,7 @@ mod tests {
         let slang2 = slpn
             .analyse_probability_coverage(&Fraction::zero())
             .unwrap();
-        assert_eq!(slang2.len(), 0);
+        assert_eq!(slang2.number_of_traces(), 0);
 
         let fin2 = fs::read_to_string("testfiles/empty_trace.slang").unwrap();
         let slang3 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
@@ -752,7 +752,7 @@ mod tests {
         let slang2 = slpn
             .analyse_probability_coverage(&Fraction::zero())
             .unwrap();
-        assert_eq!(slang2.len(), 0);
+        assert_eq!(slang2.number_of_traces(), 0);
 
         let fin2 = fs::read_to_string("testfiles/empty.slang").unwrap();
         let slang3 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
@@ -785,7 +785,7 @@ mod tests {
         let slang2 = slpn
             .analyse_probability_coverage(&Fraction::zero())
             .unwrap();
-        assert_eq!(slang2.len(), 0);
+        assert_eq!(slang2.number_of_traces(), 0);
 
         let fin2 = fs::read_to_string("testfiles/empty.slang").unwrap();
         let slang3 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
@@ -811,7 +811,7 @@ mod tests {
             .analyse_probability_coverage(&Fraction::zero())
             .unwrap();
 
-        assert_eq!(slang2.len(), 0);
+        assert_eq!(slang2.number_of_traces(), 0);
     }
 
     #[test]
@@ -823,7 +823,7 @@ mod tests {
         let slang2 = slang
             .analyse_probability_coverage(&Fraction::zero())
             .unwrap();
-        assert_eq!(slang2.len(), 0);
+        assert_eq!(slang2.number_of_traces(), 0);
 
         let slang3 = slang.analyse_probability_coverage(&Fraction::one());
         assert!(slang3.is_err());
@@ -847,7 +847,7 @@ mod tests {
         let slang2 = slpn
             .analyse_probability_coverage(&Fraction::zero())
             .unwrap();
-        assert_eq!(slang2.len(), 0);
+        assert_eq!(slang2.number_of_traces(), 0);
     }
 
     #[test]
@@ -880,7 +880,7 @@ mod tests {
             semantics
                 .analyse_minimum_probability(&Fraction::one())
                 .unwrap()
-                .len(),
+                .number_of_traces(),
             0
         );
     }
@@ -895,7 +895,7 @@ mod tests {
             slang2
                 .analyse_minimum_probability(&Fraction::one())
                 .unwrap()
-                .len(),
+                .number_of_traces(),
             0
         );
     }
@@ -918,7 +918,7 @@ mod tests {
     fn slang_minprob_zero_through_sdfa() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
-        assert_eq!(slang.len(), 3);
+        assert_eq!(slang.number_of_traces(), 3);
         let mut sdfa: StochasticDeterministicFiniteAutomaton = slang.clone().into();
         assert_eq!(sdfa.max_state, 5);
         assert_eq!(sdfa.get_number_of_transitions(), 5);
@@ -929,7 +929,7 @@ mod tests {
         assert_eq!(sdfa.get_deterministic_enabled_activities(&state).len(), 2);
 
         //take a b
-        let b = sdfa.get_activity_key_mut().process_activity("a");
+        let b = sdfa.activity_key_mut().process_activity("a");
         sdfa.execute_deterministic_activity(&state, b).unwrap();
 
         let semantics = EbiTraitStochasticDeterministicSemantics::Usize(Box::new(sdfa));
@@ -955,7 +955,7 @@ mod tests {
             semantics
                 .analyse_minimum_probability(&Fraction::one())
                 .unwrap()
-                .len(),
+                .number_of_traces(),
             0
         );
     }

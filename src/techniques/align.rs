@@ -1,4 +1,11 @@
 use anyhow::{Context, Error, Result, anyhow};
+use ebi_objects::{
+    Activity, ActivityKeyTranslator, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
+    DirectlyFollowsModel, LabelledPetriNet, LanguageOfAlignments, ProcessTree,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticProcessTree,
+    ebi_objects::{labelled_petri_net::TransitionIndex, language_of_alignments::Move},
+};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::{
     fmt::{Debug, Display},
@@ -7,31 +14,16 @@ use std::{
 };
 
 use crate::{
-    ebi_framework::{
-        activity_key::{Activity, ActivityKeyTranslator},
-        displayable::Displayable,
-        ebi_command::EbiCommand,
-    },
-    ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton,
-        directly_follows_graph::DirectlyFollowsGraph,
-        directly_follows_model::DirectlyFollowsModel,
-        finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
-        labelled_petri_net::{LPNMarking, LabelledPetriNet},
-        language_of_alignments::{LanguageOfAlignments, Move},
-        process_tree::ProcessTree,
-        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        stochastic_language_of_alignments::StochasticLanguageOfAlignments,
-        stochastic_process_tree::StochasticProcessTree,
-        stochastic_process_tree_semantics::NodeStates,
-    },
+    ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
     ebi_traits::{
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_semantics::{EbiTraitSemantics, Semantics},
-        ebi_trait_stochastic_semantics::TransitionIndex,
+        ebi_trait_semantics::EbiTraitSemantics,
+    },
+    semantics::{
+        finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
+        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
+        semantics::Semantics,
     },
 };
 
@@ -93,19 +85,19 @@ where
         &mut self,
         log: Box<dyn EbiTraitFiniteLanguage>,
     ) -> Result<LanguageOfAlignments> {
-        let mut activity_key = self.get_activity_key().clone();
+        let mut activity_key = self.activity_key().clone();
         let translator = Arc::new(ActivityKeyTranslator::new(
-            log.get_activity_key(),
+            log.activity_key(),
             &mut activity_key,
         ));
         let log = Arc::new(log);
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
 
         log::info!("Compute alignments");
-        let progress_bar = EbiCommand::get_progress_bar_ticks(log.len());
+        let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
 
         //compute alignments multi-threadedly
-        let mut aligned_traces = (0..log.len())
+        let mut aligned_traces = (0..log.number_of_traces())
             .into_par_iter()
             .filter_map(|trace_index| {
                 let log = Arc::clone(&log);
@@ -131,7 +123,7 @@ where
             })
             .collect::<Vec<_>>(); // end parallel execution
 
-        if aligned_traces.len() != log.len() {
+        if aligned_traces.len() != log.number_of_traces() {
             //something went wrong
             if let Ok(mutex) = Arc::try_unwrap(error) {
                 if let Ok(err) = mutex.into_inner() {
@@ -154,19 +146,19 @@ where
         &mut self,
         log: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<StochasticLanguageOfAlignments> {
-        let mut activity_key = self.get_activity_key().clone();
+        let mut activity_key = self.activity_key().clone();
         let translator = Arc::new(ActivityKeyTranslator::new(
-            log.get_activity_key(),
+            log.activity_key(),
             &mut activity_key,
         ));
         let log = Arc::new(log);
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
 
         log::info!("Compute alignments");
-        let progress_bar = EbiCommand::get_progress_bar_ticks(log.len());
+        let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
 
         //compute alignments multi-threadedly
-        let aligned_traces = (0..log.len())
+        let aligned_traces = (0..log.number_of_traces())
             .into_par_iter()
             .filter_map(|trace_index| {
                 let log = Arc::clone(&log);
@@ -194,7 +186,7 @@ where
             })
             .collect::<Vec<_>>(); // end parallel execution
 
-        if aligned_traces.len() != log.len() {
+        if aligned_traces.len() != log.number_of_traces() {
             //something went wrong
             if let Ok(mutex) = Arc::try_unwrap(error) {
                 if let Ok(err) = mutex.into_inner() {
@@ -595,17 +587,13 @@ usize!(StochasticDirectlyFollowsModel);
 mod tests {
     use std::fs;
 
-    use crate::{
-        ebi_framework::activity_key::{HasActivityKey, TranslateActivityKey},
-        ebi_objects::{
-            deterministic_finite_automaton::DeterministicFiniteAutomaton,
-            finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage,
-            language_of_alignments::Move,
-            stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        },
-        ebi_traits::ebi_trait_semantics::ToSemantics,
-        techniques::align::Align,
+    use ebi_objects::{
+        DeterministicFiniteAutomaton, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey,
+        StochasticDeterministicFiniteAutomaton, TranslateActivityKey,
+        ebi_objects::language_of_alignments::Move,
     };
+
+    use crate::{ebi_traits::ebi_trait_semantics::ToSemantics, techniques::align::Align};
 
     #[test]
     fn align_sdfa_trace() {
@@ -615,8 +603,8 @@ mod tests {
             .unwrap();
         let mut semantics = sdfa.to_semantics();
 
-        let a = semantics.get_activity_key_mut().process_activity("a");
-        let b = semantics.get_activity_key_mut().process_activity("b");
+        let a = semantics.activity_key_mut().process_activity("a");
+        let b = semantics.activity_key_mut().process_activity("b");
 
         let trace = vec![b, b];
 
@@ -649,8 +637,8 @@ mod tests {
         let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
         let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
 
-        let a = semantics.get_activity_key_mut().process_activity("a");
-        let b = semantics.get_activity_key_mut().process_activity("b");
+        let a = semantics.activity_key_mut().process_activity("a");
+        let b = semantics.activity_key_mut().process_activity("b");
 
         let alignment = semantics.align_language(lang).unwrap();
 
@@ -679,8 +667,8 @@ mod tests {
         let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
         let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
 
-        let a = semantics.get_activity_key_mut().process_activity("a");
-        let b = semantics.get_activity_key_mut().process_activity("b");
+        let a = semantics.activity_key_mut().process_activity("a");
+        let b = semantics.activity_key_mut().process_activity("b");
 
         let alignment = semantics.align_language(lang).unwrap();
 
@@ -708,8 +696,8 @@ mod tests {
         let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
         let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
 
-        let a = semantics.get_activity_key_mut().process_activity("a");
-        let b = semantics.get_activity_key_mut().process_activity("b");
+        let a = semantics.activity_key_mut().process_activity("a");
+        let b = semantics.activity_key_mut().process_activity("b");
 
         let alignment = semantics.align_language(lang).unwrap();
 
@@ -733,8 +721,8 @@ mod tests {
         let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
         let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
 
-        let a = semantics.get_activity_key_mut().process_activity("a");
-        let b = semantics.get_activity_key_mut().process_activity("b");
+        let a = semantics.activity_key_mut().process_activity("a");
+        let b = semantics.activity_key_mut().process_activity("b");
 
         let alignment = semantics.align_language(lang).unwrap();
 
@@ -754,13 +742,13 @@ mod tests {
 
         let fin1 = fs::read_to_string("testfiles/aa-ab-ba.dfa").unwrap();
         let mut dfa = fin1.parse::<DeterministicFiniteAutomaton>().unwrap();
-        dfa.translate_using_activity_key(lang.get_activity_key_mut());
+        dfa.translate_using_activity_key(lang.activity_key_mut());
         let mut semantics = dfa.to_semantics();
 
         let alignment = semantics.align_language(lang).unwrap();
 
-        let a = semantics.get_activity_key_mut().process_activity("a");
-        let b = semantics.get_activity_key_mut().process_activity("b");
+        let a = semantics.activity_key_mut().process_activity("a");
+        let b = semantics.activity_key_mut().process_activity("b");
 
         let correct_1 = vec![
             Move::SynchronousMove(b, 1),

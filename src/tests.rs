@@ -83,7 +83,6 @@ use crate::{
         ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
         ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
     },
-    ebi_objects::process_tree::EBI_PROCESS_TREE,
     multiple_reader::MultipleReader,
 };
 
@@ -124,12 +123,7 @@ pub fn get_all_test_files() -> Vec<(
                             file_handler,
                         );
 
-                        result.push((
-                            object,
-                            Some(importer.clone()),
-                            None,
-                            format!("{:?}", file),
-                        ));
+                        result.push((object, Some(importer.clone()), None, format!("{:?}", file)));
                     }
                 }
 
@@ -139,12 +133,7 @@ pub fn get_all_test_files() -> Vec<(
                         file_handler,
                     );
 
-                    result.push((
-                        object,
-                        None,
-                        Some(importer.clone()),
-                        format!("{:?}", file),
-                    ));
+                    result.push((object, None, Some(importer.clone()), format!("{:?}", file)));
                 }
             } else {
                 //file handler should not accept this file
@@ -181,6 +170,8 @@ pub fn should_file_be_tested(
     file_handler: &EbiFileHandler,
 ) -> bool {
     //special case: empty.ptree and empty_2.ptree cannot be imported as an LPN, but it is not invalid
+
+    use crate::ebi_file_handlers::process_tree::EBI_PROCESS_TREE;
     let special = if let EbiObjectImporter::LabelledPetriNet(_) = importer {
         true
     } else {
@@ -190,4 +181,163 @@ pub fn should_file_be_tested(
         && special
         && (file.file_name().into_string().unwrap() == "empty.ptree"
             || file.file_name().into_string().unwrap() == "empty_2.ptree"))
+}
+
+#[cfg(test)]
+pub mod tests {
+
+    use std::fs::{self, File};
+
+    use ebi_objects::{
+        DeterministicFiniteAutomaton, EbiObjectType, EventLog, FiniteLanguage, IndexTrace,
+        Infoable, PetriNetMarkupLanguage, ProcessTreeMarkupLanguage,
+        StochasticDeterministicFiniteAutomaton,
+    };
+    use strum::IntoEnumIterator;
+
+    use crate::{
+        ebi_framework::{
+            ebi_file_handler::get_file_handlers,
+            ebi_input::{EbiInput, TEST_INPUT_TYPE_STRING},
+            ebi_trait::FromEbiTraitObject,
+            ebi_trait_object::EbiTraitObject,
+            prom_link::{
+                get_java_object_handlers_that_can_export, get_java_object_handlers_that_can_import,
+            },
+        },
+        ebi_traits::{
+            ebi_trait_event_log::EbiTraitEventLog,
+            ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        },
+        multiple_reader::MultipleReader,
+        semantics::semantics::Semantics,
+    };
+
+    #[test]
+    fn all_graphable() {
+        for (input, _, _, _) in crate::tests::get_all_test_files() {
+            if let EbiInput::Trait(object, _) = input {
+                if let EbiTraitObject::Graphable(object) = object {
+                    assert!(object.to_dot().is_ok());
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn object_types() {
+        for object_type in EbiObjectType::iter() {
+            object_type.get_article();
+            get_file_handlers(&object_type);
+            get_java_object_handlers_that_can_export(&object_type);
+            get_java_object_handlers_that_can_import(&object_type);
+        }
+
+        let _ =
+            String::from_trait_object(EbiInput::String("xyz".to_string(), &TEST_INPUT_TYPE_STRING));
+    }
+
+    #[test]
+    fn objects() {
+        for (input, _, _, _) in crate::tests::get_all_test_files() {
+            if let EbiInput::Object(object, _) = input {
+                object.get_type();
+                object.to_string();
+            } else if let EbiInput::Trait(object, _) = input {
+                object.get_trait();
+            }
+        }
+    }
+
+    #[test]
+    fn all_infoable() {
+        for (input, _, _, _) in crate::tests::get_all_test_files() {
+            if let EbiInput::Object(object, _) = input {
+                let mut f = vec![];
+                object.info(&mut f).unwrap();
+            }
+        }
+    }
+
+    #[test]
+    fn dfa_empty() {
+        let fin = fs::read_to_string("testfiles/empty.dfa").unwrap();
+        let dfa = fin.parse::<DeterministicFiniteAutomaton>().unwrap();
+
+        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics() {
+            assert!(semantics.get_initial_state().is_none());
+        } else {
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn log_empty() {
+        let fin = fs::read_to_string("testfiles/empty.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+
+        if let EbiTraitSemantics::Usize(semantics) = log.to_semantics() {
+            assert!(semantics.get_initial_state().is_none());
+        }
+    }
+
+    #[test]
+    fn lang_empty() {
+        let fin = fs::read_to_string("testfiles/empty.lang").unwrap();
+        let log = fin.parse::<FiniteLanguage>().unwrap();
+
+        if let EbiTraitSemantics::Usize(semantics) = log.to_semantics() {
+            assert!(semantics.get_initial_state().is_none());
+        }
+    }
+
+    #[test]
+    fn pnml_empty() {
+        let mut reader = MultipleReader::from_file(File::open("testfiles/empty.pnml").unwrap());
+        let semantics =
+            PetriNetMarkupLanguage::import_as_semantics(&mut reader.get().unwrap()).unwrap();
+
+        if let EbiTraitSemantics::Marking(semantics) = semantics {
+            let state = semantics.get_initial_state().unwrap();
+            assert_eq!(semantics.get_enabled_transitions(&state).len(), 0);
+        } else {
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn nested_ptml() {
+        let fin = fs::read_to_string("testfiles/valid nested.ptml").unwrap();
+        let ptml = fin.parse::<ProcessTreeMarkupLanguage>().unwrap();
+
+        let sem = ptml.tree;
+        let state = sem.get_initial_state().unwrap();
+        assert_eq!(sem.get_enabled_transitions(&state).len(), 1);
+    }
+
+    #[test]
+    fn sdfa_empty() {
+        let fin = fs::read_to_string("testfiles/empty.sdfa").unwrap();
+        let dfa = fin
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
+
+        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics() {
+            assert!(semantics.get_initial_state().is_none());
+        } else {
+            assert!(false);
+        }
+    }
+
+    #[test]
+    fn len_retain() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let mut log = fin.parse::<EventLog>().unwrap();
+
+        assert_eq!(log.number_of_traces(), 2);
+
+        log.retain_traces(Box::new(|_| false));
+
+        assert_eq!(log.number_of_traces(), 0);
+    }
 }

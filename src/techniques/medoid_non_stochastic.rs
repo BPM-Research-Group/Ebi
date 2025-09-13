@@ -1,13 +1,9 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{
-    ebi_number::{Signed, Zero},
-    fraction::Fraction,
-};
-use num::One as _;
+use ebi_arithmetic::{Fraction, One, Signed, Zero, f};
+use ebi_objects::FiniteLanguage;
 use std::sync::Arc;
 
 use crate::{
-    ebi_objects::finite_language::FiniteLanguage,
     ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage,
     math::distances::TriangularDistanceMatrix,
 };
@@ -26,7 +22,7 @@ where
     T: EbiTraitFiniteLanguage,
 {
     fn medoid(&self, number_of_traces: usize) -> Result<FiniteLanguage> {
-        let activity_key = self.get_activity_key().clone();
+        let activity_key = self.activity_key().clone();
         let mut result = FiniteLanguage::new_hashmap();
 
         let distances = TriangularDistanceMatrix::new(self);
@@ -42,11 +38,11 @@ where
             return Ok((activity_key, result).into());
         }
 
-        if self.len() < number_of_traces {
+        if self.number_of_traces() < number_of_traces {
             return Err(anyhow!(
                 "{} traces were requested, but the stochastic language contains only {} traces.",
                 number_of_traces,
-                self.len()
+                self.number_of_traces()
             ));
         }
 
@@ -64,7 +60,7 @@ where
 
             //report the minimum value
             list.push(min_pos);
-            sum_distance[min_pos] = Fraction::two();
+            sum_distance[min_pos] = f!(2);
         }
         list.sort();
 
@@ -86,10 +82,10 @@ where
     fn k_medoids_clustering(&self, number_of_clusters: usize) -> Result<FiniteLanguage> {
         //there is a Rust k-medoids crate, but that does not support exact arithmetic
 
-        if self.len() < number_of_clusters {
+        if self.number_of_traces() < number_of_clusters {
             return Err(anyhow!(
                 "Language contains only {} different traces, and {} clusters were requested.",
-                self.len(),
+                self.number_of_traces(),
                 number_of_clusters
             ));
         }
@@ -98,8 +94,9 @@ where
         }
 
         let distances = TriangularDistanceMatrix::new(self);
-        let mut rng = rand::thread_rng();
-        let mut medoids = random_initialization(self.len(), number_of_clusters, &mut rng);
+        let mut rng = rand::rng();
+        let mut medoids =
+            random_initialization(self.number_of_traces(), number_of_clusters, &mut rng);
 
         fasterpam(&distances, &mut medoids, 500);
 
@@ -113,7 +110,7 @@ where
                 list_i += 1;
             }
         }
-        Ok((self.get_activity_key().clone(), result).into())
+        Ok((self.activity_key().clone(), result).into())
     }
 }
 
@@ -141,7 +138,7 @@ pub fn sum_distances<T>(log: &T, distances: &TriangularDistanceMatrix) -> Vec<Fr
 where
     T: EbiTraitFiniteLanguage + ?Sized,
 {
-    let mut sum_distance = vec![Fraction::zero(); log.len()];
+    let mut sum_distance = vec![Fraction::zero(); log.number_of_traces()];
 
     for (i, j, _, distance) in distances {
         sum_distance[i] += distance.as_ref();
@@ -513,10 +510,9 @@ where
 mod tests {
     use std::fs;
 
-    use crate::{
-        ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
-        techniques::medoid_non_stochastic::MedoidNonStochastic,
-    };
+    use ebi_objects::FiniteStochasticLanguage;
+
+    use crate::techniques::medoid_non_stochastic::MedoidNonStochastic;
 
     #[test]
     fn non_stochastic_clustering() {

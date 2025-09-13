@@ -1,20 +1,19 @@
 use anyhow::{Result, anyhow};
 use chrono::{DateTime, FixedOffset};
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
+use ebi_objects::{Activity, CompressedEventLog, EventLog, HasActivityKey, Importable, IndexTrace};
 use process_mining::event_log::{AttributeValue, Event, XESEditableAttribute};
 use std::{
     borrow::Borrow,
     collections::HashMap,
     fmt::{Debug, Display},
     hash::Hash,
+    io::BufRead,
 };
 
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, HasActivityKey},
-        ebi_input::EbiInput,
-        ebi_object::EbiTraitObject,
-        ebi_trait::FromEbiTraitObject,
+        ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
     },
     math::data_type::DataType,
 };
@@ -281,31 +280,6 @@ impl FromEbiTraitObject for dyn EbiTraitEventLog {
     }
 }
 
-pub trait IndexTrace: Sync {
-    fn len(&self) -> usize;
-    fn get_trace(&self, trace_index: usize) -> Option<&Vec<Activity>>;
-}
-
-impl<T: Sync> IndexTrace for HashMap<Vec<Activity>, T> {
-    fn len(&self) -> usize {
-        self.len()
-    }
-
-    fn get_trace(&self, trace_index: usize) -> Option<&Vec<Activity>> {
-        Some(self.iter().nth(trace_index)?.0)
-    }
-}
-
-impl<T: Sync> IndexTrace for Vec<(&Vec<Activity>, T)> {
-    fn len(&self) -> usize {
-        self.len()
-    }
-
-    fn get_trace(&self, trace_index: usize) -> Option<&Vec<Activity>> {
-        Some(self.get(trace_index)?.0)
-    }
-}
-
 #[derive(Clone, Copy)]
 pub struct Attribute {
     id: usize,
@@ -392,5 +366,60 @@ impl<'a> AttributeKey {
                 return result;
             }
         }
+    }
+}
+
+impl EbiTraitEventLog for EventLog {
+    fn get_log(&self) -> &process_mining::EventLog {
+        &self.rust4pm_log
+    }
+
+    fn get_trace_attributes(&self) -> HashMap<String, DataType> {
+        let mut map: HashMap<String, DataType> = HashMap::new();
+        for trace in &self.rust4pm_log.traces {
+            for attribute in &trace.attributes {
+                match map.entry(attribute.key.clone()) {
+                    std::collections::hash_map::Entry::Occupied(mut e) => {
+                        e.get_mut().update(&attribute.value);
+                        ()
+                    }
+                    std::collections::hash_map::Entry::Vacant(e) => {
+                        e.insert(DataType::init(&attribute.value));
+                        ()
+                    }
+                }
+            }
+        }
+        map
+    }
+
+    fn retain_traces<'a>(&'a mut self, f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>) {
+        self.traces.retain(f);
+    }
+}
+
+pub trait ToEventLog: Importable {
+    fn to_event_log(self) -> Box<dyn EbiTraitEventLog>;
+
+    fn import_as_event_log(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLog>>
+    where
+        Self: Sized,
+    {
+        Ok(Self::import(reader)?.to_event_log())
+    }
+}
+
+impl<T> ToEventLog for T
+where
+    T: EbiTraitEventLog + Importable + 'static,
+{
+    fn to_event_log(self) -> Box<dyn EbiTraitEventLog> {
+        Box::new(self)
+    }
+}
+
+impl ToEventLog for CompressedEventLog {
+    fn to_event_log(self) -> Box<dyn EbiTraitEventLog> {
+        Box::new(self.log)
     }
 }

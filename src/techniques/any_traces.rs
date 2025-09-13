@@ -1,24 +1,18 @@
 use anyhow::Result;
 use ebi_arithmetic::ebi_number::Zero;
+use ebi_objects::{
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
+    FiniteLanguage, FiniteStochasticLanguage, IndexTrace, LabelledPetriNet, ProcessTree,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticProcessTree,
+};
 
 use crate::{
     ebi_framework::displayable::Displayable,
-    ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton,
-        directly_follows_graph::DirectlyFollowsGraph,
-        directly_follows_model::DirectlyFollowsModel,
-        event_log::EventLog,
-        finite_language::FiniteLanguage,
-        finite_stochastic_language::FiniteStochasticLanguage,
-        labelled_petri_net::{LPNMarking, LabelledPetriNet},
-        process_tree::ProcessTree,
-        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        stochastic_process_tree::StochasticProcessTree,
-        stochastic_process_tree_semantics::NodeStates,
+    semantics::{
+        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
+        semantics::Semantics,
     },
-    ebi_traits::{ebi_trait_event_log::IndexTrace, ebi_trait_semantics::Semantics},
     techniques::livelock::IsPartOfLivelock,
 };
 
@@ -53,7 +47,7 @@ macro_rules! lang {
             type LivState = usize;
 
             fn any_traces(&self) -> Result<bool> {
-                Ok(!self.len().is_zero())
+                Ok(!self.number_of_traces().is_zero())
             }
         }
     };
@@ -110,16 +104,12 @@ dfm!(DirectlyFollowsGraph);
 mod tests {
     use std::fs;
 
-    use crate::{
-        ebi_objects::{
-            deterministic_finite_automaton::DeterministicFiniteAutomaton,
-            finite_stochastic_language::FiniteStochasticLanguage,
-            labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree,
-            stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-            stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        },
-        techniques::any_traces::AnyTraces,
+    use ebi_objects::{
+        DeterministicFiniteAutomaton, FiniteStochasticLanguage, LabelledPetriNet, ProcessTree,
+        StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
     };
+
+    use crate::techniques::any_traces::AnyTraces;
 
     #[test]
     fn any_traces_tree() {

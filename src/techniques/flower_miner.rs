@@ -1,18 +1,14 @@
 use std::collections::HashSet;
 
 use anyhow::{Result, anyhow};
-
-use crate::{
-    ebi_framework::activity_key::HasActivityKey,
-    ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton,
-        process_tree::{Node, Operator, ProcessTree},
-    },
-    ebi_traits::{
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_semantics::{EbiTraitSemantics, Semantics},
-    },
+use ebi_objects::{
+    DeterministicFiniteAutomaton, HasActivityKey, ProcessTree,
+    ebi_objects::process_tree::{Node, Operator},
 };
+
+use crate::{ebi_traits::{
+    ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics,
+}, semantics::semantics::Semantics};
 
 pub trait FlowerMinerTree {
     fn mine_flower_tree(&self) -> ProcessTree;
@@ -43,7 +39,7 @@ impl FlowerMinerTree for dyn EbiTraitFiniteLanguage {
                 .collect::<Vec<_>>(),
         );
 
-        (self.get_activity_key().clone(), tree).into()
+        (self.activity_key().clone(), tree).into()
     }
 }
 
@@ -58,7 +54,7 @@ impl FlowerMinerDFA for dyn EbiTraitFiniteLanguage {
         }
 
         let mut result = DeterministicFiniteAutomaton::new();
-        result.set_activity_key(self.get_activity_key().clone());
+        result.set_activity_key(self.activity_key().clone());
         let state = result
             .get_initial_state()
             .ok_or_else(|| anyhow!("no initial state found"))?;
@@ -76,14 +72,14 @@ impl FlowerMinerDFA for EbiTraitSemantics {
     ///This method relies on the activityKey being set properly. That is, a flower model will be returned that contains all -declared- activities, even if they are not used in the model, or not reachable, or .. .
     fn mine_flower_dfa(&self) -> Result<DeterministicFiniteAutomaton> {
         let mut result = DeterministicFiniteAutomaton::new();
-        result.set_activity_key(self.get_activity_key().clone());
+        result.set_activity_key(self.activity_key().clone());
         let state = result
             .get_initial_state()
             .ok_or_else(|| anyhow!("no initial state found"))?;
         result.set_final_state(state, true);
 
         let activities = result
-            .get_activity_key()
+            .activity_key()
             .get_activities()
             .into_iter()
             .cloned()
@@ -100,7 +96,7 @@ impl FlowerMinerDFA for EbiTraitSemantics {
 impl FlowerMinerTree for EbiTraitSemantics {
     ///This method relies on the activityKey being set properly. That is, a flower model will be returned that contains all -declared- activities, even if they are not used in the model, or not reachable, or .. .
     fn mine_flower_tree(&self) -> ProcessTree {
-        let activity_key = self.get_activity_key().clone();
+        let activity_key = self.activity_key().clone();
         let activities = activity_key
             .get_activities()
             .into_iter()
@@ -126,14 +122,14 @@ impl FlowerMinerDFA for dyn HasActivityKey {
     ///This method relies on the activityKey being set properly. That is, a flower model will be returned that contains all -declared- activities, even if they are not used in the model, or not reachable, or .. .
     fn mine_flower_dfa(&self) -> Result<DeterministicFiniteAutomaton> {
         let mut result = DeterministicFiniteAutomaton::new();
-        result.set_activity_key(self.get_activity_key().clone());
+        result.set_activity_key(self.activity_key().clone());
         let state = result
             .get_initial_state()
             .ok_or_else(|| anyhow!("no initial state found"))?;
         result.set_final_state(state, true);
 
         let activities = result
-            .get_activity_key()
+            .activity_key()
             .get_activities()
             .into_iter()
             .cloned()
@@ -150,7 +146,7 @@ impl FlowerMinerDFA for dyn HasActivityKey {
 impl FlowerMinerTree for dyn HasActivityKey {
     ///This method relies on the activityKey being set properly. That is, a flower model will be returned that contains all -declared- activities, even if they are not used in the model, or not reachable, or .. .
     fn mine_flower_tree(&self) -> ProcessTree {
-        let activity_key = self.get_activity_key().clone();
+        let activity_key = self.activity_key().clone();
         let activities = activity_key
             .get_activities()
             .into_iter()

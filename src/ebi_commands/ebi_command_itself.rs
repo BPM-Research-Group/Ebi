@@ -1,11 +1,12 @@
 use std::{collections::HashMap, io::Write};
 use clap::Command;
 use anyhow::Result;
+use ebi_objects::{ebi_objects::scalable_vector_graphics::ToSVGMut, EbiObject, EbiObjectType};
 use inflector::Inflector;
 use layout::{core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
-use crate::{ebi_framework::{    ebi_command::{EbiCommand, EBI_COMMANDS}, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::{self, EbiInputType}, ebi_object::{EbiObject, EbiObjectType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link}, ebi_objects::scalable_vector_graphics::ToSVGMut, text::Joiner};
+use crate::{ebi_framework::{ebi_command::{get_applicable_commands, EbiCommand, EBI_COMMANDS}, ebi_file_handler::{get_file_handlers, EBI_FILE_HANDLERS}, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link::{self, get_java_object_handlers_that_can_export, get_java_object_handlers_that_can_import}}, text::Joiner};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
  □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
@@ -368,7 +369,7 @@ fn manual() -> Result<EbiOutput> {
         }
     }
     for object_type in EbiObjectType::iter() {
-        let java_object_handlers = object_type.get_java_object_handlers_that_can_import();
+        let java_object_handlers = get_java_object_handlers_that_can_import(&object_type);
         if !java_object_handlers.is_empty() {
             writeln!(f, "\\item {}.\\\\Java class: {}.", 
                 object_type.to_string().to_sentence_case(), 
@@ -390,7 +391,7 @@ fn manual() -> Result<EbiOutput> {
     //prom output list
     writeln!(f, "\\def\\ebipromoutput{{\\begin{{itemize}}")?;
     for object_type in EbiObjectType::iter() {
-        let java_object_handlers = object_type.get_java_object_handlers_that_can_export();
+        let java_object_handlers = get_java_object_handlers_that_can_export(&object_type);
         if !java_object_handlers.is_empty() {
             writeln!(f, "\\item {}.\\\\Java class: {}.", 
                 object_type.to_string().to_sentence_case(), 
@@ -517,7 +518,7 @@ pub fn graph() -> Result<VisualGraph> {
     //object types to commands
     for object_type in EbiObjectType::iter() {
         let source = object_types.get(&object_type).unwrap();
-        for command in object_type.get_applicable_commands() {
+        for command in get_applicable_commands(&object_type) {
             let target = commands.get(&command).unwrap();
             let arrow = Arrow::simple("");
             graph.add_edge(arrow, *source, *target);
@@ -527,7 +528,7 @@ pub fn graph() -> Result<VisualGraph> {
     //files to object types
     for object_type in EbiObjectType::iter() {
         let to = object_types.get(&object_type).unwrap();
-        for file_handler in object_type.get_file_handlers() {
+        for file_handler in get_file_handlers(&object_type) {
             let from = file_handlers.get(&file_handler).unwrap();
             let arrow = Arrow::simple("");
             graph.add_edge(arrow, *from, *to);

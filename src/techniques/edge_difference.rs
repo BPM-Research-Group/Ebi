@@ -1,12 +1,5 @@
-use ebi_arithmetic::{
-    ebi_number::{Signed, Zero},
-    fraction::Fraction,
-};
-
-use crate::{
-    ebi_framework::activity_key::TranslateActivityKey,
-    ebi_objects::directly_follows_graph::DirectlyFollowsGraph,
-};
+use ebi_arithmetic::{Fraction, Signed, Zero};
+use ebi_objects::{DirectlyFollowsGraph, TranslateActivityKey};
 
 pub trait EdgeDifference {
     fn edge_difference(&mut self, other: &mut Self) -> Fraction;

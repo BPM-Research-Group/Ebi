@@ -4,11 +4,11 @@ use std::{
 };
 
 use anyhow::Result;
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::{Fraction, OneMinus};
+use ebi_objects::ActivityKeyTranslator;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::{
-    ebi_framework::activity_key::ActivityKeyTranslator,
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
@@ -29,10 +29,10 @@ impl UnitEarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLangua
         mut language2: Box<dyn EbiTraitQueriableStochasticLanguage>,
     ) -> Result<Fraction> {
         let translator =
-            ActivityKeyTranslator::new(self.get_activity_key(), language2.get_activity_key_mut());
+            ActivityKeyTranslator::new(self.activity_key(), language2.activity_key_mut());
         let error = Arc::new(Mutex::new(None));
 
-        let mut sum = (0..self.len())
+        let mut sum = (0..self.number_of_traces())
             .into_par_iter()
             .filter_map(|trace_index| {
                 let trace = self.get_trace(trace_index).unwrap();
@@ -76,10 +76,10 @@ impl UnitEarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLangua
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::{ebi_number::One, fraction::Fraction};
+    use ebi_arithmetic::{Fraction, One};
+    use ebi_objects::FiniteStochasticLanguage;
 
     use crate::{
-        ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         techniques::unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
     };

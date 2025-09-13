@@ -1,10 +1,9 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
+use ebi_arithmetic::{Fraction, Zero};
 
 use crate::math::root::Root;
 
 pub fn correlation(pairs: &[(Fraction, Fraction)]) -> Result<Root> {
-
     let mut sum_xy = Fraction::zero();
     let mut sum_x = Fraction::zero();
     let mut sum_y = Fraction::zero();
@@ -21,8 +20,8 @@ pub fn correlation(pairs: &[(Fraction, Fraction)]) -> Result<Root> {
     }
 
     let num = Root::from(&(&n * &sum_xy) - &(&sum_x * &sum_y));
-    let den_x = Root::of(&(&n * &sum_x_squared) - &(&sum_x * &sum_x));
-    let den_y = Root::of(&(&n * &sum_y_squared) - &(&sum_y * &sum_y));
+    let den_x = Root::of(&(&n * &sum_x_squared) - &(&sum_x * &sum_x))?;
+    let den_y = Root::of(&(&n * &sum_y_squared) - &(&sum_y * &sum_y))?;
 
     if den_x.is_zero() || den_y.is_zero() {
         return Err(anyhow!("the standard deviation is zero"));

@@ -1,4 +1,4 @@
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::{
@@ -12,12 +12,12 @@ pub trait ProcessVariety {
 
 impl ProcessVariety for dyn EbiTraitFiniteStochasticLanguage {
     fn rao_stirling_diversity(&self) -> Fraction {
-        (0..self.len())
+        (0..self.number_of_traces())
             .into_par_iter()
             .map(|i| {
                 let trace_i = self.get_trace(i).unwrap();
                 let probability_i = self.get_trace_probability(i).unwrap();
-                (i + 1..self.len())
+                (i + 1..self.number_of_traces())
                     .into_par_iter()
                     .map(|j| {
                         let trace_j = self.get_trace(j).unwrap();
@@ -37,10 +37,10 @@ impl ProcessVariety for dyn EbiTraitFiniteStochasticLanguage {
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::fraction::Fraction;
+    use ebi_arithmetic::Fraction;
+    use ebi_objects::FiniteStochasticLanguage;
 
     use crate::{
-        ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         techniques::process_variety::ProcessVariety,
     };

@@ -1,11 +1,16 @@
 use anyhow::Result;
+use ebi_objects::{
+    DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet, ProcessTree,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticProcessTree,
+};
 
 use crate::{
     ebi_framework::displayable::Displayable,
-    ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_model::DirectlyFollowsModel, labelled_petri_net::{LPNMarking, LabelledPetriNet}, process_tree::ProcessTree, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree, stochastic_process_tree_semantics::NodeStates
+    semantics::{
+        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
+        semantics::Semantics,
     },
-    ebi_traits::ebi_trait_semantics::Semantics,
 };
 
 pub trait NonDecreasingLivelock {
@@ -36,7 +41,7 @@ tree!(ProcessTree);
 tree!(StochasticProcessTree);
 
 macro_rules! lpn {
-    ($t:ident) => {
+    ($t:ident, $v:expr) => {
         impl NonDecreasingLivelock for $t {
             type LivState = LPNMarking;
 
@@ -82,7 +87,7 @@ macro_rules! lpn {
                             state.marking *= omega;
 
                             //technicality: after touching the state, we need to re-compute the enabled transitions
-                            self.compute_enabled_transitions(state);
+                            ($v)(self, state);
 
                             //then, walk through the loop again
                             for transition in trace.iter().skip(pos) {
@@ -138,8 +143,14 @@ macro_rules! is_non_decreasing_livelock_dfm {
     };
 }
 
-lpn!(LabelledPetriNet);
-lpn!(StochasticLabelledPetriNet);
+lpn!(
+    LabelledPetriNet,
+    crate::semantics::labelled_petri_net_semantics::compute_enabled_transitions
+);
+lpn!(
+    StochasticLabelledPetriNet,
+    crate::semantics::stochastic_labelled_petri_net_semantics::compute_enabled_transitions
+);
 is_non_decreasing_livelock_dfm!(DirectlyFollowsModel);
 is_non_decreasing_livelock_dfm!(StochasticDirectlyFollowsModel);
 is_non_decreasing_livelock_dfm!(DeterministicFiniteAutomaton);

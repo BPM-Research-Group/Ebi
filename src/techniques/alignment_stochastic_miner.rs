@@ -1,15 +1,9 @@
-use crate::{
-    ebi_objects::{
-        labelled_petri_net::LabelledPetriNet, language_of_alignments::Move,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-    },
-    ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_semantics::Semantics,
-    },
-};
+use crate::{ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, semantics::semantics::Semantics};
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
+use ebi_arithmetic::{Fraction, Zero};
+use ebi_objects::{
+    LabelledPetriNet, StochasticLabelledPetriNet, ebi_objects::language_of_alignments::Move,
+};
 
 use super::align::Align;
 
@@ -57,13 +51,9 @@ impl AlignmentMiner for LabelledPetriNet {
 mod tests {
     use std::fs;
 
-    use crate::{
-        ebi_objects::{
-            finite_stochastic_language::FiniteStochasticLanguage,
-            labelled_petri_net::LabelledPetriNet,
-        },
-        techniques::alignment_stochastic_miner::AlignmentMiner,
-    };
+    use ebi_objects::{FiniteStochasticLanguage, LabelledPetriNet};
+
+    use crate::techniques::alignment_stochastic_miner::AlignmentMiner;
 
     #[test]
     fn lpn_uniform() {

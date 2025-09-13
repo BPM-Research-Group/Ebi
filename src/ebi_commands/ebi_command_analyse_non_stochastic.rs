@@ -2,7 +2,6 @@ use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
-        ebi_object::{EbiObject, EbiObjectType},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
@@ -16,6 +15,7 @@ use crate::{
     },
 };
 use anyhow::anyhow;
+use ebi_objects::{EbiObject, EbiObjectType};
 use std::io::Write;
 
 pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
@@ -49,7 +49,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES: EbiCommand = EbiCommand::Comman
     execute: |mut objects, _| {
         let activities = objects.remove(0).to_type::<dyn EbiTraitActivities>()?;
         let mut f = vec![];
-        for label in &activities.get_activity_key().activity2name {
+        for label in &activities.activity_key().activity2name {
             writeln!(f, "{}", label)?;
         }
         Ok(EbiOutput::String(String::from_utf8(f)?))

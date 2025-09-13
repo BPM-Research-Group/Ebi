@@ -1,19 +1,23 @@
 use crate::{
     ebi_framework::{
-        activity_key::{Activity, ActivityKey, HasActivityKey},
-        displayable::Displayable,
-        ebi_input::EbiInput,
-        ebi_object::EbiTraitObject,
-        ebi_trait::FromEbiTraitObject,
-        importable::Importable,
+        ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
     },
-    ebi_objects::{labelled_petri_net::LPNMarking, stochastic_process_tree_semantics::NodeStates},
-    techniques::align::AlignmentHeuristics,
+    semantics::{
+        finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
+        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
+        semantics::Semantics,
+    },
 };
 use anyhow::{Result, anyhow};
-use std::{fmt::Debug, io::BufRead};
-
-use super::ebi_trait_stochastic_semantics::TransitionIndex;
+use ebi_objects::{
+    ActivityKey, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
+    EventLog, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, Importable,
+    LabelledPetriNet, LolaNet, PetriNetMarkupLanguage, ProcessTree, ProcessTreeMarkupLanguage,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticProcessTree, TranslateActivityKey,
+    ebi_objects::compressed_event_log::CompressedEventLog,
+};
+use std::io::BufRead;
 
 ///
 /// This is a wrapper enum in order to be able to implement algorithms that are agnostic of the marking/state type, amongst other things.
@@ -25,20 +29,36 @@ pub enum EbiTraitSemantics {
     NodeStates(Box<dyn Semantics<SemState = NodeStates, AliState = NodeStates>>),
 }
 
-impl EbiTraitSemantics {
-    pub fn get_activity_key(&self) -> &ActivityKey {
+impl HasActivityKey for EbiTraitSemantics {
+    fn activity_key(&self) -> &ActivityKey {
         match self {
-            EbiTraitSemantics::Marking(semantics) => semantics.get_activity_key(),
-            EbiTraitSemantics::Usize(semantics) => semantics.get_activity_key(),
-            EbiTraitSemantics::NodeStates(semantics) => semantics.get_activity_key(),
+            EbiTraitSemantics::Marking(semantics) => semantics.activity_key(),
+            EbiTraitSemantics::Usize(semantics) => semantics.activity_key(),
+            EbiTraitSemantics::NodeStates(semantics) => semantics.activity_key(),
         }
     }
 
-    pub fn get_activity_key_mut(&mut self) -> &mut ActivityKey {
+    fn activity_key_mut(&mut self) -> &mut ActivityKey {
         match self {
-            EbiTraitSemantics::Marking(semantics) => semantics.get_activity_key_mut(),
-            EbiTraitSemantics::Usize(semantics) => semantics.get_activity_key_mut(),
-            EbiTraitSemantics::NodeStates(semantics) => semantics.get_activity_key_mut(),
+            EbiTraitSemantics::Marking(semantics) => semantics.activity_key_mut(),
+            EbiTraitSemantics::Usize(semantics) => semantics.activity_key_mut(),
+            EbiTraitSemantics::NodeStates(semantics) => semantics.activity_key_mut(),
+        }
+    }
+}
+
+impl TranslateActivityKey for EbiTraitSemantics {
+    fn translate_using_activity_key(&mut self, to_activity_key: &mut ActivityKey) {
+        match self {
+            EbiTraitSemantics::Marking(semantics) => {
+                semantics.translate_using_activity_key(to_activity_key)
+            }
+            EbiTraitSemantics::Usize(semantics) => {
+                semantics.translate_using_activity_key(to_activity_key)
+            }
+            EbiTraitSemantics::NodeStates(semantics) => {
+                semantics.translate_using_activity_key(to_activity_key)
+            }
         }
     }
 }
@@ -56,51 +76,110 @@ impl FromEbiTraitObject for EbiTraitSemantics {
     }
 }
 
-pub trait Semantics:
-    Debug + Send + Sync + AlignmentHeuristics<AliState = Self::SemState> + HasActivityKey
-{
-    type SemState: Displayable;
-
-    /**
-     * Get the initial state.
-     * If it does not exist, then the language is empty.
-     */
-    fn get_initial_state(&self) -> Option<<Self as Semantics>::SemState>;
-
-    /**
-     * Update the state to reflect execution of the transition. This alters the state to avoid repeated memory allocations in simple walkthroughs.
-     * May return an error when the transition is not enabled, or when the marking cannot be represented (unbounded).
-     *
-     * @param transition
-     */
-    fn execute_transition(
-        &self,
-        state: &mut <Self as Semantics>::SemState,
-        transition: TransitionIndex,
-    ) -> Result<()>;
-
-    /**
-     *
-     * @return whether the current state is a final state. In a final state, no other transitions may be enabled.
-     */
-    fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool;
-
-    fn is_transition_silent(&self, transition: TransitionIndex) -> bool;
-
-    fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity>;
-
-    fn get_enabled_transitions(
-        &self,
-        state: &<Self as Semantics>::SemState,
-    ) -> Vec<TransitionIndex>;
-
-    fn get_number_of_transitions(&self) -> usize;
-}
-
 pub trait ToSemantics: Importable + Sized {
     fn to_semantics(self) -> EbiTraitSemantics;
 
     fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
         Ok(Self::import(reader)?.to_semantics())
+    }
+}
+
+impl ToSemantics for CompressedEventLog {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        self.log.to_semantics()
+    }
+}
+
+impl ToSemantics for DeterministicFiniteAutomaton {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::Usize(Box::new(self))
+    }
+}
+
+impl ToSemantics for LolaNet {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        self.0.to_semantics()
+    }
+}
+
+impl ToSemantics for StochasticProcessTree {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::NodeStates(Box::new(self))
+    }
+}
+
+impl ToSemantics for LabelledPetriNet {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::Marking(Box::new(self))
+    }
+}
+
+impl ToSemantics for PetriNetMarkupLanguage {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        self.0.to_semantics()
+    }
+}
+
+impl ToSemantics for StochasticLabelledPetriNet {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::Marking(Box::new(self))
+    }
+}
+
+impl ToSemantics for StochasticDirectlyFollowsModel {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::Usize(Box::new(self))
+    }
+}
+
+impl ToSemantics for DirectlyFollowsGraph {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        let dfm: DirectlyFollowsModel = self.into();
+        EbiTraitSemantics::Usize(Box::new(dfm))
+    }
+}
+
+impl ToSemantics for DirectlyFollowsModel {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::Usize(Box::new(self))
+    }
+}
+
+impl ToSemantics for StochasticDeterministicFiniteAutomaton {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::Usize(Box::new(self))
+    }
+}
+
+impl ToSemantics for EventLog {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        Into::<FiniteStochasticLanguage>::into(self).to_semantics()
+    }
+}
+
+impl ToSemantics for FiniteLanguage {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        Into::<DeterministicFiniteAutomaton>::into(self).to_semantics()
+    }
+}
+
+impl ToSemantics for FiniteStochasticLanguage {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::Usize(Box::new(FiniteStochasticLanguageSemantics::from_language(
+            &self,
+        )))
+    }
+}
+
+impl ToSemantics for ProcessTreeMarkupLanguage {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        let lpn: LabelledPetriNet = self.into();
+        EbiTraitSemantics::Marking(Box::new(lpn))
+    }
+}
+
+impl ToSemantics for ProcessTree {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::NodeStates(Box::new(self))
     }
 }

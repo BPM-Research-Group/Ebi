@@ -54,7 +54,7 @@ pub const ASSOCIATION_ATTRIBUTE: EbiCommand = EbiCommand::Command {
         "The number of samples.",
     ],
     execute: |mut inputs, _| {
-        let mut event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
+        let event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         let attribute = inputs.remove(0).to_type::<String>()?;
         let number_of_samples = inputs.remove(0).to_type::<usize>()?;
 
@@ -90,7 +90,7 @@ pub const ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command {
         "The number of samples taken.",
     ],
     execute: |mut inputs, _| {
-        let mut event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
+        let event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         let number_of_samples = inputs.remove(0).to_type::<usize>()?;
 
         let result = event_log.associations(*number_of_samples);

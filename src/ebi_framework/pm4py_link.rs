@@ -1,6 +1,4 @@
 use anyhow::{anyhow, Result};
-use fraction::BigFraction;
-use num::ToPrimitive;
 use pyo3::prelude::*;
 use pyo3::types::{PyAny, PyDict, PyList, PySet, PyString};
 use pyo3::AsPyPointer;
@@ -11,19 +9,33 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use std::str::Chars;
 use std::iter::Peekable;
+use malachite::rational::Rational;
 
-use crate::ebi_objects::finite_language::FiniteLanguage;
-use crate::ebi_objects::process_tree::ProcessTree;
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::fraction::fraction::Fraction;
+use ebi_objects::ebi_objects::{
+    finite_language::FiniteLanguage, 
+    process_tree::ProcessTree, 
+    event_log::EventLog, 
+    labelled_petri_net::LabelledPetriNet, 
+    stochastic_labelled_petri_net::StochasticLabelledPetriNet, 
+    finite_stochastic_language::FiniteStochasticLanguage};
+
+use ebi_objects::activity_key::activity_key::ActivityKey;
+use ebi_objects::constants::{ebi_object::EbiObject, ebi_object_type::EbiObjectType};
+
+use crate::ebi_file_handlers::{
+    event_log::EBI_EVENT_LOG,
+    labelled_petri_net::EBI_LABELLED_PETRI_NET,
+    finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
+    process_tree::EBI_PROCESS_TREE,
+    finite_language::EBI_FINITE_LANGUAGE};
+
 use super::ebi_output::EbiOutput;
-use crate::ebi_framework::ebi_object::EbiTraitObject;
+use crate::ebi_framework::ebi_trait_object::EbiTraitObject;
 use crate::ebi_framework::{ebi_command::EbiCommand, prom_link::attempt_parse};
-use crate::ebi_framework::{ebi_input::{EbiInput, EbiInputType}, ebi_object::{EbiObject, EbiObjectType}, ebi_trait::EbiTrait, activity_key::ActivityKey, ebi_output};
-use crate::ebi_objects::event_log::{EventLog, EBI_EVENT_LOG};
-use crate::ebi_objects::labelled_petri_net::{LabelledPetriNet, EBI_LABELLED_PETRI_NET};
+use crate::ebi_framework::{ebi_input::{EbiInput, EbiInputType}, ebi_trait::EbiTrait, ebi_output};
 use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};
-use crate::ebi_objects::{stochastic_labelled_petri_net::StochasticLabelledPetriNet, finite_stochastic_language::{FiniteStochasticLanguage, EBI_FINITE_STOCHASTIC_LANGUAGE}, process_tree::EBI_PROCESS_TREE, finite_language::EBI_FINITE_LANGUAGE};
-use crate::marking::Marking;
+use ebi_objects::marking::Marking;
 use process_mining::event_log::{event_log_struct::{EventLogClassifier, to_attributes}, Attributes, AttributeValue};
 use process_mining::event_log::{EventLog as ProcessMiningEventLog, Trace, Event};
 
@@ -118,12 +130,14 @@ impl ImportableFromPM4Py for Fraction {
         let value: f64 = double.extract().map_err(|_| {
             PyValueError::new_err("Expected a Python double to convert to Rust usize")
         })?;
-        let frac: BigFraction = BigFraction::from_str(&value.to_string())
-            .map_err(|_| PyValueError::new_err("Failed to convert f64 to BigFraction"))?;
+
+        let rational = Rational::from_str(&value.to_string())
+            .map_err(|_| PyValueError::new_err("Failed to convert f64 to appropriate Rational type"))?;
+
         for &itype in input_types {
             match itype {
                 EbiInputType::Fraction(..) => {
-                    return Ok(EbiInput::Fraction(Fraction::Exact(frac), itype));
+                    return Ok(EbiInput::Fraction(Fraction::Exact(rational), itype));
                 },
                 _ => { /* skip other input types */ }
             }
@@ -137,45 +151,20 @@ impl ImportableFromPM4Py for Fraction {
 impl ExportableToPM4Py for Fraction {
     fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
         match self {
-            // Case: Exact fraction (BigFraction)
-            Fraction::Exact(big_fraction) => match big_fraction {
-                fraction::GenericFraction::Rational(sign, ratio) => {
-                    let numer = ratio.numer().to_u128().ok_or_else(|| {
-                        PyValueError::new_err("Failed to convert numerator to u128")
-                    })?;
-                    let denom = ratio.denom().to_u128().ok_or_else(|| {
-                        PyValueError::new_err("Failed to convert numerator to u128")
-                    })?;
-                    let float_value =  (sign.is_positive() as i64).to_f64().unwrap_or(1.0) * numer.to_f64().ok_or_else(|| {
-                        PyValueError::new_err("Failed to convert numerator to f64")
-                    })? / denom.to_f64().ok_or_else(|| {
-                        PyValueError::new_err("Failed to convert numerator to f64")
-                    })?;
-
-                
-                    Ok(float_value.to_object(py))
-                }
-                fraction::GenericFraction::Infinity(sign) => Err(PyValueError::new_err(format!(
-                    "Cannot export infinity with sign {:?} to PM4Py",
-                    sign
-                ))),
-                fraction::GenericFraction::NaN => Err(PyValueError::new_err(
-                    "Cannot export NaN to PM4Py",
-                )),
-            },
-
-            // Case: Approximation as f64
-            Fraction::Approx(value) => Ok(value.to_object(py)),
-
-            // Case: Invalid state
-            Fraction::CannotCombineExactAndApprox => {
-                Err(PyValueError::new_err(
-                    "Cannot export a Fraction that combines Exact and Approx",
-                ))
+            Fraction::Exact(rat) => {
+                let float_value : f64 = f64::try_from(rat)
+                    .map_err(|_| PyValueError::new_err("Failed to convert Rational to f64"))?;
+                Ok(float_value.to_object(py))
             }
+            Fraction::Approx(value) => Ok(value.to_object(py)),
+            Fraction::CannotCombineExactAndApprox => Err(PyValueError::new_err(
+                "Cannot export a Fraction that combines Exact and Approx",
+            )),
         }
     }
 }
+
+
 
 
 impl ImportableFromPM4Py for EventLog {

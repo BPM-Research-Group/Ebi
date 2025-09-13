@@ -7,12 +7,9 @@
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use anyhow::Result;
-use ebi_arithmetic::fraction::Fraction;
-use ebi_arithmetic::ebi_number::Zero;
-use std::fmt;
-use std::fmt::Debug;
-use std::{iter::FusedIterator, sync::Arc};
-
+use ebi_arithmetic::Fraction;
+use ebi_arithmetic::Zero;
+use ebi_objects::IndexTrace;
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),
@@ -21,14 +18,15 @@ use std::{iter::FusedIterator, sync::Arc};
     all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use num::BigInt;
+use malachite::Natural;
+use std::fmt;
+use std::fmt::Debug;
+use std::{iter::FusedIterator, sync::Arc};
+
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::ebi_framework::ebi_command::EbiCommand;
-use crate::ebi_traits::{
-    ebi_trait_event_log::IndexTrace,
-    ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-};
+use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
 use crate::math::levenshtein;
 
 pub trait WeightedDistances: Send + Sync {
@@ -61,7 +59,7 @@ pub trait WeightedDistances: Send + Sync {
     /**
      * Only call in exact mode.
      */
-    fn lowest_common_multiple_denominators_distances(&self) -> Result<BigInt>;
+    fn lowest_common_multiple_denominators_distances(&self) -> Result<Natural>;
 
     #[cfg(any(
         all(
@@ -74,7 +72,7 @@ pub trait WeightedDistances: Send + Sync {
     /**
      * Only call in exact mode.
      */
-    fn lowest_common_multiple_denominators_weights(&self) -> Result<BigInt>;
+    fn lowest_common_multiple_denominators_weights(&self) -> Result<Natural>;
 }
 
 pub struct TriangularDistanceMatrix {
@@ -89,10 +87,11 @@ impl TriangularDistanceMatrix {
         T: IndexTrace + ?Sized,
     {
         log::info!("Compute distances");
-        let progress_bar =
-            EbiCommand::get_progress_bar_ticks(Self::get_number_of_distances(log.len()));
+        let progress_bar = EbiCommand::get_progress_bar_ticks(Self::get_number_of_distances(
+            log.number_of_traces(),
+        ));
 
-        let len = log.len();
+        let len = log.number_of_traces();
         let log = Arc::new(log);
 
         let distances = (0..Self::get_number_of_distances(len))
@@ -253,11 +252,11 @@ impl DistanceMatrix {
         K: EbiTraitFiniteStochasticLanguage + ?Sized,
     {
         log::info!("Translate second language to first");
-        lang_b.translate_using_activity_key(lang_a.get_activity_key_mut());
+        lang_b.translate_using_activity_key(lang_a.activity_key_mut());
 
         log::info!("Compute distances");
-        let len_a = lang_a.len();
-        let len_b = lang_b.len();
+        let len_a = lang_a.number_of_traces();
+        let len_b = lang_b.number_of_traces();
 
         // Pre-allocate the entire matrix
         let mut distances = Vec::with_capacity(len_a);

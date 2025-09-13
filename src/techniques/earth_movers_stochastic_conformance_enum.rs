@@ -1,13 +1,16 @@
 use crate::math::distances::WeightedDistances;
-use ebi_optimisation::network_simplex::NetworkSimplex;
 use anyhow::{Context, Result};
 use ebi_arithmetic::{
-    ebi_number::One,
+    One,
     exact::{MaybeExact, is_exact_globally},
-    fraction_enum::FractionEnum,
+    fraction::{fraction_enum::FractionEnum, signed::Numerator},
 };
-use fraction::{BigInt, ToPrimitive};
-use num_bigint::ToBigInt;
+use ebi_optimisation::network_simplex::NetworkSimplex;
+use malachite::{
+    Integer,
+    base::num::basic::traits::{One as MOne, Zero as MZero},
+    rational::Rational,
+};
 use rayon::prelude::*;
 
 /// Authored by Leonhard Mühlmeyer (2024)
@@ -52,8 +55,9 @@ impl dyn WeightedDistances {
             let n = self.len_a();
             let m = self.len_b();
 
-            let lcm_distance_fraction = FractionEnum::try_from(lcm_distances.clone())?;
-            let lcm_probability_fraction = FractionEnum::try_from(lcm_probabilities.clone())?;
+            let lcm_distance_fraction = FractionEnum::Exact(Rational::from(lcm_distances.clone()));
+            let lcm_probability_fraction =
+                FractionEnum::Exact(Rational::from(lcm_probabilities.clone()));
 
             log::debug!(
                 "LCM of distances: {:?} \n LCM of probabilities {:?}",
@@ -62,9 +66,10 @@ impl dyn WeightedDistances {
             );
 
             // 2c. If the LCMs are within the range of i64, use i64 for the NetworkSimplex computation (remains exact but faster). Otherwise use BigInt.
-            if lcm_probabilities <= BigInt::from(i64::MAX)
-                && (lcm_distances.clone() + BigInt::from(1)) * BigInt::from(n + m)
-                    <= BigInt::from(i64::MAX)
+            if lcm_probabilities <= Integer::from(i64::MAX)
+                && (Into::<Integer>::into(lcm_distances.clone()) + Integer::ONE)
+                    * Integer::from(n + m)
+                    <= Integer::from(i64::MAX)
             {
                 log::info!("Using i64 for NetworkSimplex computation.");
 
@@ -80,20 +85,19 @@ impl dyn WeightedDistances {
                             let idx = chunk_idx * 1024 + i;
                             *s = if idx < n {
                                 (self.weight_a(idx) * &lcm_probability_fraction)
-                                    .extract_exact()
+                                    .exact_ref()
                                     .unwrap()
-                                    .numer()
-                                    .unwrap()
-                                    .to_i64()
+                                    .numerator_ref()
+                                    .try_into()
                                     .unwrap()
                             } else if idx < n + m {
-                                -(self.weight_b(idx - n) * &lcm_probability_fraction)
-                                    .extract_exact()
-                                    .unwrap()
-                                    .numer()
-                                    .unwrap()
-                                    .to_i64()
-                                    .unwrap()
+                                -TryInto::<i64>::try_into(
+                                    (self.weight_b(idx - n) * &lcm_probability_fraction)
+                                        .exact_ref()
+                                        .unwrap()
+                                        .numerator_ref(),
+                                )
+                                .unwrap()
                             } else {
                                 0
                             };
@@ -107,11 +111,10 @@ impl dyn WeightedDistances {
                     for j in 0..m {
                         let product = self.distance(i, j) * &lcm_distance_fraction;
                         let i64 = product
-                            .extract_exact()
+                            .exact_ref()
                             .unwrap()
-                            .numer()
-                            .unwrap()
-                            .to_i64()
+                            .numerator_ref()
+                            .try_into()
                             .unwrap();
                         graph_and_costs[i][j + n] = Some(i64);
                     }
@@ -131,15 +134,16 @@ impl dyn WeightedDistances {
 
                 // (i64) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
                 let mut result = FractionEnum::one();
-                let mut distance = FractionEnum::try_from(ns_result)?;
-                distance /= FractionEnum::try_from(lcm_distances)?;
-                distance /= FractionEnum::try_from(lcm_probabilities)?;
+                let mut distance = FractionEnum::Exact(Rational::from(ns_result));
+                distance /= FractionEnum::Exact(Rational::from(lcm_distances));
+                distance /= FractionEnum::Exact(Rational::from(lcm_probabilities));
                 result -= distance;
 
                 return Ok(result);
-            } else if lcm_probabilities <= BigInt::from(i128::MAX)
-                && (lcm_distances.clone() + BigInt::from(1)) * BigInt::from(n + m)
-                    <= BigInt::from(i128::MAX)
+            } else if lcm_probabilities <= Integer::from(i128::MAX)
+                && (Into::<Integer>::into(lcm_distances.clone()) + Integer::ONE)
+                    * Integer::from(n + m)
+                    <= Integer::from(i128::MAX)
             {
                 log::info!("Using i128 for NetworkSimplex computation.");
 
@@ -155,20 +159,19 @@ impl dyn WeightedDistances {
                             let idx = chunk_idx * 1024 + i;
                             *s = if idx < n {
                                 (self.weight_a(idx) * &lcm_probability_fraction)
-                                    .extract_exact()
+                                    .exact_ref()
                                     .unwrap()
-                                    .numer()
-                                    .unwrap()
-                                    .to_i128()
+                                    .numerator_ref()
+                                    .try_into()
                                     .unwrap()
                             } else if idx < n + m {
-                                -(self.weight_b(idx - n) * &lcm_probability_fraction)
-                                    .extract_exact()
-                                    .unwrap()
-                                    .numer()
-                                    .unwrap()
-                                    .to_i128()
-                                    .unwrap()
+                                -TryInto::<i128>::try_into(
+                                    (self.weight_b(idx - n) * &lcm_probability_fraction)
+                                        .exact_ref()
+                                        .unwrap()
+                                        .numerator_ref(),
+                                )
+                                .unwrap()
                             } else {
                                 0
                             };
@@ -182,11 +185,10 @@ impl dyn WeightedDistances {
                     for j in 0..m {
                         let product = self.distance(i, j) * &lcm_distance_fraction;
                         let i128 = product
-                            .extract_exact()
+                            .exact_ref()
                             .unwrap()
-                            .numer()
-                            .unwrap()
-                            .to_i128()
+                            .numerator_ref()
+                            .try_into()
                             .unwrap();
                         graph_and_costs[i][j + n] = Some(i128);
                     }
@@ -205,9 +207,9 @@ impl dyn WeightedDistances {
 
                 // (i128) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
                 let mut result = FractionEnum::one();
-                let mut distance = FractionEnum::try_from(ns_result)?;
-                distance /= FractionEnum::try_from(lcm_distances)?;
-                distance /= FractionEnum::try_from(lcm_probabilities)?;
+                let mut distance = FractionEnum::Exact(Rational::from(ns_result));
+                distance /= FractionEnum::Exact(Rational::from(lcm_distances));
+                distance /= FractionEnum::Exact(Rational::from(lcm_probabilities));
                 result -= distance;
 
                 return Ok(result);
@@ -217,7 +219,7 @@ impl dyn WeightedDistances {
                 // (BigInt) 2e. Create a network graph with the scaled distances and probabilities:
                 // (BigInt) 2e(i). For each trace in the first language, create a supply node with the corresponding trace probability as supply.
                 // (BigInt) 2e(ii). For each trace in the second language, create a demand node with the corresponding trace probability as demand (i.e. negative supply).
-                let mut supply = vec![BigInt::from(0); n + m];
+                let mut supply = vec![Integer::ZERO; n + m];
                 supply
                     .par_chunks_mut(1024)
                     .enumerate()
@@ -226,22 +228,17 @@ impl dyn WeightedDistances {
                             let idx = chunk_idx * 1024 + i;
                             *s = if idx < n {
                                 (self.weight_a(idx) * &lcm_probability_fraction)
-                                    .extract_exact()
+                                    .exact_ref()
                                     .unwrap()
-                                    .numer()
-                                    .unwrap()
-                                    .to_bigint()
-                                    .unwrap()
+                                    .to_numerator()
+                                    .into()
                             } else if idx < n + m {
                                 -(self.weight_b(idx - n) * &lcm_probability_fraction)
-                                    .extract_exact()
+                                    .exact_ref()
                                     .unwrap()
-                                    .numer()
-                                    .unwrap()
-                                    .to_bigint()
-                                    .unwrap()
+                                    .to_numerator()
                             } else {
-                                BigInt::from(0)
+                                Integer::ZERO
                             };
                         });
                     });
@@ -252,13 +249,7 @@ impl dyn WeightedDistances {
                 for index_a in 0..n {
                     for index_b in 0..m {
                         let product = self.distance(index_a, index_b) * &lcm_distance_fraction;
-                        let bigint = product
-                            .extract_exact()
-                            .unwrap()
-                            .numer()
-                            .unwrap()
-                            .to_bigint()
-                            .unwrap();
+                        let bigint = product.exact_ref().unwrap().signed_numerator();
                         graph_and_costs[index_a][index_b + n] = Some(bigint);
                     }
                 }
@@ -276,9 +267,9 @@ impl dyn WeightedDistances {
 
                 // 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
                 let mut result = FractionEnum::one();
-                let mut distance = FractionEnum::try_from(ns_result)?;
-                distance /= FractionEnum::try_from(lcm_distances)?;
-                distance /= FractionEnum::try_from(lcm_probabilities)?;
+                let mut distance = FractionEnum::Exact(Rational::from(ns_result));
+                distance /= FractionEnum::Exact(Rational::from(lcm_distances));
+                distance /= FractionEnum::Exact(Rational::from(lcm_probabilities));
                 result -= distance;
 
                 return Ok(result);
@@ -304,7 +295,7 @@ impl dyn WeightedDistances {
                 .enumerate()
                 .take(n)
                 .for_each(|(i, supply)| {
-                    *supply = self.weight_a(i).extract_approx().unwrap();
+                    *supply = *self.weight_a(i).approx_ref().unwrap();
                 });
             // 3a(ii). For each trace in the second language, create a demand node with the corresponding trace probability as demand (i.e. negative supply).
             supply
@@ -313,14 +304,14 @@ impl dyn WeightedDistances {
                 .skip(n)
                 .take(m)
                 .for_each(|(i, supply)| {
-                    *supply = -self.weight_b(i - n).extract_approx().unwrap();
+                    *supply = -self.weight_b(i - n).approx_ref().unwrap();
                 });
 
             // 3a(iii). Create an edge between each pair of traces with the respective distance as cost.
             let mut graph_and_costs = vec![vec![None; n + m]; n + m];
             // Populate the top-right n x m part of graph_and_costs with scaled_distances
             self.iter().for_each(|(i, j, f)| {
-                graph_and_costs[i][j + n] = Some(f.extract_approx().unwrap())
+                graph_and_costs[i][j + n] = Some(*f.approx_ref().unwrap())
             });
 
             // 3b. Run the NetworkSimplex algorithm to find the optimal flow between the supply and demand nodes.
@@ -356,13 +347,10 @@ impl dyn WeightedDistances {
 
 #[cfg(test)]
 mod tests {
-    use ebi_arithmetic::{
-        ebi_number::{One, Zero},
-        fraction::Fraction,
-    };
+    use ebi_arithmetic::{Fraction, One, Zero};
+    use ebi_objects::FiniteStochasticLanguage;
 
     use crate::{
-        ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
     };

@@ -1,14 +1,13 @@
 use anyhow::Context;
+use ebi_objects::{EbiObject, EbiObjectType, StochasticLanguageOfAlignments};
 
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::EbiInputType,
-        ebi_object::{EbiObject, EbiObjectType},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_objects::stochastic_language_of_alignments::StochasticLanguageOfAlignments,
     ebi_traits::{
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,

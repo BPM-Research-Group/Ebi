@@ -1,4 +1,4 @@
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 use std::fmt::Display;
 
 #[derive(Eq, Clone)]

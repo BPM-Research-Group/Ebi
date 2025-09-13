@@ -1,5 +1,5 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
 use std::{
     collections::{BTreeSet, HashSet},
     fmt::{Debug, Display},

@@ -5,13 +5,20 @@ use std::{
 
 use crate::{
     ebi_framework::displayable::Displayable,
-    ebi_objects::{
-        deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, event_log::EventLog, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::{LPNMarking, LabelledPetriNet}, process_tree::{Node, Operator, ProcessTree}, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_process_tree::StochasticProcessTree, stochastic_process_tree_semantics::NodeStates
+    semantics::{
+        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
+        semantics::Semantics,
     },
-    ebi_traits::ebi_trait_semantics::Semantics,
     techniques::livelock::IsPartOfLivelock,
 };
 use anyhow::Result;
+use ebi_objects::{
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
+    FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, ProcessTree,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticProcessTree,
+    ebi_objects::process_tree::{Node, Operator},
+};
 
 pub trait InfinitelyManyTraces {
     type LivState: Displayable;
@@ -285,15 +292,12 @@ lang!(FiniteStochasticLanguage);
 mod tests {
     use std::fs;
 
-    use crate::{
-        ebi_objects::{
-            deterministic_finite_automaton::DeterministicFiniteAutomaton,
-            labelled_petri_net::LabelledPetriNet, process_tree::ProcessTree,
-            stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-            stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        },
-        techniques::infinitely_many_traces::InfinitelyManyTraces,
+    use ebi_objects::{
+        DeterministicFiniteAutomaton, LabelledPetriNet, ProcessTree,
+        StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
     };
+
+    use crate::techniques::infinitely_many_traces::InfinitelyManyTraces;
 
     #[test]
     fn infinitely_many_traces_lpn() {

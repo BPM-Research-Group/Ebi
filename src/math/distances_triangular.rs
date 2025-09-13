@@ -9,7 +9,7 @@ use std::sync::Arc;
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use anyhow::Result;
-use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
+use ebi_arithmetic::{Fraction, Zero};
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),
@@ -18,7 +18,7 @@ use ebi_arithmetic::{fraction::Fraction, ebi_number::Zero};
     all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use num::BigInt;
+use malachite::Natural;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 #[cfg(any(
@@ -58,13 +58,13 @@ impl WeightedTriangularDistanceMatrix {
         log::info!("Compute triangular distances");
 
         // Pre-allocate the entire matrix
-        let mut distances = Vec::with_capacity(lang.len() - 1);
+        let mut distances = Vec::with_capacity(lang.number_of_traces() - 1);
 
         // Create thread pool with custom configuration
         let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
 
         // Create weights vectors
-        let weights_a = (0..lang.len())
+        let weights_a = (0..lang.number_of_traces())
             .filter_map(|trace_index| lang.get_trace_probability(trace_index))
             .cloned()
             .collect::<Vec<_>>();
@@ -73,16 +73,19 @@ impl WeightedTriangularDistanceMatrix {
         // log::debug!("weights_a {:?}", weights_a);
         // log::debug!("weights_b {:?}", weights_b);
 
-        let progress_bar =
-            EbiCommand::get_progress_bar_ticks((lang.len() * lang.len()).try_into().unwrap());
+        let progress_bar = EbiCommand::get_progress_bar_ticks(
+            (lang.number_of_traces() * lang.number_of_traces())
+                .try_into()
+                .unwrap(),
+        );
 
         // Compute in chunks for better cache utilisation
         pool.install(|| {
-            distances = (0..lang.len() - 1)
+            distances = (0..lang.number_of_traces() - 1)
                 .into_par_iter()
                 .map(|i| {
                     let trace_a = lang.get_trace(i).unwrap();
-                    let row: Vec<Arc<Fraction>> = (0..lang.len() - 1)
+                    let row: Vec<Arc<Fraction>> = (0..lang.number_of_traces() - 1)
                         .into_par_iter()
                         .map(|j| {
                             let trace_b = lang.get_trace(j).unwrap();
@@ -161,30 +164,24 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
         all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
         all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
-    fn lowest_common_multiple_denominators_distances(&self) -> Result<BigInt> {
+    fn lowest_common_multiple_denominators_distances(&self) -> Result<Natural> {
+        use malachite::base::num::arithmetic::traits::Lcm;
+        use malachite::base::num::basic::traits::One;
         // 2a. Calculate the Least Common Multiple (LCM) of all denominators of distances (i.e. the elements in the DistanceMatrix).
-        use num_bigint::ToBigInt;
         use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
-        let denominators: Vec<BigInt> = self
+        let denominators: Vec<Natural> = self
             .distances
             .par_iter()
             .flat_map(|row| {
-                row.par_iter().map(|value| {
-                    value
-                        .extract_exact()
-                        .unwrap()
-                        .denom()
-                        .unwrap()
-                        .to_bigint()
-                        .unwrap()
-                })
+                row.par_iter()
+                    .map(|value| value.exact_ref().unwrap().to_denominator())
             })
             .collect();
 
         let lcm = denominators
             .par_iter()
             .cloned()
-            .reduce(|| BigInt::from(1), |a, b| num::integer::lcm(a, b));
+            .reduce(|| Natural::ONE, |a, b| a.lcm(b));
 
         Ok(lcm)
     }
@@ -197,42 +194,28 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
         all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
         all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
-    fn lowest_common_multiple_denominators_weights(&self) -> Result<BigInt> {
-        use num::BigInt;
-        use num_bigint::ToBigInt;
+    fn lowest_common_multiple_denominators_weights(&self) -> Result<Natural> {
+        use malachite::base::num::arithmetic::traits::Lcm;
+        use malachite::base::num::basic::traits::One;
         use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
-        let self_denominators: Vec<BigInt> = self
+        let self_denominators: Vec<Natural> = self
             .weights_a
             .par_iter()
-            .map(|frac| {
-                frac.extract_exact()
-                    .unwrap()
-                    .denom()
-                    .unwrap()
-                    .to_bigint()
-                    .unwrap()
-            })
+            .map(|frac| frac.exact_ref().unwrap().to_denominator())
             .collect();
 
-        let lang_b_denominators: Vec<BigInt> = self
+        let lang_b_denominators: Vec<Natural> = self
             .weights_b
             .par_iter()
-            .map(|frac| {
-                frac.extract_exact()
-                    .unwrap()
-                    .denom()
-                    .unwrap()
-                    .to_bigint()
-                    .unwrap()
-            })
+            .map(|frac| frac.exact_ref().unwrap().to_denominator())
             .collect();
 
         // Combine and calculate LCM
         let lcm_probabilities = self_denominators
             .into_par_iter()
             .chain(lang_b_denominators)
-            .reduce(|| BigInt::from(1), |a, b| num::integer::lcm(a, b));
+            .reduce(|| Natural::ONE, |a, b| a.lcm(b));
 
         Ok(lcm_probabilities)
     }

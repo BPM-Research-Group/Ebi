@@ -1,13 +1,12 @@
-use anyhow::Result;
-use ebi_arithmetic::{fraction::Fraction, ebi_number::{Signed, Zero}};
+use anyhow::{Result, anyhow};
+use ebi_arithmetic::{Fraction, OneMinus, Signed, Sqrt, Zero};
+use ebi_objects::Infoable;
 use fraction::Sign;
 use std::{
     fmt::{Debug, Display},
     io::Write,
     ops::{Div, Mul, Neg},
 };
-
-use crate::ebi_framework::{ebi_output::EbiOutput, exportable::Exportable, infoable::Infoable};
 
 #[derive(Clone)]
 pub struct ContainsRoot {
@@ -31,7 +30,7 @@ impl ContainsRoot {
     }
 
     pub fn approximate(&self) -> String {
-        let mut x = self.root.r.sqrt_abs(6);
+        let mut x = self.root.r.clone().approx_abs_sqrt(6);
         if self.one_minus {
             x = x.one_minus();
         }
@@ -41,17 +40,8 @@ impl ContainsRoot {
             format!("-{:.4}", x)
         }
     }
-}
 
-impl Exportable for ContainsRoot {
-    fn export_from_object(object: EbiOutput, f: &mut dyn Write) -> Result<()> {
-        match object {
-            EbiOutput::ContainsRoot(fr) => fr.export(f),
-            _ => unreachable!(),
-        }
-    }
-
-    fn export(&self, f: &mut dyn Write) -> Result<()> {
+    pub fn export(&self, f: &mut dyn Write) -> Result<()> {
         writeln!(f, "{}", self)?;
         Ok(writeln!(f, "Approximately {:.4}", self.approximate())?)
     }
@@ -93,12 +83,14 @@ pub struct Root {
 }
 
 impl Root {
-    pub fn of(r: Fraction) -> Self {
-        assert!(r.is_not_negative());
-        Self {
+    pub fn of(r: Fraction) -> Result<Self> {
+        if !r.is_not_negative() {
+            return Err(anyhow!("cannot take the root of a negative number"));
+        }
+        Ok(Self {
             sign: Sign::Plus,
             r: r,
-        }
+        })
     }
 
     // pub fn approximate(&self) -> String {

@@ -1,5 +1,5 @@
 use anyhow::{Context, Result, anyhow};
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::{Fraction, OneMinus};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::sync::{
     Arc,
@@ -68,8 +68,8 @@ impl StatisticalTestsLogCategoricalAttribute for dyn EbiTraitEventLog {
         }
 
         //create sampling arrays
-        let mut trace_indices = Vec::with_capacity(self.len());
-        let mut attribute_indices = Vec::with_capacity(self.len());
+        let mut trace_indices = Vec::with_capacity(self.number_of_traces());
+        let mut attribute_indices = Vec::with_capacity(self.number_of_traces());
         for (ti, (_, attributes)) in traces_with_attributes.iter().enumerate() {
             for (attribute, cardinality) in attributes.iter() {
                 for _ in 0..*cardinality {
@@ -100,7 +100,7 @@ impl StatisticalTestsLogCategoricalAttribute for dyn EbiTraitEventLog {
                 let trace_indices = Arc::clone(&trace_indices);
                 let attribute_indices = Arc::clone(&attribute_indices);
 
-                let mut sample = vec![0; self.len()];
+                let mut sample = vec![0; self.number_of_traces()];
                 sample::sample_indices_uniform(trace_indices.len(), &mut sample);
 
                 // log::debug!("sample {:?}", sample);
@@ -203,7 +203,7 @@ impl BootstrapTest for dyn EbiTraitFiniteStochasticLanguage {
                 let resample_cache = resample_cache.as_ref();
 
                 //create the sample
-                let sample = self.resample(resample_cache, self.len());
+                let sample = self.resample(resample_cache, self.number_of_traces());
                 sample
                     .into_iter()
                     .enumerate()
@@ -245,10 +245,10 @@ impl BootstrapTest for dyn EbiTraitFiniteStochasticLanguage {
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::fraction::Fraction;
+    use ebi_arithmetic::Fraction;
+    use ebi_objects::{EventLog, FiniteStochasticLanguage};
 
     use crate::{
-        ebi_objects::{event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage},
         ebi_traits::{
             ebi_trait_event_log::EbiTraitEventLog,
             ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,

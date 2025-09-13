@@ -6,19 +6,21 @@ use std::{
 
 use anyhow::{Context, Error, Ok, Result};
 use chrono::{DateTime, FixedOffset};
+use ebi_objects::{
+    Executions,
+    ebi_objects::{
+        executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
+    },
+};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 
 use crate::{
     ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
-    ebi_objects::{
-        executions::{Execution, Executions},
-        language_of_alignments::Move,
-    },
     ebi_traits::{
         ebi_trait_event_log::{ATTRIBUTE_TIME, EbiTraitEventLog},
-        ebi_trait_semantics::{EbiTraitSemantics, Semantics},
-        ebi_trait_stochastic_semantics::TransitionIndex,
+        ebi_trait_semantics::EbiTraitSemantics,
     },
+    semantics::semantics::Semantics,
     techniques::align::Align,
 };
 
@@ -43,12 +45,12 @@ where
 {
     fn find_executions(&mut self, mut log: Box<dyn EbiTraitEventLog>) -> Result<Executions> {
         log::info!("Compute alignments");
-        let progress_bar = EbiCommand::get_progress_bar_ticks(log.len());
+        let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
 
-        self.translate_using_activity_key(log.get_activity_key_mut());
+        self.translate_using_activity_key(log.activity_key_mut());
 
-        let result = (0..log.len())
+        let result = (0..log.number_of_traces())
             .into_par_iter()
             .filter_map(|trace_index| {
                 let trace = log.get_trace(trace_index).unwrap();
@@ -263,13 +265,9 @@ impl C {
 mod tests {
     use std::fs;
 
-    use crate::{
-        ebi_objects::{
-            event_log::EventLog,
-            stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        },
-        techniques::executions::FindExecutions,
-    };
+    use ebi_objects::{EventLog, StochasticDeterministicFiniteAutomaton};
+
+    use crate::techniques::executions::FindExecutions;
 
     #[test]
     fn executions() {

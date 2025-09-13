@@ -1,12 +1,12 @@
 use anyhow::{Context, anyhow};
 use clap::{Arg, ArgAction, value_parser};
-use ebi_arithmetic::fraction::Fraction;
+use ebi_arithmetic::Fraction;
+use ebi_objects::{EbiObject, EbiObjectType, HasActivityKey};
 
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::EbiInputType,
-        ebi_object::{EbiObject, EbiObjectType},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
@@ -98,7 +98,7 @@ pub const EBI_PROBABILITY_TRACE: EbiCommand = EbiCommand::Command {
                 .into_iter()
                 .map(|activity| activity.as_str())
                 .collect::<Vec<_>>();
-            let trace = model.get_activity_key_mut().process_trace_ref(&trace);
+            let trace = model.activity_key_mut().process_trace_ref(&trace);
 
             log::trace!("compute probability of trace {:?}", trace);
 
@@ -154,7 +154,7 @@ pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command {
                 .into_iter()
                 .map(|activity| activity.as_str())
                 .collect::<Vec<_>>();
-            let trace = semantics.get_activity_key_mut().process_trace_ref(&trace);
+            let trace = semantics.activity_key_mut().process_trace_ref(&trace);
 
             log::trace!("explain the trace {:?} given the model", trace);
 

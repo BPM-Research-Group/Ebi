@@ -1,7 +1,7 @@
-use anyhow::{Context, Result};
-use ebi_arithmetic::{
-    ebi_number::{One, Zero},
-    fraction::Fraction,
+use anyhow::{Context, Result, anyhow};
+use ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, GaussJordan, One, Zero};
+use ebi_objects::{
+    StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet, StochasticProcessTree,
 };
 use std::{
     collections::{HashMap, HashSet},
@@ -12,19 +12,13 @@ use std::{
 };
 
 use crate::{
-    ebi_objects::{
-        labelled_petri_net::LPNMarking,
-        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        stochastic_process_tree::StochasticProcessTree,
-        stochastic_process_tree_semantics::NodeStates,
-    },
-    ebi_traits::{
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-        ebi_trait_semantics::Semantics, ebi_trait_stochastic_semantics::StochasticSemantics,
-    },
+    ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     follower_semantics::FollowerSemantics,
-    math::matrix::Matrix,
+    semantics::{
+        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
+        semantics::Semantics,
+    },
+    stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
 
 //generic implementation
@@ -393,34 +387,31 @@ impl CrossProductResultImpl {
             return Ok(Fraction::zero());
         }
 
-        let mut matrix = Matrix::new_sized(
-            self.number_of_states(),
-            self.number_of_states() + 1,
-            Fraction::zero(),
-        );
+        let mut matrix = FractionMatrix::new(self.number_of_states(), self.number_of_states() + 1);
 
         for state_index in 0..self.number_of_states() {
-            matrix[state_index] = vec![Fraction::zero(); self.number_of_states() + 1];
-            matrix[state_index][state_index] = Fraction::one();
+            matrix.set(state_index, state_index, Fraction::one());
 
             if state_index == self.dead_state {
                 //a dead state has a 0 probability to end up in a final state
             } else if self.final_states.contains(&state_index) {
                 //a final state has a 1 probability to end up in a final state
-                matrix[state_index][self.number_of_states()] = Fraction::one();
+                matrix.set(state_index, self.number_of_states(), Fraction::one());
             } else {
                 //any other state has a probability equal to the weighted sum of its next states, to end up in a final state
                 for i in 0..self.next_states[state_index].len() {
                     let state_index_2 = self.next_states[state_index][i];
                     let coeff = &self.next_state_probabilities[state_index][i];
-                    matrix[state_index][state_index_2] = -coeff;
+                    matrix.set(state_index, state_index_2, -coeff);
                 }
             }
         }
 
-        matrix.solve()?;
+        matrix = matrix.gauss_jordan_reduced()?;
 
-        Ok(matrix[self.initial_state][self.number_of_states()].to_owned())
+        matrix
+            .get(self.initial_state, self.number_of_states())
+            .ok_or_else(|| anyhow!("item not found"))
     }
 }
 
@@ -471,15 +462,12 @@ struct Y {
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::{ebi_number::Zero, fraction::Fraction};
+    use ebi_arithmetic::{Fraction, Zero};
+    use ebi_objects::{
+        FiniteLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet, StochasticProcessTree
+    };
 
     use crate::{
-        ebi_framework::activity_key::HasActivityKey,
-        ebi_objects::{
-            stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-            stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-            stochastic_process_tree::StochasticProcessTree,
-        },
         ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
         follower_semantics::FollowerSemantics,
     };
@@ -493,7 +481,7 @@ mod tests {
 
         //a ends in a livelock and has probability 0
         let strace = vec!["a".to_string()];
-        let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+        let trace = sdfa.activity_key_mut().process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         assert_eq!(
             sdfa.get_probability(&trace_follower).unwrap(),
@@ -502,7 +490,7 @@ mod tests {
 
         //a, a ends in a livelock and has probability 0
         let strace = vec!["a".to_string(), "a".to_string()];
-        let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+        let trace = sdfa.activity_key_mut().process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         assert_eq!(
             sdfa.get_probability(&trace_follower).unwrap(),
@@ -511,7 +499,7 @@ mod tests {
 
         //b has weight 0
         let strace = vec!["b".to_string()];
-        let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+        let trace = sdfa.activity_key_mut().process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         assert_eq!(
             sdfa.get_probability(&trace_follower).unwrap(),
@@ -526,7 +514,7 @@ mod tests {
 
         //a ends in a livelock and has probability 0
         let strace = vec!["a".to_string()];
-        let trace = slpn.get_activity_key_mut().process_trace(&strace);
+        let trace = slpn.activity_key_mut().process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         assert_eq!(
             slpn.get_probability(&trace_follower).unwrap(),
@@ -535,7 +523,7 @@ mod tests {
 
         //a, a ends in a livelock and has probability 0
         let strace = vec!["a".to_string(), "a".to_string()];
-        let trace = slpn.get_activity_key_mut().process_trace(&strace);
+        let trace = slpn.activity_key_mut().process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         assert_eq!(
             slpn.get_probability(&trace_follower).unwrap(),
@@ -544,7 +532,7 @@ mod tests {
 
         //b has weight 0
         let strace = vec!["b".to_string()];
-        let trace = slpn.get_activity_key_mut().process_trace(&strace);
+        let trace = slpn.activity_key_mut().process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         assert_eq!(
             slpn.get_probability(&trace_follower).unwrap(),
@@ -553,7 +541,7 @@ mod tests {
 
         //c has weight 0
         let strace = vec!["c".to_string()];
-        let trace = slpn.get_activity_key_mut().process_trace(&strace);
+        let trace = slpn.activity_key_mut().process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         assert_eq!(
             slpn.get_probability(&trace_follower).unwrap(),
@@ -571,7 +559,7 @@ mod tests {
         //a
         {
             let strace = vec!["a".to_string()];
-            let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+            let trace = sdfa.activity_key_mut().process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = sdfa.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "2/5".parse::<Fraction>().unwrap());
@@ -580,7 +568,7 @@ mod tests {
         //b
         {
             let strace = vec!["b".to_string()];
-            let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+            let trace = sdfa.activity_key_mut().process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = sdfa.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "1/5".parse::<Fraction>().unwrap());
@@ -589,7 +577,7 @@ mod tests {
         //c (part of livelock trace)
         {
             let strace = vec!["c".to_string()];
-            let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+            let trace = sdfa.activity_key_mut().process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = sdfa.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "0".parse::<Fraction>().unwrap());
@@ -598,7 +586,7 @@ mod tests {
         //d (non-existing label)
         {
             let strace = vec!["d".to_string()];
-            let trace = sdfa.get_activity_key_mut().process_trace(&strace);
+            let trace = sdfa.activity_key_mut().process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = sdfa.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "0".parse::<Fraction>().unwrap());
@@ -613,7 +601,7 @@ mod tests {
         //a
         {
             let strace = vec!["a".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = slpn.activity_key_mut().process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "2/5".parse::<Fraction>().unwrap());
@@ -622,7 +610,7 @@ mod tests {
         //b
         {
             let strace = vec!["b".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = slpn.activity_key_mut().process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "1/5".parse::<Fraction>().unwrap());
@@ -631,7 +619,7 @@ mod tests {
         //c (part of livelock trace)
         {
             let strace = vec!["c".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = slpn.activity_key_mut().process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "0".parse::<Fraction>().unwrap());
@@ -640,7 +628,7 @@ mod tests {
         //d (non-existing label)
         {
             let strace = vec!["d".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = slpn.activity_key_mut().process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "0".parse::<Fraction>().unwrap());
@@ -655,7 +643,7 @@ mod tests {
         //a
         {
             let strace = vec!["a".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = slpn.activity_key_mut().process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "2/5".parse::<Fraction>().unwrap());
@@ -664,7 +652,7 @@ mod tests {
         //b
         {
             let strace = vec!["b".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = slpn.activity_key_mut().process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "1/5".parse::<Fraction>().unwrap());
@@ -673,7 +661,7 @@ mod tests {
         //empty trace (part of livelock trace)
         {
             let strace = vec![];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = slpn.activity_key_mut().process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "0".parse::<Fraction>().unwrap());
@@ -682,7 +670,7 @@ mod tests {
         //d (non-existing label)
         {
             let strace = vec!["d".to_string()];
-            let trace = slpn.get_activity_key_mut().process_trace(&strace);
+            let trace = slpn.activity_key_mut().process_trace(&strace);
             let trace_follower = FollowerSemantics::Trace(&trace);
             let probability = slpn.get_probability(&trace_follower).unwrap();
             assert_eq!(probability, "0".parse::<Fraction>().unwrap());
@@ -695,15 +683,29 @@ mod tests {
         let mut tree = fin.parse::<StochasticProcessTree>().unwrap();
 
         let strace = vec!["d".to_string()];
-        let trace = tree.get_activity_key_mut().process_trace(&strace);
+        let trace = tree.activity_key_mut().process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         let probability = tree.get_probability(&trace_follower).unwrap();
         assert_eq!(probability, Fraction::zero());
 
         let strace = vec!["a".to_string(), "c".to_string()];
-        let trace = tree.get_activity_key_mut().process_trace(&strace);
+        let trace = tree.activity_key_mut().process_trace(&strace);
         let trace_follower = FollowerSemantics::Trace(&trace);
         let probability = tree.get_probability(&trace_follower).unwrap();
         assert_eq!(probability, Fraction::from((2, 3)));
+    }
+
+    #[test]
+    fn emsc() {
+        let fin1 = fs::read_to_string("testfiles/aa-ab-ba_ali.slpn").unwrap();
+        let mut slpn: StochasticLabelledPetriNet =
+            fin1.parse::<StochasticLabelledPetriNet>().unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/aa.lang").unwrap();
+        let slang2 = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
+
+        let probability = slpn.get_probability_language(slang2).unwrap();
+
+        assert_eq!(probability, Fraction::zero());
     }
 }

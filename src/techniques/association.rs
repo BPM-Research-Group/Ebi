@@ -3,26 +3,26 @@ use crate::{
     math::{correlation::correlation, data_type::DataType, levenshtein, root::ContainsRoot},
 };
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{fraction::Fraction, ebi_number::{Signed, Zero}};
+use ebi_arithmetic::{Fraction, Signed, Zero};
 use rand::Rng;
 use rayon::prelude::*;
 
 pub trait Associations {
     fn association(
-        self: &mut Box<Self>,
+        self: &Box<Self>,
         number_of_samples: usize,
         attribute: &String,
     ) -> Result<ContainsRoot>;
 
     fn associations(
-        self: &mut Box<Self>,
+        self: &Box<Self>,
         number_of_samples: usize,
     ) -> Vec<(String, Result<ContainsRoot>)>;
 }
 
 impl Associations for dyn EbiTraitEventLog {
     fn association(
-        self: &mut Box<Self>,
+        self: &Box<Self>,
         number_of_samples: usize,
         attribute: &String,
     ) -> Result<ContainsRoot> {
@@ -38,7 +38,7 @@ impl Associations for dyn EbiTraitEventLog {
     }
 
     fn associations(
-        self: &mut Box<Self>,
+        self: &Box<Self>,
         number_of_samples: usize,
     ) -> Vec<(String, Result<ContainsRoot>)> {
         let attributes = self.get_trace_attributes();
@@ -81,7 +81,7 @@ impl dyn EbiTraitEventLog {
     ) -> Result<ContainsRoot> {
         //gather pairs
         let mut pairs = vec![];
-        for trace_index in 0..self.len() {
+        for trace_index in 0..self.number_of_traces() {
             if let Some(t) = self.get_trace_attribute_time(trace_index, case_attribute) {
                 pairs.push(t);
             }
@@ -122,11 +122,11 @@ impl dyn EbiTraitEventLog {
         case_attribute: &String,
         number_of_samples: usize,
     ) -> Result<ContainsRoot> {
-        let sample_size = self.len();
+        let sample_size = self.number_of_traces();
 
         //gather pairs
         let mut pairs = vec![];
-        for trace_index in 0..self.len() {
+        for trace_index in 0..self.number_of_traces() {
             if let Some(t) = self.get_trace_attribute_categorical(trace_index, case_attribute) {
                 pairs.push((t, trace_index));
             }
@@ -153,7 +153,7 @@ impl dyn EbiTraitEventLog {
                 let mut sample = vec![];
                 //create sample
                 for _ in 0..sample_size {
-                    let i = rand::thread_rng().gen_range(0..pairs.len());
+                    let i = rand::rng().random_range(0..pairs.len());
                     sample.push(i);
                 }
 
@@ -201,7 +201,7 @@ impl dyn EbiTraitEventLog {
     ) -> Result<ContainsRoot> {
         //gather pairs
         let mut pairs = vec![];
-        for trace_index in 0..self.len() {
+        for trace_index in 0..self.number_of_traces() {
             if let Some(t) = self.get_trace_attribute_numeric(trace_index, case_attribute) {
                 pairs.push((t, trace_index));
             }
@@ -280,8 +280,8 @@ impl<'a> Iterator for SamplePairsSpaceIterator<'a> {
             if self.done >= self.sample_space.number_of_samples {
                 None
             } else {
-                let i = rand::thread_rng().gen_range(0..self.sample_space.len);
-                let j = rand::thread_rng().gen_range(0..self.sample_space.len);
+                let i = rand::rng().random_range(0..self.sample_space.len);
+                let j = rand::rng().random_range(0..self.sample_space.len);
                 self.done += 1;
                 Some((i, j))
             }
@@ -296,5 +296,24 @@ impl<'a> Iterator for SamplePairsSpaceIterator<'a> {
                 Some((i, j))
             }
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use ebi_objects::EventLog;
+
+    use crate::{
+        ebi_traits::ebi_trait_event_log::EbiTraitEventLog, techniques::association::Associations,
+    };
+
+    #[test]
+    fn zero() {
+        let fin = fs::read_to_string("testfiles/a-b-double.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+        let log: Box<dyn EbiTraitEventLog> = Box::new(log);
+        log.associations(500);
     }
 }
