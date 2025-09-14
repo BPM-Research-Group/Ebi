@@ -23,9 +23,11 @@ use crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STO
 use crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_MEDOID;
 use crate::ebi_commands::ebi_command_association::ASSOCIATION_ATTRIBUTES;
 use crate::ebi_commands::ebi_command_association::ASSOCIATION_ATTRIBUTE;
+use crate::ebi_commands::ebi_command_conformance::CONFORMANCE_CSSC;
 use crate::ebi_commands::ebi_command_conformance::CONFORMANCE_EMSC;
 use crate::ebi_commands::ebi_command_conformance::CONFORMANCE_EMSC_SAMPLE;
 use crate::ebi_commands::ebi_command_conformance::CONFORMANCE_ER;
+use crate::ebi_commands::ebi_command_conformance::CONFORMANCE_HSC;
 use crate::ebi_commands::ebi_command_conformance::CONFORMANCE_JSSC;
 use crate::ebi_commands::ebi_command_conformance::CONFORMANCE_JSSC_SAMPLE;
 use crate::ebi_commands::ebi_command_conformance::CONFORMANCE_UEMSC;
@@ -445,6 +447,28 @@ fn association_trace_attribute(py: Python<'_>, arg0: &PyAny, arg1: &PyAny, arg2:
 }
 
 #[pyfunction]
+fn conformance_chi_square_stochastic_conformance(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
+    let command: &&EbiCommand = &&CONFORMANCE_CSSC;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
 fn conformance_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&CONFORMANCE_EMSC;
     let input_types = match **command {
@@ -493,6 +517,28 @@ fn conformance_earth_movers_stochastic_conformance_sample(py: Python<'_>, arg0: 
 #[pyfunction]
 fn conformance_entropic_relevance(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&CONFORMANCE_ER;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn conformance_hellinger_stochastic_conformance(py: Python<'_>, arg0: &PyAny, arg1: &PyAny) -> PyResult<PyObject> {
+    let command: &&EbiCommand = &&CONFORMANCE_HSC;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -1265,9 +1311,11 @@ fn ebi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {    m.add_function(wrap_p
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_medoid, m)?)?;
     m.add_function(wrap_pyfunction!(association_all_trace_attributes, m)?)?;
     m.add_function(wrap_pyfunction!(association_trace_attribute, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_chi_square_stochastic_conformance, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_earth_movers_stochastic_conformance, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_earth_movers_stochastic_conformance_sample, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_entropic_relevance, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_hellinger_stochastic_conformance, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_jensen_shannon, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_jensen_shannon_sample, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_unit_earth_movers_stochastic_conformance, m)?)?;

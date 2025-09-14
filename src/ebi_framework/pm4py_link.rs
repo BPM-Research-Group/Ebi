@@ -4,6 +4,7 @@ use pyo3::types::{PyAny, PyDict, PyList, PySet, PyString};
 use pyo3::AsPyPointer;
 use polars::prelude::*;
 use pyo3::exceptions::PyValueError;
+use pyo3::types::IntoPyDict;
 use std::io::Cursor;
 use std::collections::HashMap;
 use std::str::FromStr;
@@ -68,6 +69,10 @@ impl ExportableToPM4Py for EbiOutput {
             }
             EbiOutput::Usize(value) => {
                 value.export_to_pm4py(py)
+            }
+            EbiOutput::Object(EbiObject::EventLog(event_log)) => {
+                // special case: export EventLog directly
+                event_log.export_to_pm4py(py)
             }
             // default: no exporter available (not implemented yet or no equivalent in PM4Py) -> return string representation
             EbiOutput::Object(_)
@@ -166,7 +171,6 @@ impl ExportableToPM4Py for Fraction {
 
 
 
-
 impl ImportableFromPM4Py for EventLog {
     fn import_from_pm4py(event_log: &PyAny, input_types: &[&'static EbiInputType]) -> PyResult<EbiInput> {
         // Extract the list of traces from the PM4Py event log.
@@ -239,6 +243,170 @@ impl ImportableFromPM4Py for EventLog {
 
     }
 }
+
+impl ExportableToPM4Py for EventLog {
+    fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        let pm4py_module = py.import("pm4py.objects.log.obj")?;
+        let py_event_cls = pm4py_module.getattr("Event")?;
+        let py_trace_cls = pm4py_module.getattr("Trace")?;
+        let py_log_cls = pm4py_module.getattr("EventLog")?;
+
+        // Collect traces
+        let mut py_traces = Vec::with_capacity(self.rust4pm_log.traces.len());
+
+        for (trace_idx, rust_trace) in self.rust4pm_log.traces.iter().enumerate() {
+            // Collect events
+            let mut py_events = Vec::with_capacity(rust_trace.events.len());
+
+            for rust_event in &rust_trace.events {
+                let py_dict = PyDict::new(py);
+
+                for attr in &rust_event.attributes {
+                    let py_val = match &attr.value {
+                        AttributeValue::String(s) => s.to_object(py),
+                        AttributeValue::Int(i) => i.to_object(py),
+                        AttributeValue::Float(f) => f.to_object(py),
+                        AttributeValue::Boolean(b) => b.to_object(py),
+                        AttributeValue::Date(dt) => dt.to_rfc3339().to_object(py),
+                        AttributeValue::ID(id) => id.to_string().to_object(py),
+                        AttributeValue::List(list) => {
+                            let py_list = PyList::new(
+                                py,
+                                list.iter()
+                                    .map(|a| a.value.export_to_pm4py(py))
+                                    .collect::<Result<Vec<_>, _>>()?,
+                            );
+                            py_list.to_object(py)
+                        }
+                        AttributeValue::Container(container) => {
+                            let py_container = PyDict::new(py);
+                            for attr in container.iter() {
+                                py_container.set_item(&attr.key, attr.value.export_to_pm4py(py)?)?;
+                            }
+                            py_container.to_object(py)
+                        }
+                        AttributeValue::None() => py.None(),
+                    };
+                    py_dict.set_item(&attr.key, py_val)?;
+                }
+
+                let py_event = py_event_cls.call1((py_dict,))?;
+                py_events.push(py_event);
+            }
+
+            let py_trace_list = PyList::new(py, py_events);
+
+            // Trace attributes
+            let py_trace_attrs = PyDict::new(py);
+            for attr in &rust_trace.attributes {
+                let py_val = match &attr.value {
+                    AttributeValue::String(s) => s.to_object(py),
+                    AttributeValue::Int(i) => i.to_object(py),
+                    AttributeValue::Float(f) => f.to_object(py),
+                    AttributeValue::Boolean(b) => b.to_object(py),
+                    AttributeValue::Date(dt) => dt.to_rfc3339().to_object(py),
+                    AttributeValue::ID(id) => id.to_string().to_object(py),
+                    AttributeValue::List(list) => {
+                        let py_list = PyList::new(
+                            py,
+                            list.iter()
+                                .map(|a| a.value.export_to_pm4py(py))
+                                .collect::<Result<Vec<_>, _>>()?,
+                        );
+                        py_list.to_object(py)
+                    }
+                    AttributeValue::Container(container) => {
+                        let py_container = PyDict::new(py);
+                        for attr in container.iter() {
+                            py_container.set_item(&attr.key, attr.value.export_to_pm4py(py)?)?;
+                        }
+                        py_container.to_object(py)
+                    }
+                    AttributeValue::None() => py.None(),
+                };
+                py_trace_attrs.set_item(&attr.key, py_val)?;
+            }
+
+            let py_trace = py_trace_cls.call(
+                (py_trace_list,),
+                Some([("attributes", py_trace_attrs)].into_py_dict(py)),
+            )?;
+            py_traces.push(py_trace);
+        }
+
+        let py_log_list = PyList::new(py, py_traces);
+
+        // Log attributes
+        let py_log_attrs = PyDict::new(py);
+        for attr in &self.rust4pm_log.attributes {
+            let py_val = match &attr.value {
+                AttributeValue::String(s) => s.to_object(py),
+                AttributeValue::Int(i) => i.to_object(py),
+                AttributeValue::Float(f) => f.to_object(py),
+                AttributeValue::Boolean(b) => b.to_object(py),
+                AttributeValue::Date(dt) => dt.to_rfc3339().to_object(py),
+                AttributeValue::ID(id) => id.to_string().to_object(py),
+                AttributeValue::List(list) => {
+                    let py_list = PyList::new(
+                        py,
+                        list.iter()
+                            .map(|a| a.value.export_to_pm4py(py))
+                            .collect::<Result<Vec<_>, _>>()?,
+                    );
+                    py_list.to_object(py)
+                }
+                AttributeValue::Container(container) => {
+                    let py_container = PyDict::new(py);
+                    for attr in container.iter() {
+                        py_container.set_item(&attr.key, attr.value.export_to_pm4py(py)?)?;
+                    }
+                    py_container.to_object(py)
+                }
+                AttributeValue::None() => py.None(),
+            };
+            py_log_attrs.set_item(&attr.key, py_val)?;
+        }
+
+        let py_log = py_log_cls.call(
+            (py_log_list,),
+            Some([("attributes", py_log_attrs)].into_py_dict(py)),
+        )?;
+
+        Ok(py_log.into())
+    }
+}
+
+
+
+impl ExportableToPM4Py for AttributeValue {
+    fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
+        match self {
+            AttributeValue::String(s) => Ok(s.to_object(py)),
+            AttributeValue::Date(dt) => Ok(dt.to_rfc3339().to_object(py)), // export as ISO string
+            AttributeValue::Int(i) => Ok(i.to_object(py)),
+            AttributeValue::Float(f) => Ok(f.to_object(py)),
+            AttributeValue::Boolean(b) => Ok(b.to_object(py)),
+            AttributeValue::ID(uuid) => Ok(uuid.to_string().to_object(py)), // export as string
+            AttributeValue::List(attrs) => {
+                let py_list = PyList::new(
+                    py,
+                    attrs.iter().map(|a| a.value.export_to_pm4py(py)).collect::<PyResult<Vec<_>>>()?,
+                );
+                Ok(py_list.into_py(py))
+            }
+            AttributeValue::Container(attrs) => {
+                let py_dict = PyDict::new(py);
+                for attr in attrs {
+                    py_dict.set_item(&attr.key, attr.value.export_to_pm4py(py)?)?;
+                }
+                Ok(py_dict.into_py(py))
+            }
+            AttributeValue::None() => Ok(py.None()),
+        }
+    }
+}
+
+
 
 
 impl ImportableFromPM4Py for LabelledPetriNet {
