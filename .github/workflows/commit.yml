@@ -14,6 +14,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Compile link to pm4py
+      run: cargo run itself pm4py -o src/ebi_framework/pm4py_module_autogen.rs
     - name: Run tests mixed mode 1
       run: cargo test --verbose
     - name: Run tests mixed mode 2

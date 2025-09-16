@@ -36,7 +36,7 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
         &EBI_ITSELF_JAVA,
         &EBI_ITSELF_LOGO,
         &EBI_ITSELF_MANUAL,
-        &EBI_ITSELF_GENERATE_PM4PY,
+        &EBI_ITSELF_PM4PY,
      ]
 };
 
@@ -122,10 +122,10 @@ pub const EBI_ITSELF_HTML: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String
 };
 
-pub const EBI_ITSELF_GENERATE_PM4PY: EbiCommand = EbiCommand::Command { 
+pub const EBI_ITSELF_PM4PY: EbiCommand = EbiCommand::Command { 
     name_short: "pm4py", 
-    name_long: Some("generate-pm4py"), 
-    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_GENERATE_PM4PY",
+    name_long: None, 
+    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_PM4PY",
     explanation_short: "Generate the module exposed to PM4Py with all functions.", 
     explanation_long: None, 
     cli_command: None, 

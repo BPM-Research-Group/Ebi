@@ -47,7 +47,7 @@ use crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_S
 use crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA;
 use crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE;
 use crate::ebi_commands::ebi_command_info::EBI_INFO;
-use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_GENERATE_PM4PY;
+use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_PM4PY;
 use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_GRAPH;
 use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_HTML;
 use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_JAVA;
@@ -960,7 +960,7 @@ fn information(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
 
 #[pyfunction]
 fn itself_generate_pm4py(py: Python<'_>, ) -> PyResult<PyObject> {
-    let command: &&EbiCommand = &&EBI_ITSELF_GENERATE_PM4PY;
+    let command: &&EbiCommand = &&EBI_ITSELF_PM4PY;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
