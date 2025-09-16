@@ -7,10 +7,11 @@ use pyo3::prelude::*;
 use pyo3::types::IntoPyDict;
 use pyo3::types::{PyAny, PyDict, PyList, PySet, PyString};
 use std::collections::HashMap;
-use std::io::Cursor;
-use std::iter::Peekable;
-use std::str::Chars;
-use std::str::FromStr;
+use std::{
+    io::Cursor,
+    iter::Peekable,
+    str::{Chars, FromStr},
+};
 
 use ebi_arithmetic::fraction::fraction::Fraction;
 use ebi_objects::ebi_objects::{
@@ -28,21 +29,22 @@ use crate::ebi_file_handlers::{
     labelled_petri_net::EBI_LABELLED_PETRI_NET, process_tree::EBI_PROCESS_TREE,
 };
 
-use super::ebi_output::EbiOutput;
-use crate::ebi_framework::ebi_trait_object::EbiTraitObject;
-use crate::ebi_framework::{ebi_command::EbiCommand, prom_link::attempt_parse};
-use crate::ebi_framework::{
-    ebi_input::{EbiInput, EbiInputType},
-    ebi_output,
-    ebi_trait::EbiTrait,
+use crate::{
+    ebi_framework::{
+        ebi_command::EbiCommand,
+        ebi_input::{EbiInput, EbiInputType},
+        ebi_output::{self, EbiOutput},
+        ebi_trait::EbiTrait,
+        ebi_trait_object::EbiTraitObject,
+        prom_link::attempt_parse,
+    },
+    ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
 };
-use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};
 use ebi_objects::marking::Marking;
 use process_mining::event_log::{
-    AttributeValue, Attributes,
+    AttributeValue, Attributes, Event, EventLog as ProcessMiningEventLog, Trace,
     event_log_struct::{EventLogClassifier, to_attributes},
 };
-use process_mining::event_log::{Event, EventLog as ProcessMiningEventLog, Trace};
 
 type Importer = fn(&PyAny, &[&'static EbiInputType]) -> PyResult<EbiInput>;
 pub const IMPORTERS: &[Importer] = &[

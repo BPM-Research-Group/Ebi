@@ -9,8 +9,6 @@ pub mod ebi_framework {
     pub mod object_importers;
     pub mod prom_link;
     pub mod validate;
-    pub mod pm4py_link;
-    pub mod pm4py_module_autogen;
 }
 pub mod ebi_commands {
     pub mod ebi_command_analyse;
@@ -107,6 +105,11 @@ pub mod math {
     pub mod root;
     pub mod root_log_div;
 }
+pub mod pm4py {
+    pub mod pm4py_link;
+    pub mod pm4py_module;
+    pub mod pm4py_module_autogen;
+}
 pub mod semantics {
     pub mod directly_follows_graph_semantics;
     pub mod finite_stochastic_language_semantics;
@@ -150,6 +153,7 @@ pub mod techniques {
     pub mod any_traces;
     pub mod bootstrap_test;
     pub mod bounded;
+    pub mod chi_square_stochastic_conformance;
     pub mod directly_follows_graph_abstractor;
     pub mod directly_follows_model_miner;
     pub mod edge_difference;
@@ -159,6 +163,7 @@ pub mod techniques {
     pub mod explain_trace;
     pub mod fitness;
     pub mod flower_miner;
+    pub mod hellinger_stochastic_conformance;
     pub mod infinitely_many_traces;
     pub mod jensen_shannon_stochastic_conformance;
     pub mod livelock;
@@ -175,8 +180,6 @@ pub mod techniques {
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
-    pub mod hellinger_stochastic_conformance;
-    pub mod chi_square_stochastic_conformance;
 }
 pub mod follower_semantics;
 pub mod json;
