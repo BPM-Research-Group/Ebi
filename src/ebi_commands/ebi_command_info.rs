@@ -18,6 +18,7 @@ macro_rules! ebi_info {
 pub const EBI_INFO: EbiCommand = EbiCommand::Command {
     name_short: ebi_info!(),
     name_long: Some("information"),
+    library_name: "ebi_commands::ebi_command_info::EBI_INFO",
     explanation_short: "Show information about a file.",
     explanation_long: None,
     latex_link: None,

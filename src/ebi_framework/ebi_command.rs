@@ -71,6 +71,7 @@ pub enum EbiCommand {
     Command {
         name_short: &'static str,
         name_long: Option<&'static str>,
+        library_name: &'static str, // must match path to the commans, e.g.  (neccessary for automatic code generation)
         explanation_short: &'static str,
         explanation_long: Option<&'static str>,
         latex_link: Option<&'static str>, //insert a link to a Latex target
@@ -702,6 +703,7 @@ impl PartialEq for EbiCommand {
                 Self::Command {
                     name_short: l_name_short,
                     name_long: l_name_long,
+                    library_name: l_library_name,
                     explanation_short: l_explanation_short,
                     explanation_long: l_explanation_long,
                     latex_link: l_latex_link,
@@ -716,6 +718,7 @@ impl PartialEq for EbiCommand {
                 Self::Command {
                     name_short: r_name_short,
                     name_long: r_name_long,
+                    library_name: r_library_name,
                     explanation_short: r_explanation_short,
                     explanation_long: r_explanation_long,
                     latex_link: r_latex_link,
@@ -730,6 +733,7 @@ impl PartialEq for EbiCommand {
             ) => {
                 l_name_short == r_name_short
                     && l_name_long == r_name_long
+                    && l_library_name == r_library_name
                     && l_explanation_short == r_explanation_short
                     && l_explanation_long == r_explanation_long
                     && l_latex_link == r_latex_link

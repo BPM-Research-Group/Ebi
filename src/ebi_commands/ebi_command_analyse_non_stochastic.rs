@@ -37,6 +37,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
 pub const EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES: EbiCommand = EbiCommand::Command {
     name_short: "act",
     name_long: Some("activities"),
+    library_name: "ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES",
     explanation_short: "Shows the activities that are declared in the object.",
     explanation_long: None,
     latex_link: None,
@@ -59,6 +60,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES: EbiCommand = EbiCommand::Comman
 pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
     name_short: "bnd",
     name_long: Some("bounded"),
+    library_name: "ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_BOUNDED",
     explanation_short: "Compute whether the model has a bounded state space.",
     explanation_long: Some(
         "Compute whether the model has a bounded state space. 
@@ -145,6 +147,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
 pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
     name_short: "clus",
     name_long: Some("cluster"),
+    library_name: "ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_CLUSTER",
     explanation_short: "Apply k-medoid clustering on a finite set of traces, without considering the stochastic perspective.",
     explanation_long: Some(
         "Apply k-medoid clustering: group the traces into a given number of clusters, such that the average distance of each trace to its closest medoid is minimal. The computation is random and does not take into account how often each trace occurs.",
@@ -170,6 +173,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
 pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Command {
     name_short: "exe",
     name_long: Some("executions"),
+    library_name: "ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS",
     explanation_short: "Compute the executions of each transition of the model in the log.",
     explanation_long: Some(
         "Compute executions.\nNB 1: the model must be able to terminate and its states must be bounded.\nNB 2: the search performed is not optimised. For Petri nets, the ProM implementation may be more efficient.",
@@ -197,6 +201,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Comman
 pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Command {
     name_short: "at",
     name_long: Some("any-traces"),
+    library_name: "ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES",
     explanation_short: "Compute whether the model has any traces.",
     explanation_long: Some(
         "Compute whether the model has any traces.
@@ -287,6 +292,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
 pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCommand::Command {
     name_short: "inft",
     name_long: Some("infinitely-many-traces"),
+    library_name: "ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES",
     explanation_short: "Compute whether the model has infinitely many traces.",
     explanation_long: Some(
         "Compute whether the model has infinitely many traces. The computation may not terminate if the model is unbounded.",
@@ -362,6 +368,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
 pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command {
     name_short: "med",
     name_long: Some("medoid"),
+    library_name: "ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_MEDOID",
     explanation_short: "Find the traces with the least distance to the other traces, without considering the stochastic perspective.",
     explanation_long: Some(
         "Find the traces with the lowest average normalised Levenshtein distance to the other traces; ties are resolved arbritrarily. The computation is random and does not take into account how often each trace occurs.",

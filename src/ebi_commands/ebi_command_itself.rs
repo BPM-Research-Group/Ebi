@@ -3,7 +3,6 @@ use clap::Command;
 use anyhow::Result;
 use ebi_objects::{ebi_objects::scalable_vector_graphics::ToSVGMut, EbiObject, EbiObjectType};
 use inflector::Inflector;
-use itertools::Itertools;
 use layout::{core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
@@ -37,12 +36,14 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
         &EBI_ITSELF_JAVA,
         &EBI_ITSELF_LOGO,
         &EBI_ITSELF_MANUAL,
+        &EBI_ITSELF_GENERATE_PM4PY,
      ]
 };
 
 pub const EBI_ITSELF_LOGO: EbiCommand = EbiCommand::Command {
     name_short: "log", 
     name_long: Some("logo"), 
+    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_LOGO",
     explanation_short: "Print the logo of Ebi.", 
     explanation_long: None, 
     cli_command: None, 
@@ -58,6 +59,7 @@ pub const EBI_ITSELF_LOGO: EbiCommand = EbiCommand::Command {
 pub const EBI_ITSELF_MANUAL: EbiCommand = EbiCommand::Command { 
     name_short: "man", 
     name_long: Some("manual"), 
+    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_MANUAL",
     explanation_short: "Print the automatically generated parts of the manual of Ebi in Latex format.", 
     explanation_long: None, 
     cli_command: None, 
@@ -73,6 +75,7 @@ pub const EBI_ITSELF_MANUAL: EbiCommand = EbiCommand::Command {
 pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command { 
     name_short: "graph", 
     name_long: None, 
+    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_GRAPH",
     explanation_short: "Print the graph of Ebi.", 
     explanation_long: None, 
     cli_command: None, 
@@ -91,6 +94,7 @@ pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command {
 pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command { 
     name_short: "java", 
     name_long: None, 
+    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_JAVA",
     explanation_short: "Print the classes for Java.", 
     explanation_long: None, 
     cli_command: None, 
@@ -102,10 +106,10 @@ pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command {
     execute: |_, _| Ok(prom_link::print_java_plugins()?), 
     output_type: &EbiOutputType::String
 };
-
 pub const EBI_ITSELF_HTML: EbiCommand = EbiCommand::Command { 
     name_short: "html", 
     name_long: None, 
+    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_HTML",
     explanation_short: "Print parts of the website.", 
     explanation_long: None, 
     cli_command: None, 
@@ -117,6 +121,23 @@ pub const EBI_ITSELF_HTML: EbiCommand = EbiCommand::Command {
     execute: |_, _| Ok(EbiOutput::String(html())), 
     output_type: &EbiOutputType::String
 };
+
+pub const EBI_ITSELF_GENERATE_PM4PY: EbiCommand = EbiCommand::Command { 
+    name_short: "pm4py", 
+    name_long: Some("generate-pm4py"), 
+    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_GENERATE_PM4PY",
+    explanation_short: "Generate the module exposed to PM4Py with all functions.", 
+    explanation_long: None, 
+    cli_command: None, 
+    latex_link: None, 
+    exact_arithmetic: false, 
+    input_types: &[], 
+    input_names: &[],
+    input_helps: &[],
+    execute: |_, _| Ok(generate_pm4py_module()?), 
+    output_type: &EbiOutputType::String
+};
+
 
 fn manual() -> Result<EbiOutput> {
     let mut f = vec![];
@@ -403,10 +424,10 @@ pub fn output_types(output_type: &EbiOutputType) -> String {
     let mut list = output_type.get_exporters().into_iter().map(
         |exp| exp.get_article().to_string() 
         + " " 
-        + &match exp {
+        + match exp {
             EbiExporter::Object(_, file_handler) => format!("{} (.{} -- Section~\\ref{{filehandler:{}}})", file_handler.name, file_handler.file_extension, file_handler.name),
             _ => exp.to_string()
-        }
+        }.as_str()
     ).collect::<Vec<_>>();
     if list.len() == 1 {
         return list.remove(0)
@@ -421,7 +442,7 @@ pub fn graph() -> Result<VisualGraph> {
     //traits
     let mut traits = HashMap::new();
     for etrait in EbiTrait::iter() {
-        let shape = ShapeKind::new_box(&("trait ".to_owned() + &etrait.to_string()));
+        let shape = ShapeKind::new_box(&("trait ".to_owned() + etrait.to_string().as_str()));
         let look = StyleAttr::simple();
         let orientation = Orientation::LeftToRight;
         let mut size = get_shape_size(orientation, &shape, look.font_size, false);
@@ -435,7 +456,7 @@ pub fn graph() -> Result<VisualGraph> {
     //object types
     let mut object_types = HashMap::new();
     for object_type in EbiObjectType::iter() {
-        let shape = ShapeKind::new_box(&("type ".to_owned() + &object_type.to_string()));
+        let shape = ShapeKind::new_box(&("type ".to_owned() + object_type.to_string().as_str()));
         let mut look = StyleAttr::simple();
         look.fill_color = Color::from_name("lightgray");
         let orientation = Orientation::LeftToRight;
@@ -450,7 +471,7 @@ pub fn graph() -> Result<VisualGraph> {
     //file handlers
     let mut file_handlers = HashMap::new();
     for file_handler in EBI_FILE_HANDLERS {
-        let shape = ShapeKind::new_circle(&(".".to_owned() + &file_handler.file_extension.to_string()));
+        let shape = ShapeKind::new_circle(&(".".to_owned() + file_handler.file_extension.to_string().as_str()));
         let look = StyleAttr::simple();
         let orientation = Orientation::LeftToRight;
         let mut size = get_shape_size(orientation, &shape, look.font_size-5, false);
@@ -522,20 +543,133 @@ pub fn scale(point: &mut Point) {
 }
 
 pub fn html() -> String {
-    "<h2>Commands</h2>".to_owned() +
-    "Ebi offers the following comands and techniques. " +
-    "Please refer to the <a href=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true\">manual</a> for more information. " + 
-    "<ul><li>" +
-    &EBI_COMMANDS.get_command_paths().iter().filter_map(|path| if path[1].long_name() != EBI_ITSELF.long_name() {
-        Some("<i>".to_owned() + &EbiCommand::path_to_string(&path[1..]).to_sentence_case() + "</i>. " + path.last().unwrap().explanation_short())
-    } else {None}).join("</li><li>") +
+    let commands_html = EBI_COMMANDS
+        .get_command_paths()
+        .iter()
+        .filter_map(|path| {
+            if path[1].long_name() != EBI_ITSELF.long_name() {
+                Some(format!(
+                    "<i>{}</i>. {}",
+                    EbiCommand::path_to_string(&path[1..]).to_sentence_case(),
+                    path.last().unwrap().explanation_short()
+                ))
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>()
+        .join("</li><li>");
+
+    let file_formats_html = EBI_FILE_HANDLERS
+        .iter()
+        .map(|file_handler| {
+            format!(
+                "{} (.{})",
+                file_handler.name.to_sentence_case(),
+                file_handler.file_extension
+            )
+        })
+        .collect::<Vec<_>>()
+        .join("</li><li>");
+
+    format!(
+        "<h2>Commands</h2>\
+        Ebi offers the following comands and techniques. \
+        Please refer to the <a href=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true\">manual</a> for more information. \
+        <ul><li>{}</li></ul>\
+        <h2>Supported file formats</h2>\
+        <ul><li>{}</li></ul>",
+        commands_html, file_formats_html
+    )
+}
+
+
+pub fn generate_pm4py_module() -> Result<EbiOutput> {
+    let mut imports = format!("#![allow(unsafe_op_in_unsafe_fn)]
+#![allow(unused_variables)]
+
+use pyo3::prelude::*;
+use pyo3::types::PyAny;
+use super::pm4py_link::{{import_or_load, ExportableToPM4Py}};
+use crate::ebi_framework::ebi_command::EbiCommand;");
+    let mut functions = String::new();
+    let mut module = format!("#[pymodule]\nfn ebi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {{");
     
-    "</li></ul>" + 
-    
-    
-    //file formats
-    "<h2>Supported file formats</h2>" + 
-    "<ul><li>" +
-    &EBI_FILE_HANDLERS.iter().map(|file_handler| format!("{} (.{})", file_handler.name.to_sentence_case(), file_handler.file_extension)).join("</li><li>") +
-    "</li></ul>"
+    for path in EBI_COMMANDS.get_command_paths() {
+        if let EbiCommand::Command { library_name,.. } = path[path.len() - 1] {
+            imports.push_str(&format!("\nuse crate::{};", library_name));
+            let (fn_name, body) = generate_pyfn(&path, library_name.to_string());
+            functions.push_str(&body);
+            module.push_str(&format!("    m.add_function(wrap_pyfunction!({}, m)?)?;\n", fn_name));
+        }
+    }
+
+    module.push_str("    Ok(())
+}
+");
+
+    let result = format!("{}\n\n{}\n\n{}", imports, functions, module);
+    Ok(EbiOutput::String(result))
+}
+
+/// return the tupe (string1, string2) where
+/// string1 - function name
+/// string2 - function body
+fn generate_pyfn(path: &Vec<&EbiCommand>, library_name: String) -> (String, String) {
+    // Derive raw name and fn name
+    let raw_name = EbiCommand::path_to_string(path);
+    let fn_name: String = raw_name
+        .strip_prefix("Ebi ")
+        .unwrap_or(&raw_name)
+        .to_lowercase()
+        .chars()
+        .map(|c| if c == ' ' || c == '-' { '_' } else { c })
+        .collect();
+
+    // Extract input_types
+    let input_types = if let EbiCommand::Command { input_types, .. } = path[path.len() - 1] {
+        input_types
+    } else {
+        return (String::new(), String::new());
+    };
+
+    // Start building function
+    let mut body = format!(r###"#[pyfunction]
+fn {fname}(py: Python<'_>, {args}) -> PyResult<PyObject> {{
+    let command: &&EbiCommand = &&{library_name};
+    let input_types = match **command {{
+        EbiCommand::Command {{ input_types, .. }} => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    }};
+"###,
+        fname = fn_name,
+        args = (0..input_types.len()).map(|i| format!("arg{}: &PyAny", i)).collect::<Vec<_>>().join(", "),
+        library_name = library_name.split("::").last().unwrap()
+    );
+
+    // Import each argument
+    for idx in 0..input_types.len() {
+        body.push_str(&format!(r###"    let input{idx} = import_or_load(arg{idx}, input_types[{idx}], {idx})
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument {idx}: {{}}", e)))?;
+    "###,
+            idx = idx
+        ));
+    }
+
+    // Collect inputs
+    let inputs = (0..input_types.len()).map(|i| format!("input{}", i)).collect::<Vec<_>>().join(", ");
+    body.push_str(&format!(r###"    let inputs = vec![{}];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {{}}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {{}}", e)))?;
+
+    Ok(result)
+}}
+
+"###, inputs));
+
+    (fn_name, body)
 }

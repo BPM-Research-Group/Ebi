@@ -35,6 +35,7 @@ pub const EBI_PROBABILITY: EbiCommand = EbiCommand::Group {
 pub const EBI_PROBABILITY_LOG: EbiCommand = EbiCommand::Command {
     name_short: "log",
     name_long: None,
+    library_name: "ebi_commands::ebi_command_probability::EBI_PROBABILITY_LOG",
     explanation_short: "Compute the probability that a stochastic model produces any trace of a log.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:journals/is/LeemansMM24}"),
@@ -68,6 +69,7 @@ pub const EBI_PROBABILITY_LOG: EbiCommand = EbiCommand::Command {
 pub const EBI_PROBABILITY_TRACE: EbiCommand = EbiCommand::Command {
     name_short: "trac",
     name_long: Some("trace"),
+    library_name: "ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE",
     explanation_short: "Compute the probability of a trace in a stochastic model.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:journals/is/LeemansMM24}"),
@@ -114,6 +116,7 @@ pub const EBI_PROBABILITY_TRACE: EbiCommand = EbiCommand::Command {
 pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command {
     name_short: "exptra",
     name_long: Some("explain-trace"),
+    library_name: "ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE",
     explanation_short: "Compute the most likely explanation of a trace given the stochastic model.",
     explanation_long: None,
     latex_link: None,

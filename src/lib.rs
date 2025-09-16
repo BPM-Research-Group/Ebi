@@ -9,7 +9,8 @@ pub mod ebi_framework {
     pub mod object_importers;
     pub mod prom_link;
     pub mod validate;
-    // pub mod pm4py_link;
+    pub mod pm4py_link;
+    pub mod pm4py_module_autogen;
 }
 pub mod ebi_commands {
     pub mod ebi_command_analyse;

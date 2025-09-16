@@ -221,7 +221,7 @@ impl EbiInputType {
                         .collect();
                     result.insert(
                         "the file extension of any file type supported by Ebi (".to_owned()
-                            + &extensions.join_with(", ", " or ")
+                            + extensions.join_with(", ", " or ").as_str()
                             + ")",
                     );
                 }
@@ -290,7 +290,7 @@ impl EbiInputType {
                         .collect();
                     result.insert(
                         "the file extension of any file type supported by Ebi (".to_owned()
-                            + &extensions.join_with(", ", " or ")
+                            + extensions.join_with(", ", " or ").as_str()
                             + ")",
                     );
                 }

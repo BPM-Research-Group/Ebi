@@ -42,6 +42,7 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
 pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
     name_short: "uemsc",
     name_long: Some("unit-earth-movers-stochastic-conformance"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_UEMSC",
     explanation_short: "Compute unit-earth movers' stochastic conformance.",
     explanation_long: Some(
         "Compute unit-earth movers' stochastic conformance, also known as total variation distance.",
@@ -76,6 +77,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
     name_short: "er",
     name_long: Some("entropic-relevance"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_ER",
     explanation_short: "Compute entropic relevance (uniform).",
     explanation_long: None,
     latex_link: Some(
@@ -125,6 +127,7 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
     name_short: "jssc",
     name_long: Some("jensen-shannon"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_JSSC",
     explanation_short: "Compute Jensen-Shannon stochastic conformance.",
     explanation_long: None,
     latex_link: None,
@@ -163,6 +166,7 @@ pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "jssc-sample",
     name_long: Some("jensen-shannon-sample"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_JSSC_SAMPLE",
     explanation_short: "Compute Jensen-Shannon stochastic conformance with sampling.",
     explanation_long: None,
     latex_link: None,
@@ -206,6 +210,7 @@ pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
     name_short: "emsc",
     name_long: Some("earth-movers-stochastic-conformance"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_EMSC",
     explanation_short: "Compute Earth mover's stochastic conformance.",
     explanation_long: Some(
         "Compute Earth mover's stochastic conformance, also known as the Wasserstein distance.",
@@ -244,6 +249,7 @@ pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "emsc-sample",
     name_long: Some("earth-movers-stochastic-conformance-sample"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_EMSC_SAMPLE",
     explanation_short: "Compute Earth mover's stochastic conformance with sampling.",
     explanation_long: Some(
         "Compute Earth mover's stochastic conformance with sampling, also known as the Wasserstein distance.",
@@ -289,6 +295,7 @@ pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
     name_short: "hsc",
     name_long: Some("hellinger-stochastic-conformance"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_HSC",
     explanation_short: "Compute Hellinger stochastic conformance.",
     explanation_long: Some(
         "Compute Hellinger stochastic conformance, also known as the Hellinger distance.",
@@ -323,6 +330,7 @@ pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
     name_short: "cssc",
     name_long: Some("chi-square-stochastic-conformance"),
+    library_name: "ebi_commands::ebi_command_conformance::CONFORMANCE_CSSC",
     explanation_short: "Compute Chi-Square stochastic conformance.",
     explanation_long: Some(
         "Compute Chi-Square stochastic conformance, also known as the Chi-Square distance.",
