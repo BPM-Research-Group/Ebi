@@ -107,8 +107,8 @@ pub mod math {
 }
 pub mod pm4py {
     pub mod pm4py_link;
-    pub mod pm4py_module;
     pub mod pm4py_module_autogen;
+    pub mod pm4py_module_generator;
 }
 pub mod semantics {
     pub mod directly_follows_graph_semantics;

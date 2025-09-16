@@ -1,27 +1,29 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{MaybeExact, is_exact_globally};
 use polars::prelude::*;
-use pyo3::AsPyPointer;
-use pyo3::exceptions::PyValueError;
-use pyo3::prelude::*;
-use pyo3::types::IntoPyDict;
-use pyo3::types::{PyAny, PyDict, PyList, PySet, PyString};
-use std::collections::HashMap;
+use pyo3::{
+    AsPyPointer,
+    exceptions::PyValueError,
+    prelude::*,
+    types::{IntoPyDict, PyAny, PyDict, PyList, PySet, PyString},
+};
 use std::{
+    collections::HashMap,
     io::Cursor,
     iter::Peekable,
     str::{Chars, FromStr},
 };
 
-use ebi_arithmetic::fraction::fraction::Fraction;
-use ebi_objects::ebi_objects::{
-    event_log::EventLog, finite_language::FiniteLanguage,
-    finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet,
-    process_tree::ProcessTree,
+use ebi_arithmetic::{MaybeExact, fraction::fraction::Fraction, is_exact_globally};
+use ebi_objects::{
+    activity_key::activity_key::ActivityKey,
+    constants::{ebi_object::EbiObject, ebi_object_type::EbiObjectType},
+    ebi_objects::{
+        event_log::EventLog, finite_language::FiniteLanguage,
+        finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet,
+        process_tree::ProcessTree,
+    },
+    marking::Marking,
 };
-
-use ebi_objects::activity_key::activity_key::ActivityKey;
-use ebi_objects::constants::{ebi_object::EbiObject, ebi_object_type::EbiObjectType};
 
 use crate::ebi_file_handlers::{
     event_log::EBI_EVENT_LOG, finite_language::EBI_FINITE_LANGUAGE,
@@ -40,11 +42,12 @@ use crate::{
     },
     ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
 };
-use ebi_objects::marking::Marking;
 use process_mining::event_log::{
     AttributeValue, Attributes, Event, EventLog as ProcessMiningEventLog, Trace,
     event_log_struct::{EventLogClassifier, to_attributes},
 };
+
+pub const PM4PY_PACKAGE: &str = "ebi-pm";
 
 type Importer = fn(&PyAny, &[&'static EbiInputType]) -> PyResult<EbiInput>;
 pub const IMPORTERS: &[Importer] = &[
