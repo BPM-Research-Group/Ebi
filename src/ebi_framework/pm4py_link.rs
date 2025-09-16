@@ -156,9 +156,11 @@ impl ImportableFromPM4Py for Fraction {
 impl ExportableToPM4Py for Fraction {
     fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
         match self {
+            // malachite does not offer any direct way to convert Rational to f64, but log can be retrieved as f64
+            // we apply exp to get back the original value
             Fraction::Exact(rat) => {
-                let float_value : f64 = f64::try_from(rat)
-                    .map_err(|_| PyValueError::new_err("Failed to convert Rational to f64"))?;
+                let log_value = rat.approx_log();
+                let float_value: f64 = log_value.exp();
                 Ok(float_value.to_object(py))
             }
             Fraction::Approx(value) => Ok(value.to_object(py)),
@@ -254,7 +256,7 @@ impl ExportableToPM4Py for EventLog {
         // Collect traces
         let mut py_traces = Vec::with_capacity(self.rust4pm_log.traces.len());
 
-        for (trace_idx, rust_trace) in self.rust4pm_log.traces.iter().enumerate() {
+        for (_trace_idx, rust_trace) in self.rust4pm_log.traces.iter().enumerate() {
             // Collect events
             let mut py_events = Vec::with_capacity(rust_trace.events.len());
 
