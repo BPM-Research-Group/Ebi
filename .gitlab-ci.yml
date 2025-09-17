@@ -42,6 +42,7 @@ buildlatex:
     - git add build/prom-rust/Rust-6.15.3-lin64.zip
 
     #compile windows 64 bit
+    - export PYO3_CROSS_PYTHON_VERSION="3.12"
     - cargo build --target x86_64-pc-windows-gnu --release
     - mv target/x86_64-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-x86_64-windows.exe
     - git add build/nightly/Ebi-x86_64-windows.exe

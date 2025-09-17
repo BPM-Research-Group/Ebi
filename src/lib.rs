@@ -106,7 +106,9 @@ pub mod math {
     pub mod root_log_div;
 }
 pub mod pm4py {
+    #[cfg(feature = "python")]
     pub mod pm4py_link;
+    #[cfg(feature = "python")]
     pub mod pm4py_module_autogen;
     pub mod pm4py_module_generator;
 }

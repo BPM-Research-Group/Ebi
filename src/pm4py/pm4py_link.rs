@@ -47,8 +47,6 @@ use process_mining::event_log::{
     event_log_struct::{EventLogClassifier, to_attributes},
 };
 
-pub const PM4PY_PACKAGE: &str = "ebi-pm";
-
 type Importer = fn(&PyAny, &[&'static EbiInputType]) -> PyResult<EbiInput>;
 pub const IMPORTERS: &[Importer] = &[
     usize::import_from_pm4py,

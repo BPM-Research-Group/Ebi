@@ -2,6 +2,7 @@
 /data
 /.vscode
 /builds
+/python-runtime
 
 # Added by cargo
 #
