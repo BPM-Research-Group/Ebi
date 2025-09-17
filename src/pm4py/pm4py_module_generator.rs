@@ -55,13 +55,12 @@ use crate::ebi_framework::ebi_command::EbiCommand;"
 /// string1 - function name
 /// string2 - function body
 fn ebi_command_to_pm4py_function(path: &Vec<&EbiCommand>) -> (String, String) {
-    let library_name = path[path.len() - 1].to_string();
     // Derive raw name and fn name
     let fn_name = pm4py_function_name(path);
 
     // Extract input_types
-    let input_types = if let EbiCommand::Command { input_types, .. } = path[path.len() - 1] {
-        input_types
+    let (input_types, library_name) = if let EbiCommand::Command { input_types, library_name, .. } = path[path.len() - 1] {
+        (input_types, library_name)
     } else {
         return (String::new(), String::new());
     };

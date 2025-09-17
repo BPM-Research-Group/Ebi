@@ -47,12 +47,12 @@ use crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_S
 use crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA;
 use crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE;
 use crate::ebi_commands::ebi_command_info::EBI_INFO;
-use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_PM4PY;
 use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_GRAPH;
 use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_HTML;
 use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_JAVA;
 use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_LOGO;
 use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_MANUAL;
+use crate::ebi_commands::ebi_command_itself::EBI_ITSELF_PM4PY;
 use crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE;
 use crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_LOG;
 use crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE;
@@ -959,24 +959,6 @@ fn information(py: Python<'_>, arg0: &PyAny) -> PyResult<PyObject> {
 }
 
 #[pyfunction]
-fn itself_generate_pm4py(py: Python<'_>, ) -> PyResult<PyObject> {
-    let command: &&EbiCommand = &&EBI_ITSELF_PM4PY;
-    let input_types = match **command {
-        EbiCommand::Command { input_types, .. } => input_types,
-        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
-    };
-    let inputs = vec![];
-
-    // Execute the command.
-    let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
-        .export_to_pm4py(py)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-
-    Ok(result)
-}
-
-#[pyfunction]
 fn itself_graph(py: Python<'_>, ) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ITSELF_GRAPH;
     let input_types = match **command {
@@ -1051,6 +1033,24 @@ fn itself_logo(py: Python<'_>, ) -> PyResult<PyObject> {
 #[pyfunction]
 fn itself_manual(py: Python<'_>, ) -> PyResult<PyObject> {
     let command: &&EbiCommand = &&EBI_ITSELF_MANUAL;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let inputs = vec![];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn itself_pm4py(py: Python<'_>, ) -> PyResult<PyObject> {
+    let command: &&EbiCommand = &&EBI_ITSELF_PM4PY;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -1335,12 +1335,12 @@ fn ebi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {    m.add_function(wrap_p
     m.add_function(wrap_pyfunction!(discover_non_stochastic_prefix_tree_deterministic_finite_automaton, m)?)?;
     m.add_function(wrap_pyfunction!(discover_non_stochastic_prefix_tree_process_tree, m)?)?;
     m.add_function(wrap_pyfunction!(information, m)?)?;
-    m.add_function(wrap_pyfunction!(itself_generate_pm4py, m)?)?;
     m.add_function(wrap_pyfunction!(itself_graph, m)?)?;
     m.add_function(wrap_pyfunction!(itself_html, m)?)?;
     m.add_function(wrap_pyfunction!(itself_java, m)?)?;
     m.add_function(wrap_pyfunction!(itself_logo, m)?)?;
     m.add_function(wrap_pyfunction!(itself_manual, m)?)?;
+    m.add_function(wrap_pyfunction!(itself_pm4py, m)?)?;
     m.add_function(wrap_pyfunction!(probability_explain_trace, m)?)?;
     m.add_function(wrap_pyfunction!(probability_log, m)?)?;
     m.add_function(wrap_pyfunction!(probability_trace, m)?)?;
