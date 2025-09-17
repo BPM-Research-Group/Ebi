@@ -18,9 +18,9 @@ use crate::ebi_framework::ebi_output::EbiOutputType;
 // can't return one of the objects with lifetime information because the
 // lifetime checker won't let us.
 use crate::multiple_reader::MultipleReader;
+use crate::text::JavaEscaper;
 use anyhow::{Context, Result, anyhow};
 use jni::sys::jstring;
-use regex::Regex;
 use strum::IntoEnumIterator;
 
 use super::ebi_file_handler::EBI_FILE_HANDLERS;
@@ -369,8 +369,8 @@ pub fn print_java_plugins() -> Result<EbiOutput> {
 
             for exporter in output_type.get_exporters() {
                 //function name
-                let ebi_function_name = escape_code(EbiCommand::path_to_string(&path));
-                let java_exporter_name = escape_code(exporter.get_name().to_string());
+                let ebi_function_name = EbiCommand::path_to_string(&path).escape_java_code();
+                let java_exporter_name = exporter.get_name().to_string().escape_java_code();
 
                 //output
                 for output_java_object_handler in exporter.get_java_object_handlers() {
@@ -416,7 +416,9 @@ pub fn print_java_plugins() -> Result<EbiOutput> {
                                 .any(|java_object_handler| java_object_handler.input_gui.is_some());
                             let mut parameterlabels = inputs_java_object_handler_without_gui
                                 .iter()
-                                .map(|java_object_handler| escape_string(java_object_handler.name));
+                                .map(|java_object_handler| {
+                                    java_object_handler.name.escape_java_string()
+                                });
 
                             //create function
                             let java_function_name = format!(
@@ -469,15 +471,17 @@ pub fn print_java_plugins() -> Result<EbiOutput> {
                             writeln!(
                                 f,
                                 "\t\tname = \"{} (input: {}; output: {})\",",
-                                escape_string(explanation_short),
-                                escape_string(&abbreviated_inputs_without_gui.join(", ")),
-                                escape_string(output_java_object_handler.name)
+                                explanation_short.escape_java_string(),
+                                abbreviated_inputs_without_gui
+                                    .join(", ")
+                                    .escape_java_string(),
+                                output_java_object_handler.name.escape_java_string()
                             )?;
                             writeln!(f, "\t\tlevel = PluginLevel.PeerReviewed, ")?;
                             writeln!(
                                 f,
                                 "\t\treturnLabels = {{ \"{}\" }}, ",
-                                escape_string(output_java_object_handler.name)
+                                output_java_object_handler.name.escape_java_string()
                             )?;
                             writeln!(
                                 f,
@@ -497,7 +501,7 @@ pub fn print_java_plugins() -> Result<EbiOutput> {
                             writeln!(
                                 f,
                                 "\t\thelp = \"{} (calls Ebi)\"",
-                                escape_string(path.last().unwrap().explanation_long())
+                                path.last().unwrap().explanation_long().escape_java_string()
                             )?;
                             writeln!(f, "\t)")?;
                             writeln!(
@@ -534,13 +538,13 @@ pub fn print_java_plugins() -> Result<EbiOutput> {
                                         f,
                                         "\t\tdialog.add_input({}(\"{}\"));",
                                         java_object_handler.input_gui.unwrap(),
-                                        escape_string(input_helps[*i])
+                                        input_helps[*i].escape_java_string()
                                     )?;
                                 }
                                 writeln!(
                                     f,
                                     "\t\tInteractionResult result = context.showWizard(\"{}\", true, true, dialog);\n",
-                                    escape_string(explanation_short)
+                                    explanation_short.escape_java_string()
                                 )?;
                                 writeln!(f, "\t\tif (result != InteractionResult.FINISHED) {{")?;
                                 writeln!(f, "\t\t\tcontext.getFutureResult(0).cancel(false);")?;
@@ -555,7 +559,10 @@ pub fn print_java_plugins() -> Result<EbiOutput> {
                                         "\t\t{} input_{} = dialog.get_parameter_{}({});",
                                         java_object_handler.java_class,
                                         i,
-                                        escape_code(java_object_handler.java_class.to_string()),
+                                        java_object_handler
+                                            .java_class
+                                            .to_string()
+                                            .escape_java_code(),
                                         j
                                     )?;
                                 }
@@ -620,17 +627,6 @@ fn java_compiler_trigger(f: &mut Vec<u8>, java_object_handler: &JavaObjectHandle
     }
 
     Ok(writeln!(f, "\t\t}}")?)
-}
-
-pub fn escape_code(str: String) -> String {
-    str.replace(' ', "_").replace("-", "_").replace(".", "_")
-}
-
-pub fn escape_string(str: &str) -> String {
-    let str = str.replace("\"", "\\\"").replace("\n", "");
-    let re = Regex::new(r"~\\cite\{[^\}]*\}").unwrap();
-    let str = re.replace_all(&str, " ");
-    str.to_string()
 }
 
 #[derive(Debug, PartialEq, Eq, Hash, Clone)]

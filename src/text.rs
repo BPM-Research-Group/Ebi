@@ -1,7 +1,18 @@
 use std::fmt::Display;
 
+use regex::Regex;
+
 pub trait Joiner {
     fn join_with(&self, sep: &str, last_sep: &str) -> String;
+}
+
+pub trait LatexEscaper {
+    fn escape_latex(&self) -> String;
+}
+
+pub trait JavaEscaper {
+    fn escape_java_string(&self) -> String;
+    fn escape_java_code(&self) -> String;
 }
 
 impl<T> Joiner for &[T]
@@ -35,6 +46,31 @@ where
     fn join_with(&self, sep: &str, last_sep: &str) -> String {
         let slice = &self[..];
         slice.join_with(sep, last_sep)
+    }
+}
+
+impl<T> LatexEscaper for T
+where
+    T: AsRef<str>,
+{
+    fn escape_latex(&self) -> String {
+        self.as_ref().replace("_", "\\_")
+    }
+}
+
+impl<T> JavaEscaper for T
+where
+    T: AsRef<str>,
+{
+    fn escape_java_string(&self) -> String {
+        let str = self.as_ref().replace("\"", "\\\"").replace("\n", "");
+        let re = Regex::new(r"~\\cite\{[^\}]*\}").unwrap();
+        let str = re.replace_all(&str, " ");
+        str.to_string()
+    }
+
+    fn escape_java_code(&self) -> String {
+        self.as_ref().replace(' ', "_").replace("-", "_").replace(".", "_")
     }
 }
 
