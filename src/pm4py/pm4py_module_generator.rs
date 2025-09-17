@@ -61,8 +61,14 @@ fn ebi_command_to_pm4py_function(path: &Vec<&EbiCommand>) -> (String, String) {
     let fn_name = pm4py_function_name(path);
 
     // Extract input_types
-    let (input_types, library_name) = if let EbiCommand::Command { input_types, library_name, .. } = path[path.len() - 1] {
-        (input_types, library_name)
+    let (input_types, library_name, exact_arithmetic) = if let EbiCommand::Command {
+        input_types,
+        library_name,
+        exact_arithmetic,
+        ..
+    } = path[path.len() - 1]
+    {
+        (input_types, library_name, *exact_arithmetic)
     } else {
         return (String::new(), String::new());
     };
@@ -71,6 +77,7 @@ fn ebi_command_to_pm4py_function(path: &Vec<&EbiCommand>) -> (String, String) {
     let mut body = format!(
         r###"#[pyfunction]
 fn {fname}(py: Python<'_>, {args}) -> PyResult<PyObject> {{
+    {exact}
     let command: &&EbiCommand = &&{library_name};
     let input_types = match **command {{
         EbiCommand::Command {{ input_types, .. }} => input_types,
@@ -82,6 +89,11 @@ fn {fname}(py: Python<'_>, {args}) -> PyResult<PyObject> {{
             .map(|i| format!("arg{}: &PyAny", i))
             .collect::<Vec<_>>()
             .join(", "),
+        exact = if exact_arithmetic {
+            "ebi_arithmetic::exact::set_exact_globally(true);"
+        } else {
+            "ebi_arithmetic::exact::set_exact_globally(false);"
+        },
         library_name = library_name.split("::").last().unwrap()
     );
 
