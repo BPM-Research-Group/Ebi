@@ -114,28 +114,35 @@ Sander J.J. Leemans, Tian Li, Leonhard Mühlmeyer}
 
     \subsection{Python/PM4Py plug-in}
         Ebi can be used as a plug-in of the PM4Py Python library~\cite{DBLP:journals/simpa/BertiZS23} (\url{https://pm4py.org}).
+        
+        \subsubsection{Installation}
+            Ebi can be installed in Python using \verb=pip install ebi-pm=.
 
-        We're currently working on automated installation through PyPi.
+            Alternatively, Ebi can be installed in Python manually:
+            first set up Ebi for local development,
+            install Maturin, and generate a .whl file using \verb=maturin build --features python=.
+            Finally, install the Ebi python package using \verb=pip install ⟨file name⟩.whl -force-reinstall=.
 
-        To install Ebi in Python manually, first set up Ebi for local development and install Maturin, then generate a .whl file using \verb=maturin build=.
-        Finally, install the Ebi python package using \verb=pip install ⟨file name⟩.whl -force-reinstall=.
-
-        Every command can be used as a Python plug-in; the function name can be found with the respective command in Section~\ref{sec:commands}.
-	
-        Then, Ebi can be used as follows:
-        \begin{lstlisting}[language=python, style=boxed]
+        \subsubsection{Usage}
+            Every command can be used as a Python plug-in; the function name can be found with the respective command in Section~\ref{sec:commands}.
+        
+            Then, Ebi can be used as follows:
+            \begin{lstlisting}[language=python, style=boxed]
 import pm4py
 import ebi_pm4py
 # Load a log using PM4Py
 log = pm4py.read_xes("myLog.xes", return_legacy_log_object=True)
 # Call the Ebi function
 result = ebi_pm4py.conformance_earth_movers_stochastic_conformance_sample(
-log,
-"myModel.slpn",
-1000
+    log,
+    "myModel.slpn",
+    1000
 )
 print(result)
-        \end{lstlisting}
+            \end{lstlisting}
+
+            Currently, logs, Petri nets, process trees and numbers are linked to the PM4Py data structures.
+            All other Ebi file formats are treated as strings.
 
 	\subsection{Speed tricks}
 	\label{sec:speedtricks}

@@ -1,10 +1,44 @@
-# How to use from the command line
-
-Ebi is a command line tool that requires neither installation nor internet access.
+Ebi is a tool and library that focuses on stochastic process mining algorithms.
+Ebi is available as a command-line utility, as a ProM plug-in and as a Python package.
 
 More information on its use can be found in its [manual.pdf](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
 
+# How to use from the command line
+
+Ebi can be used as a standalone tool from the command line.
 Compiled versions are available on [Ebi's  website](https://ebitools.org).
+
+# How to use from ProM
+
+Ebi can be used as a plug-in of the ProM framework~\cite{DBLP:conf/bpm/VerbeekBDA10} (\url{https://promtools.org}) on Windows and Linux. 
+ProM has limited support for Mac OS X.
+		
+To install, open the ProM Package Manager and install the \verb=Ebi= package.
+Then, a selection of Ebi commands can be run, just as any other ProM plug-in.
+
+The [manual.pdf](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true) indicates which commands are available in ProM.
+
+# How to use from Python
+
+1. Install the Ebi-pm package using pip: 
+
+        pip install ebi-pm
+
+1. Then, one can use it as follows:
+        
+        import pm4py
+        import ebi_pm4py
+        # Load a log using PM4Py
+        log = pm4py.read_xes("myLog.xes", return_legacy_log_object=True)
+        # Call the Ebi function
+        result = ebi_pm4py.conformance_earth_movers_stochastic_conformance_sample(
+            log,
+            "myModel.slpn",
+            1000
+        )
+        print(result)
+
+    The names of the Ebi functions can be found in the [manual.pdf](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
 
 # Getting started with development
 

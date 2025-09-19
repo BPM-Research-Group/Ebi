@@ -1,0 +1,18 @@
+[project]
+name = 'ebi-pm'
+dynamic = ["version"]
+dependencies = [
+  "pm4py"
+]
+authors = [
+  {name = "Sander Leemans"},
+  {name = "Leonhard Mühlmeyer"},
+  {name = "Tian Li"},
+]
+description = "Ebi: a stochastic process mining utility"
+readme = "README.md"
+keywords = ["process mining", "stochastic process mining", "business process analysis"]
+
+[build-system]
+requires = ["maturin >= 0.12"]
+build-backend = "maturin"
