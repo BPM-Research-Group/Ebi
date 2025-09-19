@@ -1,6 +1,6 @@
 [package]
 name = "ebi"
-version = "0.0.7"
+version = "0.0.8"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 keywords = ["stochastic-processes", "process-mining", "business-processes"]
@@ -18,7 +18,7 @@ crate-type = ["cdylib", "lib"]
 [features]
 default = [ ]
 eexactarithmetic = []
-python = [ "dep:pyo3", "dep:polars" ]
+python = [ "dep:pyo3", "dep:polars", "dep:num-traits" ]
 exactarithmetic = [ "eexactarithmetic", "ebi_arithmetic/exactarithmetic" ]
 approximatearithmetic = [ "eapproximatearithmetic", "ebi_arithmetic/approximatearithmetic" ]
 eapproximatearithmetic = []
@@ -64,9 +64,9 @@ regex = "1.11.1"
 quick-xml = {version="0.38.3", features=["serialize"]}
 malachite = "0.6.1"
 pastey = "0.1.1"
-pyo3 = { version = "0.18", features = ["extension-module"], optional = true }
+pyo3 = { version = "0.18", features = ["extension-module", "abi3-py37", "generate-import-lib"], optional = true }
 polars = { version = "0.32", features = ["ipc", "timezones"], optional = true }
-num-traits = "0.2"
+num-traits = { version = "0.2", optional = true}
 
 [profile.release]
 debug = false
