@@ -17,7 +17,6 @@ pub const EBI_CONVERT: EbiCommand = EbiCommand::Group {
 pub const EBI_CONVERT_LPN: EbiCommand = EbiCommand::Command {
     name_short: "lpn",
     name_long: Some("labelled-petri-net"),
-    library_name: "ebi_commands::ebi_command_convert::EBI_CONVERT_LPN",
     explanation_short: "Convert an object to a labelled Petri net.",
     explanation_long: None,
     latex_link: None,
@@ -38,7 +37,6 @@ pub const EBI_CONVERT_LPN: EbiCommand = EbiCommand::Command {
 pub const EBI_CONVERT_SLANG: EbiCommand = EbiCommand::Command {
     name_short: "slang",
     name_long: Some("finite-stochastic-language"),
-    library_name: "ebi_commands::ebi_command_convert::EBI_CONVERT_SLANG",
     explanation_short: "Convert an object to a finite stochastic language.",
     explanation_long: None,
     latex_link: None,
@@ -61,7 +59,6 @@ pub const EBI_CONVERT_SLANG: EbiCommand = EbiCommand::Command {
 pub const EBI_CONVERT_SDFA: EbiCommand = EbiCommand::Command {
     name_short: "sdfa",
     name_long: Some("stochastic-finite-deterministic-automaton"),
-    library_name: "ebi_commands::ebi_command_convert::EBI_CONVERT_SDFA",
     explanation_short: "Convert an object to a stochastic deterministic finite automaton.",
     explanation_long: None,
     latex_link: None,

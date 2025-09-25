@@ -41,7 +41,6 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER: EbiCommand = EbiCommand::Group {
 pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA: EbiCommand = EbiCommand::Command {
     name_short: "dfa",
     name_long: Some("deterministic-finite-automaton"),
-    library_name: "ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA",
     explanation_short: "Discover a DFA that supports any trace with the activities of the log.",
     explanation_long: None,
     latex_link: None,
@@ -76,7 +75,6 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA: EbiCommand = EbiCommand::Comma
 pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE: EbiCommand = EbiCommand::Command {
     name_short: "ptree",
     name_long: Some("process-tree"),
-    library_name: "ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE",
     explanation_short: "Discover a process tree that supports any trace with the activities of the log.",
     explanation_long: None,
     latex_link: None,
@@ -117,7 +115,6 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_PREFIX: EbiCommand = EbiCommand::Group {
 pub const EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA: EbiCommand = EbiCommand::Command {
     name_short: "dfa",
     name_long: Some("deterministic-finite-automaton"),
-    library_name: "ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA",
     explanation_short: "Discover a DFA that is a prefix tree of the log.",
     explanation_long: None,
     latex_link: None,
@@ -138,7 +135,6 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA: EbiCommand = EbiCommand::Command
 pub const EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE: EbiCommand = EbiCommand::Command {
     name_short: "tree",
     name_long: Some("process-tree"),
-    library_name: "ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE",
     explanation_short: "Discover a process tree that is a prefix tree of the log.",
     explanation_long: None,
     latex_link: None,

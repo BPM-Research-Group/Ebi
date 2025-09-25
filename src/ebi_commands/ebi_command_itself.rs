@@ -6,7 +6,7 @@ use inflector::Inflector;
 use layout::{core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
-use crate::{ebi_framework::{ebi_command::{get_applicable_commands, EbiCommand, EBI_COMMANDS}, ebi_file_handler::{get_file_handlers, EBI_FILE_HANDLERS}, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link::{self, get_java_object_handlers_that_can_export, get_java_object_handlers_that_can_import}}, pm4py::pm4py_module_generator::{generate_pm4py_module, pm4py_function_name, PM4PY_PACKAGE}, text::{Joiner, LatexEscaper}};
+use crate::{ebi_framework::{ebi_command::{get_applicable_commands, EbiCommand, EBI_COMMANDS}, ebi_file_handler::{get_file_handlers, EBI_FILE_HANDLERS}, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link::{self, get_java_object_handlers_that_can_export, get_java_object_handlers_that_can_import}}, pm4py::pm4py::{pm4py_function_name, PM4PY_PACKAGE}, text::{Joiner, LatexEscaper}};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
  □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
@@ -36,6 +36,7 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
         &EBI_ITSELF_JAVA,
         &EBI_ITSELF_LOGO,
         &EBI_ITSELF_MANUAL,
+        #[cfg(feature = "python")]
         &EBI_ITSELF_PM4PY,
      ]
 };
@@ -43,7 +44,6 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
 pub const EBI_ITSELF_LOGO: EbiCommand = EbiCommand::Command {
     name_short: "log", 
     name_long: Some("logo"), 
-    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_LOGO",
     explanation_short: "Print the logo of Ebi.", 
     explanation_long: None, 
     cli_command: None, 
@@ -59,7 +59,6 @@ pub const EBI_ITSELF_LOGO: EbiCommand = EbiCommand::Command {
 pub const EBI_ITSELF_MANUAL: EbiCommand = EbiCommand::Command { 
     name_short: "man", 
     name_long: Some("manual"), 
-    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_MANUAL",
     explanation_short: "Print the automatically generated parts of the manual of Ebi in Latex format.", 
     explanation_long: None, 
     cli_command: None, 
@@ -75,7 +74,6 @@ pub const EBI_ITSELF_MANUAL: EbiCommand = EbiCommand::Command {
 pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command { 
     name_short: "graph", 
     name_long: None, 
-    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_GRAPH",
     explanation_short: "Print the graph of Ebi.", 
     explanation_long: None, 
     cli_command: None, 
@@ -94,7 +92,6 @@ pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command {
 pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command { 
     name_short: "java", 
     name_long: None, 
-    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_JAVA",
     explanation_short: "Print the classes for Java.", 
     explanation_long: None, 
     cli_command: None, 
@@ -109,7 +106,6 @@ pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command {
 pub const EBI_ITSELF_HTML: EbiCommand = EbiCommand::Command { 
     name_short: "html", 
     name_long: None, 
-    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_HTML",
     explanation_short: "Print parts of the website.", 
     explanation_long: None, 
     cli_command: None, 
@@ -122,10 +118,10 @@ pub const EBI_ITSELF_HTML: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String
 };
 
+#[cfg(feature = "python")]
 pub const EBI_ITSELF_PM4PY: EbiCommand = EbiCommand::Command { 
     name_short: "pm4py", 
     name_long: None, 
-    library_name: "ebi_commands::ebi_command_itself::EBI_ITSELF_PM4PY",
     explanation_short: "Generate the module exposed to PM4Py with all functions.", 
     explanation_long: None, 
     cli_command: None, 
@@ -134,7 +130,7 @@ pub const EBI_ITSELF_PM4PY: EbiCommand = EbiCommand::Command {
     input_types: &[], 
     input_names: &[],
     input_helps: &[],
-    execute: |_, _| Ok(generate_pm4py_module()?), 
+    execute: |_, _| Ok(crate::pm4py::pm4py_module_generator::generate_pm4py_module()?), 
     output_type: &EbiOutputType::String
 };
 

@@ -12,7 +12,6 @@ macro_rules! ebi_validate {
 pub const EBI_VALIDATE: EbiCommand = EbiCommand::Command {
     name_short: "vali",
     name_long: Some(ebi_validate!()),
-    library_name: "ebi_commands::ebi_command_validate::EBI_VALIDATE",
     explanation_short: concat!(concat!("Attempt to parse any file supported by Ebi, and return a parsing error if necessary.
         If you do not know the type the file should have, try `Ebi ", ebi_info!(), "`.")),
     explanation_long: None,

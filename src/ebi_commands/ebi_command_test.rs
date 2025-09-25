@@ -35,7 +35,6 @@ pub const EBI_TEST: EbiCommand = EbiCommand::Group {
 pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     name_short: "lcat",
     name_long: Some("log-categorical-attribute"),
-    library_name: "ebi_commands::ebi_command_test::EBI_TEST_LOG_ATTRIBUTE",
     explanation_short: "Test the hypothesis that the sub-logs defined by the categorical attribute are derived from identical processes.",
     explanation_long: None,
     latex_link: Some("\\cite{DBLP:journals/tkde/LeemansMPH23}"),
@@ -107,7 +106,6 @@ pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
 pub const EBI_BOOTSTRAP_TEST: EbiCommand = EbiCommand::Command {
     name_short: "btst",
     name_long: Some("bootstrap-test"),
-    library_name: "ebi_commands::ebi_command_test::EBI_BOOTSTRAP_TEST",
     explanation_short: "Test the hypothesis that the logs are derived from identical processes.",
     explanation_long: None,
     latex_link: Some("\\cite{DBLP:journals/tkde/LeemansMPH23}"),
@@ -175,7 +173,6 @@ pub const EBI_BOOTSTRAP_TEST: EbiCommand = EbiCommand::Command {
 pub const EBI_PERMUTATION_TEST: EbiCommand = EbiCommand::Command {
     name_short: "perm",
     name_long: Some("permutation-test"),
-    library_name: "ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST",
     explanation_short: "Test the hypothesis that the logs are derived from identical processes.",
     explanation_long: None,
     latex_link: None,

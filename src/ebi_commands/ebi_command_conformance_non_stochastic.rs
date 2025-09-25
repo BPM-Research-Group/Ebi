@@ -34,7 +34,6 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
 pub const EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS: EbiCommand = EbiCommand::Command {
     name_short: "ali",
     name_long: Some("alignments"),
-    library_name: "ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS",
     explanation_short: "Compute alignments.",
     explanation_long: Some(
         "Compute alignments.\nThe model must be able to terminate and its states must be bounded. The search performed is not optimised. For Petri nets, the ProM implementation may be more efficient.",
@@ -69,7 +68,6 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION: EbiCommand =
     EbiCommand::Command {
         name_short: "eep",
         name_long: Some("escaping-edges-precision"),
-        library_name: "ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION",
         explanation_short: "Computes the alignment-based escaping-edges-precision of an alignment and a model.",
         explanation_long: Some(
             "Computes a prefix automaton of the alignments, where the states represent model states that have been visited by the alignments. The states are weighed by the probability of traces visiting them. The precision is then the sum of the number of taken edges out of each state multiplied by the weight of the state, divided by the sum of the number of outgoing edges multiplied by the weight of the states.",
@@ -107,7 +105,6 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION: EbiCommand =
 pub const EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS: EbiCommand = EbiCommand::Command {
     name_short: "setali",
     name_long: Some("set-alignments"),
-    library_name: "ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS",
     explanation_short: "Compute alignments as a set.",
     explanation_long: Some(
         "Compute a non-weighted set of alignments.\nThe model must be able to terminate and its states must be bounded. The search performed is not optimised. For Petri nets, the ProM implementation may be more efficient.",
@@ -137,7 +134,6 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS: EbiCommand = EbiCommand
 pub const EBI_CONFORMANCE_NON_STOCHASTIC_TRACE_FITNESS: EbiCommand = EbiCommand::Command {
     name_short: "tfit",
     name_long: Some("trace-fitness"),
-    library_name: "ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_TRACE_FITNESS",
     explanation_short: "Compute the trace-fitness of a stochastic language of alignments.",
     explanation_long: Some(
         "Compute the trace-fitness of a stochastic language of alignments: the number of synchronous moves divided by the total number of moves, both without silent moves.",

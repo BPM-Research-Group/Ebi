@@ -43,7 +43,6 @@ pub const EBI_SAMPLE: EbiCommand = EbiCommand::Group {
 pub const EBI_SAMPLE_TRACES: EbiCommand = EbiCommand::Command {
     name_short: "tra",
     name_long: Some("traces"),
-    library_name: "ebi_commands::ebi_command_sample::EBI_SAMPLE_TRACES",
     explanation_short: "Draw traces randomly from a model.",
     explanation_long: Some(
         "Sample traces randomly. Please note that this may run forever if the model contains a livelock.",
@@ -74,7 +73,6 @@ pub const EBI_SAMPLE_TRACES: EbiCommand = EbiCommand::Command {
 pub const EBI_SAMPLE_FOLDS: EbiCommand = EbiCommand::Command {
     name_short: "folds",
     name_long: None,
-    library_name: "ebi_commands::ebi_command_sample::EBI_SAMPLE_FOLDS",
     explanation_short: "Randomly split a log into a given number of sub-logs, and return a specific one of these sub-logs.",
     explanation_long: Some(
         "Randomly but reproducibly split a log into a given number of sub-logs. Each trace has a likelihood of 1/folds to end up in any of the folds. Giving the same random seed yields the same split, as long as the same build number of Ebi is used. 

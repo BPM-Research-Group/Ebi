@@ -26,7 +26,6 @@ pub const EBI_ASSOCIATION: EbiCommand = EbiCommand::Group {
 pub const ASSOCIATION_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     name_short: "att",
     name_long: Some("trace-attribute"),
-    library_name: "ebi_commands::ebi_command_association::ASSOCIATION_ATTRIBUTE",
     explanation_short: "Compute the association between the process and a trace attribute.",
     explanation_long: None,
     latex_link: Some("\\cite{DBLP:journals/tkde/LeemansMPH23}"),
@@ -70,7 +69,6 @@ pub const ASSOCIATION_ATTRIBUTE: EbiCommand = EbiCommand::Command {
 pub const ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command {
     name_short: "atts",
     name_long: Some("all-trace-attributes"),
-    library_name: "ebi_commands::ebi_command_association::ASSOCIATION_ATTRIBUTES",
     explanation_short: "Compute the association between the process and trace attributes.",
     explanation_long: None,
     latex_link: Some("\\cite{DBLP:journals/tkde/LeemansMPH23}"),

@@ -37,7 +37,6 @@ pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
 pub const EBI_DISCOVER_ALIGNMENTS: EbiCommand = EbiCommand::Command {
     name_short: "ali",
     name_long: Some("alignments"),
-    library_name: "ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS",
     explanation_short: "Give each transition a weight that matches the aligned occurrences of its label.",
     explanation_long: Some(
         "Give each transition a weight that matches the aligned occurrences of its label. The model must be livelock-free.",
@@ -69,7 +68,6 @@ pub const EBI_DISCOVER_ALIGNMENTS: EbiCommand = EbiCommand::Command {
 pub const EBI_DISCOVER_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
     name_short: "dfg",
     name_long: Some("directly-follows-graph"),
-    library_name: "ebi_commands::ebi_command_discover::EBI_DISCOVER_DIRECTLY_FOLLOWS",
     explanation_short: "Discover a directly follows graph.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:conf/icpm/LeemansPW19}"),
@@ -119,7 +117,6 @@ pub const EBI_DISCOVER_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
 pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Command { 
     name_short: "occ", 
     name_long: Some("occurrence"), 
-    library_name: "ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE",
     explanation_short: "Give each transition a weight that matches the occurrences of its label; silent transitions get a weight of 1.", 
     explanation_long: None, 
     latex_link: Some("~\\cite{DBLP:conf/icpm/BurkeLW20}"), 
@@ -146,7 +143,6 @@ pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Command {
 pub const EBI_DISCOVER_OCCURRENCE_PTREE: EbiCommand = EbiCommand::Command {
     name_short: "ptree",
     name_long: Some("process-tree"),
-    library_name: "ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_PTREE",
     explanation_short: "Give each leaf a weight that matches the occurrences of its label; silent leaves get a weight of 1.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:conf/icpm/BurkeLW20}"),
@@ -176,7 +172,6 @@ pub const EBI_DISCOVER_OCCURRENCE_PTREE: EbiCommand = EbiCommand::Command {
 pub const EBI_DISCOVER_UNIFORM: EbiCommand = EbiCommand::Command { 
     name_short: "uni", 
     name_long: Some("uniform"), 
-    library_name: "ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM",
     explanation_short: "Give each transition a weight of 1.", 
     explanation_long: None, 
     latex_link: None, 
@@ -199,7 +194,6 @@ pub const EBI_DISCOVER_UNIFORM: EbiCommand = EbiCommand::Command {
 pub const EBI_DISCOVER_UNIFORM_PTREE: EbiCommand = EbiCommand::Command {
     name_short: "ptree",
     name_long: Some("process-tree"),
-    library_name: "ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_PTREE",
     explanation_short: "Give each leaf a weight of 1 in a process tree.",
     explanation_long: None,
     latex_link: None,

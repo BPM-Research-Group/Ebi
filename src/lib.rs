@@ -105,11 +105,14 @@ pub mod math {
     pub mod root;
     pub mod root_log_div;
 }
+
 pub mod pm4py {
+    pub mod pm4py;
     #[cfg(feature = "python")]
     pub mod pm4py_link;
     #[cfg(feature = "python")]
     pub mod pm4py_module_autogen;
+    #[cfg(feature = "python")]
     pub mod pm4py_module_generator;
 }
 pub mod semantics {

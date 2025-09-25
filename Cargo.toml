@@ -1,6 +1,6 @@
 [package]
 name = "ebi"
-version = "0.0.8"
+version = "0.0.9"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 keywords = ["stochastic-processes", "process-mining", "business-processes"]
@@ -18,7 +18,7 @@ crate-type = ["cdylib", "lib"]
 [features]
 default = [ ]
 eexactarithmetic = []
-python = [ "dep:pyo3", "dep:polars", "dep:num-traits" ]
+python = [ "dep:pyo3", "dep:polars", "dep:num-traits", "dep:syn" ]
 exactarithmetic = [ "eexactarithmetic", "ebi_arithmetic/exactarithmetic" ]
 approximatearithmetic = [ "eapproximatearithmetic", "ebi_arithmetic/approximatearithmetic" ]
 eapproximatearithmetic = []
@@ -29,8 +29,8 @@ ebi_arithmetic = "0.2.24"
 ebi_optimisation = "0.0.10"
 ebi_objects = "0.0.9"
 bitvec = "1.0.1"
-clap = { version = "4.5.47", features = ["derive", "cargo", "string"] }
-anyhow = "1.0.98"
+clap = { version = "4.5.48", features = ["derive", "cargo", "string"] }
+anyhow = "1.0.100"
 clap-verbosity-flag = "3.0.3"
 log = { version = "0.4.28", features = ["release_max_level_debug"] }
 env_logger = "0.11.8"
@@ -49,24 +49,25 @@ Inflector = "0.11.4"
 strum = "0.27.1"
 strum_macros = "0.27.2"
 indicatif = "0.18.0"
-indexmap = "2.11.3"
+indexmap = "2.11.4"
 pathfinding="4.14.0"
 fnv = "1.0.7"
 jni = "0.21.1"
 itertools = "0.14.0"
-serde = "1.0.225"
+serde = "1.0.226"
 logging_timer = "1.1.1"
 svg2pdf = "0.13.0"
 uuid = "1.18.1"
 cfg-if = "1.0.1"
 ntest = "0.9.3"
-regex = "1.11.1"
+regex = "1.11.3"
 quick-xml = {version="0.38.3", features=["serialize"]}
 malachite = "0.6.1"
 pastey = "0.1.1"
 pyo3 = { version = "0.18", features = ["extension-module", "abi3-py37", "generate-import-lib"], optional = true }
 polars = { version = "0.32", features = ["ipc", "timezones"], optional = true }
-num-traits = { version = "0.2", optional = true}
+num-traits = { version = "0.2", optional = true }
+syn = { version = "2.0.106", features = [ "parsing", "full" ], optional = true }
 
 [profile.release]
 debug = false
