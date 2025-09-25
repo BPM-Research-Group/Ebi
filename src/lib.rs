@@ -106,15 +106,16 @@ pub mod math {
     pub mod root_log_div;
 }
 
-pub mod pm4py {
-    pub mod pm4py;
+pub mod python {
+    pub mod python;
     #[cfg(feature = "python")]
-    pub mod pm4py_link;
+    pub mod python_link;
     #[cfg(feature = "python")]
-    pub mod pm4py_module_autogen;
+    pub mod python_module_autogen;
     #[cfg(feature = "python")]
-    pub mod pm4py_module_generator;
+    pub mod python_module_generator;
 }
+
 pub mod semantics {
     pub mod directly_follows_graph_semantics;
     pub mod finite_stochastic_language_semantics;

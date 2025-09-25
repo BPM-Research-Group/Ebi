@@ -6,7 +6,7 @@ use inflector::Inflector;
 use layout::{core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
-use crate::{ebi_framework::{ebi_command::{get_applicable_commands, EbiCommand, EBI_COMMANDS}, ebi_file_handler::{get_file_handlers, EBI_FILE_HANDLERS}, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link::{self, get_java_object_handlers_that_can_export, get_java_object_handlers_that_can_import}}, pm4py::pm4py::{pm4py_function_name, PM4PY_PACKAGE}, text::{Joiner, LatexEscaper}};
+use crate::{ebi_framework::{ebi_command::{get_applicable_commands, EbiCommand, EBI_COMMANDS}, ebi_file_handler::{get_file_handlers, EBI_FILE_HANDLERS}, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link::{self, get_java_object_handlers_that_can_export, get_java_object_handlers_that_can_import}}, python::python::{pm4py_function_name, PYTHON_PACKAGE}, text::{Joiner, LatexEscaper}};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
  □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
@@ -37,7 +37,7 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
         &EBI_ITSELF_LOGO,
         &EBI_ITSELF_MANUAL,
         #[cfg(feature = "python")]
-        &EBI_ITSELF_PM4PY,
+        &EBI_ITSELF_PYTHON,
      ]
 };
 
@@ -119,10 +119,10 @@ pub const EBI_ITSELF_HTML: EbiCommand = EbiCommand::Command {
 };
 
 #[cfg(feature = "python")]
-pub const EBI_ITSELF_PM4PY: EbiCommand = EbiCommand::Command { 
-    name_short: "pm4py", 
+pub const EBI_ITSELF_PYTHON: EbiCommand = EbiCommand::Command { 
+    name_short: "python", 
     name_long: None, 
-    explanation_short: "Generate the module exposed to PM4Py with all functions.", 
+    explanation_short: "Generate the module exposed to Python with all functions.", 
     explanation_long: None, 
     cli_command: None, 
     latex_link: None, 
@@ -130,7 +130,7 @@ pub const EBI_ITSELF_PM4PY: EbiCommand = EbiCommand::Command {
     input_types: &[], 
     input_names: &[],
     input_helps: &[],
-    execute: |_, _| Ok(crate::pm4py::pm4py_module_generator::generate_pm4py_module()?), 
+    execute: |_, _| Ok(crate::python::python_module_generator::generate_pm4py_module()?), 
     output_type: &EbiOutputType::String
 };
 
@@ -260,7 +260,7 @@ fn manual() -> Result<EbiOutput> {
             }
 
             //pm4py
-            writeln!(f, "\\\\This command is available in the {} Python package using the function {}", PM4PY_PACKAGE, pm4py_function_name(&path).escape_latex())?;
+            writeln!(f, "\\\\This command is available in the {} Python package using the function {}", PYTHON_PACKAGE, pm4py_function_name(&path).escape_latex())?;
         }
     }
     writeln!(f, "}}")?;

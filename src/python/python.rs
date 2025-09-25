@@ -1,6 +1,6 @@
 use crate::ebi_framework::ebi_command::EbiCommand;
 
-pub const PM4PY_PACKAGE: &str = "ebi-pm";
+pub const PYTHON_PACKAGE: &str = "ebi-pm";
 
 pub fn pm4py_function_name(path: &Vec<&EbiCommand>) -> String {
     let raw_name = EbiCommand::path_to_string(path);

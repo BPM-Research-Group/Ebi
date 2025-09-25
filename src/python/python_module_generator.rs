@@ -5,7 +5,7 @@ use crate::{
         ebi_command::{EBI_COMMANDS, EbiCommand},
         ebi_output::EbiOutput,
     },
-    pm4py::pm4py::pm4py_function_name,
+    python::python::pm4py_function_name,
 };
 use anyhow::{Result, anyhow};
 use syn::Item;
@@ -17,7 +17,7 @@ pub fn generate_pm4py_module() -> Result<EbiOutput> {
 
 use pyo3::prelude::*;
 use pyo3::types::PyAny;
-use super::pm4py_link::{{import_or_load, ExportableToPM4Py}};
+use super::python_link::{{import_or_load, ExportableToPM4Py}};
 use crate::ebi_framework::ebi_command::EbiCommand;"
     );
     let mut functions = String::new();

@@ -14,9 +14,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Generate and test link to pm4py
+    - name: Generate and test link to python
       run: |
-        cargo run itself pm4py -o src/pm4py/pm4py_module_autogen.rs
+        cargo run itself python -o src/python/python_module_autogen.rs
         cargo build --features python
     - name: Run tests mixed mode 1
       run: cargo test --verbose
