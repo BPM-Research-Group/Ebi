@@ -16,7 +16,7 @@ jobs:
     - uses: actions/checkout@v4
     - name: Generate and test link to python
       run: |
-        cargo run itself python -o src/python/python_module_autogen.rs --features python
+        cargo run --features python itself python -o src/python/python_module_autogen.rs
         cargo build --features python
     - name: Run tests mixed mode 1
       run: cargo test --verbose
