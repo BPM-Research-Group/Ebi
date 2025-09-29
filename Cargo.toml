@@ -16,7 +16,7 @@ name = "ebi"
 crate-type = ["cdylib", "lib"]
 
 [features]
-default = [ "python" ]
+default = [ ]
 eexactarithmetic = []
 python = [ "dep:pyo3", "dep:polars", "dep:num-traits", "dep:syn" ]
 exactarithmetic = [ "eexactarithmetic", "ebi_arithmetic/exactarithmetic" ]
