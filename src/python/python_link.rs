@@ -1,7 +1,6 @@
 use anyhow::{Result, anyhow};
 use polars::prelude::*;
 use pyo3::{
-    AsPyPointer,
     exceptions::PyValueError,
     prelude::*,
     types::{IntoPyDict, PyAny, PyDict, PyList, PySet, PyString},
@@ -47,7 +46,7 @@ use process_mining::event_log::{
     event_log_struct::{EventLogClassifier, to_attributes},
 };
 
-type Importer = fn(&PyAny, &[&'static EbiInputType]) -> PyResult<EbiInput>;
+type Importer = fn(&Bound<'_, PyAny>, &[&'static EbiInputType]) -> PyResult<EbiInput>;
 pub const IMPORTERS: &[Importer] = &[
     usize::import_from_pm4py,
     Fraction::import_from_pm4py,
@@ -59,7 +58,7 @@ pub const IMPORTERS: &[Importer] = &[
 pub trait ImportableFromPM4Py {
     /// Imports a PM4Py Object as its Ebi equivalent.
     fn import_from_pm4py(
-        object: &PyAny,
+        object: &Bound<'_, PyAny>,
         input_types: &[&'static EbiInputType],
     ) -> PyResult<EbiInput>;
 }
@@ -102,7 +101,7 @@ impl ExportableToPM4Py for EbiOutput {
                         pyo3::exceptions::PyException::new_err(format!("Export error: {}", e))
                     })?
                 };
-                let py_str: &PyString = PyString::new(py, &output_string);
+                let py_str = PyString::new_bound(py, &output_string);
                 Ok(py_str.into())
             }
         }
@@ -117,7 +116,7 @@ impl ExportableToPM4Py for bool {
 
 impl ImportableFromPM4Py for usize {
     fn import_from_pm4py(
-        integer: &PyAny,
+        integer: &Bound<'_, PyAny>,
         input_types: &[&'static EbiInputType],
     ) -> PyResult<EbiInput> {
         let value: usize = integer.extract().map_err(|_| {
@@ -146,7 +145,7 @@ impl ExportableToPM4Py for usize {
 
 impl ImportableFromPM4Py for Fraction {
     fn import_from_pm4py(
-        double: &PyAny,
+        double: &Bound<'_, PyAny>,
         input_types: &[&'static EbiInputType],
     ) -> PyResult<EbiInput> {
         let value: f64 = double.extract().map_err(|_| {
@@ -194,19 +193,20 @@ impl ExportableToPM4Py for Fraction {
 
 impl ImportableFromPM4Py for EventLog {
     fn import_from_pm4py(
-        event_log: &PyAny,
+        event_log: &Bound<'_, PyAny>,
         input_types: &[&'static EbiInputType],
     ) -> PyResult<EbiInput> {
         // Extract the list of traces from the PM4Py event log.
-        let py_traces = event_log.getattr("_list")?.downcast::<PyList>()?;
+        let binding = event_log.getattr("_list")?;
+        let py_traces = binding.downcast::<PyList>()?;
         let mut traces = Vec::new();
         for py_trace in py_traces.iter() {
-            let trace = trace_from_py(py_trace)?;
+            let trace = trace_from_py(&py_trace)?;
             traces.push(trace);
         }
         // Get log-level attributes, if available.
         let attributes = if let Ok(attr_obj) = event_log.getattr("_attributes") {
-            convert_py_dict_to_attributes(attr_obj)?
+            convert_py_dict_to_attributes(&attr_obj)?
         } else {
             vec![]
         };
@@ -273,7 +273,7 @@ impl ImportableFromPM4Py for EventLog {
 
 impl ExportableToPM4Py for EventLog {
     fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
-        let pm4py_module = py.import("pm4py.objects.log.obj")?;
+        let pm4py_module = py.import_bound("pm4py.objects.log.obj")?;
         let py_event_cls = pm4py_module.getattr("Event")?;
         let py_trace_cls = pm4py_module.getattr("Trace")?;
         let py_log_cls = pm4py_module.getattr("EventLog")?;
@@ -286,7 +286,7 @@ impl ExportableToPM4Py for EventLog {
             let mut py_events = Vec::with_capacity(rust_trace.events.len());
 
             for rust_event in &rust_trace.events {
-                let py_dict = PyDict::new(py);
+                let py_dict = PyDict::new_bound(py);
 
                 for attr in &rust_event.attributes {
                     let py_val = match &attr.value {
@@ -297,7 +297,7 @@ impl ExportableToPM4Py for EventLog {
                         AttributeValue::Date(dt) => dt.to_rfc3339().to_object(py),
                         AttributeValue::ID(id) => id.to_string().to_object(py),
                         AttributeValue::List(list) => {
-                            let py_list = PyList::new(
+                            let py_list = PyList::new_bound(
                                 py,
                                 list.iter()
                                     .map(|a| a.value.export_to_pm4py(py))
@@ -306,7 +306,7 @@ impl ExportableToPM4Py for EventLog {
                             py_list.to_object(py)
                         }
                         AttributeValue::Container(container) => {
-                            let py_container = PyDict::new(py);
+                            let py_container = PyDict::new_bound(py);
                             for attr in container.iter() {
                                 py_container
                                     .set_item(&attr.key, attr.value.export_to_pm4py(py)?)?;
@@ -322,10 +322,10 @@ impl ExportableToPM4Py for EventLog {
                 py_events.push(py_event);
             }
 
-            let py_trace_list = PyList::new(py, py_events);
+            let py_trace_list = PyList::new_bound(py, py_events);
 
             // Trace attributes
-            let py_trace_attrs = PyDict::new(py);
+            let py_trace_attrs = PyDict::new_bound(py);
             for attr in &rust_trace.attributes {
                 let py_val = match &attr.value {
                     AttributeValue::String(s) => s.to_object(py),
@@ -335,7 +335,7 @@ impl ExportableToPM4Py for EventLog {
                     AttributeValue::Date(dt) => dt.to_rfc3339().to_object(py),
                     AttributeValue::ID(id) => id.to_string().to_object(py),
                     AttributeValue::List(list) => {
-                        let py_list = PyList::new(
+                        let py_list = PyList::new_bound(
                             py,
                             list.iter()
                                 .map(|a| a.value.export_to_pm4py(py))
@@ -344,7 +344,7 @@ impl ExportableToPM4Py for EventLog {
                         py_list.to_object(py)
                     }
                     AttributeValue::Container(container) => {
-                        let py_container = PyDict::new(py);
+                        let py_container = PyDict::new_bound(py);
                         for attr in container.iter() {
                             py_container.set_item(&attr.key, attr.value.export_to_pm4py(py)?)?;
                         }
@@ -357,15 +357,15 @@ impl ExportableToPM4Py for EventLog {
 
             let py_trace = py_trace_cls.call(
                 (py_trace_list,),
-                Some([("attributes", py_trace_attrs)].into_py_dict(py)),
+                Some(&[("attributes", py_trace_attrs)].into_py_dict_bound(py)),
             )?;
             py_traces.push(py_trace);
         }
 
-        let py_log_list = PyList::new(py, py_traces);
+        let py_log_list = PyList::new_bound(py, py_traces);
 
         // Log attributes
-        let py_log_attrs = PyDict::new(py);
+        let py_log_attrs = PyDict::new_bound(py);
         for attr in &self.rust4pm_log.attributes {
             let py_val = match &attr.value {
                 AttributeValue::String(s) => s.to_object(py),
@@ -375,7 +375,7 @@ impl ExportableToPM4Py for EventLog {
                 AttributeValue::Date(dt) => dt.to_rfc3339().to_object(py),
                 AttributeValue::ID(id) => id.to_string().to_object(py),
                 AttributeValue::List(list) => {
-                    let py_list = PyList::new(
+                    let py_list = PyList::new_bound(
                         py,
                         list.iter()
                             .map(|a| a.value.export_to_pm4py(py))
@@ -384,7 +384,7 @@ impl ExportableToPM4Py for EventLog {
                     py_list.to_object(py)
                 }
                 AttributeValue::Container(container) => {
-                    let py_container = PyDict::new(py);
+                    let py_container = PyDict::new_bound(py);
                     for attr in container.iter() {
                         py_container.set_item(&attr.key, attr.value.export_to_pm4py(py)?)?;
                     }
@@ -397,7 +397,7 @@ impl ExportableToPM4Py for EventLog {
 
         let py_log = py_log_cls.call(
             (py_log_list,),
-            Some([("attributes", py_log_attrs)].into_py_dict(py)),
+            Some(&[("attributes", py_log_attrs)].into_py_dict_bound(py)),
         )?;
 
         Ok(py_log.into())
@@ -414,7 +414,7 @@ impl ExportableToPM4Py for AttributeValue {
             AttributeValue::Boolean(b) => Ok(b.to_object(py)),
             AttributeValue::ID(uuid) => Ok(uuid.to_string().to_object(py)), // export as string
             AttributeValue::List(attrs) => {
-                let py_list = PyList::new(
+                let py_list = PyList::new_bound(
                     py,
                     attrs
                         .iter()
@@ -424,7 +424,7 @@ impl ExportableToPM4Py for AttributeValue {
                 Ok(py_list.into_py(py))
             }
             AttributeValue::Container(attrs) => {
-                let py_dict = PyDict::new(py);
+                let py_dict = PyDict::new_bound(py);
                 for attr in attrs {
                     py_dict.set_item(&attr.key, attr.value.export_to_pm4py(py)?)?;
                 }
@@ -436,33 +436,39 @@ impl ExportableToPM4Py for AttributeValue {
 }
 
 impl ImportableFromPM4Py for LabelledPetriNet {
-    fn import_from_pm4py(pn: &PyAny, input_types: &[&'static EbiInputType]) -> PyResult<EbiInput> {
+    fn import_from_pm4py(
+        pn: &Bound<'_, PyAny>,
+        input_types: &[&'static EbiInputType],
+    ) -> PyResult<EbiInput> {
         // Retrieve "places", "transitions", and "arcs" attributes as sets.
-        let py_places = get_collection_as_set(pn, "places").map_err(|e| {
+        let binding = pn.getattr("places")?;
+        let py_places = binding.downcast::<PySet>().map_err(|e| {
             pyo3::exceptions::PyValueError::new_err(format!("Failed to get places: {}", e))
         })?;
-        let py_transitions = get_collection_as_set(pn, "transitions").map_err(|e| {
+        let binding = pn.getattr("transitions")?;
+        let py_transitions = binding.downcast::<PySet>().map_err(|e| {
             pyo3::exceptions::PyValueError::new_err(format!("Failed to get transitions: {}", e))
         })?;
-        let py_arcs = get_collection_as_set(pn, "arcs").map_err(|e| {
+        let binding = pn.getattr("arcs")?;
+        let py_arcs = binding.downcast::<PySet>().map_err(|e| {
             pyo3::exceptions::PyValueError::new_err(format!("Failed to get arcs: {}", e))
         })?;
 
         // Convert sets to vectors.
-        let places: Vec<&PyAny> = pyset_as_vec(py_places);
-        let transitions: Vec<&PyAny> = pyset_as_vec(py_transitions);
-        let arcs: Vec<&PyAny> = pyset_as_vec(py_arcs);
+        let places = py_places.iter().collect::<Vec<_>>();
+        let transitions = py_transitions.iter().collect::<Vec<_>>();
+        let arcs = py_arcs.iter().collect::<Vec<_>>();
 
         let num_places = places.len();
         let num_transitions = transitions.len();
 
         // Create mappings using raw pointers as keys.
         let mut place_idx_map: HashMap<usize, usize> = HashMap::new();
-        for (i, &place) in places.iter().enumerate() {
+        for (i, place) in places.iter().enumerate() {
             place_idx_map.insert(place.as_ptr() as usize, i);
         }
         let mut trans_idx_map: HashMap<usize, usize> = HashMap::new();
-        for (i, &trans) in transitions.iter().enumerate() {
+        for (i, trans) in transitions.iter().enumerate() {
             trans_idx_map.insert(trans.as_ptr() as usize, i);
         }
 
@@ -742,7 +748,7 @@ impl ImportableFromPM4Py for LabelledPetriNet {
 
 impl ImportableFromPM4Py for ProcessTree {
     fn import_from_pm4py(
-        ptree: &PyAny,
+        ptree: &Bound<'_, PyAny>,
         input_types: &[&'static EbiInputType],
     ) -> PyResult<EbiInput> {
         // 1) Get the `.ptree` text via Python's repr/to_string
@@ -801,37 +807,38 @@ impl ImportableFromPM4Py for ProcessTree {
 
 // helper functions for event logs
 // A helper to convert a Python dict into our Attributes.
-fn convert_py_dict_to_attributes(py_obj: &PyAny) -> PyResult<Attributes> {
+fn convert_py_dict_to_attributes(py_obj: &Bound<'_, PyAny>) -> PyResult<Attributes> {
     let dict = py_obj.downcast::<PyDict>()?;
     let mut map = HashMap::new();
     for (key, value) in dict.iter() {
         let key_str: String = key.extract()?;
         // For simplicity, we assume every attribute is a string.
-        let value_str: String = value.str()?.to_str()?.to_owned();
+        let value_str: String = value.str()?.to_string();
         map.insert(key_str, AttributeValue::String(value_str));
     }
     Ok(to_attributes(map))
 }
 
 // Build an Event from a PyAny that represents a PM4Py Event.
-pub fn event_from_py(py_event: &PyAny) -> PyResult<Event> {
+pub fn event_from_py(py_event: &Bound<'_, PyAny>) -> PyResult<Event> {
     // PM4Py Event stores its data in _dict
     let dict_obj = py_event.getattr("_dict")?;
-    let attributes = convert_py_dict_to_attributes(dict_obj)?;
+    let attributes = convert_py_dict_to_attributes(&dict_obj)?;
     Ok(Event { attributes })
 }
 
 // Build a Trace from a PyAny that represents a PM4Py Trace.
-pub fn trace_from_py(py_trace: &PyAny) -> PyResult<Trace> {
+pub fn trace_from_py(py_trace: &Bound<'_, PyAny>) -> PyResult<Trace> {
     let attributes = if let Ok(attr_obj) = py_trace.getattr("_attributes") {
-        convert_py_dict_to_attributes(attr_obj)?
+        convert_py_dict_to_attributes(&attr_obj)?
     } else {
         vec![]
     };
-    let py_events = py_trace.getattr("_list")?.downcast::<PyList>()?;
+    let binding = py_trace.getattr("_list")?;
+    let py_events = binding.downcast::<PyList>()?;
     let mut events = Vec::new();
     for py_event in py_events.iter() {
-        let event = event_from_py(py_event)?;
+        let event = event_from_py(&py_event)?;
         events.push(event);
     }
     Ok(Trace { attributes, events })
@@ -839,14 +846,14 @@ pub fn trace_from_py(py_trace: &PyAny) -> PyResult<Trace> {
 
 // helper functions for petri nets
 
-fn get_collection_as_set<'a>(obj: &'a PyAny, attr: &'a str) -> PyResult<&'a PySet> {
-    Ok(obj.getattr(attr)?.downcast::<PySet>()?)
-}
+// fn get_collection_as_set<'a>(obj: &'a PyAny, attr: &'a str) -> PyResult<&'a PySet> {
+//     Ok(obj.getattr(attr)?.downcast::<PySet>()?)
+// }
 
-fn pyset_as_vec<'a>(set: &'a PySet) -> Vec<&'a PyAny> {
-    // Note: sets in Python are unordered.
-    set.iter().collect()
-}
+// fn pyset_as_vec<'a>(set: &'a PySet) -> Vec<&'a PyAny> {
+//     // Note: sets in Python are unordered.
+//     set.iter().collect()
+// }
 
 // helper functions for process trees
 fn translate_pm4py_process_tree(s: &str) -> Result<String, String> {
@@ -999,7 +1006,7 @@ impl EbiCommand {
 
 // helper: try import via PM4Py importer, else if it's a str, treat as file path
 pub fn import_or_load(
-    py_obj: &PyAny,
+    py_obj: &Bound<'_, PyAny>,
     input_types: &[&'static EbiInputType],
     index: usize,
 ) -> PyResult<EbiInput> {
@@ -1011,9 +1018,9 @@ pub fn import_or_load(
         inp
     }
     // 2) if that failed, see if we got a Python str → file path
-    else if let Ok(path) = py_obj.extract::<&str>() {
+    else if let Ok(path) = py_obj.extract::<String>() {
         // read the file
-        let content = std::fs::read_to_string(path)
+        let content = std::fs::read_to_string(&path)
             .map_err(|e| PyValueError::new_err(format!("Failed to read file `{}`: {}", path, e)))?;
         // parse via your CLI-style function
         attempt_parse(input_types, content).map_err(|e| {

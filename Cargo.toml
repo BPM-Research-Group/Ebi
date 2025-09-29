@@ -64,7 +64,7 @@ regex = "1.11.3"
 quick-xml = {version="0.38.3", features=["serialize"]}
 malachite = "0.7.0"
 pastey = "0.1.1"
-pyo3 = { version = "0.18", features = ["extension-module", "abi3-py37", "generate-import-lib"], optional = true }
+pyo3 = { version = "0.21", features = ["extension-module", "abi3-py37", "generate-import-lib"], optional = true }
 polars = { version = "0.32", features = ["ipc", "timezones"], optional = true }
 num-traits = { version = "0.2", optional = true }
 syn = { version = "2.0.106", features = [ "parsing", "full" ], optional = true }

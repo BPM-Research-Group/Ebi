@@ -22,7 +22,7 @@ use crate::ebi_framework::ebi_command::EbiCommand;"
     );
     let mut functions = String::new();
     let mut module =
-        format!("#[pymodule]\nfn ebi(_py: Python<'_>, m: &PyModule) -> PyResult<()> {{");
+        format!("#[pymodule]\nfn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {{");
 
     for path in EBI_COMMANDS.get_command_paths() {
         let (fn_name, body) = ebi_command_to_pm4py_function(&path)?;
@@ -77,7 +77,7 @@ fn {fname}(py: Python<'_>, {args}) -> PyResult<PyObject> {{
 "###,
         fname = fn_name,
         args = (0..input_types.len())
-            .map(|i| format!("arg{}: &PyAny", i))
+            .map(|i| format!("arg{}: &Bound<'_, PyAny>", i))
             .collect::<Vec<_>>()
             .join(", "),
         exact = if exact_arithmetic {
