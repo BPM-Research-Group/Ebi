@@ -1,6 +1,6 @@
 [package]
 name = "ebi"
-version = "0.0.9"
+version = "0.3.0"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 keywords = ["stochastic-processes", "process-mining", "business-processes"]
@@ -25,9 +25,9 @@ eapproximatearithmetic = []
 
 [dependencies]
 ebi_derive = "0.2.2"
-ebi_arithmetic = "0.2.24"
-ebi_optimisation = "0.0.10"
-ebi_objects = "0.0.9"
+ebi_arithmetic = "0.3.0"
+ebi_optimisation = "0.3.0"
+ebi_objects = "0.3.0"
 bitvec = "1.0.1"
 clap = { version = "4.5.48", features = ["derive", "cargo", "string"] }
 anyhow = "1.0.100"
@@ -62,7 +62,7 @@ cfg-if = "1.0.1"
 ntest = "0.9.3"
 regex = "1.11.3"
 quick-xml = {version="0.38.3", features=["serialize"]}
-malachite = "0.6.1"
+malachite = "0.7.0"
 pastey = "0.1.1"
 pyo3 = { version = "0.18", features = ["extension-module", "abi3-py37", "generate-import-lib"], optional = true }
 polars = { version = "0.32", features = ["ipc", "timezones"], optional = true }
