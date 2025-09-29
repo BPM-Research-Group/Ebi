@@ -260,7 +260,7 @@ fn manual() -> Result<EbiOutput> {
             }
 
             //pm4py
-            writeln!(f, "\\\\This command is available in the {} Python package using the function {}", PYTHON_PACKAGE, pm4py_function_name(&path).escape_latex())?;
+            writeln!(f, "\\\\This command is available in the {} Python package using the function {}.", PYTHON_PACKAGE, pm4py_function_name(&path).escape_latex())?;
         }
     }
     writeln!(f, "}}")?;
