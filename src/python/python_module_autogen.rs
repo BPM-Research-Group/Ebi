@@ -7,7 +7,7 @@ use super::python_link::{import_or_load, ExportableToPM4Py};
 use crate::ebi_framework::ebi_command::EbiCommand;
 
 #[pyfunction]
-fn analyse_all_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_all_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ALL;
     let input_types = match **command {
@@ -28,7 +28,7 @@ fn analyse_all_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObj
 }
 
 #[pyfunction]
-fn analyse_completeness(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_completeness(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COMPLETENESS;
     let input_types = match **command {
@@ -49,7 +49,7 @@ fn analyse_completeness(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyO
 }
 
 #[pyfunction]
-fn analyse_coverage(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_coverage(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COVERAGE;
     let input_types = match **command {
@@ -72,7 +72,7 @@ fn analyse_coverage(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, Py
 }
 
 #[pyfunction]
-fn analyse_directly_follows_edge_difference(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_directly_follows_edge_difference(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE;
     let input_types = match **command {
@@ -95,7 +95,7 @@ fn analyse_directly_follows_edge_difference(py: Python<'_>, arg0: &Bound<'_, PyA
 }
 
 #[pyfunction]
-fn analyse_medoid(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_medoid(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MEDOID;
     let input_types = match **command {
@@ -118,7 +118,7 @@ fn analyse_medoid(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAn
 }
 
 #[pyfunction]
-fn analyse_minimum_probability_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_minimum_probability_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MINPROB;
     let input_types = match **command {
@@ -141,7 +141,7 @@ fn analyse_minimum_probability_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>, a
 }
 
 #[pyfunction]
-fn analyse_mode(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_mode(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MODE;
     let input_types = match **command {
@@ -162,7 +162,7 @@ fn analyse_mode(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
 }
 
 #[pyfunction]
-fn analyse_most_likely_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_most_likely_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MOSTLIKELY;
     let input_types = match **command {
@@ -185,7 +185,7 @@ fn analyse_most_likely_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bo
 }
 
 #[pyfunction]
-fn analyse_variety(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_variety(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_VARIETY;
     let input_types = match **command {
@@ -206,7 +206,7 @@ fn analyse_variety(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_activities(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_non_stochastic_activities(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES;
     let input_types = match **command {
@@ -227,7 +227,7 @@ fn analyse_non_stochastic_activities(py: Python<'_>, arg0: &Bound<'_, PyAny>) ->
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_any_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_non_stochastic_any_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES;
     let input_types = match **command {
@@ -248,7 +248,7 @@ fn analyse_non_stochastic_any_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>) ->
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_bounded(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_non_stochastic_bounded(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_BOUNDED;
     let input_types = match **command {
@@ -269,7 +269,7 @@ fn analyse_non_stochastic_bounded(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> Py
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_cluster(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_non_stochastic_cluster(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_CLUSTER;
     let input_types = match **command {
@@ -292,7 +292,7 @@ fn analyse_non_stochastic_cluster(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1:
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_executions(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_non_stochastic_executions(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS;
     let input_types = match **command {
@@ -315,7 +315,7 @@ fn analyse_non_stochastic_executions(py: Python<'_>, arg0: &Bound<'_, PyAny>, ar
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_infinitely_many_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_non_stochastic_infinitely_many_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES;
     let input_types = match **command {
@@ -336,7 +336,7 @@ fn analyse_non_stochastic_infinitely_many_traces(py: Python<'_>, arg0: &Bound<'_
 }
 
 #[pyfunction]
-fn analyse_non_stochastic_medoid(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn analyse_non_stochastic_medoid(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_MEDOID;
     let input_types = match **command {
@@ -359,7 +359,7 @@ fn analyse_non_stochastic_medoid(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: 
 }
 
 #[pyfunction]
-fn association_all_trace_attributes(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn association_all_trace_attributes(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_association::ASSOCIATION_ATTRIBUTES;
     let input_types = match **command {
@@ -382,7 +382,7 @@ fn association_all_trace_attributes(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg
 }
 
 #[pyfunction]
-fn association_trace_attribute(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn association_trace_attribute(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_association::ASSOCIATION_ATTRIBUTE;
     let input_types = match **command {
@@ -407,7 +407,7 @@ fn association_trace_attribute(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &B
 }
 
 #[pyfunction]
-fn conformance_chi_square_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn conformance_chi_square_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_CSSC;
     let input_types = match **command {
@@ -430,7 +430,7 @@ fn conformance_chi_square_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_
 }
 
 #[pyfunction]
-fn conformance_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn conformance_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_EMSC;
     let input_types = match **command {
@@ -453,7 +453,7 @@ fn conformance_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &Bound<
 }
 
 #[pyfunction]
-fn conformance_earth_movers_stochastic_conformance_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn conformance_earth_movers_stochastic_conformance_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_EMSC_SAMPLE;
     let input_types = match **command {
@@ -478,7 +478,7 @@ fn conformance_earth_movers_stochastic_conformance_sample(py: Python<'_>, arg0: 
 }
 
 #[pyfunction]
-fn conformance_entropic_relevance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn conformance_entropic_relevance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_ER;
     let input_types = match **command {
@@ -501,7 +501,7 @@ fn conformance_entropic_relevance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1:
 }
 
 #[pyfunction]
-fn conformance_hellinger_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn conformance_hellinger_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_HSC;
     let input_types = match **command {
@@ -524,7 +524,7 @@ fn conformance_hellinger_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_,
 }
 
 #[pyfunction]
-fn conformance_jensen_shannon(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn conformance_jensen_shannon(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(false);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_JSSC;
     let input_types = match **command {
@@ -547,7 +547,7 @@ fn conformance_jensen_shannon(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bo
 }
 
 #[pyfunction]
-fn conformance_jensen_shannon_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn conformance_jensen_shannon_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(false);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_JSSC_SAMPLE;
     let input_types = match **command {
@@ -572,7 +572,7 @@ fn conformance_jensen_shannon_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, ar
 }
 
 #[pyfunction]
-fn conformance_unit_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn conformance_unit_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_UEMSC;
     let input_types = match **command {
@@ -595,7 +595,7 @@ fn conformance_unit_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &B
 }
 
 #[pyfunction]
-fn conformance_non_stochastic_alignments(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn conformance_non_stochastic_alignments(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS;
     let input_types = match **command {
@@ -618,7 +618,7 @@ fn conformance_non_stochastic_alignments(py: Python<'_>, arg0: &Bound<'_, PyAny>
 }
 
 #[pyfunction]
-fn conformance_non_stochastic_escaping_edges_precision(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn conformance_non_stochastic_escaping_edges_precision(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION;
     let input_types = match **command {
@@ -641,7 +641,7 @@ fn conformance_non_stochastic_escaping_edges_precision(py: Python<'_>, arg0: &Bo
 }
 
 #[pyfunction]
-fn conformance_non_stochastic_set_alignments(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn conformance_non_stochastic_set_alignments(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS;
     let input_types = match **command {
@@ -664,7 +664,7 @@ fn conformance_non_stochastic_set_alignments(py: Python<'_>, arg0: &Bound<'_, Py
 }
 
 #[pyfunction]
-fn conformance_non_stochastic_trace_fitness(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn conformance_non_stochastic_trace_fitness(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_TRACE_FITNESS;
     let input_types = match **command {
@@ -685,7 +685,7 @@ fn conformance_non_stochastic_trace_fitness(py: Python<'_>, arg0: &Bound<'_, PyA
 }
 
 #[pyfunction]
-fn convert_finite_stochastic_language(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn convert_finite_stochastic_language(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SLANG;
     let input_types = match **command {
@@ -706,7 +706,7 @@ fn convert_finite_stochastic_language(py: Python<'_>, arg0: &Bound<'_, PyAny>) -
 }
 
 #[pyfunction]
-fn convert_labelled_petri_net(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn convert_labelled_petri_net(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_convert::EBI_CONVERT_LPN;
     let input_types = match **command {
@@ -727,7 +727,7 @@ fn convert_labelled_petri_net(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResu
 }
 
 #[pyfunction]
-fn convert_stochastic_finite_deterministic_automaton(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn convert_stochastic_finite_deterministic_automaton(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SDFA;
     let input_types = match **command {
@@ -748,7 +748,7 @@ fn convert_stochastic_finite_deterministic_automaton(py: Python<'_>, arg0: &Boun
 }
 
 #[pyfunction]
-fn discover_alignments(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn discover_alignments(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS;
     let input_types = match **command {
@@ -771,7 +771,7 @@ fn discover_alignments(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_,
 }
 
 #[pyfunction]
-fn discover_directly_follows_graph(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn discover_directly_follows_graph(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_DIRECTLY_FOLLOWS;
     let input_types = match **command {
@@ -794,7 +794,7 @@ fn discover_directly_follows_graph(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1
 }
 
 #[pyfunction]
-fn discover_occurrence(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn discover_occurrence(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE;
     let input_types = match **command {
@@ -817,7 +817,7 @@ fn discover_occurrence(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_,
 }
 
 #[pyfunction]
-fn discover_uniform(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn discover_uniform(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM;
     let input_types = match **command {
@@ -838,7 +838,7 @@ fn discover_uniform(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObjec
 }
 
 #[pyfunction]
-fn discover_non_stochastic_flower_deterministic_finite_automaton(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn discover_non_stochastic_flower_deterministic_finite_automaton(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA;
     let input_types = match **command {
@@ -859,7 +859,7 @@ fn discover_non_stochastic_flower_deterministic_finite_automaton(py: Python<'_>,
 }
 
 #[pyfunction]
-fn discover_non_stochastic_flower_process_tree(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn discover_non_stochastic_flower_process_tree(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE;
     let input_types = match **command {
@@ -880,7 +880,7 @@ fn discover_non_stochastic_flower_process_tree(py: Python<'_>, arg0: &Bound<'_, 
 }
 
 #[pyfunction]
-fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA;
     let input_types = match **command {
@@ -901,7 +901,7 @@ fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton(py: Python
 }
 
 #[pyfunction]
-fn discover_non_stochastic_prefix_tree_process_tree(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn discover_non_stochastic_prefix_tree_process_tree(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE;
     let input_types = match **command {
@@ -922,7 +922,7 @@ fn discover_non_stochastic_prefix_tree_process_tree(py: Python<'_>, arg0: &Bound
 }
 
 #[pyfunction]
-fn information(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn information(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_info::EBI_INFO;
     let input_types = match **command {
@@ -943,7 +943,7 @@ fn information(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
 }
 
 #[pyfunction]
-fn itself_graph(py: Python<'_>, ) -> PyResult<PyObject> {
+fn itself_graph(py: Python<'_>, ) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(false);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_itself::EBI_ITSELF_GRAPH;
     let input_types = match **command {
@@ -962,7 +962,7 @@ fn itself_graph(py: Python<'_>, ) -> PyResult<PyObject> {
 }
 
 #[pyfunction]
-fn itself_html(py: Python<'_>, ) -> PyResult<PyObject> {
+fn itself_html(py: Python<'_>, ) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(false);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_itself::EBI_ITSELF_HTML;
     let input_types = match **command {
@@ -981,7 +981,7 @@ fn itself_html(py: Python<'_>, ) -> PyResult<PyObject> {
 }
 
 #[pyfunction]
-fn itself_java(py: Python<'_>, ) -> PyResult<PyObject> {
+fn itself_java(py: Python<'_>, ) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(false);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_itself::EBI_ITSELF_JAVA;
     let input_types = match **command {
@@ -1000,7 +1000,7 @@ fn itself_java(py: Python<'_>, ) -> PyResult<PyObject> {
 }
 
 #[pyfunction]
-fn itself_logo(py: Python<'_>, ) -> PyResult<PyObject> {
+fn itself_logo(py: Python<'_>, ) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(false);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_itself::EBI_ITSELF_LOGO;
     let input_types = match **command {
@@ -1019,7 +1019,7 @@ fn itself_logo(py: Python<'_>, ) -> PyResult<PyObject> {
 }
 
 #[pyfunction]
-fn itself_manual(py: Python<'_>, ) -> PyResult<PyObject> {
+fn itself_manual(py: Python<'_>, ) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(false);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_itself::EBI_ITSELF_MANUAL;
     let input_types = match **command {
@@ -1038,7 +1038,7 @@ fn itself_manual(py: Python<'_>, ) -> PyResult<PyObject> {
 }
 
 #[pyfunction]
-fn itself_python(py: Python<'_>, ) -> PyResult<PyObject> {
+fn itself_python(py: Python<'_>, ) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(false);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_itself::EBI_ITSELF_PYTHON;
     let input_types = match **command {
@@ -1057,7 +1057,7 @@ fn itself_python(py: Python<'_>, ) -> PyResult<PyObject> {
 }
 
 #[pyfunction]
-fn probability_explain_trace(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn probability_explain_trace(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE;
     let input_types = match **command {
@@ -1080,7 +1080,7 @@ fn probability_explain_trace(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bou
 }
 
 #[pyfunction]
-fn probability_log(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn probability_log(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_LOG;
     let input_types = match **command {
@@ -1103,7 +1103,7 @@ fn probability_log(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyA
 }
 
 #[pyfunction]
-fn probability_trace(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn probability_trace(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE;
     let input_types = match **command {
@@ -1124,7 +1124,7 @@ fn probability_trace(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObje
 }
 
 #[pyfunction]
-fn sample_folds(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>, arg3: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn sample_folds(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>, arg3: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_sample::EBI_SAMPLE_FOLDS;
     let input_types = match **command {
@@ -1151,7 +1151,7 @@ fn sample_folds(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>
 }
 
 #[pyfunction]
-fn sample_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn sample_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_sample::EBI_SAMPLE_TRACES;
     let input_types = match **command {
@@ -1174,7 +1174,7 @@ fn sample_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny
 }
 
 #[pyfunction]
-fn test_bootstrap_test(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>, arg3: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn test_bootstrap_test(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>, arg3: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_test::EBI_BOOTSTRAP_TEST;
     let input_types = match **command {
@@ -1201,7 +1201,7 @@ fn test_bootstrap_test(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_,
 }
 
 #[pyfunction]
-fn test_log_categorical_attribute(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>, arg3: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn test_log_categorical_attribute(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>, arg3: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_test::EBI_TEST_LOG_ATTRIBUTE;
     let input_types = match **command {
@@ -1228,7 +1228,7 @@ fn test_log_categorical_attribute(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1:
 }
 
 #[pyfunction]
-fn validate(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn validate(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_validate::EBI_VALIDATE;
     let input_types = match **command {
@@ -1249,7 +1249,7 @@ fn validate(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
 }
 
 #[pyfunction]
-fn visualise_graph(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn visualise_graph(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_GRAPH;
     let input_types = match **command {
@@ -1270,7 +1270,7 @@ fn visualise_graph(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject
 }
 
 #[pyfunction]
-fn visualise_text(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<PyObject> {
+fn visualise_text(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_arithmetic::exact::set_exact_globally(false);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT;
     let input_types = match **command {

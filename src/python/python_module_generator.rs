@@ -67,7 +67,7 @@ fn ebi_command_to_pm4py_function(path: &Vec<&EbiCommand>) -> Result<(String, Str
     // Start building function
     let mut body = format!(
         r###"#[pyfunction]
-fn {fname}(py: Python<'_>, {args}) -> PyResult<PyObject> {{
+fn {fname}(py: Python<'_>, {args}) -> PyResult<Py<PyAny>> {{
     {exact}
     let command: &&EbiCommand = &&{library_name};
     let input_types = match **command {{
