@@ -70,6 +70,13 @@ impl EbiInput {
     }
 }
 
+#[macro_export]
+macro_rules! EbiInputTypeEnum {
+    ($t:ident) => {
+        EbiInputType::String(Some($t::VARIANTS), None)
+    };
+}
+
 #[derive(PartialEq, Eq, EnumIter, Clone)]
 pub enum EbiInputType {
     Trait(EbiTrait),

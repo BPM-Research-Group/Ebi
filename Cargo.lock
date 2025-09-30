@@ -740,12 +740,13 @@ dependencies = [
 
 [[package]]
 name = "ebi_derive"
-version = "0.2.2"
+version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ba7fbff4118d94768b4958caedb8056dab3134c8d986dda5930a497dab314252"
+checksum = "1d0792011924345f2d409cc35beb26556e5d003c8f8b0379f140d7976118f443"
 dependencies = [
  "darling",
  "quote",
+ "strum_macros 0.27.2",
  "syn 2.0.106",
 ]
 

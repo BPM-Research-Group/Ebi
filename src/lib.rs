@@ -19,6 +19,7 @@ pub mod ebi_commands {
     pub mod ebi_command_convert;
     pub mod ebi_command_discover;
     pub mod ebi_command_discover_non_stochastic;
+    pub mod ebi_command_filter;
     pub mod ebi_command_info;
     pub mod ebi_command_itself;
     pub mod ebi_command_probability;
@@ -138,10 +139,15 @@ pub mod stochastic_semantics {
 pub mod techniques {
     pub mod align;
     pub mod alignment_stochastic_miner;
+    pub mod any_traces;
     pub mod association;
+    pub mod bootstrap_test;
+    pub mod bounded;
+    pub mod chi_square_stochastic_conformance;
     pub mod completeness;
     pub mod deterministic_semantics_for_stochastic_semantics;
-
+    pub mod directly_follows_graph_abstractor;
+    pub mod directly_follows_model_miner;
     pub mod earth_movers_stochastic_conformance;
     #[cfg(any(
         all(
@@ -155,18 +161,12 @@ pub mod techniques {
     pub mod earth_movers_stochastic_conformance_exact;
     #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
     pub mod earth_movers_stochastic_conformance_f64;
-
-    pub mod any_traces;
-    pub mod bootstrap_test;
-    pub mod bounded;
-    pub mod chi_square_stochastic_conformance;
-    pub mod directly_follows_graph_abstractor;
-    pub mod directly_follows_model_miner;
     pub mod edge_difference;
     pub mod entropic_relevance;
     pub mod escaping_edges_precision;
     pub mod executions;
     pub mod explain_trace;
+    pub mod filter;
     pub mod fitness;
     pub mod flower_miner;
     pub mod hellinger_stochastic_conformance;
