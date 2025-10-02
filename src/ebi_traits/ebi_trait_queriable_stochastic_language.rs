@@ -20,8 +20,9 @@ use crate::{
 };
 
 use super::ebi_trait_finite_language::EbiTraitFiniteLanguage;
+use std::any::Any;
 
-pub trait EbiTraitQueriableStochasticLanguage: HasActivityKey + Sync {
+pub trait EbiTraitQueriableStochasticLanguage: HasActivityKey + Sync + Any {
     /**
      * Compute the probability that self produces a trace that is accepted by the follower.
      * Note that the follower must use the same activity key.

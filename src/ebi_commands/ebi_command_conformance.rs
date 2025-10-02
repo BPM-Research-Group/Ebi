@@ -19,6 +19,7 @@ use crate::{
         unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
         hellinger_stochastic_conformance::HellingerStochasticConformance,
         chi_square_stochastic_conformance::ChiSquareStochasticConformance,
+        stochastic_markovian_abstraction::StochasticMarkovianAbstraction,
     },
 };
 
@@ -35,6 +36,7 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
         &CONFORMANCE_HSC,
         &CONFORMANCE_JSSC,
         &CONFORMANCE_JSSC_SAMPLE,
+        &CONFORMANCE_STOCHASTIC_MARKOVIAN,
         &CONFORMANCE_UEMSC,
     ],
 };
@@ -353,4 +355,65 @@ pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
     },
     output_type: &EbiOutputType::Fraction,
 };
+pub const CONFORMANCE_STOCHASTIC_MARKOVIAN: EbiCommand = EbiCommand::Command {
+    name_short: "sma",
+    name_long: Some("stochastic-markovian-abstraction"),
+    explanation_short: "Compare languages using Stochastic Markovian Abstraction.",
+    explanation_long: Some("Compare stochastic languages using the Stochastic Markovian Abstraction, which represents languages based on the expected frequency of subtraces to better handle partially matching traces."),
+    // TODO: add latex link
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
+        &[&EbiInputType::Usize(None, None, None)],
+        &[&EbiInputType::String(None, None)],
+        &[&EbiInputType::Fraction(None, None, Some(crate::math::constant_fraction::ConstFraction::of(1, 1000)))],
+    ],
+    input_names: &["FILE_1", "FILE_2", "K_ORDER", "METRIC", "DELTA"],
+    input_helps: &[
+        "A finite stochastic language (log) to compare.",
+        "A queriable stochastic language (model) to compare.",
+        "The order k of the Markovian abstraction (should be at least 1).",
+        "Distance metric: one of uemsc | l2 | js | hellinger.",
+        "Optional delta value for livelock patch (default: 0.001).",
+    ],
+    execute: |mut inputs, _| {
+        let log = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        
+        let model = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
+        
+        let k = inputs
+            .remove(0)
+            .to_type::<usize>()?;
 
+        let metric_str = inputs
+            .remove(0)
+            .to_type::<String>()?;
+
+        use crate::techniques::stochastic_markovian_abstraction::DistanceMetric;
+        let metric = match metric_str.to_ascii_lowercase().as_str() {
+            "uemsc" => DistanceMetric::Uemsc,
+            "l2" | "scaled_l2" => DistanceMetric::ScaledL2,
+            "js" | "jsd" | "jensen" | "jensen-shannon" => DistanceMetric::JensenShannon,
+            "hellinger" | "h" => DistanceMetric::Hellinger,
+            other => return Err(anyhow!(format!("Unknown metric '{}'.", other))),
+        };
+
+        let delta = inputs
+            .remove(0)
+            .to_type::<ebi_arithmetic::Fraction>()?;
+
+        let result = log
+            .markovian_conformance(model, *k, metric, *delta)
+            .context("Compute SMA.")?;
+
+        Ok(EbiOutput::Fraction(result))
+    },
+    output_type: &EbiOutputType::Fraction,
+};
