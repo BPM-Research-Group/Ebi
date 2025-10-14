@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
+             id="Definitions_1"
+             targetNamespace="http://example.com/bpmn">
+
+  <process id="StochasticLanguageProcess" isExecutable="false">
+
+    <startEvent id="StartEvent_1" name="Start">
+      <outgoing>Flow_Start_XOR</outgoing>
+    </startEvent>
+
+    <exclusiveGateway id="Gateway_XOR" name="Choice">
+      <incoming>Flow_Start_XOR</incoming>
+      <outgoing>Flow_XOR_A</outgoing>
+      <outgoing>Flow_XOR_B</outgoing>
+    </exclusiveGateway>
+
+    <task id="Task_A" name="a">
+      <incoming>Flow_XOR_A</incoming>
+      <outgoing>Flow_A_End</outgoing>
+    </task>
+
+    <task id="Task_B" name="b">
+      <incoming>Flow_XOR_B</incoming>
+      <outgoing>Flow_B_End</outgoing>
+    </task>
+
+    <endEvent id="EndEvent_1" name="End">
+      <incoming>Flow_A_End</incoming>
+      <incoming>Flow_B_End</incoming>
+    </endEvent>
+
+    <sequenceFlow id="Flow_Start_XOR" sourceRef="StartEvent_1" targetRef="Gateway_XOR"/>
+    <sequenceFlow id="Flow_XOR_A" sourceRef="Gateway_XOR" targetRef="Task_A">
+      <documentation>probability=0.5</documentation>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_XOR_B" sourceRef="Gateway_XOR" targetRef="Task_B">
+      <documentation>probability=0.5</documentation>
+    </sequenceFlow>
+    <sequenceFlow id="Flow_A_End" sourceRef="Task_A" targetRef="EndEvent_1"/>
+    <sequenceFlow id="Flow_B_End" sourceRef="Task_B" targetRef="EndEvent_1"/>
+
+  </process>
+
+</definitions>

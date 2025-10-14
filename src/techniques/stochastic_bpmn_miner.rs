@@ -5,7 +5,6 @@ use crate::ebi_objects::stochastic_business_process_model_and_notation::{
     StochasticBusinessProcessModelAndNotation, StochasticSequenceFlow, StochasticTask
 };
 use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
-//use crate::optimisation_algorithms::microlp::microlp::{ComparisonOp, OptimizationDirection, Problem};
 
 use ebi_arithmetic::fraction::Fraction;
 use ebi_arithmetic::exact::MaybeExact;
@@ -13,9 +12,6 @@ use ebi_arithmetic::exact::MaybeExact;
 use ebi_optimisation::linear_programming::{OptimisationDirection, ComparisonOp, Problem};
 
 use std::collections::{HashMap, HashSet, VecDeque};
-//use crate::math::fraction::MaybeExact;
-//use crate::math::fraction::Fraction;
-//use crate::math::traits::{Zero};
 
 fn is_diverging_gateway(node: &BPMNGateway) -> bool {
     node.direction == GatewayDirection::Diverging
@@ -30,15 +26,15 @@ pub fn detect_concurrent_pairs(_log: &dyn EbiTraitFiniteStochasticLanguage, bpmn
     let mut succ: HashMap<String, Vec<String>> = HashMap::new();
     for f in &bpmn.sequence_flows { succ.entry(f.source_id.clone()).or_default().push(f.target_id.clone()); }
 
-    // Sets and counts
+    // Sets
     let activity_ids: HashSet<String> = bpmn.nodes.iter().map(|n| n.id.clone()).collect();
     let and_ids: HashSet<String> = bpmn.and_gateways.iter().map(|g| g.id.clone()).collect();
     let or_ids: HashSet<String> = bpmn.or_gateways.iter().map(|g| g.id.clone()).collect();
     let mut in_deg: HashMap<String, usize> = HashMap::new();
     for f in &bpmn.sequence_flows { *in_deg.entry(f.target_id.clone()).or_default() += 1; in_deg.entry(f.source_id.clone()).or_default(); }
 
-    // BFS that halts expansion at stop nodes (but includes them in visited)
-    let mut bfs_until = |start: &str, stop: &HashSet<String>| -> (HashSet<String>, HashMap<String, usize>) {
+    // BFS that halts expansion at stop nodes
+    let bfs_until = |start: &str, stop: &HashSet<String>| -> (HashSet<String>, HashMap<String, usize>) {
         let mut vis = HashSet::new();
         let mut dist: HashMap<String, usize> = HashMap::new();
         let mut q = VecDeque::new();
@@ -60,7 +56,7 @@ pub fn detect_concurrent_pairs(_log: &dyn EbiTraitFiniteStochasticLanguage, bpmn
 
     let mut pairs: HashSet<(String, String)> = HashSet::new();
 
-    // Helper to process a diverging gateway set (AND or OR)
+    // Helper to process a diverging AND/OR gateways
     let mut process_diverging = |gateways: &Vec<BPMNGateway>, is_and: bool| {
         for gw in gateways {
             if !is_diverging_gateway(gw) || gw.outgoing.len() <= 1 { continue; }
@@ -122,22 +118,20 @@ pub fn detect_concurrent_pairs(_log: &dyn EbiTraitFiniteStochasticLanguage, bpmn
 
     process_diverging(&bpmn.and_gateways, true);
     process_diverging(&bpmn.or_gateways, false);
-
-    println!("Concurrent pairs: {:#?}", pairs);
     pairs
 }
 
-// Estimates the frequency of each activity in the log and maps it to node IDs using fractions.
+// Estimates the frequency of each activity in the log
 pub fn frequency_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &BusinessProcessModelAndNotation) -> HashMap<String, Fraction> {
     let mut count: HashMap<String, Fraction> = HashMap::new();
     let activity_key = log.get_activity_key();
     
-    // Count activity occurrences weighted by trace probabilities
+    // Count activity occurrences
     let mut activity_counts: HashMap<String, Fraction> = HashMap::new();
     
     for (trace, probability) in log.iter_trace_probability() {
         if let Ok(exact_fraction) = probability.extract_exact() {
-            // Count each activity in the trace, weighted by trace probability
+            // Count each activity in the trace
             for activity in trace {
                 let activity_name = activity_key.get_activity_label(activity).to_string();
                 let current_count = activity_counts.get(&activity_name).cloned().unwrap_or_else(|| Fraction::from((0, 1)));
@@ -222,7 +216,6 @@ pub fn lhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Busin
     result
 }
 
-/// Estimates right-hand pair frequencies, excluding concurrent pairs, for a BPMN model using fractions.
 pub fn rhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &BusinessProcessModelAndNotation) -> HashMap<String, Fraction> {
     let mut counts: HashMap<String, Fraction> = HashMap::new();
     let concurrent = detect_concurrent_pairs(log, bpmn);
@@ -280,49 +273,6 @@ pub fn rhpair_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &Busin
     result
 }
 
-/// Estimates scaled right-hand pair frequencies for a BPMN model using fractions.
-pub fn pairscale_estimator(log: &dyn EbiTraitFiniteStochasticLanguage, bpmn: &BusinessProcessModelAndNotation) -> HashMap<String, Fraction> {
-    let counts: HashMap<String, Fraction> = rhpair_estimator(log, bpmn);
-    
-    // Calculate total trace length as fraction
-    let mut trace_total = Fraction::from((0, 1));
-    let mut trace_count = 0;
-    
-    for (trace, probability) in log.iter_trace_probability() {
-        if probability.is_exact() {
-            if let Ok(exact_fraction) = probability.extract_exact() {
-                let trace_length = Fraction::from((trace.len() as i64, 1));
-                let fraction_to_add = match exact_fraction {
-                    fraction::GenericFraction::Rational(sign, ratio) => {
-                        Fraction::Exact(fraction::GenericFraction::Rational(
-                            sign.clone(),
-                            ratio.clone()
-                        ))
-                    }
-                    _ => Fraction::from(0)
-                };
-                trace_total = &trace_total + &(&trace_length * &fraction_to_add);
-                trace_count += 1;
-            }
-        }
-    }
-    
-    let mut result: HashMap<String, Fraction> = HashMap::new();
-    if trace_count > 0 {
-        let transition_freq = if counts.len() > 0 {
-            &trace_total / &Fraction::from((counts.len() as i64, 1))
-        } else {
-            Fraction::from((1, 1))
-        };
-        
-        for (node_id, count) in counts {
-            result.insert(node_id, &count / &transition_freq);
-        }
-    }
-    
-    result
-}
-
 pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weights: &HashMap<String, Fraction>) -> anyhow::Result<StochasticBusinessProcessModelAndNotation>{
     let n_flows = bpmn.sequence_flows.len();
 
@@ -352,7 +302,6 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
         });
     }
 
-    //map incoming, outgoing sequence flows to tasks/gateways
     // Build incoming/outgoing maps for each node
     let mut incoming: HashMap<String, Vec<String>> = HashMap::new();
     let mut outgoing: HashMap<String, Vec<String>> = HashMap::new();
@@ -362,14 +311,13 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
         incoming.entry(flow.target_id.clone()).or_default().push(flow_id);
     }
 
-    //Setup Problem: Minimize sum of absolute slacks, ignore flow weights in optimisation
+    //Setup Problem: Minimize sum of absolute slacks
     let mut problem = Problem::new(OptimisationDirection::Minimise);
 
     //Setup variable per sequence flow
     let mut flow_vars = HashMap::new();
     for (_i, flow) in bpmn.sequence_flows.iter().enumerate(){
         let flow_id = format!("flow_{}_{}", flow.source_id, flow.target_id);
-        // 0 <= v <= infinity, coefficient = 0
         let v = problem.add_var(Fraction::from(0), (Fraction::from(0), Fraction::infinity()));
         flow_vars.insert(flow_id, v);
     }
@@ -510,7 +458,7 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
             }
         }
     let solution = problem.solve().unwrap();
-    
+        
     //Retreive result
     let mut flow_weights: HashMap<String, Fraction> = HashMap::new();
     for flow in &bpmn.sequence_flows{
@@ -622,351 +570,74 @@ pub fn weight_propagtion_micro_lp(bpmn: &BusinessProcessModelAndNotation, weight
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::collections::HashMap;
+    use std::fs;
     use std::io::BufReader;
-    use std::fs::File;
-    use crate::ebi_objects::event_log::EventLog;
+    use ebi_arithmetic::f;
+
     use crate::ebi_objects::finite_stochastic_language::FiniteStochasticLanguage;
     use crate::ebi_framework::importable::Importable;
-    use std::time::Instant;
-
 
     #[test]
-    fn test_basic_compilation() {
-        // Simple test to verify the functions compile correctly
-        let weights: HashMap<String, u64> = HashMap::new();
-        assert!(weights.is_empty());
+    fn frequency_test() {
+        let file_lang = fs::read_to_string("testfiles/a-b.slang").unwrap();
+        let language = file_lang.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let file_bpmn = fs::read_to_string("testfiles/a-b.bpmn").unwrap();
+        let mut reader = BufReader::new(file_bpmn.as_bytes());
+        let bpmn = BusinessProcessModelAndNotation::import(&mut reader).unwrap();
+
+        let weights = frequency_estimator(&language, &bpmn);
+
+        assert_eq!(weights.get("Task_A"), Some(&f!(1, 2)));
+        assert_eq!(weights.get("Task_B"), Some(&f!(1, 2)));
+        }
+
+    #[test]
+    fn lhpair_test() {
+        let file_lang = fs::read_to_string("testfiles/a-b.slang").unwrap();
+        let language = file_lang.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let file_bpmn = fs::read_to_string("testfiles/a-b.bpmn").unwrap();
+        let mut reader = BufReader::new(file_bpmn.as_bytes());
+        let bpmn = BusinessProcessModelAndNotation::import(&mut reader).unwrap();
+
+        let weights = lhpair_estimator(&language, &bpmn);
         
-        // Test that our main functions exist and have the right signatures
-        let _f = frequency_estimator as fn(&dyn EbiTraitFiniteStochasticLanguage, &BusinessProcessModelAndNotation) -> HashMap<String, Fraction>;
-        //let _h = weight_propagation as fn(&BusinessProcessModelAndNotation, &HashMap<String, Fraction>) -> anyhow::Result<StochasticBusinessProcessModelAndNotation>;
-        
-        println!("All functions compile correctly");
+        assert_eq!(weights.get("Task_A"), Some(&f!(1, 2)));
+        assert_eq!(weights.get("Task_B"), Some(&f!(1, 2)));
     }
 
     #[test]
-    fn test_gateway_direction_helper() {
-        // Test the helper function
-        let diverging_gateway = BPMNGateway {
-            id: "test".to_string(),
-            direction: GatewayDirection::Diverging,
-            incoming: vec![],
-            outgoing: vec![],
-        };
+    fn rhpair_test() {
+        let file_lang = fs::read_to_string("testfiles/a-b.slang").unwrap();
+        let language = file_lang.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let file_bpmn = fs::read_to_string("testfiles/a-b.bpmn").unwrap();
+        let mut reader = BufReader::new(file_bpmn.as_bytes());
+        let bpmn = BusinessProcessModelAndNotation::import(&mut reader).unwrap();
+
+        let weights = rhpair_estimator(&language, &bpmn);
         
-        let converging_gateway = BPMNGateway {
-            id: "test2".to_string(),
-            direction: GatewayDirection::Converging,
-            incoming: vec![],
-            outgoing: vec![],
-        };
-        
-        assert!(is_diverging_gateway(&diverging_gateway));
-        assert!(!is_diverging_gateway(&converging_gateway));
+        assert_eq!(weights.get("Task_A"), Some(&f!(1, 2)));
+        assert_eq!(weights.get("Task_B"), Some(&f!(1, 2)));
     }
 
     #[test]
-    #[ignore]
-    fn test_weight_propagation_from_files() {
-        use crate::ebi_traits::ebi_trait_event_log::IndexTrace;
-        
-        // File paths
-        let  bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\evaluation\Road_Traffic_Fine_Management_Process.bpmn";
-        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\evaluation\Road_Traffic_Fine_Management_Process.xes";
-        
-        
-        println!("=== Loading files for weight propagation test ===");
-        
-        let mut start = Instant::now();
-        // Load XES eventlog, transform to FIniteStochasticLanguage
-        println!("Loading event log from: {}", log_file);
-        let log_result = File::open(log_file)
-            .map_err(|e| anyhow::anyhow!("Failed to open log file: {}", e))
-            .and_then(|file| {
-                let mut reader = BufReader::new(file);
-                // Step 1: Import as EventLog (handles XES format)
-                EventLog::import(&mut reader)
-                    .map_err(|e| anyhow::anyhow!("Failed to parse XES: {}", e))
-            })
-            .map(|event_log| {
-                // Step 2: Convert EventLog to FiniteStochasticLanguage
-                FiniteStochasticLanguage::from(event_log)
-            });
-        
-        let event_log = match log_result {
-            Ok(log) => {
-                println!(" Event log loaded successfully");
-                println!(" Number of traces: {}", log.len());
-                log
-            }
-            Err(e) => {
-                println!(" Failed to load event log: {:?}", e);
-                println!(" Please ensure the file exists and is in the correct format");
-                return;
-            }
-        };
+    fn propagation_test(){
+        let file_lang = fs::read_to_string("testfiles/a-b.slang").unwrap();
+        let language = file_lang.parse::<FiniteStochasticLanguage>().unwrap();
 
+        let file_bpmn = fs::read_to_string("testfiles/a-b.bpmn").unwrap();
+        let mut reader = BufReader::new(file_bpmn.as_bytes());
+        let bpmn = BusinessProcessModelAndNotation::import(&mut reader).unwrap();
 
-        // Load BPMN model using the Importable trait
-        println!("Loading BPMN model from: {}", bpmn_file);
-        let bpmn_result = File::open(bpmn_file)
-            .map_err(|e| anyhow::anyhow!("Failed to open BPMN file: {}", e))
-            .and_then(|file| {
-                let mut reader = BufReader::new(file);
-                BusinessProcessModelAndNotation::import(&mut reader)
-            });
-        
-        let bpmn_model = match bpmn_result {
-            Ok(model) => {
-                println!(" BPMN model loaded successfully");
-                println!(" Number of nodes: {}", model.nodes.len());
-                println!(" Number of sequence flows: {}", model.sequence_flows.len());
-                println!(" Number of AND gateways: {}", model.and_gateways.len());
-                println!(" Number of XOR gateways: {}", model.xor_gateways.len());
-                println!(" Number of OR gateways: {}", model.or_gateways.len());
-                
-                // Display the loaded model
-                println!("\n--- Loaded BPMN Model ---");
-                println!("{}", model);
-                
-                model
-            }
-            Err(e) => {
-                println!(" Failed to load BPMN model: {:?}", e);
-                println!(" Please ensure the file exists and is in the correct format");
-                return;
-            }
-        };
-        let duration = start.elapsed();
-        println!("Time conversion: {:?}", duration);
-
-        start = Instant::now();
-        // Estimate frequencies from the event log
-        let frequencies = lhpair_estimator(&event_log as &dyn EbiTraitFiniteStochasticLanguage, &bpmn_model);
-
-        /*for (node_id, fraction) in &frequencies {
-            // Try to get the activity name from the label mapping
-            let activity_name = bpmn_model.label.get(node_id).unwrap_or(node_id);
-            if let Ok(exact_fraction) = fraction.extract_exact() {
-                match exact_fraction {
-                    fraction::GenericFraction::Rational(_, ratio) => {
-                        let num = ratio.numer();
-                        let den = ratio.denom();
-                        println!("   {} ({}): {}/{} = {:.3}", activity_name, node_id, num, den, 
-                            num.to_string().parse::<f64>().unwrap_or(0.0) / den.to_string().parse::<f64>().unwrap_or(1.0));
-                    }
-                    _ => {
-                        println!("   {} ({}): {}", activity_name, node_id, fraction);
-                    }
-                }
-            } else {
-                println!("   {} ({}): {}", activity_name, node_id, fraction);
-            }
-        }*/
-        
-        // Use frequencies directly as weights (already mapped to node IDs)
-        let weights: HashMap<String, Fraction> = frequencies;
-        
-        // Apply weight propagation
-        let result: Result<StochasticBusinessProcessModelAndNotation, anyhow::Error> = weight_propagtion_micro_lp(&bpmn_model, &weights);
-        let duration = start.elapsed();
-        println!("Estimator + Propagation time: {:?}", duration);
-
-        match result {
-            Ok(stochastic_bpmn) => {
-                println!("Weight propagation completed successfully!");
-                println!("SBPMN: {}", stochastic_bpmn);
-                println!("\n--- Results ---");
-                println!("Stochastic BPMN model created with:");
-                println!("  - {} tasks", stochastic_bpmn.tasks.len());
-                println!("  - {} sequence flows", stochastic_bpmn.sequence_flows.len());
-                println!("  - {} AND gateways", stochastic_bpmn.and_gateways.len());
-                println!("  - {} XOR gateways", stochastic_bpmn.xor_gateways.len());
-                println!("  - {} OR gateways", stochastic_bpmn.or_gateways.len());
-                
-                // Create a mapping from node ID to node name for better display
-                let mut id_to_name: HashMap<String, String> = HashMap::new();
-                for (node_id, label) in &bpmn_model.label {
-                    id_to_name.insert(node_id.clone(), label.clone());
-                }
-                
-                // Add gateway type mappings
-                for gw in &bpmn_model.and_gateways {
-                    id_to_name.insert(gw.id.clone(), "and_gateway".to_string());
-                }
-                for gw in &bpmn_model.xor_gateways {
-                    id_to_name.insert(gw.id.clone(), "xor_gateway".to_string());
-                }
-                for gw in &bpmn_model.or_gateways {
-                    id_to_name.insert(gw.id.clone(), "or_gateway".to_string());
-                }
-                
-                println!("\n--- Stochastic BPMN Model (with readable names) ---");
-                println!("Tasks:");
-                for task in &stochastic_bpmn.tasks {
-                    let name = id_to_name.get(&task.id).unwrap_or(&task.id);
-                    println!("  - {}: weight {:.2}", name, task.weight);
-                }
-                
-                println!("\nSequence Flows:");
-                for flow in &stochastic_bpmn.sequence_flows {
-                    let source_name = id_to_name.get(&flow.source_id).unwrap_or(&flow.source_id);
-                    let target_name = id_to_name.get(&flow.target_id).unwrap_or(&flow.target_id);
-                    println!("  - {} --> {}: weight {:.2}", source_name, target_name, flow.weight);
-                }
-                
-                println!("\nGateways:");
-                for gw_id in &stochastic_bpmn.and_gateways {
-                    println!("  - and_gateway ({})", gw_id);
-                }
-                for gw_id in &stochastic_bpmn.xor_gateways {
-                    println!("  - xor_gateway ({})", gw_id);
-                }
-                for gw_id in &stochastic_bpmn.or_gateways {
-                    println!("  - or_gateway ({})", gw_id);
-                }
-                
-                println!("\n Test completed successfully!");
-                println!("Note: The model includes {} gateways total", 
-                    stochastic_bpmn.and_gateways.len() + 
-                    stochastic_bpmn.xor_gateways.len() + 
-                    stochastic_bpmn.or_gateways.len());
-            }
-            Err(e) => {
-                println!("Weight propagation failed: {:?}", e);
-                panic!("Weight propagation failed: {:?}", e);
+        let weights = frequency_estimator(&language, &bpmn);
+        let sbpmn = weight_propagtion_micro_lp(&bpmn, &weights);
+        for sf in &sbpmn.unwrap().sequence_flows {
+            if (sf.source_id == "Task_A" || sf.source_id == "Task_B") && sf.target_id == "EndEvent_1" {
+                assert_eq!(sf.weight, f!(1, 1));
             }
         }
     }
     
-    #[test]
-    #[ignore]
-    fn evaluation() {        
-        // File paths
-        let  bpmn_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\test_models\airline.bpmn";
-        let log_file = r"C:\Users\larso\OneDrive\Dokumente\RWTH\SS25\Thesis\eventlogs\airline.xes";
-        
-        // Load XES eventlog, transform to FIniteStochasticLanguage
-        let log_result = File::open(log_file)
-            .map_err(|e| anyhow::anyhow!("Failed to open log file: {}", e))
-            .and_then(|file| {
-                let mut reader = BufReader::new(file);
-                // Step 1: Import as EventLog (handles XES format)
-                EventLog::import(&mut reader)
-                    .map_err(|e| anyhow::anyhow!("Failed to parse XES: {}", e))
-            })
-            .map(|event_log| {
-                // Step 2: Convert EventLog to FiniteStochasticLanguage
-                FiniteStochasticLanguage::from(event_log)
-            });
-        
-        let event_log = match log_result {
-            Ok(log) => {
-                log
-            }
-            Err(e) => {
-                return;
-            }
-        };
-
-
-        // Load BPMN model using the Importable trait
-        let bpmn_result = File::open(bpmn_file)
-            .map_err(|e| anyhow::anyhow!("Failed to open BPMN file: {}", e))
-            .and_then(|file| {
-                let mut reader = BufReader::new(file);
-                BusinessProcessModelAndNotation::import(&mut reader)
-            });
-        
-        let bpmn_model = match bpmn_result {
-            Ok(model) => {
-                model
-            }
-            Err(e) => {
-                return;
-            }
-        };
-
-
-        let start = Instant::now();
-        // Estimate frequencies from the event log
-        let frequencies = lhpair_estimator(&event_log as &dyn EbiTraitFiniteStochasticLanguage, &bpmn_model);
-        let duration = start.elapsed();
-        println!("Estimator: {:?}", duration);
-
-        let start = Instant::now();
-        // Use frequencies directly as weights (already mapped to node IDs)
-        let weights: HashMap<String, Fraction> = frequencies;
-        
-        // Apply weight propagation
-        let result: Result<StochasticBusinessProcessModelAndNotation, anyhow::Error> = weight_propagtion_micro_lp(&bpmn_model, &weights);
-        let duration = start.elapsed();
-        println!("Propagation time: {:?}", duration);
-
-        match result {
-            Ok(stochastic_bpmn) => {
-                println!("Weight propagation completed successfully!");
-                println!("SBPMN: {}", stochastic_bpmn);
-                println!("\n--- Results ---");
-                println!("Stochastic BPMN model created with:");
-                println!("  - {} tasks", stochastic_bpmn.tasks.len());
-                println!("  - {} sequence flows", stochastic_bpmn.sequence_flows.len());
-                println!("  - {} AND gateways", stochastic_bpmn.and_gateways.len());
-                println!("  - {} XOR gateways", stochastic_bpmn.xor_gateways.len());
-                println!("  - {} OR gateways", stochastic_bpmn.or_gateways.len());
-                
-                // Create a mapping from node ID to node name for better display
-                let mut id_to_name: HashMap<String, String> = HashMap::new();
-                for (node_id, label) in &bpmn_model.label {
-                    id_to_name.insert(node_id.clone(), label.clone());
-                }
-                
-                // Add gateway type mappings
-                for gw in &bpmn_model.and_gateways {
-                    id_to_name.insert(gw.id.clone(), "and_gateway".to_string());
-                }
-                for gw in &bpmn_model.xor_gateways {
-                    id_to_name.insert(gw.id.clone(), "xor_gateway".to_string());
-                }
-                for gw in &bpmn_model.or_gateways {
-                    id_to_name.insert(gw.id.clone(), "or_gateway".to_string());
-                }
-                
-                println!("\n--- Stochastic BPMN Model (with readable names) ---");
-                println!("Tasks:");
-                for task in &stochastic_bpmn.tasks {
-                    let name = id_to_name.get(&task.id).unwrap_or(&task.id);
-                    println!("  - {}: weight {:.2}", name, task.weight);
-                }
-                
-                println!("\nSequence Flows:");
-                for flow in &stochastic_bpmn.sequence_flows {
-                    let source_name = id_to_name.get(&flow.source_id).unwrap_or(&flow.source_id);
-                    let target_name = id_to_name.get(&flow.target_id).unwrap_or(&flow.target_id);
-                    println!("  - {} --> {}: weight {:.2}", source_name, target_name, flow.weight);
-                }
-                
-                println!("\nGateways:");
-                for gw_id in &stochastic_bpmn.and_gateways {
-                    println!("  - and_gateway ({})", gw_id);
-                }
-                for gw_id in &stochastic_bpmn.xor_gateways {
-                    println!("  - xor_gateway ({})", gw_id);
-                }
-                for gw_id in &stochastic_bpmn.or_gateways {
-                    println!("  - or_gateway ({})", gw_id);
-                }
-                
-                println!("\n Test completed successfully!");
-                println!("Note: The model includes {} gateways total", 
-                    stochastic_bpmn.and_gateways.len() + 
-                    stochastic_bpmn.xor_gateways.len() + 
-                    stochastic_bpmn.or_gateways.len());
-            }
-            Err(e) => {
-                println!("Weight propagation failed: {:?}", e);
-                panic!("Weight propagation failed: {:?}", e);
-            }
-        }
-    }
 }

@@ -3,10 +3,9 @@ use anyhow::{Context, anyhow};
 
 use crate::{
     ebi_framework::{
-        activity_key::HasActivityKey,
         ebi_command::EbiCommand,
-        ebi_input::{EbiInput, EbiInputType},
-        ebi_object::{EbiObject, EbiObjectType, EbiTraitObject},
+        ebi_input::{EbiInputType},
+        ebi_object::{EbiObject, EbiObjectType},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
