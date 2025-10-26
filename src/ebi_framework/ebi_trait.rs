@@ -107,16 +107,22 @@ impl EbiTrait {
             \\\\
             Definition: let $\\Sigma$ be an alphabet of activities.
             Then, a \\emph{trace} $\\sigma \\in \\Sigma^*$ is a finite sequence of activities, and 
-            a \\emph{finite language} $F \\in (\\Sigma^*)^*$ is a finite set of traces.",
-            EbiTrait::FiniteStochasticLanguage => "A ``finite stochastic language'' provides a distribution over traces.",
+            a \\emph{finite language} $F \\subseteq \\Sigma^*$ is a finite set of traces.",
+            EbiTrait::FiniteStochasticLanguage => "Iterating over a finite stochastic language will yield each trace variant once, as well as how likely that trace variant is in the language.
+            The probabilities are positive and their sum must be smaller than or equal to one.
+            The ``missing'' probability means ``no trace'' or ``livelock''.
+            \\\\
+            Definition: let $\\Sigma$ be an alphabet of activities.
+            Then, a \\emph{trace} $\\sigma \\in \\Sigma^*$ is a finite sequence of activities, and 
+            a \\emph{finite stochastic language} $S \\subseteq \\Sigma^* \\mapsto \\mathcal{R}^+$ is a finite set of trace-probability tuples, such that $1 \\geq \\sum_{\\sigma \\in \\Sigma^*} S(\\sigma) $.",
             EbiTrait::IterableLanguage => {
-                "Can walk over the traces. Iterating over traces may not terminate."
+                "An iterable language allows to walk over its traces. May iterate over infinitely many traces and not terminate."
             }
             EbiTrait::IterableStochasticLanguage => {
-                "Can walk over the traces and their probabilities. May iterate over infinitely many traces."
+                "An iterable stochastic language allows to walk over its traces and their probabilities. May iterate over infinitely many traces and not terminate."
             }
             EbiTrait::QueriableStochasticLanguage => {
-                "Can query by giving a trace, which will return its probability."
+                "A queriable stochastic language can be given a trace, and it will return the probability of the trace."
             }
             EbiTrait::Semantics => {
                 "An object in which the state space can be traversed. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
