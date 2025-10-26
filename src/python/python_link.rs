@@ -15,6 +15,7 @@ use std::{
 
 use ebi_arithmetic::{MaybeExact, fraction::fraction::Fraction, is_exact_globally};
 use ebi_objects::{
+    EventLogTraceAttributes, NumberOfTraces,
     activity_key::activity_key::ActivityKey,
     constants::{ebi_object::EbiObject, ebi_object_type::EbiObjectType},
     ebi_objects::{
@@ -74,7 +75,7 @@ impl ExportableToPM4Py for EbiOutput {
             EbiOutput::Fraction(frac) => frac.export_to_pm4py(py),
             EbiOutput::Bool(value) => value.export_to_pm4py(py),
             EbiOutput::Usize(value) => value.export_to_pm4py(py),
-            EbiOutput::Object(EbiObject::EventLog(event_log)) => {
+            EbiOutput::Object(EbiObject::EventLogTraceAttributes(event_log)) => {
                 // special case: export EventLog directly
                 event_log.export_to_pm4py(py)
             }
@@ -222,7 +223,7 @@ impl ImportableFromPM4Py for EventLog {
         };
         // For classifier, we use a default one.
         let classifier = EventLogClassifier::default();
-        let event_log_rust = EventLog::new(pm_log, classifier);
+        let event_log_rust = EventLog::from((pm_log, classifier));
 
         for &itype in input_types {
             match itype {
@@ -272,7 +273,7 @@ impl ImportableFromPM4Py for EventLog {
     }
 }
 
-impl ExportableToPM4Py for EventLog {
+impl ExportableToPM4Py for EventLogTraceAttributes {
     fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
         let pm4py_module = py.import("pm4py.objects.log.obj")?;
         let py_event_cls = pm4py_module.getattr("Event")?;
@@ -280,7 +281,7 @@ impl ExportableToPM4Py for EventLog {
         let py_log_cls = pm4py_module.getattr("EventLog")?;
 
         // Collect traces
-        let mut py_traces = Vec::with_capacity(self.rust4pm_log.traces.len());
+        let mut py_traces = Vec::with_capacity(self.number_of_traces());
 
         for (_trace_idx, rust_trace) in self.rust4pm_log.traces.iter().enumerate() {
             // Collect events
