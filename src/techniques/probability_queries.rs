@@ -111,11 +111,11 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
             let mut result = HashMap::new();
 
             let (mut max_trace, mut max_probability) =
-                self.iter_trace_probability().next().ok_or_else(|| {
+                self.iter_traces_probabilities().next().ok_or_else(|| {
                     anyhow!("Finite stochastic language is empty where it should not.")
                 })?;
 
-            for (trace, probability) in self.iter_trace_probability() {
+            for (trace, probability) in self.iter_traces_probabilities() {
                 if probability > max_probability {
                     max_trace = trace;
                     max_probability = probability;
@@ -127,7 +127,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
             Ok((self.activity_key().clone(), result).into())
         } else {
             let mut result = vec![];
-            for (trace, probability) in self.iter_trace_probability() {
+            for (trace, probability) in self.iter_traces_probabilities() {
                 match result.binary_search_by(|&(_, cmp_probability): &(_, &Fraction)| {
                     cmp_probability.cmp(probability)
                 }) {
@@ -155,7 +155,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
 
     fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
         let mut result = vec![];
-        for (trace, probability) in self.iter_trace_probability() {
+        for (trace, probability) in self.iter_traces_probabilities() {
             if probability >= at_least {
                 result.push((trace, probability));
             }
@@ -185,14 +185,11 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
         //idea: keep a list of traces sorted by probability
 
         //insert the first trace
-        let mut result = vec![(
-            self.get_trace(0).unwrap(),
-            self.get_trace_probability(0).unwrap(),
-        )];
+        let mut result = vec![self.iter_traces_probabilities().next().unwrap()];
 
         let mut sum = Fraction::zero();
 
-        for (trace, probability) in self.iter_trace_probability().skip(1) {
+        for (trace, probability) in self.iter_traces_probabilities().skip(1) {
             if &sum < coverage || probability > result[0].1 {
                 //as the new trace has a higher probability than the trace with the lowest probability, we have to insert it
                 match result.binary_search_by(|&(_, cmp_probability): &(_, &Fraction)| {
@@ -562,7 +559,8 @@ mod tests {
 
     use ebi_arithmetic::{Fraction, One, Zero};
     use ebi_objects::{
-        FiniteStochasticLanguage, HasActivityKey, IndexTrace, StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet
+        FiniteStochasticLanguage, HasActivityKey, NumberOfTraces,
+        StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
     };
 
     use crate::{

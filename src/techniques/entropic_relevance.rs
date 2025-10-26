@@ -29,7 +29,7 @@ impl EntropicRelvance for dyn EbiTraitFiniteStochasticLanguage {
 
         let number_of_activities_in_log = {
             let mut activities = HashSet::new();
-            for (trace, _) in self.iter_trace_probability() {
+            for trace in self.iter_traces() {
                 for activity in trace {
                     activities.insert(activity);
                 }
@@ -37,11 +37,10 @@ impl EntropicRelvance for dyn EbiTraitFiniteStochasticLanguage {
             activities.len()
         };
 
-        let translator =
-            ActivityKeyTranslator::new(self.activity_key(), model.activity_key_mut());
+        let translator = ActivityKeyTranslator::new(self.activity_key(), model.activity_key_mut());
         let sum_j = self.j(&mut model, number_of_activities_in_log, &translator)?;
 
-        for (trace, log_probability) in self.iter_trace_probability() {
+        for (trace, log_probability) in self.iter_traces_probabilities() {
             let translated_trace = translator.translate_trace(trace);
             let follower = FollowerSemantics::Trace(&translated_trace);
             let model_probability = model.get_probability(&follower).with_context(|| {
@@ -71,7 +70,7 @@ impl dyn EbiTraitFiniteStochasticLanguage {
     ) -> Result<LogDiv> {
         let mut sum_j = LogDiv::zero();
 
-        for (trace, probability_log) in self.iter_trace_probability() {
+        for (trace, probability_log) in self.iter_traces_probabilities() {
             let translated_trace = translator.translate_trace(&trace);
             let probability_model =
                 model.get_probability(&FollowerSemantics::Trace(&translated_trace))?;

@@ -189,8 +189,8 @@ pub mod tests {
     use std::fs::{self, File};
 
     use ebi_objects::{
-        DeterministicFiniteAutomaton, EbiObjectType, EventLog, FiniteLanguage, IndexTrace,
-        Infoable, PetriNetMarkupLanguage, ProcessTreeMarkupLanguage,
+        DeterministicFiniteAutomaton, EbiObjectType, EventLog, FiniteLanguage, Infoable,
+        NumberOfTraces, PetriNetMarkupLanguage, ProcessTreeMarkupLanguage,
         StochasticDeterministicFiniteAutomaton,
     };
     use strum::IntoEnumIterator;

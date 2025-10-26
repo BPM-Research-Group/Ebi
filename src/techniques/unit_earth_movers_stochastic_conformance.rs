@@ -1,19 +1,17 @@
-use std::{
-    ops::Neg,
-    sync::{Arc, Mutex},
-};
-
-use anyhow::Result;
-use ebi_arithmetic::{Fraction, OneMinus};
-use ebi_objects::ActivityKeyTranslator;
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
-
 use crate::{
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
     follower_semantics::FollowerSemantics,
+};
+use anyhow::Result;
+use ebi_arithmetic::{Fraction, OneMinus};
+use ebi_objects::ActivityKeyTranslator;
+use rayon::iter::ParallelIterator;
+use std::{
+    ops::Neg,
+    sync::{Arc, Mutex},
 };
 
 pub trait UnitEarthMoversStochasticConformance {
@@ -32,12 +30,9 @@ impl UnitEarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLangua
             ActivityKeyTranslator::new(self.activity_key(), language2.activity_key_mut());
         let error = Arc::new(Mutex::new(None));
 
-        let mut sum = (0..self.number_of_traces())
-            .into_par_iter()
-            .filter_map(|trace_index| {
-                let trace = self.get_trace(trace_index).unwrap();
-                let probability = self.get_trace_probability(trace_index).unwrap();
-
+        let mut sum = self
+            .par_iter_traces_probabilities()
+            .filter_map(|(trace, probability)| {
                 match language2.get_probability(&FollowerSemantics::Trace(
                     &translator.translate_trace(trace),
                 )) {

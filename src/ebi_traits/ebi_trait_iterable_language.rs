@@ -1,15 +1,15 @@
 use std::io::BufRead;
 
 use anyhow::{Result, anyhow};
-use ebi_objects::{Activity, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, Importable};
+use ebi_objects::{
+    FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, Importable, IntoRefTraceIterator,
+};
 
 use crate::ebi_framework::{
     ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
 };
 
-pub trait EbiTraitIterableLanguage: HasActivityKey {
-    fn iter(&self) -> Box<dyn Iterator<Item = &Vec<Activity>> + '_>;
-}
+pub trait EbiTraitIterableLanguage: HasActivityKey + IntoRefTraceIterator {}
 
 impl FromEbiTraitObject for dyn EbiTraitIterableLanguage {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
@@ -24,17 +24,9 @@ impl FromEbiTraitObject for dyn EbiTraitIterableLanguage {
     }
 }
 
-impl EbiTraitIterableLanguage for FiniteLanguage {
-    fn iter(&self) -> Box<dyn Iterator<Item = &Vec<Activity>> + '_> {
-        Box::new(self.traces.iter())
-    }
-}
+impl EbiTraitIterableLanguage for FiniteLanguage {}
 
-impl EbiTraitIterableLanguage for FiniteStochasticLanguage {
-    fn iter(&self) -> Box<dyn Iterator<Item = &Vec<Activity>> + '_> {
-        Box::new(self.traces.keys())
-    }
-}
+impl EbiTraitIterableLanguage for FiniteStochasticLanguage {}
 
 pub trait ToIterableLanguage: Importable {
     fn to_iterable_language(self) -> Box<dyn EbiTraitIterableLanguage>;

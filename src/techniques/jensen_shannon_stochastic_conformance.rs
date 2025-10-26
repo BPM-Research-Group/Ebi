@@ -1,7 +1,3 @@
-use anyhow::Result;
-use ebi_arithmetic::{Fraction, OneMinus, Signed, Zero};
-use ebi_objects::ActivityKeyTranslator;
-
 use crate::{
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
@@ -10,6 +6,9 @@ use crate::{
     follower_semantics::FollowerSemantics,
     math::{log_div::LogDiv, root_log_div::RootLogDiv},
 };
+use anyhow::Result;
+use ebi_arithmetic::{Fraction, OneMinus, Signed, Zero};
+use ebi_objects::ActivityKeyTranslator;
 
 pub trait JensenShannonStochasticConformance {
     fn jssc_log2log(
@@ -29,16 +28,15 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
         event_log2: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<RootLogDiv> {
         let mut activity_key1 = self.activity_key().clone();
-        let translator =
-            ActivityKeyTranslator::new(&event_log2.activity_key(), &mut activity_key1);
+        let translator = ActivityKeyTranslator::new(&event_log2.activity_key(), &mut activity_key1);
 
         let mut sum = LogDiv::zero();
 
         let mut log1_prob_intersection_sum = Fraction::zero();
         let mut log2_prob_intersection_sum = Fraction::zero();
 
-        for (trace1, probability1) in self.iter_trace_probability() {
-            for (trace2, probability2) in event_log2.iter_trace_probability() {
+        for (trace1, probability1) in self.iter_traces_probabilities() {
+            for (trace2, probability2) in event_log2.iter_traces_probabilities() {
                 if trace1 == &translator.translate_trace(trace2) {
                     log1_prob_intersection_sum += probability1;
                     log2_prob_intersection_sum += probability2;
@@ -69,7 +67,7 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
         let translator =
             ActivityKeyTranslator::new(self.activity_key(), language2.activity_key_mut());
 
-        for (trace, probability1) in self.iter_trace_probability() {
+        for (trace, probability1) in self.iter_traces_probabilities() {
             let probability2 = language2.get_probability(&FollowerSemantics::Trace(
                 &translator.translate_trace(trace),
             ))?;

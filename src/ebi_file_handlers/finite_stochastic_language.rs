@@ -1,8 +1,8 @@
+use anyhow::{Result, anyhow};
 use ebi_objects::{
     EbiObject, Exportable, FiniteStochasticLanguage, Importable,
     ebi_objects::finite_stochastic_language::FORMAT_SPECIFICATION,
 };
-use anyhow::{anyhow, Result};
 
 use crate::{
     ebi_framework::{
@@ -84,7 +84,7 @@ mod tests {
     use std::fs;
 
     use ebi_arithmetic::{Fraction, Zero};
-    use ebi_objects::{FiniteStochasticLanguage, IndexTrace};
+    use ebi_objects::{FiniteStochasticLanguage, NumberOfTraces};
 
     use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
 

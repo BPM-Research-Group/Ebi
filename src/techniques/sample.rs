@@ -46,7 +46,7 @@ impl Sampler for dyn EbiTraitFiniteStochasticLanguage {
         for _ in 0..number_of_traces {
             let trace_index = Fraction::choose_randomly_cached(&cache);
 
-            match result.entry(self.get_trace(trace_index).unwrap().clone()) {
+            match result.entry(self.iter_traces().nth(trace_index).unwrap().clone()) {
                 Entry::Occupied(mut e) => *e.get_mut() += 1,
                 Entry::Vacant(e) => {
                     e.insert(Fraction::one());
@@ -127,7 +127,7 @@ impl Resampler for dyn EbiTraitFiniteStochasticLanguage {
             return Err(anyhow!("Cannot sample from empty language."));
         }
 
-        let probabilities = self.iter_trace_probability().map(|(_, p)| p);
+        let probabilities = self.iter_traces_probabilities().map(|(_, p)| p);
         let cache = Fraction::choose_randomly_create_cache(probabilities)?;
 
         Ok(cache)

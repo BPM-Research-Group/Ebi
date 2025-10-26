@@ -1,3 +1,6 @@
+use crate::ebi_framework::ebi_command::EbiCommand;
+use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
+use crate::math::levenshtein;
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),
@@ -9,7 +12,7 @@
 use anyhow::Result;
 use ebi_arithmetic::Fraction;
 use ebi_arithmetic::Zero;
-use ebi_objects::IndexTrace;
+use ebi_objects::{IntoRefTraceIterator, NumberOfTraces};
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),
@@ -19,15 +22,10 @@ use ebi_objects::IndexTrace;
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use malachite::Natural;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::fmt;
 use std::fmt::Debug;
 use std::{iter::FusedIterator, sync::Arc};
-
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
-
-use crate::ebi_framework::ebi_command::EbiCommand;
-use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
-use crate::math::levenshtein;
 
 pub trait WeightedDistances: Send + Sync {
     fn len_a(&self) -> usize;
@@ -84,7 +82,7 @@ pub struct TriangularDistanceMatrix {
 impl TriangularDistanceMatrix {
     pub fn new<T>(log: &T) -> Self
     where
-        T: IndexTrace + ?Sized,
+        T: NumberOfTraces + IntoRefTraceIterator + ?Sized,
     {
         log::info!("Compute distances");
         let progress_bar = EbiCommand::get_progress_bar_ticks(Self::get_number_of_distances(
@@ -101,8 +99,8 @@ impl TriangularDistanceMatrix {
                 let i = Self::get_i(index);
                 let j = Self::get_j(index, i);
 
-                let trace1 = log.get_trace(i).unwrap();
-                let trace2 = log.get_trace(j).unwrap();
+                let trace1 = log.iter_traces().nth(i).unwrap();
+                let trace2 = log.iter_traces().nth(j).unwrap();
 
                 let result = levenshtein::normalised(trace1, trace2);
                 progress_bar.inc(1);
@@ -264,22 +262,16 @@ impl DistanceMatrix {
         // Create thread pool with custom configuration
         let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
 
-        // Pre-fetch all traces to avoid repeated get_trace calls
-        let traces_a: Vec<_> = (0..len_a).map(|i| lang_a.get_trace(i).unwrap()).collect();
-        let traces_b: Vec<_> = (0..len_b).map(|j| lang_b.get_trace(j).unwrap()).collect();
-
         let progress_bar = EbiCommand::get_progress_bar_ticks((len_a * len_b).try_into().unwrap());
 
         // Compute in chunks for better cache utilization
         pool.install(|| {
-            distances = (0..len_a)
-                .into_par_iter()
-                .map(|i| {
-                    let trace_a = &traces_a[i];
-                    let row: Vec<Arc<Fraction>> = (0..len_b)
-                        .into_par_iter()
-                        .map(|j| {
-                            let trace_b = &traces_b[j];
+            distances = lang_a
+                .par_iter_traces()
+                .map(|trace_a| {
+                    let row: Vec<Arc<Fraction>> = lang_b
+                        .par_iter_traces()
+                        .map(|trace_b| {
                             let result = levenshtein::normalised(trace_a, trace_b);
                             progress_bar.inc(1);
                             Arc::new(result)

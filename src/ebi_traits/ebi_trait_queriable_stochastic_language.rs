@@ -2,10 +2,9 @@ use anyhow::{Context, Error, Result, anyhow};
 use ebi_arithmetic::{Fraction, Zero};
 use ebi_objects::{
     ActivityKeyTranslator, CompressedEventLog, DirectlyFollowsGraph, EventLog,
-    FiniteStochasticLanguage, HasActivityKey, Importable, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet,
+    EventLogTraceAttributes, FiniteStochasticLanguage, HasActivityKey, Importable,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
 };
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::{
     io::BufRead,
     sync::{Arc, Mutex},
@@ -40,10 +39,10 @@ pub trait EbiTraitQueriableStochasticLanguage: HasActivityKey + Sync {
         let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
 
-        let sum = (0..log.number_of_traces())
-            .into_par_iter()
-            .filter_map(|trace_index| {
-                let trace = translator.translate_trace(log.get_trace(trace_index).unwrap());
+        let sum = log
+            .iter_traces()
+            .filter_map(|log_trace| {
+                let trace = translator.translate_trace(log_trace);
                 let c = self
                     .get_probability(&FollowerSemantics::Trace(&trace))
                     .with_context(|| format!("cannot compute probability of trace {:?}", trace));
@@ -148,6 +147,7 @@ macro_rules! queriable_via_slang {
 queriable_via_slpn!(DirectlyFollowsGraph);
 queriable_via_slpn!(StochasticDirectlyFollowsModel);
 queriable_via_slang!(EventLog);
+queriable_via_slang!(EventLogTraceAttributes);
 queriable_via_slang!(CompressedEventLog);
 
 #[cfg(test)]

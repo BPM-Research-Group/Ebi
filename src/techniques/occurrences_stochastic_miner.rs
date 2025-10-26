@@ -36,7 +36,7 @@ impl OccurrencesStochasticMinerLPN for LabelledPetriNet {
         for activity in self.activity_key().get_activities() {
             model_activity2frequency.insert(*activity, Fraction::zero());
         }
-        for (trace, probability) in language.iter_trace_probability() {
+        for (trace, probability) in language.iter_traces_probabilities() {
             for log_activity in trace {
                 let model_activity = translator.translate_activity(log_activity);
                 model_activity2frequency
@@ -77,7 +77,7 @@ impl OccurrencesStochasticMinerTree for ProcessTree {
         for activity in self.activity_key().get_activities() {
             model_activity2frequency.insert(*activity, Fraction::zero());
         }
-        for (trace, probability) in language.iter_trace_probability() {
+        for (trace, probability) in language.iter_traces_probabilities() {
             for log_activity in trace {
                 let model_activity = translator.translate_activity(log_activity);
                 model_activity2frequency

@@ -7,7 +7,7 @@ use crate::{
     },
     techniques::filter::{EventSelector, Filter, Operator},
 };
-use ebi_objects::{EbiObject, EbiObjectType, EventLog, HasActivityKey};
+use ebi_objects::{EbiObject, EbiObjectType, EventLog, EventLogTraceAttributes, HasActivityKey};
 use strum::VariantNames;
 
 pub const EBI_FILTER: EbiCommand = EbiCommand::Group {
@@ -39,22 +39,24 @@ pub const EBI_FILTER_TRACES_LENGTH: EbiCommand = EbiCommand::Command {
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
-        &[&EbiInputType::Object(EbiObjectType::EventLog)],
+        &[&EbiInputType::Object(
+            EbiObjectType::EventLogTraceAttributes,
+        )],
         &[&EbiInputTypeEnum!(Operator)],
         &[&EbiInputType::Usize(Some(0), None, None)],
     ],
-    input_names: &["event log", "operator", "value",],
+    input_names: &["event log", "operator", "value"],
     input_helps: &["the log", "the operator", "the value"],
     execute: |mut inputs, _| {
-        let mut log = inputs.remove(0).to_type::<EventLog>()?;
+        let mut log = inputs.remove(0).to_type::<EventLogTraceAttributes>()?;
         let operator = inputs.remove(0).to_type::<Operator>()?;
         let value = inputs.remove(0).to_type::<usize>()?;
 
-        log.remove_traces_length(&operator, *value);
+        log.remove_traces_length(*operator, *value);
 
-        Ok(EbiOutput::Object(EbiObject::EventLog(*log)))
+        Ok(EbiOutput::Object(EbiObject::EventLogTraceAttributes(*log)))
     },
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::EventLog),
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::EventLogTraceAttributes),
 };
 
 pub const EBI_FILTER_TRACES_EMPTY: EbiCommand = EbiCommand::Command {
@@ -65,7 +67,9 @@ pub const EBI_FILTER_TRACES_EMPTY: EbiCommand = EbiCommand::Command {
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[&[&EbiInputType::Object(EbiObjectType::EventLog)]],
+    input_types: &[&[&EbiInputType::Object(
+        EbiObjectType::EventLogTraceAttributes,
+    )]],
     input_names: &["event log"],
     input_helps: &["the log"],
     execute: |mut inputs, _| {
@@ -75,7 +79,7 @@ pub const EBI_FILTER_TRACES_EMPTY: EbiCommand = EbiCommand::Command {
 
         Ok(EbiOutput::Object(EbiObject::EventLog(*log)))
     },
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::EventLog),
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::EventLogTraceAttributes),
 };
 
 pub const EBI_FILTER_TRACES_WITH_EVENT: EbiCommand = EbiCommand::Group {
@@ -95,7 +99,9 @@ pub const EBI_FILTER_TRACES_EVENT_ACTIVITY: EbiCommand = EbiCommand::Command {
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
-        &[&EbiInputType::Object(EbiObjectType::EventLog)],
+        &[&EbiInputType::Object(
+            EbiObjectType::EventLogTraceAttributes,
+        )],
         &[&EbiInputTypeEnum!(EventSelector)],
         &[&EbiInputType::String(None, None)],
     ],
@@ -112,9 +118,9 @@ pub const EBI_FILTER_TRACES_EVENT_ACTIVITY: EbiCommand = EbiCommand::Command {
 
         let activity = log.activity_key_mut().process_activity(&activity_label);
 
-        log.remove_traces_event_activity(&event_selector, activity);
+        log.remove_traces_event_activity(*event_selector, activity);
 
         Ok(EbiOutput::Object(EbiObject::EventLog(*log)))
     },
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::EventLog),
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::EventLogTraceAttributes),
 };

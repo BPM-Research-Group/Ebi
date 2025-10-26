@@ -1,9 +1,10 @@
 use crate::{
-    ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
-    math::{correlation::correlation, data_type::DataType, levenshtein, root::ContainsRoot},
+    ebi_traits::ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
+    math::{correlation::correlation, levenshtein, root::ContainsRoot},
 };
 use anyhow::{Result, anyhow};
 use ebi_arithmetic::{Fraction, Signed, Zero};
+use ebi_objects::{Attribute, DataType};
 use rand::Rng;
 use rayon::prelude::*;
 
@@ -11,7 +12,7 @@ pub trait Associations {
     fn association(
         self: &Box<Self>,
         number_of_samples: usize,
-        attribute: &String,
+        attribute: Attribute,
     ) -> Result<ContainsRoot>;
 
     fn associations(
@@ -20,16 +21,13 @@ pub trait Associations {
     ) -> Vec<(String, Result<ContainsRoot>)>;
 }
 
-impl Associations for dyn EbiTraitEventLog {
+impl Associations for dyn EbiTraitEventLogTraceAttributes {
     fn association(
         self: &Box<Self>,
         number_of_samples: usize,
-        attribute: &String,
+        attribute: Attribute,
     ) -> Result<ContainsRoot> {
-        let attributes = self.get_trace_attributes();
-        let data_type = attributes.get(attribute);
-        log::info!("number of samples {}", number_of_samples);
-        match data_type {
+        match self.attribute_key().attribute_to_data_type(attribute) {
             Some(d_type) => self.association_type(number_of_samples, attribute, d_type),
             None => Err(anyhow!(
                 "attribute is missing, attribute type is not consistent, or attribute type is not supported"
@@ -41,31 +39,34 @@ impl Associations for dyn EbiTraitEventLog {
         self: &Box<Self>,
         number_of_samples: usize,
     ) -> Vec<(String, Result<ContainsRoot>)> {
-        let attributes = self.get_trace_attributes();
-        log::info!("found attributes {:?}", attributes);
+        log::info!("found attributes {:?}", self.attribute_key());
         log::info!("number of samples {}", number_of_samples);
-        let mut result = vec![];
-        for (attribute, data_type) in attributes {
-            result.push((
-                attribute.clone(),
-                self.association_type(number_of_samples, &attribute, &data_type),
-            ));
-        }
-        result
+        self.attribute_key()
+            .par_iter()
+            .map(|(attribute, data_type)| {
+                (
+                    self.attribute_key()
+                        .attribute_to_label(attribute)
+                        .unwrap()
+                        .to_owned(),
+                    self.association_type(number_of_samples, attribute, &data_type),
+                )
+            })
+            .collect()
     }
 }
 
-impl dyn EbiTraitEventLog {
+impl dyn EbiTraitEventLogTraceAttributes {
     fn association_type(
         self: &Box<Self>,
         number_of_samples: usize,
-        attribute: &String,
+        attribute: Attribute,
         data_type: &DataType,
     ) -> Result<ContainsRoot> {
         let result = match data_type {
-            DataType::Categorical => self.association_categorical(&attribute, number_of_samples),
-            DataType::Numerical(_, _) => self.association_numerical(&attribute, number_of_samples),
-            DataType::Time(_, _) => self.association_time(&attribute, number_of_samples),
+            DataType::Categorical => self.association_categorical(attribute, number_of_samples),
+            DataType::Numerical(_, _) => self.association_numerical(attribute, number_of_samples),
+            DataType::Time(_, _) => self.association_time(attribute, number_of_samples),
             DataType::Undefined => Err(anyhow!(
                 "attribute is missing, attribute type is not consistent, or attribute type is not supported"
             )),
@@ -76,16 +77,20 @@ impl dyn EbiTraitEventLog {
 
     fn association_time(
         self: &Box<Self>,
-        case_attribute: &String,
+        case_attribute: Attribute,
         number_of_samples: usize,
     ) -> Result<ContainsRoot> {
         //gather pairs
-        let mut pairs = vec![];
-        for trace_index in 0..self.number_of_traces() {
-            if let Some(t) = self.get_trace_attribute_time(trace_index, case_attribute) {
-                pairs.push(t);
-            }
-        }
+        let pairs = self
+            .iter_time_and_traces(case_attribute)
+            .filter_map(|(trace, value)| {
+                if let Some(value) = value {
+                    Some((value, trace))
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>();
 
         if pairs.is_empty() {
             return Err(anyhow!("no values of the attribute to consider"));
@@ -119,18 +124,22 @@ impl dyn EbiTraitEventLog {
 
     pub fn association_categorical(
         self: &Box<Self>,
-        case_attribute: &String,
+        case_attribute: Attribute,
         number_of_samples: usize,
     ) -> Result<ContainsRoot> {
         let sample_size = self.number_of_traces();
 
         //gather pairs
-        let mut pairs = vec![];
-        for trace_index in 0..self.number_of_traces() {
-            if let Some(t) = self.get_trace_attribute_categorical(trace_index, case_attribute) {
-                pairs.push((t, trace_index));
-            }
-        }
+        let pairs = self
+            .iter_categorical_and_traces(case_attribute)
+            .filter_map(|(trace, value)| {
+                if let Some(value) = value {
+                    Some((value, trace))
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>();
 
         if pairs.is_empty() {
             return Err(anyhow!("no values of the attribute to consider"));
@@ -163,10 +172,7 @@ impl dyn EbiTraitEventLog {
                 let mut sum_different = Fraction::zero();
                 for i in &sample {
                     for j in &sample {
-                        let trace_dist = levenshtein::normalised(
-                            self.get_trace(pairs[*i].1).unwrap(),
-                            self.get_trace(pairs[*j].1).unwrap(),
-                        );
+                        let trace_dist = levenshtein::normalised(&pairs[*i].1, &pairs[*j].1);
 
                         if pairs[*i].0 != pairs[*j].0 {
                             count_same += 1;
@@ -196,16 +202,20 @@ impl dyn EbiTraitEventLog {
 
     pub fn association_numerical(
         self: &Box<Self>,
-        case_attribute: &String,
+        case_attribute: Attribute,
         number_of_samples: usize,
     ) -> Result<ContainsRoot> {
         //gather pairs
-        let mut pairs = vec![];
-        for trace_index in 0..self.number_of_traces() {
-            if let Some(t) = self.get_trace_attribute_numeric(trace_index, case_attribute) {
-                pairs.push((t, trace_index));
-            }
-        }
+        let pairs = self
+            .iter_numeric_and_traces(case_attribute)
+            .filter_map(|(trace, value)| {
+                if let Some(value) = value {
+                    Some((value, trace))
+                } else {
+                    None
+                }
+            })
+            .collect::<Vec<_>>();
 
         if pairs.is_empty() {
             return Err(anyhow!("no values of the attribute to consider"));
@@ -226,10 +236,7 @@ impl dyn EbiTraitEventLog {
         for (i, j) in &sample_space {
             let (value1, trace1) = &pairs[i];
             let (value2, trace2) = &pairs[j];
-            let lev_dist = levenshtein::normalised(
-                self.get_trace(*trace1).unwrap(),
-                self.get_trace(*trace2).unwrap(),
-            );
+            let lev_dist = levenshtein::normalised(trace1, trace2);
 
             // pairs_numeric.push((&Fraction::from(value1 - value2).abs() / &maxx, lev_dist));
             pairs_numeric.push((Fraction::from(value1 - value2).abs(), lev_dist));
@@ -303,17 +310,18 @@ impl<'a> Iterator for SamplePairsSpaceIterator<'a> {
 mod tests {
     use std::fs;
 
-    use ebi_objects::EventLog;
+    use ebi_objects::EventLogTraceAttributes;
 
     use crate::{
-        ebi_traits::ebi_trait_event_log::EbiTraitEventLog, techniques::association::Associations,
+        ebi_traits::ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
+        techniques::association::Associations,
     };
 
     #[test]
     fn zero() {
         let fin = fs::read_to_string("testfiles/a-b-double.xes").unwrap();
-        let log = fin.parse::<EventLog>().unwrap();
-        let log: Box<dyn EbiTraitEventLog> = Box::new(log);
+        let log = fin.parse::<EventLogTraceAttributes>().unwrap();
+        let log: Box<dyn EbiTraitEventLogTraceAttributes> = Box::new(log);
         log.associations(500);
     }
 }

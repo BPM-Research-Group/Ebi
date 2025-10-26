@@ -1,9 +1,3 @@
-use std::{
-    fmt::{Debug, Display},
-    hash::Hash,
-    sync::{Arc, Mutex},
-};
-
 use anyhow::{Context, Error, Ok, Result};
 use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
@@ -12,12 +6,17 @@ use ebi_objects::{
         executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
     },
 };
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use rayon::iter::{IndexedParallelIterator, ParallelIterator};
+use std::{
+    fmt::{Debug, Display},
+    hash::Hash,
+    sync::{Arc, Mutex},
+};
 
 use crate::{
     ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
     ebi_traits::{
-        ebi_trait_event_log::{ATTRIBUTE_TIME, EbiTraitEventLog},
+        ebi_trait_event_log_trace_attributes::{ATTRIBUTE_TIME, EbiTraitEventLogTraceAttributes},
         ebi_trait_semantics::EbiTraitSemantics,
     },
     semantics::semantics::Semantics,
@@ -25,11 +24,17 @@ use crate::{
 };
 
 pub trait FindExecutions {
-    fn find_executions(&mut self, log: Box<dyn EbiTraitEventLog>) -> Result<Executions>;
+    fn find_executions(
+        &mut self,
+        log: Box<dyn EbiTraitEventLogTraceAttributes>,
+    ) -> Result<Executions>;
 }
 
 impl FindExecutions for EbiTraitSemantics {
-    fn find_executions(&mut self, log: Box<dyn EbiTraitEventLog>) -> Result<Executions> {
+    fn find_executions(
+        &mut self,
+        log: Box<dyn EbiTraitEventLogTraceAttributes>,
+    ) -> Result<Executions> {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.find_executions(log),
             EbiTraitSemantics::Marking(sem) => sem.find_executions(log),
@@ -43,18 +48,20 @@ where
     T: Semantics<SemState = State, AliState = State> + Send + Sync + ?Sized,
     State: Displayable,
 {
-    fn find_executions(&mut self, mut log: Box<dyn EbiTraitEventLog>) -> Result<Executions> {
+    fn find_executions(
+        &mut self,
+        mut log: Box<dyn EbiTraitEventLogTraceAttributes>,
+    ) -> Result<Executions> {
         log::info!("Compute alignments");
         let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
 
         self.translate_using_activity_key(log.activity_key_mut());
 
-        let result = (0..log.number_of_traces())
-            .into_par_iter()
-            .filter_map(|trace_index| {
-                let trace = log.get_trace(trace_index).unwrap();
-
+        let result = log
+            .par_iter_traces()
+            .enumerate()
+            .filter_map(|(trace_index, trace)| {
                 //align the trace
                 let alignment = self.align_trace(&trace);
 
@@ -115,7 +122,7 @@ impl C {
     fn process_alignment<T, FS>(
         &self,
         semantics: &T,
-        log: &Box<dyn EbiTraitEventLog>,
+        log: &Box<dyn EbiTraitEventLogTraceAttributes>,
     ) -> Result<Vec<Execution>>
     where
         T: Semantics<SemState = FS> + Send + Sync + ?Sized,
@@ -171,7 +178,7 @@ impl C {
     fn get_time(
         &self,
         move_index: Option<usize>,
-        log: &Box<dyn EbiTraitEventLog>,
+        log: &Box<dyn EbiTraitEventLogTraceAttributes>,
     ) -> Option<DateTime<FixedOffset>> {
         let event_index = self.get_event_index(move_index?);
 
@@ -265,14 +272,14 @@ impl C {
 mod tests {
     use std::fs;
 
-    use ebi_objects::{EventLog, StochasticDeterministicFiniteAutomaton};
+    use ebi_objects::{EventLogTraceAttributes, StochasticDeterministicFiniteAutomaton};
 
     use crate::techniques::executions::FindExecutions;
 
     #[test]
     fn executions() {
         let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
-        let log = fin.parse::<EventLog>().unwrap();
+        let log = fin.parse::<EventLogTraceAttributes>().unwrap();
 
         let fin2 = fs::read_to_string("testfiles/a-b-c-livelock.sdfa").unwrap();
         let mut model = fin2

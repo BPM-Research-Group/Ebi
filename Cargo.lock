@@ -740,9 +740,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_derive"
-version = "0.2.6"
+version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d0792011924345f2d409cc35beb26556e5d003c8f8b0379f140d7976118f443"
+checksum = "ff945201a9228a19ee786456e052ddda33c302285831e931ba800d2fcb3f25e1"
 dependencies = [
  "darling",
  "quote",
@@ -752,9 +752,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
-version = "0.3.0"
+version = "0.3.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08ee2bbbed3b9f3598d671b3ee6910427fcea1c880e5f39a87e9706249e60cd4"
+checksum = "ad3d7b8801052fd5a7235424a2abd39843b696a8b18e4aa1f73d2047a54e0ec2"
 dependencies = [
  "anyhow",
  "chrono",
@@ -768,6 +768,7 @@ dependencies = [
  "malachite",
  "process_mining",
  "quick-xml 0.38.3",
+ "rayon",
  "serde",
  "serde_json",
  "strum",
@@ -909,9 +910,9 @@ checksum = "0ce7134b9999ecaf8bcd65542e436736ef32ddca1b3e06094cb6ec5755203b80"
 
 [[package]]
 name = "flate2"
-version = "1.1.2"
+version = "1.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4a3d7db9596fecd151c5f638c0ee5d5bd487b6e0ea232e5dc96d5250f6f94b1d"
+checksum = "dc5a4e564e38c699f2880d3fda590bedc2e69f3f84cd48b457bd892ce61d0aa9"
 dependencies = [
  "crc32fast",
  "miniz_oxide",

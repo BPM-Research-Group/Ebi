@@ -1,15 +1,12 @@
-use std::collections::HashSet;
-
-use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, One};
-use ebi_objects::{Activity, DirectlyFollowsGraph};
-
+use super::directly_follows_graph_abstractor::DirectlyFollowsAbstractor;
 use crate::ebi_traits::{
     ebi_trait_event_log::EbiTraitEventLog,
     ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
 };
-
-use super::directly_follows_graph_abstractor::DirectlyFollowsAbstractor;
+use anyhow::{Result, anyhow};
+use ebi_arithmetic::{Fraction, One};
+use ebi_objects::{Activity, DirectlyFollowsGraph};
+use std::collections::HashSet;
 
 pub trait DirectlyFollowsModelMinerFiltering {
     /**

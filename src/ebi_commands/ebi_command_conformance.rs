@@ -98,7 +98,7 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
             \end{definition}",
     ),
     cli_command: None,
-    exact_arithmetic: true,
+    exact_arithmetic: false,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],

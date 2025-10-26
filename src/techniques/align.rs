@@ -6,7 +6,7 @@ use ebi_objects::{
     StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticProcessTree,
     ebi_objects::{labelled_petri_net::TransitionIndex, language_of_alignments::Move},
 };
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use rayon::iter::ParallelIterator;
 use std::{
     fmt::{Debug, Display},
     hash::Hash,
@@ -90,21 +90,18 @@ where
             log.activity_key(),
             &mut activity_key,
         ));
-        let log = Arc::new(log);
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
 
         log::info!("Compute alignments");
         let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
 
         //compute alignments multi-threadedly
-        let mut aligned_traces = (0..log.number_of_traces())
-            .into_par_iter()
-            .filter_map(|trace_index| {
-                let log = Arc::clone(&log);
+        let mut aligned_traces = log
+            .par_iter_traces()
+            .filter_map(|trace| {
                 let translator = Arc::clone(&translator);
                 let self2 = Arc::from(&self);
 
-                let trace = log.get_trace(trace_index).unwrap();
                 let trace_translated = translator.translate_trace(trace);
 
                 let result = self2
@@ -151,23 +148,20 @@ where
             log.activity_key(),
             &mut activity_key,
         ));
-        let log = Arc::new(log);
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
+        let log_len = log.number_of_traces();
 
         log::info!("Compute alignments");
         let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
 
         //compute alignments multi-threadedly
-        let aligned_traces = (0..log.number_of_traces())
-            .into_par_iter()
-            .filter_map(|trace_index| {
-                let log = Arc::clone(&log);
+        let aligned_traces = log
+            .par_iter_traces_probabilities()
+            .filter_map(|(trace, probability)| {
                 let translator = Arc::clone(&translator);
                 let self2 = Arc::from(&self);
 
-                let trace = log.get_trace(trace_index).unwrap();
-                let trace_translated = translator.translate_trace(trace);
-                let probability = log.get_trace_probability(trace_index).unwrap().clone();
+                let trace_translated = translator.translate_trace(&trace);
 
                 // log::debug!("align trace {:?}", trace);
                 let result = self2
@@ -176,7 +170,7 @@ where
                 progress_bar.inc(1);
 
                 match result {
-                    Ok((aligned_trace, _)) => Some((aligned_trace, probability)),
+                    Ok((aligned_trace, _)) => Some((aligned_trace, probability.clone())),
                     Err(err) => {
                         let error = Arc::clone(&error);
                         *error.lock().unwrap() = Some(err);
@@ -186,7 +180,7 @@ where
             })
             .collect::<Vec<_>>(); // end parallel execution
 
-        if aligned_traces.len() != log.number_of_traces() {
+        if aligned_traces.len() != log_len {
             //something went wrong
             if let Ok(mutex) = Arc::try_unwrap(error) {
                 if let Ok(err) = mutex.into_inner() {

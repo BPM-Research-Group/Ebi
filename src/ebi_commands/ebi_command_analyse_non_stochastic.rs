@@ -6,7 +6,8 @@ use crate::{
         ebi_trait::EbiTrait,
     },
     ebi_traits::{
-        ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_activities::EbiTraitActivities,
+        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
         ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics,
     },
     techniques::{
@@ -96,6 +97,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
                 sdfa.bounded()?
             }
             EbiInput::Object(EbiObject::EventLog(object), _) => object.bounded()?,
+            EbiInput::Object(EbiObject::EventLogTraceAttributes(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::FiniteLanguage(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.bounded()?,
@@ -178,13 +180,15 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Comman
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::EventLog)],
+        &[&EbiInputType::Trait(EbiTrait::EventLogTraceAttributes)],
         &[&EbiInputType::Trait(EbiTrait::Semantics)],
     ],
     input_names: &["LOG", "MODEL"],
     input_helps: &["The event log.", "The model."],
     execute: |mut objects, _| {
-        let log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
+        let log = objects
+            .remove(0)
+            .to_type::<dyn EbiTraitEventLogTraceAttributes>()?;
         let mut model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
 
         let result = model.find_executions(log)?;
@@ -239,6 +243,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
                 sdfa.any_traces()?
             }
             EbiInput::Object(EbiObject::EventLog(object), _) => object.any_traces()?,
+            EbiInput::Object(EbiObject::EventLogTraceAttributes(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::FiniteLanguage(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => {
                 object.any_traces()?

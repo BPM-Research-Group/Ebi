@@ -1,12 +1,3 @@
-use anyhow::Result;
-use ebi_arithmetic::ebi_number::Zero;
-use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
-    FiniteLanguage, FiniteStochasticLanguage, IndexTrace, LabelledPetriNet, ProcessTree,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticProcessTree,
-};
-
 use crate::{
     ebi_framework::displayable::Displayable,
     semantics::{
@@ -14,6 +5,14 @@ use crate::{
         semantics::Semantics,
     },
     techniques::livelock::IsPartOfLivelock,
+};
+use anyhow::Result;
+use ebi_arithmetic::ebi_number::Zero;
+use ebi_objects::{
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
+    EventLogTraceAttributes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet,
+    NumberOfTraces, ProcessTree, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
 };
 
 pub trait AnyTraces {
@@ -92,6 +91,7 @@ macro_rules! dfm {
 lang!(FiniteLanguage);
 lang!(FiniteStochasticLanguage);
 lang!(EventLog);
+lang!(EventLogTraceAttributes);
 lpn!(LabelledPetriNet);
 lpn!(StochasticLabelledPetriNet);
 dfm!(DeterministicFiniteAutomaton);

@@ -18,6 +18,7 @@ use crate::{
     },
     ebi_traits::{
         ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_graphable::EbiTraitGraphable,
@@ -450,7 +451,10 @@ pub enum EbiTraitImporter {
     IterableStochasticLanguage(
         fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>>,
     ), //can walk over the traces, potentially forever
-    EventLog(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLog>>), //full XES; access to traces and attributes
+    EventLog(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLog>>), //traces only
+    EventLogTraceAttributes(
+        fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLogTraceAttributes>>,
+    ), //full XES; access to traces and attributes
     Semantics(fn(&mut dyn BufRead) -> Result<EbiTraitSemantics>), //can walk over states using transitions, potentially forever
     StochasticSemantics(fn(&mut dyn BufRead) -> Result<EbiTraitStochasticSemantics>), //can walk over states  using transitions, potentially forever
     StochasticDeterministicSemantics(
@@ -471,6 +475,7 @@ impl EbiTraitImporter {
             EbiTraitImporter::IterableLanguage(_) => EbiTrait::IterableLanguage,
             EbiTraitImporter::IterableStochasticLanguage(_) => EbiTrait::IterableStochasticLanguage,
             EbiTraitImporter::EventLog(_) => EbiTrait::EventLog,
+            EbiTraitImporter::EventLogTraceAttributes(_) => EbiTrait::EventLogTraceAttributes,
             EbiTraitImporter::Semantics(_) => EbiTrait::Semantics,
             EbiTraitImporter::StochasticSemantics(_) => EbiTrait::StochasticSemantics,
             EbiTraitImporter::StochasticDeterministicSemantics(_) => {
@@ -495,6 +500,9 @@ impl EbiTraitImporter {
                 EbiTraitObject::IterableStochasticLanguage((f)(reader)?)
             }
             EbiTraitImporter::EventLog(f) => EbiTraitObject::EventLog((f)(reader)?),
+            EbiTraitImporter::EventLogTraceAttributes(f) => {
+                EbiTraitObject::EventLogTraceAttributes((f)(reader)?)
+            }
             EbiTraitImporter::Semantics(f) => EbiTraitObject::Semantics((f)(reader)?),
             EbiTraitImporter::StochasticSemantics(f) => {
                 EbiTraitObject::StochasticSemantics((f)(reader)?)
@@ -517,6 +525,7 @@ impl Display for EbiTraitImporter {
 #[derive(Debug, Clone)]
 pub enum EbiObjectImporter {
     EventLog(fn(&mut dyn BufRead) -> Result<EbiObject>),
+    EventLogTraceAttributes(fn(&mut dyn BufRead) -> Result<EbiObject>),
     DirectlyFollowsGraph(fn(&mut dyn BufRead) -> Result<EbiObject>),
     DirectlyFollowsModel(fn(&mut dyn BufRead) -> Result<EbiObject>),
     StochasticDirectlyFollowsModel(fn(&mut dyn BufRead) -> Result<EbiObject>),
@@ -537,6 +546,7 @@ impl EbiObjectImporter {
     pub fn get_type(&self) -> EbiObjectType {
         match self {
             EbiObjectImporter::EventLog(_) => EbiObjectType::EventLog,
+            EbiObjectImporter::EventLogTraceAttributes(_) => EbiObjectType::EventLogTraceAttributes,
             EbiObjectImporter::DirectlyFollowsGraph(_) => EbiObjectType::DirectlyFollowsGraph,
             EbiObjectImporter::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
             EbiObjectImporter::StochasticDirectlyFollowsModel(_) => {
@@ -569,6 +579,7 @@ impl EbiObjectImporter {
     pub fn get_importer(&self) -> fn(&mut dyn BufRead) -> Result<EbiObject> {
         match self {
             EbiObjectImporter::EventLog(importer) => *importer,
+            EbiObjectImporter::EventLogTraceAttributes(importer) => *importer,
             EbiObjectImporter::DirectlyFollowsGraph(importer) => *importer,
             EbiObjectImporter::DirectlyFollowsModel(importer) => *importer,
             EbiObjectImporter::StochasticDirectlyFollowsModel(importer) => *importer,

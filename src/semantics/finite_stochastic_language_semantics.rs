@@ -1,15 +1,12 @@
+use crate::semantics::semantics::Semantics;
 use anyhow::{Result, anyhow};
 use ebi_arithmetic::{Fraction, Zero};
 use ebi_objects::{
-    ebi_objects::labelled_petri_net::TransitionIndex, Activity, ActivityKey, ActivityKeyTranslator, FiniteStochasticLanguage, HasActivityKey, IndexTrace, TranslateActivityKey
+    Activity, ActivityKey, ActivityKeyTranslator, FiniteStochasticLanguage, HasActivityKey,
+    IntoRefTraceProbabilityIterator, NumberOfTraces, TranslateActivityKey,
+    ebi_objects::labelled_petri_net::TransitionIndex,
 };
-
 use std::collections::HashMap;
-
-use crate::{
-    ebi_traits::ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage,
-    semantics::semantics::Semantics,
-};
 
 #[derive(Debug)]
 pub struct FiniteStochasticLanguageSemantics {
@@ -27,7 +24,7 @@ impl FiniteStochasticLanguageSemantics {
         } else {
             nodes.push(HashMap::new()); //0: root
 
-            for (trace, trace_probability) in lang.iter_trace_probability() {
+            for (trace, trace_probability) in lang.iter_traces_probabilities() {
                 let mut node_index = 0usize;
 
                 for activity in trace {

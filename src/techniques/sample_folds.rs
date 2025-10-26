@@ -21,7 +21,7 @@ impl FoldsSampler for EventLog {
 mod tests {
     use std::fs;
 
-    use ebi_objects::{EventLog, IndexTrace};
+    use ebi_objects::{EventLog, NumberOfTraces};
 
     use crate::techniques::sample_folds::FoldsSampler;
 

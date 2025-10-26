@@ -19,13 +19,18 @@ where
     let distances = TriangularDistanceMatrix::new(log);
 
     if number_of_traces.is_one() {
-        let trace_number = medoid_single(log, &distances);
-        if trace_number.is_none() {
+        let trace_index = medoid_single(log, &distances);
+        if trace_index.is_none() {
             return Err(anyhow!(
                 "1 trace was requested, but the stochastic language contains none."
             ));
         }
-        result.insert(log.get_trace(trace_number.unwrap()).unwrap().to_owned());
+        result.insert(
+            log.iter_traces()
+                .nth(trace_index.unwrap())
+                .unwrap()
+                .to_owned(),
+        );
         return Ok((activity_key, result).into());
     }
 
@@ -57,7 +62,7 @@ where
 
     //put in the output format
     let mut list_i = 0;
-    for (i1, trace1) in log.iter().enumerate() {
+    for (i1, trace1) in log.iter_traces().enumerate() {
         if list_i < list.len() && i1 == list[list_i] {
             result.insert(trace1.to_vec());
             list_i += 1;
@@ -97,11 +102,11 @@ where
 
     for (i, j, _, distance) in distances {
         let mut distance_i = distance.as_ref().clone();
-        distance_i *= log.get_trace_probability(j).unwrap();
+        distance_i *= log.iter_probabilities().nth(j).unwrap();
         sum_distance[i] += &distance_i;
 
         let mut distance_j = distance.as_ref().clone();
-        distance_j *= log.get_trace_probability(i).unwrap();
+        distance_j *= log.iter_probabilities().nth(i).unwrap();
         sum_distance[j] += distance_j;
     }
 

@@ -1,10 +1,9 @@
-use ebi_arithmetic::Fraction;
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
-
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::levenshtein,
 };
+use ebi_arithmetic::Fraction;
+use rayon::iter::{IndexedParallelIterator, ParallelIterator};
 
 pub trait ProcessVariety {
     fn rao_stirling_diversity(&self) -> Fraction;
@@ -12,16 +11,12 @@ pub trait ProcessVariety {
 
 impl ProcessVariety for dyn EbiTraitFiniteStochasticLanguage {
     fn rao_stirling_diversity(&self) -> Fraction {
-        (0..self.number_of_traces())
-            .into_par_iter()
-            .map(|i| {
-                let trace_i = self.get_trace(i).unwrap();
-                let probability_i = self.get_trace_probability(i).unwrap();
-                (i + 1..self.number_of_traces())
-                    .into_par_iter()
-                    .map(|j| {
-                        let trace_j = self.get_trace(j).unwrap();
-                        let probability_j = self.get_trace_probability(j).unwrap();
+        self.par_iter_traces_probabilities()
+            .enumerate()
+            .map(|(i, (trace_i, probability_i))| {
+                self.par_iter_traces_probabilities()
+                    .skip(i)
+                    .map(|(trace_j, probability_j)| {
                         let mut d = Fraction::from(levenshtein::distance(trace_i, trace_j));
                         d *= probability_i;
                         d *= probability_j;

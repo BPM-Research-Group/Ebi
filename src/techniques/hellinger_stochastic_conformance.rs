@@ -1,9 +1,9 @@
 use std::sync::{Arc, Mutex};
 
 use anyhow::Result;
-use ebi_arithmetic::{Fraction, OneMinus, Sqrt, Zero, One};
+use ebi_arithmetic::{Fraction, One, OneMinus, Sqrt, Zero};
 use ebi_objects::ActivityKeyTranslator;
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use rayon::iter::ParallelIterator;
 
 use crate::{
     ebi_traits::{
@@ -29,18 +29,15 @@ impl HellingerStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
             ActivityKeyTranslator::new(self.activity_key(), language2.activity_key_mut());
         let error = Arc::new(Mutex::new(None));
 
-        let mut sum = (0..self.number_of_traces())
-            .into_par_iter()
-            .filter_map(|trace_index| {
-                let trace = self.get_trace(trace_index).unwrap();
-                let probability = self.get_trace_probability(trace_index).unwrap();
-
+        let mut sum = self
+            .par_iter_traces_probabilities()
+            .filter_map(|(trace, probability)| {
                 match language2.get_probability(&FollowerSemantics::Trace(
                     &translator.translate_trace(trace),
                 )) {
                     Ok(probability2) => {
                         let mut probability2 = probability2.approx_abs_sqrt(10);
-                        probability2 -=  probability.clone().approx_abs_sqrt(10);
+                        probability2 -= probability.clone().approx_abs_sqrt(10);
                         Some(&probability2 * &probability2)
                     }
                     Err(err) => {

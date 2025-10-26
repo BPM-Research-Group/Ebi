@@ -1,17 +1,17 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::Fraction;
-use ebi_objects::{Activity, FiniteStochasticLanguage, Importable};
+use ebi_objects::{
+    FiniteStochasticLanguage, Importable, IntoRefProbabilityIterator, IntoRefTraceIterator,
+    IntoRefTraceProbabilityIterator,
+};
 use std::io::BufRead;
 
 use crate::ebi_framework::{
     ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
 };
 
-pub trait EbiTraitIterableStochasticLanguage {
-    //an iterable language is not necessarily finite
-    fn iter_trace_probability(&self) -> Box<dyn Iterator<Item = (&Vec<Activity>, &Fraction)> + '_>;
-
-    fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction>;
+pub trait EbiTraitIterableStochasticLanguage:
+    IntoRefTraceIterator + IntoRefProbabilityIterator + IntoRefTraceProbabilityIterator
+{
 }
 
 impl FromEbiTraitObject for dyn EbiTraitIterableStochasticLanguage {
@@ -27,15 +27,7 @@ impl FromEbiTraitObject for dyn EbiTraitIterableStochasticLanguage {
     }
 }
 
-impl EbiTraitIterableStochasticLanguage for FiniteStochasticLanguage {
-    fn iter_trace_probability(&self) -> Box<dyn Iterator<Item = (&Vec<Activity>, &Fraction)> + '_> {
-        Box::new(self.traces.iter())
-    }
-
-    fn get_trace_probability(&self, trace_index: usize) -> Option<&Fraction> {
-        Some(self.traces.iter().nth(trace_index)?.1)
-    }
-}
+impl EbiTraitIterableStochasticLanguage for FiniteStochasticLanguage {}
 
 pub trait ToIterableStochasticLanguage: Importable {
     fn to_iterable_stochastic_language(self) -> Box<dyn EbiTraitIterableStochasticLanguage>;

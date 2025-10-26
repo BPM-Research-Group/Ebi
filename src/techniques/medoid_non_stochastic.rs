@@ -1,12 +1,11 @@
-use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, One, Signed, Zero, f};
-use ebi_objects::FiniteLanguage;
-use std::sync::Arc;
-
 use crate::{
     ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage,
     math::distances::TriangularDistanceMatrix,
 };
+use anyhow::{Result, anyhow};
+use ebi_arithmetic::{Fraction, One, Signed, Zero, f};
+use ebi_objects::FiniteLanguage;
+use std::sync::Arc;
 
 pub trait MedoidNonStochastic {
     fn medoid(&self, number_of_traces: usize) -> Result<FiniteLanguage>;
@@ -34,7 +33,7 @@ where
                     "1 trace was requested, but the stochastic language contains none."
                 ));
             }
-            result.insert(self.get_trace(trace_number.unwrap()).unwrap().to_owned());
+            result.insert(self.iter_traces().nth(trace_number.unwrap()).unwrap().to_owned());
             return Ok((activity_key, result).into());
         }
 
@@ -66,7 +65,7 @@ where
 
         //put in the output format
         let mut list_i = 0;
-        for (i1, trace1) in self.iter().enumerate() {
+        for (i1, trace1) in self.iter_traces().enumerate() {
             if list_i < list.len() && i1 == list[list_i] {
                 result.insert(trace1.to_vec());
                 list_i += 1;
@@ -104,7 +103,7 @@ where
         let mut result = FiniteLanguage::new_hashmap();
         medoids.sort();
         let mut list_i = 0;
-        for (i1, trace1) in self.iter().enumerate() {
+        for (i1, trace1) in self.iter_traces().enumerate() {
             if list_i < medoids.len() && i1 == medoids[list_i] {
                 result.insert(trace1.to_vec());
                 list_i += 1;

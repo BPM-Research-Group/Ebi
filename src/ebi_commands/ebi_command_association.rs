@@ -1,6 +1,3 @@
-use anyhow::Context;
-use std::io::Write;
-
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
@@ -9,9 +6,11 @@ use crate::{
         ebi_trait::EbiTrait,
     },
     ebi_info,
-    ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
+    ebi_traits::ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
     techniques::association::Associations,
 };
+use anyhow::{Context, anyhow};
+use std::io::Write;
 
 pub const DEFAULT_NUMBER_OF_SAMPLES: usize = 500;
 
@@ -32,7 +31,7 @@ pub const ASSOCIATION_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::EventLog)],
+        &[&EbiInputType::Trait(EbiTrait::EventLogTraceAttributes)],
         &[&EbiInputType::String(None, None)],
         &[&EbiInputType::Usize(
             Some(1),
@@ -53,12 +52,19 @@ pub const ASSOCIATION_ATTRIBUTE: EbiCommand = EbiCommand::Command {
         "The number of samples.",
     ],
     execute: |mut inputs, _| {
-        let event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
-        let attribute = inputs.remove(0).to_type::<String>()?;
+        let event_log = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitEventLogTraceAttributes>()?;
+        let attribute_label = inputs.remove(0).to_type::<String>()?;
         let number_of_samples = inputs.remove(0).to_type::<usize>()?;
 
+        let attribute = event_log
+            .attribute_key()
+            .label_to_attribute(&attribute_label)
+            .ok_or_else(|| anyhow!("the log does not contain the attribute {}", attribute_label))?;
+
         let ass = event_log
-            .association(*number_of_samples, &attribute)
+            .association(*number_of_samples, attribute)
             .with_context(|| format!("attribute {}", attribute))?;
 
         Ok(EbiOutput::ContainsRoot(ass))
@@ -75,7 +81,7 @@ pub const ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command {
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::EventLog)],
+        &[&EbiInputType::Trait(EbiTrait::EventLogTraceAttributes)],
         &[&EbiInputType::Usize(
             Some(1),
             None,
@@ -88,7 +94,9 @@ pub const ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command {
         "The number of samples taken.",
     ],
     execute: |mut inputs, _| {
-        let event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
+        let event_log = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitEventLogTraceAttributes>()?;
         let number_of_samples = inputs.remove(0).to_type::<usize>()?;
 
         let result = event_log.associations(*number_of_samples);

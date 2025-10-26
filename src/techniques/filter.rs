@@ -1,7 +1,51 @@
-use crate::ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject};
+use crate::{
+    ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject},
+    ebi_traits::{
+        ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
+    },
+};
 use anyhow::{Result, anyhow};
 use ebi_derive::EbiInputEnum;
-use ebi_objects::{Activity, EventLog};
+use ebi_objects::{Activity, EventLog, EventLogTraceAttributes};
+
+pub trait Filter {
+    /// keep all traces that have a given length
+    fn remove_traces_length(&mut self, operator: Operator, value: usize);
+
+    /// keep all non-empty traces
+    fn remove_traces_empty(&mut self);
+
+    /// remove all traces that have [event_selector] [activity]
+    fn remove_traces_event_activity(&mut self, event_selector: EventSelector, activity: Activity);
+}
+
+macro_rules! filter {
+    ($t:ident) => {
+        impl Filter for $t {
+            fn remove_traces_length(&mut self, operator: Operator, value: usize) {
+                self.retain_traces(Box::new(move |trace| !operator.apply(trace.len(), value)));
+            }
+
+            fn remove_traces_empty(&mut self) {
+                self.retain_traces(Box::new(|trace| trace.len() != 0));
+            }
+
+            fn remove_traces_event_activity(
+                &mut self,
+                event_selector: EventSelector,
+                activity: Activity,
+            ) {
+                self.retain_traces(Box::new(move |trace| {
+                    !event_selector.apply(trace, |act| act == &activity)
+                }));
+            }
+        }
+    };
+}
+
+filter!(EventLog);
+filter!(EventLogTraceAttributes);
 
 #[derive(EbiInputEnum)]
 pub enum EventSelector {
@@ -65,55 +109,24 @@ impl Operator {
     }
 }
 
-pub trait Filter {
-    /// keep all traces that have a given length
-    fn remove_traces_length(&mut self, operator: &Operator, value: usize);
-
-    /// keep all non-empty traces
-    fn remove_traces_empty(&mut self);
-
-    /// remove all traces that have [event_selector] [activity]
-    fn remove_traces_event_activity(&mut self, event_selector: &EventSelector, activity: Activity);
-}
-
-impl Filter for EventLog {
-    fn remove_traces_length(&mut self, operator: &Operator, value: usize) {
-        self.retain_traces_mut(&mut |(trace, _)| !operator.apply(trace.len(), value));
-    }
-
-    fn remove_traces_empty(&mut self) {
-        self.retain_traces_mut(&mut |(trace, _)| trace.len() != 0);
-    }
-
-    fn remove_traces_event_activity(&mut self, event_selector: &EventSelector, activity: Activity) {
-        self.retain_traces_mut(&mut |(trace, _)| {
-            !event_selector.apply(trace, |act| act == &activity)
-        });
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use std::fs;
 
-    use ebi_objects::{EventLog, HasActivityKey, IndexTrace};
+    use ebi_objects::{EventLog, EventLogTraceAttributes, HasActivityKey, NumberOfTraces};
 
     use crate::techniques::filter::{EventSelector, Filter, Operator};
 
     #[test]
     fn filter_traces_length() {
         let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
-        let mut log = Box::new(fin.parse::<EventLog>().unwrap());
+        let mut log = Box::new(fin.parse::<EventLogTraceAttributes>().unwrap());
 
-        log.remove_traces_length(&Operator::Larger, 10);
-
-        let fin2 = fs::read_to_string("testfiles/a-b.xes").unwrap();
-        let log2 = Box::new(fin2.parse::<EventLog>().unwrap());
+        log.remove_traces_length(Operator::Larger, 10);
 
         assert_eq!(log.number_of_traces(), 2);
-        assert_eq!(log.rust4pm_log, log2.rust4pm_log);
 
-        log.remove_traces_length(&Operator::SmallerEqual, 2);
+        log.remove_traces_length(Operator::SmallerEqual, 2);
 
         assert_eq!(log.number_of_traces(), 0);
     }
@@ -134,23 +147,23 @@ mod tests {
 
         let mut log = Box::new(fin.parse::<EventLog>().unwrap());
         let a = log.activity_key_mut().process_activity("a");
-        log.remove_traces_event_activity(&EventSelector::All, a);
+        log.remove_traces_event_activity(EventSelector::All, a);
         assert_eq!(log.number_of_traces(), 1);
 
         let mut log = Box::new(fin.parse::<EventLog>().unwrap());
-        log.remove_traces_event_activity(&EventSelector::Any, a);
+        log.remove_traces_event_activity(EventSelector::Any, a);
         assert_eq!(log.number_of_traces(), 1);
 
         let mut log = Box::new(fin.parse::<EventLog>().unwrap());
-        log.remove_traces_event_activity(&EventSelector::End, a);
+        log.remove_traces_event_activity(EventSelector::End, a);
         assert_eq!(log.number_of_traces(), 1);
 
         let mut log = Box::new(fin.parse::<EventLog>().unwrap());
-        log.remove_traces_event_activity(&EventSelector::Start, a);
+        log.remove_traces_event_activity(EventSelector::Start, a);
         assert_eq!(log.number_of_traces(), 1);
 
         let mut log = Box::new(fin.parse::<EventLog>().unwrap());
-        log.remove_traces_event_activity(&EventSelector::None, a);
+        log.remove_traces_event_activity(EventSelector::None, a);
         assert_eq!(log.number_of_traces(), 1);
     }
 }

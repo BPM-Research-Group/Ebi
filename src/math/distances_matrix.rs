@@ -25,8 +25,8 @@ use malachite::Natural;
     all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use rayon::iter::IntoParallelRefIterator;
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator};
+use rayon::iter::ParallelIterator;
 
 #[cfg(any(
     all(
@@ -71,23 +71,9 @@ impl WeightedDistanceMatrix {
         // Create thread pool with custom configuration
         let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
 
-        // Pre-fetch all traces to avoid repeated get_trace calls
-        let traces_a: Vec<_> = (0..lang_a.number_of_traces())
-            .map(|i| lang_a.get_trace(i).unwrap())
-            .collect();
-        let traces_b: Vec<_> = (0..lang_b.number_of_traces())
-            .map(|j| lang_b.get_trace(j).unwrap())
-            .collect();
-
         // Create weights vectors
-        let weights_a = (0..lang_a.number_of_traces())
-            .filter_map(|trace_index| lang_a.get_trace_probability(trace_index))
-            .cloned()
-            .collect();
-        let weights_b = (0..lang_b.number_of_traces())
-            .filter_map(|trace_index| lang_b.get_trace_probability(trace_index))
-            .cloned()
-            .collect();
+        let weights_a = lang_a.iter_probabilities().cloned().collect();
+        let weights_b = lang_b.iter_probabilities().cloned().collect();
 
         let progress_bar = EbiCommand::get_progress_bar_ticks(
             (lang_a.number_of_traces() * lang_b.number_of_traces())
@@ -97,14 +83,12 @@ impl WeightedDistanceMatrix {
 
         // Compute in chunks for better cache utilisation
         pool.install(|| {
-            distances = (0..lang_a.number_of_traces())
-                .into_par_iter()
-                .map(|i| {
-                    let trace_a = &traces_a[i];
-                    let row: Vec<Fraction> = (0..lang_b.number_of_traces())
-                        .into_par_iter()
-                        .map(|j| {
-                            let trace_b = &traces_b[j];
+            distances = lang_a
+                .par_iter_traces()
+                .map(|trace_a| {
+                    let row: Vec<Fraction> = lang_b
+                        .par_iter_traces()
+                        .map(|trace_b| {
                             let result = levenshtein::normalised(trace_a, trace_b);
                             progress_bar.inc(1);
                             result

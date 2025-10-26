@@ -185,6 +185,12 @@ impl EbiOutputType {
                 &EbiObjectExporter::EventLog(CompressedEventLog::export_from_object),
                 &EBI_COMPRESSED_EVENT_LOG,
             ),
+            EbiOutputType::ObjectType(EbiObjectType::EventLogTraceAttributes) => {
+                EbiExporter::Object(
+                    &EbiObjectExporter::EventLog(CompressedEventLog::export_from_object),
+                    &EBI_COMPRESSED_EVENT_LOG,
+                )
+            }
             EbiOutputType::ObjectType(EbiObjectType::Executions) => EbiExporter::Object(
                 &EbiObjectExporter::Executions(Executions::export_from_object),
                 &EBI_EXECUTIONS,
@@ -394,6 +400,7 @@ impl Display for EbiExporter {
 #[derive(Debug, Hash)]
 pub enum EbiObjectExporter {
     EventLog(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
+    EventLogTraceAttributes(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     DirectlyFollowsModel(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     StochasticDirectlyFollowsModel(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     FiniteLanguage(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
@@ -417,6 +424,7 @@ impl EbiObjectExporter {
     pub fn get_type(&self) -> EbiObjectType {
         match self {
             EbiObjectExporter::EventLog(_) => EbiObjectType::EventLog,
+            EbiObjectExporter::EventLogTraceAttributes(_) => EbiObjectType::EventLogTraceAttributes,
             EbiObjectExporter::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
             EbiObjectExporter::StochasticDirectlyFollowsModel(_) => {
                 EbiObjectType::StochasticDirectlyFollowsModel
@@ -451,6 +459,7 @@ impl EbiObjectExporter {
         if let EbiOutput::Object(object) = object {
             match self {
                 EbiObjectExporter::EventLog(exporter) => (exporter)(object, f),
+                EbiObjectExporter::EventLogTraceAttributes(exporter) => (exporter)(object, f),
                 EbiObjectExporter::DirectlyFollowsModel(exporter) => (exporter)(object, f),
                 EbiObjectExporter::StochasticDirectlyFollowsModel(exporter) => {
                     (exporter)(object, f)

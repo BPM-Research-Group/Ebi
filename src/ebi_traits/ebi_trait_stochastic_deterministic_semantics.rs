@@ -3,7 +3,9 @@ use std::io::BufRead;
 use anyhow::{Result, anyhow};
 use ebi_arithmetic::Fraction;
 use ebi_objects::{
-    Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, FiniteStochasticLanguage, HasActivityKey, Importable, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree
+    Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogTraceAttributes,
+    FiniteStochasticLanguage, HasActivityKey, Importable, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
 };
 
 use crate::{
@@ -156,6 +158,12 @@ impl ToStochasticDeterministicSemantics for StochasticDeterministicFiniteAutomat
 }
 
 impl ToStochasticDeterministicSemantics for EventLog {
+    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+        Into::<FiniteStochasticLanguage>::into(self).to_stochastic_deterministic_semantics()
+    }
+}
+
+impl ToStochasticDeterministicSemantics for EventLogTraceAttributes {
     fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
         Into::<FiniteStochasticLanguage>::into(self).to_stochastic_deterministic_semantics()
     }

@@ -1,6 +1,4 @@
-use ebi_objects::{
-    EbiObject, EbiObjectType, ebi_objects::scalable_vector_graphics::ToSVG,
-};
+use ebi_objects::{EbiObject, EbiObjectType, ebi_objects::scalable_vector_graphics::ToSVG};
 
 use crate::{
     ebi_framework::{
@@ -40,6 +38,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
                 sdfa.to_string()
             }
             EbiInput::Object(EbiObject::EventLog(log), _) => log.to_string(),
+            EbiInput::Object(EbiObject::EventLogTraceAttributes(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::FiniteLanguage(language), _) => language.to_string(),
             EbiInput::Object(EbiObject::DirectlyFollowsModel(d), _) => d.to_string(),
             EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(d), _) => d.to_string(),
@@ -62,9 +61,9 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
-pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command { 
-    name_short: "graph", 
-    name_long: None, 
+pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command {
+    name_short: "graph",
+    name_long: None,
     explanation_short: "Visualise a file as a graph.",
     explanation_long: None,
     latex_link: None,

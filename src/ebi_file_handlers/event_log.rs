@@ -1,6 +1,7 @@
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    EbiObject, EventLog, Exportable, Importable, ebi_objects::event_log::FORMAT_SPECIFICATION,
+    EbiObject, EventLog, EventLogTraceAttributes, Exportable, Importable,
+    ebi_objects::event_log::FORMAT_SPECIFICATION,
 };
 
 use crate::{
@@ -17,6 +18,7 @@ use crate::{
     },
     ebi_traits::{
         ebi_trait_activities::ToActivities, ebi_trait_event_log::ToEventLog,
+        ebi_trait_event_log_trace_attributes::ToEventLogTraceAttributes,
         ebi_trait_finite_language::ToFiniteLanguage,
         ebi_trait_finite_stochastic_language::ToFiniteStochasticLanguage,
         ebi_trait_iterable_language::ToIterableLanguage,
@@ -47,15 +49,18 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
             EventLog::import_as_iterable_stochastic_language,
         ),
         EbiTraitImporter::EventLog(EventLog::import_as_event_log),
+        EbiTraitImporter::EventLogTraceAttributes(
+            EventLogTraceAttributes::import_as_event_log_trace_attributes,
+        ),
         EbiTraitImporter::StochasticSemantics(EventLog::import_as_stochastic_semantics),
         EbiTraitImporter::StochasticDeterministicSemantics(
             EventLog::import_as_stochastic_deterministic_semantics,
         ),
-        EbiTraitImporter::StochasticSemantics(EventLog::import_as_stochastic_semantics),
         EbiTraitImporter::Semantics(EventLog::import_as_semantics),
     ],
     object_importers: &[
         EbiObjectImporter::EventLog(EventLog::import_as_object),
+        EbiObjectImporter::EventLogTraceAttributes(EventLogTraceAttributes::import_as_object),
         EbiObjectImporter::FiniteStochasticLanguage(
             EventLog::import_as_finite_stochastic_language_object,
         ),
@@ -86,11 +91,26 @@ impl FromEbiTraitObject for EventLog {
     }
 }
 
+impl FromEbiTraitObject for EventLogTraceAttributes {
+    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::EventLogTraceAttributes(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "cannot read {} {} as an event log",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::fs;
 
-    use ebi_objects::{ActivityKey, FiniteStochasticLanguage, IndexTrace, TranslateActivityKey};
+    use ebi_objects::{
+        ActivityKey, FiniteStochasticLanguage, NumberOfTraces, TranslateActivityKey,
+    };
 
     use crate::ebi_traits::{
         ebi_trait_event_log::EbiTraitEventLog,
@@ -155,11 +175,9 @@ mod tests {
         let mut log = fin.parse::<EventLog>().unwrap();
 
         assert_eq!(log.number_of_traces(), 2);
-        assert_eq!(log.rust4pm_log.traces.len(), 2);
 
         log.retain_traces_mut(&mut |_| false);
 
         assert_eq!(log.number_of_traces(), 0);
-        assert_eq!(log.rust4pm_log.traces.len(), 0);
     }
 }

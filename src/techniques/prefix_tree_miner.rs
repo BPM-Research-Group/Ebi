@@ -24,7 +24,7 @@ impl PrefixTreeMinerDFA for dyn EbiTraitFiniteLanguage {
         if self.number_of_traces().is_zero() {
             result.set_initial_state(None);
         } else {
-            for trace in self.iter() {
+            for trace in self.iter_traces() {
                 let mut state = result.get_initial_state().unwrap();
 
                 for activity in trace {
@@ -47,7 +47,7 @@ impl PrefixTreeMinerTree for dyn EbiTraitFiniteLanguage {
         } else {
             let mut tree = vec![Node::Operator(Operator::Xor, self.number_of_traces())];
 
-            for trace in self.iter() {
+            for trace in self.iter_traces() {
                 if trace.len().is_zero() {
                     //empty trace
                     tree.push(Node::Tau);

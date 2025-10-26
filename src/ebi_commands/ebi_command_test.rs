@@ -1,7 +1,3 @@
-use anyhow::Context;
-use ebi_arithmetic::Fraction;
-use std::io::Write;
-
 use crate::{
     ebi_commands::ebi_command_association::DEFAULT_NUMBER_OF_SAMPLES,
     ebi_framework::{
@@ -12,7 +8,7 @@ use crate::{
     },
     ebi_info,
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
     math::constant_fraction::ConstFraction,
@@ -21,6 +17,9 @@ use crate::{
         permutation_test::PermutationTest,
     },
 };
+use anyhow::{Context, anyhow};
+use ebi_arithmetic::Fraction;
+use std::io::Write;
 
 pub const DEFAULT_P_VALUE: ConstFraction = ConstFraction::of(1, 20);
 
@@ -41,7 +40,7 @@ pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::EventLog)],
+        &[&EbiInputType::Trait(EbiTrait::EventLogTraceAttributes)],
         &[&EbiInputType::String(None, None)],
         &[&EbiInputType::Usize(
             Some(1),
@@ -68,13 +67,20 @@ pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
         "The threshold p-value.",
     ],
     execute: |mut inputs, _| {
-        let event_log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
-        let attribute = inputs.remove(0).to_type::<String>()?;
+        let event_log = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitEventLogTraceAttributes>()?;
+        let attribute_label = inputs.remove(0).to_type::<String>()?;
         let number_of_samples = inputs.remove(0).to_type::<usize>()?;
         let p_value = inputs.remove(0).to_type::<Fraction>()?;
 
+        let attribute = event_log
+            .attribute_key()
+            .label_to_attribute(&attribute_label)
+            .ok_or_else(|| anyhow!("the log does not contain the attribute {}", attribute_label))?;
+
         let (value, sustained) = event_log
-            .log_categorical_attribute(*number_of_samples, &attribute, &p_value)
+            .log_categorical_attribute(*number_of_samples, attribute, &p_value)
             .with_context(|| format!("attribute {}", attribute))?;
 
         let mut f = vec![];

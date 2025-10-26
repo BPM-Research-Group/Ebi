@@ -54,6 +54,7 @@ pub mod ebi_file_handlers {
 pub mod ebi_traits {
     pub mod ebi_trait_activities;
     pub mod ebi_trait_event_log;
+    pub mod ebi_trait_event_log_trace_attributes;
     pub mod ebi_trait_finite_language;
     pub mod ebi_trait_finite_stochastic_language;
     pub mod ebi_trait_graphable;
@@ -97,7 +98,6 @@ pub mod math {
 
     pub mod constant_fraction;
     pub mod correlation;
-    pub mod data_type;
     pub mod distances;
     pub mod distances_matrix;
     pub mod distances_triangular;

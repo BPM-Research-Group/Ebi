@@ -320,7 +320,7 @@ print(result)
 		
 		\subsubsection{Conventions and Hints}
 			\begin{enumerate}
-				\item Ebi only uses floating point numbers (f32, f64) when the user asks for it.
+				\item Ebi only uses floating point numbers (f64) when the user asks for it.
 				Commands should use \verb=Fraction= or other exact numeric classes (see Section~\ref{sec:exact}); these perform computations with the arithmetic type selected by the user.
 				\item It is important that errors are propagated appropriately.
 				Therefore, avoid \verb=.unwrap()= but instead propagate errors using \verb=.with_context(|| "error message")?=.

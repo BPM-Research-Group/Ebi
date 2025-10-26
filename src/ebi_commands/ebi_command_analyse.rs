@@ -65,7 +65,7 @@ pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
     input_names: &[ "FILE" ],
     input_helps: &[ "An event log."],
     execute: |mut objects, _| {
-        let log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
+        let mut log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         
         let result = log.to_multiset().estimate_completeness();
         

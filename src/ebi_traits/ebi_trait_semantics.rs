@@ -10,12 +10,7 @@ use crate::{
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    ActivityKey, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
-    EventLog, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, Importable,
-    LabelledPetriNet, LolaNet, PetriNetMarkupLanguage, ProcessTree, ProcessTreeMarkupLanguage,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticProcessTree, TranslateActivityKey,
-    ebi_objects::compressed_event_log::CompressedEventLog,
+    ebi_objects::{compressed_event_log::CompressedEventLog, compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes}, ActivityKey, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogTraceAttributes, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, Importable, LabelledPetriNet, LolaNet, PetriNetMarkupLanguage, ProcessTree, ProcessTreeMarkupLanguage, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree, TranslateActivityKey
 };
 use std::io::BufRead;
 
@@ -86,7 +81,15 @@ pub trait ToSemantics: Importable + Sized {
 
 impl ToSemantics for CompressedEventLog {
     fn to_semantics(self) -> EbiTraitSemantics {
-        self.log.to_semantics()
+        let log: EventLog = self.into();
+        log.to_semantics()
+    }
+}
+
+impl ToSemantics for CompressedEventLogTraceAttributes {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        let log: EventLog = self.into();
+        log.to_semantics()
     }
 }
 
@@ -152,6 +155,12 @@ impl ToSemantics for StochasticDeterministicFiniteAutomaton {
 }
 
 impl ToSemantics for EventLog {
+    fn to_semantics(self) -> EbiTraitSemantics {
+        Into::<FiniteStochasticLanguage>::into(self).to_semantics()
+    }
+}
+
+impl ToSemantics for EventLogTraceAttributes {
     fn to_semantics(self) -> EbiTraitSemantics {
         Into::<FiniteStochasticLanguage>::into(self).to_semantics()
     }

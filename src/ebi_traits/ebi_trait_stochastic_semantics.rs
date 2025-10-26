@@ -1,9 +1,9 @@
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    ActivityKey, DirectlyFollowsGraph, EventLog, FiniteStochasticLanguage, HasActivityKey,
-    Importable, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticProcessTree, TranslateActivityKey,
-    ebi_objects::compressed_event_log::CompressedEventLog,
+    ActivityKey, DirectlyFollowsGraph, EventLog, EventLogTraceAttributes, FiniteStochasticLanguage,
+    HasActivityKey, Importable, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
+    TranslateActivityKey, ebi_objects::compressed_event_log::CompressedEventLog,
 };
 use std::io::BufRead;
 
@@ -135,6 +135,12 @@ impl ToStochasticSemantics for StochasticDeterministicFiniteAutomaton {
 }
 
 impl ToStochasticSemantics for EventLog {
+    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+        Into::<FiniteStochasticLanguage>::into(self).to_stochastic_semantics()
+    }
+}
+
+impl ToStochasticSemantics for EventLogTraceAttributes {
     fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
         Into::<FiniteStochasticLanguage>::into(self).to_stochastic_semantics()
     }

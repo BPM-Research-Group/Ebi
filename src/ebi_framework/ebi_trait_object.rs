@@ -2,6 +2,7 @@ use crate::{
     ebi_framework::ebi_trait::EbiTrait,
     ebi_traits::{
         ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_graphable::EbiTraitGraphable,
@@ -16,6 +17,7 @@ use crate::{
 
 pub enum EbiTraitObject {
     EventLog(Box<dyn EbiTraitEventLog>),
+    EventLogTraceAttributes(Box<dyn EbiTraitEventLogTraceAttributes>),
     IterableLanguage(Box<dyn EbiTraitIterableLanguage>),
     FiniteLanguage(Box<dyn EbiTraitFiniteLanguage>),
     FiniteStochasticLanguage(Box<dyn EbiTraitFiniteStochasticLanguage>),
@@ -32,6 +34,7 @@ impl EbiTraitObject {
     pub fn get_trait(&self) -> EbiTrait {
         match self {
             EbiTraitObject::EventLog(_) => EbiTrait::EventLog,
+            EbiTraitObject::EventLogTraceAttributes(_) => EbiTrait::EventLogTraceAttributes,
             EbiTraitObject::IterableLanguage(_) => EbiTrait::IterableLanguage,
             EbiTraitObject::FiniteLanguage(_) => EbiTrait::FiniteLanguage,
             EbiTraitObject::FiniteStochasticLanguage(_) => EbiTrait::FiniteStochasticLanguage,

@@ -1,5 +1,5 @@
 use anyhow::{Result, anyhow};
-use ebi_objects::{FiniteLanguage, FiniteStochasticLanguage, Importable, IndexTrace};
+use ebi_objects::{FiniteLanguage, FiniteStochasticLanguage, Importable, NumberOfTraces};
 use std::{fmt::Display, io::BufRead};
 
 use crate::ebi_framework::{
@@ -9,7 +9,7 @@ use crate::ebi_framework::{
 use super::ebi_trait_iterable_language::EbiTraitIterableLanguage;
 
 pub trait EbiTraitFiniteLanguage:
-    IndexTrace + Display + EbiTraitIterableLanguage + Send + Sync
+    Display + EbiTraitIterableLanguage + NumberOfTraces + Send + Sync
 {
 }
 

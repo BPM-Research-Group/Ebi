@@ -1,15 +1,7 @@
-use anyhow::{Context, Result, anyhow};
-use ebi_arithmetic::{Fraction, OneMinus};
-use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use std::sync::{
-    Arc,
-    atomic::{AtomicUsize, Ordering},
-};
-
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
     ebi_traits::{
-        ebi_trait_event_log::{AttributeKey, EbiTraitEventLog},
+        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
     math::{
@@ -19,6 +11,14 @@ use crate::{
         distances_triangular::WeightedTriangularDistanceMatrix,
     },
     techniques::sample::{self, Resampler},
+};
+use anyhow::{Context, Result, anyhow};
+use ebi_arithmetic::{Fraction, OneMinus};
+use ebi_objects::Attribute;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use std::sync::{
+    Arc,
+    atomic::{AtomicUsize, Ordering},
 };
 
 pub trait BootstrapTest {
@@ -42,21 +42,20 @@ pub trait StatisticalTestsLogCategoricalAttribute {
     fn log_categorical_attribute(
         &self,
         number_of_samples: usize,
-        trace_attribute: &String,
+        trace_attribute: Attribute,
         alpha: &Fraction,
     ) -> Result<(Fraction, bool)>;
 }
 
-impl StatisticalTestsLogCategoricalAttribute for dyn EbiTraitEventLog {
+impl StatisticalTestsLogCategoricalAttribute for dyn EbiTraitEventLogTraceAttributes {
     fn log_categorical_attribute(
         &self,
         number_of_samples: usize,
-        trace_attribute: &String,
+        trace_attribute: Attribute,
         alpha: &Fraction,
     ) -> Result<(Fraction, bool)> {
-        let mut attribute_key = AttributeKey::new();
         let traces_with_attributes = self
-            .get_traces_with_categorical_attributes(&mut attribute_key, trace_attribute)
+            .get_traces_with_categorical_attribute(trace_attribute)
             .into_iter()
             .collect::<Vec<_>>();
 
@@ -246,11 +245,11 @@ mod tests {
     use std::fs;
 
     use ebi_arithmetic::Fraction;
-    use ebi_objects::{EventLog, FiniteStochasticLanguage};
+    use ebi_objects::{EventLog, EventLogTraceAttributes, FiniteStochasticLanguage};
 
     use crate::{
         ebi_traits::{
-            ebi_trait_event_log::EbiTraitEventLog,
+            ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
             ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         },
         techniques::bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
@@ -259,10 +258,16 @@ mod tests {
     #[test]
     fn cla_test() {
         let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
-        let event_log: Box<dyn EbiTraitEventLog> = Box::new(fin.parse::<EventLog>().unwrap());
+        let event_log: Box<dyn EbiTraitEventLogTraceAttributes> =
+            Box::new(fin.parse::<EventLogTraceAttributes>().unwrap());
+
+        let attribute = event_log
+            .attribute_key()
+            .label_to_attribute("attribute")
+            .unwrap();
 
         let (_, sustain) = event_log
-            .log_categorical_attribute(500, &"attribute".to_string(), &Fraction::from((1, 20)))
+            .log_categorical_attribute(500, attribute, &Fraction::from((1, 20)))
             .unwrap();
         assert!(sustain) //The hypothesis should be rejected if we consider the meaning of things, however, as we have only two traces, it will be sustained.
     }

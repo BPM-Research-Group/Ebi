@@ -22,7 +22,7 @@ impl FlowerMinerTree for dyn EbiTraitFiniteLanguage {
     fn mine_flower_tree(&self) -> ProcessTree {
         //gather activities
         let mut activities = HashSet::new();
-        for trace in self.iter() {
+        for trace in self.iter_traces() {
             for activity in trace {
                 activities.insert(activity);
             }
@@ -47,7 +47,7 @@ impl FlowerMinerDFA for dyn EbiTraitFiniteLanguage {
     fn mine_flower_dfa(&self) -> Result<DeterministicFiniteAutomaton> {
         //gather activities
         let mut activities = HashSet::new();
-        for trace in self.iter() {
+        for trace in self.iter_traces() {
             for activity in trace {
                 activities.insert(activity);
             }

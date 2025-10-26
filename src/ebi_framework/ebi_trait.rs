@@ -18,6 +18,7 @@ pub enum EbiTrait {
     Activities,
     #[default]
     EventLog,
+    EventLogTraceAttributes,
     FiniteLanguage,
     FiniteStochasticLanguage,
     Graphable,
@@ -51,6 +52,7 @@ impl EbiTrait {
     pub fn get_article(&self) -> &str {
         match self {
             EbiTrait::EventLog => "an",
+            EbiTrait::EventLogTraceAttributes => "an",
             EbiTrait::IterableLanguage => "an",
             EbiTrait::FiniteLanguage => "a",
             EbiTrait::FiniteStochasticLanguage => "a",
@@ -87,11 +89,17 @@ impl EbiTrait {
 
     pub fn get_explanation(&self) -> &str {
         match self {
-            EbiTrait::EventLog => "Has traces and attached event and trace attributes.",
-            EbiTrait::FiniteLanguage => "Finite set of traces.",
-            EbiTrait::FiniteStochasticLanguage => "Finite distribution of traces.",
+            EbiTrait::EventLog => "An ``event log'' provides a list of traces. 
+            Consider using a finite (stochastic) language, which are (weighted) sets of traces.",
+            EbiTrait::EventLogTraceAttributes => {
+                "An ``event log with trace attributes'' provides an iterator over traces, where each trace may have trace attributes attached.
+                The underlying ``process mining'' log is accessible, but access may move to another trait in the future."
+            }
+            EbiTrait::FiniteLanguage => "A ``finite language'' provides a set of traces.
+            Iterating over a finite language will yield each trace variant once.",
+            EbiTrait::FiniteStochasticLanguage => "A ``finite stochastic language'' provides a distribution over traces.",
             EbiTrait::IterableLanguage => {
-                "Can walk over the traces. May iterate over infinitely many traces."
+                "Can walk over the traces. Iterating over traces may not terminate."
             }
             EbiTrait::IterableStochasticLanguage => {
                 "Can walk over the traces and their probabilities. May iterate over infinitely many traces."
@@ -108,8 +116,8 @@ impl EbiTrait {
             EbiTrait::StochasticSemantics => {
                 "An object in which the state space can be traversed, with probabilities. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
             }
-            EbiTrait::Graphable => "Can be visualised as a graph.",
-            EbiTrait::Activities => "Has activities",
+            EbiTrait::Graphable => "The trait ``graphable'' allows to create a graph representation.",
+            EbiTrait::Activities => "The trait ``activities'' provides access to activities.",
         }
     }
 }
@@ -121,6 +129,7 @@ impl Display for EbiTrait {
             "{}",
             match self {
                 EbiTrait::EventLog => "event log",
+                EbiTrait::EventLogTraceAttributes => "event log with trace attributes",
                 EbiTrait::IterableLanguage => "iterable language",
                 EbiTrait::FiniteLanguage => "finite language",
                 EbiTrait::FiniteStochasticLanguage => "finite stochastic language",
