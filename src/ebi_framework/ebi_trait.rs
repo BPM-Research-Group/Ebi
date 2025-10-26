@@ -89,14 +89,25 @@ impl EbiTrait {
 
     pub fn get_explanation(&self) -> &str {
         match self {
-            EbiTrait::EventLog => "An ``event log'' provides a list of traces. 
-            Consider using a finite (stochastic) language, which are (weighted) sets of traces.",
+            EbiTrait::EventLog => "Iterating over an event log will yield traces.
+            \\\\
+            Definition: let $\\Sigma$ be an alphabet of activities.
+            Then, a \\emph{trace} $\\sigma \\in \\Sigma^*$ is a finite sequence of activities, and 
+            an \\emph{event log} $L \\in (\\Sigma^*)^*$ is a sequence of traces.",
             EbiTrait::EventLogTraceAttributes => {
                 "An ``event log with trace attributes'' provides an iterator over traces, where each trace may have trace attributes attached.
-                The underlying ``process mining'' log is accessible, but access may move to another trait in the future."
+                The underlying ``process mining'' log is accessible, but access may move to another trait in the future.
+                \\\\
+                Definition: let $\\Sigma$ be an alphabet of activities.
+                Let $A \\colon \\text{attribute} \\mapsto \\text{value}$ be an attribute-value mapping, and let $\\mathcal{A}$ be the set of all attribute-value mappings.
+                A \\emph{trace with attributes} $\\sigma^{A} \\in \\Sigma^* \\times \\mathcal{A}$ is a finite sequence of activities, where the sequence is annotated with attributes.
+                An \\emph{event log with trace attributes} $L^A \\in (\\Sigma^* \\times \\mathcal{A})^*$ is a sequence of traces with attributes."
             }
-            EbiTrait::FiniteLanguage => "A ``finite language'' provides a set of traces.
-            Iterating over a finite language will yield each trace variant once.",
+            EbiTrait::FiniteLanguage => "Iterating over a finite language will yield each trace variant once.
+            \\\\
+            Definition: let $\\Sigma$ be an alphabet of activities.
+            Then, a \\emph{trace} $\\sigma \\in \\Sigma^*$ is a finite sequence of activities, and 
+            a \\emph{finite language} $F \\in (\\Sigma^*)^*$ is a finite set of traces.",
             EbiTrait::FiniteStochasticLanguage => "A ``finite stochastic language'' provides a distribution over traces.",
             EbiTrait::IterableLanguage => {
                 "Can walk over the traces. Iterating over traces may not terminate."
