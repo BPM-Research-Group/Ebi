@@ -1,4 +1,16 @@
 use anyhow::{Result, anyhow};
+use ebi_arithmetic::{MaybeExact, fraction::fraction::Fraction, is_exact_globally};
+use ebi_objects::{
+    EventLogXes, NumberOfTraces,
+    activity_key::activity_key::ActivityKey,
+    constants::{ebi_object::EbiObject, ebi_object_type::EbiObjectType},
+    ebi_objects::{
+        event_log::EventLog, finite_language::FiniteLanguage,
+        finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet,
+        process_tree::ProcessTree,
+    },
+    marking::Marking,
+};
 use polars::prelude::*;
 use pyo3::{
     IntoPyObjectExt,
@@ -11,19 +23,6 @@ use std::{
     io::Cursor,
     iter::Peekable,
     str::{Chars, FromStr},
-};
-
-use ebi_arithmetic::{MaybeExact, fraction::fraction::Fraction, is_exact_globally};
-use ebi_objects::{
-    EventLogTraceAttributes, NumberOfTraces,
-    activity_key::activity_key::ActivityKey,
-    constants::{ebi_object::EbiObject, ebi_object_type::EbiObjectType},
-    ebi_objects::{
-        event_log::EventLog, finite_language::FiniteLanguage,
-        finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet,
-        process_tree::ProcessTree,
-    },
-    marking::Marking,
 };
 
 use crate::ebi_file_handlers::{
@@ -75,7 +74,7 @@ impl ExportableToPM4Py for EbiOutput {
             EbiOutput::Fraction(frac) => frac.export_to_pm4py(py),
             EbiOutput::Bool(value) => value.export_to_pm4py(py),
             EbiOutput::Usize(value) => value.export_to_pm4py(py),
-            EbiOutput::Object(EbiObject::EventLogTraceAttributes(event_log)) => {
+            EbiOutput::Object(EbiObject::EventLogXes(event_log)) => {
                 // special case: export EventLog directly
                 event_log.export_to_pm4py(py)
             }
@@ -273,7 +272,7 @@ impl ImportableFromPM4Py for EventLog {
     }
 }
 
-impl ExportableToPM4Py for EventLogTraceAttributes {
+impl ExportableToPM4Py for EventLogXes {
     fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
         let pm4py_module = py.import("pm4py.objects.log.obj")?;
         let py_event_cls = pm4py_module.getattr("Event")?;

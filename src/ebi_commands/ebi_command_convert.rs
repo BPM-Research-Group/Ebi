@@ -1,4 +1,7 @@
-use ebi_objects::{EbiObject, EbiObjectType, FiniteStochasticLanguage, LabelledPetriNet, StochasticDeterministicFiniteAutomaton};
+use ebi_objects::{
+    EbiObject, EbiObjectType, FiniteStochasticLanguage, LabelledPetriNet,
+    StochasticDeterministicFiniteAutomaton,
+};
 
 use crate::ebi_framework::{
     ebi_command::EbiCommand,

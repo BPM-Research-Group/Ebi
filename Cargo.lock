@@ -729,9 +729,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
-version = "0.3.26"
+version = "0.3.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2f0523fd83cd4e6549f9a53695e388743ec1010d89bc6888e739299cced20435"
+checksum = "002cdf3654eacc5eb24e37cb242298052f50b47e47dcf975f75ebd319048278f"
 dependencies = [
  "anyhow",
  "chrono",
@@ -1277,9 +1277,9 @@ dependencies = [
 
 [[package]]
 name = "indicatif"
-version = "0.18.1"
+version = "0.18.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2e0ddd45fe8e09ee1a607920b12271f8a5528a41ecaf6e1d1440d6493315b6b"
+checksum = "ade6dfcba0dfb62ad59e59e7241ec8912af34fd29e0e743e3db992bd278e8b65"
 dependencies = [
  "console",
  "portable-atomic",

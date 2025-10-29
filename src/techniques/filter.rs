@@ -4,7 +4,7 @@ use crate::{
 };
 use anyhow::{Result, anyhow};
 use ebi_derive::EbiInputEnum;
-use ebi_objects::{Activity, EventLog, EventLogTraceAttributes};
+use ebi_objects::{Activity, EventLog, EventLogTraceAttributes, EventLogXes};
 
 pub trait Filter {
     /// keep all traces that have a given length
@@ -43,6 +43,7 @@ macro_rules! filter {
 
 filter!(EventLog);
 filter!(EventLogTraceAttributes);
+filter!(EventLogXes);
 
 #[derive(EbiInputEnum)]
 pub enum EventSelector {
