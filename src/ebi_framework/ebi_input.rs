@@ -454,7 +454,7 @@ pub enum EbiTraitImporter {
     EventLog(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLog>>), //traces only
     EventLogTraceAttributes(
         fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLogTraceAttributes>>,
-    ), //full XES; access to traces and attributes
+    ), //access to traces and attributes
     Semantics(fn(&mut dyn BufRead) -> Result<EbiTraitSemantics>), //can walk over states using transitions, potentially forever
     StochasticSemantics(fn(&mut dyn BufRead) -> Result<EbiTraitStochasticSemantics>), //can walk over states  using transitions, potentially forever
     StochasticDeterministicSemantics(
@@ -526,6 +526,7 @@ impl Display for EbiTraitImporter {
 pub enum EbiObjectImporter {
     EventLog(fn(&mut dyn BufRead) -> Result<EbiObject>),
     EventLogTraceAttributes(fn(&mut dyn BufRead) -> Result<EbiObject>),
+    EventLogXes(fn(&mut dyn BufRead) -> Result<EbiObject>),
     DirectlyFollowsGraph(fn(&mut dyn BufRead) -> Result<EbiObject>),
     DirectlyFollowsModel(fn(&mut dyn BufRead) -> Result<EbiObject>),
     StochasticDirectlyFollowsModel(fn(&mut dyn BufRead) -> Result<EbiObject>),
@@ -547,6 +548,7 @@ impl EbiObjectImporter {
         match self {
             EbiObjectImporter::EventLog(_) => EbiObjectType::EventLog,
             EbiObjectImporter::EventLogTraceAttributes(_) => EbiObjectType::EventLogTraceAttributes,
+            EbiObjectImporter::EventLogXes(_) => EbiObjectType::EventLogXes,
             EbiObjectImporter::DirectlyFollowsGraph(_) => EbiObjectType::DirectlyFollowsGraph,
             EbiObjectImporter::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
             EbiObjectImporter::StochasticDirectlyFollowsModel(_) => {
@@ -580,6 +582,7 @@ impl EbiObjectImporter {
         match self {
             EbiObjectImporter::EventLog(importer) => *importer,
             EbiObjectImporter::EventLogTraceAttributes(importer) => *importer,
+            EbiObjectImporter::EventLogXes(importer) => *importer,
             EbiObjectImporter::DirectlyFollowsGraph(importer) => *importer,
             EbiObjectImporter::DirectlyFollowsModel(importer) => *importer,
             EbiObjectImporter::StochasticDirectlyFollowsModel(importer) => *importer,

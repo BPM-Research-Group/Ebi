@@ -90,13 +90,14 @@ impl EbiTrait {
     pub fn get_explanation(&self) -> &str {
         match self {
             EbiTrait::EventLog => "Iterating over an event log will yield traces.
+            For full access to an underlying XES log, use the EventLogXes object (not trait).
             \\\\
             Definition: let $\\Sigma$ be an alphabet of activities.
             Then, a \\emph{trace} $\\sigma \\in \\Sigma^*$ is a finite sequence of activities, and 
             an \\emph{event log} $L \\in (\\Sigma^*)^*$ is a sequence of traces.",
             EbiTrait::EventLogTraceAttributes => {
                 "An ``event log with trace attributes'' provides an iterator over traces, where each trace may have trace attributes attached.
-                The underlying ``process mining'' log is accessible, but access may move to another trait in the future.
+                For full access to an underlying XES log, use the EventLogXes object (not trait).
                 \\\\
                 Definition: let $\\Sigma$ be an alphabet of activities.
                 Let $A \\colon \\text{attribute} \\mapsto \\text{value}$ be an attribute-value mapping, and let $\\mathcal{A}$ be the set of all attribute-value mappings.

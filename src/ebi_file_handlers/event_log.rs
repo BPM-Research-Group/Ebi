@@ -1,9 +1,3 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::{
-    EbiObject, EventLog, EventLogTraceAttributes, Exportable, Importable,
-    ebi_objects::event_log::FORMAT_SPECIFICATION,
-};
-
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
@@ -28,6 +22,11 @@ use crate::{
         ebi_trait_stochastic_deterministic_semantics::ToStochasticDeterministicSemantics,
         ebi_trait_stochastic_semantics::ToStochasticSemantics,
     },
+};
+use anyhow::{Result, anyhow};
+use ebi_objects::{
+    EbiObject, EventLog, EventLogTraceAttributes, EventLogXes, Exportable, Importable,
+    ebi_objects::event_log::FORMAT_SPECIFICATION,
 };
 
 pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
@@ -61,6 +60,7 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     object_importers: &[
         EbiObjectImporter::EventLog(EventLog::import_as_object),
         EbiObjectImporter::EventLogTraceAttributes(EventLogTraceAttributes::import_as_object),
+        EbiObjectImporter::EventLogXes(EventLogXes::import_as_object),
         EbiObjectImporter::FiniteStochasticLanguage(
             EventLog::import_as_finite_stochastic_language_object,
         ),
@@ -68,7 +68,11 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
             EventLog::import_as_stochastic_deterministic_finite_automaton_object,
         ),
     ],
-    object_exporters: &[EbiObjectExporter::EventLog(EventLog::export_from_object)],
+    object_exporters: &[
+        EbiObjectExporter::EventLog(EventLog::export_from_object),
+        EbiObjectExporter::EventLogTraceAttributes(EventLogTraceAttributes::export_from_object),
+        EbiObjectExporter::EventLogXes(EventLogXes::export_from_object),
+    ],
     java_object_handlers: &[JavaObjectHandler {
         name: "XLog",
         translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiEventLog.EbiStringToXLog"),
@@ -95,6 +99,19 @@ impl FromEbiTraitObject for EventLogTraceAttributes {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {
             EbiInput::Object(EbiObject::EventLogTraceAttributes(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "cannot read {} {} as an event log",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
+    }
+}
+
+impl FromEbiTraitObject for EventLogXes {
+    fn from_trait_object(object: ebi_input::EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::EventLogXes(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
                 "cannot read {} {} as an event log",
                 object.get_type().get_article(),

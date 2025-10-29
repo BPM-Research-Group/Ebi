@@ -1,9 +1,8 @@
 use ebi_objects::{
-    Exportable, Importable,
-    ebi_objects::{
+    CompressedEventLogXes, Exportable, Importable, ebi_objects::{
         compressed_event_log::{CompressedEventLog, FORMAT_SPECIFICATION},
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-    },
+    }
 };
 
 use crate::{
@@ -62,12 +61,14 @@ pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
         EbiObjectImporter::EventLogTraceAttributes(
             CompressedEventLogTraceAttributes::import_as_object,
         ),
+        EbiObjectImporter::EventLogXes(CompressedEventLogXes::import_as_object),
     ],
     object_exporters: &[
         EbiObjectExporter::EventLog(CompressedEventLog::export_from_object),
         EbiObjectExporter::EventLogTraceAttributes(
             CompressedEventLogTraceAttributes::export_from_object,
         ),
+        EbiObjectExporter::EventLogXes(CompressedEventLogXes::export_from_object),
     ],
     java_object_handlers: &[],
 };

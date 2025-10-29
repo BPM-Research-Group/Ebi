@@ -9,7 +9,10 @@ use crate::{
 };
 use anyhow::Result;
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogTraceAttributes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
+    EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
+    LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
 };
 
 pub trait Bounded {
@@ -162,6 +165,7 @@ usize!(StochasticDirectlyFollowsModel);
 usize!(FiniteLanguage);
 usize!(EventLog);
 usize!(EventLogTraceAttributes);
+usize!(EventLogXes);
 usize!(FiniteStochasticLanguage);
 usize!(DirectlyFollowsGraph);
 LPNMarking!(LabelledPetriNet);

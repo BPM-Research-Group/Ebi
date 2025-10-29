@@ -10,8 +10,8 @@ use anyhow::Result;
 use ebi_arithmetic::ebi_number::Zero;
 use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
-    EventLogTraceAttributes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet,
-    NumberOfTraces, ProcessTree, StochasticDeterministicFiniteAutomaton,
+    EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
+    LabelledPetriNet, NumberOfTraces, ProcessTree, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
 };
 
@@ -92,6 +92,7 @@ lang!(FiniteLanguage);
 lang!(FiniteStochasticLanguage);
 lang!(EventLog);
 lang!(EventLogTraceAttributes);
+lang!(EventLogXes);
 lpn!(LabelledPetriNet);
 lpn!(StochasticLabelledPetriNet);
 dfm!(DeterministicFiniteAutomaton);

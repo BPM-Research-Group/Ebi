@@ -1,36 +1,36 @@
-use crate::ebi_framework::{
-    ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+use crate::{
+    ebi_framework::{
+        ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+    },
+    ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
 };
 use anyhow::{Result, anyhow};
-use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
-    Activity, Attribute, EventLogTraceAttributes, HasActivityKey, Importable,
-    IntoAttributeIterator, IntoAttributeTraceIterator, IntoTraceIterator, NumberOfTraces,
-    TraceAttributes, attribute_key::has_attribute_key::HasAttributeKey,
+    Activity, Attribute, EventLogTraceAttributes, Importable, IntoAttributeIterator,
+    IntoAttributeTraceIterator, TraceAttributes, attribute_key::has_attribute_key::HasAttributeKey,
     ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
 };
-use process_mining::event_log::{AttributeValue, Event, XESEditableAttribute};
+use intmap::IntMap;
+use process_mining::event_log::AttributeValue;
 use std::{collections::HashMap, io::BufRead};
 
 pub const ATTRIBUTE_TIME: &str = "time:timestamp";
 
 pub trait EbiTraitEventLogTraceAttributes:
-    HasActivityKey
-    + HasAttributeKey
+    EbiTraitEventLog
     + IntoAttributeIterator
     + IntoAttributeTraceIterator
-    + IntoTraceIterator
     + TraceAttributes
-    + NumberOfTraces
-    + Sync
+    + HasAttributeKey
 {
-    fn get_log(&self) -> &process_mining::EventLog;
-
     /// Remove traces for which the function returns false.
     ///
     /// Note to callers: please put the closure definition inside the Box::new in the call of retain_traces.
     /// Otherwise, Rust may give weird compile errors.
-    fn retain_traces<'a>(&'a mut self, f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>);
+    fn retain_traces_attributes<'a>(
+        &'a mut self,
+        f: Box<dyn Fn(&(Vec<Activity>, IntMap<Attribute, AttributeValue>)) -> bool + 'static>,
+    );
 }
 
 impl dyn EbiTraitEventLogTraceAttributes {
@@ -48,7 +48,7 @@ impl dyn EbiTraitEventLogTraceAttributes {
                 self.get_trace_attribute_categorical(trace_index, attribute)
             {
                 //the trace has the attribute
-                match result.entry(trace) {
+                match result.entry(trace.clone()) {
                     std::collections::hash_map::Entry::Occupied(mut e) => {
                         //we have seen this trace before
                         let attributes: &mut HashMap<String, u64> = e.get_mut();
@@ -75,35 +75,6 @@ impl dyn EbiTraitEventLogTraceAttributes {
 
         result
     }
-
-    fn get_event(&self, trace_index: usize, event_index: usize) -> Option<&Event> {
-        self.get_log()
-            .traces
-            .get(trace_index)?
-            .events
-            .get(event_index)
-    }
-
-    pub fn get_event_attribute_time(
-        &self,
-        trace_index: usize,
-        event_index: usize,
-        case_attribute: &String,
-    ) -> Option<DateTime<FixedOffset>> {
-        if let Some(attribute) = self
-            .get_event(trace_index, event_index)?
-            .attributes
-            .get_by_key(case_attribute)
-        {
-            match &attribute.value {
-                AttributeValue::String(x) => x.parse::<DateTime<FixedOffset>>().ok(),
-                AttributeValue::Date(x) => Some(*x),
-                _ => None,
-            }
-        } else {
-            None
-        }
-    }
 }
 
 impl FromEbiTraitObject for dyn EbiTraitEventLogTraceAttributes {
@@ -120,23 +91,11 @@ impl FromEbiTraitObject for dyn EbiTraitEventLogTraceAttributes {
 }
 
 impl EbiTraitEventLogTraceAttributes for EventLogTraceAttributes {
-    fn get_log(&self) -> &process_mining::EventLog {
-        &self.rust4pm_log
-    }
-
-    fn retain_traces<'a>(&'a mut self, f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>) {
-        let mut activity_key = self.activity_key().clone();
-        let event_classifier = self.event_classifier().clone();
-        self.rust4pm_log.traces.retain(|trace| {
-            let mut result = Vec::with_capacity(trace.events.len());
-            for event in trace.events.iter() {
-                let activity =
-                    activity_key.process_activity(&event_classifier.get_class_identity(event));
-                result.push(activity);
-            }
-
-            f(&result)
-        });
+    fn retain_traces_attributes<'a>(
+        &'a mut self,
+        mut f: Box<dyn Fn(&(Vec<Activity>, IntMap<Attribute, AttributeValue>)) -> bool + 'static>,
+    ) {
+        self.retain_traces_attributes_mut(&mut f);
     }
 }
 

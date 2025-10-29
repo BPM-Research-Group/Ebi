@@ -1,9 +1,6 @@
 use crate::{
     ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject},
-    ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog,
-        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
-    },
+    ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
 };
 use anyhow::{Result, anyhow};
 use ebi_derive::EbiInputEnum;

@@ -1,7 +1,7 @@
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    Activity, CompressedEventLog, EventLog, HasActivityKey, Importable, IntoRefTraceIterator,
-    NumberOfTraces,
+    Activity, CompressedEventLog, EventLog, EventLogTraceAttributes, HasActivityKey, Importable,
+    IntoRefTraceIterator, NumberOfTraces,
 };
 use std::{collections::HashMap, io::BufRead};
 
@@ -52,6 +52,12 @@ impl FromEbiTraitObject for dyn EbiTraitEventLog {
 impl EbiTraitEventLog for EventLog {
     fn retain_traces<'a>(&'a mut self, f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>) {
         self.traces.retain(f);
+    }
+}
+
+impl EbiTraitEventLog for EventLogTraceAttributes {
+    fn retain_traces<'a>(&'a mut self, mut f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>) {
+        self.retain_traces_mut(&mut f);
     }
 }
 

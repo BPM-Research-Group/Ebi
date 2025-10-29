@@ -1,9 +1,10 @@
 use anyhow::{Context, Result, anyhow};
 use ebi_arithmetic::{Exporter, Fraction};
 use ebi_objects::{
-    EbiObject, EbiObjectType, Exportable,
+    CompressedEventLogXes, EbiObject, EbiObjectType, Exportable,
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
+        compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         deterministic_finite_automaton::DeterministicFiniteAutomaton,
         directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel,
         executions::Executions, finite_language::FiniteLanguage,
@@ -187,10 +188,16 @@ impl EbiOutputType {
             ),
             EbiOutputType::ObjectType(EbiObjectType::EventLogTraceAttributes) => {
                 EbiExporter::Object(
-                    &EbiObjectExporter::EventLog(CompressedEventLog::export_from_object),
+                    &EbiObjectExporter::EventLog(
+                        CompressedEventLogTraceAttributes::export_from_object,
+                    ),
                     &EBI_COMPRESSED_EVENT_LOG,
                 )
             }
+            EbiOutputType::ObjectType(EbiObjectType::EventLogXes) => EbiExporter::Object(
+                &EbiObjectExporter::EventLog(CompressedEventLogXes::export_from_object),
+                &EBI_COMPRESSED_EVENT_LOG,
+            ),
             EbiOutputType::ObjectType(EbiObjectType::Executions) => EbiExporter::Object(
                 &EbiObjectExporter::Executions(Executions::export_from_object),
                 &EBI_EXECUTIONS,
@@ -401,6 +408,7 @@ impl Display for EbiExporter {
 pub enum EbiObjectExporter {
     EventLog(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogTraceAttributes(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
+    EventLogXes(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     DirectlyFollowsModel(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     StochasticDirectlyFollowsModel(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     FiniteLanguage(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
@@ -425,6 +433,7 @@ impl EbiObjectExporter {
         match self {
             EbiObjectExporter::EventLog(_) => EbiObjectType::EventLog,
             EbiObjectExporter::EventLogTraceAttributes(_) => EbiObjectType::EventLogTraceAttributes,
+            EbiObjectExporter::EventLogXes(_) => EbiObjectType::EventLogXes,
             EbiObjectExporter::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
             EbiObjectExporter::StochasticDirectlyFollowsModel(_) => {
                 EbiObjectType::StochasticDirectlyFollowsModel
@@ -460,6 +469,7 @@ impl EbiObjectExporter {
             match self {
                 EbiObjectExporter::EventLog(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogTraceAttributes(exporter) => (exporter)(object, f),
+                EbiObjectExporter::EventLogXes(exporter) => (exporter)(object, f),
                 EbiObjectExporter::DirectlyFollowsModel(exporter) => (exporter)(object, f),
                 EbiObjectExporter::StochasticDirectlyFollowsModel(exporter) => {
                     (exporter)(object, f)
