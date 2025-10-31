@@ -1,4 +1,7 @@
-use crate::text::Joiner;
+use crate::{
+    ebi_framework::{ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType},
+    text::Joiner,
+};
 use anyhow::{Result, anyhow};
 use clap::{Arg, ArgAction, ArgMatches, Command, builder::ValueParser, value_parser};
 use ebi_arithmetic::{Fraction, parsing::FractionNotParsedYet};
@@ -7,7 +10,56 @@ use ebi_objects::traits::importable::{
 };
 use std::collections::BTreeSet;
 
-pub fn build_gui(
+pub fn merge_importer_parameters(
+    input_types: &[&EbiInputType],
+) -> BTreeSet<&'static ImporterParameter> {
+    let mut result = BTreeSet::new();
+    for input_type in input_types {
+        match input_type {
+            EbiInputType::Trait(ebi_trait) => {
+                //look for file handlers that can import this trait
+                for file_handler in EBI_FILE_HANDLERS {
+                    for importer in file_handler.trait_importers {
+                        if &importer.get_trait() == ebi_trait {
+                            //found an importer for this trait; copy its parameters
+                            for parameter in importer.parameters() {
+                                result.insert(parameter);
+                            }
+                        }
+                    }
+                }
+            }
+            EbiInputType::Object(ebi_object_type) => {
+                //look for file handlers that cn import this object
+                for file_handler in EBI_FILE_HANDLERS {
+                    for importer in file_handler.object_importers {
+                        if &importer.get_type() == ebi_object_type {
+                            //found an importer for this trait; copy its parameters
+                            for parameter in importer.parameters() {
+                                result.insert(parameter);
+                            }
+                        }
+                    }
+                }
+            }
+            EbiInputType::AnyObject => {
+                //look for any object importer
+                for file_handler in EBI_FILE_HANDLERS {
+                    for importer in file_handler.object_importers {
+                        //found an importer; copy its parameters
+                        for parameter in importer.parameters() {
+                            result.insert(parameter);
+                        }
+                    }
+                }
+            }
+            _ => {}
+        }
+    }
+    result
+}
+
+pub fn build_cli(
     mut command: Command,
     parameters: BTreeSet<&'static ImporterParameter>,
     input_index: usize,
@@ -17,7 +69,12 @@ pub fn build_gui(
         let mut arg = Arg::new(&gui_id)
             .long(gui_id)
             .help(parameter.explanation())
-            .required(false);
+            .required(false)
+            .long_help(format!(
+                "{}. {}",
+                parameter.explanation(),
+                explanation_with_values(parameter)
+            ));
         arg = match parameter {
             ImporterParameter::Flag { .. } => arg.action(ArgAction::SetTrue),
             ImporterParameter::String {
@@ -42,54 +99,90 @@ pub fn build_gui(
 
                 arg.action(ArgAction::Set).value_parser(parser)
             }
-            ImporterParameter::Usize {
-                explanation,
-                minimum_value,
-                maximum_value,
-                default_value,
-                ..
-            } => {
+            ImporterParameter::Usize { .. } => {
                 let parser: ValueParser = value_parser!(usize).into();
-
-                let allowed = match (minimum_value, maximum_value) {
-                    (None, None) => "integer".to_string(),
-                    (None, Some(max)) => format!("integer below or equal to {}", max),
-                    (Some(min), None) => format!("integer above or equal to {}", min),
-                    (Some(min), Some(max)) => format!("integer between {} and {}", min, max),
-                };
-                arg = arg.long_help(format!(
-                    "{}. Value: {}. Default: {}",
-                    explanation, allowed, default_value
-                ));
-
                 arg.action(ArgAction::Set).value_parser(parser)
             }
-            ImporterParameter::Fraction {
-                explanation,
-                minimum_value,
-                maximum_value,
-                default_value,
-                ..
-            } => {
+            ImporterParameter::Fraction { .. } => {
                 let parser: ValueParser = value_parser!(FractionNotParsedYet).into();
-
-                let allowed = match (minimum_value, maximum_value) {
-                    (None, None) => "fraction".to_string(),
-                    (None, Some(max)) => format!("fraction below or equal to {}", max),
-                    (Some(min), None) => format!("fraction above or equal to {}", min),
-                    (Some(min), Some(max)) => format!("fraction between {} and {}", min, max),
-                };
-                arg = arg.long_help(format!(
-                    "{}. Value: {}. Default: {}",
-                    explanation, allowed, default_value
-                ));
-
                 arg.action(ArgAction::Set).value_parser(parser)
             }
         };
         command = command.arg(arg)
     }
     command
+}
+
+pub fn explanation_with_values(parameter: &ImporterParameter) -> String {
+    match parameter {
+        ImporterParameter::Flag { .. } => "".to_string(),
+        ImporterParameter::String {
+            allowed_values,
+            default_value,
+            ..
+        } => {
+            if let Some(allowed) = allowed_values {
+                let allowed = allowed
+                    .iter()
+                    .map(|s| s.to_string())
+                    .collect::<Vec<_>>()
+                    .join_with("', `", "' or `");
+                format!(
+                    "May be any of the values `{}'. The default value is `{}'.",
+                    allowed, default_value
+                )
+            } else {
+                format!("The default value is `{}'.", default_value)
+            }
+        }
+        ImporterParameter::Usize {
+            minimum_value,
+            maximum_value,
+            default_value,
+            ..
+        } => format!(
+            "Must be an {}; the default is {}.",
+            match (minimum_value, maximum_value) {
+                (None, None) => "integer".to_string(),
+                (None, Some(max)) => format!("integer below or equal to {}", max),
+                (Some(min), None) => format!("integer above or equal to {}", min),
+                (Some(min), Some(max)) => format!("integer between {} and {}", min, max),
+            },
+            default_value
+        ),
+        ImporterParameter::Fraction {
+            minimum_value,
+            maximum_value,
+            default_value,
+            ..
+        } => format!(
+            "Must be a {}; the default is {}.",
+            match (minimum_value, maximum_value) {
+                (None, None) => "fraction".to_string(),
+                (None, Some(max)) => format!("fraction below or equal to {}", max),
+                (Some(min), None) => format!("fraction above or equal to {}", min),
+                (Some(min), Some(max)) => format!("fraction between {} and {}", min, max),
+            },
+            default_value
+        ),
+    }
+}
+
+pub fn has_accepted_values(parameter: &ImporterParameter) -> bool {
+    match parameter {
+        ImporterParameter::Flag { .. } => false,
+        ImporterParameter::String { allowed_values, .. } => allowed_values.is_some(),
+        ImporterParameter::Usize {
+            minimum_value,
+            maximum_value,
+            ..
+        } => minimum_value.is_some() || maximum_value.is_some(),
+        ImporterParameter::Fraction {
+            minimum_value,
+            maximum_value,
+            ..
+        } => minimum_value.is_some() || maximum_value.is_some(),
+    }
 }
 
 /// Get parameters from CLI, appended with defaults.

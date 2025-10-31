@@ -1,6 +1,29 @@
+use regex::Regex;
 use std::fmt::Display;
 
-use regex::Regex;
+pub trait Rank {
+    fn rank(&self) -> String;
+}
+
+impl Rank for usize {
+    fn rank(&self) -> String {
+        match self + 1 {
+            1 => "first".to_string(),
+            2 => "second".to_string(),
+            3 => "third".to_string(),
+            4 => "fourth".to_string(),
+            5 => "fifth".to_string(),
+            6 => "sixth".to_string(),
+            7 => "seventh".to_string(),
+            8 => "eight".to_string(),
+            9 => "ninth".to_string(),
+            val if val > 20 && val % 10 == 1 => format!("{}st", val),
+            val if val > 20 && val % 10 == 2 => format!("{}nd", val),
+            val if val > 20 && val % 10 == 3 => format!("{}rd", val),
+            val => format!("{}th", val),
+        }
+    }
+}
 
 pub trait Joiner {
     fn join_with(&self, sep: &str, last_sep: &str) -> String;
@@ -70,7 +93,10 @@ where
     }
 
     fn escape_java_code(&self) -> String {
-        self.as_ref().replace(' ', "_").replace("-", "_").replace(".", "_")
+        self.as_ref()
+            .replace(' ', "_")
+            .replace("-", "_")
+            .replace(".", "_")
     }
 }
 

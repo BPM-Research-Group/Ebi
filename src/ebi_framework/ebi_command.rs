@@ -205,8 +205,8 @@ impl EbiCommand {
                 //importer flags
                 for (input_index, inputs) in input_types.iter().enumerate() {
                     let merged_importer_parameters =
-                        EbiInputType::merge_importer_parameters(inputs);
-                    command = ebi_importer_parameters::build_gui(
+                        ebi_importer_parameters::merge_importer_parameters(inputs);
+                    command = ebi_importer_parameters::build_cli(
                         command,
                         merged_importer_parameters,
                         input_index,

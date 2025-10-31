@@ -6,7 +6,7 @@ use inflector::Inflector;
 use layout::{core::{base::Orientation, color::Color, geometry::Point, style::StyleAttr}, std_shapes::{render::get_shape_size, shapes::{Arrow, Element, ShapeKind}}, topo::layout::VisualGraph};
 use strum::IntoEnumIterator;
 
-use crate::{ebi_framework::{ebi_command::{get_applicable_commands, EbiCommand, EBI_COMMANDS}, ebi_file_handler::{get_file_handlers, EBI_FILE_HANDLERS}, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link::{self, get_java_object_handlers_that_can_export, get_java_object_handlers_that_can_import}}, python::python::{pm4py_function_name, PYTHON_PACKAGE}, text::{Joiner, LatexEscaper}};
+use crate::{ebi_framework::{ebi_command::{EBI_COMMANDS, EbiCommand, get_applicable_commands}, ebi_file_handler::{EBI_FILE_HANDLERS, get_file_handlers}, ebi_importer_parameters, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link::{self, get_java_object_handlers_that_can_export, get_java_object_handlers_that_can_import}}, python::python::{PYTHON_PACKAGE, pm4py_function_name}, text::{Joiner, LatexEscaper, Rank}};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
  □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
@@ -241,9 +241,21 @@ fn manual() -> Result<EbiOutput> {
             }
             writeln!(f, "&\\textit{{Mandatory:}} \\quad no\\\\")?;
             
+            //exact arithmetic flag
             if *exact_arithmetic {
                 writeln!(f, "\\texttt{{-a}} or \\texttt{{--approximate}} & Use approximate arithmetic instead of exact arithmetic.\\\\")?;
                 writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
+            }
+
+            //importer parameters
+            for (input_index, (input_types, input_name)) in input_typess.iter().zip(input_names.iter()).enumerate() {
+                for parameter in ebi_importer_parameters::merge_importer_parameters(input_types) { 
+                    writeln!(f, "\\texttt{{--{}}} & This parameter applies to some of the importers of the {} input {}. {}\\\\", ebi_importer_parameters::name_to_id(parameter.name(), input_index).escape_latex(), input_index.rank(), input_name.escape_latex(), ebi_importer_parameters::explanation_with_values(parameter).escape_latex())?;
+                    writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
+                    if ebi_importer_parameters::has_accepted_values(parameter) {
+                        writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", ebi_importer_parameters::explanation_with_values(parameter).escape_latex())?;
+                    }
+                }
             }
 
             writeln!(f, "\\bottomrule")?;

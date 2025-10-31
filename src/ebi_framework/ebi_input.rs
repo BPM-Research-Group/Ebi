@@ -344,55 +344,6 @@ impl EbiInputType {
         list.join_with(", ", last_connector)
     }
 
-    pub fn merge_importer_parameters(
-        input_types: &[&EbiInputType],
-    ) -> BTreeSet<&'static ImporterParameter> {
-        let mut result = BTreeSet::new();
-        for input_type in input_types {
-            match input_type {
-                EbiInputType::Trait(ebi_trait) => {
-                    //look for file handlers that can import this trait
-                    for file_handler in EBI_FILE_HANDLERS {
-                        for importer in file_handler.trait_importers {
-                            if &importer.get_trait() == ebi_trait {
-                                //found an importer for this trait; copy its parameters
-                                for parameter in importer.parameters() {
-                                    result.insert(parameter);
-                                }
-                            }
-                        }
-                    }
-                }
-                EbiInputType::Object(ebi_object_type) => {
-                    //look for file handlers that cn import this object
-                    for file_handler in EBI_FILE_HANDLERS {
-                        for importer in file_handler.object_importers {
-                            if &importer.get_type() == ebi_object_type {
-                                //found an importer for this trait; copy its parameters
-                                for parameter in importer.parameters() {
-                                    result.insert(parameter);
-                                }
-                            }
-                        }
-                    }
-                }
-                EbiInputType::AnyObject => {
-                    //look for any object importer
-                    for file_handler in EBI_FILE_HANDLERS {
-                        for importer in file_handler.object_importers {
-                            //found an importer; copy its parameters
-                            for parameter in importer.parameters() {
-                                result.insert(parameter);
-                            }
-                        }
-                    }
-                }
-                _ => {}
-            }
-        }
-        result
-    }
-
     pub fn show_file_handlers(file_handlers: Vec<&'static EbiFileHandler>) -> Vec<String> {
         file_handlers
             .iter()
