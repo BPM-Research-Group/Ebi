@@ -158,7 +158,7 @@ pub fn attempt_parse(input_types: &[&'static EbiInputType], value: String) -> Re
         match input_type {
             EbiInputType::Trait(etrait) => {
                 //try to parse a trait
-                match ebi_input::read_as_trait(etrait, &mut reader)
+                match ebi_input::read_as_trait(etrait, &mut reader, None, 0)
                     .with_context(|| format!("Parsing as the trait `{}`.", etrait))
                 {
                     Ok((object, file_handler)) => return Ok(EbiInput::Trait(object, file_handler)),
@@ -167,7 +167,7 @@ pub fn attempt_parse(input_types: &[&'static EbiInputType], value: String) -> Re
             }
             EbiInputType::Object(etype) => {
                 //try to parse a specific object
-                match ebi_input::read_as_object(etype, &mut reader)
+                match ebi_input::read_as_object(etype, &mut reader, None, 0)
                     .with_context(|| format!("Parsing as the object type `{}`.", etype))
                 {
                     Ok((object, file_handler)) => {
@@ -177,7 +177,9 @@ pub fn attempt_parse(input_types: &[&'static EbiInputType], value: String) -> Re
                 }
             }
             EbiInputType::AnyObject => {
-                match ebi_input::read_as_any_object(&mut reader).context("Parsing as any object.") {
+                match ebi_input::read_as_any_object(&mut reader, None, 0)
+                    .context("Parsing as any object.")
+                {
                     Ok((object, file_handler)) => {
                         return Ok(EbiInput::Object(object, file_handler));
                     }

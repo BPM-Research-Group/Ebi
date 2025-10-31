@@ -8,7 +8,7 @@ use anyhow::{Result, anyhow};
 use ebi_objects::{
     Activity, Attribute, EventLogTraceAttributes, Importable, IntoAttributeIterator,
     IntoAttributeTraceIterator, TraceAttributes, attribute_key::has_attribute_key::HasAttributeKey,
-    ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
+    ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes, traits::importable::ImporterParameterValues,
 };
 use intmap::IntMap;
 use process_mining::event_log::AttributeValue;
@@ -104,11 +104,12 @@ pub trait ToEventLogTraceAttributes: Importable {
 
     fn import_as_event_log_trace_attributes(
         reader: &mut dyn BufRead,
+        parameter_values: &ImporterParameterValues,
     ) -> Result<Box<dyn EbiTraitEventLogTraceAttributes>>
     where
         Self: Sized,
     {
-        Ok(Self::import(reader)?.to_event_log_trace_attributes())
+        Ok(Self::import(reader, parameter_values)?.to_event_log_trace_attributes())
     }
 }
 

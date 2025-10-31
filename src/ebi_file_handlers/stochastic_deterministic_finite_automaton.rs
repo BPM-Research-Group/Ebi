@@ -1,9 +1,3 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::{
-    EbiObject, Exportable, Importable, StochasticDeterministicFiniteAutomaton,
-    ebi_objects::stochastic_deterministic_finite_automaton::FORMAT_SPECIFICATION,
-};
-
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
@@ -21,34 +15,50 @@ use crate::{
         ebi_trait_stochastic_semantics::ToStochasticSemantics,
     },
 };
+use anyhow::{Result, anyhow};
+use ebi_objects::{EbiObject, Exportable, Importable, StochasticDeterministicFiniteAutomaton};
 
 pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     name: "stochastic deterministic finite automaton",
     article: "a",
     file_extension: "sdfa",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: StochasticDeterministicFiniteAutomaton::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(StochasticDeterministicFiniteAutomaton::validate),
     trait_importers: &[
-        EbiTraitImporter::Activities(StochasticDeterministicFiniteAutomaton::import_as_activities),
+        EbiTraitImporter::Activities(
+            StochasticDeterministicFiniteAutomaton::import_as_activities,
+            StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
+        ),
         EbiTraitImporter::QueriableStochasticLanguage(
             StochasticDeterministicFiniteAutomaton::import_as_queriable_stochastic_language,
+            StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticDeterministicSemantics(
             StochasticDeterministicFiniteAutomaton::import_as_stochastic_deterministic_semantics,
+            StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticSemantics(
             StochasticDeterministicFiniteAutomaton::import_as_stochastic_semantics,
+            StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
-        EbiTraitImporter::Semantics(StochasticDeterministicFiniteAutomaton::import_as_semantics),
-        EbiTraitImporter::Graphable(StochasticDeterministicFiniteAutomaton::import_as_graphable),
+        EbiTraitImporter::Semantics(
+            StochasticDeterministicFiniteAutomaton::import_as_semantics,
+            StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Graphable(
+            StochasticDeterministicFiniteAutomaton::import_as_graphable,
+            StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
+        ),
     ],
     object_importers: &[
         EbiObjectImporter::StochasticDeterministicFiniteAutomaton(
             StochasticDeterministicFiniteAutomaton::import_as_object,
+            StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::LabelledPetriNet(
             StochasticDeterministicFiniteAutomaton::import_as_labelled_petri_net_object,
+            StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
     ],
     object_exporters: &[

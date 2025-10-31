@@ -1,9 +1,3 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::{
-    EbiObject, Exportable, FiniteStochasticLanguage, Importable,
-    ebi_objects::finite_stochastic_language::FORMAT_SPECIFICATION,
-};
-
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
@@ -24,39 +18,62 @@ use crate::{
         ebi_trait_stochastic_semantics::ToStochasticSemantics,
     },
 };
+use anyhow::{Result, anyhow};
+use ebi_objects::{EbiObject, Exportable, FiniteStochasticLanguage, Importable};
 
 pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "finite stochastic language",
     article: "a",
     file_extension: "slang",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: FiniteStochasticLanguage::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(FiniteStochasticLanguage::validate),
     trait_importers: &[
-        EbiTraitImporter::Activities(FiniteStochasticLanguage::import_as_activities),
-        EbiTraitImporter::IterableLanguage(FiniteStochasticLanguage::import_as_iterable_language),
-        EbiTraitImporter::FiniteLanguage(FiniteStochasticLanguage::import_as_finite_language),
+        EbiTraitImporter::Activities(
+            FiniteStochasticLanguage::import_as_activities,
+            FiniteStochasticLanguage::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::IterableLanguage(
+            FiniteStochasticLanguage::import_as_iterable_language,
+            FiniteStochasticLanguage::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::FiniteLanguage(
+            FiniteStochasticLanguage::import_as_finite_language,
+            FiniteStochasticLanguage::IMPORTER_PARAMETERS,
+        ),
         EbiTraitImporter::FiniteStochasticLanguage(
             FiniteStochasticLanguage::import_as_finite_stochastic_language,
+            FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::QueriableStochasticLanguage(
             FiniteStochasticLanguage::import_as_queriable_stochastic_language,
+            FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::IterableStochasticLanguage(
             FiniteStochasticLanguage::import_as_iterable_stochastic_language,
+            FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticSemantics(
             FiniteStochasticLanguage::import_as_stochastic_semantics,
+            FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticDeterministicSemantics(
             FiniteStochasticLanguage::import_as_stochastic_deterministic_semantics,
+            FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
-        EbiTraitImporter::Semantics(FiniteStochasticLanguage::import_as_semantics),
+        EbiTraitImporter::Semantics(
+            FiniteStochasticLanguage::import_as_semantics,
+            FiniteStochasticLanguage::IMPORTER_PARAMETERS,
+        ),
     ],
     object_importers: &[
-        EbiObjectImporter::FiniteStochasticLanguage(FiniteStochasticLanguage::import_as_object),
+        EbiObjectImporter::FiniteStochasticLanguage(
+            FiniteStochasticLanguage::import_as_object,
+            FiniteStochasticLanguage::IMPORTER_PARAMETERS,
+        ),
         EbiObjectImporter::StochasticDeterministicFiniteAutomaton(
             FiniteStochasticLanguage::import_as_stochastic_deterministic_finite_automaton_object,
+            FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
     ],
     object_exporters: &[

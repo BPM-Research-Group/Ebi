@@ -2,6 +2,7 @@ pub mod ebi_framework {
     pub mod displayable;
     pub mod ebi_command;
     pub mod ebi_file_handler;
+    pub mod ebi_importer_parameters;
     pub mod ebi_input;
     pub mod ebi_output;
     pub mod ebi_trait;
@@ -96,7 +97,6 @@ pub mod math {
     #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
     pub mod fixed_denominator_fraction_f64;
 
-    pub mod constant_fraction;
     pub mod correlation;
     pub mod distances;
     pub mod distances_matrix;

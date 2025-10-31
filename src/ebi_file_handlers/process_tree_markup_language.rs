@@ -1,8 +1,3 @@
-use ebi_objects::{
-    Exportable, Importable, ProcessTreeMarkupLanguage,
-    ebi_objects::process_tree_markup_language::FORMAT_SPECIFICATION,
-};
-
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
@@ -13,22 +8,30 @@ use crate::{
     },
     ebi_traits::{ebi_trait_graphable::ToGraphable, ebi_trait_semantics::ToSemantics},
 };
+use ebi_objects::{Exportable, Importable, ProcessTreeMarkupLanguage};
 
 pub const EBI_PROCESS_TREE_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "process tree markup language",
     article: "a",
     file_extension: "ptml",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: ProcessTreeMarkupLanguage::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(ProcessTreeMarkupLanguage::validate),
     trait_importers: &[
-        EbiTraitImporter::Semantics(ProcessTreeMarkupLanguage::import_as_semantics),
-        EbiTraitImporter::Graphable(ProcessTreeMarkupLanguage::import_as_graphable),
+        EbiTraitImporter::Semantics(
+            ProcessTreeMarkupLanguage::import_as_semantics,
+            ProcessTreeMarkupLanguage::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Graphable(
+            ProcessTreeMarkupLanguage::import_as_graphable,
+            ProcessTreeMarkupLanguage::IMPORTER_PARAMETERS,
+        ),
     ],
     object_importers: &[
-        EbiObjectImporter::ProcessTree(ProcessTreeMarkupLanguage::import_as_object),
+        EbiObjectImporter::ProcessTree(ProcessTreeMarkupLanguage::import_as_object, &[]),
         EbiObjectImporter::LabelledPetriNet(
             ProcessTreeMarkupLanguage::import_as_labelled_petri_net_object,
+            ProcessTreeMarkupLanguage::IMPORTER_PARAMETERS,
         ),
     ],
     object_exporters: &[

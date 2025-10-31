@@ -1,7 +1,4 @@
-use ebi_objects::{
-    Exportable, Importable, StochasticDirectlyFollowsModel,
-    ebi_objects::stochastic_directly_follows_model::FORMAT_SPECIFICATION,
-};
+use ebi_objects::{Exportable, Importable, StochasticDirectlyFollowsModel};
 
 use crate::{
     ebi_framework::{
@@ -28,34 +25,50 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
     article: "a",
     file_extension: "sdfm",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: StochasticDirectlyFollowsModel::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(StochasticDirectlyFollowsModel::validate),
     trait_importers: &[
-        EbiTraitImporter::Activities(StochasticDirectlyFollowsModel::import_as_activities),
+        EbiTraitImporter::Activities(
+            StochasticDirectlyFollowsModel::import_as_activities,
+            StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
+        ),
         EbiTraitImporter::QueriableStochasticLanguage(
             StochasticDirectlyFollowsModel::import_as_queriable_stochastic_language,
+            StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
-        EbiTraitImporter::Semantics(StochasticDirectlyFollowsModel::import_as_semantics),
+        EbiTraitImporter::Semantics(
+            StochasticDirectlyFollowsModel::import_as_semantics,
+            StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
+        ),
         EbiTraitImporter::StochasticSemantics(
             StochasticDirectlyFollowsModel::import_as_stochastic_semantics,
+            StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticDeterministicSemantics(
             StochasticDirectlyFollowsModel::import_as_stochastic_deterministic_semantics,
+            StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
-        EbiTraitImporter::Graphable(StochasticDirectlyFollowsModel::import_as_graphable),
+        EbiTraitImporter::Graphable(
+            StochasticDirectlyFollowsModel::import_as_graphable,
+            StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
+        ),
     ],
     object_importers: &[
         EbiObjectImporter::StochasticDirectlyFollowsModel(
             StochasticDirectlyFollowsModel::import_as_object,
+            StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::DirectlyFollowsModel(
             StochasticDirectlyFollowsModel::import_as_directly_follows_model_object,
+            StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::LabelledPetriNet(
             StochasticDirectlyFollowsModel::import_as_labelled_petri_net_object,
+            StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::StochasticLabelledPetriNet(
             StochasticDirectlyFollowsModel::import_as_stochastic_labelled_petri_net_object,
+            StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
     ],
     object_exporters: &[

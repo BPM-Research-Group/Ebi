@@ -1,8 +1,3 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::{
-    EbiObject, Exportable, Importable, ProcessTree, ebi_objects::process_tree::FORMAT_SPECIFICATION,
-};
-
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
@@ -18,22 +13,39 @@ use crate::{
         ebi_trait_semantics::ToSemantics,
     },
 };
+use anyhow::{Result, anyhow};
+use ebi_objects::{EbiObject, Exportable, Importable, ProcessTree};
 
 pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     name: "process tree",
     article: "a",
     file_extension: "ptree",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: ProcessTree::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(ProcessTree::validate),
     trait_importers: &[
-        EbiTraitImporter::Activities(ProcessTree::import_as_activities),
-        EbiTraitImporter::Semantics(ProcessTree::import_as_semantics),
-        EbiTraitImporter::Graphable(ProcessTree::import_as_graphable),
+        EbiTraitImporter::Activities(
+            ProcessTree::import_as_activities,
+            ProcessTree::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Semantics(
+            ProcessTree::import_as_semantics,
+            ProcessTree::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Graphable(
+            ProcessTree::import_as_graphable,
+            ProcessTree::IMPORTER_PARAMETERS,
+        ),
     ],
     object_importers: &[
-        EbiObjectImporter::ProcessTree(ProcessTree::import_as_object),
-        EbiObjectImporter::LabelledPetriNet(ProcessTree::import_as_labelled_petri_net_object),
+        EbiObjectImporter::ProcessTree(
+            ProcessTree::import_as_object,
+            ProcessTree::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::LabelledPetriNet(
+            ProcessTree::import_as_labelled_petri_net_object,
+            ProcessTree::IMPORTER_PARAMETERS,
+        ),
     ],
     object_exporters: &[EbiObjectExporter::ProcessTree(
         ProcessTree::export_from_object,

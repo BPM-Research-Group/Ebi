@@ -1,8 +1,3 @@
-use anyhow::{Context, anyhow};
-use clap::{Arg, ArgAction, value_parser};
-use ebi_arithmetic::Fraction;
-use ebi_objects::{EbiObject, EbiObjectType, HasActivityKey};
-
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
@@ -16,9 +11,12 @@ use crate::{
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
     follower_semantics::FollowerSemantics,
-    math::constant_fraction::ConstFraction,
     techniques::explain_trace::ExplainTrace,
 };
+use anyhow::{Context, anyhow};
+use clap::{Arg, ArgAction, value_parser};
+use ebi_arithmetic::{ConstFraction, Fraction};
+use ebi_objects::{EbiObject, EbiObjectType, HasActivityKey};
 
 pub const EBI_PROBABILITY: EbiCommand = EbiCommand::Group {
     name_short: "prob",

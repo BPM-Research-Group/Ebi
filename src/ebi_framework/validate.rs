@@ -8,7 +8,7 @@ pub trait Validate: Importable {
     where
         Self: Sized,
     {
-        match Self::import(reader) {
+        match Self::import(reader, &Self::default_importer_parameter_values()) {
             Ok(_) => Ok(()),
             Err(x) => Err(x),
         }

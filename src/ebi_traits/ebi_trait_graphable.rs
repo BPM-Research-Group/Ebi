@@ -1,6 +1,7 @@
 use anyhow::{Result, anyhow};
 use ebi_objects::{
     Graphable, Importable, ScalableVectorGraphics, ebi_objects::scalable_vector_graphics::ToSVG,
+    traits::importable::ImporterParameterValues,
 };
 use layout::backends::svg::SVGWriter;
 use std::io::BufRead;
@@ -42,11 +43,14 @@ impl ToSVG for dyn EbiTraitGraphable {
 pub trait ToGraphable: Importable {
     fn to_graphable(self) -> Box<dyn EbiTraitGraphable>;
 
-    fn import_as_graphable(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitGraphable>>
+    fn import_as_graphable(
+        reader: &mut dyn BufRead,
+        parameter_values: &ImporterParameterValues,
+    ) -> Result<Box<dyn EbiTraitGraphable>>
     where
         Self: Sized,
     {
-        Ok(Self::import(reader)?.to_graphable())
+        Ok(Self::import(reader, parameter_values)?.to_graphable())
     }
 }
 

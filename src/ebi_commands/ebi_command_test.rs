@@ -11,14 +11,13 @@ use crate::{
         ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
-    math::constant_fraction::ConstFraction,
     techniques::{
         bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
         permutation_test::PermutationTest,
     },
 };
 use anyhow::{Context, anyhow};
-use ebi_arithmetic::Fraction;
+use ebi_arithmetic::{ConstFraction, Fraction};
 use std::io::Write;
 
 pub const DEFAULT_P_VALUE: ConstFraction = ConstFraction::of(1, 20);

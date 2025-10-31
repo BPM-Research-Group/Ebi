@@ -4,6 +4,7 @@ use ebi_objects::{
     ActivityKeyTranslator, CompressedEventLog, DirectlyFollowsGraph, EventLog,
     EventLogTraceAttributes, FiniteStochasticLanguage, HasActivityKey, Importable,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    traits::importable::ImporterParameterValues,
 };
 use std::{
     io::BufRead,
@@ -104,8 +105,9 @@ pub trait ToQueriableStochasticLanguage: Importable + Sized {
 
     fn import_as_queriable_stochastic_language(
         reader: &mut dyn BufRead,
+        parameter_values: &ImporterParameterValues,
     ) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>> {
-        Ok(Self::import(reader)?.to_queriable_stochastic_language())
+        Ok(Self::import(reader, parameter_values)?.to_queriable_stochastic_language())
     }
 }
 

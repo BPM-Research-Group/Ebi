@@ -1,4 +1,6 @@
-use ebi_objects::{ebi_objects::executions::FORMAT_SPECIFICATION, Executions, Exportable, Importable};
+use ebi_objects::{
+    Executions, Exportable, Importable, ebi_objects::executions::FORMAT_SPECIFICATION,
+};
 
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler, ebi_input::EbiObjectImporter, ebi_output::EbiObjectExporter,
@@ -13,7 +15,10 @@ pub const EBI_EXECUTIONS: EbiFileHandler = EbiFileHandler {
     format_specification: &FORMAT_SPECIFICATION,
     validator: Some(Executions::validate),
     trait_importers: &[],
-    object_importers: &[EbiObjectImporter::Executions(Executions::import_as_object)],
+    object_importers: &[EbiObjectImporter::Executions(
+        Executions::import_as_object,
+        Executions::IMPORTER_PARAMETERS,
+    )],
     object_exporters: &[EbiObjectExporter::Executions(
         Executions::export_from_object,
     )],

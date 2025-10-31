@@ -1,8 +1,3 @@
-use ebi_objects::{
-    Exportable, Importable, PetriNetMarkupLanguage,
-    ebi_objects::petri_net_markup_language::FORMAT_SPECIFICATION,
-};
-
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
@@ -15,21 +10,32 @@ use crate::{
         ebi_trait_semantics::ToSemantics,
     },
 };
+use ebi_objects::{Exportable, Importable, PetriNetMarkupLanguage};
 
 pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "Petri net markup language",
     article: "a",
     file_extension: "pnml",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: PetriNetMarkupLanguage::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(PetriNetMarkupLanguage::validate),
     trait_importers: &[
-        EbiTraitImporter::Activities(PetriNetMarkupLanguage::import_as_activities),
-        EbiTraitImporter::Semantics(PetriNetMarkupLanguage::import_as_semantics),
-        EbiTraitImporter::Graphable(PetriNetMarkupLanguage::import_as_graphable),
+        EbiTraitImporter::Activities(
+            PetriNetMarkupLanguage::import_as_activities,
+            PetriNetMarkupLanguage::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Semantics(
+            PetriNetMarkupLanguage::import_as_semantics,
+            PetriNetMarkupLanguage::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Graphable(
+            PetriNetMarkupLanguage::import_as_graphable,
+            PetriNetMarkupLanguage::IMPORTER_PARAMETERS,
+        ),
     ],
     object_importers: &[EbiObjectImporter::LabelledPetriNet(
         PetriNetMarkupLanguage::import_as_object,
+        PetriNetMarkupLanguage::IMPORTER_PARAMETERS,
     )],
     object_exporters: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(PetriNetMarkupLanguage::export_from_object),
@@ -53,17 +59,21 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
 mod tests {
     use std::fs::File;
 
-    use ebi_objects::PetriNetMarkupLanguage;
+    use ebi_objects::{Importable, PetriNetMarkupLanguage};
 
     use crate::{
-        ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, multiple_reader::MultipleReader,
+        ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        multiple_reader::MultipleReader,
     };
 
     #[test]
     fn pnml_empty() {
         let mut reader = MultipleReader::from_file(File::open("testfiles/empty.pnml").unwrap());
-        let semantics =
-            PetriNetMarkupLanguage::import_as_semantics(&mut reader.get().unwrap()).unwrap();
+        let semantics = PetriNetMarkupLanguage::import_as_semantics(
+            &mut reader.get().unwrap(),
+            &PetriNetMarkupLanguage::default_importer_parameter_values(),
+        )
+        .unwrap();
 
         if let EbiTraitSemantics::Marking(semantics) = semantics {
             let state = semantics.get_initial_state().unwrap();

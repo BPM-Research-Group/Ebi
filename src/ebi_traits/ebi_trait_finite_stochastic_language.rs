@@ -2,7 +2,7 @@ use anyhow::{Result, anyhow};
 use ebi_arithmetic::{Fraction, Zero};
 use ebi_objects::{
     Activity, Importable, TranslateActivityKey,
-    ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
+    ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, traits::importable::ImporterParameterValues,
 };
 use std::{fmt::Debug, io::BufRead};
 
@@ -72,11 +72,12 @@ pub trait ToFiniteStochasticLanguage: Importable {
 
     fn import_as_finite_stochastic_language(
         reader: &mut dyn BufRead,
+        parameter_values: &ImporterParameterValues,
     ) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>>
     where
         Self: Sized,
     {
-        Ok(Self::import(reader)?.to_finite_stochastic_language())
+        Ok(Self::import(reader, parameter_values)?.to_finite_stochastic_language())
     }
 }
 

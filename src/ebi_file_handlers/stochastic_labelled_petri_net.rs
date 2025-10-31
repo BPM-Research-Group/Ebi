@@ -1,8 +1,3 @@
-use ebi_objects::{
-    Exportable, Importable, StochasticLabelledPetriNet,
-    ebi_objects::stochastic_labelled_petri_net::FORMAT_SPECIFICATION,
-};
-
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
@@ -20,32 +15,49 @@ use crate::{
         ebi_trait_stochastic_semantics::ToStochasticSemantics,
     },
 };
+use ebi_objects::{Exportable, Importable, StochasticLabelledPetriNet};
 
 pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "stochastic labelled Petri net",
     article: "a",
     file_extension: "slpn",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: StochasticLabelledPetriNet::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(StochasticLabelledPetriNet::validate),
     trait_importers: &[
-        EbiTraitImporter::Activities(StochasticLabelledPetriNet::import_as_activities),
+        EbiTraitImporter::Activities(
+            StochasticLabelledPetriNet::import_as_activities,
+            StochasticLabelledPetriNet::IMPORTER_PARAMETERS,
+        ),
         EbiTraitImporter::QueriableStochasticLanguage(
             StochasticLabelledPetriNet::import_as_queriable_stochastic_language,
+            StochasticLabelledPetriNet::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticDeterministicSemantics(
             StochasticLabelledPetriNet::import_as_stochastic_deterministic_semantics,
+            StochasticLabelledPetriNet::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticSemantics(
             StochasticLabelledPetriNet::import_as_stochastic_semantics,
+            StochasticLabelledPetriNet::IMPORTER_PARAMETERS,
         ),
-        EbiTraitImporter::Semantics(StochasticLabelledPetriNet::import_as_semantics),
-        EbiTraitImporter::Graphable(StochasticLabelledPetriNet::import_as_graphable),
+        EbiTraitImporter::Semantics(
+            StochasticLabelledPetriNet::import_as_semantics,
+            StochasticLabelledPetriNet::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Graphable(
+            StochasticLabelledPetriNet::import_as_graphable,
+            StochasticLabelledPetriNet::IMPORTER_PARAMETERS,
+        ),
     ],
     object_importers: &[
-        EbiObjectImporter::StochasticLabelledPetriNet(StochasticLabelledPetriNet::import_as_object),
+        EbiObjectImporter::StochasticLabelledPetriNet(
+            StochasticLabelledPetriNet::import_as_object,
+            StochasticLabelledPetriNet::IMPORTER_PARAMETERS,
+        ),
         EbiObjectImporter::LabelledPetriNet(
             StochasticLabelledPetriNet::import_as_labelled_petri_net_object,
+            StochasticLabelledPetriNet::IMPORTER_PARAMETERS,
         ),
     ],
     object_exporters: &[

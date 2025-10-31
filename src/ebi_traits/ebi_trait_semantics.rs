@@ -10,7 +10,16 @@ use crate::{
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    ebi_objects::{compressed_event_log::CompressedEventLog, compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes}, ActivityKey, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogTraceAttributes, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, Importable, LabelledPetriNet, LolaNet, PetriNetMarkupLanguage, ProcessTree, ProcessTreeMarkupLanguage, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree, TranslateActivityKey
+    ActivityKey, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
+    EventLog, EventLogTraceAttributes, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey,
+    Importable, LabelledPetriNet, LolaNet, PetriNetMarkupLanguage, ProcessTree,
+    ProcessTreeMarkupLanguage, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
+    TranslateActivityKey,
+    ebi_objects::{
+        compressed_event_log::CompressedEventLog,
+        compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
+    }, traits::importable::ImporterParameterValues,
 };
 use std::io::BufRead;
 
@@ -74,8 +83,11 @@ impl FromEbiTraitObject for EbiTraitSemantics {
 pub trait ToSemantics: Importable + Sized {
     fn to_semantics(self) -> EbiTraitSemantics;
 
-    fn import_as_semantics(reader: &mut dyn BufRead) -> Result<EbiTraitSemantics> {
-        Ok(Self::import(reader)?.to_semantics())
+    fn import_as_semantics(
+        reader: &mut dyn BufRead,
+        parameter_values: &ImporterParameterValues,
+    ) -> Result<EbiTraitSemantics> {
+        Ok(Self::import(reader, parameter_values)?.to_semantics())
     }
 }
 

@@ -15,6 +15,7 @@
     <int key="attribute" value="1"/>
     <event>
       <string key="concept:name" value="a"/>
+      <string key="other_attribute" value="z"/>
     </event>
   </trace>
   <trace>
@@ -22,6 +23,7 @@
     <int key="attribute" value="2"/>
     <event>
       <string key="concept:name" value="b"/>
+      <string key="other_attribute" value="y"/>
     </event>
   </trace>
 </log>

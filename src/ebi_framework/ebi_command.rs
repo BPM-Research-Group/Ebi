@@ -23,7 +23,7 @@ use crate::{
         ebi_command_info, ebi_command_itself, ebi_command_probability, ebi_command_sample,
         ebi_command_test, ebi_command_validate, ebi_command_visualise,
     },
-    ebi_framework::ebi_output,
+    ebi_framework::{ebi_importer_parameters, ebi_output},
 };
 
 use super::{
@@ -176,6 +176,7 @@ impl EbiCommand {
                     command = (f)(command);
                 }
 
+                //output flag
                 command = command.arg(
                     Arg::new(ARG_ID_OUTPUT)
                         .short(ARG_SHORT_OUTPUT)
@@ -187,6 +188,7 @@ impl EbiCommand {
                         .value_parser(value_parser!(PathBuf)),
                 );
 
+                //exact arithmetic flag
                 if *exact_arithmetic {
                     command = command.arg(
                         Arg::new("approx")
@@ -198,6 +200,17 @@ impl EbiCommand {
                             .required(false)
                             .value_parser(value_parser!(bool)),
                     )
+                }
+
+                //importer flags
+                for (input_index, inputs) in input_types.iter().enumerate() {
+                    let merged_importer_parameters =
+                        EbiInputType::merge_importer_parameters(inputs);
+                    command = ebi_importer_parameters::build_gui(
+                        command,
+                        merged_importer_parameters,
+                        input_index,
+                    );
                 }
             }
         };
@@ -418,14 +431,19 @@ impl EbiCommand {
             }
         };
 
-        for input_type in input_types.iter() {
+        for (input_index, input_type) in input_types.iter().enumerate() {
             //try to parse the input as this type
             match input_type {
                 EbiInputType::Trait(etrait) => {
                     //try to parse a trait
                     if let Some(ref mut reader) = reader {
-                        match ebi_input::read_as_trait(etrait, reader)
-                            .with_context(|| format!("Parsing as the trait `{}`.", etrait))
+                        match ebi_input::read_as_trait(
+                            etrait,
+                            reader,
+                            Some(cli_matches),
+                            input_index,
+                        )
+                        .with_context(|| format!("Parsing as the trait `{}`.", etrait))
                         {
                             Ok((object, file_handler)) => {
                                 return Ok(EbiInput::Trait(object, file_handler));
@@ -437,8 +455,13 @@ impl EbiCommand {
                 EbiInputType::Object(etype) => {
                     //try to parse a specific object
                     if let Some(ref mut reader) = reader {
-                        match ebi_input::read_as_object(etype, reader)
-                            .with_context(|| format!("Parsing as the object type `{}`.", etype))
+                        match ebi_input::read_as_object(
+                            etype,
+                            reader,
+                            Some(cli_matches),
+                            input_index,
+                        )
+                        .with_context(|| format!("Parsing as the object type `{}`.", etype))
                         {
                             Ok((object, file_handler)) => {
                                 return Ok(EbiInput::Object(object, file_handler));
@@ -449,7 +472,7 @@ impl EbiCommand {
                 }
                 EbiInputType::AnyObject => {
                     if let Some(ref mut reader) = reader {
-                        match ebi_input::read_as_any_object(reader)
+                        match ebi_input::read_as_any_object(reader, Some(cli_matches), input_index)
                             .context("Parsing as any object.")
                         {
                             Ok((object, file_handler)) => {
@@ -911,7 +934,7 @@ mod tests {
             match self {
                 TestInput::Trait(etrait, file) => {
                     let mut reader = MultipleReader::from_file(File::open(file).unwrap());
-                    match ebi_input::read_as_trait(&etrait, &mut reader) {
+                    match ebi_input::read_as_trait(&etrait, &mut reader, None, 0) {
                         Ok((object, file_handler)) => EbiInput::Trait(object, file_handler),
                         Err(_) => unreachable!(),
                     }
@@ -1011,7 +1034,7 @@ mod tests {
                                 EbiInputType::Trait(etrait) => {
                                     //try to parse a trait
 
-                                    match ebi_input::read_as_trait(etrait, &mut reader) {
+                                    match ebi_input::read_as_trait(etrait, &mut reader, None, 0) {
                                         Ok((_, _)) => {
                                             result.push(TestInput::Trait(*etrait, file.path()));
                                         }
@@ -1020,7 +1043,7 @@ mod tests {
                                 }
                                 EbiInputType::Object(etype) => {
                                     //try to parse a specific object
-                                    match ebi_input::read_as_object(etype, &mut reader) {
+                                    match ebi_input::read_as_object(etype, &mut reader, None, 0) {
                                         Ok((object, file_handler)) => {
                                             result.push(TestInput::Object(
                                                 object,
@@ -1032,7 +1055,7 @@ mod tests {
                                     }
                                 }
                                 EbiInputType::AnyObject => {
-                                    match ebi_input::read_as_any_object(&mut reader) {
+                                    match ebi_input::read_as_any_object(&mut reader, None, 0) {
                                         Ok((object, file_handler)) => {
                                             result.push(TestInput::Object(
                                                 object,

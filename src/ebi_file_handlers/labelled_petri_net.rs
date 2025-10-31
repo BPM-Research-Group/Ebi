@@ -1,5 +1,5 @@
 use anyhow::{Ok, Result, anyhow};
-use ebi_objects::{ebi_objects::labelled_petri_net::FORMAT_SPECIFICATION, EbiObject, Exportable, Importable, LabelledPetriNet};
+use ebi_objects::{EbiObject, Exportable, Importable, LabelledPetriNet};
 
 use crate::{
     ebi_framework::{
@@ -21,15 +21,25 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "lpn",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: LabelledPetriNet::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(LabelledPetriNet::validate),
     trait_importers: &[
-        EbiTraitImporter::Activities(LabelledPetriNet::import_as_activities),
-        EbiTraitImporter::Semantics(LabelledPetriNet::import_as_semantics),
-        EbiTraitImporter::Graphable(LabelledPetriNet::import_as_graphable),
+        EbiTraitImporter::Activities(
+            LabelledPetriNet::import_as_activities,
+            LabelledPetriNet::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Semantics(
+            LabelledPetriNet::import_as_semantics,
+            LabelledPetriNet::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Graphable(
+            LabelledPetriNet::import_as_graphable,
+            LabelledPetriNet::IMPORTER_PARAMETERS,
+        ),
     ],
     object_importers: &[EbiObjectImporter::LabelledPetriNet(
         LabelledPetriNet::import_as_object,
+        LabelledPetriNet::IMPORTER_PARAMETERS,
     )],
     object_exporters: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(LabelledPetriNet::export_from_object),

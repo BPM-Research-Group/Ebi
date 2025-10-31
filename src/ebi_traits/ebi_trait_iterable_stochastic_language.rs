@@ -1,7 +1,7 @@
 use anyhow::{Result, anyhow};
 use ebi_objects::{
     FiniteStochasticLanguage, Importable, IntoRefProbabilityIterator, IntoRefTraceIterator,
-    IntoRefTraceProbabilityIterator,
+    IntoRefTraceProbabilityIterator, traits::importable::ImporterParameterValues,
 };
 use std::io::BufRead;
 
@@ -34,11 +34,12 @@ pub trait ToIterableStochasticLanguage: Importable {
 
     fn import_as_iterable_stochastic_language(
         reader: &mut dyn BufRead,
+        parameter_values: &ImporterParameterValues,
     ) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>>
     where
         Self: Sized,
     {
-        Ok(Self::import(reader)?.to_iterable_stochastic_language())
+        Ok(Self::import(reader, parameter_values)?.to_iterable_stochastic_language())
     }
 }
 

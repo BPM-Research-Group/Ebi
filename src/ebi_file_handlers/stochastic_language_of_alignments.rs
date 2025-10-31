@@ -1,31 +1,30 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::{
-    EbiObject, Exportable, Importable, StochasticLanguageOfAlignments,
-    ebi_objects::stochastic_language_of_alignments::FORMAT_SPECIFICATION,
-};
-
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
         ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_output::EbiObjectExporter,
-        ebi_trait::FromEbiTraitObject, validate::Validate,
+        ebi_trait::FromEbiTraitObject,
+        validate::Validate,
     },
     ebi_traits::ebi_trait_activities::ToActivities,
 };
+use anyhow::{Result, anyhow};
+use ebi_objects::{EbiObject, Exportable, Importable, StochasticLanguageOfAlignments};
 
 pub const EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     name: "stochastic language of alignments",
     article: "a",
     file_extension: "sali",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: StochasticLanguageOfAlignments::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(StochasticLanguageOfAlignments::validate),
     trait_importers: &[EbiTraitImporter::Activities(
         StochasticLanguageOfAlignments::import_as_activities,
+        StochasticLanguageOfAlignments::IMPORTER_PARAMETERS,
     )],
     object_importers: &[EbiObjectImporter::StochasticLanguageOfAlignments(
         StochasticLanguageOfAlignments::import_as_object,
+        StochasticLanguageOfAlignments::IMPORTER_PARAMETERS,
     )],
     object_exporters: &[EbiObjectExporter::StochasticLanguageOfAlignments(
         StochasticLanguageOfAlignments::export_from_object,

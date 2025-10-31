@@ -1,19 +1,16 @@
-use anyhow::{Context, Result, anyhow};
-use clap::{ArgMatches, builder::ValueParser, value_parser};
-use ebi_arithmetic::{Fraction, parsing::FractionNotParsedYet};
-use ebi_objects::{EbiObject, EbiObjectType};
-use std::{
-    collections::{BTreeSet, HashSet},
-    fmt::Display,
-    fs::File,
-    io::BufRead,
-    path::PathBuf,
+use super::{
+    ebi_command::{EBI_COMMANDS, EbiCommand},
+    ebi_file_handler::EBI_FILE_HANDLERS,
+    ebi_trait::{EbiTrait, FromEbiTraitObject},
+    prom_link::{
+        JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE,
+        JavaObjectHandler,
+    },
 };
-use strum_macros::EnumIter;
-
 use crate::{
     ebi_framework::{
         ebi_file_handler::{EbiFileHandler, get_file_handlers},
+        ebi_importer_parameters,
         ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::{
@@ -30,20 +27,24 @@ use crate::{
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
     ebi_validate,
-    math::constant_fraction::ConstFraction,
     multiple_reader::MultipleReader,
     text::Joiner,
 };
-
-use super::{
-    ebi_command::{EBI_COMMANDS, EbiCommand},
-    ebi_file_handler::EBI_FILE_HANDLERS,
-    ebi_trait::{EbiTrait, FromEbiTraitObject},
-    prom_link::{
-        JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE,
-        JavaObjectHandler,
-    },
+use anyhow::{Context, Result, anyhow};
+use clap::{ArgMatches, builder::ValueParser, value_parser};
+use ebi_arithmetic::{ConstFraction, Fraction, parsing::FractionNotParsedYet};
+use ebi_objects::{
+    EbiObject, EbiObjectType,
+    traits::importable::{ImporterParameter, ImporterParameterValues},
 };
+use std::{
+    collections::{BTreeSet, HashSet},
+    fmt::Display,
+    fs::File,
+    io::BufRead,
+    path::PathBuf,
+};
+use strum_macros::EnumIter;
 
 pub enum EbiInput {
     Trait(EbiTraitObject, &'static EbiFileHandler),
@@ -78,7 +79,7 @@ macro_rules! EbiInputTypeEnum {
     };
 }
 
-#[derive(PartialEq, Eq, EnumIter, Clone)]
+#[derive(PartialEq, Eq, EnumIter, Clone, Debug)]
 pub enum EbiInputType {
     Trait(EbiTrait),
     Object(EbiObjectType),
@@ -208,10 +209,10 @@ impl EbiInputType {
                     result.insert(format!("integer between {} and {}", min, max));
                 }
                 EbiInputType::Usize(None, Some(max), _) => {
-                    result.insert(format!("integer below {}", max));
+                    result.insert(format!("integer below or equal to {}", max));
                 }
                 EbiInputType::Usize(Some(min), _, _) => {
-                    result.insert(format!("integer above {}", min));
+                    result.insert(format!("integer above or equal to {}", min));
                 }
                 EbiInputType::Usize(_, _, _) => {
                     result.insert("integer".to_string());
@@ -343,6 +344,55 @@ impl EbiInputType {
         list.join_with(", ", last_connector)
     }
 
+    pub fn merge_importer_parameters(
+        input_types: &[&EbiInputType],
+    ) -> BTreeSet<&'static ImporterParameter> {
+        let mut result = BTreeSet::new();
+        for input_type in input_types {
+            match input_type {
+                EbiInputType::Trait(ebi_trait) => {
+                    //look for file handlers that can import this trait
+                    for file_handler in EBI_FILE_HANDLERS {
+                        for importer in file_handler.trait_importers {
+                            if &importer.get_trait() == ebi_trait {
+                                //found an importer for this trait; copy its parameters
+                                for parameter in importer.parameters() {
+                                    result.insert(parameter);
+                                }
+                            }
+                        }
+                    }
+                }
+                EbiInputType::Object(ebi_object_type) => {
+                    //look for file handlers that cn import this object
+                    for file_handler in EBI_FILE_HANDLERS {
+                        for importer in file_handler.object_importers {
+                            if &importer.get_type() == ebi_object_type {
+                                //found an importer for this trait; copy its parameters
+                                for parameter in importer.parameters() {
+                                    result.insert(parameter);
+                                }
+                            }
+                        }
+                    }
+                }
+                EbiInputType::AnyObject => {
+                    //look for any object importer
+                    for file_handler in EBI_FILE_HANDLERS {
+                        for importer in file_handler.object_importers {
+                            //found an importer; copy its parameters
+                            for parameter in importer.parameters() {
+                                result.insert(parameter);
+                            }
+                        }
+                    }
+                }
+                _ => {}
+            }
+        }
+        result
+    }
+
     pub fn show_file_handlers(file_handlers: Vec<&'static EbiFileHandler>) -> Vec<String> {
         file_handlers
             .iter()
@@ -440,78 +490,162 @@ pub fn default(input_types: &[&EbiInputType]) -> Option<String> {
 
 #[derive(Debug, Clone)]
 pub enum EbiTraitImporter {
-    FiniteLanguage(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitFiniteLanguage>>), //finite set of traces
+    FiniteLanguage(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<Box<dyn EbiTraitFiniteLanguage>>,
+        &'static [ImporterParameter],
+    ),
     FiniteStochasticLanguage(
-        fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>>,
-    ), //finite number of traces
+        fn(
+            &mut dyn BufRead,
+            &ImporterParameterValues,
+        ) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>>,
+        &'static [ImporterParameter],
+    ),
     QueriableStochasticLanguage(
-        fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>>,
-    ), //can query for the probability of a trace
-    IterableLanguage(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitIterableLanguage>>), //can walk over the traces, potentially forever
+        fn(
+            &mut dyn BufRead,
+            &ImporterParameterValues,
+        ) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>>,
+        &'static [ImporterParameter],
+    ),
+    IterableLanguage(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<Box<dyn EbiTraitIterableLanguage>>,
+        &'static [ImporterParameter],
+    ),
     IterableStochasticLanguage(
-        fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>>,
-    ), //can walk over the traces, potentially forever
-    EventLog(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLog>>), //traces only
+        fn(
+            &mut dyn BufRead,
+            &ImporterParameterValues,
+        ) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>>,
+        &'static [ImporterParameter],
+    ),
+    EventLog(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<Box<dyn EbiTraitEventLog>>,
+        &'static [ImporterParameter],
+    ),
     EventLogTraceAttributes(
-        fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLogTraceAttributes>>,
-    ), //access to traces and attributes
-    Semantics(fn(&mut dyn BufRead) -> Result<EbiTraitSemantics>), //can walk over states using transitions, potentially forever
-    StochasticSemantics(fn(&mut dyn BufRead) -> Result<EbiTraitStochasticSemantics>), //can walk over states  using transitions, potentially forever
+        fn(
+            &mut dyn BufRead,
+            &ImporterParameterValues,
+        ) -> Result<Box<dyn EbiTraitEventLogTraceAttributes>>,
+        &'static [ImporterParameter],
+    ),
+    Semantics(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiTraitSemantics>,
+        &'static [ImporterParameter],
+    ),
+    StochasticSemantics(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiTraitStochasticSemantics>,
+        &'static [ImporterParameter],
+    ),
     StochasticDeterministicSemantics(
-        fn(&mut dyn BufRead) -> Result<EbiTraitStochasticDeterministicSemantics>,
-    ), //can walk over states using activities, potentially forever
-    Graphable(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitGraphable>>), //can produce a Dot graph
-    Activities(fn(&mut dyn BufRead) -> Result<Box<dyn EbiTraitActivities>>), //has activities
+        fn(
+            &mut dyn BufRead,
+            &ImporterParameterValues,
+        ) -> Result<EbiTraitStochasticDeterministicSemantics>,
+        &'static [ImporterParameter],
+    ),
+    Graphable(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<Box<dyn EbiTraitGraphable>>,
+        &'static [ImporterParameter],
+    ),
+    Activities(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<Box<dyn EbiTraitActivities>>,
+        &'static [ImporterParameter],
+    ),
 }
 
 impl EbiTraitImporter {
     pub fn get_trait(&self) -> EbiTrait {
         match self {
-            EbiTraitImporter::FiniteLanguage(_) => EbiTrait::FiniteLanguage,
-            EbiTraitImporter::FiniteStochasticLanguage(_) => EbiTrait::FiniteStochasticLanguage,
-            EbiTraitImporter::QueriableStochasticLanguage(_) => {
+            EbiTraitImporter::FiniteLanguage(_, _) => EbiTrait::FiniteLanguage,
+            EbiTraitImporter::FiniteStochasticLanguage(_, _) => EbiTrait::FiniteStochasticLanguage,
+            EbiTraitImporter::QueriableStochasticLanguage(_, _) => {
                 EbiTrait::QueriableStochasticLanguage
             }
-            EbiTraitImporter::IterableLanguage(_) => EbiTrait::IterableLanguage,
-            EbiTraitImporter::IterableStochasticLanguage(_) => EbiTrait::IterableStochasticLanguage,
-            EbiTraitImporter::EventLog(_) => EbiTrait::EventLog,
-            EbiTraitImporter::EventLogTraceAttributes(_) => EbiTrait::EventLogTraceAttributes,
-            EbiTraitImporter::Semantics(_) => EbiTrait::Semantics,
-            EbiTraitImporter::StochasticSemantics(_) => EbiTrait::StochasticSemantics,
-            EbiTraitImporter::StochasticDeterministicSemantics(_) => {
+            EbiTraitImporter::IterableLanguage(_, _) => EbiTrait::IterableLanguage,
+            EbiTraitImporter::IterableStochasticLanguage(_, _) => {
+                EbiTrait::IterableStochasticLanguage
+            }
+            EbiTraitImporter::EventLog(_, _) => EbiTrait::EventLog,
+            EbiTraitImporter::EventLogTraceAttributes(_, _) => EbiTrait::EventLogTraceAttributes,
+            EbiTraitImporter::Semantics(_, _) => EbiTrait::Semantics,
+            EbiTraitImporter::StochasticSemantics(_, _) => EbiTrait::StochasticSemantics,
+            EbiTraitImporter::StochasticDeterministicSemantics(_, _) => {
                 EbiTrait::StochasticDeterministicSemantics
             }
-            EbiTraitImporter::Graphable(_) => EbiTrait::Graphable,
-            EbiTraitImporter::Activities(_) => EbiTrait::Activities,
+            EbiTraitImporter::Graphable(_, _) => EbiTrait::Graphable,
+            EbiTraitImporter::Activities(_, _) => EbiTrait::Activities,
         }
     }
 
-    pub fn import(&self, reader: &mut dyn BufRead) -> Result<EbiTraitObject> {
+    pub fn parameters(&self) -> &'static [ImporterParameter] {
+        match self {
+            EbiTraitImporter::FiniteLanguage(_, importer_parameters)
+            | EbiTraitImporter::FiniteStochasticLanguage(_, importer_parameters)
+            | EbiTraitImporter::QueriableStochasticLanguage(_, importer_parameters)
+            | EbiTraitImporter::IterableLanguage(_, importer_parameters)
+            | EbiTraitImporter::IterableStochasticLanguage(_, importer_parameters)
+            | EbiTraitImporter::EventLog(_, importer_parameters)
+            | EbiTraitImporter::EventLogTraceAttributes(_, importer_parameters)
+            | EbiTraitImporter::Semantics(_, importer_parameters)
+            | EbiTraitImporter::StochasticSemantics(_, importer_parameters)
+            | EbiTraitImporter::StochasticDeterministicSemantics(_, importer_parameters)
+            | EbiTraitImporter::Graphable(_, importer_parameters)
+            | EbiTraitImporter::Activities(_, importer_parameters) => importer_parameters,
+        }
+    }
+
+    pub fn default_parameter_values(&self) -> ImporterParameterValues {
+        let mut result = ImporterParameterValues::new();
+        for parameter in self.parameters() {
+            result.insert(*parameter, parameter.default());
+        }
+        result
+    }
+
+    pub fn import(
+        &self,
+        reader: &mut dyn BufRead,
+        parameter_values: &ImporterParameterValues,
+    ) -> Result<EbiTraitObject> {
         Ok(match self {
-            EbiTraitImporter::FiniteLanguage(f) => EbiTraitObject::FiniteLanguage((f)(reader)?),
-            EbiTraitImporter::FiniteStochasticLanguage(f) => {
-                EbiTraitObject::FiniteStochasticLanguage((f)(reader)?)
+            EbiTraitImporter::FiniteLanguage(f, _) => {
+                EbiTraitObject::FiniteLanguage((f)(reader, parameter_values)?)
             }
-            EbiTraitImporter::QueriableStochasticLanguage(f) => {
-                EbiTraitObject::QueriableStochasticLanguage((f)(reader)?)
+            EbiTraitImporter::FiniteStochasticLanguage(f, _) => {
+                EbiTraitObject::FiniteStochasticLanguage((f)(reader, parameter_values)?)
             }
-            EbiTraitImporter::IterableLanguage(f) => EbiTraitObject::IterableLanguage((f)(reader)?),
-            EbiTraitImporter::IterableStochasticLanguage(f) => {
-                EbiTraitObject::IterableStochasticLanguage((f)(reader)?)
+            EbiTraitImporter::QueriableStochasticLanguage(f, _) => {
+                EbiTraitObject::QueriableStochasticLanguage((f)(reader, parameter_values)?)
             }
-            EbiTraitImporter::EventLog(f) => EbiTraitObject::EventLog((f)(reader)?),
-            EbiTraitImporter::EventLogTraceAttributes(f) => {
-                EbiTraitObject::EventLogTraceAttributes((f)(reader)?)
+            EbiTraitImporter::IterableLanguage(f, _) => {
+                EbiTraitObject::IterableLanguage((f)(reader, parameter_values)?)
             }
-            EbiTraitImporter::Semantics(f) => EbiTraitObject::Semantics((f)(reader)?),
-            EbiTraitImporter::StochasticSemantics(f) => {
-                EbiTraitObject::StochasticSemantics((f)(reader)?)
+            EbiTraitImporter::IterableStochasticLanguage(f, _) => {
+                EbiTraitObject::IterableStochasticLanguage((f)(reader, parameter_values)?)
             }
-            EbiTraitImporter::StochasticDeterministicSemantics(f) => {
-                EbiTraitObject::StochasticDeterministicSemantics((f)(reader)?)
+            EbiTraitImporter::EventLog(f, _) => {
+                EbiTraitObject::EventLog((f)(reader, parameter_values)?)
             }
-            EbiTraitImporter::Graphable(f) => EbiTraitObject::Graphable((f)(reader)?),
-            EbiTraitImporter::Activities(f) => EbiTraitObject::Activities((f)(reader)?),
+            EbiTraitImporter::EventLogTraceAttributes(f, _) => {
+                EbiTraitObject::EventLogTraceAttributes((f)(reader, parameter_values)?)
+            }
+            EbiTraitImporter::Semantics(f, _) => {
+                EbiTraitObject::Semantics((f)(reader, parameter_values)?)
+            }
+            EbiTraitImporter::StochasticSemantics(f, _) => {
+                EbiTraitObject::StochasticSemantics((f)(reader, parameter_values)?)
+            }
+            EbiTraitImporter::StochasticDeterministicSemantics(f, _) => {
+                EbiTraitObject::StochasticDeterministicSemantics((f)(reader, parameter_values)?)
+            }
+            EbiTraitImporter::Graphable(f, _) => {
+                EbiTraitObject::Graphable((f)(reader, parameter_values)?)
+            }
+            EbiTraitImporter::Activities(f, _) => {
+                EbiTraitObject::Activities((f)(reader, parameter_values)?)
+            }
         })
     }
 }
@@ -524,79 +658,164 @@ impl Display for EbiTraitImporter {
 
 #[derive(Debug, Clone)]
 pub enum EbiObjectImporter {
-    EventLog(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    EventLogTraceAttributes(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    EventLogXes(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    DirectlyFollowsGraph(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    DirectlyFollowsModel(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    StochasticDirectlyFollowsModel(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    FiniteLanguage(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    FiniteStochasticLanguage(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    LabelledPetriNet(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    StochasticDeterministicFiniteAutomaton(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    StochasticLabelledPetriNet(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    LanguageOfAlignments(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    DeterministicFiniteAutomaton(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    ProcessTree(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    Executions(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    StochasticLanguageOfAlignments(fn(&mut dyn BufRead) -> Result<EbiObject>),
-    StochasticProcessTree(fn(&mut dyn BufRead) -> Result<EbiObject>),
+    EventLog(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    EventLogTraceAttributes(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    EventLogXes(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    DirectlyFollowsGraph(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    DirectlyFollowsModel(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    StochasticDirectlyFollowsModel(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    FiniteLanguage(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    FiniteStochasticLanguage(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    LabelledPetriNet(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    StochasticDeterministicFiniteAutomaton(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    StochasticLabelledPetriNet(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    LanguageOfAlignments(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    DeterministicFiniteAutomaton(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    ProcessTree(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    Executions(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    StochasticLanguageOfAlignments(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    StochasticProcessTree(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
 }
 
 impl EbiObjectImporter {
     pub fn get_type(&self) -> EbiObjectType {
         match self {
-            EbiObjectImporter::EventLog(_) => EbiObjectType::EventLog,
-            EbiObjectImporter::EventLogTraceAttributes(_) => EbiObjectType::EventLogTraceAttributes,
-            EbiObjectImporter::EventLogXes(_) => EbiObjectType::EventLogXes,
-            EbiObjectImporter::DirectlyFollowsGraph(_) => EbiObjectType::DirectlyFollowsGraph,
-            EbiObjectImporter::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
-            EbiObjectImporter::StochasticDirectlyFollowsModel(_) => {
+            EbiObjectImporter::EventLog(_, _) => EbiObjectType::EventLog,
+            EbiObjectImporter::EventLogTraceAttributes(_, _) => {
+                EbiObjectType::EventLogTraceAttributes
+            }
+            EbiObjectImporter::EventLogXes(_, _) => EbiObjectType::EventLogXes,
+            EbiObjectImporter::DirectlyFollowsGraph(_, _) => EbiObjectType::DirectlyFollowsGraph,
+            EbiObjectImporter::DirectlyFollowsModel(_, _) => EbiObjectType::DirectlyFollowsModel,
+            EbiObjectImporter::StochasticDirectlyFollowsModel(_, _) => {
                 EbiObjectType::StochasticDirectlyFollowsModel
             }
-            EbiObjectImporter::FiniteLanguage(_) => EbiObjectType::FiniteLanguage,
-            EbiObjectImporter::FiniteStochasticLanguage(_) => {
+            EbiObjectImporter::FiniteLanguage(_, _) => EbiObjectType::FiniteLanguage,
+            EbiObjectImporter::FiniteStochasticLanguage(_, _) => {
                 EbiObjectType::FiniteStochasticLanguage
             }
-            EbiObjectImporter::LabelledPetriNet(_) => EbiObjectType::LabelledPetriNet,
-            EbiObjectImporter::StochasticDeterministicFiniteAutomaton(_) => {
+            EbiObjectImporter::LabelledPetriNet(_, _) => EbiObjectType::LabelledPetriNet,
+            EbiObjectImporter::StochasticDeterministicFiniteAutomaton(_, _) => {
                 EbiObjectType::StochasticDeterministicFiniteAutomaton
             }
-            EbiObjectImporter::StochasticLabelledPetriNet(_) => {
+            EbiObjectImporter::StochasticLabelledPetriNet(_, _) => {
                 EbiObjectType::StochasticLabelledPetriNet
             }
-            EbiObjectImporter::LanguageOfAlignments(_) => EbiObjectType::LanguageOfAlignments,
-            EbiObjectImporter::StochasticLanguageOfAlignments(_) => {
+            EbiObjectImporter::LanguageOfAlignments(_, _) => EbiObjectType::LanguageOfAlignments,
+            EbiObjectImporter::StochasticLanguageOfAlignments(_, _) => {
                 EbiObjectType::StochasticLanguageOfAlignments
             }
-            EbiObjectImporter::DeterministicFiniteAutomaton(_) => {
+            EbiObjectImporter::DeterministicFiniteAutomaton(_, _) => {
                 EbiObjectType::DeterministicFiniteAutomaton
             }
-            EbiObjectImporter::ProcessTree(_) => EbiObjectType::ProcessTree,
-            EbiObjectImporter::StochasticProcessTree(_) => EbiObjectType::StochasticProcessTree,
-            EbiObjectImporter::Executions(_) => EbiObjectType::Executions,
+            EbiObjectImporter::ProcessTree(_, _) => EbiObjectType::ProcessTree,
+            EbiObjectImporter::StochasticProcessTree(_, _) => EbiObjectType::StochasticProcessTree,
+            EbiObjectImporter::Executions(_, _) => EbiObjectType::Executions,
         }
     }
 
-    pub fn get_importer(&self) -> fn(&mut dyn BufRead) -> Result<EbiObject> {
+    pub fn parameters(&self) -> &'static [ImporterParameter] {
         match self {
-            EbiObjectImporter::EventLog(importer) => *importer,
-            EbiObjectImporter::EventLogTraceAttributes(importer) => *importer,
-            EbiObjectImporter::EventLogXes(importer) => *importer,
-            EbiObjectImporter::DirectlyFollowsGraph(importer) => *importer,
-            EbiObjectImporter::DirectlyFollowsModel(importer) => *importer,
-            EbiObjectImporter::StochasticDirectlyFollowsModel(importer) => *importer,
-            EbiObjectImporter::FiniteLanguage(importer) => *importer,
-            EbiObjectImporter::FiniteStochasticLanguage(importer) => *importer,
-            EbiObjectImporter::LabelledPetriNet(importer) => *importer,
-            EbiObjectImporter::StochasticDeterministicFiniteAutomaton(importer) => *importer,
-            EbiObjectImporter::StochasticLabelledPetriNet(importer) => *importer,
-            EbiObjectImporter::LanguageOfAlignments(importer) => *importer,
-            EbiObjectImporter::StochasticLanguageOfAlignments(importer) => *importer,
-            EbiObjectImporter::DeterministicFiniteAutomaton(importer) => *importer,
-            EbiObjectImporter::ProcessTree(importer) => *importer,
-            EbiObjectImporter::StochasticProcessTree(importer) => *importer,
-            EbiObjectImporter::Executions(importer) => *importer,
+            EbiObjectImporter::EventLog(_, parameters) => parameters,
+            EbiObjectImporter::EventLogTraceAttributes(_, parameters) => parameters,
+            EbiObjectImporter::EventLogXes(_, parameters) => parameters,
+            EbiObjectImporter::DirectlyFollowsGraph(_, parameters) => parameters,
+            EbiObjectImporter::DirectlyFollowsModel(_, parameters) => parameters,
+            EbiObjectImporter::StochasticDirectlyFollowsModel(_, parameters) => parameters,
+            EbiObjectImporter::FiniteLanguage(_, parameters) => parameters,
+            EbiObjectImporter::FiniteStochasticLanguage(_, parameters) => parameters,
+            EbiObjectImporter::LabelledPetriNet(_, parameters) => parameters,
+            EbiObjectImporter::StochasticDeterministicFiniteAutomaton(_, parameters) => parameters,
+            EbiObjectImporter::StochasticLabelledPetriNet(_, parameters) => parameters,
+            EbiObjectImporter::LanguageOfAlignments(_, parameters) => parameters,
+            EbiObjectImporter::DeterministicFiniteAutomaton(_, parameters) => parameters,
+            EbiObjectImporter::ProcessTree(_, parameters) => parameters,
+            EbiObjectImporter::Executions(_, parameters) => parameters,
+            EbiObjectImporter::StochasticLanguageOfAlignments(_, parameters) => parameters,
+            EbiObjectImporter::StochasticProcessTree(_, parameters) => parameters,
+        }
+    }
+
+    pub fn default_parameter_values(&self) -> ImporterParameterValues {
+        let mut result = ImporterParameterValues::new();
+        for parameter in self.parameters() {
+            result.insert(*parameter, parameter.default());
+        }
+        result
+    }
+
+    pub fn get_importer(
+        &self,
+    ) -> fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject> {
+        match self {
+            EbiObjectImporter::EventLog(importer, _) => *importer,
+            EbiObjectImporter::EventLogTraceAttributes(importer, _) => *importer,
+            EbiObjectImporter::EventLogXes(importer, _) => *importer,
+            EbiObjectImporter::DirectlyFollowsGraph(importer, _) => *importer,
+            EbiObjectImporter::DirectlyFollowsModel(importer, _) => *importer,
+            EbiObjectImporter::StochasticDirectlyFollowsModel(importer, _) => *importer,
+            EbiObjectImporter::FiniteLanguage(importer, _) => *importer,
+            EbiObjectImporter::FiniteStochasticLanguage(importer, _) => *importer,
+            EbiObjectImporter::LabelledPetriNet(importer, _) => *importer,
+            EbiObjectImporter::StochasticDeterministicFiniteAutomaton(importer, _) => *importer,
+            EbiObjectImporter::StochasticLabelledPetriNet(importer, _) => *importer,
+            EbiObjectImporter::LanguageOfAlignments(importer, _) => *importer,
+            EbiObjectImporter::StochasticLanguageOfAlignments(importer, _) => *importer,
+            EbiObjectImporter::DeterministicFiniteAutomaton(importer, _) => *importer,
+            EbiObjectImporter::ProcessTree(importer, _) => *importer,
+            EbiObjectImporter::StochasticProcessTree(importer, _) => *importer,
+            EbiObjectImporter::Executions(importer, _) => *importer,
         }
     }
 }
@@ -636,17 +855,28 @@ pub fn get_reader(cli_matches: &ArgMatches, cli_id: &str) -> Result<MultipleRead
 pub fn read_as_trait(
     etrait: &EbiTrait,
     reader: &mut MultipleReader,
+    cli_matches: Option<&ArgMatches>,
+    input_index: usize,
 ) -> Result<(EbiTraitObject, &'static EbiFileHandler)> {
     let mut error = None;
     for file_handler in EBI_FILE_HANDLERS {
         for importer in file_handler.trait_importers {
             if &importer.get_trait() == etrait {
                 //attempt to import
-                match importer.import(reader.get().context("Obtaining reader.")?.as_mut())
-                    .with_context(|| {format!("The last attempted importer was: {}.", file_handler)})
-                    .with_context(|| format!("Attempting to parse file as either {}.\nIf you know the type of your file, use `Ebi {}` to check it.", EbiInputType::show_file_handlers(etrait.get_file_handlers()).join(", "), ebi_validate!())) {
-                    Ok(object) => {return Ok((object, file_handler));}, //object parsed, return it
-                    Err(err) => {error = Some(err);}
+                match ebi_importer_parameters::extract_parameter_values(
+                    cli_matches,
+                    importer.parameters(),
+                    input_index,
+                ) {
+                    Ok(importer_parameter_values) => {
+                        match importer.import(reader.get().with_context(|| "Obtaining reader.")?.as_mut(), &importer_parameter_values)
+                            .with_context(|| {format!("The last attempted importer was: {}.", file_handler)})
+                            .with_context(|| format!("Attempting to parse file as either {}.\nIf you know the type of your file, use `Ebi {}` to check it.", EbiInputType::show_file_handlers(etrait.get_file_handlers()).join(", "), ebi_validate!())) {
+                            Ok(object) => {return Ok((object, file_handler));}, //object parsed, return it
+                            Err(err) => {error = Some(err);}
+                        }
+                    }
+                    Err(e) => error = Some(e),
                 }
             }
         }
@@ -657,16 +887,28 @@ pub fn read_as_trait(
 pub fn read_as_object(
     etype: &EbiObjectType,
     reader: &mut MultipleReader,
+    cli_matches: Option<&ArgMatches>,
+    input_index: usize,
 ) -> Result<(EbiObject, &'static EbiFileHandler)> {
     for file_handler in EBI_FILE_HANDLERS {
         for importer in file_handler.object_importers {
             if &importer.get_type() == etype {
                 //attempt to import
-                if let Ok(object) = (importer.get_importer())(
-                    reader.get().context("Could not obtain reader.")?.as_mut(),
+                match ebi_importer_parameters::extract_parameter_values(
+                    cli_matches,
+                    importer.parameters(),
+                    input_index,
                 ) {
-                    //object parsed; return it
-                    return Ok((object, file_handler));
+                    Ok(importer_parameter_values) => {
+                        if let Ok(object) = (importer.get_importer())(
+                            reader.get().context("Could not obtain reader.")?.as_mut(),
+                            &importer_parameter_values,
+                        ) {
+                            //object parsed; return it
+                            return Ok((object, file_handler));
+                        }
+                    }
+                    Err(_) => {}
                 }
             }
         }
@@ -678,15 +920,27 @@ pub fn read_as_object(
 
 pub fn read_as_any_object(
     reader: &mut MultipleReader,
+    cli_matches: Option<&ArgMatches>,
+    input_index: usize,
 ) -> Result<(EbiObject, &'static EbiFileHandler)> {
     for file_handler in EBI_FILE_HANDLERS {
         //attempt to import
         for importer in file_handler.object_importers {
-            if let Ok(object) = (importer.get_importer())(
-                reader.get().context("Could not obtain reader.")?.as_mut(),
+            match ebi_importer_parameters::extract_parameter_values(
+                cli_matches,
+                importer.parameters(),
+                input_index,
             ) {
-                //object parsed; return it
-                return Ok((object, file_handler));
+                Ok(importer_parameter_values) => {
+                    if let Ok(object) = (importer.get_importer())(
+                        reader.get().context("Could not obtain reader.")?.as_mut(),
+                        &importer_parameter_values,
+                    ) {
+                        //object parsed; return it
+                        return Ok((object, file_handler));
+                    }
+                }
+                Err(_) => {}
             }
         }
     }

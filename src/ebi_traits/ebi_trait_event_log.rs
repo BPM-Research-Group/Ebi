@@ -1,7 +1,7 @@
 use anyhow::{Result, anyhow};
 use ebi_objects::{
     Activity, CompressedEventLog, EventLog, EventLogTraceAttributes, HasActivityKey, Importable,
-    IntoRefTraceIterator, NumberOfTraces,
+    IntoRefTraceIterator, NumberOfTraces, traits::importable::ImporterParameterValues,
 };
 use std::{collections::HashMap, io::BufRead};
 
@@ -64,11 +64,14 @@ impl EbiTraitEventLog for EventLogTraceAttributes {
 pub trait ToEventLog: Importable {
     fn to_event_log(self) -> Box<dyn EbiTraitEventLog>;
 
-    fn import_as_event_log(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitEventLog>>
+    fn import_as_event_log(
+        reader: &mut dyn BufRead,
+        parameter_values: &ImporterParameterValues,
+    ) -> Result<Box<dyn EbiTraitEventLog>>
     where
         Self: Sized,
     {
-        Ok(Self::import(reader)?.to_event_log())
+        Ok(Self::import(reader, parameter_values)?.to_event_log())
     }
 }
 

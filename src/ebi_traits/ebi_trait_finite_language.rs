@@ -1,5 +1,5 @@
 use anyhow::{Result, anyhow};
-use ebi_objects::{FiniteLanguage, FiniteStochasticLanguage, Importable, NumberOfTraces};
+use ebi_objects::{FiniteLanguage, FiniteStochasticLanguage, Importable, NumberOfTraces, traits::importable::ImporterParameterValues};
 use std::{fmt::Display, io::BufRead};
 
 use crate::ebi_framework::{
@@ -35,11 +35,12 @@ pub trait ToFiniteLanguage: Importable {
 
     fn import_as_finite_language(
         reader: &mut dyn BufRead,
+        parameter_values: &ImporterParameterValues,
     ) -> Result<Box<dyn EbiTraitFiniteLanguage>>
     where
         Self: Sized,
     {
-        Ok(Self::import(reader)?.to_finite_language())
+        Ok(Self::import(reader, parameter_values)?.to_finite_language())
     }
 }
 

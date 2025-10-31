@@ -1,8 +1,5 @@
 use anyhow::{Result, anyhow};
-use ebi_objects::{
-    DirectlyFollowsGraph, EbiObject, Exportable, Importable,
-    ebi_objects::directly_follows_graph::FORMAT_SPECIFICATION,
-};
+use ebi_objects::{DirectlyFollowsGraph, EbiObject, Exportable, Importable};
 
 use crate::{
     ebi_framework::{
@@ -30,33 +27,54 @@ pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "dfg",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: DirectlyFollowsGraph::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(DirectlyFollowsGraph::validate),
     trait_importers: &[
-        EbiTraitImporter::Activities(DirectlyFollowsGraph::import_as_activities),
+        EbiTraitImporter::Activities(
+            DirectlyFollowsGraph::import_as_activities,
+            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
+        ),
         EbiTraitImporter::QueriableStochasticLanguage(
             DirectlyFollowsGraph::import_as_queriable_stochastic_language,
+            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
         ),
-        EbiTraitImporter::Semantics(DirectlyFollowsGraph::import_as_semantics),
-        EbiTraitImporter::StochasticSemantics(DirectlyFollowsGraph::import_as_stochastic_semantics),
+        EbiTraitImporter::Semantics(
+            DirectlyFollowsGraph::import_as_semantics,
+            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::StochasticSemantics(
+            DirectlyFollowsGraph::import_as_stochastic_semantics,
+            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
+        ),
         EbiTraitImporter::StochasticDeterministicSemantics(
             DirectlyFollowsGraph::import_as_stochastic_deterministic_semantics,
+            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
         ),
-        EbiTraitImporter::Graphable(DirectlyFollowsGraph::import_as_graphable),
+        EbiTraitImporter::Graphable(
+            DirectlyFollowsGraph::import_as_graphable,
+            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
+        ),
     ],
     object_importers: &[
-        EbiObjectImporter::DirectlyFollowsGraph(DirectlyFollowsGraph::import_as_object),
+        EbiObjectImporter::DirectlyFollowsGraph(
+            DirectlyFollowsGraph::import_as_object,
+            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
+        ),
         EbiObjectImporter::StochasticDirectlyFollowsModel(
             DirectlyFollowsGraph::import_as_stochastic_directly_follows_model_object,
+            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::DirectlyFollowsModel(
             DirectlyFollowsGraph::import_as_directly_follows_model_object,
+            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::LabelledPetriNet(
             DirectlyFollowsGraph::import_as_labelled_petri_net_object,
+            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::StochasticLabelledPetriNet(
             DirectlyFollowsGraph::import_as_stochastic_labelled_petri_net_object,
+            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
         ),
     ],
     object_exporters: &[EbiObjectExporter::DirectlyFollowsGraph(

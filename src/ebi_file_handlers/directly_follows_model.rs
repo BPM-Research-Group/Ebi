@@ -1,7 +1,4 @@
-use ebi_objects::{
-    DirectlyFollowsModel, Exportable, Importable,
-    ebi_objects::directly_follows_model::FORMAT_SPECIFICATION,
-};
+use ebi_objects::{DirectlyFollowsModel, Exportable, Importable};
 
 use crate::{
     ebi_framework::{
@@ -22,17 +19,30 @@ pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "dfm",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: DirectlyFollowsModel::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(DirectlyFollowsModel::validate),
     trait_importers: &[
-        EbiTraitImporter::Activities(DirectlyFollowsModel::import_as_activities),
-        EbiTraitImporter::Semantics(DirectlyFollowsModel::import_as_semantics),
-        EbiTraitImporter::Graphable(DirectlyFollowsModel::import_as_graphable),
+        EbiTraitImporter::Activities(
+            DirectlyFollowsModel::import_as_activities,
+            DirectlyFollowsModel::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Semantics(
+            DirectlyFollowsModel::import_as_semantics,
+            DirectlyFollowsModel::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Graphable(
+            DirectlyFollowsModel::import_as_graphable,
+            DirectlyFollowsModel::IMPORTER_PARAMETERS,
+        ),
     ],
     object_importers: &[
-        EbiObjectImporter::DirectlyFollowsModel(DirectlyFollowsModel::import_as_object),
+        EbiObjectImporter::DirectlyFollowsModel(
+            DirectlyFollowsModel::import_as_object,
+            DirectlyFollowsModel::IMPORTER_PARAMETERS,
+        ),
         EbiObjectImporter::LabelledPetriNet(
             DirectlyFollowsModel::import_as_labelled_petri_net_object,
+            DirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
     ],
     object_exporters: &[

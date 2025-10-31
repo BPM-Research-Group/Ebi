@@ -6,22 +6,23 @@ use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject, FiniteLanguage,
     FiniteStochasticLanguage, LabelledPetriNet, ProcessTree,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticProcessTree, traits::importable::Importable,
+    StochasticLabelledPetriNet, StochasticProcessTree,
+    traits::importable::{Importable, ImporterParameterValues},
 };
 
 macro_rules! import_as_object {
     ($t:ident, $u:expr) => {
         paste! {
             pub trait [<To $t Object>] {
-                fn [<import_as_ $u _object>](reader: &mut dyn BufRead) -> Result<EbiObject>;
+                fn [<import_as_ $u _object>](reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) -> Result<EbiObject>;
             }
 
             impl<T: Importable> [<To $t Object>] for T
             where
                 T: Into<$t>,
             {
-                fn [<import_as_ $u _object>](reader: &mut dyn BufRead) -> Result<EbiObject> {
-                    let x = Self::import(reader)?.into();
+                fn [<import_as_ $u _object>](reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) -> Result<EbiObject> {
+                    let x = Self::import(reader, parameter_values)?.into();
                     Ok(EbiObject::$t(x))
                 }
             }

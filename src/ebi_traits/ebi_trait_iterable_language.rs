@@ -3,6 +3,7 @@ use std::io::BufRead;
 use anyhow::{Result, anyhow};
 use ebi_objects::{
     FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, Importable, IntoRefTraceIterator,
+    traits::importable::ImporterParameterValues,
 };
 
 use crate::ebi_framework::{
@@ -33,11 +34,12 @@ pub trait ToIterableLanguage: Importable {
 
     fn import_as_iterable_language(
         reader: &mut dyn BufRead,
+        parameter_values: &ImporterParameterValues,
     ) -> Result<Box<dyn EbiTraitIterableLanguage>>
     where
         Self: Sized,
     {
-        Ok(Self::import(reader)?.to_iterable_language())
+        Ok(Self::import(reader, parameter_values)?.to_iterable_language())
     }
 }
 

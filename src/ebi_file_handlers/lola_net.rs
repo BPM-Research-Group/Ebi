@@ -8,19 +8,19 @@ use crate::{
         ebi_trait_semantics::ToSemantics,
     },
 };
-use ebi_objects::{Exportable, LolaNet, ebi_objects::lola_net::FORMAT_SPECIFICATION};
+use ebi_objects::{Exportable, Importable, LolaNet};
 
 pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
     name: "LoLa Petri net",
     article: "a",
     file_extension: "lola",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: LolaNet::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(LolaNet::validate),
     trait_importers: &[
-        EbiTraitImporter::Activities(LolaNet::import_as_activities),
-        EbiTraitImporter::Semantics(LolaNet::import_as_semantics),
-        EbiTraitImporter::Graphable(LolaNet::import_as_graphable),
+        EbiTraitImporter::Activities(LolaNet::import_as_activities, LolaNet::IMPORTER_PARAMETERS),
+        EbiTraitImporter::Semantics(LolaNet::import_as_semantics, LolaNet::IMPORTER_PARAMETERS),
+        EbiTraitImporter::Graphable(LolaNet::import_as_graphable, LolaNet::IMPORTER_PARAMETERS),
     ],
     object_importers: &[],
     object_exporters: &[

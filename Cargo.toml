@@ -25,11 +25,11 @@ eapproximatearithmetic = []
 
 [dependencies]
 ebi_derive = "0.2.7"
-ebi_arithmetic = "0.3.0"
+ebi_arithmetic = "0.3.2"
 ebi_optimisation = "0.3.0"
-ebi_objects = "0.3.27"
+ebi_objects = "0.3.34"
 bitvec = "1.0.1"
-clap = { version = "4.5.50", features = ["derive", "cargo", "string"] }
+clap = { version = "4.5.51", features = ["derive", "cargo", "string"] }
 anyhow = "1.0.100"
 clap-verbosity-flag = "3.0.3"
 log = { version = "0.4.28", features = ["release_max_level_debug"] }

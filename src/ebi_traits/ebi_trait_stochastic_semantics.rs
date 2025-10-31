@@ -1,12 +1,3 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::{
-    ActivityKey, DirectlyFollowsGraph, EventLog, EventLogTraceAttributes, FiniteStochasticLanguage,
-    HasActivityKey, Importable, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
-    TranslateActivityKey, ebi_objects::compressed_event_log::CompressedEventLog,
-};
-use std::io::BufRead;
-
 use crate::{
     ebi_framework::{
         ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
@@ -17,6 +8,14 @@ use crate::{
     },
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
+use anyhow::{Result, anyhow};
+use ebi_objects::{
+    ActivityKey, DirectlyFollowsGraph, EventLog, EventLogTraceAttributes, FiniteStochasticLanguage,
+    HasActivityKey, Importable, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
+    TranslateActivityKey, ebi_objects::compressed_event_log::CompressedEventLog, traits::importable::ImporterParameterValues,
+};
+use std::io::BufRead;
 
 pub enum EbiTraitStochasticSemantics {
     Usize(Box<dyn StochasticSemantics<StoSemState = usize, SemState = usize, AliState = usize>>),
@@ -92,8 +91,9 @@ pub trait ToStochasticSemantics: Importable + Sized {
 
     fn import_as_stochastic_semantics(
         reader: &mut dyn BufRead,
+        parameter_values: &ImporterParameterValues,
     ) -> Result<EbiTraitStochasticSemantics> {
-        Ok(Self::import(reader)?.to_stochastic_semantics())
+        Ok(Self::import(reader, parameter_values)?.to_stochastic_semantics())
     }
 }
 

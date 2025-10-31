@@ -1,9 +1,3 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::{
-    EbiObject, Exportable, FiniteLanguage, Importable,
-    ebi_objects::finite_language::FORMAT_SPECIFICATION,
-};
-
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
@@ -18,24 +12,42 @@ use crate::{
         ebi_trait_iterable_language::ToIterableLanguage, ebi_trait_semantics::ToSemantics,
     },
 };
+use anyhow::{Result, anyhow};
+use ebi_objects::{EbiObject, Exportable, FiniteLanguage, Importable};
 
 pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "finite language",
     article: "a",
     file_extension: "lang",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: FiniteLanguage::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(FiniteLanguage::validate),
     trait_importers: &[
-        EbiTraitImporter::Activities(FiniteLanguage::import_as_activities),
-        EbiTraitImporter::IterableLanguage(FiniteLanguage::import_as_iterable_language),
-        EbiTraitImporter::FiniteLanguage(FiniteLanguage::import_as_finite_language),
-        EbiTraitImporter::Semantics(FiniteLanguage::import_as_semantics),
+        EbiTraitImporter::Activities(
+            FiniteLanguage::import_as_activities,
+            FiniteLanguage::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::IterableLanguage(
+            FiniteLanguage::import_as_iterable_language,
+            FiniteLanguage::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::FiniteLanguage(
+            FiniteLanguage::import_as_finite_language,
+            FiniteLanguage::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Semantics(
+            FiniteLanguage::import_as_semantics,
+            FiniteLanguage::IMPORTER_PARAMETERS,
+        ),
     ],
     object_importers: &[
-        EbiObjectImporter::FiniteLanguage(FiniteLanguage::import_as_object),
+        EbiObjectImporter::FiniteLanguage(
+            FiniteLanguage::import_as_object,
+            FiniteLanguage::IMPORTER_PARAMETERS,
+        ),
         EbiObjectImporter::DeterministicFiniteAutomaton(
             FiniteLanguage::import_as_deterministic_finite_automaton_object,
+            &[],
         ),
     ],
     object_exporters: &[

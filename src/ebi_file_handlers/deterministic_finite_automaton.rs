@@ -1,7 +1,4 @@
-use ebi_objects::{
-    DeterministicFiniteAutomaton, Exportable, Importable,
-    ebi_objects::deterministic_finite_automaton::FORMAT_SPECIFICATION,
-};
+use ebi_objects::{DeterministicFiniteAutomaton, Exportable, Importable};
 
 use crate::{
     ebi_framework::{
@@ -22,19 +19,30 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "dfa",
     is_binary: false,
-    format_specification: FORMAT_SPECIFICATION,
+    format_specification: DeterministicFiniteAutomaton::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(DeterministicFiniteAutomaton::validate),
     trait_importers: &[
-        EbiTraitImporter::Activities(DeterministicFiniteAutomaton::import_as_activities),
-        EbiTraitImporter::Semantics(DeterministicFiniteAutomaton::import_as_semantics),
-        EbiTraitImporter::Graphable(DeterministicFiniteAutomaton::import_as_graphable),
+        EbiTraitImporter::Activities(
+            DeterministicFiniteAutomaton::import_as_activities,
+            DeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Semantics(
+            DeterministicFiniteAutomaton::import_as_semantics,
+            DeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Graphable(
+            DeterministicFiniteAutomaton::import_as_graphable,
+            DeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
+        ),
     ],
     object_importers: &[
         EbiObjectImporter::DeterministicFiniteAutomaton(
             DeterministicFiniteAutomaton::import_as_object,
+            DeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::LabelledPetriNet(
             DeterministicFiniteAutomaton::import_as_labelled_petri_net_object,
+            DeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
     ],
     object_exporters: &[
@@ -59,7 +67,10 @@ mod tests {
 
     use ebi_objects::{DeterministicFiniteAutomaton, HasActivityKey};
 
-    use crate::{ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics}, semantics::semantics::Semantics};
+    use crate::{
+        ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+        semantics::semantics::Semantics,
+    };
 
     #[test]
     fn insert_wrong_edge() {

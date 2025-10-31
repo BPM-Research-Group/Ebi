@@ -119,7 +119,11 @@ pub fn get_all_test_files() -> Vec<(
                             importer
                         );
                         let object = EbiInput::Object(
-                            (importer.get_importer())(&mut reader.get().unwrap()).unwrap(),
+                            (importer.get_importer())(
+                                &mut reader.get().unwrap(),
+                                &importer.default_parameter_values(),
+                            )
+                            .unwrap(),
                             file_handler,
                         );
 
@@ -129,7 +133,12 @@ pub fn get_all_test_files() -> Vec<(
 
                 for importer in file_handler.trait_importers {
                     let object = EbiInput::Trait(
-                        importer.import(&mut reader.get().unwrap()).unwrap(),
+                        importer
+                            .import(
+                                &mut reader.get().unwrap(),
+                                &importer.default_parameter_values(),
+                            )
+                            .unwrap(),
                         file_handler,
                     );
 
@@ -145,7 +154,13 @@ pub fn get_all_test_files() -> Vec<(
                         file_handler,
                         importer
                     );
-                    assert!((importer.get_importer())(&mut reader.get().unwrap()).is_err());
+                    assert!(
+                        (importer.get_importer())(
+                            &mut reader.get().unwrap(),
+                            &importer.default_parameter_values()
+                        )
+                        .is_err()
+                    );
                 }
 
                 for importer in file_handler.trait_importers {
@@ -155,7 +170,14 @@ pub fn get_all_test_files() -> Vec<(
                         file_handler,
                         importer
                     );
-                    assert!(importer.import(&mut reader.get().unwrap()).is_err());
+                    assert!(
+                        importer
+                            .import(
+                                &mut reader.get().unwrap(),
+                                &importer.default_parameter_values()
+                            )
+                            .is_err()
+                    );
                 }
             }
         }
@@ -172,7 +194,7 @@ pub fn should_file_be_tested(
     //special case: empty.ptree and empty_2.ptree cannot be imported as an LPN, but it is not invalid
 
     use crate::ebi_file_handlers::process_tree::EBI_PROCESS_TREE;
-    let special = if let EbiObjectImporter::LabelledPetriNet(_) = importer {
+    let special = if let EbiObjectImporter::LabelledPetriNet(_, _) = importer {
         true
     } else {
         false
@@ -189,8 +211,8 @@ pub mod tests {
     use std::fs::{self, File};
 
     use ebi_objects::{
-        DeterministicFiniteAutomaton, EbiObjectType, EventLog, FiniteLanguage, Infoable,
-        NumberOfTraces, PetriNetMarkupLanguage, ProcessTreeMarkupLanguage,
+        DeterministicFiniteAutomaton, EbiObjectType, EventLog, FiniteLanguage, Importable,
+        Infoable, NumberOfTraces, PetriNetMarkupLanguage, ProcessTreeMarkupLanguage,
         StochasticDeterministicFiniteAutomaton,
     };
     use strum::IntoEnumIterator;
@@ -294,8 +316,11 @@ pub mod tests {
     #[test]
     fn pnml_empty() {
         let mut reader = MultipleReader::from_file(File::open("testfiles/empty.pnml").unwrap());
-        let semantics =
-            PetriNetMarkupLanguage::import_as_semantics(&mut reader.get().unwrap()).unwrap();
+        let semantics = PetriNetMarkupLanguage::import_as_semantics(
+            &mut reader.get().unwrap(),
+            &PetriNetMarkupLanguage::default_importer_parameter_values(),
+        )
+        .unwrap();
 
         if let EbiTraitSemantics::Marking(semantics) = semantics {
             let state = semantics.get_initial_state().unwrap();

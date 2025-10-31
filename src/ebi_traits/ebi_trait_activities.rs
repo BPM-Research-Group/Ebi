@@ -4,7 +4,7 @@ use crate::ebi_framework::{
     ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
 };
 use anyhow::{Result, anyhow};
-use ebi_objects::{HasActivityKey, Importable};
+use ebi_objects::{HasActivityKey, Importable, traits::importable::ImporterParameterValues};
 
 pub trait EbiTraitActivities: HasActivityKey {}
 
@@ -26,11 +26,11 @@ impl FromEbiTraitObject for dyn EbiTraitActivities {
 pub trait ToActivities: Importable {
     fn to_activities(self) -> Box<dyn EbiTraitActivities>;
 
-    fn import_as_activities(reader: &mut dyn BufRead) -> Result<Box<dyn EbiTraitActivities>>
+    fn import_as_activities(reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) -> Result<Box<dyn EbiTraitActivities>>
     where
         Self: Sized,
     {
-        Ok(Self::import(reader)?.to_activities())
+        Ok(Self::import(reader, parameter_values)?.to_activities())
     }
 }
 

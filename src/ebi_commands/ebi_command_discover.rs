@@ -1,5 +1,5 @@
 use anyhow::{Context, anyhow};
-use ebi_arithmetic::Fraction;
+use ebi_arithmetic::{ConstFraction, Fraction};
 use ebi_objects::{EbiObject, EbiObjectType, LabelledPetriNet, ProcessTree};
 
 use crate::{
@@ -7,10 +7,10 @@ use crate::{
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
         ebi_output::{EbiOutput, EbiOutputType},
-        ebi_trait::EbiTrait, ebi_trait_object::EbiTraitObject,
+        ebi_trait::EbiTrait,
+        ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::constant_fraction::ConstFraction,
     techniques::{
         alignment_stochastic_miner::AlignmentMiner,
         directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
@@ -114,20 +114,23 @@ pub const EBI_DISCOVER_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsGraph),
 };
 
-pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Command { 
-    name_short: "occ", 
-    name_long: Some("occurrence"), 
-    explanation_short: "Give each transition a weight that matches the occurrences of its label; silent transitions get a weight of 1.", 
-    explanation_long: None, 
-    latex_link: Some("~\\cite{DBLP:conf/icpm/BurkeLW20}"), 
-    cli_command: None, 
-    exact_arithmetic: true, 
-    input_types: &[ 
-        &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)], 
-        &[ &EbiInputType::Object(EbiObjectType::LabelledPetriNet)]
-    ], 
-    input_names: &[ "FILE_1", "FILE_2" ], 
-    input_helps: &[ "A finite stochastic language (log) to get the occurrences from.", "A labelled Petri net with the control flow." ], 
+pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Command {
+    name_short: "occ",
+    name_long: Some("occurrence"),
+    explanation_short: "Give each transition a weight that matches the occurrences of its label; silent transitions get a weight of 1.",
+    explanation_long: None,
+    latex_link: Some("~\\cite{DBLP:conf/icpm/BurkeLW20}"),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)],
+    ],
+    input_names: &["FILE_1", "FILE_2"],
+    input_helps: &[
+        "A finite stochastic language (log) to get the occurrences from.",
+        "A labelled Petri net with the control flow.",
+    ],
     execute: |mut inputs, _| {
         let language = inputs
             .remove(0)
@@ -169,19 +172,17 @@ pub const EBI_DISCOVER_OCCURRENCE_PTREE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticProcessTree),
 };
 
-pub const EBI_DISCOVER_UNIFORM: EbiCommand = EbiCommand::Command { 
-    name_short: "uni", 
-    name_long: Some("uniform"), 
-    explanation_short: "Give each transition a weight of 1.", 
-    explanation_long: None, 
-    latex_link: None, 
-    cli_command: None, 
-    exact_arithmetic: true, 
-    input_types: &[ 
-        &[ &EbiInputType::Object(EbiObjectType::LabelledPetriNet)]
-    ], 
-    input_names: &["LPN_FILE" ], 
-    input_helps: &[ "A labelled Petri net." ], 
+pub const EBI_DISCOVER_UNIFORM: EbiCommand = EbiCommand::Command {
+    name_short: "uni",
+    name_long: Some("uniform"),
+    explanation_short: "Give each transition a weight of 1.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)]],
+    input_names: &["LPN_FILE"],
+    input_helps: &["A labelled Petri net."],
     execute: |mut inputs, _| {
         let lpn = inputs.remove(0).to_type::<LabelledPetriNet>()?;
         Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(
