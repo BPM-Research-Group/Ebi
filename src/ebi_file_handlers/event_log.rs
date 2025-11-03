@@ -29,7 +29,7 @@ use ebi_objects::{
 };
 
 pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
-    name: "event log",
+    name: "extensible event stream",
     article: "an",
     file_extension: "xes",
     is_binary: false,

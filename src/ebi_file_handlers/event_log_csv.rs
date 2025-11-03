@@ -16,8 +16,8 @@ use crate::{
 use ebi_objects::{Exportable, Importable, ebi_objects::event_log_csv::EventLogCsv};
 
 pub const EBI_EVENT_LOG_CSV: EbiFileHandler = EbiFileHandler {
-    name: "event log",
-    article: "an",
+    name: "comma-separated values",
+    article: "a",
     file_extension: "csv",
     is_binary: false,
     format_specification: EventLogCsv::FILE_FORMAT_SPECIFICATION_LATEX,
