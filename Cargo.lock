@@ -549,6 +549,27 @@ dependencies = [
 ]
 
 [[package]]
+name = "csv"
+version = "1.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "52cd9d68cf7efc6ddfaaee42e7288d3a99d613d4b50f76ce9827ae0c6e14f938"
+dependencies = [
+ "csv-core",
+ "itoa",
+ "ryu",
+ "serde_core",
+]
+
+[[package]]
+name = "csv-core"
+version = "0.1.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "704a3c26996a80471189265814dbc2c257598b96b8a7feae2d31ace646bb9782"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "darling"
 version = "0.21.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -729,12 +750,13 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
-version = "0.3.34"
+version = "0.3.39"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4184aeafb941f4213710f46d0722959a47ec98e8f2cb4a22b5b1945da4ab711a"
+checksum = "d806b18e828a2d252504005adc0bf0559fb9d97dfbd56c8a59027d49284679a0"
 dependencies = [
  "anyhow",
  "chrono",
+ "csv",
  "ebi_arithmetic",
  "ebi_derive",
  "flate2",

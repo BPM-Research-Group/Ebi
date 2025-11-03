@@ -38,6 +38,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
                 sdfa.to_string()
             }
             EbiInput::Object(EbiObject::EventLog(log), _) => log.to_string(),
+            EbiInput::Object(EbiObject::EventLogCsv(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::EventLogTraceAttributes(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::EventLogXes(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::FiniteLanguage(language), _) => language.to_string(),

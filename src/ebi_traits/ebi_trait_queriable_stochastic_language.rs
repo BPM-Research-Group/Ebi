@@ -1,10 +1,7 @@
 use anyhow::{Context, Error, Result, anyhow};
 use ebi_arithmetic::{Fraction, Zero};
 use ebi_objects::{
-    ActivityKeyTranslator, CompressedEventLog, DirectlyFollowsGraph, EventLog,
-    EventLogTraceAttributes, FiniteStochasticLanguage, HasActivityKey, Importable,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    traits::importable::ImporterParameterValues,
+    ActivityKeyTranslator, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, Importable, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, ebi_objects::{compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes, event_log_csv::EventLogCsv}, traits::importable::ImporterParameterValues
 };
 use std::{
     io::BufRead,
@@ -151,6 +148,9 @@ queriable_via_slpn!(StochasticDirectlyFollowsModel);
 queriable_via_slang!(EventLog);
 queriable_via_slang!(EventLogTraceAttributes);
 queriable_via_slang!(CompressedEventLog);
+queriable_via_slang!(CompressedEventLogTraceAttributes);
+queriable_via_slang!(EventLogXes);
+queriable_via_slang!(EventLogCsv);
 
 #[cfg(test)]
 mod tests {

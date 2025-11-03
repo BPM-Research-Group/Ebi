@@ -1,7 +1,9 @@
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    Activity, CompressedEventLog, EventLog, EventLogTraceAttributes, HasActivityKey, Importable,
-    IntoRefTraceIterator, NumberOfTraces, traits::importable::ImporterParameterValues,
+    Activity, CompressedEventLog, EventLog, EventLogCsv, EventLogTraceAttributes, HasActivityKey,
+    Importable, IntoRefTraceIterator, NumberOfTraces,
+    ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
+    traits::importable::ImporterParameterValues,
 };
 use std::{collections::HashMap, io::BufRead};
 
@@ -87,5 +89,18 @@ where
 impl ToEventLog for CompressedEventLog {
     fn to_event_log(self) -> Box<dyn EbiTraitEventLog> {
         Box::new(self.log)
+    }
+}
+
+impl ToEventLog for CompressedEventLogTraceAttributes {
+    fn to_event_log(self) -> Box<dyn EbiTraitEventLog> {
+        Box::new(self.log)
+    }
+}
+
+impl ToEventLog for EventLogCsv {
+    fn to_event_log(self) -> Box<dyn EbiTraitEventLog> {
+        let log: EventLog = self.into();
+        Box::new(log)
     }
 }

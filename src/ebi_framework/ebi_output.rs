@@ -7,7 +7,7 @@ use ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         deterministic_finite_automaton::DeterministicFiniteAutomaton,
         directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel,
-        executions::Executions, finite_language::FiniteLanguage,
+        event_log_csv::EventLogCsv, executions::Executions, finite_language::FiniteLanguage,
         finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet,
         language_of_alignments::LanguageOfAlignments, process_tree::ProcessTree,
         scalable_vector_graphics::ScalableVectorGraphics,
@@ -32,8 +32,8 @@ use crate::{
         compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
         deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
         directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
-        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, executions::EBI_EXECUTIONS,
-        finite_language::EBI_FINITE_LANGUAGE,
+        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_csv::EBI_EVENT_LOG_CSV,
+        executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE,
         finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
         labelled_petri_net::EBI_LABELLED_PETRI_NET,
         language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS, process_tree::EBI_PROCESS_TREE,
@@ -185,6 +185,10 @@ impl EbiOutputType {
             EbiOutputType::ObjectType(EbiObjectType::EventLog) => EbiExporter::Object(
                 &EbiObjectExporter::EventLog(CompressedEventLog::export_from_object),
                 &EBI_COMPRESSED_EVENT_LOG,
+            ),
+            EbiOutputType::ObjectType(EbiObjectType::EventLogCsv) => EbiExporter::Object(
+                &EbiObjectExporter::EventLog(EventLogCsv::export_from_object),
+                &EBI_EVENT_LOG_CSV,
             ),
             EbiOutputType::ObjectType(EbiObjectType::EventLogTraceAttributes) => {
                 EbiExporter::Object(
@@ -407,6 +411,7 @@ impl Display for EbiExporter {
 #[derive(Debug, Hash)]
 pub enum EbiObjectExporter {
     EventLog(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
+    EventLogCsv(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogTraceAttributes(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogXes(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     DirectlyFollowsModel(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
@@ -432,6 +437,7 @@ impl EbiObjectExporter {
     pub fn get_type(&self) -> EbiObjectType {
         match self {
             EbiObjectExporter::EventLog(_) => EbiObjectType::EventLog,
+            EbiObjectExporter::EventLogCsv(_) => EbiObjectType::EventLogCsv,
             EbiObjectExporter::EventLogTraceAttributes(_) => EbiObjectType::EventLogTraceAttributes,
             EbiObjectExporter::EventLogXes(_) => EbiObjectType::EventLogXes,
             EbiObjectExporter::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
@@ -468,6 +474,7 @@ impl EbiObjectExporter {
         if let EbiOutput::Object(object) = object {
             match self {
                 EbiObjectExporter::EventLog(exporter) => (exporter)(object, f),
+                EbiObjectExporter::EventLogCsv(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogTraceAttributes(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogXes(exporter) => (exporter)(object, f),
                 EbiObjectExporter::DirectlyFollowsModel(exporter) => (exporter)(object, f),
@@ -556,8 +563,20 @@ mod tests {
                 for file_handler2 in EBI_FILE_HANDLERS {
                     for exporter in file_handler2.object_exporters {
                         if exporter.get_type() == importer.clone().unwrap().get_type() {
-                            println!("file {} importer {:?} exporter {}", f, importer, exporter);
+                            println!(
+                                "file {}\n\timporter\t{:?}\n\texporter\t{}\n\tobject\t\t{}",
+                                f,
+                                importer,
+                                exporter,
+                                object.get_type()
+                            );
+
+                            if importer.clone().unwrap().get_type() != object.get_type() {
+                                assert!(false)
+                            }
+
                             let mut c = Cursor::new(Vec::new());
+                            println!("\tobject type\t{}", object.get_type());
                             exporter
                                 .export(EbiOutput::Object(object.clone()), &mut c)
                                 .unwrap();

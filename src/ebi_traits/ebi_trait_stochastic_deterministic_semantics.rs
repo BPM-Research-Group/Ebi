@@ -13,8 +13,14 @@ use anyhow::{Result, anyhow};
 use ebi_arithmetic::Fraction;
 use ebi_objects::{
     Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogTraceAttributes,
-    FiniteStochasticLanguage, HasActivityKey, Importable, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree, traits::importable::ImporterParameterValues,
+    EventLogXes, FiniteStochasticLanguage, HasActivityKey, Importable,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticProcessTree,
+    ebi_objects::{
+        compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
+        event_log_csv::EventLogCsv,
+    },
+    traits::importable::ImporterParameterValues,
 };
 use std::io::BufRead;
 
@@ -120,11 +126,23 @@ pub trait ToStochasticDeterministicSemantics: Importable + Sized {
     }
 }
 
-impl ToStochasticDeterministicSemantics for CompressedEventLog {
-    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
-        self.log.to_stochastic_deterministic_semantics()
-    }
+macro_rules! via_fslang {
+    ($t:ident) => {
+        impl ToStochasticDeterministicSemantics for $t {
+            fn to_stochastic_deterministic_semantics(
+                self,
+            ) -> EbiTraitStochasticDeterministicSemantics {
+                Into::<FiniteStochasticLanguage>::into(self).to_stochastic_deterministic_semantics()
+            }
+        }
+    };
 }
+via_fslang!(CompressedEventLog);
+via_fslang!(CompressedEventLogTraceAttributes);
+via_fslang!(EventLog);
+via_fslang!(EventLogTraceAttributes);
+via_fslang!(EventLogXes);
+via_fslang!(EventLogCsv);
 
 impl ToStochasticDeterministicSemantics for StochasticProcessTree {
     fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
@@ -153,18 +171,6 @@ impl ToStochasticDeterministicSemantics for StochasticDirectlyFollowsModel {
 impl ToStochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton {
     fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
         EbiTraitStochasticDeterministicSemantics::Usize(Box::new(self))
-    }
-}
-
-impl ToStochasticDeterministicSemantics for EventLog {
-    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
-        Into::<FiniteStochasticLanguage>::into(self).to_stochastic_deterministic_semantics()
-    }
-}
-
-impl ToStochasticDeterministicSemantics for EventLogTraceAttributes {
-    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
-        Into::<FiniteStochasticLanguage>::into(self).to_stochastic_deterministic_semantics()
     }
 }
 

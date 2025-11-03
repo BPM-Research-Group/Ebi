@@ -13,6 +13,7 @@ use ebi_objects::{
     EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
     LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
+    ebi_objects::event_log_csv::EventLogCsv,
 };
 
 pub trait Bounded {
@@ -164,6 +165,7 @@ usize!(DirectlyFollowsModel);
 usize!(StochasticDirectlyFollowsModel);
 usize!(FiniteLanguage);
 usize!(EventLog);
+usize!(EventLogCsv);
 usize!(EventLogTraceAttributes);
 usize!(EventLogXes);
 usize!(FiniteStochasticLanguage);

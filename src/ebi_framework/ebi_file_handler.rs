@@ -1,7 +1,3 @@
-use anyhow::{Error, Result, anyhow};
-use ebi_objects::EbiObjectType;
-use std::{collections::BTreeSet, fmt::Display, hash::Hash, io::BufRead, str::FromStr};
-
 use crate::{
     ebi_commands::ebi_command_validate::EBI_VALIDATE,
     ebi_file_handlers::{
@@ -9,7 +5,8 @@ use crate::{
         deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
         directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
         directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log::EBI_EVENT_LOG,
-        executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE,
+        event_log_csv::EBI_EVENT_LOG_CSV, executions::EBI_EXECUTIONS,
+        finite_language::EBI_FINITE_LANGUAGE,
         finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
         labelled_petri_net::EBI_LABELLED_PETRI_NET,
         language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS, lola_net::EBI_LOLA_NET,
@@ -25,6 +22,9 @@ use crate::{
     },
     ebi_framework::ebi_command::get_applicable_commands,
 };
+use anyhow::{Error, Result, anyhow};
+use ebi_objects::EbiObjectType;
+use std::{collections::BTreeSet, fmt::Display, hash::Hash, io::BufRead, str::FromStr};
 
 use super::{
     ebi_command::{EBI_COMMANDS, EbiCommand},
@@ -45,6 +45,7 @@ pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_DIRECTLY_FOLLOWS_MODEL,
     EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL,
     EBI_EVENT_LOG,
+    EBI_EVENT_LOG_CSV,
     EBI_EXECUTIONS,
     EBI_FINITE_LANGUAGE,
     EBI_FINITE_STOCHASTIC_LANGUAGE,

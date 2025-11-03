@@ -11,15 +11,17 @@ use crate::{
 use anyhow::{Result, anyhow};
 use ebi_objects::{
     ActivityKey, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
-    EventLog, EventLogTraceAttributes, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey,
-    Importable, LabelledPetriNet, LolaNet, PetriNetMarkupLanguage, ProcessTree,
+    EventLog, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
+    HasActivityKey, Importable, LabelledPetriNet, LolaNet, PetriNetMarkupLanguage, ProcessTree,
     ProcessTreeMarkupLanguage, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
     TranslateActivityKey,
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-    }, traits::importable::ImporterParameterValues,
+        event_log_csv::EventLogCsv,
+    },
+    traits::importable::ImporterParameterValues,
 };
 use std::io::BufRead;
 
@@ -91,19 +93,21 @@ pub trait ToSemantics: Importable + Sized {
     }
 }
 
-impl ToSemantics for CompressedEventLog {
-    fn to_semantics(self) -> EbiTraitSemantics {
-        let log: EventLog = self.into();
-        log.to_semantics()
-    }
+macro_rules! via_log {
+    ($t:ident) => {
+        impl ToSemantics for $t {
+            fn to_semantics(self) -> EbiTraitSemantics {
+                Into::<FiniteLanguage>::into(self).to_semantics()
+            }
+        }
+    };
 }
-
-impl ToSemantics for CompressedEventLogTraceAttributes {
-    fn to_semantics(self) -> EbiTraitSemantics {
-        let log: EventLog = self.into();
-        log.to_semantics()
-    }
-}
+via_log!(CompressedEventLog);
+via_log!(CompressedEventLogTraceAttributes);
+via_log!(EventLog);
+via_log!(EventLogTraceAttributes);
+via_log!(EventLogXes);
+via_log!(EventLogCsv);
 
 impl ToSemantics for DeterministicFiniteAutomaton {
     fn to_semantics(self) -> EbiTraitSemantics {
@@ -163,18 +167,6 @@ impl ToSemantics for DirectlyFollowsModel {
 impl ToSemantics for StochasticDeterministicFiniteAutomaton {
     fn to_semantics(self) -> EbiTraitSemantics {
         EbiTraitSemantics::Usize(Box::new(self))
-    }
-}
-
-impl ToSemantics for EventLog {
-    fn to_semantics(self) -> EbiTraitSemantics {
-        Into::<FiniteStochasticLanguage>::into(self).to_semantics()
-    }
-}
-
-impl ToSemantics for EventLogTraceAttributes {
-    fn to_semantics(self) -> EbiTraitSemantics {
-        Into::<FiniteStochasticLanguage>::into(self).to_semantics()
     }
 }
 

@@ -10,10 +10,16 @@ use crate::{
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    ActivityKey, DirectlyFollowsGraph, EventLog, EventLogTraceAttributes, FiniteStochasticLanguage,
-    HasActivityKey, Importable, StochasticDeterministicFiniteAutomaton,
+    ActivityKey, DirectlyFollowsGraph, EventLog, EventLogTraceAttributes, EventLogXes,
+    FiniteStochasticLanguage, HasActivityKey, Importable, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
-    TranslateActivityKey, ebi_objects::compressed_event_log::CompressedEventLog, traits::importable::ImporterParameterValues,
+    TranslateActivityKey,
+    ebi_objects::{
+        compressed_event_log::CompressedEventLog,
+        compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
+        event_log_csv::EventLogCsv,
+    },
+    traits::importable::ImporterParameterValues,
 };
 use std::io::BufRead;
 
@@ -97,11 +103,21 @@ pub trait ToStochasticSemantics: Importable + Sized {
     }
 }
 
-impl ToStochasticSemantics for CompressedEventLog {
-    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
-        self.log.to_stochastic_semantics()
-    }
+macro_rules! via_fslang {
+    ($t:ident) => {
+        impl ToStochasticSemantics for $t {
+            fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+                Into::<FiniteStochasticLanguage>::into(self).to_stochastic_semantics()
+            }
+        }
+    };
 }
+via_fslang!(CompressedEventLog);
+via_fslang!(CompressedEventLogTraceAttributes);
+via_fslang!(EventLog);
+via_fslang!(EventLogTraceAttributes);
+via_fslang!(EventLogXes);
+via_fslang!(EventLogCsv);
 
 impl ToStochasticSemantics for StochasticProcessTree {
     fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
@@ -131,18 +147,6 @@ impl ToStochasticSemantics for StochasticDirectlyFollowsModel {
 impl ToStochasticSemantics for StochasticDeterministicFiniteAutomaton {
     fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
         EbiTraitStochasticSemantics::Usize(Box::new(self))
-    }
-}
-
-impl ToStochasticSemantics for EventLog {
-    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
-        Into::<FiniteStochasticLanguage>::into(self).to_stochastic_semantics()
-    }
-}
-
-impl ToStochasticSemantics for EventLogTraceAttributes {
-    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
-        Into::<FiniteStochasticLanguage>::into(self).to_stochastic_semantics()
     }
 }
 

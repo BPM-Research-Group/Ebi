@@ -12,7 +12,7 @@ use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
     EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
     LabelledPetriNet, NumberOfTraces, ProcessTree, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree, ebi_objects::event_log_csv::EventLogCsv,
 };
 
 pub trait AnyTraces {
@@ -91,6 +91,7 @@ macro_rules! dfm {
 lang!(FiniteLanguage);
 lang!(FiniteStochasticLanguage);
 lang!(EventLog);
+lang!(EventLogCsv);
 lang!(EventLogTraceAttributes);
 lang!(EventLogXes);
 lpn!(LabelledPetriNet);

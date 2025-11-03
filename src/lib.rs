@@ -35,6 +35,7 @@ pub mod ebi_file_handlers {
     pub mod directly_follows_graph;
     pub mod directly_follows_model;
     pub mod event_log;
+    pub mod event_log_csv;
     pub mod executions;
     pub mod finite_language;
     pub mod finite_stochastic_language;
