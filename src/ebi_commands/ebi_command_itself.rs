@@ -250,7 +250,7 @@ fn manual() -> Result<EbiOutput> {
             //importer parameters
             for (input_index, (input_types, input_name)) in input_typess.iter().zip(input_names.iter()).enumerate() {
                 for parameter in ebi_importer_parameters::merge_importer_parameters(input_types) { 
-                    writeln!(f, "\\texttt{{--{}}} & This parameter applies to some of the importers of the {} input {}. {}\\\\", ebi_importer_parameters::name_to_id(parameter.name(), input_index).escape_latex(), input_index.rank(), input_name.escape_latex(), ebi_importer_parameters::explanation_with_values(parameter).escape_latex())?;
+                    writeln!(f, "\\texttt{{--{}}} & {}. This parameter applies to some of the importers of the {} input {}. {}\\\\", ebi_importer_parameters::name_to_id(parameter.name(), input_index).escape_latex(), parameter.explanation().escape_latex(), input_index.rank(), input_name.escape_latex(), ebi_importer_parameters::explanation_with_values(parameter).escape_latex())?;
                     writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
                     if ebi_importer_parameters::has_accepted_values(parameter) {
                         writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", ebi_importer_parameters::explanation_with_values(parameter).escape_latex())?;
