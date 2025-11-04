@@ -27,7 +27,7 @@ eapproximatearithmetic = []
 ebi_derive = "0.2.7"
 ebi_arithmetic = "0.3.2"
 ebi_optimisation = "0.3.0"
-ebi_objects = "0.3.41"
+ebi_objects = "0.3.42"
 bitvec = "1.0.1"
 clap = { version = "4.5.51", features = ["derive", "cargo", "string"] }
 anyhow = "1.0.100"
