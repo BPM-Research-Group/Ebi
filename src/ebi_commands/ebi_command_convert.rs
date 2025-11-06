@@ -1,6 +1,5 @@
 use ebi_objects::{
-    EbiObject, EbiObjectType, FiniteStochasticLanguage, LabelledPetriNet,
-    StochasticDeterministicFiniteAutomaton,
+    EbiObject, EbiObjectType, EventLog, FiniteStochasticLanguage, LabelledPetriNet, StochasticDeterministicFiniteAutomaton
 };
 
 use crate::ebi_framework::{
@@ -14,7 +13,27 @@ pub const EBI_CONVERT: EbiCommand = EbiCommand::Group {
     name_long: Some("convert"),
     explanation_short: "Convert an object into something else.",
     explanation_long: None,
-    children: &[&EBI_CONVERT_LPN, &EBI_CONVERT_SLANG, &EBI_CONVERT_SDFA],
+    children: &[& EBI_CONVERT_LOG, &EBI_CONVERT_LPN, &EBI_CONVERT_SLANG, &EBI_CONVERT_SDFA],
+};
+
+pub const EBI_CONVERT_LOG: EbiCommand = EbiCommand::Command {
+    name_short: "log",
+    name_long: None,
+    explanation_short: "Convert an object to an event log, considering only its traces.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::EventLog), //every object that can be imported as an event log will be supported by the framework
+    ]],
+    input_names: &["FILE"],
+    input_helps: &["Any file supported by Ebi that can be converted."],
+    execute: |mut inputs, _| {
+        let lpn = inputs.remove(0).to_type::<EventLog>()?;
+        Ok(EbiOutput::Object(EbiObject::EventLog(*lpn)))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::EventLog),
 };
 
 pub const EBI_CONVERT_LPN: EbiCommand = EbiCommand::Command {
