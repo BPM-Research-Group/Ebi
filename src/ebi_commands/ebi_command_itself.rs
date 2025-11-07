@@ -1,4 +1,4 @@
-use std::{collections::HashMap, io::Write};
+use std::{collections::{BTreeSet, HashMap}, io::Write};
 use clap::Command;
 use anyhow::Result;
 use ebi_objects::{ebi_objects::scalable_vector_graphics::ToSVGMut, EbiObject, EbiObjectType};
@@ -279,7 +279,8 @@ fn manual() -> Result<EbiOutput> {
 
     //file handlers
     writeln!(f, "\\long\\def\\ebifilehandlers{{")?;
-    for (i, file_handler) in EBI_FILE_HANDLERS.iter().enumerate() {
+    let file_handlers: BTreeSet::<_> = EBI_FILE_HANDLERS.iter().collect();
+    for (i, file_handler) in file_handlers.iter().enumerate() {
         if i != 0 {
             writeln!(f, "\\clearpage")?;
         }
