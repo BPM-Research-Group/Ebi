@@ -322,8 +322,9 @@ fn manual() -> Result<EbiOutput> {
     writeln!(f, "}}")?;
 
     //file handlers list
+    let file_handlers: BTreeSet::<_> = EBI_FILE_HANDLERS.iter().collect();
     writeln!(f, "\\def\\ebifilehandlerlist{{\\begin{{itemize}}")?;
-    for file_handler in EBI_FILE_HANDLERS {
+    for file_handler in file_handlers {
         writeln!(f, "\\item {} (.{}) (Section~\\ref{{filehandler:{}}})", file_handler.name, file_handler.file_extension, file_handler.name)?;
     }
     writeln!(f, "\\end{{itemize}}}}")?;
