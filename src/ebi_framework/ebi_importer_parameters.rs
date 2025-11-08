@@ -198,10 +198,14 @@ pub fn extract_parameter_values(
             *parameter,
             match parameter {
                 ImporterParameter::Flag { name, .. } => {
-                    if let Some(cli_matches) = cli_matches
-                        && cli_matches.contains_id(&name_to_id(name, input_index))
-                    {
-                        ImporterParameterValue::Boolean(true)
+                    println!("flag {}", name);
+
+                    if let Some(cli_matches) = cli_matches {
+                        ImporterParameterValue::Boolean(
+                            *cli_matches
+                                .get_one::<bool>(&name_to_id(name, input_index))
+                                .unwrap_or(&false),
+                        )
                     } else {
                         ImporterParameterValue::Boolean(false)
                     }
