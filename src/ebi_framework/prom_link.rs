@@ -139,7 +139,7 @@ pub fn handle_prom_request(
         //write result to string
         let mut output_path = PathBuf::new();
         output_path.push(output_format);
-        let exporter = EbiCommand::select_exporter(output_type, Some(&output_path));
+        let exporter = EbiCommand::select_exporter(output_type, Some(&output_path), None)?;
         ebi_output::export_to_string(result, exporter)
     } else {
         Err(anyhow!("Command not found"))

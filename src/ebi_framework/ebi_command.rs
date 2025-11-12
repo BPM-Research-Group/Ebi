@@ -1,3 +1,21 @@
+use super::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{self, EbiInput, EbiInputType},
+    ebi_output::{EbiExporter, EbiOutput, EbiOutputType},
+};
+use crate::{
+    ebi_commands::{
+        ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association,
+        ebi_command_conformance, ebi_command_conformance_non_stochastic, ebi_command_convert,
+        ebi_command_discover, ebi_command_discover_non_stochastic, ebi_command_filter,
+        ebi_command_info,
+        ebi_command_itself::{self},
+        ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate,
+        ebi_command_visualise,
+    },
+    ebi_framework::{ebi_importer_parameters, ebi_output},
+    text::Joiner,
+};
 use anyhow::{Context, Result, anyhow};
 use clap::{Arg, ArgAction, ArgMatches, Command, value_parser};
 use ebi_arithmetic::{Fraction, exact::set_exact_globally, parsing::FractionNotParsedYet};
@@ -13,23 +31,6 @@ use std::{
     io::Write,
     path::PathBuf,
     time::Duration,
-};
-
-use crate::{
-    ebi_commands::{
-        ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association,
-        ebi_command_conformance, ebi_command_conformance_non_stochastic, ebi_command_convert,
-        ebi_command_discover, ebi_command_discover_non_stochastic, ebi_command_filter,
-        ebi_command_info, ebi_command_itself, ebi_command_probability, ebi_command_sample,
-        ebi_command_test, ebi_command_validate, ebi_command_visualise,
-    },
-    ebi_framework::{ebi_importer_parameters, ebi_output},
-};
-
-use super::{
-    ebi_file_handler::EbiFileHandler,
-    ebi_input::{self, EbiInput, EbiInputType},
-    ebi_output::{EbiExporter, EbiOutput, EbiOutputType},
 };
 
 pub const EBI_COMMANDS: EbiCommand = EbiCommand::Group {
@@ -58,8 +59,10 @@ pub const EBI_COMMANDS: EbiCommand = EbiCommand::Group {
 };
 
 pub const ARG_SHORT_OUTPUT: char = 'o';
+pub const ARG_SHORT_OUTPUT_TYPE: char = 't';
 pub const ARG_SHORT_APPROX: char = 'a';
 pub const ARG_ID_OUTPUT: &str = "output";
+pub const ARG_ID_OUTPUT_TYPE: &str = "output_type";
 
 pub enum EbiCommand {
     Group {
@@ -132,6 +135,7 @@ impl EbiCommand {
                 input_types,
                 input_helps: input_help,
                 input_names,
+                output_type,
                 ..
             } => {
                 let name = if let Some(x) = name_long {
@@ -176,16 +180,44 @@ impl EbiCommand {
                     command = (f)(command);
                 }
 
-                //output flag
+                //output type flag
+
+                let output_extensions = output_type
+                    .get_exporters()
+                    .iter()
+                    .map(|exporter| exporter.get_extension())
+                    .collect::<Vec<_>>()
+                    .join_with(", ", " and ");
+                if output_type.get_exporters().len() > 1 {
+                    command = command.arg(
+                        Arg::new(ARG_ID_OUTPUT_TYPE)
+                            .short(ARG_SHORT_OUTPUT_TYPE)
+                            .long(ARG_ID_OUTPUT_TYPE)
+                            .action(ArgAction::Set)
+                            .value_name("OUTPUT_TYPE")
+                            .help("Specify the output type.")
+                            .long_help(format!("Specify the output file extension (without period). The default is {}. Possible values are {}.", output_type.get_default_exporter().get_extension(), output_extensions))
+                            .value_parser(value_parser!(String)),
+                        );
+                };
+
+                //output file flag
                 command = command.arg(
-                    Arg::new(ARG_ID_OUTPUT)
+                    { let mut arg = Arg::new(ARG_ID_OUTPUT)
                         .short(ARG_SHORT_OUTPUT)
                         .long(ARG_ID_OUTPUT)
                         .action(ArgAction::Set)
                         .value_name("FILE")
                         .help("Saves the result to a file.")
                         .required(false)
-                        .value_parser(value_parser!(PathBuf)),
+                        .value_parser(value_parser!(PathBuf));
+
+                        if output_type.get_exporters().len() > 1 {
+                            arg = arg.long_help(format!("Saves the results to a file. The file type is determined by its extension, unless the -{} parameter is also given.", ARG_SHORT_OUTPUT_TYPE))
+                        }
+
+                        arg
+                    }
                 );
 
                 //exact arithmetic flag
@@ -352,7 +384,7 @@ impl EbiCommand {
 
                 if let Some(to_file) = cli_matches.get_one::<PathBuf>(ARG_ID_OUTPUT) {
                     //write result to file
-                    let exporter = Self::select_exporter(output_type, Some(to_file));
+                    let exporter = Self::select_exporter(output_type, Some(to_file), Some(cli_matches))?;
                     log::info!(
                         "Writing result to {:?} as {} {}",
                         to_file,
@@ -362,7 +394,7 @@ impl EbiCommand {
                     ebi_output::export_object(to_file, result, exporter)?;
                 } else {
                     //write result to STDOUT
-                    let exporter = Self::select_exporter(output_type, None);
+                    let exporter = Self::select_exporter(output_type, None, Some(cli_matches))?;
                     log::info!("Writing result as {} {}", exporter.get_article(), exporter);
                     if exporter.is_binary() {
                         let mut out = std::io::stdout();
@@ -379,8 +411,21 @@ impl EbiCommand {
         Err(anyhow!("command not recognised"))
     }
 
-    pub fn select_exporter(output_type: &EbiOutputType, to_file: Option<&PathBuf>) -> EbiExporter {
+    pub fn select_exporter(output_type: &EbiOutputType, to_file: Option<&PathBuf>, cli_matches: Option<&ArgMatches>) -> Result<EbiExporter> {
         let exporters = output_type.get_exporters();
+
+        if let Some(cli_matches) = cli_matches && exporters.len() > 1 {
+            //attempt to read the cli parameter
+            if let Some(extension) = cli_matches.get_one::<String>(ARG_ID_OUTPUT_TYPE) {
+                for exporter in exporters {
+                    if exporter.get_extension() == extension {
+                        //found the requested exporter
+                        return Ok(exporter);
+                    }
+                }
+                return Err(anyhow!("the requested output file type {} is not available for this command", extension));
+            }
+        }
 
         match to_file {
             Some(file) => {
@@ -397,17 +442,17 @@ impl EbiCommand {
                                 .to_string()
                                 .ends_with(&(".".to_string() + file_handler.file_extension))
                             {
-                                return exporter;
+                                return Ok(exporter);
                             }
                         }
                     }
                 }
 
                 //otherwise, take the default one
-                return output_type.get_default_exporter();
+                return Ok(output_type.get_default_exporter());
             }
             None => {
-                return output_type.get_default_exporter();
+                return Ok(output_type.get_default_exporter());
             }
         }
     }

@@ -616,8 +616,8 @@ mod tests {
             output_type.get_applicable_commands();
             output_type.get_default_exporter();
             output_type.to_string();
-            EbiCommand::select_exporter(&output_type, None);
-            EbiCommand::select_exporter(&output_type, Some(&PathBuf::from(".xes.gz")));
+            EbiCommand::select_exporter(&output_type, None, None).unwrap();
+            EbiCommand::select_exporter(&output_type, Some(&PathBuf::from(".xes.gz")), None).unwrap();
             println!("source {}, output type {}", source, output.get_type());
             for exporter in output_type.get_exporters() {
                 exporter.get_article();
