@@ -178,6 +178,19 @@ fn manual() -> Result<EbiOutput> {
                 writeln!(f, "More information: {}.\\\\", link)?;
             }
 
+            //output
+            writeln!(f, "\\noindent Output: {}, which can be written as {}.\\\\", output_type, output_types(output_type))?;
+
+            //ProM
+            if path.last().unwrap().is_in_java() {
+                writeln!(f, "\\\\This command is available in Java and ProM.")?;
+            } else {
+                writeln!(f, "\\\\This command is not available in Java and ProM.")?;
+            }
+
+            //pm4py
+            writeln!(f, "\\\\This command is available in the {} Python package using the function {}.", PYTHON_PACKAGE, pm4py_function_name(&path).escape_latex())?;
+
             //parameters table
             writeln!(f, "\\begin{{tabularx}}{{\\linewidth}}{{lX}}")?;
             writeln!(f, "\\toprule")?;
@@ -230,6 +243,19 @@ fn manual() -> Result<EbiOutput> {
                 }
             }
 
+            //output-type
+            if output_type.get_exporters().len() > 1 {
+                let output_extensions = output_type
+                        .get_exporters()
+                        .iter()
+                        .map(|exporter| exporter.get_extension())
+                        .collect::<Vec<_>>()
+                        .join_with(", ", " and ");
+                writeln!(f, "\\texttt{{-t}} or \\texttt{{--output\\_type}} <\\texttt{{OUTPUT\\_TYPE}}> &")?;
+                writeln!(f, "The output file extension (without period). The default is {}. Possible values are {}.\\\\", output_type.get_default_exporter().get_extension(), output_extensions)?;
+                writeln!(f, "&\\textit{{Mandatory:}} \\quad no\\\\")?;
+            }
+
             //output
             writeln!(f, "\\texttt{{-o}} or \\texttt{{--output}} <\\texttt{{FILE}}> &")?;
             if output_type.get_exporters().len() == 1 {
@@ -260,19 +286,6 @@ fn manual() -> Result<EbiOutput> {
 
             writeln!(f, "\\bottomrule")?;
             writeln!(f, "\\end{{tabularx}}")?;
-
-            //output
-            writeln!(f, "\\noindent Output: {}, which can be written as {}.", output_type, output_types(output_type))?;
-
-            //ProM
-            if path.last().unwrap().is_in_java() {
-                writeln!(f, "\\\\This command is available in Java and ProM.")?;
-            } else {
-                writeln!(f, "\\\\This command is not available in Java and ProM.")?;
-            }
-
-            //pm4py
-            writeln!(f, "\\\\This command is available in the {} Python package using the function {}.", PYTHON_PACKAGE, pm4py_function_name(&path).escape_latex())?;
         }
     }
     writeln!(f, "}}")?;

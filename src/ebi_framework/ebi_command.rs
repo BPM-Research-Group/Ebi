@@ -181,14 +181,13 @@ impl EbiCommand {
                 }
 
                 //output type flag
-
-                let output_extensions = output_type
-                    .get_exporters()
-                    .iter()
-                    .map(|exporter| exporter.get_extension())
-                    .collect::<Vec<_>>()
-                    .join_with(", ", " and ");
                 if output_type.get_exporters().len() > 1 {
+                    let output_extensions = output_type
+                        .get_exporters()
+                        .iter()
+                        .map(|exporter| exporter.get_extension())
+                        .collect::<Vec<_>>()
+                        .join_with(", ", " and ");
                     command = command.arg(
                         Arg::new(ARG_ID_OUTPUT_TYPE)
                             .short(ARG_SHORT_OUTPUT_TYPE)
@@ -384,7 +383,8 @@ impl EbiCommand {
 
                 if let Some(to_file) = cli_matches.get_one::<PathBuf>(ARG_ID_OUTPUT) {
                     //write result to file
-                    let exporter = Self::select_exporter(output_type, Some(to_file), Some(cli_matches))?;
+                    let exporter =
+                        Self::select_exporter(output_type, Some(to_file), Some(cli_matches))?;
                     log::info!(
                         "Writing result to {:?} as {} {}",
                         to_file,
@@ -411,10 +411,16 @@ impl EbiCommand {
         Err(anyhow!("command not recognised"))
     }
 
-    pub fn select_exporter(output_type: &EbiOutputType, to_file: Option<&PathBuf>, cli_matches: Option<&ArgMatches>) -> Result<EbiExporter> {
+    pub fn select_exporter(
+        output_type: &EbiOutputType,
+        to_file: Option<&PathBuf>,
+        cli_matches: Option<&ArgMatches>,
+    ) -> Result<EbiExporter> {
         let exporters = output_type.get_exporters();
 
-        if let Some(cli_matches) = cli_matches && exporters.len() > 1 {
+        if let Some(cli_matches) = cli_matches
+            && exporters.len() > 1
+        {
             //attempt to read the cli parameter
             if let Some(extension) = cli_matches.get_one::<String>(ARG_ID_OUTPUT_TYPE) {
                 for exporter in exporters {
@@ -423,7 +429,10 @@ impl EbiCommand {
                         return Ok(exporter);
                     }
                 }
-                return Err(anyhow!("the requested output file type {} is not available for this command", extension));
+                return Err(anyhow!(
+                    "the requested output file type {} is not available for this command",
+                    extension
+                ));
             }
         }
 
