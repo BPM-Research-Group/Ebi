@@ -1,8 +1,9 @@
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiObjectImporter, EbiTraitImporter},
+        ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_output::EbiObjectExporter,
+        ebi_trait::FromEbiTraitObject,
         object_importers::ToLabelledPetriNetObject,
         prom_link::JavaObjectHandler,
         validate::Validate,
@@ -15,7 +16,8 @@ use crate::{
         ebi_trait_stochastic_semantics::ToStochasticSemantics,
     },
 };
-use ebi_objects::{Exportable, Importable, StochasticLabelledPetriNet};
+use anyhow::{Result, anyhow};
+use ebi_objects::{EbiObject, Exportable, Importable, StochasticLabelledPetriNet};
 
 pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "stochastic labelled Petri net",
@@ -81,6 +83,19 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
         input_gui: None,
     }],
 };
+
+impl FromEbiTraitObject for StochasticLabelledPetriNet {
+    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "cannot read {} {} as a stochastic labelled Petri net",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {

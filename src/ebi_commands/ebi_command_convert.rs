@@ -1,5 +1,6 @@
 use ebi_objects::{
-    EbiObject, EbiObjectType, EventLog, FiniteStochasticLanguage, LabelledPetriNet, StochasticDeterministicFiniteAutomaton
+    EbiObject, EbiObjectType, EventLog, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet,
+    StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
 };
 
 use crate::ebi_framework::{
@@ -13,7 +14,14 @@ pub const EBI_CONVERT: EbiCommand = EbiCommand::Group {
     name_long: Some("convert"),
     explanation_short: "Convert an object into something else.",
     explanation_long: None,
-    children: &[& EBI_CONVERT_LOG, &EBI_CONVERT_LPN, &EBI_CONVERT_SLANG, &EBI_CONVERT_SDFA],
+    children: &[
+        &EBI_CONVERT_LANG,
+        &EBI_CONVERT_LOG,
+        &EBI_CONVERT_LPN,
+        &EBI_CONVERT_SLANG,
+        &EBI_CONVERT_SLPN,
+        &EBI_CONVERT_SDFA,
+    ],
 };
 
 pub const EBI_CONVERT_LOG: EbiCommand = EbiCommand::Command {
@@ -54,6 +62,26 @@ pub const EBI_CONVERT_LPN: EbiCommand = EbiCommand::Command {
         Ok(EbiOutput::Object(EbiObject::LabelledPetriNet(*lpn)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::LabelledPetriNet),
+};
+
+pub const EBI_CONVERT_LANG: EbiCommand = EbiCommand::Command {
+    name_short: "lang",
+    name_long: Some("finite-language"),
+    explanation_short: "Convert an object to a finite language.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::FiniteLanguage), //every object that can be imported will be supported by the framework
+    ]],
+    input_names: &["FILE"],
+    input_helps: &["Any file supported by Ebi that can be converted."],
+    execute: |mut inputs, _| {
+        let slang = inputs.remove(0).to_type::<FiniteLanguage>()?;
+        Ok(EbiOutput::Object(EbiObject::FiniteLanguage(*slang)))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage),
 };
 
 pub const EBI_CONVERT_SLANG: EbiCommand = EbiCommand::Command {
@@ -100,4 +128,24 @@ pub const EBI_CONVERT_SDFA: EbiCommand = EbiCommand::Command {
         ))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticDeterministicFiniteAutomaton),
+};
+
+pub const EBI_CONVERT_SLPN: EbiCommand = EbiCommand::Command {
+    name_short: "slpn",
+    name_long: Some("stochastic-labelled-petri-net"),
+    explanation_short: "Convert an object to a stochastic labelled Petri net.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet), //every object that can be imported will be supported by the framework
+    ]],
+    input_names: &["FILE"],
+    input_helps: &["Any file supported by Ebi that can be converted."],
+    execute: |mut inputs, _| {
+        let lpn = inputs.remove(0).to_type::<StochasticLabelledPetriNet>()?;
+        Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(*lpn)))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
 };

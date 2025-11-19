@@ -3,6 +3,10 @@ use crate::{
         ebi_file_handler::EbiFileHandler,
         ebi_input::{EbiObjectImporter, EbiTraitImporter},
         ebi_output::EbiObjectExporter,
+        object_importers::{
+            ToFiniteLanguageObject, ToFiniteStochasticLanguageObject,
+            ToStochasticDeterministicFiniteAutomatonObject,
+        },
         validate::Validate,
     },
     ebi_traits::{
@@ -19,7 +23,7 @@ use crate::{
     },
 };
 use ebi_objects::{
-    CompressedEventLogXes, EventLogTraceAttributes, Exportable, Importable,
+    CompressedEventLogXes, Exportable, Importable,
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
@@ -86,10 +90,22 @@ pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
         ),
         EbiObjectImporter::EventLogTraceAttributes(
             CompressedEventLogTraceAttributes::import_as_object,
-            EventLogTraceAttributes::IMPORTER_PARAMETERS,
+            CompressedEventLogTraceAttributes::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::EventLogXes(
             CompressedEventLogXes::import_as_object,
+            CompressedEventLogXes::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::FiniteLanguage(
+            CompressedEventLogXes::import_as_finite_language_object,
+            CompressedEventLogXes::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::FiniteStochasticLanguage(
+            CompressedEventLogXes::import_as_finite_stochastic_language_object,
+            CompressedEventLogXes::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::StochasticDeterministicFiniteAutomaton(
+            CompressedEventLogXes::import_as_stochastic_deterministic_finite_automaton_object,
             CompressedEventLogXes::IMPORTER_PARAMETERS,
         ),
     ],

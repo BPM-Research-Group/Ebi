@@ -84,7 +84,10 @@ impl ExportableToPM4Py for EbiOutput {
             | EbiOutput::LogDiv(_)
             | EbiOutput::ContainsRoot(_)
             | EbiOutput::RootLogDiv(_) => {
-                let exporter = EbiCommand::select_exporter(&self.get_type(), None);
+                let exporter =
+                    EbiCommand::select_exporter(&self.get_type(), None, None).map_err(|e| {
+                        pyo3::exceptions::PyException::new_err(format!("Export error: {}", e))
+                    })?;
 
                 let output_string = if exporter.is_binary() {
                     let bytes =

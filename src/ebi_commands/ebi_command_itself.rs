@@ -177,7 +177,7 @@ fn manual() -> Result<EbiOutput> {
             if let Some(link) = latex_link {
                 writeln!(f, "More information: {}.\\\\", link)?;
             }
-
+            
             //output
             writeln!(f, "\\noindent Output: {}, which can be written as {}.\\\\", output_type, output_types(output_type))?;
 

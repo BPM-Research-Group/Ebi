@@ -5,7 +5,7 @@ use crate::{
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
         object_importers::{
-            ToFiniteStochasticLanguageObject, ToStochasticDeterministicFiniteAutomatonObject,
+            ToFiniteLanguageObject, ToFiniteStochasticLanguageObject, ToStochasticDeterministicFiniteAutomatonObject
         },
         prom_link::JavaObjectHandler,
         validate::Validate,
@@ -83,6 +83,10 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
         ),
         EbiObjectImporter::EventLogXes(
             EventLogXes::import_as_object,
+            EventLog::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::FiniteLanguage(
+            EventLog::import_as_finite_language_object,
             EventLog::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::FiniteStochasticLanguage(
