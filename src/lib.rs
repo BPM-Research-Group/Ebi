@@ -7,6 +7,7 @@ pub mod ebi_framework {
     pub mod ebi_output;
     pub mod ebi_trait;
     pub mod ebi_trait_object;
+    pub mod manual;
     pub mod object_importers;
     pub mod prom_link;
     pub mod validate;

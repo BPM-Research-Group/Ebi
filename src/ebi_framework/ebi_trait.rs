@@ -140,6 +140,22 @@ impl EbiTrait {
     }
 }
 
+impl Ord for EbiTrait {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.to_string()
+            .to_lowercase()
+            .cmp(&other.to_string().to_lowercase())
+    }
+}
+
+impl PartialOrd for EbiTrait {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.to_string()
+            .to_lowercase()
+            .partial_cmp(&other.to_string().to_lowercase())
+    }
+}
+
 impl Display for EbiTrait {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(

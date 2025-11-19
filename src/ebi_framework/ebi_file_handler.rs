@@ -20,7 +20,7 @@ use crate::{
         stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
         stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE,
     },
-    ebi_framework::ebi_command::get_applicable_commands,
+    ebi_framework::{ebi_command::get_applicable_commands, ebi_trait::EbiTrait},
 };
 use anyhow::{Error, Result, anyhow};
 use ebi_objects::EbiObjectType;
@@ -115,6 +115,33 @@ impl EbiFileHandler {
 
         result
     }
+
+    pub fn can_import_as_object(&self, object_type: &EbiObjectType) -> bool {
+        for importer in self.object_importers {
+            if importer.get_type() == *object_type {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    pub fn can_import_as_trait(&self, trait_type: &EbiTrait) -> bool {
+        for importer in self.trait_importers {
+            if importer.get_trait() == *trait_type {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    pub fn can_export_as_object(&self, object_type: &EbiObjectType) -> bool {
+        for importer in self.object_exporters {
+            if importer.get_type() == *object_type {
+                return true;
+            }
+        }
+        return false;
+    }
 }
 
 impl FromStr for EbiFileHandler {
@@ -155,13 +182,15 @@ impl PartialEq for EbiFileHandler {
 
 impl PartialOrd for EbiFileHandler {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.name.partial_cmp(other.name)
+        self.name
+            .to_lowercase()
+            .partial_cmp(&other.name.to_lowercase())
     }
 }
 
 impl Ord for EbiFileHandler {
     fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.name.cmp(&other.name)
+        self.name.to_lowercase().cmp(&other.name.to_lowercase())
     }
 }
 
