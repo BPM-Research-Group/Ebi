@@ -6,7 +6,7 @@ use crate::{
         object_importers::ToLabelledPetriNetObject,
         validate::Validate,
     },
-    ebi_traits::{ebi_trait_graphable::ToGraphable, ebi_trait_semantics::ToSemantics},
+    ebi_traits::{ebi_trait_activities::ToActivities, ebi_trait_graphable::ToGraphable, ebi_trait_semantics::ToSemantics},
 };
 use ebi_objects::{Exportable, Importable, ProcessTreeMarkupLanguage};
 
@@ -18,6 +18,10 @@ pub const EBI_PROCESS_TREE_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     format_specification: ProcessTreeMarkupLanguage::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(ProcessTreeMarkupLanguage::validate),
     trait_importers: &[
+        EbiTraitImporter::Activities(
+            ProcessTreeMarkupLanguage::import_as_activities,
+            ProcessTreeMarkupLanguage::IMPORTER_PARAMETERS,
+        ),
         EbiTraitImporter::Semantics(
             ProcessTreeMarkupLanguage::import_as_semantics,
             ProcessTreeMarkupLanguage::IMPORTER_PARAMETERS,
