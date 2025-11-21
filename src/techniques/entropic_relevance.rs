@@ -9,7 +9,7 @@ use crate::{
     math::log_div::LogDiv,
 };
 use anyhow::{Context, Result};
-use ebi_arithmetic::{Fraction, One, Zero};
+use ebi_arithmetic::{Fraction, One, Signed, Zero};
 use ebi_objects::{Activity, ActivityKeyTranslator};
 
 pub trait EntropicRelvance {
@@ -46,7 +46,7 @@ impl EntropicRelvance for dyn EbiTraitFiniteStochasticLanguage {
             let model_probability = model.get_probability(&follower).with_context(|| {
                 format!("could not compute the probability of trace `{:?}`", trace)
             })?;
-            if model_probability > Fraction::zero() {
+            if model_probability.is_positive() {
                 rho += log_probability;
             }
 
