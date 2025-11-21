@@ -26,7 +26,7 @@ use std::{
 };
 
 use crate::ebi_file_handlers::{
-    event_log::EBI_EVENT_LOG, finite_language::EBI_FINITE_LANGUAGE,
+    event_log_xes::EBI_EVENT_LOG_XES, finite_language::EBI_FINITE_LANGUAGE,
     finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
     labelled_petri_net::EBI_LABELLED_PETRI_NET, process_tree::EBI_PROCESS_TREE,
 };
@@ -231,13 +231,13 @@ impl ImportableFromPM4Py for EventLog {
             match itype {
                 EbiInputType::Object(obj_type) if *obj_type == EbiObjectType::EventLog => {
                     let obj = EbiObject::EventLog(event_log_rust);
-                    return Ok(EbiInput::Object(obj, &EBI_EVENT_LOG));
+                    return Ok(EbiInput::Object(obj, &EBI_EVENT_LOG_XES));
                 }
                 EbiInputType::Trait(etrait) => {
                     match etrait {
                         EbiTrait::EventLog => {
                             let tobj = EbiTraitObject::EventLog(Box::new(event_log_rust));
-                            return Ok(EbiInput::Trait(tobj, &EBI_EVENT_LOG));
+                            return Ok(EbiInput::Trait(tobj, &EBI_EVENT_LOG_XES));
                         }
                         EbiTrait::FiniteStochasticLanguage => {
                             let fsl = Box::new(Into::<FiniteStochasticLanguage>::into(Into::<
@@ -261,7 +261,7 @@ impl ImportableFromPM4Py for EventLog {
                 }
                 EbiInputType::AnyObject => {
                     let obj = EbiObject::EventLog(event_log_rust);
-                    return Ok(EbiInput::Object(obj, &EBI_EVENT_LOG));
+                    return Ok(EbiInput::Object(obj, &EBI_EVENT_LOG_XES));
                 }
                 _ => {
                     // skip other input types
