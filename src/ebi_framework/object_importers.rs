@@ -3,7 +3,7 @@ use pastey::paste;
 use std::io::BufRead;
 
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject, EventLog, EventLogXes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree, traits::importable::{Importable, ImporterParameterValues}
+    DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject, EventLog, EventLogXes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, LanguageOfAlignments, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticProcessTree, traits::importable::{Importable, ImporterParameterValues}
 };
 
 macro_rules! import_as_object {
@@ -60,3 +60,5 @@ import_as_object!(FiniteStochasticLanguage, finite_stochastic_language);
 import_as_object!(DeterministicFiniteAutomaton, deterministic_finite_automaton);
 import_as_object!(ProcessTree, process_tree);
 import_as_object!(StochasticProcessTree, stochastic_process_tree);
+import_as_object!(LanguageOfAlignments, language_of_alignments);
+import_as_object!(StochasticLanguageOfAlignments, stochastic_language_of_alignments);
