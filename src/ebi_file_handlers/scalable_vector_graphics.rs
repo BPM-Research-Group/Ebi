@@ -26,6 +26,7 @@ pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::StochasticProcessTree(ScalableVectorGraphics::export_from_object),
         EbiObjectExporter::ScalableVectorGraphics(ScalableVectorGraphics::export_from_object),
     ],
+    object_exporters_fallible: &[],
     java_object_handlers: &[
     //     JavaObjectHandler {
     //     name: "svg",

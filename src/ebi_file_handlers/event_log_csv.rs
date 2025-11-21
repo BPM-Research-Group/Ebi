@@ -4,8 +4,8 @@ use crate::{
         ebi_input::{EbiObjectImporter, EbiTraitImporter},
         ebi_output::EbiObjectExporter,
         object_importers::{
-            ToEventLogObject, ToFiniteStochasticLanguageObject,
-            ToStochasticDeterministicFiniteAutomatonObject,
+            ToEventLogObject, ToFiniteLanguageObject, ToFiniteStochasticLanguageObject,
+            ToStochasticDeterministicFiniteAutomatonObject, TryToEventLogXesObject,
         },
         validate::Validate,
     },
@@ -77,8 +77,16 @@ pub const EBI_EVENT_LOG_CSV: EbiFileHandler = EbiFileHandler {
             EventLogCsv::import_as_event_log_object,
             EventLogCsv::IMPORTER_PARAMETERS,
         ),
+        EbiObjectImporter::EventLogXes(
+            EventLogCsv::try_import_as_event_log_xes_object,
+            EventLogCsv::IMPORTER_PARAMETERS,
+        ),
         EbiObjectImporter::EventLogCsv(
             EventLogCsv::import_as_object,
+            EventLogCsv::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::FiniteLanguage(
+            EventLogCsv::import_as_finite_language_object,
             EventLogCsv::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::FiniteStochasticLanguage(
@@ -90,9 +98,13 @@ pub const EBI_EVENT_LOG_CSV: EbiFileHandler = EbiFileHandler {
             EventLogCsv::IMPORTER_PARAMETERS,
         ),
     ],
-    object_exporters: &[
+    object_exporters: &[EbiObjectExporter::EventLogCsv(
+        EventLogCsv::export_from_object,
+    )],
+    object_exporters_fallible: &[
         EbiObjectExporter::EventLog(EventLogCsv::export_from_object),
-        EbiObjectExporter::EventLogCsv(EventLogCsv::export_from_object),
+        EbiObjectExporter::EventLogXes(EventLogCsv::export_from_object),
+        EbiObjectExporter::EventLogTraceAttributes(EventLogCsv::export_from_object),
     ],
     java_object_handlers: &[],
 };

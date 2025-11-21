@@ -79,7 +79,11 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     object_exporters: &[
         EbiObjectExporter::FiniteStochasticLanguage(FiniteStochasticLanguage::export_from_object),
         EbiObjectExporter::EventLog(FiniteStochasticLanguage::export_from_object),
+        EbiObjectExporter::EventLogCsv(FiniteStochasticLanguage::export_from_object),
+        EbiObjectExporter::EventLogXes(FiniteStochasticLanguage::export_from_object),
+        EbiObjectExporter::EventLogTraceAttributes(FiniteStochasticLanguage::export_from_object),
     ],
+    object_exporters_fallible: &[],
     java_object_handlers: &[],
 };
 

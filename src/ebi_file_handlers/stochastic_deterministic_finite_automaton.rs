@@ -69,7 +69,11 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
             StochasticDeterministicFiniteAutomaton::export_from_object,
         ),
         EbiObjectExporter::EventLog(StochasticDeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::EventLogTraceAttributes(StochasticDeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::EventLogXes(StochasticDeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::EventLogCsv(StochasticDeterministicFiniteAutomaton::export_from_object),
     ],
+    object_exporters_fallible: &[],
     java_object_handlers: &[],
 };
 

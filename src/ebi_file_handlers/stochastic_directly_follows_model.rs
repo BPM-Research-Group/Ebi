@@ -32,6 +32,10 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
             StochasticDirectlyFollowsModel::import_as_activities,
             StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
+        EbiTraitImporter::Graphable(
+            StochasticDirectlyFollowsModel::import_as_graphable,
+            StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
+        ),
         EbiTraitImporter::QueriableStochasticLanguage(
             StochasticDirectlyFollowsModel::import_as_queriable_stochastic_language,
             StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
@@ -77,5 +81,6 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
         ),
         EbiObjectExporter::DirectlyFollowsGraph(StochasticDirectlyFollowsModel::export_from_object),
     ],
+    object_exporters_fallible: &[],
     java_object_handlers: &[],
 };

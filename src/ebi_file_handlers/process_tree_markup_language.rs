@@ -42,6 +42,7 @@ pub const EBI_PROCESS_TREE_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::ProcessTree(ProcessTreeMarkupLanguage::export_from_object),
         EbiObjectExporter::StochasticProcessTree(ProcessTreeMarkupLanguage::export_from_object),
     ],
+    object_exporters_fallible: &[],
     java_object_handlers: &[], //java object handlers are through processtree
 };
 

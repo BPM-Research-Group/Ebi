@@ -39,12 +39,12 @@ use ebi_objects::{
 };
 use std::{
     collections::{BTreeSet, HashSet},
-    fmt::Display,
+    fmt::{self, Debug, Display},
     fs::File,
     io::BufRead,
     path::PathBuf,
 };
-use strum_macros::EnumIter;
+use strum_macros::{EnumIter, IntoStaticStr};
 
 pub enum EbiInput {
     Trait(EbiTraitObject, &'static EbiFileHandler),
@@ -393,8 +393,8 @@ impl EbiInputType {
 impl Display for EbiInputType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            EbiInputType::Trait(t) => t.fmt(f),
-            EbiInputType::Object(o) => o.fmt(f),
+            EbiInputType::Trait(t) => Display::fmt(t, f),
+            EbiInputType::Object(o) => Display::fmt(o, f),
             EbiInputType::AnyObject => write!(f, "object"),
             EbiInputType::String(Some(allowed_values), _) => {
                 write!(f, "either one of `{}`", allowed_values.join("`, `"))
@@ -607,7 +607,7 @@ impl Display for EbiTraitImporter {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, IntoStaticStr)]
 pub enum EbiObjectImporter {
     EventLog(
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
@@ -780,7 +780,15 @@ impl EbiObjectImporter {
 
 impl Display for EbiObjectImporter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.get_type().to_string())
+        let right: &'static str = self.into();
+        write!(f, "{}", right)
+    }
+}
+
+impl Debug for EbiObjectImporter {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let right: &'static str = self.into();
+        write!(f, "{}", right)
     }
 }
 

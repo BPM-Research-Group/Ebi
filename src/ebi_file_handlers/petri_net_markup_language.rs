@@ -52,6 +52,7 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
             PetriNetMarkupLanguage::export_from_object,
         ),
     ],
+    object_exporters_fallible: &[],
     java_object_handlers: &[], //java translations covered by LabelledPetrinet
 };
 

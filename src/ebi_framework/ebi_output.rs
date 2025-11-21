@@ -20,12 +20,12 @@ use ebi_objects::{
 };
 use std::{
     collections::{BTreeSet, HashSet},
-    fmt::{self, Display},
+    fmt::{self, Debug, Display},
     fs::File,
     io::Write,
     path::PathBuf,
 };
-use strum_macros::{Display, EnumIter};
+use strum_macros::{Display, EnumIter, IntoStaticStr};
 
 use crate::{
     ebi_file_handlers::{
@@ -127,6 +127,11 @@ impl EbiOutputType {
                 let mut result = vec![];
                 for file_handler in EBI_FILE_HANDLERS {
                     for exporter in file_handler.object_exporters {
+                        if &exporter.get_type() == etype {
+                            result.push(EbiExporter::Object(exporter, file_handler))
+                        }
+                    }
+                    for exporter in file_handler.object_exporters_fallible {
                         if &exporter.get_type() == etype {
                             result.push(EbiExporter::Object(exporter, file_handler))
                         }
@@ -282,7 +287,7 @@ impl EbiOutputType {
 impl Display for EbiOutputType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            EbiOutputType::ObjectType(t) => t.fmt(f),
+            EbiOutputType::ObjectType(t) => Display::fmt(t, f),
             EbiOutputType::String => Display::fmt(&"text", f),
             EbiOutputType::Usize => Display::fmt(&"integer", f),
             EbiOutputType::Fraction => Display::fmt(&"fraction", f),
@@ -408,7 +413,7 @@ impl Display for EbiExporter {
     }
 }
 
-#[derive(Debug, Hash)]
+#[derive(Hash, IntoStaticStr)]
 pub enum EbiObjectExporter {
     EventLog(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogCsv(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
@@ -505,6 +510,20 @@ impl EbiObjectExporter {
     }
 }
 
+impl Display for EbiObjectExporter {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let right: &'static str = self.into();
+        write!(f, "{}", right)
+    }
+}
+
+impl Debug for EbiObjectExporter {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let right: &'static str = self.into();
+        write!(f, "{}", right)
+    }
+}
+
 pub fn export_object(to_file: &PathBuf, object: EbiOutput, exporter: EbiExporter) -> Result<()> {
     let file =
         File::create(to_file).with_context(|| format!("Writing result to file {:?}.", to_file))?;
@@ -527,12 +546,6 @@ pub fn export_to_bytes(object: EbiOutput, exporter: EbiExporter) -> Result<Vec<u
     let mut f = vec![];
     exporter.export_from_object(object, &mut f)?;
     Ok(f)
-}
-
-impl Display for EbiObjectExporter {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.get_type().to_string())
-    }
 }
 
 #[cfg(test)]
@@ -559,14 +572,16 @@ mod tests {
     #[test]
     fn all_exporters() {
         for (object, importer, _, f) in crate::tests::get_all_test_files() {
-            if let EbiInput::Object(object, _) = object {
+            if let EbiInput::Object(object, file_handler) = object {
                 for file_handler2 in EBI_FILE_HANDLERS {
                     for exporter in file_handler2.object_exporters {
                         if exporter.get_type() == importer.clone().unwrap().get_type() {
                             println!(
-                                "file {}\n\timporter\t{:?}\n\texporter\t{}\n\tobject\t\t{}",
+                                "file {}\n\tfile handler\t{}\n\timporter\t{:?}\n\tfile handler\t{}\n\texporter\t{}\n\tobject\t\t{}",
                                 f,
+                                file_handler,
                                 importer,
+                                file_handler2,
                                 exporter,
                                 object.get_type()
                             );
@@ -580,6 +595,38 @@ mod tests {
                             exporter
                                 .export(EbiOutput::Object(object.clone()), &mut c)
                                 .unwrap();
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn all_fallible_exporters() {
+        for (object, importer, _, f) in crate::tests::get_all_test_files() {
+            if let EbiInput::Object(object, file_handler) = object {
+                for file_handler2 in EBI_FILE_HANDLERS {
+                    for exporter in file_handler2.object_exporters_fallible {
+                        if exporter.get_type() == importer.clone().unwrap().get_type() {
+                            println!(
+                                "file {}\n\tfile handler\t{}\n\timporter\t{:?}\n\tfile handler\t{}\n\texporter\t{}\n\tobject\t\t{}",
+                                f,
+                                file_handler,
+                                importer,
+                                file_handler2,
+                                exporter,
+                                object.get_type()
+                            );
+
+                            if importer.clone().unwrap().get_type() != object.get_type() {
+                                assert!(false)
+                            }
+
+                            let mut c = Cursor::new(Vec::new());
+                            println!("\tobject type\t{}", object.get_type());
+                            //this exporter is fallible, so the only thing we can test is whether it does not panic
+                            let _ = exporter.export(EbiOutput::Object(object.clone()), &mut c);
                         }
                     }
                 }
@@ -617,7 +664,8 @@ mod tests {
             output_type.get_default_exporter();
             output_type.to_string();
             EbiCommand::select_exporter(&output_type, None, None).unwrap();
-            EbiCommand::select_exporter(&output_type, Some(&PathBuf::from(".xes.gz")), None).unwrap();
+            EbiCommand::select_exporter(&output_type, Some(&PathBuf::from(".xes.gz")), None)
+                .unwrap();
             println!("source {}, output type {}", source, output.get_type());
             for exporter in output_type.get_exporters() {
                 exporter.get_article();

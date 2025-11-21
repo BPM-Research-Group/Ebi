@@ -3,13 +3,14 @@ use pastey::paste;
 use std::io::BufRead;
 
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject, EventLog, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree, traits::importable::{Importable, ImporterParameterValues}
+    DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject, EventLog, EventLogXes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, LanguageOfAlignments, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticProcessTree, traits::importable::{Importable, ImporterParameterValues}
 };
 
 macro_rules! import_as_object {
     ($t:ident, $u:expr) => {
         paste! {
             pub trait [<To $t Object>] {
+                /// A To will first import, and then convert. The latter conversion may not fail.
                 fn [<import_as_ $u _object>](reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) -> Result<EbiObject>;
             }
 
@@ -22,11 +23,27 @@ macro_rules! import_as_object {
                     Ok(EbiObject::$t(x))
                 }
             }
+
+            pub trait [<TryTo $t Object>] {
+                /// A TryTo will first import, and then try to convert. The latter conversion may fail.
+                fn [<try_import_as_ $u _object>](reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) -> Result<EbiObject>;
+            }
+
+            impl<T: Importable> [<TryTo $t Object>] for T
+            where
+                T: TryInto<$t, Error = anyhow::Error>,
+            {
+                fn [<try_import_as_ $u _object>](reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) -> Result<EbiObject> {
+                    let x = Self::import(reader, parameter_values)?.try_into()?;
+                    Ok(EbiObject::$t(x))
+                }
+            }
         }
     };
 }
 
 import_as_object!(EventLog, event_log);
+import_as_object!(EventLogXes, event_log_xes);
 import_as_object!(LabelledPetriNet, labelled_petri_net);
 import_as_object!(DirectlyFollowsModel, directly_follows_model);
 import_as_object!(
@@ -43,3 +60,5 @@ import_as_object!(FiniteStochasticLanguage, finite_stochastic_language);
 import_as_object!(DeterministicFiniteAutomaton, deterministic_finite_automaton);
 import_as_object!(ProcessTree, process_tree);
 import_as_object!(StochasticProcessTree, stochastic_process_tree);
+import_as_object!(LanguageOfAlignments, language_of_alignments);
+import_as_object!(StochasticLanguageOfAlignments, stochastic_language_of_alignments);

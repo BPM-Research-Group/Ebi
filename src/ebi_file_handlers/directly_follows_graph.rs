@@ -80,6 +80,7 @@ pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
     object_exporters: &[EbiObjectExporter::DirectlyFollowsGraph(
         DirectlyFollowsGraph::export_from_object,
     )],
+    object_exporters_fallible: &[],
     java_object_handlers: &[], //java translations covered by LabelledPetrinet
 };
 

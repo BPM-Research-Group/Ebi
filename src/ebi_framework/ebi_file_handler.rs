@@ -4,7 +4,7 @@ use crate::{
         compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
         deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
         directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
-        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log::EBI_EVENT_LOG,
+        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_xes::EBI_EVENT_LOG_XES,
         event_log_csv::EBI_EVENT_LOG_CSV, executions::EBI_EXECUTIONS,
         finite_language::EBI_FINITE_LANGUAGE,
         finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
@@ -45,7 +45,7 @@ pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_DIRECTLY_FOLLOWS_MODEL,
     EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL,
     EBI_EXECUTIONS,
-    EBI_EVENT_LOG,
+    EBI_EVENT_LOG_XES,
     EBI_FINITE_LANGUAGE,
     EBI_FINITE_STOCHASTIC_LANGUAGE,
     EBI_LABELLED_PETRI_NET,
@@ -73,7 +73,8 @@ pub struct EbiFileHandler {
     pub validator: Option<fn(&mut dyn BufRead) -> Result<()>>,
     pub trait_importers: &'static [EbiTraitImporter],
     pub object_importers: &'static [EbiObjectImporter],
-    pub object_exporters: &'static [EbiObjectExporter], //the order matters, because if multiple file handlers can export an object, the one that mentions the object earliest is preferred.
+    pub object_exporters: &'static [EbiObjectExporter], //the order matters, because if multiple file handlers can export an object, the one that mentions the object earliest is preferred. Should not fail unless the underlying writer yields an error.
+    pub object_exporters_fallible: &'static [EbiObjectExporter], //the order matters, because if multiple file handlers can export an object, the one that mentions the object earliest is preferred.
     pub java_object_handlers: &'static [JavaObjectHandler],
 }
 
@@ -98,6 +99,9 @@ impl EbiFileHandler {
         //get objects that can export to this file handler
         let mut objects = vec![];
         for exporter in self.object_exporters {
+            objects.push(exporter.get_type());
+        }
+        for exporter in self.object_exporters_fallible {
             objects.push(exporter.get_type());
         }
 
@@ -134,13 +138,18 @@ impl EbiFileHandler {
         return false;
     }
 
-    pub fn can_export_as_object(&self, object_type: &EbiObjectType) -> bool {
-        for importer in self.object_exporters {
-            if importer.get_type() == *object_type {
-                return true;
+    pub fn can_export_as_object(&self, object_type: &EbiObjectType) -> Tri {
+        for exporter in self.object_exporters {
+            if exporter.get_type() == *object_type {
+                return Tri::Yes;
             }
         }
-        return false;
+        for exporter in self.object_exporters_fallible {
+            if exporter.get_type() == *object_type {
+                return Tri::Fallible;
+            }
+        }
+        return Tri::No;
     }
 }
 
@@ -218,6 +227,12 @@ pub fn get_file_handlers(object_type: &EbiObjectType) -> Vec<&'static EbiFileHan
     }
     result
 }
+
+pub enum Tri {
+        Yes,
+        No,
+        Fallible,
+    }
 
 #[cfg(test)]
 mod tests {

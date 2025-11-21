@@ -32,6 +32,8 @@ pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::DirectlyFollowsModel(LolaNet::export_from_object),
         EbiObjectExporter::DirectlyFollowsGraph(LolaNet::export_from_object),
         EbiObjectExporter::ProcessTree(LolaNet::export_from_object),
+        EbiObjectExporter::StochasticProcessTree(LolaNet::export_from_object),
     ],
+    object_exporters_fallible: &[],
     java_object_handlers: &[], //java translations covered by LabelledPetrinet
 };

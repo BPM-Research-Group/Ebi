@@ -111,10 +111,11 @@ pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     ],
     object_exporters: &[
         EbiObjectExporter::EventLog(CompressedEventLog::export_from_object),
-        EbiObjectExporter::EventLogTraceAttributes(
-            CompressedEventLogTraceAttributes::export_from_object,
-        ),
-        EbiObjectExporter::EventLogXes(CompressedEventLogXes::export_from_object),
+        EbiObjectExporter::EventLogTraceAttributes(CompressedEventLog::export_from_object),
+        EbiObjectExporter::EventLogXes(CompressedEventLog::export_from_object),
     ],
+    object_exporters_fallible: &[EbiObjectExporter::EventLogCsv(
+        CompressedEventLog::export_from_object,
+    )],
     java_object_handlers: &[],
 };
