@@ -25,11 +25,11 @@ use std::{
     str::{Chars, FromStr},
 };
 
-use crate::ebi_file_handlers::{
+use crate::{ebi_file_handlers::{
     event_log_xes::EBI_EVENT_LOG_XES, finite_language::EBI_FINITE_LANGUAGE,
     finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
     labelled_petri_net::EBI_LABELLED_PETRI_NET, process_tree::EBI_PROCESS_TREE,
-};
+}, prom::prom_link::attempt_parse};
 
 use crate::{
     ebi_framework::{
@@ -38,7 +38,6 @@ use crate::{
         ebi_output::{self, EbiOutput},
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
-        prom_link::attempt_parse,
     },
     ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
 };
