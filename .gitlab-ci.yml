@@ -79,7 +79,7 @@ buildlatex:
 
     #generate Java code and push to ProM git
     - git clone https://github.com/promworkbench/Ebi.git
-    - cargo run itself java -o Ebi/src/org/processmining/ebi/plugins/EbiPlugins.java
+    - cargo run --features java itself java -o Ebi/src/org/processmining/ebi/plugins/EbiPlugins.java
     - cd Ebi
     - git add src/org/processmining/ebi/plugins/EbiPlugins.java
     - git commit -m "update Ebi plugins"

@@ -1,3 +1,32 @@
+use super::{
+    ebi_command::{EBI_COMMANDS, EbiCommand},
+    ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+};
+use crate::{
+    ebi_file_handlers::{
+        compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
+        deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
+        directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
+        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_csv::EBI_EVENT_LOG_CSV,
+        executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE,
+        finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
+        labelled_petri_net::EBI_LABELLED_PETRI_NET,
+        language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS, process_tree::EBI_PROCESS_TREE,
+        scalable_vector_graphics::EBI_SCALABLE_VECTOR_GRAPHICS,
+        stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON,
+        stochastic_directly_follows_model::EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL,
+        stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
+        stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
+        stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE,
+    },
+    math::{log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv},
+    prom::java_object_handler::{
+        JAVA_OBJECT_HANDLERS_BOOL, JAVA_OBJECT_HANDLERS_CONTAINSROOT,
+        JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV,
+        JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE,
+        JavaObjectHandler,
+    },
+};
 use anyhow::{Context, Result, anyhow};
 use ebi_arithmetic::{Exporter, Fraction};
 use ebi_objects::{
@@ -19,44 +48,13 @@ use ebi_objects::{
     },
 };
 use std::{
-    collections::{BTreeSet, HashSet},
+    collections::BTreeSet,
     fmt::{self, Debug, Display},
     fs::File,
     io::Write,
     path::PathBuf,
 };
 use strum_macros::{Display, EnumIter, IntoStaticStr};
-
-use crate::{
-    ebi_file_handlers::{
-        compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
-        deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
-        directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
-        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_csv::EBI_EVENT_LOG_CSV,
-        executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE,
-        finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
-        labelled_petri_net::EBI_LABELLED_PETRI_NET,
-        language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS, process_tree::EBI_PROCESS_TREE,
-        scalable_vector_graphics::EBI_SCALABLE_VECTOR_GRAPHICS,
-        stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON,
-        stochastic_directly_follows_model::EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL,
-        stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
-        stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
-        stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE,
-    },
-    math::{log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv},
-};
-
-use super::{
-    ebi_command::{EBI_COMMANDS, EbiCommand},
-    ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
-    prom_link::{
-        JAVA_OBJECT_HANDLERS_BOOL, JAVA_OBJECT_HANDLERS_CONTAINSROOT,
-        JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV,
-        JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE,
-        JavaObjectHandler,
-    },
-};
 
 #[derive(Display, Clone)]
 pub enum EbiOutput {
@@ -269,18 +267,6 @@ impl EbiOutputType {
             EbiOutputType::RootLogDiv => EbiExporter::RootLogDiv,
             EbiOutputType::Bool => EbiExporter::Bool,
         }
-    }
-
-    pub fn get_java_object_handlers_that_can_export(&self) -> HashSet<JavaObjectHandler> {
-        let mut result = HashSet::new();
-        for exporter in self.get_exporters() {
-            for java_object_handler in exporter.get_java_object_handlers() {
-                if java_object_handler.translator_ebi_to_java.is_some() {
-                    result.insert(java_object_handler.to_owned());
-                }
-            }
-        }
-        result
     }
 }
 

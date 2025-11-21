@@ -5,7 +5,6 @@ use crate::{
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
         object_importers::ToLabelledPetriNetObject,
-        prom_link::JavaObjectHandler,
         validate::Validate,
     },
     ebi_traits::{
@@ -14,7 +13,7 @@ use crate::{
         ebi_trait_semantics::ToSemantics,
         ebi_trait_stochastic_deterministic_semantics::ToStochasticDeterministicSemantics,
         ebi_trait_stochastic_semantics::ToStochasticSemantics,
-    },
+    }, prom::java_object_handler::JavaObjectHandler,
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{EbiObject, Exportable, Importable, StochasticLabelledPetriNet};

@@ -2,10 +2,6 @@ use super::{
     ebi_command::{EBI_COMMANDS, EbiCommand},
     ebi_file_handler::EBI_FILE_HANDLERS,
     ebi_trait::{EbiTrait, FromEbiTraitObject},
-    prom_link::{
-        JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE,
-        JavaObjectHandler,
-    },
 };
 use crate::{
     ebi_framework::{
@@ -146,45 +142,6 @@ impl EbiInputType {
         }
     }
 
-    pub fn get_java_object_handlers(&self) -> Vec<&JavaObjectHandler> {
-        match self {
-            EbiInputType::Trait(t) => Self::get_file_handlers_java(t.get_file_handlers()),
-            EbiInputType::Object(o) => Self::get_file_handlers_java(get_file_handlers(o)),
-            EbiInputType::AnyObject => {
-                Self::get_file_handlers_java(EBI_FILE_HANDLERS.iter().collect())
-            }
-            EbiInputType::String(_, _) => {
-                let mut x = vec![];
-                x.extend(JAVA_OBJECT_HANDLERS_STRING);
-                x
-            }
-            EbiInputType::Usize(_, _, _) => {
-                let mut x = vec![];
-                x.extend(JAVA_OBJECT_HANDLERS_USIZE);
-                x
-            }
-            EbiInputType::FileHandler => {
-                //not supported in Java;
-                vec![]
-            }
-            EbiInputType::Fraction(_, _, _) => {
-                let mut x = vec![];
-                x.extend(JAVA_OBJECT_HANDLERS_FRACTION);
-                x
-            }
-        }
-    }
-
-    pub fn get_java_object_handlers_that_can_import(&self) -> HashSet<JavaObjectHandler> {
-        let mut result = HashSet::new();
-        for java_object_handler in self.get_java_object_handlers() {
-            if java_object_handler.translator_java_to_ebi.is_some() {
-                result.insert(java_object_handler.to_owned());
-            }
-        }
-        result
-    }
-
     pub fn get_possible_inputs(traits: &[&EbiInputType]) -> Vec<String> {
         let mut result = HashSet::new();
 
@@ -321,21 +278,6 @@ impl EbiInputType {
         result.into_iter().collect::<Vec<_>>()
     }
 
-    pub fn get_possible_inputs_with_java(traits: &[&EbiInputType]) -> Vec<JavaObjectHandler> {
-        let mut result = HashSet::new();
-
-        for input_type in traits {
-            result.extend(input_type.get_java_object_handlers());
-        }
-
-        result = result
-            .into_iter()
-            .filter(|java_object_handler| java_object_handler.translator_java_to_ebi.is_some())
-            .collect();
-
-        result.into_iter().cloned().collect::<Vec<_>>()
-    }
-
     pub fn possible_inputs_as_strings_with_articles(
         traits: &[&EbiInputType],
         last_connector: &str,
@@ -361,15 +303,6 @@ impl EbiInputType {
                 )
             })
             .collect::<Vec<_>>()
-    }
-
-    pub fn get_file_handlers_java(
-        file_handlers: Vec<&'static EbiFileHandler>,
-    ) -> Vec<&'static JavaObjectHandler> {
-        file_handlers.iter().fold(vec![], |mut list, file_handler| {
-            list.extend(file_handler.java_object_handlers);
-            list
-        })
     }
 
     pub fn get_applicable_commands(&self) -> BTreeSet<Vec<&'static EbiCommand>> {
@@ -944,6 +877,8 @@ mod tests {
     use ebi_arithmetic::{Fraction, Zero};
     use strum::IntoEnumIterator;
 
+    use super::{EbiInputType, validate_object_of};
+    use crate::ebi_framework::ebi_input;
     use crate::{
         ebi_file_handlers::compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
         ebi_framework::{
@@ -952,9 +887,6 @@ mod tests {
         },
         multiple_reader::MultipleReader,
     };
-
-    use super::{EbiInputType, validate_object_of};
-    use crate::ebi_framework::ebi_input;
 
     #[test]
     fn input_primitives() {
@@ -969,12 +901,10 @@ mod tests {
             let list = vec![&input_type];
             input_type.get_article();
             EbiInputType::get_parser_of_list(&list);
-            input_type.get_java_object_handlers();
             input_type.get_applicable_commands();
             input_type.to_string();
             EbiInputType::get_possible_inputs(&list);
             EbiInputType::get_possible_inputs_with_latex(&list);
-            EbiInputType::get_possible_inputs_with_java(&list);
             EbiInputType::possible_inputs_as_strings_with_articles(&list, "xyz");
         }
     }

@@ -1,11 +1,3 @@
-use crate::{
-    ebi_commands::ebi_command_itself::EBI_ITSELF, ebi_framework::{
-        ebi_command::{EBI_COMMANDS, EbiCommand, get_applicable_commands}, ebi_file_handler::{EBI_FILE_HANDLERS, Tri, get_file_handlers}, ebi_importer_parameters, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link::{
-            get_java_object_handlers_that_can_export,
-            get_java_object_handlers_that_can_import,
-        }
-    }, python::python::{PYTHON_PACKAGE, pm4py_function_name}, text::{Joiner, LatexEscaper, Rank}
-};
 use anyhow::Result;
 use clap::Command;
 use ebi_objects::EbiObjectType;
@@ -23,6 +15,7 @@ use std::{
     io::Write,
 };
 use strum::IntoEnumIterator;
+use crate::{ebi_commands::ebi_command_itself::EBI_ITSELF, ebi_framework::{ebi_command::{EBI_COMMANDS, EbiCommand, get_applicable_commands}, ebi_file_handler::{EBI_FILE_HANDLERS, Tri, get_file_handlers}, ebi_importer_parameters, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, prom::java_object_handler::{JavaObjectHandlerQueryExport, JavaObjectHandlerQueryImport}, python::python::{PYTHON_PACKAGE, pm4py_function_name}, text::{Joiner, LatexEscaper, Rank}};
 
 pub fn manual() -> Result<EbiOutput> {
     let mut f = vec![];
@@ -284,7 +277,7 @@ pub fn manual() -> Result<EbiOutput> {
         }
     }
     for object_type in EbiObjectType::iter() {
-        let java_object_handlers = get_java_object_handlers_that_can_import(&object_type);
+        let java_object_handlers = object_type.get_java_object_handlers_that_can_import();
         if !java_object_handlers.is_empty() {
             writeln!(f, "\\item {}.\\\\Java class: {}.", 
                 object_type.to_string().to_sentence_case(), 
@@ -306,7 +299,7 @@ pub fn manual() -> Result<EbiOutput> {
     //prom output list
     writeln!(f, "\\def\\ebipromoutput{{\\begin{{itemize}}")?;
     for object_type in EbiObjectType::iter() {
-        let java_object_handlers = get_java_object_handlers_that_can_export(&object_type);
+        let java_object_handlers = object_type.get_java_object_handlers_that_can_export();
         if !java_object_handlers.is_empty() {
             writeln!(f, "\\item {}.\\\\Java class: {}.", 
                 object_type.to_string().to_sentence_case(), 

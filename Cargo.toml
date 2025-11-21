@@ -19,6 +19,7 @@ crate-type = ["cdylib", "lib"]
 default = [ ]
 eexactarithmetic = []
 python = [ "dep:pyo3", "dep:polars", "dep:num-traits", "dep:syn" ]
+java = [ "dep:jni" ]
 exactarithmetic = [ "eexactarithmetic", "ebi_arithmetic/exactarithmetic" ]
 approximatearithmetic = [ "eapproximatearithmetic", "ebi_arithmetic/approximatearithmetic" ]
 eapproximatearithmetic = []
@@ -52,7 +53,6 @@ indicatif = "0.18.2"
 indexmap = "2.12.0"
 pathfinding="4.14.0"
 fnv = "1.0.7"
-jni = "0.21.1"
 itertools = "0.14.0"
 serde = "1.0.226"
 logging_timer = "1.1.1"
@@ -69,6 +69,7 @@ pyo3 = { version = "0.26", features = ["extension-module", "abi3-py37", "generat
 polars = { version = "0.32", features = ["ipc", "timezones"], optional = true }
 num-traits = { version = "0.2", optional = true }
 syn = { version = "2.0.108", features = [ "parsing", "full" ], optional = true }
+jni = { version = "0.21.1", optional=true }
 
 [profile.release]
 debug = false

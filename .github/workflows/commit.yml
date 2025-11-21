@@ -18,6 +18,8 @@ jobs:
       run: |
         cargo run --features python itself python -o src/python/python_module_autogen.rs
         cargo build --features python
+    - name: Compile with link to java
+      run: cargo build --features java
     - name: Run tests mixed mode 1
       run: cargo test --verbose
     - name: Run tests mixed mode 2

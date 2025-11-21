@@ -1,3 +1,8 @@
+use super::{
+    ebi_command::{EBI_COMMANDS, EbiCommand},
+    ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+    ebi_input::{EbiInput, EbiInputType},
+};
 use anyhow::{Result, anyhow};
 use ebi_arithmetic::Fraction;
 use std::{
@@ -5,13 +10,6 @@ use std::{
     fmt::{Debug, Display},
 };
 use strum_macros::EnumIter;
-
-use super::{
-    ebi_command::{EBI_COMMANDS, EbiCommand},
-    ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
-    ebi_input::{EbiInput, EbiInputType},
-    prom_link::JavaObjectHandler,
-};
 
 #[derive(Clone, Copy, PartialEq, Eq, EnumIter, Hash, Default)]
 pub enum EbiTrait {
@@ -81,10 +79,6 @@ impl EbiTrait {
             false
         });
         result
-    }
-
-    pub fn get_java_object_handlers_that_can_import(&self) -> HashSet<JavaObjectHandler> {
-        EbiInputType::Trait(self.clone()).get_java_object_handlers_that_can_import()
     }
 
     pub fn get_explanation(&self) -> &str {
@@ -232,8 +226,9 @@ impl FromEbiTraitObject for String {
 mod tests {
     use strum::IntoEnumIterator;
 
-    use crate::ebi_framework::ebi_input::{
-        EbiInput, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE,
+    use crate::{
+        ebi_framework::ebi_input::{EbiInput, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE},
+        prom::java_object_handler::JavaObjectHandlerQueryImport,
     };
 
     use super::{EbiTrait, FromEbiTraitObject};

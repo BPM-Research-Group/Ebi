@@ -208,25 +208,8 @@ pub fn should_file_be_tested(
 #[cfg(test)]
 pub mod tests {
 
-    use std::fs::{self, File};
-
-    use ebi_objects::{
-        DeterministicFiniteAutomaton, EbiObjectType, EventLog, FiniteLanguage, Importable,
-        Infoable, NumberOfTraces, PetriNetMarkupLanguage, ProcessTreeMarkupLanguage,
-        StochasticDeterministicFiniteAutomaton,
-    };
-    use strum::IntoEnumIterator;
-
     use crate::{
-        ebi_framework::{
-            ebi_file_handler::get_file_handlers,
-            ebi_input::{EbiInput, TEST_INPUT_TYPE_STRING},
-            ebi_trait::FromEbiTraitObject,
-            ebi_trait_object::EbiTraitObject,
-            prom_link::{
-                get_java_object_handlers_that_can_export, get_java_object_handlers_that_can_import,
-            },
-        },
+        ebi_framework::{ebi_input::EbiInput, ebi_trait_object::EbiTraitObject},
         ebi_traits::{
             ebi_trait_event_log::EbiTraitEventLog,
             ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
@@ -234,6 +217,12 @@ pub mod tests {
         multiple_reader::MultipleReader,
         semantics::semantics::Semantics,
     };
+    use ebi_objects::{
+        DeterministicFiniteAutomaton, EventLog, FiniteLanguage, Importable, Infoable,
+        NumberOfTraces, PetriNetMarkupLanguage, ProcessTreeMarkupLanguage,
+        StochasticDeterministicFiniteAutomaton,
+    };
+    use std::fs::{self, File};
 
     #[test]
     fn all_graphable() {
@@ -244,19 +233,6 @@ pub mod tests {
                 }
             }
         }
-    }
-
-    #[test]
-    fn object_types() {
-        for object_type in EbiObjectType::iter() {
-            object_type.get_article();
-            get_file_handlers(&object_type);
-            get_java_object_handlers_that_can_export(&object_type);
-            get_java_object_handlers_that_can_import(&object_type);
-        }
-
-        let _ =
-            String::from_trait_object(EbiInput::String("xyz".to_string(), &TEST_INPUT_TYPE_STRING));
     }
 
     #[test]

@@ -57,13 +57,13 @@ mod tests {
     use ebi_objects::EbiObjectType;
     use strum::IntoEnumIterator;
 
-    use crate::ebi_framework::{
-        ebi_file_handler::get_file_handlers,
-        ebi_input::{EbiInput, TEST_INPUT_TYPE_STRING},
-        ebi_trait::FromEbiTraitObject,
-        prom_link::{
-            get_java_object_handlers_that_can_export, get_java_object_handlers_that_can_import,
+    use crate::{
+        ebi_framework::{
+            ebi_file_handler::get_file_handlers,
+            ebi_input::{EbiInput, TEST_INPUT_TYPE_STRING},
+            ebi_trait::FromEbiTraitObject,
         },
+        prom::java_object_handler::{JavaObjectHandlerQueryExport, JavaObjectHandlerQueryImport},
     };
 
     #[test]
@@ -71,8 +71,8 @@ mod tests {
         for object_type in EbiObjectType::iter() {
             object_type.get_article();
             get_file_handlers(&object_type);
-            get_java_object_handlers_that_can_export(&object_type);
-            get_java_object_handlers_that_can_import(&object_type);
+            object_type.get_java_object_handlers_that_can_export();
+            object_type.get_java_object_handlers_that_can_import();
         }
 
         let _ =

@@ -9,7 +9,6 @@ pub mod ebi_framework {
     pub mod ebi_trait_object;
     pub mod manual;
     pub mod object_importers;
-    pub mod prom_link;
     pub mod validate;
 }
 pub mod ebi_commands {
@@ -35,8 +34,8 @@ pub mod ebi_file_handlers {
     pub mod deterministic_finite_automaton;
     pub mod directly_follows_graph;
     pub mod directly_follows_model;
-    pub mod event_log_xes;
     pub mod event_log_csv;
+    pub mod event_log_xes;
     pub mod executions;
     pub mod finite_language;
     pub mod finite_stochastic_language;
@@ -107,6 +106,14 @@ pub mod math {
     pub mod markov_model;
     pub mod root;
     pub mod root_log_div;
+}
+
+pub mod prom {
+    pub mod java_object_handler;
+    #[cfg(feature = "java")]
+    pub mod prom_link;
+    #[cfg(feature = "java")]
+    pub mod prom_plugin_generator;
 }
 
 pub mod python {

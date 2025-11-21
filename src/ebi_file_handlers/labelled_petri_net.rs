@@ -7,13 +7,12 @@ use crate::{
         ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
-        prom_link::JavaObjectHandler,
         validate::Validate,
     },
     ebi_traits::{
         ebi_trait_activities::ToActivities, ebi_trait_graphable::ToGraphable,
         ebi_trait_semantics::ToSemantics,
-    },
+    }, prom::java_object_handler::JavaObjectHandler,
 };
 
 pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {

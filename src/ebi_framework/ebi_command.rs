@@ -14,6 +14,7 @@ use crate::{
         ebi_command_visualise,
     },
     ebi_framework::{ebi_importer_parameters, ebi_output},
+    prom::java_object_handler::get_possible_inputs_with_java,
     text::Joiner,
 };
 use anyhow::{Context, Result, anyhow};
@@ -691,7 +692,7 @@ impl EbiCommand {
                     if let Some(_) = output_java_object_handler.translator_ebi_to_java {
                         let input_typesss = input_typess
                             .iter()
-                            .map(|arr| EbiInputType::get_possible_inputs_with_java(arr))
+                            .map(|arr| get_possible_inputs_with_java(arr))
                             .collect::<Vec<_>>();
                         for _ in input_typesss.iter().multi_cartesian_product() {
                             return true;

@@ -2,8 +2,9 @@ use crate::ebi_framework::{
     ebi_command::EbiCommand,
     ebi_output::{EbiOutput, EbiOutputType},
     manual::{graph, html, manual},
-    prom_link,
 };
+#[cfg(feature = "java")]
+use crate::prom::prom_plugin_generator::print_java_plugins;
 use ebi_objects::{EbiObject, EbiObjectType, ebi_objects::scalable_vector_graphics::ToSVGMut};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
@@ -31,6 +32,7 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
     children: &[
         &EBI_ITSELF_GRAPH,
         &EBI_ITSELF_HTML,
+        #[cfg(feature = "java")]
         &EBI_ITSELF_JAVA,
         &EBI_ITSELF_LOGO,
         &EBI_ITSELF_MANUAL,
@@ -87,6 +89,7 @@ pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::ObjectType(EbiObjectType::ScalableVectorGraphics),
 };
 
+#[cfg(feature = "java")]
 pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command {
     name_short: "java",
     name_long: None,
@@ -98,7 +101,7 @@ pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command {
     input_types: &[],
     input_names: &[],
     input_helps: &[],
-    execute: |_, _| Ok(prom_link::print_java_plugins()?),
+    execute: |_, _| Ok(print_java_plugins()?),
     output_type: &EbiOutputType::String,
 };
 

@@ -1,11 +1,17 @@
+use super::{
+    ebi_command::{EBI_COMMANDS, EbiCommand},
+    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    ebi_output::{EbiObjectExporter, EbiOutputType},
+    ebi_trait::FromEbiTraitObject,
+};
 use crate::{
     ebi_commands::ebi_command_validate::EBI_VALIDATE,
     ebi_file_handlers::{
         compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
         deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
         directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
-        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_xes::EBI_EVENT_LOG_XES,
-        event_log_csv::EBI_EVENT_LOG_CSV, executions::EBI_EXECUTIONS,
+        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_csv::EBI_EVENT_LOG_CSV,
+        event_log_xes::EBI_EVENT_LOG_XES, executions::EBI_EXECUTIONS,
         finite_language::EBI_FINITE_LANGUAGE,
         finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
         labelled_petri_net::EBI_LABELLED_PETRI_NET,
@@ -20,19 +26,11 @@ use crate::{
         stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
         stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE,
     },
-    ebi_framework::{ebi_command::get_applicable_commands, ebi_trait::EbiTrait},
+    ebi_framework::{ebi_command::get_applicable_commands, ebi_trait::EbiTrait}, prom::java_object_handler::JavaObjectHandler,
 };
 use anyhow::{Error, Result, anyhow};
 use ebi_objects::EbiObjectType;
 use std::{collections::BTreeSet, fmt::Display, hash::Hash, io::BufRead, str::FromStr};
-
-use super::{
-    ebi_command::{EBI_COMMANDS, EbiCommand},
-    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
-    ebi_output::{EbiObjectExporter, EbiOutputType},
-    ebi_trait::FromEbiTraitObject,
-    prom_link::JavaObjectHandler,
-};
 
 /**
  * The order of this list is important: for the "any object" input type and for trait importers,
@@ -229,10 +227,10 @@ pub fn get_file_handlers(object_type: &EbiObjectType) -> Vec<&'static EbiFileHan
 }
 
 pub enum Tri {
-        Yes,
-        No,
-        Fallible,
-    }
+    Yes,
+    No,
+    Fallible,
+}
 
 #[cfg(test)]
 mod tests {
