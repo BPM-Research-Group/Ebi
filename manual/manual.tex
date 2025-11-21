@@ -14,6 +14,7 @@
 \usepackage{todonotes}
 \setuptodonotes{inline}
 \usepackage[british]{babel}
+\usepackage{wasysym}
 
 \definecolor{eclipseStrings}{RGB}{42,0.0,255}
 \definecolor{eclipseKeywords}{RGB}{127,0,85}
@@ -305,7 +306,9 @@ print(result)
             \filehandlerstraits
 
         \subsubsection{Objects $\rightarrow$ file handlers (exporters)}
-            \objecttypesfilehandlers
+            In this table, \CIRCLE{} means that the export is always possible, and \LEFTcircle{} means that a conversion is involved that may fail.
+            
+            \noindent\objecttypesfilehandlers
             
 		\subsubsection{ProM support}
 			Ebi automatically exports the commands it supports to ProM.

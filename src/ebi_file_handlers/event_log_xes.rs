@@ -5,7 +5,8 @@ use crate::{
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
         object_importers::{
-            ToFiniteLanguageObject, ToFiniteStochasticLanguageObject, ToStochasticDeterministicFiniteAutomatonObject
+            ToFiniteLanguageObject, ToFiniteStochasticLanguageObject,
+            ToStochasticDeterministicFiniteAutomatonObject,
         },
         prom_link::JavaObjectHandler,
         validate::Validate,
@@ -28,7 +29,7 @@ use ebi_objects::{
     EbiObject, EventLog, EventLogTraceAttributes, EventLogXes, Exportable, Importable,
 };
 
-pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
+pub const EBI_EVENT_LOG_XES: EbiFileHandler = EbiFileHandler {
     name: "extensible event stream",
     article: "an",
     file_extension: "xes",
@@ -83,7 +84,7 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
         ),
         EbiObjectImporter::EventLogXes(
             EventLogXes::import_as_object,
-            EventLog::IMPORTER_PARAMETERS,
+            EventLogXes::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::FiniteLanguage(
             EventLog::import_as_finite_language_object,
@@ -100,9 +101,11 @@ pub const EBI_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     ],
     object_exporters: &[
         EbiObjectExporter::EventLog(EventLog::export_from_object),
-        EbiObjectExporter::EventLogTraceAttributes(EventLogTraceAttributes::export_from_object),
-        EbiObjectExporter::EventLogXes(EventLogXes::export_from_object),
+        EbiObjectExporter::EventLogTraceAttributes(EventLog::export_from_object),
+        EbiObjectExporter::EventLogXes(EventLog::export_from_object),
+        EbiObjectExporter::EventLogCsv(EventLog::export_from_object),
     ],
+    object_exporters_fallible: &[],
     java_object_handlers: &[JavaObjectHandler {
         name: "XLog",
         translator_ebi_to_java: Some("org.processmining.ebi.objects.EbiEventLog.EbiStringToXLog"),

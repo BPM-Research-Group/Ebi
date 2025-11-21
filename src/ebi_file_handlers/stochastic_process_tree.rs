@@ -68,6 +68,7 @@ pub const EBI_STOCHASTIC_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     object_exporters: &[EbiObjectExporter::StochasticProcessTree(
         StochasticProcessTree::export_from_object,
     )],
+    object_exporters_fallible: &[],
     java_object_handlers: &[],
 };
 

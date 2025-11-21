@@ -29,6 +29,7 @@ pub const EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler
     object_exporters: &[EbiObjectExporter::StochasticLanguageOfAlignments(
         StochasticLanguageOfAlignments::export_from_object,
     )],
+    object_exporters_fallible: &[],
     java_object_handlers: &[],
 };
 

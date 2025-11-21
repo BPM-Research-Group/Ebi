@@ -26,5 +26,6 @@ pub const EBI_PORTABLE_DOCUMENT_FORMAT: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::StochasticProcessTree(PortableDocumentFormat::export_from_object),
         EbiObjectExporter::ScalableVectorGraphics(PortableDocumentFormat::export_from_object),
     ],
+    object_exporters_fallible: &[],
     java_object_handlers: &[],
 };

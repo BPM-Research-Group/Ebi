@@ -1,6 +1,6 @@
 use crate::{
     ebi_commands::ebi_command_itself::EBI_ITSELF, ebi_framework::{
-        ebi_command::{EBI_COMMANDS, EbiCommand, get_applicable_commands}, ebi_file_handler::{EBI_FILE_HANDLERS, get_file_handlers}, ebi_importer_parameters, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link::{
+        ebi_command::{EBI_COMMANDS, EbiCommand, get_applicable_commands}, ebi_file_handler::{EBI_FILE_HANDLERS, Tri, get_file_handlers}, ebi_importer_parameters, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, prom_link::{
             get_java_object_handlers_that_can_export,
             get_java_object_handlers_that_can_import,
         }
@@ -533,9 +533,9 @@ pub fn object_importers_table() -> Result<String> {
 
         for object_type in &types {
             if file_handler.can_import_as_object(&object_type) {
-                write!(f, "&+")?;
+                write!(f, "&\\CIRCLE")?;
             } else {
-                write!(f, "&-")?;
+                write!(f, "&\\Circle")?;
             }
         }
         writeln!(f, "\\\\")?;
@@ -573,9 +573,9 @@ pub fn trait_importers_table() -> Result<String> {
 
         for object_type in &types {
             if file_handler.can_import_as_trait(&object_type) {
-                write!(f, "&+")?;
+                write!(f, "&\\CIRCLE")?;
             } else {
-                write!(f, "&-")?;
+                write!(f, "&\\Circle")?;
             }
         }
         writeln!(f, "\\\\")?;
@@ -612,11 +612,11 @@ pub fn object_exporters_table() -> Result<String> {
         writeln!(f, "{}", object_type)?;
 
         for file_handler in &handlers {
-            if file_handler.can_export_as_object(&object_type) {
-                write!(f, "&+")?;
-            } else {
-                write!(f, "&-")?;
-            }
+            write!(f, "&{}", match file_handler.can_export_as_object(&object_type) {
+                Tri::Yes => "\\CIRCLE",
+                Tri::Fallible => "\\LEFTcircle",
+                Tri::No => "\\Circle"
+            })?;
         }
         writeln!(f, "\\\\")?;
     }

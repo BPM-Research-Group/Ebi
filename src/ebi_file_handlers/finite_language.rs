@@ -52,9 +52,13 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     ],
     object_exporters: &[
         EbiObjectExporter::EventLog(FiniteLanguage::export_from_object),
+        EbiObjectExporter::EventLogTraceAttributes(FiniteLanguage::export_from_object),
+        EbiObjectExporter::EventLogXes(FiniteLanguage::export_from_object),
+        EbiObjectExporter::EventLogCsv(FiniteLanguage::export_from_object),
         EbiObjectExporter::FiniteLanguage(FiniteLanguage::export_from_object),
         EbiObjectExporter::FiniteStochasticLanguage(FiniteLanguage::export_from_object),
     ],
+    object_exporters_fallible: &[],
     java_object_handlers: &[],
 };
 

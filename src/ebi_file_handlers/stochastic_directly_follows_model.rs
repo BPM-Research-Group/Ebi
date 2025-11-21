@@ -81,5 +81,6 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
         ),
         EbiObjectExporter::DirectlyFollowsGraph(StochasticDirectlyFollowsModel::export_from_object),
     ],
+    object_exporters_fallible: &[],
     java_object_handlers: &[],
 };

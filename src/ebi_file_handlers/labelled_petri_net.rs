@@ -54,6 +54,7 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
             LabelledPetriNet::export_from_object,
         ),
     ],
+    object_exporters_fallible: &[],
     java_object_handlers: &[
         JavaObjectHandler {
             name: "PetriNet",

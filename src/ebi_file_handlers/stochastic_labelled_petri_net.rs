@@ -71,6 +71,7 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
         ),
         EbiObjectExporter::DirectlyFollowsGraph(StochasticLabelledPetriNet::export_from_object),
     ],
+    object_exporters_fallible: &[],
     java_object_handlers: &[JavaObjectHandler {
         name: "StochasticLabelledPetriNet",
         translator_ebi_to_java: Some(

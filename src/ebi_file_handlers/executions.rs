@@ -22,5 +22,6 @@ pub const EBI_EXECUTIONS: EbiFileHandler = EbiFileHandler {
     object_exporters: &[EbiObjectExporter::Executions(
         Executions::export_from_object,
     )],
+    object_exporters_fallible: &[],
     java_object_handlers: &[],
 };
