@@ -27,7 +27,7 @@ use ebi_objects::{
     },
     marking::Marking,
 };
-use malachite::{Natural, base::num::conversion::traits::ToSci};
+use malachite::Natural;
 use polars::prelude::*;
 use process_mining::event_log::{
     AttributeValue, Attributes, Event, EventLog as ProcessMiningEventLog, Trace,
