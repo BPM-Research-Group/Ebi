@@ -39,6 +39,8 @@ The [manual.pdf](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/buil
         print(result)
 
     The names of the Ebi functions can be found in the [manual.pdf](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
+    
+    Please note that for fractional numbers, Ebi returns an array consisting of 1) a 4-decimal approximation, 2) the full numerator, and 3) the full denominator.
 
 # Getting started with development
 

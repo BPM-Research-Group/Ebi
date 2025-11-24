@@ -186,10 +186,6 @@ impl ExportableToPM4Py for Fraction {
             let approx_float = approx_string.parse::<f64>()?;
             let py_approx_float = approx_float.into_py_any(py)?;
 
-            //scientific notation
-            let sci = rat.to_sci().to_string();
-            let py_sci = sci.into_py_any(py)?;
-
             //create the exact values
             let numerator = rat.numerator_ref();
             let py_numerator = natural_to_num_biguints(numerator).into_py_any(py)?;
@@ -198,7 +194,7 @@ impl ExportableToPM4Py for Fraction {
             let py_denominator = natural_to_num_biguints(denominator).into_py_any(py)?;
 
             //create the list
-            let py_events = vec![py_approx_float, py_sci, py_numerator, py_denominator];
+            let py_events = vec![py_approx_float, py_numerator, py_denominator];
             let py_list = PyList::new(py, py_events)?;
 
             Ok(py_list.into_py_any(py)?)
