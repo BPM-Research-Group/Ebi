@@ -1,3 +1,19 @@
+use crate::{
+    ebi_file_handlers::{
+        event_log_xes::EBI_EVENT_LOG_XES, finite_language::EBI_FINITE_LANGUAGE,
+        finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
+        labelled_petri_net::EBI_LABELLED_PETRI_NET, process_tree::EBI_PROCESS_TREE,
+    },
+    ebi_framework::{
+        ebi_command::EbiCommand,
+        ebi_input::{EbiInput, EbiInputType},
+        ebi_output::{self, EbiOutput},
+        ebi_trait::EbiTrait,
+        ebi_trait_object::EbiTraitObject,
+    },
+    ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+    prom::prom_link::attempt_parse,
+};
 use anyhow::{Result, anyhow};
 use ebi_arithmetic::{MaybeExact, fraction::fraction::Fraction, is_exact_globally};
 use ebi_objects::{
@@ -11,7 +27,12 @@ use ebi_objects::{
     },
     marking::Marking,
 };
+use malachite::{Natural, base::num::conversion::traits::ToSci};
 use polars::prelude::*;
+use process_mining::event_log::{
+    AttributeValue, Attributes, Event, EventLog as ProcessMiningEventLog, Trace,
+    event_log_struct::{EventLogClassifier, to_attributes},
+};
 use pyo3::{
     IntoPyObjectExt,
     exceptions::PyValueError,
@@ -23,27 +44,6 @@ use std::{
     io::Cursor,
     iter::Peekable,
     str::{Chars, FromStr},
-};
-
-use crate::{ebi_file_handlers::{
-    event_log_xes::EBI_EVENT_LOG_XES, finite_language::EBI_FINITE_LANGUAGE,
-    finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
-    labelled_petri_net::EBI_LABELLED_PETRI_NET, process_tree::EBI_PROCESS_TREE,
-}, prom::prom_link::attempt_parse};
-
-use crate::{
-    ebi_framework::{
-        ebi_command::EbiCommand,
-        ebi_input::{EbiInput, EbiInputType},
-        ebi_output::{self, EbiOutput},
-        ebi_trait::EbiTrait,
-        ebi_trait_object::EbiTraitObject,
-    },
-    ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
-};
-use process_mining::event_log::{
-    AttributeValue, Attributes, Event, EventLog as ProcessMiningEventLog, Trace,
-    event_log_struct::{EventLogClassifier, to_attributes},
 };
 
 type Importer = fn(&Bound<'_, PyAny>, &[&'static EbiInputType]) -> PyResult<EbiInput>;
@@ -179,11 +179,29 @@ impl ImportableFromPM4Py for Fraction {
 impl ExportableToPM4Py for Fraction {
     fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
         if let Ok(rat) = self.exact_ref() {
-            // malachite does not offer any direct way to convert Rational to f64, but log can be retrieved as f64
-            // we apply exp to get back the original value
-            let log_value = rat.approx_log();
-            let float_value: f64 = log_value.exp();
-            Ok(float_value.into_py_any(py)?)
+            // malachite does not offer any direct way to convert Rational to f64
+
+            //create an approximation float
+            let approx_string = format!("{:.4}", rat);
+            let approx_float = approx_string.parse::<f64>()?;
+            let py_approx_float = approx_float.into_py_any(py)?;
+
+            //scientific notation
+            let sci = rat.to_sci().to_string();
+            let py_sci = sci.into_py_any(py)?;
+
+            //create the exact values
+            let numerator = rat.numerator_ref();
+            let py_numerator = natural_to_num_biguints(numerator).into_py_any(py)?;
+
+            let denominator = rat.denominator_ref();
+            let py_denominator = natural_to_num_biguints(denominator).into_py_any(py)?;
+
+            //create the list
+            let py_events = vec![py_approx_float, py_sci, py_numerator, py_denominator];
+            let py_list = PyList::new(py, py_events)?;
+
+            Ok(py_list.into_py_any(py)?)
         } else if let Ok(flo) = self.approx_ref() {
             Ok(flo.into_py_any(py)?)
         } else {
@@ -192,6 +210,15 @@ impl ExportableToPM4Py for Fraction {
             ))
         }
     }
+}
+
+pub fn natural_to_num_biguints(n: &Natural) -> num_bigint::BigUint {
+    let n_limbs = n.to_limbs_asc();
+    let n_limbs_u32: Vec<u32> = n_limbs
+        .iter()
+        .flat_map(|u| vec![*u as u32, (u >> 32) as u32])
+        .collect();
+    num_bigint::BigUint::from_slice(&n_limbs_u32)
 }
 
 impl ImportableFromPM4Py for EventLog {
@@ -598,157 +625,6 @@ impl ImportableFromPM4Py for LabelledPetriNet {
     }
 }
 
-// /// StochasticPetriNets are not fully integrated into PM4Py (yet)
-// /// this function will remain useless until PM4Py has a proper implementation of Stochastic Petri Nets
-// impl ImportableFromPM4Py for StochasticLabelledPetriNet {
-//     fn import_from_pm4py(pn: &PyAny, input_types: &[&'static EbiInputType]) -> PyResult<EbiInput> {
-//         // Retrieve "places", "transitions", and "arcs" attributes as sets.
-//         let py_places = get_collection_as_set(pn, "places").map_err(|e| {
-//             pyo3::exceptions::PyValueError::new_err(format!("Failed to get places: {}", e))
-//         })?;
-//         let py_transitions = get_collection_as_set(pn, "transitions").map_err(|e| {
-//             pyo3::exceptions::PyValueError::new_err(format!("Failed to get transitions: {}", e))
-//         })?;
-//         let py_arcs = get_collection_as_set(pn, "arcs").map_err(|e| {
-//             pyo3::exceptions::PyValueError::new_err(format!("Failed to get arcs: {}", e))
-//         })?;
-
-//         // Convert sets to vectors.
-//         let places: Vec<&PyAny> = pyset_as_vec(py_places);
-//         let transitions: Vec<&PyAny> = pyset_as_vec(py_transitions);
-//         let arcs: Vec<&PyAny> = pyset_as_vec(py_arcs);
-
-//         let num_places = places.len();
-//         let num_transitions = transitions.len();
-
-//         // Create mappings using raw pointers as keys.
-//         let mut place_idx_map: HashMap<usize, usize> = HashMap::new();
-//         for (i, &place) in places.iter().enumerate() {
-//             place_idx_map.insert(place.as_ptr() as usize, i);
-//         }
-//         let mut trans_idx_map: HashMap<usize, usize> = HashMap::new();
-//         for (i, &trans) in transitions.iter().enumerate() {
-//             trans_idx_map.insert(trans.as_ptr() as usize, i);
-//         }
-
-//         // For this example, assume initial marking is all zeros.
-//         let initial_marking = Marking {
-//             place2token: vec![0u64; num_places],
-//         };
-
-//         // Build labels vector for transitions.
-//         let mut activity_key = ActivityKey::new();
-//         let mut labels = Vec::with_capacity(num_transitions);
-//         let mut weights: Vec<Fraction> = Vec::with_capacity(num_transitions);
-//         for trans in transitions.iter() {
-//             if let Ok(label_obj) = trans.getattr("label") {
-//                 let label_str: String = label_obj.extract().unwrap_or_default();
-//                 let act = activity_key.process_activity(&label_str);
-//                 labels.push(Some(act));
-//             } else {
-//                 labels.push(None);
-//             }
-
-//             let trans_weight = trans
-//                 .getattr("weight")?
-//                 .extract::<f64>()
-//                 .map(|float_weight| Fraction::Approx(float_weight))
-//                 .map_err(|e| {
-//                     pyo3::exceptions::PyValueError::new_err(format!(
-//                         "Failed to retrieve transition weight: {}",
-//                         e
-//                     ))
-//                 })?;
-//             weights.push(trans_weight);
-//         }
-
-//         // Initialize mapping vectors.
-//         let mut transition2input_places = vec![Vec::new(); num_transitions];
-//         let mut transition2output_places = vec![Vec::new(); num_transitions];
-//         let mut transition2input_places_cardinality = vec![Vec::new(); num_transitions]; // default cardinality
-//         let mut transition2output_places_cardinality = vec![Vec::new(); num_transitions]; // default cardinality
-//         let mut place2output_transitions = vec![Vec::new(); num_places];
-
-//         // Process each arc.
-//         for arc in arcs {
-//             // Each arc should have "source" and "target" attributes.
-//             let source = arc.getattr("source").map_err(|e| {
-//                 pyo3::exceptions::PyValueError::new_err(format!(
-//                     "Arc missing source attribute: {}",
-//                     e
-//                 ))
-//             })?;
-//             let target = arc.getattr("target").map_err(|e| {
-//                 pyo3::exceptions::PyValueError::new_err(format!(
-//                     "Arc missing target attribute: {}",
-//                     e
-//                 ))
-//             })?;
-//             let weight = arc.getattr("weight")?.extract::<u64>().map_err(|e| {
-//                 pyo3::exceptions::PyValueError::new_err(format!(
-//                     "Arc missing weight attribute: {}",
-//                     e
-//                 ))
-//             })?;
-//             let source_key = source.as_ptr() as usize;
-//             let target_key = target.as_ptr() as usize;
-
-//             if place_idx_map.contains_key(&source_key) {
-//                 let p_idx = *place_idx_map.get(&source_key).unwrap();
-//                 let t_idx = *trans_idx_map.get(&target_key).ok_or_else(|| {
-//                     pyo3::exceptions::PyValueError::new_err(
-//                         "Arc target not found among transitions",
-//                     )
-//                 })?;
-//                 // Update place-to-transition mappings.
-//                 place2output_transitions[p_idx].push(t_idx);
-//                 transition2input_places[t_idx].push(p_idx);
-//                 transition2input_places_cardinality[t_idx].push(weight);
-//             } else if trans_idx_map.contains_key(&source_key) {
-//                 let t_idx = *trans_idx_map.get(&source_key).unwrap();
-//                 let p_idx = *place_idx_map.get(&target_key).ok_or_else(|| {
-//                     pyo3::exceptions::PyValueError::new_err("Arc target not found among places")
-//                 })?;
-//                 // Update transition-to-place mappings.
-//                 transition2output_places[t_idx].push(p_idx);
-//                 place2output_transitions[p_idx].push(t_idx);
-//                 transition2output_places_cardinality[t_idx].push(weight);
-//             } else {
-//                 return Err(pyo3::exceptions::PyValueError::new_err(
-//                     "Arc source not found in either places or transitions",
-//                 ));
-//             }
-//         }
-
-//         let _slpn = StochasticLabelledPetriNet {
-//             activity_key,
-//             initial_marking,
-//             labels,
-//             place2output_transitions,
-//             transition2input_places,
-//             transition2output_places,
-//             transition2input_places_cardinality,
-//             transition2output_places_cardinality,
-//             weights,
-//         };
-
-//         //Ok(EbiObject::StochasticLabelledPetriNet(slpn))
-//         //Ok(slpn)
-
-//         for &itype in input_types {
-//             match itype {
-//                 _ => {
-//                     // skip other input types
-//                 }
-//             }
-//         }
-
-//         Err(PyValueError::new_err(
-//             "This is not implemented yet!! (and PM4Py does not support it)",
-//         ))
-//     }
-// }
-
 impl ImportableFromPM4Py for ProcessTree {
     fn import_from_pm4py(
         ptree: &Bound<'_, PyAny>,
@@ -1042,4 +918,34 @@ pub fn import_or_load(
     };
 
     Ok(input)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::python::python_link::natural_to_num_biguints;
+    use malachite::{
+        Natural,
+        base::num::basic::traits::{One, Zero},
+    };
+
+    #[test]
+    fn num_bigint_conversion() {
+        let n_mal = Natural::ZERO;
+        let n_num = natural_to_num_biguints(&n_mal);
+        assert_eq!(n_num.to_string(), "0");
+
+        let n_mal = Natural::ONE;
+        let n_num = natural_to_num_biguints(&n_mal);
+        assert_eq!(n_num.to_string(), "1");
+
+        let n_str = "1234567897987987987";
+        let n_mal = n_str.parse::<Natural>().unwrap();
+        let n_num = natural_to_num_biguints(&n_mal);
+        assert_eq!(n_num.to_string(), n_str);
+
+        let n_str = "4564654564356546736574566574687756894756176468774647617687746947461746796474665474878934424516";
+        let n_mal = n_str.parse::<Natural>().unwrap();
+        let n_num = natural_to_num_biguints(&n_mal);
+        assert_eq!(n_num.to_string(), n_str);
+    }
 }

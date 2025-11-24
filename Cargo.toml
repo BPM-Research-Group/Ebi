@@ -18,7 +18,7 @@ crate-type = ["cdylib", "lib"]
 [features]
 default = [ ]
 eexactarithmetic = []
-python = [ "dep:pyo3", "dep:polars", "dep:num-traits", "dep:syn", "java" ]
+python = [ "java", "dep:pyo3", "dep:polars", "dep:num-traits", "dep:syn", "dep:num-bigint" ]
 java = [ "dep:jni" ]
 exactarithmetic = [ "eexactarithmetic", "ebi_arithmetic/exactarithmetic" ]
 approximatearithmetic = [ "eapproximatearithmetic", "ebi_arithmetic/approximatearithmetic" ]
@@ -62,14 +62,15 @@ cfg-if = "1.0.4"
 ntest = "0.9.3"
 regex = "1.12.2"
 quick-xml = {version="0.38.4", features=["serialize"]}
-malachite = "0.7.1"
+malachite = { version = "0.7.1" }
 pastey = "0.2.0"
 intmap = "3.1.3"
-pyo3 = { version = "0.26", features = ["extension-module", "abi3-py37", "generate-import-lib"], optional = true }
+pyo3 = { version = "0.26.0", features = ["extension-module", "abi3-py37", "generate-import-lib", "num-bigint"], optional = true }
 polars = { version = "0.32", features = ["ipc", "timezones"], optional = true }
 num-traits = { version = "0.2", optional = true }
 syn = { version = "2.0.108", features = [ "parsing", "full" ], optional = true }
-jni = { version = "0.21.1", optional=true }
+jni = { version = "0.21.1", optional = true }
+num-bigint = { version = "0.4.6", optional = true }
 
 [profile.release]
 debug = false
