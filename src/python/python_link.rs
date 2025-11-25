@@ -183,6 +183,7 @@ impl ExportableToPM4Py for Fraction {
 
             //create an approximation float
             let approx_string = format!("{:.4}", rat);
+            println!("approx_string: {}", approx_string);
             let approx_float = approx_string.parse::<f64>()?;
             let py_approx_float = approx_float.into_py_any(py)?;
 
@@ -276,6 +277,16 @@ impl ImportableFromPM4Py for EventLog {
                             ));
                             let tobj = EbiTraitObject::FiniteLanguage(fl);
                             return Ok(EbiInput::Trait(tobj, &EBI_FINITE_LANGUAGE));
+                        }
+                        EbiTrait::QueriableStochasticLanguage => {
+                            let qsl = Box::new(Into::<FiniteStochasticLanguage>::into(
+                                Into::<FiniteStochasticLanguage>::into(event_log_rust),
+                            ));
+                            let tobj = EbiTraitObject::QueriableStochasticLanguage(qsl);
+                            return Ok(EbiInput::Trait(
+                                tobj,
+                                &EBI_FINITE_STOCHASTIC_LANGUAGE,
+                            ));
                         }
                         // … add more traits here …
                         _ => { /* this trait isn’t supported by EventLog; skip */ }
