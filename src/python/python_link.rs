@@ -15,7 +15,11 @@ use crate::{
     prom::prom_link::attempt_parse,
 };
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{MaybeExact, fraction::fraction::Fraction, is_exact_globally};
+use ebi_arithmetic::{
+    MaybeExact,
+    fraction::{approximate::Approximate, fraction::Fraction},
+    is_exact_globally,
+};
 use ebi_objects::{
     EventLogXes, NumberOfTraces,
     activity_key::activity_key::ActivityKey,
@@ -182,8 +186,15 @@ impl ExportableToPM4Py for Fraction {
             // malachite does not offer any direct way to convert Rational to f64
 
             //create an approximation float
-            let approx_string = format!("{:.4}", rat);
-            let approx_float = approx_string.parse::<f64>()?;
+            let approx_float = match rat.clone().approximate() {
+                Ok(x) => x,
+                Err(e) => {
+                    return Err(PyValueError::new_err(format!(
+                        "Cannot approximate the fraction {}",
+                        e
+                    )));
+                }
+            };
             let py_approx_float = approx_float.into_py_any(py)?;
 
             //create the exact values
