@@ -16,7 +16,7 @@ name = "ebi"
 crate-type = ["cdylib", "lib"]
 
 [features]
-default = [ ]
+default = [ "python" ]
 eexactarithmetic = []
 python = [ "java", "dep:pyo3", "dep:polars", "dep:num-traits", "dep:syn", "dep:num-bigint" ]
 java = [ "dep:jni" ]
@@ -26,7 +26,7 @@ eapproximatearithmetic = []
 
 [dependencies]
 ebi_derive = "0.2.7"
-ebi_arithmetic = "0.3.2"
+ebi_arithmetic = "0.3.3"
 ebi_optimisation = "0.3.0"
 ebi_objects = "0.3.56"
 bitvec = "1.0.1"
