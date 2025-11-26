@@ -1,19 +1,16 @@
-use anyhow::{Ok, Result, anyhow};
-use ebi_objects::{EbiObject, Exportable, Importable, LabelledPetriNet};
-
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
         ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
+        trait_importers::{ToActivitiesTrait, ToGraphableTrait, ToSemanticsTrait},
         validate::Validate,
     },
-    ebi_traits::{
-        ebi_trait_activities::ToActivities, ebi_trait_graphable::ToGraphable,
-        ebi_trait_semantics::ToSemantics,
-    }, prom::java_object_handler::JavaObjectHandler,
+    prom::java_object_handler::JavaObjectHandler,
 };
+use anyhow::{Ok, Result, anyhow};
+use ebi_objects::{EbiObject, Exportable, Importable, LabelledPetriNet};
 
 pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "labelled Petri net",
@@ -24,15 +21,15 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     validator: Some(LabelledPetriNet::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
-            LabelledPetriNet::import_as_activities,
+            LabelledPetriNet::import_as_activities_trait,
             LabelledPetriNet::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
-            LabelledPetriNet::import_as_semantics,
+            LabelledPetriNet::import_as_semantics_trait,
             LabelledPetriNet::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Graphable(
-            LabelledPetriNet::import_as_graphable,
+            LabelledPetriNet::import_as_graphable_trait,
             LabelledPetriNet::IMPORTER_PARAMETERS,
         ),
     ],

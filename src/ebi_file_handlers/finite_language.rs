@@ -1,16 +1,13 @@
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
-        ebi_output::EbiObjectExporter,
-        ebi_trait::FromEbiTraitObject,
-        object_importers::ToDeterministicFiniteAutomatonObject,
-        validate::Validate,
+use crate::ebi_framework::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    ebi_trait::FromEbiTraitObject,
+    object_importers::ToDeterministicFiniteAutomatonObject,
+    trait_importers::{
+        ToActivitiesTrait, ToFiniteLanguageTrait, ToIterableLanguageTrait, ToSemanticsTrait,
     },
-    ebi_traits::{
-        ebi_trait_activities::ToActivities, ebi_trait_finite_language::ToFiniteLanguage,
-        ebi_trait_iterable_language::ToIterableLanguage, ebi_trait_semantics::ToSemantics,
-    },
+    validate::Validate,
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{EbiObject, Exportable, FiniteLanguage, Importable};
@@ -24,19 +21,19 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     validator: Some(FiniteLanguage::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
-            FiniteLanguage::import_as_activities,
+            FiniteLanguage::import_as_activities_trait,
             FiniteLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::IterableLanguage(
-            FiniteLanguage::import_as_iterable_language,
+            FiniteLanguage::import_as_iterable_language_trait,
             FiniteLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::FiniteLanguage(
-            FiniteLanguage::import_as_finite_language,
+            FiniteLanguage::import_as_finite_language_trait,
             FiniteLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
-            FiniteLanguage::import_as_semantics,
+            FiniteLanguage::import_as_semantics_trait,
             FiniteLanguage::IMPORTER_PARAMETERS,
         ),
     ],
@@ -79,7 +76,7 @@ impl FromEbiTraitObject for FiniteLanguage {
 mod tests {
     use std::fs;
 
-    use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};
+    use crate::{ebi_framework::trait_importers::ToSemanticsTrait, ebi_traits::ebi_trait_semantics::EbiTraitSemantics};
 
     use super::FiniteLanguage;
 
@@ -88,7 +85,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/empty.lang").unwrap();
         let log = fin.parse::<FiniteLanguage>().unwrap();
 
-        if let EbiTraitSemantics::Usize(semantics) = log.to_semantics() {
+        if let EbiTraitSemantics::Usize(semantics) = log.to_semantics_trait() {
             assert!(semantics.get_initial_state().is_none());
         }
     }

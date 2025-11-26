@@ -1,6 +1,7 @@
 use crate::{
     ebi_framework::{
         ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+        trait_importers::ToEventLogTraceAttributesTrait,
     },
     ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
 };
@@ -8,11 +9,11 @@ use anyhow::{Result, anyhow};
 use ebi_objects::{
     Activity, Attribute, EventLogTraceAttributes, Importable, IntoAttributeIterator,
     IntoAttributeTraceIterator, TraceAttributes, attribute_key::has_attribute_key::HasAttributeKey,
-    ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes, traits::importable::ImporterParameterValues,
+    ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
 };
 use intmap::IntMap;
 use process_mining::event_log::AttributeValue;
-use std::{collections::HashMap, io::BufRead};
+use std::collections::HashMap;
 
 pub const ATTRIBUTE_TIME: &str = "time:timestamp";
 
@@ -99,31 +100,17 @@ impl EbiTraitEventLogTraceAttributes for EventLogTraceAttributes {
     }
 }
 
-pub trait ToEventLogTraceAttributes: Importable {
-    fn to_event_log_trace_attributes(self) -> Box<dyn EbiTraitEventLogTraceAttributes>;
-
-    fn import_as_event_log_trace_attributes(
-        reader: &mut dyn BufRead,
-        parameter_values: &ImporterParameterValues,
-    ) -> Result<Box<dyn EbiTraitEventLogTraceAttributes>>
-    where
-        Self: Sized,
-    {
-        Ok(Self::import(reader, parameter_values)?.to_event_log_trace_attributes())
-    }
-}
-
-impl<T> ToEventLogTraceAttributes for T
+impl<T> ToEventLogTraceAttributesTrait for T
 where
     T: EbiTraitEventLogTraceAttributes + Importable + 'static,
 {
-    fn to_event_log_trace_attributes(self) -> Box<dyn EbiTraitEventLogTraceAttributes> {
+    fn to_event_log_trace_attributes_trait(self) -> Box<dyn EbiTraitEventLogTraceAttributes> {
         Box::new(self)
     }
 }
 
-impl ToEventLogTraceAttributes for CompressedEventLogTraceAttributes {
-    fn to_event_log_trace_attributes(self) -> Box<dyn EbiTraitEventLogTraceAttributes> {
+impl ToEventLogTraceAttributesTrait for CompressedEventLogTraceAttributes {
+    fn to_event_log_trace_attributes_trait(self) -> Box<dyn EbiTraitEventLogTraceAttributes> {
         Box::new(self.log)
     }
 }

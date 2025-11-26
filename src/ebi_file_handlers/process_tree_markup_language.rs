@@ -1,12 +1,10 @@
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiObjectImporter, EbiTraitImporter},
-        ebi_output::EbiObjectExporter,
-        object_importers::ToLabelledPetriNetObject,
-        validate::Validate,
-    },
-    ebi_traits::{ebi_trait_activities::ToActivities, ebi_trait_graphable::ToGraphable, ebi_trait_semantics::ToSemantics},
+use crate::ebi_framework::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    object_importers::ToLabelledPetriNetObject,
+    trait_importers::{ToActivitiesTrait, ToGraphableTrait, ToSemanticsTrait},
+    validate::Validate,
 };
 use ebi_objects::{Exportable, Importable, ProcessTreeMarkupLanguage};
 
@@ -19,15 +17,15 @@ pub const EBI_PROCESS_TREE_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     validator: Some(ProcessTreeMarkupLanguage::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
-            ProcessTreeMarkupLanguage::import_as_activities,
+            ProcessTreeMarkupLanguage::import_as_activities_trait,
             ProcessTreeMarkupLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
-            ProcessTreeMarkupLanguage::import_as_semantics,
+            ProcessTreeMarkupLanguage::import_as_semantics_trait,
             ProcessTreeMarkupLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Graphable(
-            ProcessTreeMarkupLanguage::import_as_graphable,
+            ProcessTreeMarkupLanguage::import_as_graphable_trait,
             ProcessTreeMarkupLanguage::IMPORTER_PARAMETERS,
         ),
     ],

@@ -1,12 +1,9 @@
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::EbiFileHandler, ebi_input::EbiTraitImporter,
-        ebi_output::EbiObjectExporter, validate::Validate,
-    },
-    ebi_traits::{
-        ebi_trait_activities::ToActivities, ebi_trait_graphable::ToGraphable,
-        ebi_trait_semantics::ToSemantics,
-    },
+use crate::ebi_framework::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::EbiTraitImporter,
+    ebi_output::EbiObjectExporter,
+    trait_importers::{ToActivitiesTrait, ToGraphableTrait, ToSemanticsTrait},
+    validate::Validate,
 };
 use ebi_objects::{Exportable, Importable, LolaNet};
 
@@ -18,9 +15,18 @@ pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
     format_specification: LolaNet::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(LolaNet::validate),
     trait_importers: &[
-        EbiTraitImporter::Activities(LolaNet::import_as_activities, LolaNet::IMPORTER_PARAMETERS),
-        EbiTraitImporter::Semantics(LolaNet::import_as_semantics, LolaNet::IMPORTER_PARAMETERS),
-        EbiTraitImporter::Graphable(LolaNet::import_as_graphable, LolaNet::IMPORTER_PARAMETERS),
+        EbiTraitImporter::Activities(
+            LolaNet::import_as_activities_trait,
+            LolaNet::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Semantics(
+            LolaNet::import_as_semantics_trait,
+            LolaNet::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Graphable(
+            LolaNet::import_as_graphable_trait,
+            LolaNet::IMPORTER_PARAMETERS,
+        ),
     ],
     object_importers: &[],
     object_exporters: &[

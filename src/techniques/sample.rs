@@ -165,10 +165,10 @@ mod tests {
 
     use ebi_objects::FiniteStochasticLanguage;
 
-    use crate::ebi_traits::{
+    use crate::{ebi_framework::trait_importers::ToStochasticSemanticsTrait, ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_stochastic_semantics::{EbiTraitStochasticSemantics, ToStochasticSemantics},
-    };
+        ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
+    }};
 
     use super::Sampler;
 
@@ -191,7 +191,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/aa.slang").unwrap();
         let slpn = fin.parse::<FiniteStochasticLanguage>().unwrap();
 
-        let slpn: EbiTraitStochasticSemantics = slpn.to_stochastic_semantics();
+        let slpn: EbiTraitStochasticSemantics = slpn.to_stochastic_semantics_trait();
 
         let sample = slpn.sample(10).unwrap();
 
@@ -215,7 +215,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/empty.slang").unwrap();
         let slpn = fin.parse::<FiniteStochasticLanguage>().unwrap();
 
-        let slpn: EbiTraitStochasticSemantics = slpn.to_stochastic_semantics();
+        let slpn: EbiTraitStochasticSemantics = slpn.to_stochastic_semantics_trait();
 
         assert!(slpn.sample(10).is_err());
     }

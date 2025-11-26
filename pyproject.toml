@@ -19,4 +19,4 @@ build-backend = "maturin"
 
 [tool.maturin]
 bindings = "pyo3"
-features = [ "python" ]
+features = [ "python", "pyo3/extension-module" ]

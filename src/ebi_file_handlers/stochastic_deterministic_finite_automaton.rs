@@ -1,19 +1,14 @@
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
-        ebi_output::EbiObjectExporter,
-        ebi_trait::FromEbiTraitObject,
-        object_importers::ToLabelledPetriNetObject,
-        validate::Validate,
+use crate::ebi_framework::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    ebi_trait::FromEbiTraitObject,
+    object_importers::ToLabelledPetriNetObject,
+    trait_importers::{
+        ToActivitiesTrait, ToGraphableTrait, ToQueriableStochasticLanguageTrait, ToSemanticsTrait,
+        ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
     },
-    ebi_traits::{
-        ebi_trait_activities::ToActivities, ebi_trait_graphable::ToGraphable,
-        ebi_trait_queriable_stochastic_language::ToQueriableStochasticLanguage,
-        ebi_trait_semantics::ToSemantics,
-        ebi_trait_stochastic_deterministic_semantics::ToStochasticDeterministicSemantics,
-        ebi_trait_stochastic_semantics::ToStochasticSemantics,
-    },
+    validate::Validate,
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{EbiObject, Exportable, Importable, StochasticDeterministicFiniteAutomaton};
@@ -27,27 +22,27 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
     validator: Some(StochasticDeterministicFiniteAutomaton::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
-            StochasticDeterministicFiniteAutomaton::import_as_activities,
+            StochasticDeterministicFiniteAutomaton::import_as_activities_trait,
             StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::QueriableStochasticLanguage(
-            StochasticDeterministicFiniteAutomaton::import_as_queriable_stochastic_language,
+            StochasticDeterministicFiniteAutomaton::import_as_queriable_stochastic_language_trait,
             StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticDeterministicSemantics(
-            StochasticDeterministicFiniteAutomaton::import_as_stochastic_deterministic_semantics,
+            StochasticDeterministicFiniteAutomaton::import_as_stochastic_deterministic_semantics_trait,
             StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticSemantics(
-            StochasticDeterministicFiniteAutomaton::import_as_stochastic_semantics,
+            StochasticDeterministicFiniteAutomaton::import_as_stochastic_semantics_trait,
             StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
-            StochasticDeterministicFiniteAutomaton::import_as_semantics,
+            StochasticDeterministicFiniteAutomaton::import_as_semantics_trait,
             StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Graphable(
-            StochasticDeterministicFiniteAutomaton::import_as_graphable,
+            StochasticDeterministicFiniteAutomaton::import_as_graphable_trait,
             StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
     ],
@@ -69,7 +64,9 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
             StochasticDeterministicFiniteAutomaton::export_from_object,
         ),
         EbiObjectExporter::EventLog(StochasticDeterministicFiniteAutomaton::export_from_object),
-        EbiObjectExporter::EventLogTraceAttributes(StochasticDeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::EventLogTraceAttributes(
+            StochasticDeterministicFiniteAutomaton::export_from_object,
+        ),
         EbiObjectExporter::EventLogXes(StochasticDeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::EventLogCsv(StochasticDeterministicFiniteAutomaton::export_from_object),
     ],
@@ -96,7 +93,10 @@ impl FromEbiTraitObject for StochasticDeterministicFiniteAutomaton {
 mod tests {
     use std::fs;
 
-    use crate::ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics};
+    use crate::{
+        ebi_framework::trait_importers::ToSemanticsTrait,
+        ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
+    };
 
     use super::StochasticDeterministicFiniteAutomaton;
 
@@ -107,7 +107,7 @@ mod tests {
             .parse::<StochasticDeterministicFiniteAutomaton>()
             .unwrap();
 
-        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics() {
+        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics_trait() {
             assert!(semantics.get_initial_state().is_none());
         } else {
             assert!(false);

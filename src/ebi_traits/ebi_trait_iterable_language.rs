@@ -1,13 +1,11 @@
-use std::io::BufRead;
-
 use anyhow::{Result, anyhow};
 use ebi_objects::{
     FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, Importable, IntoRefTraceIterator,
-    traits::importable::ImporterParameterValues,
 };
 
 use crate::ebi_framework::{
     ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+    trait_importers::ToIterableLanguageTrait,
 };
 
 pub trait EbiTraitIterableLanguage: HasActivityKey + IntoRefTraceIterator {}
@@ -29,25 +27,11 @@ impl EbiTraitIterableLanguage for FiniteLanguage {}
 
 impl EbiTraitIterableLanguage for FiniteStochasticLanguage {}
 
-pub trait ToIterableLanguage: Importable {
-    fn to_iterable_language(self) -> Box<dyn EbiTraitIterableLanguage>;
-
-    fn import_as_iterable_language(
-        reader: &mut dyn BufRead,
-        parameter_values: &ImporterParameterValues,
-    ) -> Result<Box<dyn EbiTraitIterableLanguage>>
-    where
-        Self: Sized,
-    {
-        Ok(Self::import(reader, parameter_values)?.to_iterable_language())
-    }
-}
-
-impl<T> ToIterableLanguage for T
+impl<T> ToIterableLanguageTrait for T
 where
     T: Into<FiniteLanguage> + Importable,
 {
-    fn to_iterable_language(self) -> Box<dyn EbiTraitIterableLanguage> {
+    fn to_iterable_language_trait(self) -> Box<dyn EbiTraitIterableLanguage> {
         Box::new(Into::<FiniteLanguage>::into(self))
     }
 }

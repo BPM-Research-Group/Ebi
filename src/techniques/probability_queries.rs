@@ -564,18 +564,15 @@ mod tests {
     };
 
     use crate::{
-        ebi_traits::{
+        ebi_framework::trait_importers::ToStochasticDeterministicSemanticsTrait, ebi_traits::{
             ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
             ebi_trait_stochastic_deterministic_semantics::{
                 EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics,
-                ToStochasticDeterministicSemantics,
             },
-        },
-        semantics::labelled_petri_net_semantics::LPNMarking,
-        techniques::{
+        }, semantics::labelled_petri_net_semantics::LPNMarking, techniques::{
             deterministic_semantics_for_stochastic_semantics::PMarking,
             probability_queries::ProbabilityQueries,
-        },
+        }
     };
 
     #[test]
@@ -872,7 +869,7 @@ mod tests {
     fn slang_minprob_one_deterministic() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
-        let semantics = slang.to_stochastic_deterministic_semantics();
+        let semantics = slang.to_stochastic_deterministic_semantics_trait();
 
         assert_eq!(
             semantics
@@ -948,7 +945,7 @@ mod tests {
         let sdfa = fin
             .parse::<StochasticDeterministicFiniteAutomaton>()
             .unwrap();
-        let semantics = sdfa.to_stochastic_deterministic_semantics();
+        let semantics = sdfa.to_stochastic_deterministic_semantics_trait();
         assert_eq!(
             semantics
                 .analyse_minimum_probability(&Fraction::one())
@@ -964,7 +961,7 @@ mod tests {
         let sdfa = fin
             .parse::<StochasticDeterministicFiniteAutomaton>()
             .unwrap();
-        let semantics = sdfa.to_stochastic_deterministic_semantics();
+        let semantics = sdfa.to_stochastic_deterministic_semantics_trait();
 
         let slang2 = semantics
             .analyse_minimum_probability(&Fraction::zero())

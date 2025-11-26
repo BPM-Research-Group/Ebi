@@ -1,19 +1,18 @@
-use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, Zero};
-use ebi_objects::{
-    Activity, Importable, TranslateActivityKey,
-    ebi_objects::finite_stochastic_language::FiniteStochasticLanguage, traits::importable::ImporterParameterValues,
-};
-use std::{fmt::Debug, io::BufRead};
-
-use crate::ebi_framework::{
-    ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
-};
-
 use super::{
     ebi_trait_finite_language::EbiTraitFiniteLanguage,
     ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage,
 };
+use crate::ebi_framework::{
+    ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+    trait_importers::ToFiniteStochasticLanguageTrait,
+};
+use anyhow::{Result, anyhow};
+use ebi_arithmetic::{Fraction, Zero};
+use ebi_objects::{
+    Activity, Importable, TranslateActivityKey,
+    ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
+};
+use std::fmt::Debug;
 
 pub trait EbiTraitFiniteStochasticLanguage:
     EbiTraitIterableStochasticLanguage + EbiTraitFiniteLanguage + Sync + Debug + TranslateActivityKey
@@ -67,25 +66,11 @@ impl EbiTraitFiniteStochasticLanguage for FiniteStochasticLanguage {
     }
 }
 
-pub trait ToFiniteStochasticLanguage: Importable {
-    fn to_finite_stochastic_language(self) -> Box<dyn EbiTraitFiniteStochasticLanguage>;
-
-    fn import_as_finite_stochastic_language(
-        reader: &mut dyn BufRead,
-        parameter_values: &ImporterParameterValues,
-    ) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>>
-    where
-        Self: Sized,
-    {
-        Ok(Self::import(reader, parameter_values)?.to_finite_stochastic_language())
-    }
-}
-
-impl<T> ToFiniteStochasticLanguage for T
+impl<T> ToFiniteStochasticLanguageTrait for T
 where
     T: Into<FiniteStochasticLanguage> + Importable,
 {
-    fn to_finite_stochastic_language(self) -> Box<dyn EbiTraitFiniteStochasticLanguage> {
+    fn to_finite_stochastic_language_trait(self) -> Box<dyn EbiTraitFiniteStochasticLanguage> {
         Box::new(Into::<FiniteStochasticLanguage>::into(self))
     }
 }

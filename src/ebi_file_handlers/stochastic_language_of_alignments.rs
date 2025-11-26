@@ -1,8 +1,5 @@
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::EbiFileHandler, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, object_importers::ToLanguageOfAlignmentsObject, validate::Validate
-    },
-    ebi_traits::ebi_trait_activities::ToActivities,
+use crate::ebi_framework::{
+    ebi_file_handler::EbiFileHandler, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, object_importers::ToLanguageOfAlignmentsObject, trait_importers::ToActivitiesTrait, validate::Validate
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{EbiObject, Exportable, Importable, StochasticLanguageOfAlignments};
@@ -15,7 +12,7 @@ pub const EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler
     format_specification: StochasticLanguageOfAlignments::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(StochasticLanguageOfAlignments::validate),
     trait_importers: &[EbiTraitImporter::Activities(
-        StochasticLanguageOfAlignments::import_as_activities,
+        StochasticLanguageOfAlignments::import_as_activities_trait,
         StochasticLanguageOfAlignments::IMPORTER_PARAMETERS,
     )],
     object_importers: &[

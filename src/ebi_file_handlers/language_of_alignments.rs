@@ -1,11 +1,9 @@
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiObjectImporter, EbiTraitImporter},
-        ebi_output::EbiObjectExporter,
-        validate::Validate,
-    },
-    ebi_traits::ebi_trait_activities::ToActivities,
+use crate::ebi_framework::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    trait_importers::ToActivitiesTrait,
+    validate::Validate,
 };
 use ebi_objects::{Exportable, Importable, LanguageOfAlignments};
 
@@ -17,7 +15,7 @@ pub const EBI_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     format_specification: LanguageOfAlignments::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(LanguageOfAlignments::validate),
     trait_importers: &[EbiTraitImporter::Activities(
-        LanguageOfAlignments::import_as_activities,
+        LanguageOfAlignments::import_as_activities_trait,
         LanguageOfAlignments::IMPORTER_PARAMETERS,
     )],
     object_importers: &[EbiObjectImporter::LanguageOfAlignments(

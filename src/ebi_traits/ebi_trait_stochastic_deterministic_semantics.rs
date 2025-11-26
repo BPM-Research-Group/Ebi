@@ -1,7 +1,7 @@
 use crate::{
     ebi_framework::{
         displayable::Displayable, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
-        ebi_trait_object::EbiTraitObject,
+        ebi_trait_object::EbiTraitObject, trait_importers::ToStochasticDeterministicSemanticsTrait,
     },
     semantics::{labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates},
     techniques::{
@@ -13,16 +13,13 @@ use anyhow::{Result, anyhow};
 use ebi_arithmetic::Fraction;
 use ebi_objects::{
     Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogTraceAttributes,
-    EventLogXes, FiniteStochasticLanguage, HasActivityKey, Importable,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticProcessTree,
+    EventLogXes, FiniteStochasticLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
     ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_csv::EventLogCsv,
     },
-    traits::importable::ImporterParameterValues,
 };
-use std::io::BufRead;
 
 pub enum EbiTraitStochasticDeterministicSemantics {
     Usize(Box<dyn StochasticDeterministicSemantics<DetState = usize, LivState = usize>>),
@@ -115,24 +112,14 @@ pub trait StochasticDeterministicSemantics: HasActivityKey + InfinitelyManyTrace
     ) -> Result<Fraction>;
 }
 
-pub trait ToStochasticDeterministicSemantics: Importable + Sized {
-    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics;
-
-    fn import_as_stochastic_deterministic_semantics(
-        reader: &mut dyn BufRead,
-        parameter_values: &ImporterParameterValues,
-    ) -> Result<EbiTraitStochasticDeterministicSemantics> {
-        Ok(Self::import(reader, parameter_values)?.to_stochastic_deterministic_semantics())
-    }
-}
-
 macro_rules! via_fslang {
     ($t:ident) => {
-        impl ToStochasticDeterministicSemantics for $t {
-            fn to_stochastic_deterministic_semantics(
+        impl ToStochasticDeterministicSemanticsTrait for $t {
+            fn to_stochastic_deterministic_semantics_trait(
                 self,
             ) -> EbiTraitStochasticDeterministicSemantics {
-                Into::<FiniteStochasticLanguage>::into(self).to_stochastic_deterministic_semantics()
+                Into::<FiniteStochasticLanguage>::into(self)
+                    .to_stochastic_deterministic_semantics_trait()
             }
         }
     };
@@ -144,38 +131,50 @@ via_fslang!(EventLogTraceAttributes);
 via_fslang!(EventLogXes);
 via_fslang!(EventLogCsv);
 
-impl ToStochasticDeterministicSemantics for StochasticProcessTree {
-    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+impl ToStochasticDeterministicSemanticsTrait for StochasticProcessTree {
+    fn to_stochastic_deterministic_semantics_trait(
+        self,
+    ) -> EbiTraitStochasticDeterministicSemantics {
         EbiTraitStochasticDeterministicSemantics::NodeStatesDistribution(Box::new(self))
     }
 }
 
-impl ToStochasticDeterministicSemantics for StochasticLabelledPetriNet {
-    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+impl ToStochasticDeterministicSemanticsTrait for StochasticLabelledPetriNet {
+    fn to_stochastic_deterministic_semantics_trait(
+        self,
+    ) -> EbiTraitStochasticDeterministicSemantics {
         EbiTraitStochasticDeterministicSemantics::LPNMarkingDistribution(Box::new(self))
     }
 }
-impl ToStochasticDeterministicSemantics for DirectlyFollowsGraph {
-    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+impl ToStochasticDeterministicSemanticsTrait for DirectlyFollowsGraph {
+    fn to_stochastic_deterministic_semantics_trait(
+        self,
+    ) -> EbiTraitStochasticDeterministicSemantics {
         let dfm: StochasticDirectlyFollowsModel = self.into();
         EbiTraitStochasticDeterministicSemantics::UsizeDistribution(Box::new(dfm))
     }
 }
 
-impl ToStochasticDeterministicSemantics for StochasticDirectlyFollowsModel {
-    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+impl ToStochasticDeterministicSemanticsTrait for StochasticDirectlyFollowsModel {
+    fn to_stochastic_deterministic_semantics_trait(
+        self,
+    ) -> EbiTraitStochasticDeterministicSemantics {
         EbiTraitStochasticDeterministicSemantics::UsizeDistribution(Box::new(self))
     }
 }
 
-impl ToStochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton {
-    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+impl ToStochasticDeterministicSemanticsTrait for StochasticDeterministicFiniteAutomaton {
+    fn to_stochastic_deterministic_semantics_trait(
+        self,
+    ) -> EbiTraitStochasticDeterministicSemantics {
         EbiTraitStochasticDeterministicSemantics::Usize(Box::new(self))
     }
 }
 
-impl ToStochasticDeterministicSemantics for FiniteStochasticLanguage {
-    fn to_stochastic_deterministic_semantics(self) -> EbiTraitStochasticDeterministicSemantics {
+impl ToStochasticDeterministicSemanticsTrait for FiniteStochasticLanguage {
+    fn to_stochastic_deterministic_semantics_trait(
+        self,
+    ) -> EbiTraitStochasticDeterministicSemantics {
         EbiTraitStochasticDeterministicSemantics::Usize(Box::new(Into::<
             StochasticDeterministicFiniteAutomaton,
         >::into(self)))

@@ -1,22 +1,16 @@
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
-        ebi_output::EbiObjectExporter,
-        ebi_trait::FromEbiTraitObject,
-        object_importers::ToStochasticDeterministicFiniteAutomatonObject,
-        validate::Validate,
+use crate::ebi_framework::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    ebi_trait::FromEbiTraitObject,
+    object_importers::ToStochasticDeterministicFiniteAutomatonObject,
+    trait_importers::{
+        ToActivitiesTrait, ToFiniteLanguageTrait, ToFiniteStochasticLanguageTrait,
+        ToIterableLanguageTrait, ToIterableStochasticLanguageTrait,
+        ToQueriableStochasticLanguageTrait, ToSemanticsTrait,
+        ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
     },
-    ebi_traits::{
-        ebi_trait_activities::ToActivities, ebi_trait_finite_language::ToFiniteLanguage,
-        ebi_trait_finite_stochastic_language::ToFiniteStochasticLanguage,
-        ebi_trait_iterable_language::ToIterableLanguage,
-        ebi_trait_iterable_stochastic_language::ToIterableStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::ToQueriableStochasticLanguage,
-        ebi_trait_semantics::ToSemantics,
-        ebi_trait_stochastic_deterministic_semantics::ToStochasticDeterministicSemantics,
-        ebi_trait_stochastic_semantics::ToStochasticSemantics,
-    },
+    validate::Validate,
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{EbiObject, Exportable, FiniteStochasticLanguage, Importable};
@@ -30,39 +24,39 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     validator: Some(FiniteStochasticLanguage::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
-            FiniteStochasticLanguage::import_as_activities,
+            FiniteStochasticLanguage::import_as_activities_trait,
             FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::IterableLanguage(
-            FiniteStochasticLanguage::import_as_iterable_language,
+            FiniteStochasticLanguage::import_as_iterable_language_trait,
             FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::FiniteLanguage(
-            FiniteStochasticLanguage::import_as_finite_language,
+            FiniteStochasticLanguage::import_as_finite_language_trait,
             FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::FiniteStochasticLanguage(
-            FiniteStochasticLanguage::import_as_finite_stochastic_language,
+            FiniteStochasticLanguage::import_as_finite_stochastic_language_trait,
             FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::QueriableStochasticLanguage(
-            FiniteStochasticLanguage::import_as_queriable_stochastic_language,
+            FiniteStochasticLanguage::import_as_queriable_stochastic_language_trait,
             FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::IterableStochasticLanguage(
-            FiniteStochasticLanguage::import_as_iterable_stochastic_language,
+            FiniteStochasticLanguage::import_as_iterable_stochastic_language_trait,
             FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticSemantics(
-            FiniteStochasticLanguage::import_as_stochastic_semantics,
+            FiniteStochasticLanguage::import_as_stochastic_semantics_trait,
             FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticDeterministicSemantics(
-            FiniteStochasticLanguage::import_as_stochastic_deterministic_semantics,
+            FiniteStochasticLanguage::import_as_stochastic_deterministic_semantics_trait,
             FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
-            FiniteStochasticLanguage::import_as_semantics,
+            FiniteStochasticLanguage::import_as_semantics_trait,
             FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
     ],

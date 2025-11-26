@@ -209,10 +209,12 @@ pub fn should_file_be_tested(
 pub mod tests {
 
     use crate::{
-        ebi_framework::{ebi_input::EbiInput, ebi_trait_object::EbiTraitObject},
+        ebi_framework::{
+            ebi_input::EbiInput, ebi_trait_object::EbiTraitObject,
+            trait_importers::ToSemanticsTrait,
+        },
         ebi_traits::{
-            ebi_trait_event_log::EbiTraitEventLog,
-            ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
+            ebi_trait_event_log::EbiTraitEventLog, ebi_trait_semantics::EbiTraitSemantics,
         },
         multiple_reader::MultipleReader,
         semantics::semantics::Semantics,
@@ -262,7 +264,7 @@ pub mod tests {
         let fin = fs::read_to_string("testfiles/empty.dfa").unwrap();
         let dfa = fin.parse::<DeterministicFiniteAutomaton>().unwrap();
 
-        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics() {
+        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics_trait() {
             assert!(semantics.get_initial_state().is_none());
         } else {
             assert!(false);
@@ -274,7 +276,7 @@ pub mod tests {
         let fin = fs::read_to_string("testfiles/empty.xes").unwrap();
         let log = fin.parse::<EventLog>().unwrap();
 
-        if let EbiTraitSemantics::Usize(semantics) = log.to_semantics() {
+        if let EbiTraitSemantics::Usize(semantics) = log.to_semantics_trait() {
             assert!(semantics.get_initial_state().is_none());
         }
     }
@@ -284,7 +286,7 @@ pub mod tests {
         let fin = fs::read_to_string("testfiles/empty.lang").unwrap();
         let log = fin.parse::<FiniteLanguage>().unwrap();
 
-        if let EbiTraitSemantics::Usize(semantics) = log.to_semantics() {
+        if let EbiTraitSemantics::Usize(semantics) = log.to_semantics_trait() {
             assert!(semantics.get_initial_state().is_none());
         }
     }
@@ -292,7 +294,7 @@ pub mod tests {
     #[test]
     fn pnml_empty() {
         let mut reader = MultipleReader::from_file(File::open("testfiles/empty.pnml").unwrap());
-        let semantics = PetriNetMarkupLanguage::import_as_semantics(
+        let semantics = PetriNetMarkupLanguage::import_as_semantics_trait(
             &mut reader.get().unwrap(),
             &PetriNetMarkupLanguage::default_importer_parameter_values(),
         )
@@ -323,7 +325,7 @@ pub mod tests {
             .parse::<StochasticDeterministicFiniteAutomaton>()
             .unwrap();
 
-        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics() {
+        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics_trait() {
             assert!(semantics.get_initial_state().is_none());
         } else {
             assert!(false);

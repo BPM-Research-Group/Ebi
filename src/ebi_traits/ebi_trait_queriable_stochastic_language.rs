@@ -1,22 +1,23 @@
-use anyhow::{Context, Error, Result, anyhow};
-use ebi_arithmetic::{Fraction, Zero};
-use ebi_objects::{
-    ActivityKeyTranslator, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, Importable, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, ebi_objects::{compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes, event_log_csv::EventLogCsv}, traits::importable::ImporterParameterValues
-};
-use std::{
-    io::BufRead,
-    sync::{Arc, Mutex},
-};
-
+use super::ebi_trait_finite_language::EbiTraitFiniteLanguage;
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
-        ebi_trait_object::EbiTraitObject,
+        ebi_trait_object::EbiTraitObject, trait_importers::ToQueriableStochasticLanguageTrait,
     },
     follower_semantics::FollowerSemantics,
 };
-
-use super::ebi_trait_finite_language::EbiTraitFiniteLanguage;
+use anyhow::{Context, Error, Result, anyhow};
+use ebi_arithmetic::{Fraction, Zero};
+use ebi_objects::{
+    ActivityKeyTranslator, CompressedEventLog, DirectlyFollowsGraph, EventLog,
+    EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, Importable,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    ebi_objects::{
+        compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
+        event_log_csv::EventLogCsv,
+    },
+};
+use std::sync::{Arc, Mutex};
 
 pub trait EbiTraitQueriableStochasticLanguage: HasActivityKey + Sync {
     /**
@@ -97,30 +98,21 @@ impl EbiTraitQueriableStochasticLanguage for FiniteStochasticLanguage {
     }
 }
 
-pub trait ToQueriableStochasticLanguage: Importable + Sized {
-    fn to_queriable_stochastic_language(self) -> Box<dyn EbiTraitQueriableStochasticLanguage>;
-
-    fn import_as_queriable_stochastic_language(
-        reader: &mut dyn BufRead,
-        parameter_values: &ImporterParameterValues,
-    ) -> Result<Box<dyn EbiTraitQueriableStochasticLanguage>> {
-        Ok(Self::import(reader, parameter_values)?.to_queriable_stochastic_language())
-    }
-}
-
-impl<T> ToQueriableStochasticLanguage for T
+impl<T> ToQueriableStochasticLanguageTrait for T
 where
     T: EbiTraitQueriableStochasticLanguage + Importable + 'static,
 {
-    fn to_queriable_stochastic_language(self) -> Box<dyn EbiTraitQueriableStochasticLanguage> {
+    fn to_queriable_stochastic_language_trait(
+        self,
+    ) -> Box<dyn EbiTraitQueriableStochasticLanguage> {
         Box::new(self)
     }
 }
 
 macro_rules! queriable_via_slpn {
     ($t:ident) => {
-        impl ToQueriableStochasticLanguage for $t {
-            fn to_queriable_stochastic_language(
+        impl ToQueriableStochasticLanguageTrait for $t {
+            fn to_queriable_stochastic_language_trait(
                 self,
             ) -> Box<dyn EbiTraitQueriableStochasticLanguage> {
                 let lpn: StochasticLabelledPetriNet = self.into();
@@ -132,8 +124,8 @@ macro_rules! queriable_via_slpn {
 
 macro_rules! queriable_via_slang {
     ($t:ident) => {
-        impl ToQueriableStochasticLanguage for $t {
-            fn to_queriable_stochastic_language(
+        impl ToQueriableStochasticLanguageTrait for $t {
+            fn to_queriable_stochastic_language_trait(
                 self,
             ) -> Box<dyn EbiTraitQueriableStochasticLanguage> {
                 let lpn: FiniteStochasticLanguage = self.into();

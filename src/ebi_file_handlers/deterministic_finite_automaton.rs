@@ -1,17 +1,12 @@
 use ebi_objects::{DeterministicFiniteAutomaton, Exportable, Importable};
 
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiObjectImporter, EbiTraitImporter},
-        ebi_output::EbiObjectExporter,
-        object_importers::ToLabelledPetriNetObject,
-        validate::Validate,
-    },
-    ebi_traits::{
-        ebi_trait_activities::ToActivities, ebi_trait_graphable::ToGraphable,
-        ebi_trait_semantics::ToSemantics,
-    },
+use crate::ebi_framework::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    object_importers::ToLabelledPetriNetObject,
+    trait_importers::{ToActivitiesTrait, ToGraphableTrait, ToSemanticsTrait},
+    validate::Validate,
 };
 
 pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
@@ -23,15 +18,15 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     validator: Some(DeterministicFiniteAutomaton::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
-            DeterministicFiniteAutomaton::import_as_activities,
+            DeterministicFiniteAutomaton::import_as_activities_trait,
             DeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
-            DeterministicFiniteAutomaton::import_as_semantics,
+            DeterministicFiniteAutomaton::import_as_semantics_trait,
             DeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Graphable(
-            DeterministicFiniteAutomaton::import_as_graphable,
+            DeterministicFiniteAutomaton::import_as_graphable_trait,
             DeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
     ],
@@ -69,14 +64,11 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_objects::{DeterministicFiniteAutomaton, HasActivityKey};
-
     use crate::{
-        ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
-        semantics::semantics::Semantics,
+        ebi_framework::trait_importers::ToSemanticsTrait, ebi_traits::ebi_trait_semantics::EbiTraitSemantics, semantics::semantics::Semantics
     };
+    use ebi_objects::{DeterministicFiniteAutomaton, HasActivityKey};
+    use std::fs;
 
     #[test]
     fn insert_wrong_edge() {
@@ -95,7 +87,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/empty.dfa").unwrap();
         let dfa = fin.parse::<DeterministicFiniteAutomaton>().unwrap();
 
-        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics() {
+        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics_trait() {
             assert!(semantics.get_initial_state().is_none());
         } else {
             assert!(false);

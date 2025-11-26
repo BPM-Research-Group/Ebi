@@ -9,6 +9,7 @@ pub mod ebi_framework {
     pub mod ebi_trait_object;
     pub mod manual;
     pub mod object_importers;
+    pub mod trait_importers;
     pub mod validate;
 }
 pub mod ebi_commands {
@@ -118,6 +119,10 @@ pub mod prom {
 
 pub mod python {
     pub mod python;
+    #[cfg(feature = "python")]
+    pub mod python_export;
+    #[cfg(feature = "python")]
+    pub mod python_import;
     #[cfg(feature = "python")]
     pub mod python_link;
     #[cfg(feature = "python")]

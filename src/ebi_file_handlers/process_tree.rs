@@ -5,12 +5,10 @@ use crate::{
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
         object_importers::ToLabelledPetriNetObject,
+        trait_importers::{ToActivitiesTrait, ToGraphableTrait, ToSemanticsTrait},
         validate::Validate,
     },
-    ebi_traits::{
-        ebi_trait_activities::ToActivities, ebi_trait_graphable::ToGraphable,
-        ebi_trait_semantics::ToSemantics,
-    }, prom::java_object_handler::JavaObjectHandler,
+    prom::java_object_handler::JavaObjectHandler,
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{EbiObject, Exportable, Importable, ProcessTree};
@@ -24,15 +22,15 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     validator: Some(ProcessTree::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
-            ProcessTree::import_as_activities,
+            ProcessTree::import_as_activities_trait,
             ProcessTree::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
-            ProcessTree::import_as_semantics,
+            ProcessTree::import_as_semantics_trait,
             ProcessTree::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Graphable(
-            ProcessTree::import_as_graphable,
+            ProcessTree::import_as_graphable_trait,
             ProcessTree::IMPORTER_PARAMETERS,
         ),
     ],

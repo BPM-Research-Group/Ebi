@@ -1,6 +1,7 @@
 use crate::{
     ebi_framework::{
         ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+        trait_importers::ToSemanticsTrait,
     },
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
@@ -12,7 +13,7 @@ use anyhow::{Result, anyhow};
 use ebi_objects::{
     ActivityKey, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
     EventLog, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
-    HasActivityKey, Importable, LabelledPetriNet, LolaNet, PetriNetMarkupLanguage, ProcessTree,
+    HasActivityKey, LabelledPetriNet, LolaNet, PetriNetMarkupLanguage, ProcessTree,
     ProcessTreeMarkupLanguage, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
     TranslateActivityKey,
@@ -21,9 +22,7 @@ use ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_csv::EventLogCsv,
     },
-    traits::importable::ImporterParameterValues,
 };
-use std::io::BufRead;
 
 ///
 /// This is a wrapper enum in order to be able to implement algorithms that are agnostic of the marking/state type, amongst other things.
@@ -82,22 +81,11 @@ impl FromEbiTraitObject for EbiTraitSemantics {
     }
 }
 
-pub trait ToSemantics: Importable + Sized {
-    fn to_semantics(self) -> EbiTraitSemantics;
-
-    fn import_as_semantics(
-        reader: &mut dyn BufRead,
-        parameter_values: &ImporterParameterValues,
-    ) -> Result<EbiTraitSemantics> {
-        Ok(Self::import(reader, parameter_values)?.to_semantics())
-    }
-}
-
 macro_rules! via_log {
     ($t:ident) => {
-        impl ToSemantics for $t {
-            fn to_semantics(self) -> EbiTraitSemantics {
-                Into::<FiniteLanguage>::into(self).to_semantics()
+        impl ToSemanticsTrait for $t {
+            fn to_semantics_trait(self) -> EbiTraitSemantics {
+                Into::<FiniteLanguage>::into(self).to_semantics_trait()
             }
         }
     };
@@ -109,90 +97,90 @@ via_log!(EventLogTraceAttributes);
 via_log!(EventLogXes);
 via_log!(EventLogCsv);
 
-impl ToSemantics for DeterministicFiniteAutomaton {
-    fn to_semantics(self) -> EbiTraitSemantics {
+impl ToSemanticsTrait for DeterministicFiniteAutomaton {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
         EbiTraitSemantics::Usize(Box::new(self))
     }
 }
 
-impl ToSemantics for LolaNet {
-    fn to_semantics(self) -> EbiTraitSemantics {
-        self.0.to_semantics()
+impl ToSemanticsTrait for LolaNet {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
+        self.0.to_semantics_trait()
     }
 }
 
-impl ToSemantics for StochasticProcessTree {
-    fn to_semantics(self) -> EbiTraitSemantics {
+impl ToSemanticsTrait for StochasticProcessTree {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
         EbiTraitSemantics::NodeStates(Box::new(self))
     }
 }
 
-impl ToSemantics for LabelledPetriNet {
-    fn to_semantics(self) -> EbiTraitSemantics {
+impl ToSemanticsTrait for LabelledPetriNet {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
         EbiTraitSemantics::Marking(Box::new(self))
     }
 }
 
-impl ToSemantics for PetriNetMarkupLanguage {
-    fn to_semantics(self) -> EbiTraitSemantics {
-        self.0.to_semantics()
+impl ToSemanticsTrait for PetriNetMarkupLanguage {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
+        self.0.to_semantics_trait()
     }
 }
 
-impl ToSemantics for StochasticLabelledPetriNet {
-    fn to_semantics(self) -> EbiTraitSemantics {
+impl ToSemanticsTrait for StochasticLabelledPetriNet {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
         EbiTraitSemantics::Marking(Box::new(self))
     }
 }
 
-impl ToSemantics for StochasticDirectlyFollowsModel {
-    fn to_semantics(self) -> EbiTraitSemantics {
+impl ToSemanticsTrait for StochasticDirectlyFollowsModel {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
         EbiTraitSemantics::Usize(Box::new(self))
     }
 }
 
-impl ToSemantics for DirectlyFollowsGraph {
-    fn to_semantics(self) -> EbiTraitSemantics {
+impl ToSemanticsTrait for DirectlyFollowsGraph {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
         let dfm: DirectlyFollowsModel = self.into();
         EbiTraitSemantics::Usize(Box::new(dfm))
     }
 }
 
-impl ToSemantics for DirectlyFollowsModel {
-    fn to_semantics(self) -> EbiTraitSemantics {
+impl ToSemanticsTrait for DirectlyFollowsModel {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
         EbiTraitSemantics::Usize(Box::new(self))
     }
 }
 
-impl ToSemantics for StochasticDeterministicFiniteAutomaton {
-    fn to_semantics(self) -> EbiTraitSemantics {
+impl ToSemanticsTrait for StochasticDeterministicFiniteAutomaton {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
         EbiTraitSemantics::Usize(Box::new(self))
     }
 }
 
-impl ToSemantics for FiniteLanguage {
-    fn to_semantics(self) -> EbiTraitSemantics {
-        Into::<DeterministicFiniteAutomaton>::into(self).to_semantics()
+impl ToSemanticsTrait for FiniteLanguage {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
+        Into::<DeterministicFiniteAutomaton>::into(self).to_semantics_trait()
     }
 }
 
-impl ToSemantics for FiniteStochasticLanguage {
-    fn to_semantics(self) -> EbiTraitSemantics {
+impl ToSemanticsTrait for FiniteStochasticLanguage {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
         EbiTraitSemantics::Usize(Box::new(FiniteStochasticLanguageSemantics::from_language(
             &self,
         )))
     }
 }
 
-impl ToSemantics for ProcessTreeMarkupLanguage {
-    fn to_semantics(self) -> EbiTraitSemantics {
+impl ToSemanticsTrait for ProcessTreeMarkupLanguage {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
         let lpn: LabelledPetriNet = self.into();
         EbiTraitSemantics::Marking(Box::new(lpn))
     }
 }
 
-impl ToSemantics for ProcessTree {
-    fn to_semantics(self) -> EbiTraitSemantics {
+impl ToSemanticsTrait for ProcessTree {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
         EbiTraitSemantics::NodeStates(Box::new(self))
     }
 }

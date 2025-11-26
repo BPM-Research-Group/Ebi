@@ -1,12 +1,11 @@
+use crate::ebi_framework::{
+    ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+    trait_importers::ToIterableStochasticLanguageTrait,
+};
 use anyhow::{Result, anyhow};
 use ebi_objects::{
     FiniteStochasticLanguage, Importable, IntoRefProbabilityIterator, IntoRefTraceIterator,
-    IntoRefTraceProbabilityIterator, traits::importable::ImporterParameterValues,
-};
-use std::io::BufRead;
-
-use crate::ebi_framework::{
-    ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+    IntoRefTraceProbabilityIterator,
 };
 
 pub trait EbiTraitIterableStochasticLanguage:
@@ -29,25 +28,11 @@ impl FromEbiTraitObject for dyn EbiTraitIterableStochasticLanguage {
 
 impl EbiTraitIterableStochasticLanguage for FiniteStochasticLanguage {}
 
-pub trait ToIterableStochasticLanguage: Importable {
-    fn to_iterable_stochastic_language(self) -> Box<dyn EbiTraitIterableStochasticLanguage>;
-
-    fn import_as_iterable_stochastic_language(
-        reader: &mut dyn BufRead,
-        parameter_values: &ImporterParameterValues,
-    ) -> Result<Box<dyn EbiTraitIterableStochasticLanguage>>
-    where
-        Self: Sized,
-    {
-        Ok(Self::import(reader, parameter_values)?.to_iterable_stochastic_language())
-    }
-}
-
-impl<T> ToIterableStochasticLanguage for T
+impl<T> ToIterableStochasticLanguageTrait for T
 where
     T: Into<FiniteStochasticLanguage> + Importable,
 {
-    fn to_iterable_stochastic_language(self) -> Box<dyn EbiTraitIterableStochasticLanguage> {
+    fn to_iterable_stochastic_language_trait(self) -> Box<dyn EbiTraitIterableStochasticLanguage> {
         Box::new(Into::<FiniteStochasticLanguage>::into(self))
     }
 }

@@ -1,14 +1,9 @@
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiObjectImporter, EbiTraitImporter},
-        ebi_output::EbiObjectExporter,
-        validate::Validate,
-    },
-    ebi_traits::{
-        ebi_trait_activities::ToActivities, ebi_trait_graphable::ToGraphable,
-        ebi_trait_semantics::ToSemantics,
-    },
+use crate::ebi_framework::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    trait_importers::{ToActivitiesTrait, ToGraphableTrait, ToSemanticsTrait},
+    validate::Validate,
 };
 use ebi_objects::{Exportable, Importable, PetriNetMarkupLanguage};
 
@@ -21,15 +16,15 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
     validator: Some(PetriNetMarkupLanguage::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
-            PetriNetMarkupLanguage::import_as_activities,
+            PetriNetMarkupLanguage::import_as_activities_trait,
             PetriNetMarkupLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
-            PetriNetMarkupLanguage::import_as_semantics,
+            PetriNetMarkupLanguage::import_as_semantics_trait,
             PetriNetMarkupLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Graphable(
-            PetriNetMarkupLanguage::import_as_graphable,
+            PetriNetMarkupLanguage::import_as_graphable_trait,
             PetriNetMarkupLanguage::IMPORTER_PARAMETERS,
         ),
     ],
@@ -63,14 +58,14 @@ mod tests {
     use ebi_objects::{Importable, PetriNetMarkupLanguage};
 
     use crate::{
-        ebi_traits::ebi_trait_semantics::{EbiTraitSemantics, ToSemantics},
-        multiple_reader::MultipleReader,
+        ebi_framework::trait_importers::ToSemanticsTrait,
+        ebi_traits::ebi_trait_semantics::EbiTraitSemantics, multiple_reader::MultipleReader,
     };
 
     #[test]
     fn pnml_empty() {
         let mut reader = MultipleReader::from_file(File::open("testfiles/empty.pnml").unwrap());
-        let semantics = PetriNetMarkupLanguage::import_as_semantics(
+        let semantics = PetriNetMarkupLanguage::import_as_semantics_trait(
             &mut reader.get().unwrap(),
             &PetriNetMarkupLanguage::default_importer_parameter_values(),
         )

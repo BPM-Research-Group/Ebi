@@ -174,20 +174,20 @@ impl Semantics for FiniteStochasticLanguageSemantics {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_objects::FiniteStochasticLanguage;
-
-    use crate::ebi_traits::ebi_trait_stochastic_semantics::{
-        EbiTraitStochasticSemantics, ToStochasticSemantics,
+    use crate::{
+        ebi_framework::trait_importers::ToStochasticSemanticsTrait,
+        ebi_traits::ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     };
+    use ebi_objects::FiniteStochasticLanguage;
+    use std::fs;
 
     #[test]
     fn slang_empty() {
         let fin = fs::read_to_string("testfiles/empty.slang").unwrap();
         let slpn = fin.parse::<FiniteStochasticLanguage>().unwrap();
 
-        if let EbiTraitStochasticSemantics::Usize(semantics) = slpn.to_stochastic_semantics() {
+        if let EbiTraitStochasticSemantics::Usize(semantics) = slpn.to_stochastic_semantics_trait()
+        {
             assert!(semantics.get_initial_state().is_none())
         } else {
             assert!(false)

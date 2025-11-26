@@ -1,18 +1,8 @@
 use ebi_objects::{DirectlyFollowsModel, Exportable, Importable};
 
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiObjectImporter, EbiTraitImporter},
-        ebi_output::EbiObjectExporter,
-        object_importers::ToLabelledPetriNetObject,
-        validate::Validate,
-    },
-    ebi_traits::{
-        ebi_trait_activities::ToActivities, ebi_trait_graphable::ToGraphable,
-        ebi_trait_semantics::ToSemantics,
-    },
-};
+use crate::ebi_framework::{
+        ebi_file_handler::EbiFileHandler, ebi_input::{EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, object_importers::ToLabelledPetriNetObject, trait_importers::{ToActivitiesTrait, ToGraphableTrait, ToSemanticsTrait}, validate::Validate
+    };
 
 pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "directly follows model",
@@ -23,15 +13,15 @@ pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     validator: Some(DirectlyFollowsModel::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
-            DirectlyFollowsModel::import_as_activities,
+            DirectlyFollowsModel::import_as_activities_trait,
             DirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
-            DirectlyFollowsModel::import_as_semantics,
+            DirectlyFollowsModel::import_as_semantics_trait,
             DirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Graphable(
-            DirectlyFollowsModel::import_as_graphable,
+            DirectlyFollowsModel::import_as_graphable_trait,
             DirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
     ],

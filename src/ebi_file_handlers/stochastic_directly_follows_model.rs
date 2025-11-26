@@ -1,23 +1,17 @@
 use ebi_objects::{Exportable, Importable, StochasticDirectlyFollowsModel};
 
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiObjectImporter, EbiTraitImporter},
-        ebi_output::EbiObjectExporter,
-        object_importers::{
-            ToDirectlyFollowsModelObject, ToLabelledPetriNetObject,
-            ToStochasticLabelledPetriNetObject,
-        },
-        validate::Validate,
+use crate::ebi_framework::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    object_importers::{
+        ToDirectlyFollowsModelObject, ToLabelledPetriNetObject, ToStochasticLabelledPetriNetObject,
     },
-    ebi_traits::{
-        ebi_trait_activities::ToActivities, ebi_trait_graphable::ToGraphable,
-        ebi_trait_queriable_stochastic_language::ToQueriableStochasticLanguage,
-        ebi_trait_semantics::ToSemantics,
-        ebi_trait_stochastic_deterministic_semantics::ToStochasticDeterministicSemantics,
-        ebi_trait_stochastic_semantics::ToStochasticSemantics,
+    trait_importers::{
+        ToActivitiesTrait, ToGraphableTrait, ToQueriableStochasticLanguageTrait, ToSemanticsTrait,
+        ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
     },
+    validate::Validate,
 };
 
 pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
@@ -29,31 +23,31 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
     validator: Some(StochasticDirectlyFollowsModel::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
-            StochasticDirectlyFollowsModel::import_as_activities,
+            StochasticDirectlyFollowsModel::import_as_activities_trait,
             StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Graphable(
-            StochasticDirectlyFollowsModel::import_as_graphable,
+            StochasticDirectlyFollowsModel::import_as_graphable_trait,
             StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::QueriableStochasticLanguage(
-            StochasticDirectlyFollowsModel::import_as_queriable_stochastic_language,
+            StochasticDirectlyFollowsModel::import_as_queriable_stochastic_language_trait,
             StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
-            StochasticDirectlyFollowsModel::import_as_semantics,
+            StochasticDirectlyFollowsModel::import_as_semantics_trait,
             StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticSemantics(
-            StochasticDirectlyFollowsModel::import_as_stochastic_semantics,
+            StochasticDirectlyFollowsModel::import_as_stochastic_semantics_trait,
             StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticDeterministicSemantics(
-            StochasticDirectlyFollowsModel::import_as_stochastic_deterministic_semantics,
+            StochasticDirectlyFollowsModel::import_as_stochastic_deterministic_semantics_trait,
             StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Graphable(
-            StochasticDirectlyFollowsModel::import_as_graphable,
+            StochasticDirectlyFollowsModel::import_as_graphable_trait,
             StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
     ],

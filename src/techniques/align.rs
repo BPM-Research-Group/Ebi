@@ -587,7 +587,7 @@ mod tests {
         ebi_objects::language_of_alignments::Move,
     };
 
-    use crate::{ebi_traits::ebi_trait_semantics::ToSemantics, techniques::align::Align};
+    use crate::{ebi_framework::trait_importers::ToSemanticsTrait, techniques::align::Align};
 
     #[test]
     fn align_sdfa_trace() {
@@ -595,7 +595,7 @@ mod tests {
         let sdfa = fin
             .parse::<StochasticDeterministicFiniteAutomaton>()
             .unwrap();
-        let mut semantics = sdfa.to_semantics();
+        let mut semantics = sdfa.to_semantics_trait();
 
         let a = semantics.activity_key_mut().process_activity("a");
         let b = semantics.activity_key_mut().process_activity("b");
@@ -626,7 +626,7 @@ mod tests {
         let sdfa = fin1
             .parse::<StochasticDeterministicFiniteAutomaton>()
             .unwrap();
-        let mut semantics = sdfa.to_semantics();
+        let mut semantics = sdfa.to_semantics_trait();
 
         let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
         let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
@@ -656,7 +656,7 @@ mod tests {
     fn align_slang_lang() {
         let fin1 = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
         let sdfa = fin1.parse::<FiniteStochasticLanguage>().unwrap();
-        let mut semantics = sdfa.to_semantics();
+        let mut semantics = sdfa.to_semantics_trait();
 
         let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
         let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
@@ -685,7 +685,7 @@ mod tests {
     fn align_lang_lang() {
         let fin1 = fs::read_to_string("testfiles/aa-ab-ba.lang").unwrap();
         let sdfa = fin1.parse::<FiniteLanguage>().unwrap();
-        let mut semantics = sdfa.to_semantics();
+        let mut semantics = sdfa.to_semantics_trait();
 
         let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
         let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
@@ -710,7 +710,7 @@ mod tests {
     fn align_dfa_lang() {
         let fin1 = fs::read_to_string("testfiles/aa-ab-ba.dfa").unwrap();
         let dfa = fin1.parse::<DeterministicFiniteAutomaton>().unwrap();
-        let mut semantics = dfa.to_semantics();
+        let mut semantics = dfa.to_semantics_trait();
 
         let fin2 = fs::read_to_string("testfiles/bb.lang").unwrap();
         let lang = Box::new(fin2.parse::<FiniteLanguage>().unwrap());
@@ -737,7 +737,7 @@ mod tests {
         let fin1 = fs::read_to_string("testfiles/aa-ab-ba.dfa").unwrap();
         let mut dfa = fin1.parse::<DeterministicFiniteAutomaton>().unwrap();
         dfa.translate_using_activity_key(lang.activity_key_mut());
-        let mut semantics = dfa.to_semantics();
+        let mut semantics = dfa.to_semantics_trait();
 
         let alignment = semantics.align_language(lang).unwrap();
 

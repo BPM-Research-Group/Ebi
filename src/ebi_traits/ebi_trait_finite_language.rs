@@ -1,12 +1,11 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::{FiniteLanguage, FiniteStochasticLanguage, Importable, NumberOfTraces, traits::importable::ImporterParameterValues};
-use std::{fmt::Display, io::BufRead};
-
+use super::ebi_trait_iterable_language::EbiTraitIterableLanguage;
 use crate::ebi_framework::{
     ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+    trait_importers::ToFiniteLanguageTrait,
 };
-
-use super::ebi_trait_iterable_language::EbiTraitIterableLanguage;
+use anyhow::{Result, anyhow};
+use ebi_objects::{FiniteLanguage, FiniteStochasticLanguage, Importable, NumberOfTraces};
+use std::fmt::Display;
 
 pub trait EbiTraitFiniteLanguage:
     Display + EbiTraitIterableLanguage + NumberOfTraces + Send + Sync
@@ -30,25 +29,11 @@ impl EbiTraitFiniteLanguage for FiniteLanguage {}
 
 impl EbiTraitFiniteLanguage for FiniteStochasticLanguage {}
 
-pub trait ToFiniteLanguage: Importable {
-    fn to_finite_language(self) -> Box<dyn EbiTraitFiniteLanguage>;
-
-    fn import_as_finite_language(
-        reader: &mut dyn BufRead,
-        parameter_values: &ImporterParameterValues,
-    ) -> Result<Box<dyn EbiTraitFiniteLanguage>>
-    where
-        Self: Sized,
-    {
-        Ok(Self::import(reader, parameter_values)?.to_finite_language())
-    }
-}
-
-impl<T> ToFiniteLanguage for T
+impl<T> ToFiniteLanguageTrait for T
 where
     T: Into<FiniteLanguage> + Importable,
 {
-    fn to_finite_language(self) -> Box<dyn EbiTraitFiniteLanguage> {
+    fn to_finite_language_trait(self) -> Box<dyn EbiTraitFiniteLanguage> {
         let x = Into::<FiniteLanguage>::into(self);
         Box::new(x)
     }

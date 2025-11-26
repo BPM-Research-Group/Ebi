@@ -1,19 +1,14 @@
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
-        ebi_output::EbiObjectExporter,
-        ebi_trait::FromEbiTraitObject,
-        object_importers::{ToLabelledPetriNetObject, ToProcessTreeObject},
-        validate::Validate,
+use crate::ebi_framework::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    ebi_trait::FromEbiTraitObject,
+    object_importers::{ToLabelledPetriNetObject, ToProcessTreeObject},
+    trait_importers::{
+        ToActivitiesTrait, ToGraphableTrait, ToQueriableStochasticLanguageTrait, ToSemanticsTrait,
+        ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
     },
-    ebi_traits::{
-        ebi_trait_activities::ToActivities, ebi_trait_graphable::ToGraphable,
-        ebi_trait_queriable_stochastic_language::ToQueriableStochasticLanguage,
-        ebi_trait_semantics::ToSemantics,
-        ebi_trait_stochastic_deterministic_semantics::ToStochasticDeterministicSemantics,
-        ebi_trait_stochastic_semantics::ToStochasticSemantics,
-    },
+    validate::Validate,
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{EbiObject, Exportable, Importable, StochasticProcessTree};
@@ -27,27 +22,27 @@ pub const EBI_STOCHASTIC_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     validator: Some(StochasticProcessTree::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
-            StochasticProcessTree::import_as_activities,
+            StochasticProcessTree::import_as_activities_trait,
             StochasticProcessTree::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::QueriableStochasticLanguage(
-            StochasticProcessTree::import_as_queriable_stochastic_language,
+            StochasticProcessTree::import_as_queriable_stochastic_language_trait,
             StochasticProcessTree::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticDeterministicSemantics(
-            StochasticProcessTree::import_as_stochastic_deterministic_semantics,
+            StochasticProcessTree::import_as_stochastic_deterministic_semantics_trait,
             StochasticProcessTree::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
-            StochasticProcessTree::import_as_semantics,
+            StochasticProcessTree::import_as_semantics_trait,
             StochasticProcessTree::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticSemantics(
-            StochasticProcessTree::import_as_stochastic_semantics,
+            StochasticProcessTree::import_as_stochastic_semantics_trait,
             StochasticProcessTree::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Graphable(
-            StochasticProcessTree::import_as_graphable,
+            StochasticProcessTree::import_as_graphable_trait,
             StochasticProcessTree::IMPORTER_PARAMETERS,
         ),
     ],

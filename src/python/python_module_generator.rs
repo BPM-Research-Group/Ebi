@@ -17,20 +17,24 @@ pub fn generate_pm4py_module() -> Result<EbiOutput> {
 
 use pyo3::prelude::*;
 use pyo3::types::PyAny;
-use super::python_link::{{import_or_load, ExportableToPM4Py}};
+use super::{{python_link::import_or_load, python_export::ExportableToPM4Py}};
 use crate::ebi_framework::ebi_command::EbiCommand;"
     );
     let mut functions = String::new();
     let mut module =
-        format!("#[pymodule]\nfn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {{");
+        format!("#[pymodule]\npub fn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {{");
 
     for path in EBI_COMMANDS.get_command_paths() {
-        let (fn_name, body) = ebi_command_to_pm4py_function(&path)?;
-        functions.push_str(&body);
-        module.push_str(&format!(
-            "    m.add_function(wrap_pyfunction!({}, m)?)?;\n",
-            fn_name
-        ));
+        if let Some(EbiCommand::Command { cli_command, .. }) = path.last()
+            && cli_command.is_none()
+        {
+            let (fn_name, body) = ebi_command_to_pm4py_function(&path)?;
+            functions.push_str(&body);
+            module.push_str(&format!(
+                "    m.add_function(wrap_pyfunction!({}, m)?)?;\n",
+                fn_name
+            ));
+        }
     }
 
     module.push_str(

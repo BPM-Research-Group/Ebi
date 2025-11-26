@@ -1,15 +1,14 @@
+use crate::ebi_framework::{
+    ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+    trait_importers::ToEventLogTrait,
+};
 use anyhow::{Result, anyhow};
 use ebi_objects::{
     Activity, CompressedEventLog, EventLog, EventLogCsv, EventLogTraceAttributes, HasActivityKey,
     Importable, IntoRefTraceIterator, NumberOfTraces,
     ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-    traits::importable::ImporterParameterValues,
 };
-use std::{collections::HashMap, io::BufRead};
-
-use crate::ebi_framework::{
-    ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
-};
+use std::collections::HashMap;
 
 pub trait EbiTraitEventLog: HasActivityKey + IntoRefTraceIterator + NumberOfTraces {
     /// Remove traces for which the function returns false.
@@ -63,43 +62,29 @@ impl EbiTraitEventLog for EventLogTraceAttributes {
     }
 }
 
-pub trait ToEventLog: Importable {
-    fn to_event_log(self) -> Box<dyn EbiTraitEventLog>;
-
-    fn import_as_event_log(
-        reader: &mut dyn BufRead,
-        parameter_values: &ImporterParameterValues,
-    ) -> Result<Box<dyn EbiTraitEventLog>>
-    where
-        Self: Sized,
-    {
-        Ok(Self::import(reader, parameter_values)?.to_event_log())
-    }
-}
-
-impl<T> ToEventLog for T
+impl<T> ToEventLogTrait for T
 where
     T: EbiTraitEventLog + Importable + 'static,
 {
-    fn to_event_log(self) -> Box<dyn EbiTraitEventLog> {
+    fn to_event_log_trait(self) -> Box<dyn EbiTraitEventLog> {
         Box::new(self)
     }
 }
 
-impl ToEventLog for CompressedEventLog {
-    fn to_event_log(self) -> Box<dyn EbiTraitEventLog> {
+impl ToEventLogTrait for CompressedEventLog {
+    fn to_event_log_trait(self) -> Box<dyn EbiTraitEventLog> {
         Box::new(self.log)
     }
 }
 
-impl ToEventLog for CompressedEventLogTraceAttributes {
-    fn to_event_log(self) -> Box<dyn EbiTraitEventLog> {
+impl ToEventLogTrait for CompressedEventLogTraceAttributes {
+    fn to_event_log_trait(self) -> Box<dyn EbiTraitEventLog> {
         Box::new(self.log)
     }
 }
 
-impl ToEventLog for EventLogCsv {
-    fn to_event_log(self) -> Box<dyn EbiTraitEventLog> {
+impl ToEventLogTrait for EventLogCsv {
+    fn to_event_log_trait(self) -> Box<dyn EbiTraitEventLog> {
         let log: EventLog = self.into();
         Box::new(log)
     }

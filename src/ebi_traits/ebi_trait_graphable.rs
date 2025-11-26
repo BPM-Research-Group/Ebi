@@ -1,14 +1,12 @@
+use crate::ebi_framework::{
+    ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+    trait_importers::ToGraphableTrait,
+};
 use anyhow::{Result, anyhow};
 use ebi_objects::{
     Graphable, Importable, ScalableVectorGraphics, ebi_objects::scalable_vector_graphics::ToSVG,
-    traits::importable::ImporterParameterValues,
 };
 use layout::backends::svg::SVGWriter;
-use std::io::BufRead;
-
-use crate::ebi_framework::{
-    ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
-};
 
 pub trait EbiTraitGraphable: Graphable {}
 
@@ -40,25 +38,11 @@ impl ToSVG for dyn EbiTraitGraphable {
     }
 }
 
-pub trait ToGraphable: Importable {
-    fn to_graphable(self) -> Box<dyn EbiTraitGraphable>;
-
-    fn import_as_graphable(
-        reader: &mut dyn BufRead,
-        parameter_values: &ImporterParameterValues,
-    ) -> Result<Box<dyn EbiTraitGraphable>>
-    where
-        Self: Sized,
-    {
-        Ok(Self::import(reader, parameter_values)?.to_graphable())
-    }
-}
-
-impl<T> ToGraphable for T
+impl<T> ToGraphableTrait for T
 where
     T: EbiTraitGraphable + Importable + 'static,
 {
-    fn to_graphable(self) -> Box<dyn EbiTraitGraphable> {
+    fn to_graphable_trait(self) -> Box<dyn EbiTraitGraphable> {
         Box::new(self)
     }
 }

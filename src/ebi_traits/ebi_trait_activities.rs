@@ -1,10 +1,9 @@
-use std::io::BufRead;
-
 use crate::ebi_framework::{
     ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+    trait_importers::ToActivitiesTrait,
 };
 use anyhow::{Result, anyhow};
-use ebi_objects::{HasActivityKey, Importable, traits::importable::ImporterParameterValues};
+use ebi_objects::{HasActivityKey, Importable};
 
 pub trait EbiTraitActivities: HasActivityKey {}
 
@@ -23,22 +22,11 @@ impl FromEbiTraitObject for dyn EbiTraitActivities {
     }
 }
 
-pub trait ToActivities: Importable {
-    fn to_activities(self) -> Box<dyn EbiTraitActivities>;
-
-    fn import_as_activities(reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) -> Result<Box<dyn EbiTraitActivities>>
-    where
-        Self: Sized,
-    {
-        Ok(Self::import(reader, parameter_values)?.to_activities())
-    }
-}
-
-impl<T> ToActivities for T
+impl<T> ToActivitiesTrait for T
 where
     T: HasActivityKey + Importable + 'static,
 {
-    fn to_activities(self) -> Box<dyn EbiTraitActivities> {
+    fn to_activities_trait(self) -> Box<dyn EbiTraitActivities> {
         Box::new(self)
     }
 }

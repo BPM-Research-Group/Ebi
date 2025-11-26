@@ -1,26 +1,18 @@
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiObjectImporter, EbiTraitImporter},
-        ebi_output::EbiObjectExporter,
-        object_importers::{
-            ToFiniteLanguageObject, ToFiniteStochasticLanguageObject,
-            ToStochasticDeterministicFiniteAutomatonObject,
-        },
-        validate::Validate,
+use crate::ebi_framework::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    object_importers::{
+        ToFiniteLanguageObject, ToFiniteStochasticLanguageObject,
+        ToStochasticDeterministicFiniteAutomatonObject,
     },
-    ebi_traits::{
-        ebi_trait_activities::ToActivities, ebi_trait_event_log::ToEventLog,
-        ebi_trait_event_log_trace_attributes::ToEventLogTraceAttributes,
-        ebi_trait_finite_language::ToFiniteLanguage,
-        ebi_trait_finite_stochastic_language::ToFiniteStochasticLanguage,
-        ebi_trait_iterable_language::ToIterableLanguage,
-        ebi_trait_iterable_stochastic_language::ToIterableStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::ToQueriableStochasticLanguage,
-        ebi_trait_semantics::ToSemantics,
-        ebi_trait_stochastic_deterministic_semantics::ToStochasticDeterministicSemantics,
-        ebi_trait_stochastic_semantics::ToStochasticSemantics,
+    trait_importers::{
+        ToActivitiesTrait, ToEventLogTraceAttributesTrait, ToEventLogTrait, ToFiniteLanguageTrait,
+        ToFiniteStochasticLanguageTrait, ToIterableLanguageTrait,
+        ToIterableStochasticLanguageTrait, ToQueriableStochasticLanguageTrait, ToSemanticsTrait,
+        ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
     },
+    validate::Validate,
 };
 use ebi_objects::{
     CompressedEventLogXes, Exportable, Importable,
@@ -39,47 +31,47 @@ pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     validator: Some(CompressedEventLog::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
-            CompressedEventLog::import_as_activities,
+            CompressedEventLog::import_as_activities_trait,
             CompressedEventLog::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::IterableLanguage(
-            CompressedEventLog::import_as_iterable_language,
+            CompressedEventLog::import_as_iterable_language_trait,
             CompressedEventLog::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::FiniteLanguage(
-            CompressedEventLog::import_as_finite_language,
+            CompressedEventLog::import_as_finite_language_trait,
             CompressedEventLog::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::FiniteStochasticLanguage(
-            CompressedEventLog::import_as_finite_stochastic_language,
+            CompressedEventLog::import_as_finite_stochastic_language_trait,
             CompressedEventLog::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::QueriableStochasticLanguage(
-            CompressedEventLog::import_as_queriable_stochastic_language,
+            CompressedEventLog::import_as_queriable_stochastic_language_trait,
             CompressedEventLog::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::IterableStochasticLanguage(
-            CompressedEventLog::import_as_iterable_stochastic_language,
+            CompressedEventLog::import_as_iterable_stochastic_language_trait,
             CompressedEventLog::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::EventLog(
-            CompressedEventLog::import_as_event_log,
+            CompressedEventLog::import_as_event_log_trait,
             CompressedEventLog::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::EventLogTraceAttributes(
-            CompressedEventLogTraceAttributes::import_as_event_log_trace_attributes,
+            CompressedEventLogTraceAttributes::import_as_event_log_trace_attributes_trait,
             CompressedEventLogTraceAttributes::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticDeterministicSemantics(
-            CompressedEventLog::import_as_stochastic_deterministic_semantics,
+            CompressedEventLog::import_as_stochastic_deterministic_semantics_trait,
             CompressedEventLog::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticSemantics(
-            CompressedEventLog::import_as_stochastic_semantics,
+            CompressedEventLog::import_as_stochastic_semantics_trait,
             CompressedEventLog::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
-            CompressedEventLog::import_as_semantics,
+            CompressedEventLog::import_as_semantics_trait,
             CompressedEventLog::IMPORTER_PARAMETERS,
         ),
     ],

@@ -1,6 +1,7 @@
 use crate::{
     ebi_framework::{
         ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
+        trait_importers::ToStochasticSemanticsTrait,
     },
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
@@ -11,7 +12,7 @@ use crate::{
 use anyhow::{Result, anyhow};
 use ebi_objects::{
     ActivityKey, DirectlyFollowsGraph, EventLog, EventLogTraceAttributes, EventLogXes,
-    FiniteStochasticLanguage, HasActivityKey, Importable, StochasticDeterministicFiniteAutomaton,
+    FiniteStochasticLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
     TranslateActivityKey,
     ebi_objects::{
@@ -19,9 +20,7 @@ use ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_csv::EventLogCsv,
     },
-    traits::importable::ImporterParameterValues,
 };
-use std::io::BufRead;
 
 pub enum EbiTraitStochasticSemantics {
     Usize(Box<dyn StochasticSemantics<StoSemState = usize, SemState = usize, AliState = usize>>),
@@ -92,22 +91,11 @@ impl TranslateActivityKey for EbiTraitStochasticSemantics {
     }
 }
 
-pub trait ToStochasticSemantics: Importable + Sized {
-    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics;
-
-    fn import_as_stochastic_semantics(
-        reader: &mut dyn BufRead,
-        parameter_values: &ImporterParameterValues,
-    ) -> Result<EbiTraitStochasticSemantics> {
-        Ok(Self::import(reader, parameter_values)?.to_stochastic_semantics())
-    }
-}
-
 macro_rules! via_fslang {
     ($t:ident) => {
-        impl ToStochasticSemantics for $t {
-            fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
-                Into::<FiniteStochasticLanguage>::into(self).to_stochastic_semantics()
+        impl ToStochasticSemanticsTrait for $t {
+            fn to_stochastic_semantics_trait(self) -> EbiTraitStochasticSemantics {
+                Into::<FiniteStochasticLanguage>::into(self).to_stochastic_semantics_trait()
             }
         }
     };
@@ -119,39 +107,39 @@ via_fslang!(EventLogTraceAttributes);
 via_fslang!(EventLogXes);
 via_fslang!(EventLogCsv);
 
-impl ToStochasticSemantics for StochasticProcessTree {
-    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+impl ToStochasticSemanticsTrait for StochasticProcessTree {
+    fn to_stochastic_semantics_trait(self) -> EbiTraitStochasticSemantics {
         EbiTraitStochasticSemantics::NodeStates(Box::new(self))
     }
 }
 
-impl ToStochasticSemantics for StochasticLabelledPetriNet {
-    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+impl ToStochasticSemanticsTrait for StochasticLabelledPetriNet {
+    fn to_stochastic_semantics_trait(self) -> EbiTraitStochasticSemantics {
         EbiTraitStochasticSemantics::Marking(Box::new(self))
     }
 }
 
-impl ToStochasticSemantics for DirectlyFollowsGraph {
-    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+impl ToStochasticSemanticsTrait for DirectlyFollowsGraph {
+    fn to_stochastic_semantics_trait(self) -> EbiTraitStochasticSemantics {
         let dfm: StochasticDirectlyFollowsModel = self.into();
         EbiTraitStochasticSemantics::Usize(Box::new(dfm))
     }
 }
 
-impl ToStochasticSemantics for StochasticDirectlyFollowsModel {
-    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+impl ToStochasticSemanticsTrait for StochasticDirectlyFollowsModel {
+    fn to_stochastic_semantics_trait(self) -> EbiTraitStochasticSemantics {
         EbiTraitStochasticSemantics::Usize(Box::new(self))
     }
 }
 
-impl ToStochasticSemantics for StochasticDeterministicFiniteAutomaton {
-    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+impl ToStochasticSemanticsTrait for StochasticDeterministicFiniteAutomaton {
+    fn to_stochastic_semantics_trait(self) -> EbiTraitStochasticSemantics {
         EbiTraitStochasticSemantics::Usize(Box::new(self))
     }
 }
 
-impl ToStochasticSemantics for FiniteStochasticLanguage {
-    fn to_stochastic_semantics(self) -> EbiTraitStochasticSemantics {
+impl ToStochasticSemanticsTrait for FiniteStochasticLanguage {
+    fn to_stochastic_semantics_trait(self) -> EbiTraitStochasticSemantics {
         EbiTraitStochasticSemantics::Usize(Box::new(
             FiniteStochasticLanguageSemantics::from_language(&self),
         ))
