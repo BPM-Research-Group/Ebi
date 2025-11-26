@@ -235,7 +235,7 @@ impl ImportableFromPM4Py for EventLog {
     ) -> PyResult<EbiInput> {
         // Extract the list of traces from the PM4Py event log.
         let binding = event_log.getattr("_list")?;
-        let py_traces = binding.downcast::<PyList>()?;
+        let py_traces = binding.cast::<PyList>()?;
         let mut traces = Vec::new();
         for py_trace in py_traces.iter() {
             let trace = trace_from_py(&py_trace)?;
@@ -289,14 +289,13 @@ impl ImportableFromPM4Py for EventLog {
                             return Ok(EbiInput::Trait(tobj, &EBI_FINITE_LANGUAGE));
                         }
                         EbiTrait::QueriableStochasticLanguage => {
-                            let qsl = Box::new(Into::<FiniteStochasticLanguage>::into(
-                                Into::<FiniteStochasticLanguage>::into(event_log_rust),
-                            ));
+                            let qsl = Box::new(Into::<FiniteStochasticLanguage>::into(Into::<
+                                FiniteStochasticLanguage,
+                            >::into(
+                                event_log_rust,
+                            )));
                             let tobj = EbiTraitObject::QueriableStochasticLanguage(qsl);
-                            return Ok(EbiInput::Trait(
-                                tobj,
-                                &EBI_FINITE_STOCHASTIC_LANGUAGE,
-                            ));
+                            return Ok(EbiInput::Trait(tobj, &EBI_FINITE_STOCHASTIC_LANGUAGE));
                         }
                         // … add more traits here …
                         _ => { /* this trait isn’t supported by EventLog; skip */ }
@@ -489,15 +488,15 @@ impl ImportableFromPM4Py for LabelledPetriNet {
     ) -> PyResult<EbiInput> {
         // Retrieve "places", "transitions", and "arcs" attributes as sets.
         let binding = pn.getattr("places")?;
-        let py_places = binding.downcast::<PySet>().map_err(|e| {
+        let py_places = binding.cast::<PySet>().map_err(|e| {
             pyo3::exceptions::PyValueError::new_err(format!("Failed to get places: {}", e))
         })?;
         let binding = pn.getattr("transitions")?;
-        let py_transitions = binding.downcast::<PySet>().map_err(|e| {
+        let py_transitions = binding.cast::<PySet>().map_err(|e| {
             pyo3::exceptions::PyValueError::new_err(format!("Failed to get transitions: {}", e))
         })?;
         let binding = pn.getattr("arcs")?;
-        let py_arcs = binding.downcast::<PySet>().map_err(|e| {
+        let py_arcs = binding.cast::<PySet>().map_err(|e| {
             pyo3::exceptions::PyValueError::new_err(format!("Failed to get arcs: {}", e))
         })?;
 
@@ -704,7 +703,7 @@ impl ImportableFromPM4Py for ProcessTree {
 // helper functions for event logs
 // A helper to convert a Python dict into our Attributes.
 fn convert_py_dict_to_attributes(py_obj: &Bound<'_, PyAny>) -> PyResult<Attributes> {
-    let dict = py_obj.downcast::<PyDict>()?;
+    let dict = py_obj.cast::<PyDict>()?;
     let mut map = HashMap::new();
     for (key, value) in dict.iter() {
         let key_str: String = key.extract()?;
@@ -731,7 +730,7 @@ pub fn trace_from_py(py_trace: &Bound<'_, PyAny>) -> PyResult<Trace> {
         vec![]
     };
     let binding = py_trace.getattr("_list")?;
-    let py_events = binding.downcast::<PyList>()?;
+    let py_events = binding.cast::<PyList>()?;
     let mut events = Vec::new();
     for py_event in py_events.iter() {
         let event = event_from_py(&py_event)?;
