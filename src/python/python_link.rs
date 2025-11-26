@@ -288,6 +288,16 @@ impl ImportableFromPM4Py for EventLog {
                             let tobj = EbiTraitObject::FiniteLanguage(fl);
                             return Ok(EbiInput::Trait(tobj, &EBI_FINITE_LANGUAGE));
                         }
+                        EbiTrait::QueriableStochasticLanguage => {
+                            let qsl = Box::new(Into::<FiniteStochasticLanguage>::into(
+                                Into::<FiniteStochasticLanguage>::into(event_log_rust),
+                            ));
+                            let tobj = EbiTraitObject::QueriableStochasticLanguage(qsl);
+                            return Ok(EbiInput::Trait(
+                                tobj,
+                                &EBI_FINITE_STOCHASTIC_LANGUAGE,
+                            ));
+                        }
                         // … add more traits here …
                         _ => { /* this trait isn’t supported by EventLog; skip */ }
                     }
