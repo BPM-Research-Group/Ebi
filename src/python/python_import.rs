@@ -39,9 +39,9 @@ use std::{
     str::{Chars, FromStr},
 };
 
-type Importer = fn(&Bound<'_, PyAny>, &[&'static EbiInputType]) -> PyResult<EbiInput>;
+type PyImporter = fn(&Bound<'_, PyAny>, &[&'static EbiInputType]) -> PyResult<EbiInput>;
 
-pub const PYTHON_IMPORTERS: &[Importer] = &[
+pub const PYTHON_IMPORTERS: &[PyImporter] = &[
     usize::py_import,
     Fraction::py_import,
     EventLog::py_import,
@@ -459,15 +459,20 @@ impl ImportableFromPM4Py for ProcessTree {
                 EbiInputType::Object(obj_ty) if *obj_ty == EbiObjectType::ProcessTree => {
                     return Some(EbiInput::Object(
                         EbiObject::ProcessTree(self),
-                        &EBI_PROCESS_TREE,
+                        &Self::PY_FILE_HANDLER.unwrap(),
                     ));
                 }
-
+                EbiInputType::Trait(EbiTrait::Activities) => {
+                    return Some(EbiInput::Trait(
+                        self.to_activities_ebi_trait_object(),
+                        &Self::PY_FILE_HANDLER.unwrap(),
+                    ));
+                }
                 // as the Semantics trait
                 EbiInputType::Trait(EbiTrait::Semantics) => {
                     return Some(EbiInput::Trait(
                         self.to_semantics_ebi_trait_object(),
-                        &EBI_PROCESS_TREE,
+                        &Self::PY_FILE_HANDLER.unwrap(),
                     ));
                 }
 
@@ -475,7 +480,7 @@ impl ImportableFromPM4Py for ProcessTree {
                 EbiInputType::Trait(EbiTrait::Graphable) => {
                     return Some(EbiInput::Trait(
                         self.to_graphable_ebi_trait_object(),
-                        &EBI_PROCESS_TREE,
+                        &Self::PY_FILE_HANDLER.unwrap(),
                     ));
                 }
 
@@ -483,7 +488,7 @@ impl ImportableFromPM4Py for ProcessTree {
                 EbiInputType::AnyObject => {
                     return Some(EbiInput::Object(
                         EbiObject::ProcessTree(self),
-                        &EBI_PROCESS_TREE,
+                        &Self::PY_FILE_HANDLER.unwrap(),
                     ));
                 }
 
@@ -611,14 +616,15 @@ mod tests {
     use crate::{
         ebi_file_handlers::{
             event_log_xes::EBI_EVENT_LOG_XES, labelled_petri_net::EBI_LABELLED_PETRI_NET,
+            process_tree::EBI_PROCESS_TREE,
         },
         ebi_framework::ebi_input::EbiInputType,
         python::python_import::ImportableFromPM4Py,
     };
-    use ebi_objects::{EventLog, LabelledPetriNet};
+    use ebi_objects::{EventLog, LabelledPetriNet, ProcessTree};
     use std::fs;
 
-    //#[test]
+    #[test]
     fn py_importers_event_log() {
         let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
         let log = fin.parse::<EventLog>().unwrap();
@@ -646,6 +652,27 @@ mod tests {
 
         //every trait importer must be supported
         for trait_importer in EBI_LABELLED_PETRI_NET.trait_importers {
+            let input_type = Box::new(EbiInputType::Trait(trait_importer.get_trait()));
+            let input_type: &'static EbiInputType = Box::leak(input_type);
+            let input_types = [input_type];
+            println!("trait_importer {}", trait_importer);
+            let value = log.clone().py_object_to_ebi_input(&input_types).unwrap();
+
+            //check that the value is of the requested trait
+            assert_eq!(
+                value.get_type(),
+                EbiInputType::Trait(trait_importer.get_trait())
+            );
+        }
+    }
+
+    #[test]
+    fn py_importers_event_ptree() {
+        let fin = fs::read_to_string("testfiles/tree.ptree").unwrap();
+        let log = fin.parse::<ProcessTree>().unwrap();
+
+        //every trait importer must be supported
+        for trait_importer in EBI_PROCESS_TREE.trait_importers {
             let input_type = Box::new(EbiInputType::Trait(trait_importer.get_trait()));
             let input_type: &'static EbiInputType = Box::leak(input_type);
             let input_types = [input_type];

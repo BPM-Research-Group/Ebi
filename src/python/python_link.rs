@@ -6,6 +6,7 @@ use crate::{
     },
     prom::prom_link::attempt_parse,
     python::python_import::PYTHON_IMPORTERS,
+    text::Joiner,
 };
 use anyhow::{Result, anyhow};
 use polars::prelude::*;
@@ -72,25 +73,17 @@ pub fn import_or_load(
         .find_map(|importer| importer(py_obj, input_types).ok())
     {
         inp
-    }
-    // 2) if that failed, see if we got a Python str → file path
-    else if let Ok(path) = py_obj.extract::<String>() {
-        // read the file
-        let content = std::fs::read_to_string(&path)
-            .map_err(|e| PyValueError::new_err(format!("Failed to read file `{}`: {}", path, e)))?;
-        // parse via your CLI-style function
+    } else if let Ok(content) = py_obj.extract::<String>() {
+        // parse the content string
         attempt_parse(input_types, content).map_err(|e| {
-            PyValueError::new_err(format!(
-                "Failed to parse `{}` as input {}: {}",
-                path, index, e
-            ))
+            PyValueError::new_err(format!("Failed to parse argument {}, which was given as a string literal. Last attempted parsing gave the error {}. Expected {}.", index, e, EbiInputType::get_possible_inputs(input_types).join_with(", ", " or ")))
         })?
-    }
-    // 3) else, give up
-    else {
+    } else {
+        //did not manage to parse the input
         return Err(PyValueError::new_err(format!(
-            "Could not import argument {}",
-            index
+            "Could not import argument {}. Expected {}.",
+            index,
+            EbiInputType::get_possible_inputs(input_types).join_with(", ", " or ")
         )));
     };
 
