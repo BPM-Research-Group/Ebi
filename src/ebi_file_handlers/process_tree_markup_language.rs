@@ -2,7 +2,7 @@ use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
-    object_importers::ToLabelledPetriNetObject,
+    object_importers::ImportAsLabelledPetriNetObject,
     trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
 };

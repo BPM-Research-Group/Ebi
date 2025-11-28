@@ -674,7 +674,7 @@ checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
 
 [[package]]
 name = "ebi"
-version = "0.3.4"
+version = "0.3.5"
 dependencies = [
  "Inflector",
  "anyhow",
@@ -751,9 +751,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
-version = "0.3.60"
+version = "0.3.61"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d198c9f3b474cfa79556166493c65c1bcce1744da5c28ce1bb23bfb9aebef1a4"
+checksum = "13154b50615e31abb7b0c1cc5ba9ff56f743dd67d04cc3a69e97e5a6950c3da0"
 dependencies = [
  "anyhow",
  "chrono",

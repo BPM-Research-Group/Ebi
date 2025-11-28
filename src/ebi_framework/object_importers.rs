@@ -3,21 +3,36 @@ use pastey::paste;
 use std::io::BufRead;
 
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject, EventLog, EventLogXes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, LanguageOfAlignments, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticProcessTree, traits::importable::{Importable, ImporterParameterValues}
+    DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject, EventLog, EventLogCsv,
+    EventLogXes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, LanguageOfAlignments,
+    ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticProcessTree,
+    traits::importable::{Importable, ImporterParameterValues},
 };
 
 macro_rules! import_as_object {
     ($t:ident, $u:expr) => {
         paste! {
             pub trait [<To $t Object>] {
+                fn [<to_ $u _object>](self) -> EbiObject;
+            }
+
+            pub trait [<ImportAs $t Object>] {
                 /// A To will first import, and then convert. The latter conversion may not fail.
                 fn [<import_as_ $u _object>](reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) -> Result<EbiObject>;
             }
 
-            impl<T: Importable> [<To $t Object>] for T
+            impl<T> [<To $t Object>] for T
             where
                 T: Into<$t>,
             {
+                fn [<to_ $u _object>](self) -> EbiObject {
+                    EbiObject::$t(self.into())
+                }
+            }
+
+            impl<T: Importable> [<ImportAs $t Object>] for T
+            where T: Into<$t>{
                 fn [<import_as_ $u _object>](reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) -> Result<EbiObject> {
                     let x = Self::import(reader, parameter_values)?.into();
                     Ok(EbiObject::$t(x))
@@ -44,6 +59,7 @@ macro_rules! import_as_object {
 
 import_as_object!(EventLog, event_log);
 import_as_object!(EventLogXes, event_log_xes);
+import_as_object!(EventLogCsv, event_log_csv);
 import_as_object!(LabelledPetriNet, labelled_petri_net);
 import_as_object!(DirectlyFollowsModel, directly_follows_model);
 import_as_object!(
@@ -61,4 +77,7 @@ import_as_object!(DeterministicFiniteAutomaton, deterministic_finite_automaton);
 import_as_object!(ProcessTree, process_tree);
 import_as_object!(StochasticProcessTree, stochastic_process_tree);
 import_as_object!(LanguageOfAlignments, language_of_alignments);
-import_as_object!(StochasticLanguageOfAlignments, stochastic_language_of_alignments);
+import_as_object!(
+    StochasticLanguageOfAlignments,
+    stochastic_language_of_alignments
+);

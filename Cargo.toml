@@ -1,6 +1,6 @@
 [package]
 name = "ebi"
-version = "0.3.4"
+version = "0.3.5"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 keywords = ["stochastic-processes", "process-mining", "business-processes"]
@@ -16,7 +16,7 @@ name = "ebi"
 crate-type = ["cdylib", "lib"]
 
 [features]
-default = [ ]
+default = [ "python" ]
 eexactarithmetic = []
 exactarithmetic = [ "eexactarithmetic", "ebi_arithmetic/exactarithmetic" ]
 approximatearithmetic = [ "eapproximatearithmetic", "ebi_arithmetic/approximatearithmetic" ]
@@ -29,7 +29,7 @@ extension-module = ["pyo3/extension-module"]
 ebi_derive = "0.2.7"
 ebi_arithmetic = "0.3.4"
 ebi_optimisation = "0.3.0"
-ebi_objects = "0.3.60"
+ebi_objects = "0.3.61"
 bitvec = "1.0.1"
 clap = { version = "4.5.51", features = ["derive", "cargo", "string"] }
 anyhow = "1.0.100"

@@ -3,7 +3,7 @@ use crate::ebi_framework::{
     ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     ebi_trait::FromEbiTraitObject,
-    object_importers::ToStochasticDeterministicFiniteAutomatonObject,
+    object_importers::ImportAsStochasticDeterministicFiniteAutomatonObject,
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsFiniteLanguageTrait,
         ImportAsFiniteStochasticLanguageTrait, ImportAsIterableLanguageTrait,

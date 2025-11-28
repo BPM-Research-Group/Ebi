@@ -3,7 +3,7 @@ use crate::ebi_framework::{
     ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     ebi_trait::FromEbiTraitObject,
-    object_importers::{ToLabelledPetriNetObject, ToProcessTreeObject},
+    object_importers::{ImportAsLabelledPetriNetObject, ImportAsProcessTreeObject},
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsQueriableStochasticLanguageTrait,
         ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait,

@@ -4,8 +4,8 @@ use crate::ebi_framework::{
     ebi_output::EbiObjectExporter,
     ebi_trait::FromEbiTraitObject,
     object_importers::{
-        ToDirectlyFollowsModelObject, ToLabelledPetriNetObject,
-        ToStochasticDirectlyFollowsModelObject, ToStochasticLabelledPetriNetObject,
+        ImportAsDirectlyFollowsModelObject, ImportAsLabelledPetriNetObject,
+        ImportAsStochasticDirectlyFollowsModelObject, ImportAsStochasticLabelledPetriNetObject,
     },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsQueriableStochasticLanguageTrait,

@@ -1,10 +1,12 @@
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
     object_importers::{
-        ToDeterministicFiniteAutomatonObject, ToEventLogObject, ToEventLogXesObject,
-        ToFiniteLanguageObject, ToFiniteStochasticLanguageObject,
-        ToStochasticDeterministicFiniteAutomatonObject,
+        ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogObject,
+        ImportAsEventLogXesObject, ImportAsFiniteLanguageObject,
+        ImportAsFiniteStochasticLanguageObject,
+        ImportAsStochasticDeterministicFiniteAutomatonObject,
     },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsEventLogTrait, ImportAsFiniteLanguageTrait,
@@ -14,7 +16,7 @@ use crate::ebi_framework::{
         ImportAsStochasticSemanticsTrait,
     },
 };
-use ebi_objects::{EventLogPython, Importable};
+use ebi_objects::{EventLogPython, Exportable, Importable};
 
 pub const EBI_EVENT_LOG_PYTHON: EbiFileHandler = EbiFileHandler {
     name: "Python event log",
@@ -74,10 +76,6 @@ pub const EBI_EVENT_LOG_PYTHON: EbiFileHandler = EbiFileHandler {
             EventLogPython::import_as_event_log_xes_object,
             EventLogPython::IMPORTER_PARAMETERS,
         ),
-        EbiObjectImporter::EventLogCsv(
-            EventLogPython::import_as_object,
-            EventLogPython::IMPORTER_PARAMETERS,
-        ),
         EbiObjectImporter::FiniteLanguage(
             EventLogPython::import_as_finite_language_object,
             EventLogPython::IMPORTER_PARAMETERS,
@@ -95,7 +93,11 @@ pub const EBI_EVENT_LOG_PYTHON: EbiFileHandler = EbiFileHandler {
             EventLogPython::IMPORTER_PARAMETERS,
         ),
     ],
-    object_exporters: &[],
+    object_exporters: &[
+        EbiObjectExporter::EventLog(EventLogPython::export_from_object),
+        EbiObjectExporter::EventLogXes(EventLogPython::export_from_object),
+        EbiObjectExporter::EventLogCsv(EventLogPython::export_from_object),
+    ],
     object_exporters_fallible: &[],
     java_object_handlers: &[],
 };

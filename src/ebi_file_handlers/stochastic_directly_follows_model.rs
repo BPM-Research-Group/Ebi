@@ -1,11 +1,10 @@
-use ebi_objects::{Exportable, Importable, StochasticDirectlyFollowsModel};
-
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     object_importers::{
-        ToDirectlyFollowsModelObject, ToLabelledPetriNetObject, ToStochasticLabelledPetriNetObject,
+        ImportAsDirectlyFollowsModelObject, ImportAsLabelledPetriNetObject,
+        ImportAsStochasticLabelledPetriNetObject,
     },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsQueriableStochasticLanguageTrait,
@@ -14,6 +13,7 @@ use crate::ebi_framework::{
     },
     validate::Validate,
 };
+use ebi_objects::{Exportable, Importable, StochasticDirectlyFollowsModel};
 
 pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "stochastic directly follows model",

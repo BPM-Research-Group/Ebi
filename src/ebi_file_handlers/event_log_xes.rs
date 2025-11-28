@@ -5,7 +5,9 @@ use crate::{
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
         object_importers::{
-            ToDeterministicFiniteAutomatonObject, ToFiniteLanguageObject, ToFiniteStochasticLanguageObject, ToStochasticDeterministicFiniteAutomatonObject
+            ImportAsDeterministicFiniteAutomatonObject, ImportAsFiniteLanguageObject,
+            ImportAsFiniteStochasticLanguageObject,
+            ImportAsStochasticDeterministicFiniteAutomatonObject,
         },
         trait_importers::{
             ImportAsActivitiesTrait, ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait,

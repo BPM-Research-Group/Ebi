@@ -4,7 +4,7 @@ use crate::{
         ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
-        object_importers::ToLabelledPetriNetObject,
+        object_importers::ImportAsLabelledPetriNetObject,
         trait_importers::{
             ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait,
         },
