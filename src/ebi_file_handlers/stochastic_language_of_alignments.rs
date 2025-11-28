@@ -1,5 +1,11 @@
 use crate::ebi_framework::{
-    ebi_file_handler::EbiFileHandler, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, object_importers::ToLanguageOfAlignmentsObject, trait_importers::ToActivitiesTrait, validate::Validate
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    ebi_trait::FromEbiTraitObject,
+    object_importers::ToLanguageOfAlignmentsObject,
+    trait_importers::ImportAsActivitiesTrait,
+    validate::Validate,
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{EbiObject, Exportable, Importable, StochasticLanguageOfAlignments};

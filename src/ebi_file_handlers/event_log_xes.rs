@@ -5,14 +5,14 @@ use crate::{
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
         object_importers::{
-            ToFiniteLanguageObject, ToFiniteStochasticLanguageObject,
-            ToStochasticDeterministicFiniteAutomatonObject,
+            ToDeterministicFiniteAutomatonObject, ToFiniteLanguageObject, ToFiniteStochasticLanguageObject, ToStochasticDeterministicFiniteAutomatonObject
         },
         trait_importers::{
-            ToActivitiesTrait, ToEventLogTraceAttributesTrait, ToEventLogTrait,
-            ToFiniteLanguageTrait, ToFiniteStochasticLanguageTrait, ToIterableLanguageTrait,
-            ToIterableStochasticLanguageTrait, ToQueriableStochasticLanguageTrait,
-            ToSemanticsTrait, ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
+            ImportAsActivitiesTrait, ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait,
+            ImportAsFiniteLanguageTrait, ImportAsFiniteStochasticLanguageTrait,
+            ImportAsIterableLanguageTrait, ImportAsIterableStochasticLanguageTrait,
+            ImportAsQueriableStochasticLanguageTrait, ImportAsSemanticsTrait,
+            ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait,
         },
         validate::Validate,
     },
@@ -92,6 +92,10 @@ pub const EBI_EVENT_LOG_XES: EbiFileHandler = EbiFileHandler {
         ),
         EbiObjectImporter::FiniteStochasticLanguage(
             EventLog::import_as_finite_stochastic_language_object,
+            EventLog::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::DeterministicFiniteAutomaton(
+            EventLog::import_as_deterministic_finite_automaton_object,
             EventLog::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::StochasticDeterministicFiniteAutomaton(

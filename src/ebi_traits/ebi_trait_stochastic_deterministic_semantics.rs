@@ -12,13 +12,10 @@ use crate::{
 use anyhow::{Result, anyhow};
 use ebi_arithmetic::Fraction;
 use ebi_objects::{
-    Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogTraceAttributes,
-    EventLogXes, FiniteStochasticLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
-    ebi_objects::{
+    Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree, ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_csv::EventLogCsv,
-    },
+    }
 };
 
 pub enum EbiTraitStochasticDeterministicSemantics {
@@ -130,6 +127,7 @@ via_fslang!(EventLog);
 via_fslang!(EventLogTraceAttributes);
 via_fslang!(EventLogXes);
 via_fslang!(EventLogCsv);
+via_fslang!(EventLogPython);
 
 impl ToStochasticDeterministicSemanticsTrait for StochasticProcessTree {
     fn to_stochastic_deterministic_semantics_trait(

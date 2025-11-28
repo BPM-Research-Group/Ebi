@@ -11,8 +11,8 @@ use crate::{
         deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
         directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
         directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_csv::EBI_EVENT_LOG_CSV,
-        event_log_xes::EBI_EVENT_LOG_XES, executions::EBI_EXECUTIONS,
-        finite_language::EBI_FINITE_LANGUAGE,
+        event_log_python::EBI_EVENT_LOG_PYTHON, event_log_xes::EBI_EVENT_LOG_XES,
+        executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE,
         finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
         labelled_petri_net::EBI_LABELLED_PETRI_NET,
         language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS, lola_net::EBI_LOLA_NET,
@@ -26,7 +26,8 @@ use crate::{
         stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
         stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE,
     },
-    ebi_framework::{ebi_command::get_applicable_commands, ebi_trait::EbiTrait}, prom::java_object_handler::JavaObjectHandler,
+    ebi_framework::{ebi_command::get_applicable_commands, ebi_trait::EbiTrait},
+    prom::java_object_handler::JavaObjectHandler,
 };
 use anyhow::{Error, Result, anyhow};
 use ebi_objects::EbiObjectType;
@@ -59,6 +60,7 @@ pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_EVENT_LOG_CSV,
     EBI_PORTABLE_DOCUMENT_FORMAT,
     EBI_SCALABLE_VECTOR_GRAPHICS,
+    EBI_EVENT_LOG_PYTHON,
 ];
 
 #[derive(Clone, Debug)]

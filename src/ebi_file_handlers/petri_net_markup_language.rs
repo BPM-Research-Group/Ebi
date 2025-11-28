@@ -2,7 +2,7 @@ use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
-    trait_importers::{ToActivitiesTrait, ToGraphableTrait, ToSemanticsTrait},
+    trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
 };
 use ebi_objects::{Exportable, Importable, PetriNetMarkupLanguage};
@@ -53,14 +53,12 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
 
 #[cfg(test)]
 mod tests {
-    use std::fs::File;
-
-    use ebi_objects::{Importable, PetriNetMarkupLanguage};
-
     use crate::{
-        ebi_framework::trait_importers::ToSemanticsTrait,
+        ebi_framework::trait_importers::ImportAsSemanticsTrait,
         ebi_traits::ebi_trait_semantics::EbiTraitSemantics, multiple_reader::MultipleReader,
     };
+    use ebi_objects::{Importable, PetriNetMarkupLanguage};
+    use std::fs::File;
 
     #[test]
     fn pnml_empty() {

@@ -8,8 +8,9 @@ use crate::ebi_framework::{
         ToDirectlyFollowsModelObject, ToLabelledPetriNetObject, ToStochasticLabelledPetriNetObject,
     },
     trait_importers::{
-        ToActivitiesTrait, ToGraphableTrait, ToQueriableStochasticLanguageTrait, ToSemanticsTrait,
-        ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
+        ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsQueriableStochasticLanguageTrait,
+        ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait,
+        ImportAsStochasticSemanticsTrait,
     },
     validate::Validate,
 };

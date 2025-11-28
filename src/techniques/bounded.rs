@@ -9,11 +9,7 @@ use crate::{
 };
 use anyhow::Result;
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
-    EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
-    LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
-    ebi_objects::event_log_csv::EventLogCsv,
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree, ebi_objects::event_log_csv::EventLogCsv
 };
 
 pub trait Bounded {
@@ -166,6 +162,7 @@ usize!(StochasticDirectlyFollowsModel);
 usize!(FiniteLanguage);
 usize!(EventLog);
 usize!(EventLogCsv);
+usize!(EventLogPython);
 usize!(EventLogTraceAttributes);
 usize!(EventLogXes);
 usize!(FiniteStochasticLanguage);

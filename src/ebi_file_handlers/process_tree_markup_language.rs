@@ -3,7 +3,7 @@ use crate::ebi_framework::{
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     object_importers::ToLabelledPetriNetObject,
-    trait_importers::{ToActivitiesTrait, ToGraphableTrait, ToSemanticsTrait},
+    trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
 };
 use ebi_objects::{Exportable, Importable, ProcessTreeMarkupLanguage};

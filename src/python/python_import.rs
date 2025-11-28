@@ -1,6 +1,6 @@
 use crate::{
     ebi_file_handlers::{
-        event_log_xes::EBI_EVENT_LOG_XES, labelled_petri_net::EBI_LABELLED_PETRI_NET,
+        event_log_python::EBI_EVENT_LOG_PYTHON, labelled_petri_net::EBI_LABELLED_PETRI_NET,
         process_tree::EBI_PROCESS_TREE,
     },
     ebi_framework::{
@@ -12,7 +12,7 @@ use crate::{
             ToActivitiesTrait, ToEventLogTrait, ToFiniteLanguageTrait,
             ToFiniteStochasticLanguageTrait, ToGraphableTrait, ToIterableLanguageTrait,
             ToIterableStochasticLanguageTrait, ToQueriableStochasticLanguageTrait,
-            ToSemanticsTrait,
+            ToSemanticsTrait, ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
         },
     },
     ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
@@ -21,7 +21,7 @@ use crate::{
 use anyhow::Result;
 use ebi_arithmetic::{Fraction, is_exact_globally};
 use ebi_objects::{
-    ActivityKey, EbiObject, EbiObjectType, EventLog, LabelledPetriNet, ProcessTree,
+    ActivityKey, EbiObject, EbiObjectType, EventLogPython, LabelledPetriNet, ProcessTree,
     marking::Marking,
 };
 use process_mining::event_log::{
@@ -44,7 +44,7 @@ type PyImporter = fn(&Bound<'_, PyAny>, &[&'static EbiInputType]) -> PyResult<Eb
 pub const PYTHON_IMPORTERS: &[PyImporter] = &[
     usize::py_import,
     Fraction::py_import,
-    EventLog::py_import,
+    EventLogPython::py_import,
     LabelledPetriNet::py_import,
     ProcessTree::py_import,
 ];
@@ -131,8 +131,8 @@ impl ImportableFromPM4Py for Fraction {
     }
 }
 
-impl ImportableFromPM4Py for EventLog {
-    const PY_FILE_HANDLER: Option<&'static EbiFileHandler> = Some(&EBI_EVENT_LOG_XES);
+impl ImportableFromPM4Py for EventLogPython {
+    const PY_FILE_HANDLER: Option<&'static EbiFileHandler> = Some(&EBI_EVENT_LOG_PYTHON);
 
     fn py_extract_object(py_object: &Bound<'_, PyAny>) -> PyResult<Self> {
         // Extract the list of traces from the PM4Py event log.
@@ -158,16 +158,17 @@ impl ImportableFromPM4Py for EventLog {
             global_trace_attrs: None,
             global_event_attrs: None,
         };
-        // For classifier, we use a default one.
-        let classifier = EventLogClassifier::default();
-        Ok(EventLog::from((pm_log, classifier)))
+        Ok(EventLogPython::from((
+            pm_log,
+            EventLogClassifier::default(),
+        )))
     }
 
     fn py_object_to_ebi_input(self, input_types: &[&EbiInputType]) -> Option<EbiInput> {
         for &itype in input_types {
             match itype {
                 EbiInputType::Object(obj_type) if *obj_type == EbiObjectType::EventLog => {
-                    let obj = EbiObject::EventLog(self);
+                    let obj = EbiObject::EventLog(self.into());
                     return Some(EbiInput::Object(obj, &Self::PY_FILE_HANDLER.unwrap()));
                 }
                 EbiInputType::Trait(etrait) => {
@@ -214,12 +215,29 @@ impl ImportableFromPM4Py for EventLog {
                                 &Self::PY_FILE_HANDLER.unwrap(),
                             ));
                         }
-                        // … add more traits here …
+                        EbiTrait::Semantics => {
+                            return Some(EbiInput::Trait(
+                                self.to_semantics_ebi_trait_object(),
+                                &Self::PY_FILE_HANDLER.unwrap(),
+                            ));
+                        }
+                        EbiTrait::StochasticSemantics => {
+                            return Some(EbiInput::Trait(
+                                self.to_stochastic_semantics_ebi_trait_object(),
+                                &Self::PY_FILE_HANDLER.unwrap(),
+                            ));
+                        }
+                        EbiTrait::StochasticDeterministicSemantics => {
+                            return Some(EbiInput::Trait(
+                                self.to_stochastic_deterministic_semantics_ebi_trait_object(),
+                                &Self::PY_FILE_HANDLER.unwrap(),
+                            ));
+                        }
                         _ => { /* this trait isn’t supported by EventLog; skip */ }
                     }
                 }
                 EbiInputType::AnyObject => {
-                    let obj = EbiObject::EventLog(self);
+                    let obj = EbiObject::EventLog(self.into());
                     return Some(EbiInput::Object(obj, &Self::PY_FILE_HANDLER.unwrap()));
                 }
                 _ => {
@@ -614,23 +632,18 @@ fn translate_pm4py_process_tree(s: &str) -> Result<String, String> {
 #[cfg(test)]
 mod tests {
     use crate::{
-        ebi_file_handlers::{
-            event_log_xes::EBI_EVENT_LOG_XES, labelled_petri_net::EBI_LABELLED_PETRI_NET,
-            process_tree::EBI_PROCESS_TREE,
-        },
-        ebi_framework::ebi_input::EbiInputType,
-        python::python_import::ImportableFromPM4Py,
+        ebi_framework::ebi_input::EbiInputType, python::python_import::ImportableFromPM4Py,
     };
-    use ebi_objects::{EventLog, LabelledPetriNet, ProcessTree};
+    use ebi_objects::{EventLogPython, EventLogXes, LabelledPetriNet, ProcessTree};
     use std::fs;
 
     #[test]
     fn py_importers_event_log() {
         let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
-        let log = fin.parse::<EventLog>().unwrap();
+        let log: EventLogPython = fin.parse::<EventLogXes>().unwrap().into();
 
         //every trait importer must be supported
-        for trait_importer in EBI_EVENT_LOG_XES.trait_importers {
+        for trait_importer in EventLogPython::PY_FILE_HANDLER.unwrap().trait_importers {
             let input_type = Box::new(EbiInputType::Trait(trait_importer.get_trait()));
             let input_type: &'static EbiInputType = Box::leak(input_type);
             let input_types = [input_type];
@@ -651,7 +664,7 @@ mod tests {
         let log = fin.parse::<LabelledPetriNet>().unwrap();
 
         //every trait importer must be supported
-        for trait_importer in EBI_LABELLED_PETRI_NET.trait_importers {
+        for trait_importer in EventLogPython::PY_FILE_HANDLER.unwrap().trait_importers {
             let input_type = Box::new(EbiInputType::Trait(trait_importer.get_trait()));
             let input_type: &'static EbiInputType = Box::leak(input_type);
             let input_types = [input_type];
@@ -672,7 +685,7 @@ mod tests {
         let log = fin.parse::<ProcessTree>().unwrap();
 
         //every trait importer must be supported
-        for trait_importer in EBI_PROCESS_TREE.trait_importers {
+        for trait_importer in EventLogPython::PY_FILE_HANDLER.unwrap().trait_importers {
             let input_type = Box::new(EbiInputType::Trait(trait_importer.get_trait()));
             let input_type: &'static EbiInputType = Box::leak(input_type);
             let input_types = [input_type];

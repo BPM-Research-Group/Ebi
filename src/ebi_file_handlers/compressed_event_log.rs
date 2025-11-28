@@ -7,10 +7,11 @@ use crate::ebi_framework::{
         ToStochasticDeterministicFiniteAutomatonObject,
     },
     trait_importers::{
-        ToActivitiesTrait, ToEventLogTraceAttributesTrait, ToEventLogTrait, ToFiniteLanguageTrait,
-        ToFiniteStochasticLanguageTrait, ToIterableLanguageTrait,
-        ToIterableStochasticLanguageTrait, ToQueriableStochasticLanguageTrait, ToSemanticsTrait,
-        ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
+        ImportAsActivitiesTrait, ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait,
+        ImportAsFiniteLanguageTrait, ImportAsFiniteStochasticLanguageTrait,
+        ImportAsIterableLanguageTrait, ImportAsIterableStochasticLanguageTrait,
+        ImportAsQueriableStochasticLanguageTrait, ImportAsSemanticsTrait,
+        ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait,
     },
     validate::Validate,
 };

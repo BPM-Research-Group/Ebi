@@ -5,10 +5,11 @@ use crate::ebi_framework::{
     ebi_trait::FromEbiTraitObject,
     object_importers::ToStochasticDeterministicFiniteAutomatonObject,
     trait_importers::{
-        ToActivitiesTrait, ToFiniteLanguageTrait, ToFiniteStochasticLanguageTrait,
-        ToIterableLanguageTrait, ToIterableStochasticLanguageTrait,
-        ToQueriableStochasticLanguageTrait, ToSemanticsTrait,
-        ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
+        ImportAsActivitiesTrait, ImportAsFiniteLanguageTrait,
+        ImportAsFiniteStochasticLanguageTrait, ImportAsIterableLanguageTrait,
+        ImportAsIterableStochasticLanguageTrait, ImportAsQueriableStochasticLanguageTrait,
+        ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait,
+        ImportAsStochasticSemanticsTrait,
     },
     validate::Validate,
 };

@@ -1,16 +1,15 @@
+use crate::ebi_framework::{
+    ebi_command::EbiCommand,
+    ebi_output::{self, EbiOutput},
+};
 use ebi_arithmetic::{Fraction, MaybeExact, fraction::approximate::Approximate};
-use ebi_objects::{EbiObject, EventLogXes, NumberOfTraces};
+use ebi_objects::{EbiObject, EventLogPython, NumberOfTraces};
 use malachite::Natural;
 use process_mining::event_log::AttributeValue;
 use pyo3::{
     IntoPyObjectExt, Py, PyAny, PyResult, Python,
     exceptions::PyValueError,
     types::{IntoPyDict, PyAnyMethods, PyDict, PyList, PyString},
-};
-
-use crate::ebi_framework::{
-    ebi_command::EbiCommand,
-    ebi_output::{self, EbiOutput},
 };
 
 pub trait ExportableToPM4Py {
@@ -24,7 +23,7 @@ impl ExportableToPM4Py for EbiOutput {
             EbiOutput::Fraction(frac) => frac.export_to_pm4py(py),
             EbiOutput::Bool(value) => value.export_to_pm4py(py),
             EbiOutput::Usize(value) => value.export_to_pm4py(py),
-            EbiOutput::Object(EbiObject::EventLogXes(event_log)) => {
+            EbiOutput::Object(EbiObject::EventLogPython(event_log)) => {
                 // special case: export EventLog directly
                 event_log.export_to_pm4py(py)
             }
@@ -123,7 +122,7 @@ pub fn natural_to_num_biguints(n: &Natural) -> num_bigint::BigUint {
     num_bigint::BigUint::from_slice(&n_limbs_u32)
 }
 
-impl ExportableToPM4Py for EventLogXes {
+impl ExportableToPM4Py for EventLogPython {
     fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
         let pm4py_module = py.import("pm4py.objects.log.obj")?;
         let py_event_cls = pm4py_module.getattr("Event")?;
@@ -133,7 +132,7 @@ impl ExportableToPM4Py for EventLogXes {
         // Collect traces
         let mut py_traces = Vec::with_capacity(self.number_of_traces());
 
-        for (_trace_idx, rust_trace) in self.rust4pm_log.traces.iter().enumerate() {
+        for (_trace_idx, rust_trace) in self.log.rust4pm_log.traces.iter().enumerate() {
             // Collect events
             let mut py_events = Vec::with_capacity(rust_trace.events.len());
 
@@ -218,7 +217,7 @@ impl ExportableToPM4Py for EventLogXes {
 
         // Log attributes
         let py_log_attrs = PyDict::new(py);
-        for attr in &self.rust4pm_log.attributes {
+        for attr in &self.log.rust4pm_log.attributes {
             let py_val = match &attr.value {
                 AttributeValue::String(s) => s.into_py_any(py)?,
                 AttributeValue::Int(i) => i.into_py_any(py)?,

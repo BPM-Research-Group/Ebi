@@ -1,8 +1,12 @@
-use ebi_objects::{DirectlyFollowsModel, Exportable, Importable};
-
 use crate::ebi_framework::{
-        ebi_file_handler::EbiFileHandler, ebi_input::{EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, object_importers::ToLabelledPetriNetObject, trait_importers::{ToActivitiesTrait, ToGraphableTrait, ToSemanticsTrait}, validate::Validate
-    };
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    object_importers::ToLabelledPetriNetObject,
+    trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
+    validate::Validate,
+};
+use ebi_objects::{DirectlyFollowsModel, Exportable, Importable};
 
 pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "directly follows model",

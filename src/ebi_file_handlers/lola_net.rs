@@ -2,7 +2,7 @@ use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::EbiTraitImporter,
     ebi_output::EbiObjectExporter,
-    trait_importers::{ToActivitiesTrait, ToGraphableTrait, ToSemanticsTrait},
+    trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
 };
 use ebi_objects::{Exportable, Importable, LolaNet};

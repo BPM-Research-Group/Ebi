@@ -7,11 +7,11 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_graphable::EbiTraitGraphable,
         ebi_trait_iterable_language::EbiTraitIterableLanguage,
+        ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
         ebi_trait_semantics::EbiTraitSemantics,
         ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics,
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
-        ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage,
     },
 };
 use anyhow::Result;
@@ -22,9 +22,7 @@ use std::io::BufRead;
 macro_rules! import_as_trait_dyn {
     ($t:ident, $u:expr) => {
         paste! {
-            pub trait [<To $t Trait>]: Importable {
-                fn [<to_ $u _trait>](self) -> Box<dyn [<EbiTrait $t >]>;
-
+            pub trait [<ImportAs $t Trait>]: Importable + [<To $t Trait>] {
                 fn [<import_as_ $u _trait>] (
                     reader: &mut dyn BufRead,
                     parameter_values: &ImporterParameterValues,
@@ -34,6 +32,12 @@ macro_rules! import_as_trait_dyn {
                 {
                     Ok(Self::import(reader, parameter_values)?.[<to_ $u _trait>]())
                 }
+            }
+
+            impl <T> [<ImportAs $t Trait>] for T where T: Importable + [<To $t Trait>] {}
+
+            pub trait [<To $t Trait>] {
+                fn [<to_ $u _trait>](self) -> Box<dyn [<EbiTrait $t >]>;
 
                 fn [<to_ $u _ebi_trait_object>](self) -> EbiTraitObject
                 where
@@ -49,9 +53,7 @@ macro_rules! import_as_trait_dyn {
 macro_rules! import_as_trait {
     ($t:ident, $u:expr) => {
         paste! {
-            pub trait [<To $t Trait>]: Importable {
-                fn [<to_ $u _trait>](self) -> [<EbiTrait $t >];
-
+            pub trait [<ImportAs $t Trait>]: Importable + [<To $t Trait>] {
                 fn [<import_as_ $u _trait>] (
                     reader: &mut dyn BufRead,
                     parameter_values: &ImporterParameterValues,
@@ -61,6 +63,12 @@ macro_rules! import_as_trait {
                 {
                     Ok(Self::import(reader, parameter_values)?.[<to_ $u _trait>]())
                 }
+            }
+
+            impl <T> [<ImportAs $t Trait>] for T where T: Importable + [<To $t Trait>] {}
+
+            pub trait [<To $t Trait>] {
+                fn [<to_ $u _trait>](self) -> [<EbiTrait $t >];
 
                 fn [<to_ $u _ebi_trait_object>](self) -> EbiTraitObject
                 where

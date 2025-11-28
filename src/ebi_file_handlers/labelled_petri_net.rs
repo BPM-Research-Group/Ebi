@@ -4,7 +4,9 @@ use crate::{
         ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
-        trait_importers::{ToActivitiesTrait, ToGraphableTrait, ToSemanticsTrait},
+        trait_importers::{
+            ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait,
+        },
         validate::Validate,
     },
     prom::java_object_handler::JavaObjectHandler,

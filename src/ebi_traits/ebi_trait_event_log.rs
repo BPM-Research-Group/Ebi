@@ -4,9 +4,7 @@ use crate::ebi_framework::{
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    Activity, CompressedEventLog, EventLog, EventLogCsv, EventLogTraceAttributes, HasActivityKey,
-    Importable, IntoRefTraceIterator, NumberOfTraces,
-    ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
+    Activity, CompressedEventLog, EventLog, EventLogCsv, EventLogPython, EventLogTraceAttributes, EventLogXes, HasActivityKey, Importable, IntoRefTraceIterator, NumberOfTraces, ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes
 };
 use std::collections::HashMap;
 
@@ -84,6 +82,20 @@ impl ToEventLogTrait for CompressedEventLogTraceAttributes {
 }
 
 impl ToEventLogTrait for EventLogCsv {
+    fn to_event_log_trait(self) -> Box<dyn EbiTraitEventLog> {
+        let log: EventLog = self.into();
+        Box::new(log)
+    }
+}
+
+impl ToEventLogTrait for EventLogPython {
+    fn to_event_log_trait(self) -> Box<dyn EbiTraitEventLog> {
+        let log: EventLog = self.into();
+        Box::new(log)
+    }
+}
+
+impl ToEventLogTrait for EventLogXes {
     fn to_event_log_trait(self) -> Box<dyn EbiTraitEventLog> {
         let log: EventLog = self.into();
         Box::new(log)

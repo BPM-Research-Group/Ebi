@@ -5,7 +5,9 @@ use crate::{
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
         object_importers::ToLabelledPetriNetObject,
-        trait_importers::{ToActivitiesTrait, ToGraphableTrait, ToSemanticsTrait},
+        trait_importers::{
+            ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait,
+        },
         validate::Validate,
     },
     prom::java_object_handler::JavaObjectHandler,

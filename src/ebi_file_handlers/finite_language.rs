@@ -5,7 +5,8 @@ use crate::ebi_framework::{
     ebi_trait::FromEbiTraitObject,
     object_importers::ToDeterministicFiniteAutomatonObject,
     trait_importers::{
-        ToActivitiesTrait, ToFiniteLanguageTrait, ToIterableLanguageTrait, ToSemanticsTrait,
+        ImportAsActivitiesTrait, ImportAsFiniteLanguageTrait, ImportAsIterableLanguageTrait,
+        ImportAsSemanticsTrait,
     },
     validate::Validate,
 };
@@ -76,7 +77,10 @@ impl FromEbiTraitObject for FiniteLanguage {
 mod tests {
     use std::fs;
 
-    use crate::{ebi_framework::trait_importers::ToSemanticsTrait, ebi_traits::ebi_trait_semantics::EbiTraitSemantics};
+    use crate::{
+        ebi_framework::trait_importers::ToSemanticsTrait,
+        ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
+    };
 
     use super::FiniteLanguage;
 

@@ -211,7 +211,7 @@ pub mod tests {
     use crate::{
         ebi_framework::{
             ebi_input::EbiInput, ebi_trait_object::EbiTraitObject,
-            trait_importers::ToSemanticsTrait,
+            trait_importers::{ImportAsSemanticsTrait, ToSemanticsTrait},
         },
         ebi_traits::{
             ebi_trait_event_log::EbiTraitEventLog, ebi_trait_semantics::EbiTraitSemantics,

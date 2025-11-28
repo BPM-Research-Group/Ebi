@@ -1,7 +1,7 @@
 use crate::{
     ebi_framework::{
         ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
-        trait_importers::ToSemanticsTrait,
+        trait_importers::{ToSemanticsTrait},
     },
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
@@ -11,17 +11,11 @@ use crate::{
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    ActivityKey, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
-    EventLog, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
-    HasActivityKey, LabelledPetriNet, LolaNet, PetriNetMarkupLanguage, ProcessTree,
-    ProcessTreeMarkupLanguage, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
-    TranslateActivityKey,
-    ebi_objects::{
+    ActivityKey, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, LabelledPetriNet, LolaNet, PetriNetMarkupLanguage, ProcessTree, ProcessTreeMarkupLanguage, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree, TranslateActivityKey, ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_csv::EventLogCsv,
-    },
+    }
 };
 
 ///
@@ -96,6 +90,7 @@ via_log!(EventLog);
 via_log!(EventLogTraceAttributes);
 via_log!(EventLogXes);
 via_log!(EventLogCsv);
+via_log!(EventLogPython);
 
 impl ToSemanticsTrait for DeterministicFiniteAutomaton {
     fn to_semantics_trait(self) -> EbiTraitSemantics {

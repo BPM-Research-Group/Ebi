@@ -5,8 +5,9 @@ use crate::ebi_framework::{
     ebi_trait::FromEbiTraitObject,
     object_importers::ToLabelledPetriNetObject,
     trait_importers::{
-        ToActivitiesTrait, ToGraphableTrait, ToQueriableStochasticLanguageTrait, ToSemanticsTrait,
-        ToStochasticDeterministicSemanticsTrait, ToStochasticSemanticsTrait,
+        ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsQueriableStochasticLanguageTrait,
+        ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait,
+        ImportAsStochasticSemanticsTrait,
     },
     validate::Validate,
 };

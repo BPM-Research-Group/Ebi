@@ -2,7 +2,7 @@ use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
-    trait_importers::ToActivitiesTrait,
+    trait_importers::ImportAsActivitiesTrait,
     validate::Validate,
 };
 use ebi_objects::{Exportable, Importable, LanguageOfAlignments};

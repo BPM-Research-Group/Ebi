@@ -9,7 +9,7 @@ use crate::{
 use anyhow::{Context, Error, Result, anyhow};
 use ebi_arithmetic::{Fraction, Zero};
 use ebi_objects::{
-    ActivityKeyTranslator, CompressedEventLog, DirectlyFollowsGraph, EventLog,
+    ActivityKeyTranslator, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogPython,
     EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, Importable,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     ebi_objects::{
@@ -143,6 +143,7 @@ queriable_via_slang!(CompressedEventLog);
 queriable_via_slang!(CompressedEventLogTraceAttributes);
 queriable_via_slang!(EventLogXes);
 queriable_via_slang!(EventLogCsv);
+queriable_via_slang!(EventLogPython);
 
 #[cfg(test)]
 mod tests {
