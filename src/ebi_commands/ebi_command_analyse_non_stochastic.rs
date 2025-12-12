@@ -135,6 +135,12 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::ScalableVectorGraphics(_), _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
+            EbiInput::Object(EbiObject::PortableDocumentFormat(_), _) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
+            EbiInput::Object(EbiObject::PortableNetworkGraphics(_), _) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
         };
         if result {
             log::debug!("The model has a bounded state space.");
@@ -279,6 +285,12 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
             EbiInput::Object(EbiObject::ScalableVectorGraphics(_), _) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
+            EbiInput::Object(EbiObject::PortableDocumentFormat(_), _) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
+            EbiInput::Object(EbiObject::PortableNetworkGraphics(_), _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
         };

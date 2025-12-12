@@ -751,9 +751,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
-version = "0.3.61"
+version = "0.3.62"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13154b50615e31abb7b0c1cc5ba9ff56f743dd67d04cc3a69e97e5a6950c3da0"
+checksum = "54cefc1769d4f38bc5137cfc1db335599cc67f895402272b5f0afb23733e1907"
 dependencies = [
  "anyhow",
  "chrono",
@@ -770,11 +770,13 @@ dependencies = [
  "process_mining",
  "quick-xml 0.38.4",
  "rayon",
+ "resvg",
  "serde",
  "serde_json",
  "strum",
  "strum_macros 0.27.2",
  "svg2pdf",
+ "tiny-skia",
  "uuid",
 ]
 

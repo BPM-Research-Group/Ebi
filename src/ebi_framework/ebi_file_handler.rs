@@ -7,24 +7,7 @@ use super::{
 use crate::{
     ebi_commands::ebi_command_validate::EBI_VALIDATE,
     ebi_file_handlers::{
-        compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
-        deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
-        directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
-        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_csv::EBI_EVENT_LOG_CSV,
-        event_log_python::EBI_EVENT_LOG_PYTHON, event_log_xes::EBI_EVENT_LOG_XES,
-        executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE,
-        finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
-        labelled_petri_net::EBI_LABELLED_PETRI_NET,
-        language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS, lola_net::EBI_LOLA_NET,
-        petri_net_markup_language::EBI_PETRI_NET_MARKUP_LANGUAGE,
-        portable_document_format::EBI_PORTABLE_DOCUMENT_FORMAT, process_tree::EBI_PROCESS_TREE,
-        process_tree_markup_language::EBI_PROCESS_TREE_MARKUP_LANGUAGE,
-        scalable_vector_graphics::EBI_SCALABLE_VECTOR_GRAPHICS,
-        stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON,
-        stochastic_directly_follows_model::EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL,
-        stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
-        stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
-        stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE,
+        compressed_event_log::EBI_COMPRESSED_EVENT_LOG, deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON, directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH, directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_csv::EBI_EVENT_LOG_CSV, event_log_python::EBI_EVENT_LOG_PYTHON, event_log_xes::EBI_EVENT_LOG_XES, executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE, labelled_petri_net::EBI_LABELLED_PETRI_NET, language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS, lola_net::EBI_LOLA_NET, petri_net_markup_language::EBI_PETRI_NET_MARKUP_LANGUAGE, portable_document_format::EBI_PORTABLE_DOCUMENT_FORMAT, portable_network_graphics::EBI_PORTABLE_NETWORK_GRAPHCIS, process_tree::EBI_PROCESS_TREE, process_tree_markup_language::EBI_PROCESS_TREE_MARKUP_LANGUAGE, scalable_vector_graphics::EBI_SCALABLE_VECTOR_GRAPHICS, stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON, stochastic_directly_follows_model::EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL, stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET, stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS, stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE
     },
     ebi_framework::{ebi_command::get_applicable_commands, ebi_trait::EbiTrait},
     prom::java_object_handler::JavaObjectHandler,
@@ -60,6 +43,8 @@ pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_EVENT_LOG_CSV,
     EBI_PORTABLE_DOCUMENT_FORMAT,
     EBI_SCALABLE_VECTOR_GRAPHICS,
+    EBI_PORTABLE_DOCUMENT_FORMAT,
+    EBI_PORTABLE_NETWORK_GRAPHCIS,
     EBI_EVENT_LOG_PYTHON,
 ];
 

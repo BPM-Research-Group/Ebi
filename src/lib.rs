@@ -46,6 +46,7 @@ pub mod ebi_file_handlers {
     pub mod lola_net;
     pub mod petri_net_markup_language;
     pub mod portable_document_format;
+    pub mod portable_network_graphics;
     pub mod process_tree;
     pub mod process_tree_markup_language;
     pub mod scalable_vector_graphics;

@@ -4,7 +4,23 @@ use super::{
 };
 use crate::{
     ebi_file_handlers::{
-        compressed_event_log::EBI_COMPRESSED_EVENT_LOG, deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON, directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH, directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_csv::EBI_EVENT_LOG_CSV, event_log_python::EBI_EVENT_LOG_PYTHON, executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE, labelled_petri_net::EBI_LABELLED_PETRI_NET, language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS, process_tree::EBI_PROCESS_TREE, scalable_vector_graphics::EBI_SCALABLE_VECTOR_GRAPHICS, stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON, stochastic_directly_follows_model::EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL, stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET, stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS, stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE
+        compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
+        deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
+        directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
+        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_csv::EBI_EVENT_LOG_CSV,
+        event_log_python::EBI_EVENT_LOG_PYTHON, executions::EBI_EXECUTIONS,
+        finite_language::EBI_FINITE_LANGUAGE,
+        finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
+        labelled_petri_net::EBI_LABELLED_PETRI_NET,
+        language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS,
+        portable_document_format::EBI_PORTABLE_DOCUMENT_FORMAT,
+        portable_network_graphics::EBI_PORTABLE_NETWORK_GRAPHCIS, process_tree::EBI_PROCESS_TREE,
+        scalable_vector_graphics::EBI_SCALABLE_VECTOR_GRAPHICS,
+        stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON,
+        stochastic_directly_follows_model::EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL,
+        stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
+        stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
+        stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE,
     },
     math::{log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv},
     prom::java_object_handler::{
@@ -17,7 +33,9 @@ use crate::{
 use anyhow::{Context, Result, anyhow};
 use ebi_arithmetic::{Exporter, Fraction};
 use ebi_objects::{
-    CompressedEventLogXes, EbiObject, EbiObjectType, EventLogPython, Exportable, ebi_objects::{
+    CompressedEventLogXes, EbiObject, EbiObjectType, EventLogPython, Exportable,
+    PortableDocumentFormat, PortableNetworkGraphics,
+    ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         deterministic_finite_automaton::DeterministicFiniteAutomaton,
@@ -31,7 +49,7 @@ use ebi_objects::{
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
         stochastic_language_of_alignments::StochasticLanguageOfAlignments,
         stochastic_process_tree::StochasticProcessTree,
-    }
+    },
 };
 use std::{
     collections::BTreeSet,
@@ -243,10 +261,26 @@ impl EbiOutputType {
             ),
             EbiOutputType::ObjectType(EbiObjectType::ScalableVectorGraphics) => {
                 EbiExporter::Object(
-                    &&EbiObjectExporter::ScalableVectorGraphics(
+                    &EbiObjectExporter::ScalableVectorGraphics(
                         ScalableVectorGraphics::export_from_object,
                     ),
                     &EBI_SCALABLE_VECTOR_GRAPHICS,
+                )
+            }
+            EbiOutputType::ObjectType(EbiObjectType::PortableDocumentFormat) => {
+                EbiExporter::Object(
+                    &EbiObjectExporter::PortableDocumentFormat(
+                        PortableDocumentFormat::export_from_object,
+                    ),
+                    &EBI_PORTABLE_DOCUMENT_FORMAT,
+                )
+            }
+            EbiOutputType::ObjectType(EbiObjectType::PortableNetworkGraphics) => {
+                EbiExporter::Object(
+                    &EbiObjectExporter::PortableNetworkGraphics(
+                        PortableNetworkGraphics::export_from_object,
+                    ),
+                    &EBI_PORTABLE_NETWORK_GRAPHCIS,
                 )
             }
             EbiOutputType::String => EbiExporter::String,
@@ -413,6 +447,8 @@ pub enum EbiObjectExporter {
     Executions(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     DirectlyFollowsGraph(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     ScalableVectorGraphics(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
+    PortableDocumentFormat(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
+    PortableNetworkGraphics(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
 }
 
 impl EbiObjectExporter {
@@ -450,6 +486,8 @@ impl EbiObjectExporter {
             EbiObjectExporter::Executions(_) => EbiObjectType::Executions,
             EbiObjectExporter::DirectlyFollowsGraph(_) => EbiObjectType::DirectlyFollowsGraph,
             EbiObjectExporter::ScalableVectorGraphics(_) => EbiObjectType::ScalableVectorGraphics,
+            EbiObjectExporter::PortableDocumentFormat(_) => EbiObjectType::PortableDocumentFormat,
+            EbiObjectExporter::PortableNetworkGraphics(_) => EbiObjectType::PortableNetworkGraphics,
         }
     }
 
@@ -482,6 +520,8 @@ impl EbiObjectExporter {
                 EbiObjectExporter::Executions(exporter) => (exporter)(object, f),
                 EbiObjectExporter::DirectlyFollowsGraph(exporter) => (exporter)(object, f),
                 EbiObjectExporter::ScalableVectorGraphics(exporter) => (exporter)(object, f),
+                EbiObjectExporter::PortableDocumentFormat(exporter) => (exporter)(object, f),
+                EbiObjectExporter::PortableNetworkGraphics(exporter) => (exporter)(object, f),
             }
         } else {
             Err(anyhow!("cannot export non-object as object"))
