@@ -30,10 +30,13 @@ The [manual.pdf](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/buil
         import ebi
         # Load a log using PM4Py
         log = pm4py.read_xes("myLog.xes", return_legacy_log_object=True)
+        # Load a model as a string
+        with open('mymodel.slpn', 'r') as file:
+            model = file.read()
         # Call the Ebi function
         result = ebi.conformance_earth_movers_stochastic_conformance_sample(
             log,
-            "myModel.slpn",
+            model,
             1000
         )
         print(result)
