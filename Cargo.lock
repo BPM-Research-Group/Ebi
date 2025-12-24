@@ -674,7 +674,7 @@ checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
 
 [[package]]
 name = "ebi"
-version = "0.3.5"
+version = "0.3.6"
 dependencies = [
  "Inflector",
  "anyhow",
@@ -726,9 +726,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_arithmetic"
-version = "0.3.4"
+version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9f0224184f6ead284ac73fb62976e47c1f558b2eec853d9f88f6c94251ce89b"
+checksum = "803c18c73dd9541843eecb031c9fa18bd83e514824ec81d28128585f6d71f48d"
 dependencies = [
  "anyhow",
  "itertools",
@@ -751,9 +751,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
-version = "0.3.62"
+version = "0.3.64"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "54cefc1769d4f38bc5137cfc1db335599cc67f895402272b5f0afb23733e1907"
+checksum = "ce4a76249669d4d34e3e7e71c9f27042c372e543a70888162c298bef259cb8b5"
 dependencies = [
  "anyhow",
  "chrono",
@@ -782,16 +782,16 @@ dependencies = [
 
 [[package]]
 name = "ebi_optimisation"
-version = "0.3.0"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "53a89e84028f32a5f164c02aa0b757c9b337646ae98c2eb5e4ad1c692acf4c55"
+checksum = "afe6ee6b40459cfccae3b2f95df8392a352205b8437d87119ed104671549d3e3"
 dependencies = [
  "anyhow",
  "ebi_arithmetic",
  "indexmap 2.12.1",
  "log",
  "malachite",
- "ndarray 0.16.1",
+ "ndarray",
  "parking_lot",
  "pathfinding",
  "rand 0.9.2",
@@ -1654,9 +1654,9 @@ dependencies = [
 
 [[package]]
 name = "malachite"
-version = "0.7.1"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "16876aff882137423a05741c95492580b8ada475b18d5f007dbf15a2d40cca30"
+checksum = "eb12c5db7d642baea3ea7ee54a2c9f2a80e05e4c8992c1f561ee02c50d1b071c"
 dependencies = [
  "malachite-base",
  "malachite-float",
@@ -1666,9 +1666,9 @@ dependencies = [
 
 [[package]]
 name = "malachite-base"
-version = "0.7.1"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "30a52349e41ad66905fd33a8dc8736c554d71cfe56b81e2c499abec7f0168725"
+checksum = "c0c91cb6071ed9ac48669d3c79bd2792db596c7e542dbadd217b385bb359f42d"
 dependencies = [
  "getrandom 0.2.16",
  "hashbrown 0.16.1",
@@ -1682,9 +1682,9 @@ dependencies = [
 
 [[package]]
 name = "malachite-float"
-version = "0.7.1"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b18c3e7d0a2f8956c66554f63788887c067ab9fe59cb521280ff7f2064298140"
+checksum = "f8ab9da4c06d34dc05f7ea459d338e94d4da8bee3dc9ef2dc19fd1357385032e"
 dependencies = [
  "itertools",
  "malachite-base",
@@ -1694,9 +1694,9 @@ dependencies = [
 
 [[package]]
 name = "malachite-nz"
-version = "0.7.1"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e3069312201645d5257b0c34b8d506933f9d5ea82133b14b9c76be2ce5bb41a6"
+checksum = "1d9ecf4dd76246fd622de4811097966106aa43f9cd7cc36cb85e774fe84c8adc"
 dependencies = [
  "itertools",
  "libm",
@@ -1706,9 +1706,9 @@ dependencies = [
 
 [[package]]
 name = "malachite-q"
-version = "0.7.1"
+version = "0.8.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d2549764c0d9756d0396cf0c7fb47aee5df4da8a771ac5bfc616bb53ac344c9c"
+checksum = "b7bc9d9adf5b0a7999d84f761c809bec3dc46fe983e4de547725d2b7730462a0"
 dependencies = [
  "itertools",
  "malachite-base",
@@ -1809,21 +1809,6 @@ dependencies = [
  "quote",
  "syn 1.0.109",
  "target-features",
-]
-
-[[package]]
-name = "ndarray"
-version = "0.16.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "882ed72dce9365842bf196bdeedf5055305f11fc8c03dee7bb0194a6cad34841"
-dependencies = [
- "matrixmultiply",
- "num-complex 0.4.6",
- "num-integer",
- "num-traits",
- "portable-atomic",
- "portable-atomic-util",
- "rawpointer",
 ]
 
 [[package]]
@@ -3050,15 +3035,15 @@ dependencies = [
 
 [[package]]
 name = "serde_json"
-version = "1.0.145"
+version = "1.0.147"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "402a6f66d8c709116cf22f558eab210f5a50187f702eb4d7e5ef38d9a7f1c79c"
+checksum = "6af14725505314343e673e9ecb7cd7e8a36aa9791eb936235a3567cc31447ae4"
 dependencies = [
  "itoa",
  "memchr",
- "ryu",
  "serde",
  "serde_core",
+ "zmij",
 ]
 
 [[package]]
@@ -3230,7 +3215,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6dca58a33be2188d4edc71534f8bafa826e787cc28ca1c47f31be3423f0d6e55"
 dependencies = [
  "alga",
- "ndarray 0.17.1",
+ "ndarray",
  "num-complex 0.4.6",
  "num-traits",
  "num_cpus",
@@ -4110,6 +4095,12 @@ dependencies = [
  "quote",
  "syn 2.0.111",
 ]
+
+[[package]]
+name = "zmij"
+version = "0.1.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f1dccf46b25b205e4bebe1d5258a991df1cc17801017a845cb5b3fe0269781aa"
 
 [[package]]
 name = "zstd"
