@@ -1,5 +1,3 @@
-use std::collections::HashSet;
-
 use crate::{
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
@@ -9,8 +7,11 @@ use crate::{
     math::log_div::LogDiv,
 };
 use anyhow::{Context, Result};
-use ebi_arithmetic::{Fraction, One, Signed, Zero};
-use ebi_objects::{Activity, ActivityKeyTranslator};
+use ebi_objects::{
+    Activity, ActivityKeyTranslator,
+    ebi_arithmetic::{Fraction, One, Signed, Zero},
+};
+use std::collections::HashSet;
 
 pub trait EntropicRelvance {
     fn entropic_relevance(
@@ -125,11 +126,6 @@ fn h(x: &Fraction) -> Result<LogDiv> {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_arithmetic::ebi_number::One;
-    use ebi_objects::{EventLog, FiniteStochasticLanguage};
-
     use crate::{
         ebi_traits::{
             ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
@@ -137,6 +133,8 @@ mod tests {
         },
         techniques::entropic_relevance::EntropicRelvance,
     };
+    use ebi_objects::{EventLog, FiniteStochasticLanguage, ebi_arithmetic::ebi_number::One};
+    use std::fs;
 
     #[test]
     fn entropic_relevance() {

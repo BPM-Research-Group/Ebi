@@ -7,9 +7,9 @@ use crate::ebi_framework::{
     trait_importers::ToFiniteStochasticLanguageTrait,
 };
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, Zero};
 use ebi_objects::{
     Activity, Importable, TranslateActivityKey,
+    ebi_arithmetic::{Fraction, Zero},
     ebi_objects::finite_stochastic_language::FiniteStochasticLanguage,
 };
 use std::fmt::Debug;

@@ -3,8 +3,7 @@ use crate::{
     ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
 };
 use anyhow::{Result, anyhow};
-use ebi_derive::EbiInputEnum;
-use ebi_objects::{Activity, EventLog, EventLogTraceAttributes, EventLogXes};
+use ebi_objects::{Activity, EventLog, EventLogTraceAttributes, EventLogXes, ebi_derive::EbiInputEnum};
 
 pub trait Filter {
     /// keep all traces that have a given length

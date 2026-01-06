@@ -1,14 +1,14 @@
-use std::collections::HashMap;
-
-use ebi_arithmetic::{Fraction, One, Zero};
-use ebi_objects::{
-    ebi_objects::process_tree::Node, ActivityKeyTranslator, HasActivityKey, LabelledPetriNet, ProcessTree, StochasticLabelledPetriNet, StochasticProcessTree
-};
-
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     semantics::semantics::Semantics,
 };
+use ebi_objects::{
+    ActivityKeyTranslator, HasActivityKey, LabelledPetriNet, ProcessTree,
+    StochasticLabelledPetriNet, StochasticProcessTree,
+    ebi_arithmetic::{Fraction, One, Zero},
+    ebi_objects::process_tree::Node,
+};
+use std::collections::HashMap;
 
 pub trait OccurrencesStochasticMinerLPN {
     fn mine_occurrences_stochastic_lpn(
@@ -112,12 +112,11 @@ impl OccurrencesStochasticMinerTree for ProcessTree {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_arithmetic::exact::is_exact_globally;
-    use ebi_objects::{FiniteStochasticLanguage, LabelledPetriNet};
-
     use super::OccurrencesStochasticMinerLPN;
+    use ebi_objects::{
+        FiniteStochasticLanguage, LabelledPetriNet, ebi_arithmetic::exact::is_exact_globally,
+    };
+    use std::fs;
 
     #[test]
     fn lpn_occurrence() {

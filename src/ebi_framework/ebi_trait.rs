@@ -4,7 +4,7 @@ use super::{
     ebi_input::{EbiInput, EbiInputType},
 };
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::Fraction;
+use ebi_objects::ebi_arithmetic::Fraction;
 use std::{
     collections::{BTreeSet, HashSet},
     fmt::{Debug, Display},

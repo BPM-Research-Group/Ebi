@@ -1,8 +1,12 @@
-use crate::{ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, semantics::semantics::Semantics};
+use crate::{
+    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    semantics::semantics::Semantics,
+};
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, Zero};
 use ebi_objects::{
-    LabelledPetriNet, StochasticLabelledPetriNet, ebi_objects::language_of_alignments::Move,
+    LabelledPetriNet, StochasticLabelledPetriNet,
+    ebi_arithmetic::{Fraction, Zero},
+    ebi_objects::language_of_alignments::Move,
 };
 
 use super::align::Align;

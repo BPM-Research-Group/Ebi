@@ -1,11 +1,10 @@
+use crate::semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics};
 use anyhow::Context;
 use bitvec::bitvec;
-use ebi_arithmetic::Signed;
 use ebi_objects::{
-    Activity, StochasticLabelledPetriNet, ebi_objects::labelled_petri_net::TransitionIndex,
+    Activity, StochasticLabelledPetriNet, ebi_arithmetic::Signed,
+    ebi_objects::labelled_petri_net::TransitionIndex,
 };
-
-use crate::semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics};
 
 fn compute_enabled_transition(
     slpn: &StochasticLabelledPetriNet,

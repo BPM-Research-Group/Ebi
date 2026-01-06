@@ -15,8 +15,10 @@ use crate::{
 };
 use anyhow::{Context, anyhow};
 use clap::{Arg, ArgAction, value_parser};
-use ebi_arithmetic::{ConstFraction, Fraction};
-use ebi_objects::{EbiObject, EbiObjectType, HasActivityKey};
+use ebi_objects::{
+    EbiObject, EbiObjectType, HasActivityKey,
+    ebi_arithmetic::{ConstFraction, Fraction},
+};
 
 pub const EBI_PROBABILITY: EbiCommand = EbiCommand::Group {
     name_short: "prob",

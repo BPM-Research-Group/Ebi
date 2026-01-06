@@ -1,10 +1,11 @@
-use anyhow::anyhow;
-use ebi_arithmetic::{Fraction, Zero};
-use ebi_objects::StochasticLabelledPetriNet;
-
 use crate::{
     semantics::labelled_petri_net_semantics::LPNMarking,
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
+};
+use anyhow::anyhow;
+use ebi_objects::{
+    StochasticLabelledPetriNet,
+    ebi_arithmetic::{Fraction, Zero},
 };
 
 impl StochasticSemantics for StochasticLabelledPetriNet {

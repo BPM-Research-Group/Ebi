@@ -1,7 +1,6 @@
-use ebi_arithmetic::{Fraction, OneMinus, Sqrt};
-use std::fmt::Display;
-
 use super::log_div::LogDiv;
+use ebi_objects::ebi_arithmetic::{Fraction, OneMinus, Sqrt};
+use std::fmt::Display;
 
 #[derive(PartialEq, Eq, Debug, Clone)]
 pub struct RootLogDiv {

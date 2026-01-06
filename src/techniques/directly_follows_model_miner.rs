@@ -4,8 +4,10 @@ use crate::ebi_traits::{
     ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
 };
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, One};
-use ebi_objects::{Activity, DirectlyFollowsGraph};
+use ebi_objects::{
+    Activity, DirectlyFollowsGraph,
+    ebi_arithmetic::{Fraction, One},
+};
 use std::collections::HashSet;
 
 pub trait DirectlyFollowsModelMinerFiltering {
@@ -182,16 +184,16 @@ fn get_edges_to_filter(
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_arithmetic::{Fraction, One};
-    use ebi_objects::FiniteStochasticLanguage;
-
     use crate::{
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         semantics::semantics::Semantics,
         techniques::directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
     };
+    use ebi_objects::{
+        FiniteStochasticLanguage,
+        ebi_arithmetic::{Fraction, One},
+    };
+    use std::fs;
 
     #[test]
     fn dfm() {

@@ -13,8 +13,10 @@ use crate::{
     techniques::sample::{self, Resampler},
 };
 use anyhow::{Context, Result, anyhow};
-use ebi_arithmetic::{Fraction, OneMinus};
-use ebi_objects::Attribute;
+use ebi_objects::{
+    Attribute,
+    ebi_arithmetic::{Fraction, OneMinus},
+};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::sync::{
     Arc,
@@ -242,11 +244,6 @@ impl BootstrapTest for dyn EbiTraitFiniteStochasticLanguage {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_arithmetic::Fraction;
-    use ebi_objects::{EventLog, EventLogTraceAttributes, FiniteStochasticLanguage};
-
     use crate::{
         ebi_traits::{
             ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
@@ -254,6 +251,10 @@ mod tests {
         },
         techniques::bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
     };
+    use ebi_objects::{
+        EventLog, EventLogTraceAttributes, FiniteStochasticLanguage, ebi_arithmetic::Fraction,
+    };
+    use std::fs;
 
     #[test]
     fn cla_test() {

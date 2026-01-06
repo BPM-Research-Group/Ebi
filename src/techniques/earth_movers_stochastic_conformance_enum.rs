@@ -1,6 +1,6 @@
 use crate::math::distances::WeightedDistances;
 use anyhow::{Context, Result};
-use ebi_arithmetic::{
+use ebi_objects::ebi_arithmetic::{
     One,
     exact::{MaybeExact, is_exact_globally},
     fraction::{fraction_enum::FractionEnum, signed::Numerator},
@@ -346,12 +346,13 @@ impl dyn WeightedDistances {
 
 #[cfg(test)]
 mod tests {
-    use ebi_arithmetic::{Fraction, One, Zero};
-    use ebi_objects::FiniteStochasticLanguage;
-
     use crate::{
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
+    };
+    use ebi_objects::{
+        FiniteStochasticLanguage,
+        ebi_arithmetic::{Fraction, One, Zero},
     };
     use std::fs;
 

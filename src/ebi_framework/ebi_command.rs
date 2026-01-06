@@ -19,8 +19,10 @@ use crate::{
 };
 use anyhow::{Context, Result, anyhow};
 use clap::{Arg, ArgAction, ArgMatches, Command, value_parser};
-use ebi_arithmetic::{Fraction, exact::set_exact_globally, parsing::FractionNotParsedYet};
-use ebi_objects::EbiObjectType;
+use ebi_objects::{
+    EbiObjectType,
+    ebi_arithmetic::{Fraction, exact::set_exact_globally, parsing::FractionNotParsedYet},
+};
 use indicatif::{ProgressBar, ProgressStyle};
 use itertools::Itertools;
 use log::Level;
@@ -850,13 +852,6 @@ pub fn get_applicable_commands(object_type: &EbiObjectType) -> BTreeSet<Vec<&'st
 
 #[cfg(test)]
 mod tests {
-    use std::{
-        collections::HashSet,
-        fmt::Debug,
-        fs::{self, File},
-        path::PathBuf,
-    };
-
     use super::{EBI_COMMANDS, EbiCommand};
     use crate::{
         ebi_framework::{
@@ -866,10 +861,15 @@ mod tests {
         },
         multiple_reader::MultipleReader,
     };
-    use ebi_arithmetic::Fraction;
-    use ebi_objects::EbiObject;
+    use ebi_objects::{EbiObject, ebi_arithmetic::Fraction};
     use itertools::Itertools;
     use ntest::timeout;
+    use std::{
+        collections::HashSet,
+        fmt::Debug,
+        fs::{self, File},
+        path::PathBuf,
+    };
 
     #[test]
     fn build_cli() {

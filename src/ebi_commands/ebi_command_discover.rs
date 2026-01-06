@@ -1,6 +1,8 @@
 use anyhow::{Context, anyhow};
-use ebi_arithmetic::{ConstFraction, Fraction};
-use ebi_objects::{EbiObject, EbiObjectType, LabelledPetriNet, ProcessTree};
+use ebi_objects::{
+    EbiObject, EbiObjectType, LabelledPetriNet, ProcessTree,
+    ebi_arithmetic::{ConstFraction, Fraction},
+};
 
 use crate::{
     ebi_framework::{

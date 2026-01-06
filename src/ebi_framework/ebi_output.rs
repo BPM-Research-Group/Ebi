@@ -31,10 +31,10 @@ use crate::{
     },
 };
 use anyhow::{Context, Result, anyhow};
-use ebi_arithmetic::{Exporter, Fraction};
 use ebi_objects::{
     CompressedEventLogXes, EbiObject, EbiObjectType, EventLogPython, Exportable,
     PortableDocumentFormat, PortableNetworkGraphics,
+    ebi_arithmetic::{Exporter, Fraction},
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
@@ -569,11 +569,7 @@ pub fn export_to_bytes(object: EbiOutput, exporter: EbiExporter) -> Result<Vec<u
 
 #[cfg(test)]
 mod tests {
-    use std::{io::Cursor, path::PathBuf};
-
-    use ebi_arithmetic::{Fraction, One, Zero};
-    use strum::IntoEnumIterator;
-
+    use super::{EbiExporter, EbiOutputType, export_to_bytes, export_to_string};
     use crate::{
         ebi_framework::{
             ebi_command::EbiCommand, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInput,
@@ -585,8 +581,9 @@ mod tests {
             root_log_div::RootLogDiv,
         },
     };
-
-    use super::{EbiExporter, EbiOutputType, export_to_bytes, export_to_string};
+    use ebi_objects::ebi_arithmetic::{Fraction, One, Zero};
+    use std::{io::Cursor, path::PathBuf};
+    use strum::IntoEnumIterator;
 
     #[test]
     fn all_exporters() {

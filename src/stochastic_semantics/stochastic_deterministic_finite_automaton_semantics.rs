@@ -1,7 +1,8 @@
 use anyhow::Result;
-use ebi_arithmetic::{Fraction, One};
 use ebi_objects::{
-    StochasticDeterministicFiniteAutomaton, ebi_objects::labelled_petri_net::TransitionIndex,
+    StochasticDeterministicFiniteAutomaton,
+    ebi_arithmetic::{Fraction, One},
+    ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
 use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;

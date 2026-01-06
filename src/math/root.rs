@@ -1,6 +1,8 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, OneMinus, Signed, Sqrt, Zero};
-use ebi_objects::Infoable;
+use ebi_objects::{
+    Infoable,
+    ebi_arithmetic::{Fraction, OneMinus, Signed, Sqrt, Zero},
+};
 use fraction::Sign;
 use std::{
     fmt::{Debug, Display},

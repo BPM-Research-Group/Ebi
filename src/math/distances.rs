@@ -10,9 +10,8 @@ use crate::math::levenshtein;
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use anyhow::Result;
-use ebi_arithmetic::Fraction;
-use ebi_arithmetic::Zero;
-use ebi_objects::{IntoRefTraceIterator, NumberOfTraces};
+use ebi_objects::ebi_arithmetic::Fraction;
+use ebi_objects::ebi_arithmetic::Zero;
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),
@@ -21,7 +20,8 @@ use ebi_objects::{IntoRefTraceIterator, NumberOfTraces};
     all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use ebi_arithmetic::malachite::Natural;
+use ebi_objects::ebi_arithmetic::malachite::Natural;
+use ebi_objects::{IntoRefTraceIterator, NumberOfTraces};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::fmt;
 use std::fmt::Debug;

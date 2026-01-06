@@ -234,7 +234,11 @@ macro_rules! tree_semantics_helpers {
             }
         }
 
-        pub(crate) fn can_execute(tree: &$t, state: &<$t as Semantics>::SemState, node: usize) -> bool {
+        pub(crate) fn can_execute(
+            tree: &$t,
+            state: &<$t as Semantics>::SemState,
+            node: usize,
+        ) -> bool {
             if let Some(NodeState::Closed) = state.get(node) {
                 return false;
             }
@@ -288,7 +292,11 @@ macro_rules! tree_semantics_helpers {
         /**
          * Returns whether it is possible that this node now terminates, or that a leaf has to be executed first.
          */
-        pub(crate) fn can_terminate(tree: &$t, state: &<$t as Semantics>::SemState, node: usize) -> bool {
+        pub(crate) fn can_terminate(
+            tree: &$t,
+            state: &<$t as Semantics>::SemState,
+            node: usize,
+        ) -> bool {
             match tree.tree[node] {
                 Node::Tau => state[node] == NodeState::Closed,
                 Node::Activity(_) => state[node] == NodeState::Closed,
@@ -400,12 +408,15 @@ impl IndexMut<usize> for NodeStates {
 
 #[cfg(test)]
 mod tests {
+    use crate::{
+        semantics::semantics::Semantics,
+        stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    };
+    use ebi_objects::{
+        LabelledPetriNet, ProcessTree, StochasticProcessTree,
+        ebi_arithmetic::{Fraction, One},
+    };
     use std::fs;
-
-    use ebi_arithmetic::{Fraction, One};
-    use ebi_objects::{LabelledPetriNet, ProcessTree, StochasticProcessTree};
-
-    use crate::{semantics::semantics::Semantics, stochastic_semantics::stochastic_semantics::StochasticSemantics};
 
     #[test]
     fn tree_semantics() {

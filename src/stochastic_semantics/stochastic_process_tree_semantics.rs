@@ -1,9 +1,15 @@
-use ebi_arithmetic::{Fraction, Zero};
-use ebi_objects::{StochasticProcessTree, ebi_objects::labelled_petri_net::TransitionIndex};
-use anyhow::Result;
 use crate::{
-    semantics::{process_tree_semantics::NodeStates, stochastic_process_tree_semantics::{can_execute, can_terminate}},
+    semantics::{
+        process_tree_semantics::NodeStates,
+        stochastic_process_tree_semantics::{can_execute, can_terminate},
+    },
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
+};
+use anyhow::Result;
+use ebi_objects::{
+    StochasticProcessTree,
+    ebi_arithmetic::{Fraction, Zero},
+    ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
 impl StochasticSemantics for StochasticProcessTree {

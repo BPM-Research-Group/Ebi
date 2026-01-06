@@ -6,8 +6,10 @@ use crate::{
     follower_semantics::FollowerSemantics,
 };
 use anyhow::Result;
-use ebi_arithmetic::{Fraction, OneMinus};
-use ebi_objects::ActivityKeyTranslator;
+use ebi_objects::{
+    ActivityKeyTranslator,
+    ebi_arithmetic::{Fraction, OneMinus},
+};
 use rayon::iter::ParallelIterator;
 use std::{
     ops::Neg,
@@ -69,15 +71,15 @@ impl UnitEarthMoversStochasticConformance for dyn EbiTraitFiniteStochasticLangua
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_arithmetic::{Fraction, One};
-    use ebi_objects::FiniteStochasticLanguage;
-
     use crate::{
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         techniques::unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
     };
+    use ebi_objects::{
+        FiniteStochasticLanguage,
+        ebi_arithmetic::{Fraction, One},
+    };
+    use std::fs;
 
     #[test]
     fn uemsc_activity_key() {

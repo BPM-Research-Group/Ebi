@@ -1,5 +1,7 @@
-use ebi_arithmetic::{Fraction, One};
-use ebi_objects::DirectlyFollowsGraph;
+use ebi_objects::{
+    DirectlyFollowsGraph,
+    ebi_arithmetic::{Fraction, One},
+};
 
 use crate::ebi_traits::{
     ebi_trait_event_log::EbiTraitEventLog,

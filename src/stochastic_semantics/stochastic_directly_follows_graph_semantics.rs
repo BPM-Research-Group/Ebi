@@ -1,7 +1,8 @@
 use anyhow::Result;
-use ebi_arithmetic::{Fraction, Signed, Zero};
 use ebi_objects::{
-    StochasticDirectlyFollowsModel, ebi_objects::labelled_petri_net::TransitionIndex,
+    StochasticDirectlyFollowsModel,
+    ebi_arithmetic::{Fraction, Signed, Zero},
+    ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
 use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;

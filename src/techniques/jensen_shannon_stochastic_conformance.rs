@@ -7,8 +7,10 @@ use crate::{
     math::{log_div::LogDiv, root_log_div::RootLogDiv},
 };
 use anyhow::Result;
-use ebi_arithmetic::{Fraction, OneMinus, Signed, Zero};
-use ebi_objects::ActivityKeyTranslator;
+use ebi_objects::{
+    ActivityKeyTranslator,
+    ebi_arithmetic::{Fraction, OneMinus, Signed, Zero},
+};
 
 pub trait JensenShannonStochasticConformance {
     fn jssc_log2log(
@@ -90,16 +92,16 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_arithmetic::{Fraction, ebi_number::Zero, f};
-    use ebi_objects::{EventLog, FiniteStochasticLanguage, StochasticLabelledPetriNet};
-
     use crate::{
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         math::{log_div::LogDiv, root_log_div::RootLogDiv},
         techniques::jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
     };
+    use ebi_objects::{
+        EventLog, FiniteStochasticLanguage, StochasticLabelledPetriNet,
+        ebi_arithmetic::{Fraction, ebi_number::Zero, f},
+    };
+    use std::fs;
 
     #[test]
     fn jssc() {

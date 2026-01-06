@@ -1,7 +1,8 @@
-use ebi_arithmetic::ebi_number::Signed;
-use ebi_objects::{ebi_objects::labelled_petri_net::TransitionIndex, Activity, DirectlyFollowsGraph};
-
 use crate::semantics::semantics::Semantics;
+use ebi_objects::{
+    Activity, DirectlyFollowsGraph, ebi_arithmetic::ebi_number::Signed,
+    ebi_objects::labelled_petri_net::TransitionIndex,
+};
 
 /**
  * States:

@@ -1,6 +1,6 @@
-use ebi_arithmetic::ebi_number::Zero;
 use ebi_objects::{
     DeterministicFiniteAutomaton, ProcessTree,
+    ebi_arithmetic::ebi_number::Zero,
     ebi_objects::process_tree::{Node, Operator},
 };
 

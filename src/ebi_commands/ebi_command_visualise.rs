@@ -91,8 +91,10 @@ pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command {
 #[cfg(test)]
 mod tests {
 
-    use ebi_arithmetic::{Fraction, One};
-    use ebi_objects::FiniteLanguage;
+    use ebi_objects::{
+        FiniteLanguage,
+        ebi_arithmetic::{Fraction, One},
+    };
 
     use crate::{
         ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT,

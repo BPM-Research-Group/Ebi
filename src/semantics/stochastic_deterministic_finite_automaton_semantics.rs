@@ -1,12 +1,12 @@
-use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, One, Zero};
-use ebi_objects::{
-    ebi_objects::labelled_petri_net::TransitionIndex, Activity, DeterministicFiniteAutomaton, HasActivityKey, StochasticDeterministicFiniteAutomaton
-};
-
 use crate::{
     ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
     semantics::semantics::Semantics, techniques::non_decreasing_livelock::NonDecreasingLivelock,
+};
+use anyhow::{Result, anyhow};
+use ebi_objects::{
+    Activity, DeterministicFiniteAutomaton, HasActivityKey, StochasticDeterministicFiniteAutomaton,
+    ebi_arithmetic::{Fraction, One, Zero},
+    ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
 macro_rules! semantics_for_automaton {

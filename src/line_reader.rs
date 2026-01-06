@@ -1,5 +1,5 @@
 use anyhow::{Context, Result, anyhow};
-use ebi_arithmetic::Fraction;
+use ebi_objects::ebi_arithmetic::Fraction;
 use std::io::BufRead;
 
 pub struct LineReader<'a> {

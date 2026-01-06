@@ -1,15 +1,15 @@
+use anyhow::{Result, anyhow};
+use ebi_objects::ebi_arithmetic::{
+    ebi_number::Zero,
+    exact::is_exact_globally,
+    fraction::fraction_enum::FractionEnum,
+    malachite::{Natural, base::num::arithmetic::traits::Lcm, rational::Rational},
+};
 use std::{
     borrow::Borrow,
     ops::{AddAssign, Mul},
     sync::Arc,
 };
-
-use anyhow::{Result, anyhow};
-use ebi_arithmetic::{
-    ebi_number::Zero, exact::is_exact_globally, fraction::fraction_enum::FractionEnum,
-};
-use ebi_arithmetic::malachite::base::num::arithmetic::traits::Lcm;
-use ebi_arithmetic::malachite::{Natural, rational::Rational};
 
 #[derive(Clone)]
 pub enum FixedDenominatorFractionEnum {

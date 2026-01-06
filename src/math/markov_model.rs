@@ -1,5 +1,7 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, IdentityMinus, Inversion, Signed, Zero};
+use ebi_objects::ebi_arithmetic::{
+    EbiMatrix, Fraction, FractionMatrix, IdentityMinus, Inversion, Signed, Zero,
+};
 use std::fmt::{Debug, Display};
 
 pub struct MarkovModel<S> {

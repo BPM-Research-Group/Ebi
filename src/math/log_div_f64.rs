@@ -1,13 +1,17 @@
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{MaybeExact, One, Recip, Signed, Zero, fraction::fraction_f64::FractionF64};
-use ebi_objects::Infoable;
-use malachite::{Natural, base::num::arithmetic::traits::Pow, rational::Rational};
+use ebi_objects::{
+    Infoable,
+    ebi_arithmetic::{
+        MaybeExact, One, Recip, Signed, Zero,
+        fraction::fraction_f64::FractionF64,
+        malachite::{Natural, base::num::arithmetic::traits::Pow, rational::Rational},
+    },
+};
 use std::{
     fmt::Display,
     io::Write,
     ops::{Add, AddAssign, DivAssign, MulAssign, Sub, SubAssign},
 };
-
 
 #[derive(Clone, PartialEq, Eq)]
 pub struct LogDivF64(FractionF64);
@@ -28,9 +32,7 @@ impl LogDivF64 {
             return Err(anyhow!("cannot take log of negative value"));
         }
 
-        Ok(Self(FractionF64::from(
-            log_of.approx().unwrap().log2(),
-        )))
+        Ok(Self(FractionF64::from(log_of.approx().unwrap().log2())))
     }
 
     pub fn approximate(&self) -> FractionF64 {
@@ -209,9 +211,8 @@ impl std::fmt::Debug for LogDivF64 {
 
 #[cfg(test)]
 mod tests {
-    use ebi_arithmetic::ebi_number::Zero;
-
     use crate::math::log_div_f64::LogDivF64;
+    use ebi_objects::ebi_arithmetic::ebi_number::Zero;
 
     #[test]
     fn zero_log_div() {

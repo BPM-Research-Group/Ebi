@@ -1,10 +1,3 @@
-use std::sync::{Arc, Mutex};
-
-use anyhow::Result;
-use ebi_arithmetic::{Fraction, One, OneMinus, Sqrt, Zero};
-use ebi_objects::ActivityKeyTranslator;
-use rayon::iter::ParallelIterator;
-
 use crate::{
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
@@ -12,6 +5,13 @@ use crate::{
     },
     follower_semantics::FollowerSemantics,
 };
+use anyhow::Result;
+use ebi_objects::{
+    ActivityKeyTranslator,
+    ebi_arithmetic::{Fraction, One, OneMinus, Sqrt, Zero},
+};
+use rayon::iter::ParallelIterator;
+use std::sync::{Arc, Mutex};
 
 pub trait HellingerStochasticConformance {
     fn hellinger_stochastic_conformance(
@@ -68,15 +68,15 @@ impl HellingerStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_arithmetic::{Fraction, One};
-    use ebi_objects::FiniteStochasticLanguage;
-
     use crate::{
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         techniques::hellinger_stochastic_conformance::HellingerStochasticConformance,
     };
+    use ebi_objects::{
+        FiniteStochasticLanguage,
+        ebi_arithmetic::{Fraction, One},
+    };
+    use std::fs;
 
     #[test]
     fn uemsc_activity_key() {

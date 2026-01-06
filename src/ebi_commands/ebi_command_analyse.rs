@@ -1,6 +1,5 @@
 use anyhow::Context;
-use ebi_arithmetic::{ConstFraction, Fraction, Zero};
-use ebi_objects::{DirectlyFollowsGraph, EbiObject, EbiObjectType};
+use ebi_objects::{DirectlyFollowsGraph, EbiObject, EbiObjectType, ebi_arithmetic::{ConstFraction, Fraction, Zero}};
 use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, ebi_trait_object::EbiTraitObject}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, techniques::{completeness::Completeness, edge_difference::EdgeDifference, medoid, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}};
 
 pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {

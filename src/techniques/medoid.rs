@@ -1,10 +1,11 @@
-use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, One, Zero, f};
-use ebi_objects::FiniteLanguage;
-
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::distances::TriangularDistanceMatrix,
+};
+use anyhow::{Result, anyhow};
+use ebi_objects::{
+    FiniteLanguage,
+    ebi_arithmetic::{Fraction, One, Zero, f},
 };
 
 pub fn medoid<T>(log: &T, number_of_traces: &usize) -> Result<FiniteLanguage>

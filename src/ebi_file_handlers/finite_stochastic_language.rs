@@ -99,8 +99,10 @@ impl FromEbiTraitObject for FiniteStochasticLanguage {
 mod tests {
     use std::fs;
 
-    use ebi_arithmetic::{Fraction, Zero};
-    use ebi_objects::{FiniteStochasticLanguage, NumberOfTraces};
+    use ebi_objects::{
+        FiniteStochasticLanguage, NumberOfTraces,
+        ebi_arithmetic::{Fraction, Zero},
+    };
 
     use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
 

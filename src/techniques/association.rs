@@ -3,8 +3,10 @@ use crate::{
     math::{correlation::correlation, levenshtein, root::ContainsRoot},
 };
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, Signed, Zero};
-use ebi_objects::{Attribute, DataType};
+use ebi_objects::{
+    Attribute, DataType,
+    ebi_arithmetic::{Fraction, Signed, Zero},
+};
 use rand::Rng;
 use rayon::prelude::*;
 

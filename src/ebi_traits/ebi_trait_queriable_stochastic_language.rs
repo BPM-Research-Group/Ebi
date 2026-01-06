@@ -7,11 +7,11 @@ use crate::{
     follower_semantics::FollowerSemantics,
 };
 use anyhow::{Context, Error, Result, anyhow};
-use ebi_arithmetic::{Fraction, Zero};
 use ebi_objects::{
     ActivityKeyTranslator, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogPython,
     EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, Importable,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    ebi_arithmetic::{Fraction, Zero},
     ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_csv::EventLogCsv,
@@ -147,12 +147,12 @@ queriable_via_slang!(EventLogPython);
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_arithmetic::{Fraction, Zero};
-    use ebi_objects::{FiniteLanguage, StochasticLabelledPetriNet};
-
     use crate::ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage;
+    use ebi_objects::{
+        FiniteLanguage, StochasticLabelledPetriNet,
+        ebi_arithmetic::{Fraction, Zero},
+    };
+    use std::fs;
 
     #[test]
     fn emsc() {

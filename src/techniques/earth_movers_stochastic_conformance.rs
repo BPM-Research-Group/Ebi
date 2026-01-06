@@ -3,7 +3,7 @@ use crate::{
     math::{distances::WeightedDistances, distances_matrix::WeightedDistanceMatrix},
 };
 use anyhow::Result;
-use ebi_arithmetic::Fraction;
+use ebi_objects::ebi_arithmetic::Fraction;
 
 pub trait EarthMoversStochasticConformance {
     fn earth_movers_stochastic_conformance(

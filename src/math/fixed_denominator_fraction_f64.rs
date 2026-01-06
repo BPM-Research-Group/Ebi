@@ -1,11 +1,10 @@
+use anyhow::Result;
+use ebi_objects::ebi_arithmetic::{MaybeExact, Zero, fraction::fraction_f64::FractionF64};
 use std::{
     borrow::Borrow,
     ops::{AddAssign, Mul},
     sync::Arc,
 };
-
-use anyhow::Result;
-use ebi_arithmetic::{MaybeExact, Zero, fraction::fraction_f64::FractionF64};
 
 #[derive(Clone)]
 pub struct FixedDenominatorFractionF64(f64);

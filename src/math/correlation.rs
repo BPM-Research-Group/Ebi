@@ -1,7 +1,6 @@
-use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, Zero};
-
 use crate::math::root::Root;
+use anyhow::{Result, anyhow};
+use ebi_objects::ebi_arithmetic::{Fraction, Zero};
 
 pub fn correlation(pairs: &[(Fraction, Fraction)]) -> Result<Root> {
     let mut sum_xy = Fraction::zero();

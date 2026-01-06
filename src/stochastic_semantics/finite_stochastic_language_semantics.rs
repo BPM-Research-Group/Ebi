@@ -2,9 +2,11 @@ use crate::{
     semantics::finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
-use anyhow::{anyhow, Result};
-use ebi_arithmetic::{Fraction, Zero};
-use ebi_objects::ebi_objects::labelled_petri_net::TransitionIndex;
+use anyhow::{Result, anyhow};
+use ebi_objects::{
+    ebi_arithmetic::{Fraction, Zero},
+    ebi_objects::labelled_petri_net::TransitionIndex,
+};
 
 impl StochasticSemantics for FiniteStochasticLanguageSemantics {
     type StoSemState = usize;

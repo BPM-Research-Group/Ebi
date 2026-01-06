@@ -1,5 +1,8 @@
-use ebi_arithmetic::{Fraction, Zero};
-use ebi_objects::{StochasticLanguageOfAlignments, ebi_objects::language_of_alignments::Move};
+use ebi_objects::{
+    StochasticLanguageOfAlignments,
+    ebi_arithmetic::{Fraction, Zero},
+    ebi_objects::language_of_alignments::Move,
+};
 
 pub trait Fitness {
     fn trace_fitness(self) -> Fraction;
@@ -31,12 +34,9 @@ impl Fitness for StochasticLanguageOfAlignments {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_arithmetic::Fraction;
-    use ebi_objects::StochasticLanguageOfAlignments;
-
     use crate::techniques::fitness::Fitness;
+    use ebi_objects::{StochasticLanguageOfAlignments, ebi_arithmetic::Fraction};
+    use std::fs;
 
     #[test]
     fn trace_fitness_test() {

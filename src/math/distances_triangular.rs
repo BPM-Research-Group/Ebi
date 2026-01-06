@@ -9,7 +9,6 @@ use std::sync::Arc;
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use anyhow::Result;
-use ebi_arithmetic::{Fraction, Zero};
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),
@@ -18,7 +17,8 @@ use ebi_arithmetic::{Fraction, Zero};
     all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use ebi_arithmetic::malachite::Natural;
+use ebi_objects::ebi_arithmetic::malachite::Natural;
+use ebi_objects::ebi_arithmetic::{Fraction, Zero};
 use rayon::iter::{IndexedParallelIterator, ParallelIterator};
 
 #[cfg(any(
@@ -29,7 +29,7 @@ use rayon::iter::{IndexedParallelIterator, ParallelIterator};
     all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use ebi_arithmetic::exact::MaybeExact;
+use ebi_objects::ebi_arithmetic::exact::MaybeExact;
 
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
@@ -159,8 +159,8 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
         all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
     fn lowest_common_multiple_denominators_distances(&self) -> Result<Natural> {
-        use ebi_arithmetic::malachite::base::num::arithmetic::traits::Lcm;
-        use ebi_arithmetic::malachite::base::num::basic::traits::One;
+        use ebi_objects::ebi_arithmetic::malachite::base::num::arithmetic::traits::Lcm;
+        use ebi_objects::ebi_arithmetic::malachite::base::num::basic::traits::One;
         // 2a. Calculate the Least Common Multiple (LCM) of all denominators of distances (i.e. the elements in the DistanceMatrix).
         use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
         let denominators: Vec<Natural> = self
@@ -189,8 +189,8 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
         all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
     fn lowest_common_multiple_denominators_weights(&self) -> Result<Natural> {
-        use ebi_arithmetic::malachite::base::num::arithmetic::traits::Lcm;
-        use ebi_arithmetic::malachite::base::num::basic::traits::One;
+        use ebi_objects::ebi_arithmetic::malachite::base::num::arithmetic::traits::Lcm;
+        use ebi_objects::ebi_arithmetic::malachite::base::num::basic::traits::One;
         use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
         let self_denominators: Vec<Natural> = self

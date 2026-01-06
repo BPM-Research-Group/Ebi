@@ -1,15 +1,4 @@
-use anyhow::Result;
-use ebi_arithmetic::{Fraction, One, Signed, Zero};
-use ebi_objects::{
-    Activity, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
-};
-use std::{
-    collections::{HashMap, hash_map::Entry},
-    fmt::{self, Debug},
-    hash::{DefaultHasher, Hash, Hasher},
-};
-use strum_macros::Display;
-
+use super::non_decreasing_livelock::NonDecreasingLivelock;
 use crate::{
     ebi_framework::displayable::Displayable,
     ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
@@ -20,8 +9,17 @@ use crate::{
     },
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
-
-use super::non_decreasing_livelock::NonDecreasingLivelock;
+use anyhow::Result;
+use ebi_objects::{
+    Activity, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
+    ebi_arithmetic::{Fraction, One, Signed, Zero},
+};
+use std::{
+    collections::{HashMap, hash_map::Entry},
+    fmt::{self, Debug},
+    hash::{DefaultHasher, Hash, Hasher},
+};
+use strum_macros::Display;
 
 trait Helper<S: Displayable> {
     fn compute_next(&self, q_state: &mut PMarking<S>) -> Result<()>;
@@ -423,10 +421,11 @@ impl<S: Displayable> Displayable for MarkovMarking<S> {}
 
 #[cfg(test)]
 mod tests {
-    use ebi_arithmetic::{Fraction, Zero};
-    use ebi_objects::{HasActivityKey, StochasticLabelledPetriNet};
-
     use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics;
+    use ebi_objects::{
+        HasActivityKey, StochasticLabelledPetriNet,
+        ebi_arithmetic::{Fraction, Zero},
+    };
     use std::fs;
 
     #[test]

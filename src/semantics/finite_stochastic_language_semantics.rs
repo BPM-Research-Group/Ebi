@@ -1,9 +1,9 @@
 use crate::semantics::semantics::Semantics;
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, Zero};
 use ebi_objects::{
     Activity, ActivityKey, ActivityKeyTranslator, FiniteStochasticLanguage, HasActivityKey,
     IntoRefTraceProbabilityIterator, NumberOfTraces, TranslateActivityKey,
+    ebi_arithmetic::{Fraction, Zero},
     ebi_objects::labelled_petri_net::TransitionIndex,
 };
 use std::collections::HashMap;

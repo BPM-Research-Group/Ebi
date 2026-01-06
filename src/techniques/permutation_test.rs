@@ -1,8 +1,3 @@
-use std::sync::{
-    Arc,
-    atomic::{AtomicUsize, Ordering},
-};
-
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
@@ -13,8 +8,12 @@ use crate::{
     techniques::sample::Resampler,
 };
 use anyhow::{Context, Result, anyhow};
-use ebi_arithmetic::{Fraction, OneMinus};
+use ebi_objects::ebi_arithmetic::{Fraction, OneMinus};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use std::sync::{
+    Arc,
+    atomic::{AtomicUsize, Ordering},
+};
 
 pub trait PermutationTest {
     fn permutation_test(

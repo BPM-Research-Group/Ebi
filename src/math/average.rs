@@ -1,10 +1,8 @@
-use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, Zero};
-use std::{fmt::Debug, sync::Arc};
-
-use crate::math::distances::TriangularDistanceMatrix;
-
 use super::fixed_denominator_fraction::FixedDenominatorFraction;
+use crate::math::distances::TriangularDistanceMatrix;
+use anyhow::{Result, anyhow};
+use ebi_objects::ebi_arithmetic::{Fraction, Zero};
+use std::{fmt::Debug, sync::Arc};
 
 /**
  * Class to compute the weighted average distance over distances, where these weights are integers and all distances are not negative.

@@ -1,21 +1,23 @@
 use anyhow::{Error, Result, anyhow};
-use ebi_arithmetic::{
-    Fraction, Recip, Signed,
-    ebi_number::{One, Zero},
-    exact::MaybeExact,
-    fraction::{fraction::APPROX_DIGITS, fraction_exact::FractionExact},
-};
-use ebi_objects::Infoable;
-use fraction::Sign;
-use malachite::{
-    Natural,
-    base::num::{
-        arithmetic::traits::{Parity, Pow, Sign as MSign},
-        basic::traits::Two,
-        logic::traits::SignificantBits,
+use ebi_objects::{
+    Infoable,
+    ebi_arithmetic::{
+        Fraction, Recip, Signed,
+        ebi_number::{One, Zero},
+        exact::MaybeExact,
+        fraction::{fraction::APPROX_DIGITS, fraction_exact::FractionExact},
+        malachite::{
+            Natural,
+            base::num::{
+                arithmetic::traits::{Parity, Pow, Sign as MSign},
+                basic::traits::Two,
+                logic::traits::SignificantBits,
+            },
+            rational::Rational,
+        },
     },
-    rational::Rational,
 };
+use fraction::Sign;
 use std::{
     cmp::Ordering,
     fmt::Display,
@@ -540,8 +542,7 @@ impl Display for FractionRaw {
 
 #[cfg(test)]
 mod tests {
-    use ebi_arithmetic::ebi_number::Zero;
-
+    use ebi_objects::ebi_arithmetic::ebi_number::Zero;
     use crate::math::log_div_exact::LogDivExact;
 
     #[test]

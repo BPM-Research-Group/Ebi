@@ -1,7 +1,6 @@
 use crate::math::distances::WeightedDistances;
 use anyhow::{Context, Result};
-use ebi_arithmetic::OneMinus;
-use ebi_arithmetic::{Zero, fraction::fraction_f64::FractionF64};
+use ebi_objects::ebi_arithmetic::{OneMinus, Zero, fraction::fraction_f64::FractionF64};
 use ebi_optimisation::network_simplex::NetworkSimplex;
 use rayon::iter::ParallelIterator;
 use rayon::prelude::*;

@@ -1,15 +1,3 @@
-use anyhow::{Result, anyhow};
-use core::hash::Hash;
-use ebi_arithmetic::{Fraction, One, OneMinus, Signed, Zero};
-use ebi_objects::{Activity, FiniteStochasticLanguage};
-use priority_queue::PriorityQueue;
-use std::{
-    cmp::Ordering,
-    collections::HashMap,
-    fmt::{Debug, Display},
-    ops::{AddAssign, SubAssign},
-};
-
 use crate::{
     ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
     ebi_traits::{
@@ -18,6 +6,19 @@ use crate::{
             EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics,
         },
     },
+};
+use anyhow::{Result, anyhow};
+use core::hash::Hash;
+use ebi_objects::{
+    Activity, FiniteStochasticLanguage,
+    ebi_arithmetic::{Fraction, One, OneMinus, Signed, Zero},
+};
+use priority_queue::PriorityQueue;
+use std::{
+    cmp::Ordering,
+    collections::HashMap,
+    fmt::{Debug, Display},
+    ops::{AddAssign, SubAssign},
 };
 
 pub trait ProbabilityQueries {
@@ -555,25 +556,26 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_arithmetic::{Fraction, One, Zero};
-    use ebi_objects::{
-        FiniteStochasticLanguage, HasActivityKey, NumberOfTraces,
-        StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
-    };
-
     use crate::{
-        ebi_framework::trait_importers::ToStochasticDeterministicSemanticsTrait, ebi_traits::{
+        ebi_framework::trait_importers::ToStochasticDeterministicSemanticsTrait,
+        ebi_traits::{
             ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
             ebi_trait_stochastic_deterministic_semantics::{
                 EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics,
             },
-        }, semantics::labelled_petri_net_semantics::LPNMarking, techniques::{
+        },
+        semantics::labelled_petri_net_semantics::LPNMarking,
+        techniques::{
             deterministic_semantics_for_stochastic_semantics::PMarking,
             probability_queries::ProbabilityQueries,
-        }
+        },
     };
+    use ebi_objects::{
+        FiniteStochasticLanguage, HasActivityKey, NumberOfTraces,
+        StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
+        ebi_arithmetic::{Fraction, One, Zero},
+    };
+    use std::fs;
 
     #[test]
     fn slpn_cover_prefix() {

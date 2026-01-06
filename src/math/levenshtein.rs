@@ -1,5 +1,4 @@
-use ebi_arithmetic::Fraction;
-use ebi_objects::Activity;
+use ebi_objects::{Activity, ebi_arithmetic::Fraction};
 
 pub fn normalised(trace1: &Vec<Activity>, trace2: &Vec<Activity>) -> Fraction {
     let dist = strsim::generic_levenshtein(trace1, trace2);

@@ -3,8 +3,10 @@ use crate::{
     math::distances::TriangularDistanceMatrix,
 };
 use anyhow::{Result, anyhow};
-use ebi_arithmetic::{Fraction, One, Signed, Zero, f};
-use ebi_objects::FiniteLanguage;
+use ebi_objects::{
+    FiniteLanguage,
+    ebi_arithmetic::{Fraction, One, Signed, Zero, f},
+};
 use std::sync::Arc;
 
 pub trait MedoidNonStochastic {
@@ -33,7 +35,12 @@ where
                     "1 trace was requested, but the stochastic language contains none."
                 ));
             }
-            result.insert(self.iter_traces().nth(trace_number.unwrap()).unwrap().to_owned());
+            result.insert(
+                self.iter_traces()
+                    .nth(trace_number.unwrap())
+                    .unwrap()
+                    .to_owned(),
+            );
             return Ok((activity_key, result).into());
         }
 

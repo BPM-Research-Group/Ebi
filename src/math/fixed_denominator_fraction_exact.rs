@@ -1,12 +1,14 @@
+use anyhow::{Result, anyhow};
+use ebi_objects::ebi_arithmetic::{
+    MaybeExact, One, Zero,
+    fraction::fraction_exact::FractionExact,
+    malachite::{Natural, base::num::arithmetic::traits::Lcm, rational::Rational},
+};
 use std::{
     borrow::Borrow,
     ops::{AddAssign, Mul},
     sync::Arc,
 };
-
-use anyhow::{Result, anyhow};
-use ebi_arithmetic::{MaybeExact, One, Zero, fraction::fraction_exact::FractionExact};
-use malachite::{Natural, base::num::arithmetic::traits::Lcm, rational::Rational};
 
 #[derive(Clone)]
 pub struct FixedDenominatorFractionExact(Natural, Arc<Natural>);

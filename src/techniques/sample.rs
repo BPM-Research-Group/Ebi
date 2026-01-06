@@ -1,10 +1,3 @@
-use std::collections::{HashMap, hash_map::Entry};
-
-use anyhow::{Result, anyhow};
-use ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One, Zero};
-use ebi_objects::FiniteStochasticLanguage;
-use rand::Rng;
-
 use crate::{
     ebi_framework::displayable::Displayable,
     ebi_traits::{
@@ -13,6 +6,13 @@ use crate::{
     },
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
+use anyhow::{Result, anyhow};
+use ebi_objects::{
+    FiniteStochasticLanguage,
+    ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One, Zero},
+};
+use rand::Rng;
+use std::collections::{HashMap, hash_map::Entry};
 
 pub trait Sampler {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage>;
@@ -165,10 +165,13 @@ mod tests {
 
     use ebi_objects::FiniteStochasticLanguage;
 
-    use crate::{ebi_framework::trait_importers::ToStochasticSemanticsTrait, ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
-    }};
+    use crate::{
+        ebi_framework::trait_importers::ToStochasticSemanticsTrait,
+        ebi_traits::{
+            ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+            ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
+        },
+    };
 
     use super::Sampler;
 

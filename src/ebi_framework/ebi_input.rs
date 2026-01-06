@@ -28,9 +28,9 @@ use crate::{
 };
 use anyhow::{Context, Result, anyhow};
 use clap::{ArgMatches, builder::ValueParser, value_parser};
-use ebi_arithmetic::{ConstFraction, Fraction, parsing::FractionNotParsedYet};
 use ebi_objects::{
     EbiObject, EbiObjectType,
+    ebi_arithmetic::{ConstFraction, Fraction, parsing::FractionNotParsedYet},
     traits::importable::{ImporterParameter, ImporterParameterValues},
 };
 use std::{
@@ -869,14 +869,6 @@ pub const TEST_INPUT_TYPE_STRING: EbiInputType = EbiInputType::String(None, None
 
 #[cfg(test)]
 mod tests {
-    use std::{
-        fs::{self, File},
-        path::PathBuf,
-    };
-
-    use ebi_arithmetic::{Fraction, Zero};
-    use strum::IntoEnumIterator;
-
     use super::{EbiInputType, validate_object_of};
     use crate::ebi_framework::ebi_input;
     use crate::{
@@ -887,6 +879,12 @@ mod tests {
         },
         multiple_reader::MultipleReader,
     };
+    use ebi_objects::ebi_arithmetic::{Fraction, Zero};
+    use std::{
+        fs::{self, File},
+        path::PathBuf,
+    };
+    use strum::IntoEnumIterator;
 
     #[test]
     fn input_primitives() {

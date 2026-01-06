@@ -1,21 +1,23 @@
 use anyhow::{Error, Result, anyhow};
-use ebi_arithmetic::{
-    Recip, Signed,
-    ebi_number::{One, Zero},
-    exact::{MaybeExact, is_exact_globally},
-    fraction::{fraction::APPROX_DIGITS, fraction_enum::FractionEnum},
-};
-use ebi_objects::Infoable;
-use fraction::Sign;
-use ebi_arithmetic::malachite::{
-    Natural,
-    base::num::{
-        arithmetic::traits::{Parity, Pow},
-        basic::traits::Two,
-        logic::traits::{BitAccess, SignificantBits},
+use ebi_objects::{
+    Infoable,
+    ebi_arithmetic::{
+        Recip, Signed,
+        ebi_number::{One, Zero},
+        exact::{MaybeExact, is_exact_globally},
+        fraction::{fraction::APPROX_DIGITS, fraction_enum::FractionEnum},
+        malachite::{
+            Natural,
+            base::num::{
+                arithmetic::traits::{Parity, Pow},
+                basic::traits::Two,
+                logic::traits::{BitAccess, SignificantBits},
+            },
+            rational::Rational,
+        },
     },
-    rational::Rational,
 };
+use fraction::Sign;
 use std::{
     fmt::Display,
     io::Write,
@@ -703,9 +705,8 @@ impl Display for FractionRaw {
 
 #[cfg(test)]
 mod tests {
-    use ebi_arithmetic::ebi_number::Zero;
-
     use crate::math::log_div_enum::LogDivEnum;
+    use ebi_objects::ebi_arithmetic::ebi_number::Zero;
 
     #[test]
     fn zero_log_div() {

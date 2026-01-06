@@ -16,12 +16,15 @@ tree_semantics_helpers!(StochasticProcessTree);
 
 #[cfg(test)]
 mod tests {
+    use crate::{
+        semantics::semantics::Semantics,
+        stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    };
+    use ebi_objects::{
+        LabelledPetriNet, ProcessTree, StochasticProcessTree,
+        ebi_arithmetic::{Fraction, One},
+    };
     use std::fs;
-
-    use ebi_arithmetic::{Fraction, One};
-    use ebi_objects::{LabelledPetriNet, ProcessTree, StochasticProcessTree};
-
-    use crate::{semantics::semantics::Semantics, stochastic_semantics::stochastic_semantics::StochasticSemantics};
 
     #[test]
     fn tree_semantics() {

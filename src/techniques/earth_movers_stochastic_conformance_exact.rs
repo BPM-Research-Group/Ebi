@@ -1,10 +1,11 @@
 use crate::math::distances::WeightedDistances;
 use anyhow::{Context, Result};
-use ebi_arithmetic::fraction::signed::Numerator;
-use ebi_arithmetic::{MaybeExact, fraction::fraction_exact::FractionExact};
-use ebi_arithmetic::{One, Zero};
+use ebi_objects::ebi_arithmetic::{
+    MaybeExact, One, Zero,
+    fraction::{fraction_exact::FractionExact, signed::Numerator},
+    malachite::{Integer, base::num::basic::traits::One as MOne},
+};
 use ebi_optimisation::network_simplex::NetworkSimplex;
-use malachite::{Integer, base::num::basic::traits::One as MOne};
 use rayon::iter::ParallelIterator;
 use rayon::prelude::*;
 
@@ -272,12 +273,13 @@ impl dyn WeightedDistances {
 
 #[cfg(test)]
 mod tests {
-    use ebi_arithmetic::{Fraction, One, Zero};
-    use ebi_objects::FiniteStochasticLanguage;
-
     use crate::{
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
+    };
+    use ebi_objects::{
+        FiniteStochasticLanguage,
+        ebi_arithmetic::{Fraction, One, Zero},
     };
     use std::fs;
 

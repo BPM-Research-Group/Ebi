@@ -1,16 +1,3 @@
-use anyhow::{Context, Result, anyhow};
-use ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, GaussJordan, One, Zero};
-use ebi_objects::{
-    StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet, StochasticProcessTree,
-};
-use std::{
-    collections::{HashMap, HashSet},
-    fmt::{self, Display},
-    hash::Hash,
-    ops::Add,
-    rc::Rc,
-};
-
 use crate::{
     ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     follower_semantics::FollowerSemantics,
@@ -19,6 +6,18 @@ use crate::{
         semantics::Semantics,
     },
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
+};
+use anyhow::{Context, Result, anyhow};
+use ebi_objects::{
+    StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet, StochasticProcessTree,
+    ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, GaussJordan, One, Zero},
+};
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::{self, Display},
+    hash::Hash,
+    ops::Add,
+    rc::Rc,
 };
 
 //generic implementation
@@ -460,17 +459,16 @@ struct Y {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_arithmetic::{Fraction, Zero};
-    use ebi_objects::{
-        FiniteLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet, StochasticProcessTree
-    };
-
     use crate::{
         ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
         follower_semantics::FollowerSemantics,
     };
+    use ebi_objects::{
+        FiniteLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton,
+        StochasticLabelledPetriNet, StochasticProcessTree,
+        ebi_arithmetic::{Fraction, Zero},
+    };
+    use std::fs;
 
     #[test]
     fn probability_sdfa_livelock_zeroweight() {

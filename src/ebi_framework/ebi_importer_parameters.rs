@@ -4,9 +4,9 @@ use crate::{
 };
 use anyhow::{Result, anyhow};
 use clap::{Arg, ArgAction, ArgMatches, Command, builder::ValueParser, value_parser};
-use ebi_arithmetic::{Fraction, parsing::FractionNotParsedYet};
-use ebi_objects::traits::importable::{
-    ImporterParameter, ImporterParameterValue, ImporterParameterValues,
+use ebi_objects::{
+    ebi_arithmetic::{Fraction, parsing::FractionNotParsedYet},
+    traits::importable::{ImporterParameter, ImporterParameterValue, ImporterParameterValues},
 };
 use std::collections::BTreeSet;
 
