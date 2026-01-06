@@ -8,8 +8,8 @@ use anyhow::{Result, anyhow};
 use ebi_arithmetic::{
     ebi_number::Zero, exact::is_exact_globally, fraction::fraction_enum::FractionEnum,
 };
-use malachite::base::num::arithmetic::traits::Lcm;
-use malachite::{Natural, rational::Rational};
+use ebi_arithmetic::malachite::base::num::arithmetic::traits::Lcm;
+use ebi_arithmetic::malachite::{Natural, rational::Rational};
 
 #[derive(Clone)]
 pub enum FixedDenominatorFractionEnum {

@@ -21,7 +21,7 @@ use ebi_objects::{IntoRefTraceIterator, NumberOfTraces};
     all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use malachite::Natural;
+use ebi_arithmetic::malachite::Natural;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::fmt;
 use std::fmt::Debug;

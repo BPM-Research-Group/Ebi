@@ -7,7 +7,7 @@ use ebi_arithmetic::{
 };
 use ebi_objects::Infoable;
 use fraction::Sign;
-use malachite::{
+use ebi_arithmetic::malachite::{
     Natural,
     base::num::{
         arithmetic::traits::{Parity, Pow},

@@ -16,7 +16,7 @@ use ebi_arithmetic::Fraction;
     all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use malachite::Natural;
+use ebi_objects::ebi_arithmetic::malachite::Natural;
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),
@@ -157,7 +157,7 @@ impl WeightedDistances for WeightedDistanceMatrix {
     fn lowest_common_multiple_denominators_distances(&self) -> Result<Natural> {
         // 2a. Calculate the Least Common Multiple (LCM) of all denominators of distances (i.e. the elements in the DistanceMatrix).
 
-        use malachite::{
+        use ebi_arithmetic::malachite::{
             Natural,
             base::num::{arithmetic::traits::Lcm, basic::traits::One},
         };
@@ -191,9 +191,9 @@ impl WeightedDistances for WeightedDistanceMatrix {
         all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
     fn lowest_common_multiple_denominators_weights(&self) -> Result<Natural> {
-        use malachite::Natural;
-        use malachite::base::num::arithmetic::traits::Lcm;
-        use malachite::base::num::basic::traits::One;
+        use ebi_arithmetic::malachite::Natural;
+        use ebi_arithmetic::malachite::base::num::arithmetic::traits::Lcm;
+        use ebi_arithmetic::malachite::base::num::basic::traits::One;
 
         let self_denominators: Vec<Natural> = self
             .weights_a

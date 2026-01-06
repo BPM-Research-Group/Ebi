@@ -4,13 +4,13 @@ use ebi_arithmetic::{
     One,
     exact::{MaybeExact, is_exact_globally},
     fraction::{fraction_enum::FractionEnum, signed::Numerator},
+    malachite::{
+        Integer,
+        base::num::basic::traits::{One as MOne, Zero as MZero},
+        rational::Rational,
+    },
 };
 use ebi_optimisation::network_simplex::NetworkSimplex;
-use malachite::{
-    Integer,
-    base::num::basic::traits::{One as MOne, Zero as MZero},
-    rational::Rational,
-};
 use rayon::prelude::*;
 
 /// Authored by Leonhard Mühlmeyer (2024)
@@ -310,9 +310,8 @@ impl dyn WeightedDistances {
             // 3a(iii). Create an edge between each pair of traces with the respective distance as cost.
             let mut graph_and_costs = vec![vec![None; n + m]; n + m];
             // Populate the top-right n x m part of graph_and_costs with scaled_distances
-            self.iter().for_each(|(i, j, f)| {
-                graph_and_costs[i][j + n] = Some(*f.approx_ref().unwrap())
-            });
+            self.iter()
+                .for_each(|(i, j, f)| graph_and_costs[i][j + n] = Some(*f.approx_ref().unwrap()));
 
             // 3b. Run the NetworkSimplex algorithm to find the optimal flow between the supply and demand nodes.
             let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, false, true);
