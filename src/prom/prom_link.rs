@@ -8,7 +8,7 @@ use crate::{
     multiple_reader::MultipleReader,
 };
 use anyhow::{Context, Result, anyhow};
-use ebi_arithmetic::{Fraction, parsing::FractionNotParsedYet};
+use ebi_objects::ebi_arithmetic::{Fraction, parsing::FractionNotParsedYet};
 use jni::{
     JNIEnv,
     objects::{JClass, JObjectArray, JString},
