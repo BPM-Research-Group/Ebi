@@ -15,14 +15,17 @@ pub fn generate_pm4py_module() -> Result<EbiOutput> {
         "#![allow(unsafe_op_in_unsafe_fn)]
 #![allow(unused_variables)]
 
+// This file has been automatically generated. Manual changes will be overridden.
+
 use pyo3::prelude::*;
 use pyo3::types::PyAny;
 use super::{{python_link::import_or_load, python_export::ExportableToPM4Py}};
 use crate::ebi_framework::ebi_command::EbiCommand;"
     );
     let mut functions = String::new();
-    let mut module =
-        format!("#[pymodule]\npub fn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {{");
+    let mut module = format!(
+        "#[pymodule]\npub fn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {{"
+    );
 
     for path in EBI_COMMANDS.get_command_paths() {
         if let Some(EbiCommand::Command { cli_command, .. }) = path.last()
@@ -85,9 +88,9 @@ fn {fname}(py: Python<'_>, {args}) -> PyResult<Py<PyAny>> {{
             .collect::<Vec<_>>()
             .join(", "),
         exact = if exact_arithmetic {
-            "ebi_arithmetic::exact::set_exact_globally(true);"
+            "ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);"
         } else {
-            "ebi_arithmetic::exact::set_exact_globally(false);"
+            "ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);"
         },
         library_name = library_name
     );

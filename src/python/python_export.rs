@@ -2,9 +2,12 @@ use crate::ebi_framework::{
     ebi_command::EbiCommand,
     ebi_output::{self, EbiOutput},
 };
-use ebi_arithmetic::{Fraction, MaybeExact, fraction::approximate::Approximate};
-use ebi_objects::{EbiObject, EventLogPython, NumberOfTraces};
-use malachite::Natural;
+use ebi_objects::{
+    EbiObject, EventLogPython, NumberOfTraces,
+    ebi_arithmetic::{
+        Fraction, MaybeExact, fraction::approximate::Approximate, malachite::Natural,
+    },
+};
 use process_mining::event_log::AttributeValue;
 use pyo3::{
     IntoPyObjectExt, Py, PyAny, PyResult, Python,

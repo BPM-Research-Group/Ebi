@@ -9,7 +9,9 @@ use crate::{
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
         object_importers::{
-            ToDeterministicFiniteAutomatonObject, ToEventLogObject, ToEventLogXesObject, ToFiniteLanguageObject, ToFiniteStochasticLanguageObject, ToLabelledPetriNetObject, ToProcessTreeObject, ToStochasticDeterministicFiniteAutomatonObject
+            ToDeterministicFiniteAutomatonObject, ToEventLogObject, ToEventLogXesObject,
+            ToFiniteLanguageObject, ToFiniteStochasticLanguageObject, ToLabelledPetriNetObject,
+            ToProcessTreeObject, ToStochasticDeterministicFiniteAutomatonObject,
         },
         trait_importers::{
             ToActivitiesTrait, ToEventLogTrait, ToFiniteLanguageTrait,
@@ -22,9 +24,9 @@ use crate::{
     text::Joiner,
 };
 use anyhow::Result;
-use ebi_arithmetic::{Fraction, is_exact_globally};
 use ebi_objects::{
     ActivityKey, EbiObject, EbiObjectType, EventLogPython, LabelledPetriNet, ProcessTree,
+    ebi_arithmetic::{Fraction, is_exact_globally},
     marking::Marking,
 };
 use process_mining::event_log::{

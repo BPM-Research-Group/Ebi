@@ -93,7 +93,7 @@ pub fn import_or_load(
 #[cfg(test)]
 mod tests {
     use crate::python::{python_export::natural_to_num_biguints, python_module_autogen::ebi};
-    use malachite::{
+    use ebi_objects::ebi_arithmetic::malachite::{
         Natural,
         base::num::basic::traits::{One, Zero},
     };
