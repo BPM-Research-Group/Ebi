@@ -28,6 +28,7 @@ jobs:
       run: cargo test --verbose --features exactarithmetic
     - name: Run tests approximate mode
       run: cargo test --verbose --features approximatearithmetic
+    - name: clean
       run: cargo clean
     - name: commit to Gitlab
       env:
