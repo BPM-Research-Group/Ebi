@@ -28,11 +28,12 @@ jobs:
       run: cargo test --verbose --features exactarithmetic
     - name: Run tests approximate mode
       run: cargo test --verbose --features approximatearithmetic
+      run: cargo clean
     - name: commit to Gitlab
       env:
         GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
       run: |
-        git clone https://ci_token:$GITLAB_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary
+        git clone https://ci_token:$GITLAB_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary --depth 1
         cd rustlibrary
         git config user.name "Github auto committer"
         git config user.email "cipipeline@example.com"
