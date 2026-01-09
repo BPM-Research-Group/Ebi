@@ -68,6 +68,7 @@ pub mod ebi_traits {
     pub mod ebi_trait_queriable_stochastic_language;
     pub mod ebi_trait_semantics;
     pub mod ebi_trait_stochastic_deterministic_semantics;
+    pub mod ebi_trait_stochastic_partially_ordered_semantics;
     pub mod ebi_trait_stochastic_semantics;
 }
 pub mod math {
@@ -143,6 +144,10 @@ pub mod semantics {
     pub mod stochastic_directly_follows_graph_semantics;
     pub mod stochastic_labelled_petri_net_semantics;
     pub mod stochastic_process_tree_semantics;
+}
+pub mod stochastic_partially_ordered_semantics {
+    pub mod stochastic_partially_ordered_semantics;
+    pub mod stochastic_process_tree_stochastic_partially_ordered_semantics;
 }
 pub mod stochastic_semantics {
     pub mod finite_stochastic_language_semantics;
