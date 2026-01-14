@@ -6,21 +6,19 @@ use crate::{
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
         ebi_output::{EbiOutput, EbiOutputType},
-        ebi_trait::EbiTrait, ebi_trait_object::EbiTraitObject,
+        ebi_trait::EbiTrait, 
+        ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
     techniques::{
-        earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
-        entropic_relevance::EntropicRelvance,
-        jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
-        unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
-        hellinger_stochastic_conformance::HellingerStochasticConformance,
-        chi_square_stochastic_conformance::ChiSquareStochasticConformance,
-    },
+        chi_square_stochastic_conformance::ChiSquareStochasticConformance, earth_movers_stochastic_conformance::EarthMoversStochasticConformance, entropic_relevance::EntropicRelvance, hellinger_stochastic_conformance::HellingerStochasticConformance, jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance, stochastic_markovian_abstraction::StochasticMarkovianAbstraction, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance
+    },  
 };
+use ebi_objects::{EbiObjectType, StochasticLabelledPetriNet};
+
 
 pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
     name_short: "conf",
@@ -35,6 +33,7 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
         &CONFORMANCE_HSC,
         &CONFORMANCE_JSSC,
         &CONFORMANCE_JSSC_SAMPLE,
+        &CONFORMANCE_STOCHASTIC_MARKOVIAN,
         &CONFORMANCE_UEMSC,
     ],
 };
@@ -59,7 +58,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
         "A queriable stochastic language (model) to compare.",
     ],
     execute: |mut inputs, _| {
-        let log = inputs
+        let log: Box<dyn EbiTraitFiniteStochasticLanguage> = inputs
             .remove(0)
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let model = inputs
@@ -354,3 +353,50 @@ pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
+pub const CONFORMANCE_STOCHASTIC_MARKOVIAN: EbiCommand = EbiCommand::Command {
+    name_short: "sma",
+    name_long: Some("stochastic-markovian-abstraction-based-conformance"),
+    explanation_short: "Compute the conformance between two stochastic languages using Stochastic Markovian Abstraction.",
+    explanation_long: Some("Compute the conformance between two stochastic languages using the Stochastic Markovian Abstraction, which represents languages based on the expected frequency of subtraces to better handle partially matching traces."),
+    latex_link: Some("\\cite{DBLP:conf/icpm/RochaLA24}"),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet)],
+        &[&EbiInputType::Usize(None, None, None)],
+        &[&EbiInputType::String(None, None)]
+    ],
+    input_names: &["FILE_1", "FILE_2", "K_ORDER", "METRIC"],
+    input_helps: &[
+        "A finite stochastic language (log) to compare.",
+        "A stochastic labelled Petri net (model) to compare.",
+        "The order k of the Markovian abstraction (should be at least 1).",
+        "Conformance one of the metric: cssc, hsc, and uemsc."
+    ],
+    execute: |mut inputs, _| {
+        let log = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let model = inputs
+            .remove(0).to_type::<StochasticLabelledPetriNet>()?;
+        let k = inputs
+            .remove(0)
+            .to_type::<usize>()?;
+        let metric_str = inputs
+            .remove(0)
+            .to_type::<String>()?;
+        use crate::techniques::stochastic_markovian_abstraction::DistanceMetric;
+        let metric = match metric_str.to_ascii_lowercase().as_str() {
+            "cssc" => DistanceMetric::CSSC,
+            "hsc" => DistanceMetric::HSC,
+            "uemsc" => DistanceMetric::UEMSC,
+            other => return Err(anyhow!(format!("Unknown metric '{}'.", other))),
+        };
+        let result = log
+            .markovian_conformance(*model, *k, metric)
+            .context(format!("Compute Stochastic Markovian Abstraction (k={}) for metric: {}.", k, metric_str))?;
+        Ok(EbiOutput::Fraction(result))
+    },
+    output_type: &EbiOutputType::Fraction,
+};

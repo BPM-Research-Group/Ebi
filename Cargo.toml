@@ -70,6 +70,7 @@ num-traits = { version = "0.2", optional = true }
 syn = { version = "2.0.113", features = [ "parsing", "full" ], optional = true }
 jni = { version = "0.21.1", optional = true }
 num-bigint = { version = "0.4.6", optional = true }
+rustc-hash = "2.1.1"
 
 [profile.release]
 debug = false
