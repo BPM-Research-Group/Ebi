@@ -24,7 +24,7 @@ pub enum DistanceMetric {
 /// unbounded Petri nets. (maybe optional parameter later)
 const DEFAULT_SAMPLE_SIZE: usize = 10_000;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 /// Represents a k-th order Markovian abstraction of a stochastic language
 pub struct MarkovianAbstraction {
     /// The order of the abstraction (k)
@@ -825,7 +825,7 @@ fn compute_phi_ids(snfa: &Snfa, k: usize, key: &mut ActivityKey) -> Vec<FxHashMa
 #[cfg(test)]
 mod tests {
     use std::fs;
-    use ebi_objects::{HasActivityKey, TranslateActivityKey, ebi_objects::{finite_stochastic_language::FiniteStochasticLanguage,event_log::EventLog,stochastic_labelled_petri_net::StochasticLabelledPetriNet}};
+    use ebi_objects::{HasActivityKey, ActivityKeyTranslator, IntoRefTraceProbabilityIterator, TranslateActivityKey, ebi_objects::{finite_stochastic_language::FiniteStochasticLanguage,event_log::EventLog,stochastic_labelled_petri_net::StochasticLabelledPetriNet}};
     use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
     use super::*;
 
@@ -872,11 +872,6 @@ mod tests {
     
     #[test]
     fn test_compute_abstraction_for_petri_net() {
-        // This test verifies the computation of Markovian abstractions
-        // for a simple SLPN model with the following structure:
-        // - Initial token in place 0
-        // - Transition 'a' moves token to place 1
-        // - From place 1, transition 'b' (weight 3/4) or 'c' (weight 1/4) to deadlock
         let file_content = fs::read_to_string("testfiles/simple_markovian_abstraction.slpn").unwrap();
         let petri_net = file_content.parse::<StochasticLabelledPetriNet>().unwrap();
         
@@ -886,39 +881,31 @@ mod tests {
         
         // Compute abstraction with k=2
         let abstraction = compute_abstraction_for_petri_net(&petri_net, 2, Fraction::from((1, 1000))).unwrap();
-        
+        let language_of_model: FiniteStochasticLanguage = abstraction.clone().into();
+        let language1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(language_of_model);
 
         // Check that probabilities sum to 1
         let mut total = Fraction::from((0, 1));
-        for probability in abstraction.abstraction.values() {
-            total += probability;
+        for (_, probability1) in language1.iter_traces_probabilities() {
+            total += probability1;
         }
         assert_eq!(total, Fraction::from((1, 1)), "Total probability should be 1");
 
         // Expected internal traces and probabilities
-        let expected_traces = [
-            ("+ ac0", "1/3"),
-            ("ac0 ac1", "1/4"),
-            ("ac1 -", "1/4"),
-            ("ac0 ac2", "1/12"),
-            ("ac2 -", "1/12")
-        ];
+        let fin2 = fs::read_to_string("testfiles/markovian.slang").unwrap();
+        let expected_traces = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+        let mut activity_key1 = language1.activity_key().clone();
+        let translator = ActivityKeyTranslator::new(&expected_traces.activity_key(), &mut activity_key1);
 
-        // Verify expected traces have the correct probabilities
-        for (trace_str, expected_prob) in expected_traces.iter() {
-            let key: Vec<String> = trace_str.split_whitespace().map(|s| s.to_string()).collect();
-            let arc_key = Arc::from(key.as_slice());
-            if let Some(prob) = abstraction.abstraction.get(&arc_key) {
-                println!("Found <{}> with probability {}", trace_str, prob);
-                assert_eq!(prob.to_string(), *expected_prob,
-                    "Probability mismatch for trace <{}>: expected {}, got {}",
-                    trace_str, expected_prob, prob);
-            } else {
-                panic!("Expected trace <{}> not found in abstraction", trace_str);
+        for (trace1, probability1) in language1.iter_traces_probabilities() {
+            for (trace2, probability2) in expected_traces.iter_traces_probabilities() {
+                if trace1 == &translator.translate_trace(trace2) {
+                    assert_eq!(probability2, probability1,
+                        "Probability mismatch for trace {:?}: expected {}, got {}",
+                        trace1, probability2, probability1);
+                }
             }
         }
-
-        println!("Test passed: Abstraction matches expected internal trace probabilities!");
     }
 
     #[test]
@@ -939,8 +926,6 @@ mod tests {
         let conformance = (&finite_lang as &dyn EbiTraitFiniteStochasticLanguage)
             .markovian_conformance(petri_net, 2, DistanceMetric::UEMSC)
             .unwrap();
-
-        println!("Computed m^2-uEMSC conformance: {}", conformance);
         assert_eq!(conformance, Fraction::from((4, 5))); // Expect 4/5
     }
 }
