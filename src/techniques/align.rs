@@ -1,3 +1,16 @@
+use crate::{
+    ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
+    ebi_traits::{
+        ebi_trait_finite_language::EbiTraitFiniteLanguage,
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_trait_semantics::EbiTraitSemantics,
+    },
+    semantics::{
+        finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
+        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
+        semantics::Semantics,
+    },
+};
 use anyhow::{Context, Error, Result, anyhow};
 use ebi_objects::{
     Activity, ActivityKeyTranslator, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
@@ -11,20 +24,6 @@ use std::{
     fmt::{Debug, Display},
     hash::Hash,
     sync::{Arc, Mutex},
-};
-
-use crate::{
-    ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
-    ebi_traits::{
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_semantics::EbiTraitSemantics,
-    },
-    semantics::{
-        finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
-        semantics::Semantics,
-    },
 };
 
 pub trait Align {

@@ -13,7 +13,7 @@ use crate::{
 /// `delta * (total_out_weight(m))`, where `m` is the representative marking for the SCC.
 pub fn patch_livelocks(
     net: &StochasticLabelledPetriNet,
-    delta: Fraction,
+    delta: &Fraction,
 ) -> Result<StochasticLabelledPetriNet> {
     // Guard against invalid delta values
     if !delta.is_positive() {
@@ -63,7 +63,7 @@ pub fn patch_livelocks(
     for mark in scc_representatives {
         // compute total exit weight using semantics helper
         let total_weight = patched.get_total_weight_of_enabled_transitions(&mark)?;
-        let timeout_weight = &delta * &total_weight;
+        let timeout_weight = delta * &total_weight;
 
         // add silent transition enabled only in mark
         add_timeout_transition(&mut patched, &mark, &mut sink_place, timeout_weight)?;
@@ -274,7 +274,7 @@ mod tests {
         
         // Apply patch with small delta
         let delta = Fraction::from((1, 1000));
-        let patched = patch_livelocks(&slpn, delta).unwrap();
+        let patched = patch_livelocks(&slpn, &delta).unwrap();
         
         // Verify patch was applied:
         // More transitions than original (timeout added)
@@ -323,7 +323,7 @@ mod tests {
         
         // Apply patch
         let delta = Fraction::from((1, 1000));
-        let patched = patch_livelocks(&slpn, delta).unwrap();
+        let patched = patch_livelocks(&slpn, &delta).unwrap();
         
         println!("Patched transitions: {}, places: {}", patched.get_number_of_transitions(), patched.get_number_of_places());
         
@@ -350,9 +350,9 @@ mod tests {
         let delta = Fraction::from((1, 1000));
         
         // Apply patch multiple times
-        let patched1 = patch_livelocks(&slpn, delta.clone()).unwrap();
-        let patched2 = patch_livelocks(&slpn, delta.clone()).unwrap();
-        let patched3 = patch_livelocks(&slpn, delta).unwrap();
+        let patched1 = patch_livelocks(&slpn, &delta).unwrap();
+        let patched2 = patch_livelocks(&slpn, &delta).unwrap();
+        let patched3 = patch_livelocks(&slpn, &delta).unwrap();
         
         // Results should be identical (same number of transitions/places)
         assert_eq!(patched1.get_number_of_transitions(), patched2.get_number_of_transitions());
@@ -410,7 +410,7 @@ mod tests {
         
         // Apply patch
         let delta = Fraction::from((1, 1000));
-        let patched = patch_livelocks(&slpn, delta).unwrap();
+        let patched = patch_livelocks(&slpn, &delta).unwrap();
         
         println!("Patched transitions: {}, places: {}", patched.get_number_of_transitions(), patched.get_number_of_places());
         
@@ -464,7 +464,7 @@ mod tests {
         
         // Apply patch
         let delta = Fraction::from((1, 1000));
-        let patched = patch_livelocks(&slpn, delta).unwrap();
+        let patched = patch_livelocks(&slpn, &delta).unwrap();
         
         println!("Multi-state SCC - Patched transitions: {}, places: {}", patched.get_number_of_transitions(), patched.get_number_of_places());
         
@@ -511,10 +511,10 @@ mod tests {
         let delta = Fraction::from((1, 1000));
         
         // Apply patch once
-        let once = patch_livelocks(&slpn, delta.clone()).unwrap();
+        let once = patch_livelocks(&slpn, &delta).unwrap();
         
         // Apply patch twice (on already-patched net)
-        let twice = patch_livelocks(&once, delta).unwrap();
+        let twice = patch_livelocks(&once, &delta).unwrap();
         
         // Results should be identical - patching is idempotent
         assert_eq!(once.get_number_of_transitions(), twice.get_number_of_transitions());

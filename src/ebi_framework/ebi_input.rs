@@ -83,9 +83,10 @@ pub enum EbiInputType {
     FileHandler,
 
     ///Fields: allowed values, default value.
+    /// If the allowed values are limited, consider using an enum with a #[derive(EbiInputEnum)] and &[&EbiInputTypeEnum!(type)] as input type.
     String(Option<&'static [&'static str]>, Option<&'static str>),
 
-    //Fields: minimum, maximum, default value.
+    ///Fields: minimum, maximum, default value.
     Usize(Option<usize>, Option<usize>, Option<usize>),
 
     //Fields: minimum, maximum, default value.
