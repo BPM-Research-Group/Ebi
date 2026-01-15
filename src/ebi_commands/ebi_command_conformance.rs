@@ -391,14 +391,15 @@ pub const CONFORMANCE_STOCHASTIC_MARKOVIAN: EbiCommand = EbiCommand::Command {
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let model = inputs.remove(0).to_type::<StochasticLabelledPetriNet>()?;
         let k = inputs.remove(0).to_type::<usize>()?;
-        let metric_str = inputs.remove(0).to_type::<String>()?;
         let metric = inputs.remove(0).to_type::<DistanceMetric>()?;
         let result = log
             .markovian_conformance(*model, *k, *metric)
-            .context(format!(
-                "Compute Stochastic Markovian Abstraction (k={}) for metric: {}.",
-                k, metric_str
-            ))?;
+            .with_context(|| {
+                format!(
+                    "Compute Stochastic Markovian Abstraction (k={}) for metric: {:?}.",
+                    k, metric
+                )
+            })?;
         Ok(EbiOutput::Fraction(result))
     },
     output_type: &EbiOutputType::Fraction,
