@@ -1,23 +1,45 @@
-use rustc_hash::FxHashMap;
-use rayon::prelude::*;
-use std::{sync::Arc,collections::HashMap};
-use anyhow::{Context, Ok, Result};
-use ebi_objects::{
-    ebi_arithmetic::{Fraction, ebi_number::Zero, Recip},
-    ebi_objects::{finite_stochastic_language::FiniteStochasticLanguage, stochastic_labelled_petri_net::StochasticLabelledPetriNet},
-    ActivityKey, HasActivityKey, TranslateActivityKey};
 use crate::{
-    ebi_traits::{ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage},
-    techniques::{bounded::Bounded, livelock_patch, sample::Sampler, chi_square_stochastic_conformance::ChiSquareStochasticConformance, hellinger_stochastic_conformance::HellingerStochasticConformance, unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance},stochastic_semantics::stochastic_semantics::StochasticSemantics, 
-    semantics::{semantics::Semantics, labelled_petri_net_semantics::LPNMarking, stochastic_nondeterministic_finite_automaton_semantics::{StochasticNondeterministicFiniteAutomaton as Snfa, State as SnfaState, Transition as SnfaTransition}}
+    ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject},
+    ebi_traits::{
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+    },
+    semantics::{
+        labelled_petri_net_semantics::LPNMarking,
+        semantics::Semantics,
+        stochastic_nondeterministic_finite_automaton_semantics::{
+            State as SnfaState, StochasticNondeterministicFiniteAutomaton as Snfa,
+            Transition as SnfaTransition,
+        },
+    },
+    stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    techniques::{
+        bounded::Bounded, chi_square_stochastic_conformance::ChiSquareStochasticConformance,
+        hellinger_stochastic_conformance::HellingerStochasticConformance, livelock_patch,
+        sample::Sampler,
+        unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
+    },
 };
+use anyhow::{Context, Ok, Result, anyhow};
+use ebi_derive::EbiInputEnum;
+use ebi_objects::{
+    ActivityKey, HasActivityKey, TranslateActivityKey,
+    ebi_arithmetic::{Fraction, Recip, ebi_number::Zero},
+    ebi_objects::{
+        finite_stochastic_language::FiniteStochasticLanguage,
+        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+    },
+};
+use rayon::prelude::*;
+use rustc_hash::FxHashMap;
+use std::{collections::HashMap, sync::Arc};
 
 /// Supported distance metrics for Markovian abstraction comparison.
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, EbiInputEnum)]
 pub enum DistanceMetric {
     CSSC,
     HSC,
-    UEMSC
+    UEMSC,
 }
 
 /// Default number of traces to sample when falling back to simulation for
@@ -82,7 +104,7 @@ pub trait StochasticMarkovianAbstraction {
     ) -> Result<Fraction>;
 }
 
-impl StochasticMarkovianAbstraction for dyn EbiTraitFiniteStochasticLanguage{
+impl StochasticMarkovianAbstraction for dyn EbiTraitFiniteStochasticLanguage {
     fn markovian_conformance(
         &self,
         slpn: StochasticLabelledPetriNet,
@@ -113,15 +135,9 @@ impl StochasticMarkovianAbstraction for dyn EbiTraitFiniteStochasticLanguage{
 
         // Step 3: Compute the conformance between the abstractions depending on the metric
         match metric {
-            DistanceMetric::CSSC => {
-                language1.chi_square_stochastic_conformance(language2)
-            }
-            DistanceMetric::HSC => {
-                language1.hellinger_stochastic_conformance(language2)
-            }
-            DistanceMetric::UEMSC => {
-                language1.unit_earth_movers_stochastic_conformance(language2)
-            }
+            DistanceMetric::CSSC => language1.chi_square_stochastic_conformance(language2),
+            DistanceMetric::HSC => language1.hellinger_stochastic_conformance(language2),
+            DistanceMetric::UEMSC => language1.unit_earth_movers_stochastic_conformance(language2),
         }
     }
 }
@@ -137,18 +153,20 @@ fn abstraction_of_slpn(
     k: usize,
     delta: Fraction,
 ) -> Result<MarkovianAbstraction> {
-        if !pn.bounded()? {
-            log::warn!("Model is unbounded; falling back to random sampling. If a livelock is also present this may not terminate.");
-            let sampled: FiniteStochasticLanguage = pn
-                .sample(DEFAULT_SAMPLE_SIZE)
-                .context("Sampling unbounded Petri net")?;
-            let mut sampled = sampled;
-            sampled.translate_using_activity_key(activity_key);
-            compute_abstraction_for_log(&sampled, k)
-        } else {
-            pn.translate_using_activity_key(activity_key);
-            compute_abstraction_for_petri_net(&pn, k, delta)
-        }
+    if !pn.bounded()? {
+        log::warn!(
+            "Model is unbounded; falling back to random sampling. If a livelock is also present this may not terminate."
+        );
+        let sampled: FiniteStochasticLanguage = pn
+            .sample(DEFAULT_SAMPLE_SIZE)
+            .context("Sampling unbounded Petri net")?;
+        let mut sampled = sampled;
+        sampled.translate_using_activity_key(activity_key);
+        compute_abstraction_for_log(&sampled, k)
+    } else {
+        pn.translate_using_activity_key(activity_key);
+        compute_abstraction_for_petri_net(&pn, k, delta)
+    }
 }
 
 /// This implements the calculation of the k-th order Stochastic Markovian abstraction
@@ -162,7 +180,9 @@ pub fn compute_abstraction_for_log(
 ) -> Result<MarkovianAbstraction> {
     // Validate k
     if k < 1 {
-        return Err(anyhow::anyhow!("k must be at least 1 for Markovian abstraction"));
+        return Err(anyhow::anyhow!(
+            "k must be at least 1 for Markovian abstraction"
+        ));
     }
 
     // Initialize f_l^k which stores the expected number of occurrences of each subtrace
@@ -172,12 +192,14 @@ pub fn compute_abstraction_for_log(
     // For each trace in the log with its probability
     for (trace, probability) in log.iter_traces_probabilities() {
         // Create a Vec<String> from the Vec<Activity>
-        let string_trace: Vec<String> = trace.iter()
-            .map(|activity| activity.to_string())
-            .collect();
+        let string_trace: Vec<String> = trace.iter().map(|activity| activity.to_string()).collect();
 
         // Compute M_σ^k for this trace (k-th order multiset Markovian abstraction)
-        let m_sigma_k = compute_multiset_abstraction_for_trace_with_key(&string_trace, k, &mut activity_key_clone);
+        let m_sigma_k = compute_multiset_abstraction_for_trace_with_key(
+            &string_trace,
+            k,
+            &mut activity_key_clone,
+        );
 
         // Add contribution to f_l^k
         for (subtrace, occurrences) in m_sigma_k {
@@ -190,7 +212,8 @@ pub fn compute_abstraction_for_log(
             };
 
             // Update the expected occurrence count in f_l^k
-            f_l_k.entry(subtrace)
+            f_l_k
+                .entry(subtrace)
                 .and_modify(|current| {
                     *current += &contribution; // Add this trace's contribution to existing count
                 })
@@ -222,7 +245,9 @@ pub fn compute_abstraction_for_petri_net(
     delta: Fraction,
 ) -> Result<MarkovianAbstraction> {
     if k < 1 {
-        return Err(anyhow::anyhow!("k must be at least 1 for Markovian abstraction"));
+        return Err(anyhow::anyhow!(
+            "k must be at least 1 for Markovian abstraction"
+        ));
     }
 
     // 0.5 Patch bounded livelocks by adding timeout escapes
@@ -259,7 +284,7 @@ pub fn compute_abstraction_for_petri_net(
     let mut b = vec![Fraction::from((0, 1)); n];
     b[snfa.initial] = Fraction::from((1, 1));
     let mut a_ref = a_sparse;
-    let x = if n < 100{
+    let x = if n < 100 {
         // small matrices -> simpler hash map solver avoids conversion overhead
         solve_sparse_linear_system(&mut a_ref, b)?
     } else {
@@ -309,7 +334,11 @@ pub fn compute_abstraction_for_petri_net(
 }
 
 /// Compute the multiset of k-trimmed subtraces for a given trace
-fn compute_multiset_abstraction_for_trace_with_key(trace: &[String], k: usize, key: &mut ActivityKey) -> FxHashMap<Arc<[String]>, usize> {
+fn compute_multiset_abstraction_for_trace_with_key(
+    trace: &[String],
+    k: usize,
+    key: &mut ActivityKey,
+) -> FxHashMap<Arc<[String]>, usize> {
     // Convert labels to IDs and add start/end markers in ID space
     let mut augmented_ids: Vec<u32> = Vec::with_capacity(trace.len() + 2);
     {
@@ -332,10 +361,13 @@ fn compute_multiset_abstraction_for_trace_with_key(trace: &[String], k: usize, k
     let mut result: FxHashMap<Arc<[String]>, usize> = FxHashMap::default();
     result.reserve(id_multiset.len());
     for (sub_ids, cnt) in id_multiset {
-        let strings: Vec<String> = sub_ids.iter().map(|&id| {
-            let act = key.get_activity_by_id(id as usize);
-            key.deprocess_activity(&act).to_string()
-        }).collect();
+        let strings: Vec<String> = sub_ids
+            .iter()
+            .map(|&id| {
+                let act = key.get_activity_by_id(id as usize);
+                key.deprocess_activity(&act).to_string()
+            })
+            .collect();
         result.insert(Arc::from(strings), cnt);
     }
     result
@@ -374,8 +406,8 @@ fn compute_multiset_k_trimmed_subtraces_iterative_ids(
 
     // Slide through the trace
     for &next_id in &trace[k..] {
-        ring[head] = next_id;           // overwrite the oldest
-        head = (head + 1) % k;          // advance head
+        ring[head] = next_id; // overwrite the oldest
+        head = (head + 1) % k; // advance head
         let key = make_key(&ring, head, &mut tmp);
         *result.entry(key).or_insert(0) += 1;
     }
@@ -475,28 +507,28 @@ fn patch_snfa(snfa: &Snfa) -> Snfa {
             // Reset p_final to zero
             s.p_final = Fraction::from((0, 1));
             // Add a "-" transition with the original final probability
-            s.transitions.push(SnfaTransition { 
-                target: q_minus, 
-                label: "-".to_string(), 
-                probability: final_prob
+            s.transitions.push(SnfaTransition {
+                target: q_minus,
+                label: "-".to_string(),
+                probability: final_prob,
             });
         }
     }
 
     // q_plus with + transition to original initial state
-    states.push(SnfaState { 
-        transitions: vec![SnfaTransition { 
-            target: snfa.initial, 
-            label: "+".to_string(), 
-            probability: Fraction::from((1, 1)) 
-        }], 
-        p_final: Fraction::from((0, 1))
+    states.push(SnfaState {
+        transitions: vec![SnfaTransition {
+            target: snfa.initial,
+            label: "+".to_string(),
+            probability: Fraction::from((1, 1)),
+        }],
+        p_final: Fraction::from((0, 1)),
     });
 
     // q_minus absorbing final state
-    states.push(SnfaState { 
-        transitions: vec![], 
-        p_final: Fraction::from((1, 1))
+    states.push(SnfaState {
+        transitions: vec![],
+        p_final: Fraction::from((1, 1)),
     });
 
     // Return the patched automaton
@@ -525,7 +557,10 @@ fn build_delta(snfa: &Snfa) -> Vec<FxHashMap<usize, Fraction>> {
 /// Sparse exact Gaussian elimination where each row is a **sorted** Vec<(usize, Fraction)>.
 /// We convert the incoming FxHashMap representation once and then run a cache friendly merge based
 /// elimination (A := A - factor * pivot).
-fn solve_sparse_linear_system_optimized(a_hash: &mut [FxHashMap<usize, Fraction>], mut b: Vec<Fraction>) -> Result<Vec<Fraction>> {
+fn solve_sparse_linear_system_optimized(
+    a_hash: &mut [FxHashMap<usize, Fraction>],
+    mut b: Vec<Fraction>,
+) -> Result<Vec<Fraction>> {
     // Convert the incoming FxHashMap rows into sorted vec rows
     fn to_vec_rows(a: &mut [FxHashMap<usize, Fraction>]) -> Vec<Vec<(usize, Fraction)>> {
         a.iter_mut()
@@ -543,7 +578,12 @@ fn solve_sparse_linear_system_optimized(a_hash: &mut [FxHashMap<usize, Fraction>
     }
 
     /// target = target - factor * pivot   (skips column i)
-    fn saxpy_row(target: &mut Vec<(usize, Fraction)>, i: usize, pivot: &[(usize, Fraction)], factor: &Fraction) {
+    fn saxpy_row(
+        target: &mut Vec<(usize, Fraction)>,
+        i: usize,
+        pivot: &[(usize, Fraction)],
+        factor: &Fraction,
+    ) {
         let mut out = Vec::with_capacity(target.len() + pivot.len());
         let mut t = 0;
         let mut p = 0;
@@ -588,7 +628,7 @@ fn solve_sparse_linear_system_optimized(a_hash: &mut [FxHashMap<usize, Fraction>
         out.shrink_to_fit();
         *target = out;
     }
-    
+
     // Convert matrix once
     let mut a: Vec<Vec<(usize, Fraction)>> = to_vec_rows(a_hash);
     let n = b.len();
@@ -596,10 +636,7 @@ fn solve_sparse_linear_system_optimized(a_hash: &mut [FxHashMap<usize, Fraction>
     for i in 0..n {
         // 1. Pivot search (find first row r >= i with non zero col i)
         let pivot = (i..n)
-            .find(|&r| {
-                find_col(&a[r], i)
-                    .map_or(false, |idx| !a[r][idx].1.is_zero())
-            })
+            .find(|&r| find_col(&a[r], i).map_or(false, |idx| !a[r][idx].1.is_zero()))
             .ok_or_else(|| anyhow::anyhow!("Matrix is singular"))?;
 
         if pivot != i {
@@ -629,38 +666,43 @@ fn solve_sparse_linear_system_optimized(a_hash: &mut [FxHashMap<usize, Fraction>
             left.par_iter_mut()
                 .enumerate()
                 .filter_map(|(r, row)| {
-                    find_col(row, i).map(|idx| {
-                        let factor = row[idx].1.clone();
-                        row[idx].1 = Fraction::zero(); // lazy zeroing avoids shift
-                        if factor.is_zero() {
-                            None
-                        } else {
-                            saxpy_row(row, i, pivot_ref, &factor);
-                            Some((r, factor))
-                        }
-                    }).flatten()
+                    find_col(row, i)
+                        .map(|idx| {
+                            let factor = row[idx].1.clone();
+                            row[idx].1 = Fraction::zero(); // lazy zeroing avoids shift
+                            if factor.is_zero() {
+                                None
+                            } else {
+                                saxpy_row(row, i, pivot_ref, &factor);
+                                Some((r, factor))
+                            }
+                        })
+                        .flatten()
                 })
-                .collect::<Vec<_>>()
+                .collect::<Vec<_>>(),
         );
 
         // rows below
         updates.extend(
-            below.par_iter_mut()
+            below
+                .par_iter_mut()
                 .enumerate()
                 .filter_map(|(off, row)| {
                     let r = i + 1 + off;
-                    find_col(row, i).map(|idx| {
-                        let factor = row[idx].1.clone();
-                        row[idx].1 = Fraction::zero();
-                        if factor.is_zero() {
-                            None
-                        } else {
-                            saxpy_row(row, i, pivot_ref, &factor);
-                            Some((r, factor))
-                        }
-                    }).flatten()
+                    find_col(row, i)
+                        .map(|idx| {
+                            let factor = row[idx].1.clone();
+                            row[idx].1 = Fraction::zero();
+                            if factor.is_zero() {
+                                None
+                            } else {
+                                saxpy_row(row, i, pivot_ref, &factor);
+                                Some((r, factor))
+                            }
+                        })
+                        .flatten()
                 })
-                .collect::<Vec<_>>()
+                .collect::<Vec<_>>(),
         );
 
         // Apply RHS updates sequentially
@@ -673,7 +715,10 @@ fn solve_sparse_linear_system_optimized(a_hash: &mut [FxHashMap<usize, Fraction>
 }
 
 /// Naive sparse Gaussian elimination for Fraction matrices represented as Vec<FxHashMap<usize, Fraction>>
-fn solve_sparse_linear_system(a: &mut [FxHashMap<usize, Fraction>], mut b: Vec<Fraction>) -> Result<Vec<Fraction>> {
+fn solve_sparse_linear_system(
+    a: &mut [FxHashMap<usize, Fraction>],
+    mut b: Vec<Fraction>,
+) -> Result<Vec<Fraction>> {
     let n = b.len();
     // Forward elimination
     for i in 0..n {
@@ -702,11 +747,14 @@ fn solve_sparse_linear_system(a: &mut [FxHashMap<usize, Fraction>], mut b: Vec<F
         let pivot_b = b[i].clone();
         // Eliminate other rows
         for r in 0..n {
-            if r == i { continue; }
+            if r == i {
+                continue;
+            }
             if let Some(factor_val) = a[r].get(&i).cloned() {
                 if !factor_val.is_zero() {
                     // subtract factor * row_i from row_r
-                    let keys: Vec<(usize, Fraction)> = a[i].iter().map(|(k,v)| (*k, v.clone())).collect();
+                    let keys: Vec<(usize, Fraction)> =
+                        a[i].iter().map(|(k, v)| (*k, v.clone())).collect();
                     for (c, val_i) in keys {
                         let product = &factor_val * &val_i;
                         let entry = a[r].entry(c).or_insert_with(Fraction::zero);
@@ -725,7 +773,11 @@ fn solve_sparse_linear_system(a: &mut [FxHashMap<usize, Fraction>], mut b: Vec<F
 
 /// Compute Phi maps using integer label IDs for efficiency.
 /// Returns Vec indexed by start state q, each mapping Arc<[u32]> -> Fraction.
-fn compute_phi_ids(snfa: &Snfa, k: usize, key: &mut ActivityKey) -> Vec<FxHashMap<Arc<[u32]>, Fraction>> {
+fn compute_phi_ids(
+    snfa: &Snfa,
+    k: usize,
+    key: &mut ActivityKey,
+) -> Vec<FxHashMap<Arc<[u32]>, Fraction>> {
     let n = snfa.states.len();
     // Compute numeric IDs for "+" and "-" for quick comparisons
     let plus_act = key.process_activity("+");
@@ -760,7 +812,10 @@ fn compute_phi_ids(snfa: &Snfa, k: usize, key: &mut ActivityKey) -> Vec<FxHashMa
 
         if remaining == 0 {
             // No more symbols allowed -> empty suffix with probability 1
-            result.insert(Arc::<[u32]>::from(Vec::<u32>::new()), Fraction::from((1, 1)));
+            result.insert(
+                Arc::<[u32]>::from(Vec::<u32>::new()),
+                Fraction::from((1, 1)),
+            );
         } else {
             for tr in &snfa.states[state_idx].transitions {
                 let label = tr.label.clone();
@@ -824,28 +879,45 @@ fn compute_phi_ids(snfa: &Snfa, k: usize, key: &mut ActivityKey) -> Vec<FxHashMa
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-    use ebi_objects::{HasActivityKey, ActivityKeyTranslator, IntoRefTraceProbabilityIterator, TranslateActivityKey, ebi_objects::{finite_stochastic_language::FiniteStochasticLanguage,event_log::EventLog,stochastic_labelled_petri_net::StochasticLabelledPetriNet}};
-    use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
     use super::*;
+    use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
+    use ebi_objects::{
+        ActivityKeyTranslator, HasActivityKey, IntoRefTraceProbabilityIterator,
+        TranslateActivityKey,
+        ebi_objects::{
+            event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage,
+            stochastic_labelled_petri_net::StochasticLabelledPetriNet,
+        },
+    };
+    use std::fs;
 
     #[test]
     fn test_compute_abstraction_for_example_log() {
-        let file_content = fs::read_to_string("testfiles/simple_log_markovian_abstraction.xes").unwrap();
+        let file_content =
+            fs::read_to_string("testfiles/simple_log_markovian_abstraction.xes").unwrap();
         let event_log = file_content.parse::<EventLog>().unwrap();
         let finite_lang: FiniteStochasticLanguage = Into::into(event_log);
-        
+
         // Compute abstraction with k=2 for example log [<a,b>^{5}, <a,a,b,c>^{2}, <a,a,c,b>^{1}]
         let abstraction = compute_abstraction_for_log(&finite_lang, 2).unwrap();
-        
+
         println!("\nComputed abstraction for example log with k=2:");
 
-        assert_eq!(abstraction.abstraction.len(), 8, "Should be exactly 8 entries");
-        
+        assert_eq!(
+            abstraction.abstraction.len(),
+            8,
+            "Should be exactly 8 entries"
+        );
+
         // map for checking
-        let mut check: std::collections::HashMap<String, Fraction> = std::collections::HashMap::default();
+        let mut check: std::collections::HashMap<String, Fraction> =
+            std::collections::HashMap::default();
         for (subtrace, prob) in abstraction.abstraction.iter() {
-            let key = subtrace.iter().map(|s| s.as_str()).collect::<Vec<_>>().join(",");
+            let key = subtrace
+                .iter()
+                .map(|s| s.as_str())
+                .collect::<Vec<_>>()
+                .join(",");
             println!("{:<12} : {}", key, prob);
             check.insert(key, prob.clone());
         }
@@ -858,29 +930,42 @@ mod tests {
         let pair3 = [Fraction::from((1, 15)), Fraction::from((1, 30))];
 
         // Helper to check that a key has one of two expected values and that the other value is on the other key
-        fn assert_pair(check: &std::collections::HashMap<String, Fraction>, k1: &str, k2: &str, exp: [Fraction; 2]) {
+        fn assert_pair(
+            check: &std::collections::HashMap<String, Fraction>,
+            k1: &str,
+            k2: &str,
+            exp: [Fraction; 2],
+        ) {
             let v1 = check.get(k1).expect("missing key");
             let v2 = check.get(k2).expect("missing key");
-            assert!( (v1 == &exp[0] && v2 == &exp[1]) || (v1 == &exp[1] && v2 == &exp[0]),
-                "Pair {{ {}, {} }} has unexpected values {{ {}, {} }}", k1, k2, v1, v2);
+            assert!(
+                (v1 == &exp[0] && v2 == &exp[1]) || (v1 == &exp[1] && v2 == &exp[0]),
+                "Pair {{ {}, {} }} has unexpected values {{ {}, {} }}",
+                k1,
+                k2,
+                v1,
+                v2
+            );
         }
 
         assert_pair(&check, "ac0,ac1", "ac0,ac2", pair1);
-        assert_pair(&check, "ac1,-",   "ac2,-",   pair2);
+        assert_pair(&check, "ac1,-", "ac2,-", pair2);
         assert_pair(&check, "ac1,ac2", "ac2,ac1", pair3);
     }
-    
+
     #[test]
     fn test_compute_abstraction_for_petri_net() {
-        let file_content = fs::read_to_string("testfiles/simple_markovian_abstraction.slpn").unwrap();
+        let file_content =
+            fs::read_to_string("testfiles/simple_markovian_abstraction.slpn").unwrap();
         let petri_net = file_content.parse::<StochasticLabelledPetriNet>().unwrap();
-        
+
         // Check that k < 1 is rejected (k = 0)
         let result = compute_abstraction_for_petri_net(&petri_net, 0, Fraction::from((1, 1000)));
         assert!(result.is_err(), "Should reject k < 1");
-        
+
         // Compute abstraction with k=2
-        let abstraction = compute_abstraction_for_petri_net(&petri_net, 2, Fraction::from((1, 1000))).unwrap();
+        let abstraction =
+            compute_abstraction_for_petri_net(&petri_net, 2, Fraction::from((1, 1000))).unwrap();
         let language_of_model: FiniteStochasticLanguage = abstraction.clone().into();
         let language1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(language_of_model);
 
@@ -889,20 +974,27 @@ mod tests {
         for (_, probability1) in language1.iter_traces_probabilities() {
             total += probability1;
         }
-        assert_eq!(total, Fraction::from((1, 1)), "Total probability should be 1");
+        assert_eq!(
+            total,
+            Fraction::from((1, 1)),
+            "Total probability should be 1"
+        );
 
         // Expected internal traces and probabilities
         let fin2 = fs::read_to_string("testfiles/markovian.slang").unwrap();
         let expected_traces = fin2.parse::<FiniteStochasticLanguage>().unwrap();
         let mut activity_key1 = language1.activity_key().clone();
-        let translator = ActivityKeyTranslator::new(&expected_traces.activity_key(), &mut activity_key1);
+        let translator =
+            ActivityKeyTranslator::new(&expected_traces.activity_key(), &mut activity_key1);
 
         for (trace1, probability1) in language1.iter_traces_probabilities() {
             for (trace2, probability2) in expected_traces.iter_traces_probabilities() {
                 if trace1 == &translator.translate_trace(trace2) {
-                    assert_eq!(probability2, probability1,
+                    assert_eq!(
+                        probability2, probability1,
                         "Probability mismatch for trace {:?}: expected {}, got {}",
-                        trace1, probability2, probability1);
+                        trace1, probability2, probability1
+                    );
                 }
             }
         }
@@ -911,12 +1003,14 @@ mod tests {
     #[test]
     fn test_markovian_conformance_uemsc_log_vs_petri_net() {
         // Load the example log and convert to finite stochastic language
-        let file_content = fs::read_to_string("testfiles/simple_log_markovian_abstraction.xes").unwrap();
+        let file_content =
+            fs::read_to_string("testfiles/simple_log_markovian_abstraction.xes").unwrap();
         let event_log = file_content.parse::<EventLog>().unwrap();
         let mut finite_lang: FiniteStochasticLanguage = Into::into(event_log);
 
         // Load the Petri net model
-        let file_content = fs::read_to_string("testfiles/simple_markovian_abstraction.slpn").unwrap();
+        let file_content =
+            fs::read_to_string("testfiles/simple_markovian_abstraction.slpn").unwrap();
         let mut petri_net = file_content.parse::<StochasticLabelledPetriNet>().unwrap();
 
         // Ensure both share a common ActivityKey to avoid nondeterministic mappings
