@@ -1,9 +1,5 @@
 use crate::{
-    ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject},
-    ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-    },
+    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     semantics::{
         labelled_petri_net_semantics::LPNMarking,
         semantics::Semantics,
@@ -13,82 +9,69 @@ use crate::{
         },
     },
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
-    techniques::{
-        chi_square_stochastic_conformance::ChiSquareStochasticConformance,
-        hellinger_stochastic_conformance::HellingerStochasticConformance, livelock_patch,
-        unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
-    },
+    techniques::livelock_patch,
 };
-use anyhow::{Context, Ok, Result, anyhow};
-use ebi_derive::EbiInputEnum;
+use anyhow::{Context, Ok, Result};
 use ebi_objects::{
-    ActivityKey, HasActivityKey,
+    Activity, ActivityKey, HasActivityKey,
     ebi_arithmetic::{Fraction, One, Recip, ebi_number::Zero},
     ebi_objects::{
         finite_stochastic_language::FiniteStochasticLanguage,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
     },
 };
+use rand::{Rng, distr::Alphanumeric};
 use rayon::prelude::*;
 use rustc_hash::FxHashMap;
 use std::{collections::HashMap, sync::Arc};
 
-/// Supported distance metrics for Markovian abstraction comparison.
-#[derive(Clone, Copy, Debug, EbiInputEnum)]
-pub enum DistanceMeasure {
-    CSSC,
-    HSC,
-    UEMSC,
-}
-
-impl DistanceMeasure {
-    /// Applies the distance measure to two finite stochastic languages.
-    /// The caller must ensure that the activity keys match.
-    pub fn apply(
-        &self,
-        language1: Box<dyn EbiTraitFiniteStochasticLanguage>,
-        language2: Box<dyn EbiTraitQueriableStochasticLanguage>,
-    ) -> Result<Fraction> {
-        match self {
-            DistanceMeasure::CSSC => language1.chi_square_stochastic_conformance(language2),
-            DistanceMeasure::HSC => language1.hellinger_stochastic_conformance(language2),
-            DistanceMeasure::UEMSC => language1.unit_earth_movers_stochastic_conformance(language2),
-        }
-    }
+#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
+enum ActivityStartEnd {
+    Activity(Activity),
+    Start,
+    End,
 }
 
 #[derive(Debug, Clone)]
 /// Represents a k-th order Markovian abstraction of a stochastic language
 pub struct MarkovianAbstraction {
+    activity_key: ActivityKey,
+
     /// The order of the abstraction (k)
     pub order: usize,
-    /// The mapping from subtraces to normalized frequencies
-    /// Uses Arc<[String]> to reduce memory usage through shared ownership
-    pub abstraction: FxHashMap<Arc<[String]>, Fraction>,
+
+    /// The mapping from subtraces to normalised frequencies
+    pub abstraction: FxHashMap<Vec<ActivityStartEnd>, Fraction>,
 }
 
-// function can convert markovianabstraction to FiniteStochasticLanguage
+/// Convert a Markovian abstraction to a Finite Stochastic Language.
+/// Note that the start and end of the traces will show up as normal activities.
 impl From<MarkovianAbstraction> for FiniteStochasticLanguage {
     fn from(ma: MarkovianAbstraction) -> Self {
-        // 1. Create a new ActivityKey to handle the mapping from String -> Activity ID
-        let mut activity_key = ActivityKey::new();
-        let mut traces = HashMap::new();
+        let mut activity_key = ma.activity_key;
+        let start = activity_key.process_activity("+[start of trace]+@$%-/");
+        let end = activity_key.process_activity("-[end of trace]+@$%-/");
 
-        // 2. Iterate over the abstraction (subtraces -> fraction)
-        for (subtrace, fraction) in ma.abstraction {
-            // Convert Arc<[String]> to Vec<String> so it can be processed
-            let trace_strings: Vec<String> = subtrace.to_vec();
+        //transform the traces
+        let traces = ma
+            .abstraction
+            .into_iter()
+            .map(|(subtrace, probability)| {
+                (
+                    subtrace
+                        .into_iter()
+                        .map(|ase| match ase {
+                            ActivityStartEnd::Activity(activity) => activity,
+                            ActivityStartEnd::Start => start,
+                            ActivityStartEnd::End => end,
+                        })
+                        .collect(),
+                    probability,
+                )
+            })
+            .collect();
 
-            // Register the strings in the ActivityKey and get back the internal indices (Vec<Activity>)
-            // Note: based on the provided file, process_trace handles string registration
-            let encoded_trace = activity_key.process_trace(&trace_strings);
-
-            // Insert into the new traces map
-            traces.insert(encoded_trace, fraction);
-        }
-
-        // 3. Construct the FiniteStochasticLanguage
-        // new_raw is used because we are populating the map manually and don't necessarily want to force re-normalization immediately
+        // new_raw is used because we are populating the map manually and don't necessarily want to force re-normalisation immediately
         FiniteStochasticLanguage::new_raw(traces, activity_key)
     }
 }
@@ -101,7 +84,7 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
     fn abstract_markovian(&self, order: usize, delta: &Fraction) -> Result<MarkovianAbstraction> {
         if order < 1 {
             return Err(anyhow::anyhow!(
-                "k must be at least 1 for Markovian abstraction"
+                "order must be at least 1 for Markovian abstraction"
             ));
         }
 
@@ -175,7 +158,7 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
             }
         }
 
-        // 6 Normalize
+        // 6 Normalise
         let mut total = Fraction::from((0, 1));
         for v in f_l_k.values() {
             total += v;
@@ -199,30 +182,23 @@ impl AbstractMarkovian for dyn EbiTraitFiniteStochasticLanguage {
         // Validate k
         if order < 1 {
             return Err(anyhow::anyhow!(
-                "k must be at least 1 for Markovian abstraction"
+                "the order must be at least 1 for Markovian abstraction"
             ));
         }
 
-        // Initialize f_l^k which stores the expected number of occurrences of each subtrace
-        let mut f_l_k: FxHashMap<Arc<[String]>, Fraction> = FxHashMap::default();
+        // Initialise f_l^k which stores the expected number of occurrences of each subtrace
+        let mut f_l_k: FxHashMap<Vec<ActivityStartEnd>, Fraction> = FxHashMap::default();
 
-        let mut activity_key_clone = self.activity_key().clone();
+        let mut activity_key = self.activity_key().clone();
+
         // For each trace in the log with its probability
         for (trace, probability) in self.iter_traces_probabilities() {
-            // Create a Vec<String> from the Vec<Activity>
-            let string_trace: Vec<String> =
-                trace.iter().map(|activity| activity.to_string()).collect();
-
             // Compute M_σ^k for this trace (k-th order multiset Markovian abstraction)
-            let m_sigma_k = compute_multiset_abstraction_for_trace_with_key(
-                &string_trace,
-                order,
-                &mut activity_key_clone,
-            );
+            let m_sigma_k = compute_multiset_abstraction_for_trace_with_key(&trace, order);
 
             // Add contribution to f_l^k
             for (subtrace, occurrences) in m_sigma_k {
-                let occurrences_as_fraction = Fraction::from((occurrences, 1));
+                let occurrences_as_fraction = Fraction::from(occurrences);
                 // Create an owned contribution using explicit reference operations
                 let contribution = {
                     let p_ref: &Fraction = probability;
@@ -241,12 +217,12 @@ impl AbstractMarkovian for dyn EbiTraitFiniteStochasticLanguage {
         }
 
         // Calculate the total sum for normalization
-        let mut total = Fraction::from((0, 1));
+        let mut total = Fraction::zero();
         for value in f_l_k.values() {
             total += value;
         }
 
-        // Normalize f_l^k to get m_l^k
+        // Normalise f_l^k to get m_l^k
         let mut abstraction = FxHashMap::default();
         for (subtrace, count) in f_l_k {
             let count_ref: &Fraction = &count;
@@ -254,76 +230,68 @@ impl AbstractMarkovian for dyn EbiTraitFiniteStochasticLanguage {
             abstraction.insert(subtrace, count_ref / total_ref);
         }
 
-        Ok(MarkovianAbstraction { order, abstraction })
+        Ok(MarkovianAbstraction {
+            activity_key,
+            order,
+            abstraction,
+        })
     }
 }
 
 /// Compute the multiset of k-trimmed subtraces for a given trace
 fn compute_multiset_abstraction_for_trace_with_key(
-    trace: &[String],
+    trace: &[Activity],
     k: usize,
-    key: &mut ActivityKey,
-) -> FxHashMap<Arc<[String]>, usize> {
+) -> FxHashMap<Vec<ActivityStartEnd>, usize> {
     // Convert labels to IDs and add start/end markers in ID space
-    let mut augmented_ids: Vec<u32> = Vec::with_capacity(trace.len() + 2);
-    {
-        let act = key.process_activity("+");
-        augmented_ids.push(key.get_id_from_activity(act) as u32);
+    let mut augmented_ids = Vec::with_capacity(trace.len() + 2);
+    augmented_ids.push(ActivityStartEnd::Start);
+    for act in trace {
+        augmented_ids.push(ActivityStartEnd::Activity(*act));
     }
-    for lbl in trace {
-        let act = key.process_activity(lbl);
-        augmented_ids.push(key.get_id_from_activity(act) as u32);
-    }
-    {
-        let act = key.process_activity("-");
-        augmented_ids.push(key.get_id_from_activity(act) as u32);
-    }
+    augmented_ids.push(ActivityStartEnd::End);
 
     // Compute multiset over IDs
-    let id_multiset = compute_multiset_k_trimmed_subtraces_iterative_ids(&augmented_ids, k);
+    let id_multiset = compute_multiset_k_trimmed_subtraces_iterative_ids(augmented_ids, k);
 
-    // Reconstruct String subtrace keys via the reverse map
-    let mut result: FxHashMap<Arc<[String]>, usize> = FxHashMap::default();
+    // Reconstruct subtrace keys via the reverse map
+    let mut result: FxHashMap<Vec<ActivityStartEnd>, usize> = FxHashMap::default();
     result.reserve(id_multiset.len());
     for (sub_ids, cnt) in id_multiset {
-        let strings: Vec<String> = sub_ids
-            .iter()
-            .map(|&id| {
-                let act = key.get_activity_by_id(id as usize);
-                key.deprocess_activity(&act).to_string()
-            })
-            .collect();
-        result.insert(Arc::from(strings), cnt);
+        result.insert(sub_ids, cnt);
     }
     result
 }
 
-/// Operates on a slice of `u32` activity IDs and returns a
-/// multiset keyed by `Arc<[u32]>`. This avoids heap traffic except when a new
+/// Operates on a slice of ActivityStartEnd and returns a
+/// multiset keyed by `Arc<[ActivityStartEnd]>`. This avoids heap traffic except when a new
 /// *unique* subtrace is inserted into the map.
 fn compute_multiset_k_trimmed_subtraces_iterative_ids(
-    trace: &[u32],
+    trace: Vec<ActivityStartEnd>,
     k: usize,
-) -> FxHashMap<Arc<[u32]>, usize> {
-    let mut result: FxHashMap<Arc<[u32]>, usize> = FxHashMap::default();
+) -> FxHashMap<Vec<ActivityStartEnd>, usize> {
+    let mut result: FxHashMap<Vec<ActivityStartEnd>, usize> = FxHashMap::default();
 
     if trace.len() <= k {
-        result.insert(Arc::from(trace.to_owned()), 1);
+        result.insert(trace, 1);
         return result;
     }
 
-    let mut ring: Vec<u32> = Vec::with_capacity(k);
+    let mut ring = Vec::with_capacity(k);
     ring.extend_from_slice(&trace[..k]);
     let mut head: usize = 0; // index of the oldest element
 
     // Reusable key construction
-    let mut tmp: Vec<u32> = Vec::with_capacity(k);
+    let mut tmp = Vec::with_capacity(k);
     // Helper to build an Arc key representing the current window
-    let make_key = |ring: &Vec<u32>, head: usize, tmp: &mut Vec<u32>| -> Arc<[u32]> {
+    let make_key = |ring: &Vec<ActivityStartEnd>,
+                    head: usize,
+                    tmp: &mut Vec<ActivityStartEnd>|
+     -> Vec<ActivityStartEnd> {
         tmp.clear();
         tmp.extend_from_slice(&ring[head..]);
         tmp.extend_from_slice(&ring[..head]);
-        Arc::from(tmp.clone().into_boxed_slice())
+        tmp.clone()
     };
 
     // Insert first window
@@ -807,7 +775,7 @@ mod tests {
     use super::*;
     use crate::{
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        techniques::stochastic_markovian_abstraction_conformance::StochasticMarkovianConformance,
+        techniques::stochastic_markovian_abstraction_conformance::{DistanceMeasure, StochasticMarkovianConformance},
     };
     use ebi_objects::{
         ActivityKeyTranslator, HasActivityKey, IntoRefTraceProbabilityIterator,

@@ -1,6 +1,43 @@
-use crate::techniques::stochastic_markovian_abstraction::{DistanceMeasure, MarkovianAbstraction};
+use crate::{
+    ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject},
+    ebi_traits::{
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+    },
+    techniques::{
+        chi_square_stochastic_conformance::ChiSquareStochasticConformance,
+        hellinger_stochastic_conformance::HellingerStochasticConformance,
+        stochastic_markovian_abstraction::MarkovianAbstraction,
+        unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
+    },
+};
 use anyhow::{Result, anyhow};
+use ebi_derive::EbiInputEnum;
 use ebi_objects::{FiniteStochasticLanguage, ebi_arithmetic::Fraction};
+
+/// Supported distance metrics for Markovian abstraction comparison.
+#[derive(Clone, Copy, Debug, EbiInputEnum)]
+pub enum DistanceMeasure {
+    CSSC,
+    HSC,
+    UEMSC,
+}
+
+impl DistanceMeasure {
+    /// Applies the distance measure to two finite stochastic languages.
+    /// The caller must ensure that the activity keys match.
+    pub fn apply(
+        &self,
+        language1: Box<dyn EbiTraitFiniteStochasticLanguage>,
+        language2: Box<dyn EbiTraitQueriableStochasticLanguage>,
+    ) -> Result<Fraction> {
+        match self {
+            DistanceMeasure::CSSC => language1.chi_square_stochastic_conformance(language2),
+            DistanceMeasure::HSC => language1.hellinger_stochastic_conformance(language2),
+            DistanceMeasure::UEMSC => language1.unit_earth_movers_stochastic_conformance(language2),
+        }
+    }
+}
 
 pub trait StochasticMarkovianConformance {
     /// Compare `self` with a stochastic labelled Petri net using the selected

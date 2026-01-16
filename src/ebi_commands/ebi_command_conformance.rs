@@ -18,8 +18,8 @@ use crate::{
         entropic_relevance::EntropicRelvance,
         hellinger_stochastic_conformance::HellingerStochasticConformance,
         jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
-        stochastic_markovian_abstraction::{AbstractMarkovian, DistanceMeasure},
-        stochastic_markovian_abstraction_conformance::StochasticMarkovianConformance,
+        stochastic_markovian_abstraction::AbstractMarkovian,
+        stochastic_markovian_abstraction_conformance::{DistanceMeasure, StochasticMarkovianConformance},
         unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
     },
 };
