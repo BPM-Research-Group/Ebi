@@ -712,6 +712,7 @@ dependencies = [
  "rand_chacha 0.9.0",
  "rayon",
  "regex",
+ "rustc-hash",
  "serde",
  "serde_json",
  "strsim",
