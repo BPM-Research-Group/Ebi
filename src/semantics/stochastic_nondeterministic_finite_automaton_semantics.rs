@@ -1,11 +1,16 @@
-use ebi_objects::ebi_arithmetic::{Fraction,ebi_number::Zero};
+use ebi_objects::{
+    ActivityKey,
+    ebi_arithmetic::{Fraction, One, ebi_number::Zero},
+};
 use std::collections::{HashMap, VecDeque};
+
+use crate::techniques::stochastic_markovian_abstraction::ActivityStartEnd;
 
 /// A transition in a stochastic non-deterministic finite automaton
 #[derive(Clone, Debug)]
 pub struct Transition {
     pub target: usize,
-    pub label: String,
+    pub label: Option<ActivityStartEnd>,
     pub probability: Fraction,
 }
 
@@ -24,6 +29,7 @@ pub struct State {
 /// according to their probabilities and move to the target state.
 #[derive(Clone, Debug)]
 pub struct StochasticNondeterministicFiniteAutomaton {
+    pub activity_key: ActivityKey,
     pub states: Vec<State>,
     pub initial: usize,
 }
@@ -34,24 +40,38 @@ impl StochasticNondeterministicFiniteAutomaton {
         Self {
             states: vec![State {
                 transitions: vec![],
-                p_final: Fraction::from((1, 1)),
+                p_final: Fraction::one(),
             }],
             initial: 0,
+            activity_key: ActivityKey::new(),
         }
     }
 
     /// Ensures that a state with index `idx` exists, extending the vector if necessary.
     fn ensure_state(&mut self, idx: usize) {
         while self.states.len() <= idx {
-            self.states.push(State { transitions: vec![], p_final: Fraction::from((0, 1)) });
+            self.states.push(State {
+                transitions: vec![],
+                p_final: Fraction::zero(),
+            });
         }
     }
 
     /// Adds a transition. The caller must make sure that outgoing probabilities of each state sum up to <= 1.
-    pub fn add_transition(&mut self, source: usize, label: String, target: usize, probability: Fraction) {
+    pub fn add_transition(
+        &mut self,
+        source: usize,
+        activity: Option<ActivityStartEnd>,
+        target: usize,
+        probability: Fraction,
+    ) {
         self.ensure_state(source);
         self.ensure_state(target);
-        self.states[source].transitions.push(Transition { target, label, probability });
+        self.states[source].transitions.push(Transition {
+            target,
+            label: activity,
+            probability,
+        });
     }
 
     /// Sets the final-probability of a state.
@@ -61,10 +81,14 @@ impl StochasticNondeterministicFiniteAutomaton {
     }
 
     /// Returns the number of states.
-    pub fn len(&self) -> usize { self.states.len() }
-    pub fn is_empty(&self) -> bool { self.states.is_empty() }
+    pub fn len(&self) -> usize {
+        self.states.len()
+    }
+    pub fn is_empty(&self) -> bool {
+        self.states.is_empty()
+    }
 
-    /// Removes all tau-transitions (those whose label is the empty string "")
+    /// Removes all tau-transitions (those whose label is None)
     /// from the automaton while preserving its stochastic behaviour.
     ///
     /// The implementation follows Mohri's two–phase epsilon-removal scheme
@@ -75,14 +99,14 @@ impl StochasticNondeterministicFiniteAutomaton {
             return;
         }
 
-        let one = Fraction::from((1, 1));
-        let zero = Fraction::from((0, 1));
+        let one = Fraction::one();
+        let zero = Fraction::zero();
 
         // Build tau-only adjacency with weights
         let mut tau_adj: Vec<Vec<(usize, Fraction)>> = vec![vec![]; n];
         for p in 0..n {
             for t in &self.states[p].transitions {
-                if t.label.is_empty() {
+                if t.label.is_none() {
                     tau_adj[p].push((t.target, t.probability.clone()));
                 }
             }
@@ -123,7 +147,9 @@ impl StochasticNondeterministicFiniteAutomaton {
         let mut visited = vec![false; sccs.len()];
         let mut rev_topo: Vec<usize> = Vec::new();
         fn dfs(u: usize, dag: &Vec<Vec<usize>>, vis: &mut Vec<bool>, out: &mut Vec<usize>) {
-            if vis[u] { return; }
+            if vis[u] {
+                return;
+            }
             vis[u] = true;
             for &v in &dag[u] {
                 dfs(v, dag, vis, out);
@@ -165,19 +191,31 @@ impl StochasticNondeterministicFiniteAutomaton {
             // Propagate to successor components (inter-SCC tau-edges)
             for &q in comp {
                 for &(r, ref w_qr) in &tau_adj[q] {
-                    if comp_of[r] == cid { continue; }
+                    if comp_of[r] == cid {
+                        continue;
+                    }
                     // For every s with d[r][s] > 0 (s already processed)
                     for p in 0..n {
-                        if !row_nonzero[p] { continue; }
-                        if d[p][q].is_zero() { continue; }
+                        if !row_nonzero[p] {
+                            continue;
+                        }
+                        if d[p][q].is_zero() {
+                            continue;
+                        }
                         let prefix = &d[p][q] * &w_qr.clone();
-                        if prefix.is_zero() { continue; }
-                        
+                        if prefix.is_zero() {
+                            continue;
+                        }
+
                         for s in 0..n {
                             let d_rs = d[r][s].clone();
-                            if d_rs.is_zero() { continue; }
+                            if d_rs.is_zero() {
+                                continue;
+                            }
                             let add = &prefix * &d_rs;
-                            if add.is_zero() { continue; }
+                            if add.is_zero() {
+                                continue;
+                            }
 
                             d[p][s] += add;
                         }
@@ -192,33 +230,46 @@ impl StochasticNondeterministicFiniteAutomaton {
 
         for q in 0..n {
             for t in &self.states[q].transitions {
-                if !t.label.is_empty() {
+                if !t.label.is_none() {
                     let tprob = t.probability.clone();
                     for p in 0..n {
-                        if d[p][q].is_zero() { continue; }
+                        if d[p][q].is_zero() {
+                            continue;
+                        }
                         let prob = &d[p][q] * &tprob;
-                        new_transitions[p].push(Transition { target: t.target, label: t.label.clone(), probability: prob });
+                        new_transitions[p].push(Transition {
+                            target: t.target,
+                            label: t.label.clone(),
+                            probability: prob,
+                        });
                     }
                 }
             }
             if !self.states[q].p_final.is_zero() {
                 for p in 0..n {
-                    if d[p][q].is_zero() { continue; }
-                    new_p_final[p] = &new_p_final[p] + &(&d[p][q] * &self.states[q].p_final.clone());
+                    if d[p][q].is_zero() {
+                        continue;
+                    }
+                    new_p_final[p] =
+                        &new_p_final[p] + &(&d[p][q] * &self.states[q].p_final.clone());
                 }
             }
         }
 
         // Merge parallel edges
         for p in 0..n {
-
-            let mut map: HashMap<(usize, String), Fraction> = HashMap::new();
+            let mut map: HashMap<(usize, Option<ActivityStartEnd>), Fraction> = HashMap::new();
             for tr in new_transitions[p].drain(..) {
                 *map.entry((tr.target, tr.label.clone()))
                     .or_insert_with(Fraction::zero) += tr.probability.clone();
             }
-            new_transitions[p] = map.into_iter()
-                .map(|((tgt, lbl), prob)| Transition { target: tgt, label: lbl, probability: prob })
+            new_transitions[p] = map
+                .into_iter()
+                .map(|((tgt, lbl), prob)| Transition {
+                    target: tgt,
+                    label: lbl,
+                    probability: prob,
+                })
                 .collect();
         }
 
@@ -230,34 +281,43 @@ impl StochasticNondeterministicFiniteAutomaton {
 
         // Trim unreachable states (reachable over visible edges)
         {
-
             let mut reachable = vec![false; self.states.len()];
             let mut queue = VecDeque::new();
             queue.push_back(self.initial);
             while let Some(u) = queue.pop_front() {
-                if reachable[u] { continue; }
+                if reachable[u] {
+                    continue;
+                }
                 reachable[u] = true;
                 for tr in &self.states[u].transitions {
-                    if tr.label.is_empty() { continue; }
+                    if tr.label.is_none() {
+                        continue;
+                    }
                     queue.push_back(tr.target);
                 }
             }
             if reachable.iter().any(|&r| !r) {
-                
                 let mut map = vec![None; self.states.len()];
                 let mut new_states: Vec<State> = Vec::new();
                 for (old_idx, st) in self.states.iter().enumerate() {
                     if reachable[old_idx] {
                         let new_idx = new_states.len();
                         map[old_idx] = Some(new_idx);
-                        new_states.push(State { transitions: Vec::new(), p_final: st.p_final.clone() });
+                        new_states.push(State {
+                            transitions: Vec::new(),
+                            p_final: st.p_final.clone(),
+                        });
                     }
                 }
                 for (old_idx, st) in self.states.iter().enumerate() {
                     if let Some(new_src) = map[old_idx] {
                         for tr in &st.transitions {
                             if let Some(new_tgt) = map[tr.target] {
-                                new_states[new_src].transitions.push(Transition { target: new_tgt, label: tr.label.clone(), probability: tr.probability.clone() });
+                                new_states[new_src].transitions.push(Transition {
+                                    target: new_tgt,
+                                    label: tr.label.clone(),
+                                    probability: tr.probability.clone(),
+                                });
                             }
                         }
                     }
@@ -270,9 +330,14 @@ impl StochasticNondeterministicFiniteAutomaton {
         // Check row sums
         for (i, st) in self.states.iter().enumerate() {
             let mut row = st.p_final.clone();
-            for tr in &st.transitions { row += tr.probability.clone(); }
-            debug_assert!(row == Fraction::from((1,1)),
-                          "row sum ≠ 1 after tau-removal in state {}", i);
+            for tr in &st.transitions {
+                row += tr.probability.clone();
+            }
+            debug_assert!(
+                row == Fraction::one(),
+                "row sum ≠ 1 after tau-removal in state {}",
+                i
+            );
         }
     }
 }
@@ -281,8 +346,8 @@ impl StochasticNondeterministicFiniteAutomaton {
 /// Returns None if the matrix is singular.
 fn invert_matrix(mut a: Vec<Vec<Fraction>>) -> Option<Vec<Vec<Fraction>>> {
     let n = a.len();
-    let one = Fraction::from((1, 1));
-    let zero = Fraction::from((0, 1));
+    let one = Fraction::one();
+    let zero = Fraction::zero();
 
     // Attach the identity matrix to the right side of the current matrix
     for i in 0..n {
@@ -338,8 +403,15 @@ fn compute_scc(n: usize, adj: &Vec<Vec<(usize, Fraction)>>) -> Vec<Vec<usize>> {
     // 1st pass: order by finish time using DFS on original graph
     let mut visited = vec![false; n];
     let mut order: Vec<usize> = Vec::with_capacity(n);
-    fn dfs1(u: usize, adj: &Vec<Vec<(usize, Fraction)>>, vis: &mut Vec<bool>, order: &mut Vec<usize>) {
-        if vis[u] { return; }
+    fn dfs1(
+        u: usize,
+        adj: &Vec<Vec<(usize, Fraction)>>,
+        vis: &mut Vec<bool>,
+        order: &mut Vec<usize>,
+    ) {
+        if vis[u] {
+            return;
+        }
         vis[u] = true;
         for &(v, _) in &adj[u] {
             dfs1(v, adj, vis, order);
@@ -361,8 +433,16 @@ fn compute_scc(n: usize, adj: &Vec<Vec<(usize, Fraction)>>) -> Vec<Vec<usize>> {
     // 2nd pass: DFS on reverse graph in reverse finish order
     let mut comp_id = vec![None; n];
     let mut comps: Vec<Vec<usize>> = Vec::new();
-    fn dfs2(u: usize, radj: &Vec<Vec<usize>>, comp: &mut Vec<usize>, comp_id: &mut Vec<Option<usize>>, cid: usize) {
-        if comp_id[u].is_some() { return; }
+    fn dfs2(
+        u: usize,
+        radj: &Vec<Vec<usize>>,
+        comp: &mut Vec<usize>,
+        comp_id: &mut Vec<Option<usize>>,
+        cid: usize,
+    ) {
+        if comp_id[u].is_some() {
+            return;
+        }
         comp_id[u] = Some(cid);
         comp.push(u);
         for &v in &radj[u] {
@@ -386,10 +466,14 @@ mod tests {
     use std::collections::HashMap;
 
     /// frac!(n,d)  ->  Fraction::from((n,d))
-    macro_rules! frac { ($n:expr , $d:expr) => { Fraction::from(($n as u32, $d as u32)) }; }
+    macro_rules! frac {
+        ($n:expr , $d:expr) => {
+            Fraction::from(($n as u32, $d as u32))
+        };
+    }
 
     /// Collapse parallel visible edges into (src,label,dst) -> probability.
-    fn collect(states: &[State]) -> HashMap<(usize, String, usize), Fraction> {
+    fn collect(states: &[State]) -> HashMap<(usize, Option<ActivityStartEnd>, usize), Fraction> {
         let mut m = HashMap::new();
         for (src, st) in states.iter().enumerate() {
             for tr in &st.transitions {
@@ -404,8 +488,10 @@ mod tests {
     fn assert_rows_sum_to_one(states: &[State]) {
         for (i, st) in states.iter().enumerate() {
             let mut row = st.p_final.clone();
-            for tr in &st.transitions { row += tr.probability.clone(); }
-            assert_eq!(row, frac!(1,1), "row sum != 1 in state {}", i);
+            for tr in &st.transitions {
+                row += tr.probability.clone();
+            }
+            assert_eq!(row, frac!(1, 1), "row sum != 1 in state {}", i);
         }
     }
 
@@ -414,37 +500,52 @@ mod tests {
     fn tau_removal_self_loop_and_cycle_rows_sum_to_one() {
         // tau self-loop on 0 (1/5) and cycle between 1 and 2 (1/4,1/2)
         let mut a = StochasticNondeterministicFiniteAutomaton::new();
-        for s in 0..3 { a.ensure_state(s); }
+        for s in 0..3 {
+            a.ensure_state(s);
+        }
         a.set_final_probability(0, Fraction::zero());
 
-        a.add_transition(0, "".into(), 0, frac!(1,5));
-        a.add_transition(1, "".into(), 2, frac!(1,4));
-        a.add_transition(2, "".into(), 1, frac!(1,2));
+        a.add_transition(0, None, 0, frac!(1, 5));
+        a.add_transition(1, None, 2, frac!(1, 4));
+        a.add_transition(2, None, 1, frac!(1, 2));
 
-        a.add_transition(0, "a".into(), 0, frac!(3,5));
-        a.add_transition(0, "b".into(), 1, frac!(1,5));
-        a.add_transition(1, "c".into(), 1, frac!(3,4));
-        a.add_transition(2, "d".into(), 2, frac!(1,4));
+        let acta = Some(ActivityStartEnd::Activity(
+            a.activity_key.process_activity("a"),
+        ));
+        let actb = Some(ActivityStartEnd::Activity(
+            a.activity_key.process_activity("b"),
+        ));
+        let actc = Some(ActivityStartEnd::Activity(
+            a.activity_key.process_activity("c"),
+        ));
+        let actd = Some(ActivityStartEnd::Activity(
+            a.activity_key.process_activity("d"),
+        ));
 
-        a.set_final_probability(2, frac!(1,4));
+        a.add_transition(0, acta, 0, frac!(3, 5));
+        a.add_transition(0, actb, 1, frac!(1, 5));
+        a.add_transition(1, actc, 1, frac!(3, 4));
+        a.add_transition(2, actd, 2, frac!(1, 4));
+
+        a.set_final_probability(2, frac!(1, 4));
 
         a.remove_tau_transitions();
 
         // no tau labels
         for st in &a.states {
-            assert!(st.transitions.iter().all(|t| !t.label.is_empty()));
+            assert!(st.transitions.iter().all(|t| !t.label.is_none()));
         }
 
         // expected exact result
         let mut expect = HashMap::new();
-        expect.insert((0, "a".into(), 0), frac!(3,4));
-        expect.insert((0, "b".into(), 1), frac!(1,4));
-        expect.insert((1, "c".into(), 1), frac!(6,7));
-        expect.insert((1, "d".into(), 2), frac!(1,14));
-        expect.insert((2, "c".into(), 1), frac!(3,7));
-        expect.insert((2, "d".into(), 2), frac!(2,7));
+        expect.insert((0, acta, 0), frac!(3, 4));
+        expect.insert((0, actb, 1), frac!(1, 4));
+        expect.insert((1, actc, 1), frac!(6, 7));
+        expect.insert((1, actd, 2), frac!(1, 14));
+        expect.insert((2, actc, 1), frac!(3, 7));
+        expect.insert((2, actd, 2), frac!(2, 7));
 
-        let expect_final = [frac!(0,1), frac!(1,14), frac!(2,7)];
+        let expect_final = [frac!(0, 1), frac!(1, 14), frac!(2, 7)];
 
         assert_eq!(collect(&a.states), expect, "visible multiset differs");
         for (i, st) in a.states.iter().enumerate() {
@@ -460,35 +561,48 @@ mod tests {
         // SCC_B: 1,2 (1/4,1/3)
         // cross A -> B: 0 -> 1 1/2
         let mut a = StochasticNondeterministicFiniteAutomaton::new();
-        for s in 0..3 { a.ensure_state(s); }
+        for s in 0..3 {
+            a.ensure_state(s);
+        }
         a.set_final_probability(0, Fraction::zero());
 
-        a.add_transition(0, "".into(), 0, frac!(1,2));
-        a.add_transition(0, "".into(), 1, frac!(1,2));
-        a.add_transition(1, "".into(), 2, frac!(1,4));
-        a.add_transition(2, "".into(), 1, frac!(1,3));
+        a.add_transition(0, None, 0, frac!(1, 2));
+        a.add_transition(0, None, 1, frac!(1, 2));
+        a.add_transition(1, None, 2, frac!(1, 4));
+        a.add_transition(2, None, 1, frac!(1, 3));
+
+        let actv = Some(ActivityStartEnd::Activity(
+            a.activity_key.process_activity("v"),
+        ));
+        let actw = Some(ActivityStartEnd::Activity(
+            a.activity_key.process_activity("w"),
+        ));
 
         // visible edges
-        a.add_transition(2, "v".into(), 2, frac!(1,2));
-        a.add_transition(1, "w".into(), 1, frac!(1,4));   // completes row of state 1
+        a.add_transition(2, actv, 2, frac!(1, 2));
+        a.add_transition(1, actw, 1, frac!(1, 4)); // completes row of state 1
 
         // finals to complete rows
-        a.set_final_probability(1, frac!(1,2));
-        a.set_final_probability(2, frac!(1,6));
+        a.set_final_probability(1, frac!(1, 2));
+        a.set_final_probability(2, frac!(1, 6));
 
         a.remove_tau_transitions();
 
         // "v" must be reachable from 0 and 1 now
-        assert!(a.states[0].transitions.iter().any(|t| t.label == "v"));
-        assert!(a.states[1].transitions.iter().any(|t| t.label == "v"));
+        assert!(a.states[0].transitions.iter().any(|t| t.label == actv));
+        assert!(a.states[1].transitions.iter().any(|t| t.label == actv));
         assert_rows_sum_to_one(&a.states);
     }
 
     // 3. empty automaton
     #[test]
     fn tau_removal_empty_automaton() {
-        let mut a = StochasticNondeterministicFiniteAutomaton { states: vec![], initial: 0 };
-        a.remove_tau_transitions();   // should not panic
+        let mut a = StochasticNondeterministicFiniteAutomaton {
+            states: vec![],
+            initial: 0,
+            activity_key: ActivityKey::new(),
+        };
+        a.remove_tau_transitions(); // should not panic
         assert!(a.states.is_empty());
     }
 
@@ -496,8 +610,11 @@ mod tests {
     #[test]
     fn tau_removal_no_tau_edges_is_identity() {
         let mut a = StochasticNondeterministicFiniteAutomaton::new();
-        a.add_transition(0, "x".into(), 0, frac!(2,3));
-        a.set_final_probability(0, frac!(1,3));
+        let actx = Some(ActivityStartEnd::Activity(
+            a.activity_key.process_activity("x"),
+        ));
+        a.add_transition(0, actx, 0, frac!(2, 3));
+        a.set_final_probability(0, frac!(1, 3));
 
         let before = collect(&a.states);
         let before_final = a.states[0].p_final.clone();
@@ -514,7 +631,7 @@ mod tests {
         let mut a = StochasticNondeterministicFiniteAutomaton::new();
         a.remove_tau_transitions();
         assert_eq!(a.states.len(), 1);
-        assert_eq!(a.states[0].p_final, frac!(1,1));
+        assert_eq!(a.states[0].p_final, frac!(1, 1));
     }
 
     // 6. simple acyclic tau-chain
@@ -522,23 +639,33 @@ mod tests {
     fn tau_removal_tau_chain() {
         // 0 -(1/5)->1 -(1/2)->2 , visible 2 -a->2
         let mut a = StochasticNondeterministicFiniteAutomaton::new();
-        for s in 0..3 { a.ensure_state(s); }
+        for s in 0..3 {
+            a.ensure_state(s);
+        }
 
-        a.add_transition(0, "".into(), 1, frac!(1,5));
-        a.add_transition(1, "".into(), 2, frac!(1,2));
-        a.add_transition(2, "a".into(), 2, frac!(1,2));
+        let acta = Some(ActivityStartEnd::Activity(
+            a.activity_key.process_activity("a"),
+        ));
 
-        a.set_final_probability(0, frac!(4,5));
-        a.set_final_probability(1, frac!(1,2));
-        a.set_final_probability(2, frac!(1,2));
+        a.add_transition(0, None, 1, frac!(1, 5));
+        a.add_transition(1, None, 2, frac!(1, 2));
+        a.add_transition(2, acta, 2, frac!(1, 2));
+
+        a.set_final_probability(0, frac!(4, 5));
+        a.set_final_probability(1, frac!(1, 2));
+        a.set_final_probability(2, frac!(1, 2));
 
         a.remove_tau_transitions();
 
         // expect new a-edge from 0 with prob 1/20
-        let w = a.states[0].transitions.iter()
-                         .find(|t| t.label == "a")
-                         .unwrap().probability.clone();
-        assert_eq!(w, frac!(1,20));
+        let w = a.states[0]
+            .transitions
+            .iter()
+            .find(|t| t.label == acta)
+            .unwrap()
+            .probability
+            .clone();
+        assert_eq!(w, frac!(1, 20));
         assert_rows_sum_to_one(&a.states);
     }
 
@@ -548,8 +675,8 @@ mod tests {
     fn tau_removal_singular_matrix_panics() {
         // single state with tau-self-loop weight 1  ->  I-W singular
         let mut a = StochasticNondeterministicFiniteAutomaton::new();
-        a.add_transition(0, "".into(), 0, frac!(1,1));
-        a.remove_tau_transitions();   // must panic
+        a.add_transition(0, None, 0, frac!(1, 1));
+        a.remove_tau_transitions(); // must panic
     }
 
     // 8. automaton with only tau-edges
@@ -557,14 +684,16 @@ mod tests {
     fn tau_removal_only_tau_edges() {
         let mut a = StochasticNondeterministicFiniteAutomaton::new();
         a.ensure_state(1);
-        a.add_transition(0, "".into(), 1, frac!(1,2));
-        a.add_transition(1, "".into(), 0, frac!(1,2));
-        a.set_final_probability(0, frac!(1,2));
-        a.set_final_probability(1, frac!(1,2));
+        a.add_transition(0, None, 1, frac!(1, 2));
+        a.add_transition(1, None, 0, frac!(1, 2));
+        a.set_final_probability(0, frac!(1, 2));
+        a.set_final_probability(1, frac!(1, 2));
 
         a.remove_tau_transitions();
 
-        for st in &a.states { assert!(st.transitions.is_empty()); }
+        for st in &a.states {
+            assert!(st.transitions.is_empty());
+        }
         assert_rows_sum_to_one(&a.states);
     }
 
@@ -575,11 +704,18 @@ mod tests {
         let mut a = StochasticNondeterministicFiniteAutomaton::new();
         a.ensure_state(1);
 
-        a.add_transition(0, "x".into(), 0, frac!(1,2));
-        a.set_final_probability(0, frac!(1,2));
+        let actx = Some(ActivityStartEnd::Activity(
+            a.activity_key.process_activity("x"),
+        ));
+        let acty = Some(ActivityStartEnd::Activity(
+            a.activity_key.process_activity("y"),
+        ));
 
-        a.add_transition(1, "".into(), 1, frac!(1,2)); // tau self-loop
-        a.add_transition(1, "y".into(), 1, frac!(1,2));
+        a.add_transition(0, actx, 0, frac!(1, 2));
+        a.set_final_probability(0, frac!(1, 2));
+
+        a.add_transition(1, None, 1, frac!(1, 2)); // tau self-loop
+        a.add_transition(1, acty, 1, frac!(1, 2));
 
         a.remove_tau_transitions();
         assert_rows_sum_to_one(&a.states);

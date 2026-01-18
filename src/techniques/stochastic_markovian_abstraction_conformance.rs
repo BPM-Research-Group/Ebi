@@ -58,7 +58,7 @@ impl StochasticMarkovianConformance for MarkovianAbstraction {
         measure: DistanceMeasure,
     ) -> Result<Fraction> {
         if self.order != other.order {
-            return Err(anyhow!("order of to be compared abstractions must match"));
+            return Err(anyhow!("order of to-be compared abstractions must match"));
         }
 
         // Check the value of k
