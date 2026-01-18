@@ -31,7 +31,9 @@ pub struct State {
 pub struct StochasticNondeterministicFiniteAutomaton {
     pub activity_key: ActivityKey,
     pub states: Vec<State>,
-    pub initial: usize,
+
+    /// If the initial state is None, then the language is empty
+    pub initial: Option<usize>,
 }
 
 impl StochasticNondeterministicFiniteAutomaton {
@@ -42,7 +44,7 @@ impl StochasticNondeterministicFiniteAutomaton {
                 transitions: vec![],
                 p_final: Fraction::one(),
             }],
-            initial: 0,
+            initial: Some(0),
             activity_key: ActivityKey::new(),
         }
     }
@@ -101,6 +103,13 @@ impl StochasticNondeterministicFiniteAutomaton {
 
         let one = Fraction::one();
         let zero = Fraction::zero();
+
+        //chech whether the SLPN has an initial state
+        let initial_state = if let Some(initial) = self.initial {
+            initial
+        } else {
+            return;
+        };
 
         // Build tau-only adjacency with weights
         let mut tau_adj: Vec<Vec<(usize, Fraction)>> = vec![vec![]; n];
@@ -283,7 +292,7 @@ impl StochasticNondeterministicFiniteAutomaton {
         {
             let mut reachable = vec![false; self.states.len()];
             let mut queue = VecDeque::new();
-            queue.push_back(self.initial);
+            queue.push_back(initial_state);
             while let Some(u) = queue.pop_front() {
                 if reachable[u] {
                     continue;
@@ -323,7 +332,7 @@ impl StochasticNondeterministicFiniteAutomaton {
                     }
                 }
                 self.states = new_states;
-                self.initial = map[self.initial].unwrap();
+                self.initial = Some(map[initial_state].unwrap());
             }
         }
 
@@ -599,7 +608,7 @@ mod tests {
     fn tau_removal_empty_automaton() {
         let mut a = StochasticNondeterministicFiniteAutomaton {
             states: vec![],
-            initial: 0,
+            initial: Some(0),
             activity_key: ActivityKey::new(),
         };
         a.remove_tau_transitions(); // should not panic

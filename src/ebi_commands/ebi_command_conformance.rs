@@ -19,12 +19,14 @@ use crate::{
         hellinger_stochastic_conformance::HellingerStochasticConformance,
         jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
         stochastic_markovian_abstraction::AbstractMarkovian,
-        stochastic_markovian_abstraction_conformance::{DistanceMeasure, StochasticMarkovianConformance},
+        stochastic_markovian_abstraction_conformance::{
+            DistanceMeasure, StochasticMarkovianConformance,
+        },
         unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
     },
 };
 use anyhow::{Context, anyhow};
-use ebi_objects::{EbiObject, EbiObjectType, ebi_arithmetic::Fraction};
+use ebi_objects::{EbiObject, EbiObjectType};
 use strum::VariantNames;
 
 pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
@@ -396,24 +398,22 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
         let order = inputs.remove(0).to_type::<usize>()?;
         let measure = inputs.remove(0).to_type::<DistanceMeasure>()?;
 
-        let delta = Fraction::from((1, 1000)); // default delta value
-
         //read abstractions
         let abstraction1 = match lang1 {
             EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => {
-                slang.abstract_markovian(*order, &delta)
+                slang.abstract_markovian(*order)
             }
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
-                slpn.abstract_markovian(*order, &delta)
+                slpn.abstract_markovian(*order)
             }
             _ => unreachable!(),
         }?;
         let abstraction2 = match lang2 {
             EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => {
-                slang.abstract_markovian(*order, &delta)
+                slang.abstract_markovian(*order)
             }
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
-                slpn.abstract_markovian(*order, &delta)
+                slpn.abstract_markovian(*order)
             }
             _ => unreachable!(),
         }?;
