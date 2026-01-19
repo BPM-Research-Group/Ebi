@@ -11,7 +11,8 @@ use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
     EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
     LabelledPetriNet, NumberOfTraces, ProcessTree, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     ebi_arithmetic::ebi_number::Zero, ebi_objects::event_log_csv::EventLogCsv,
 };
 
@@ -99,6 +100,7 @@ lpn!(LabelledPetriNet);
 lpn!(StochasticLabelledPetriNet);
 dfm!(DeterministicFiniteAutomaton);
 dfm!(StochasticDeterministicFiniteAutomaton);
+dfm!(StochasticNondeterministicFiniteAutomaton);
 dfm!(DirectlyFollowsModel);
 dfm!(StochasticDirectlyFollowsModel);
 dfm!(DirectlyFollowsGraph);

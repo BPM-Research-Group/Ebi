@@ -918,7 +918,7 @@ mod tests {
         assert_eq!(slang.number_of_traces(), 3);
         let mut sdfa: StochasticDeterministicFiniteAutomaton = slang.clone().into();
         assert_eq!(sdfa.max_state, 5);
-        assert_eq!(sdfa.get_number_of_transitions(), 5);
+        assert_eq!(sdfa.number_of_transitions(), 5);
 
         //initial state
         let state = sdfa.get_deterministic_initial_state().unwrap().unwrap();

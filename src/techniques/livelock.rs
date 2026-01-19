@@ -1,6 +1,9 @@
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, HasActivityKey, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, HasActivityKey,
+    LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton,
 };
 use std::collections::{HashMap, HashSet, hash_map::Entry};
 
@@ -375,6 +378,10 @@ dfa!(
 dfa!(
     StochasticDeterministicFiniteAutomaton,
     LivelockCacheStochasticDeterministicAutomaton
+);
+dfa!(
+    StochasticNondeterministicFiniteAutomaton,
+    LivelockCacheStochasticNondeterministicAutomaton
 );
 
 #[cfg(test)]

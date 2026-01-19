@@ -54,6 +54,7 @@ pub mod ebi_file_handlers {
     pub mod stochastic_directly_follows_model;
     pub mod stochastic_labelled_petri_net;
     pub mod stochastic_language_of_alignments;
+    pub mod stochastic_nondeterministic_finite_automaton;
     pub mod stochastic_process_tree;
 }
 pub mod ebi_traits {
@@ -144,7 +145,6 @@ pub mod semantics {
     pub mod stochastic_deterministic_finite_automaton_semantics;
     pub mod stochastic_directly_follows_graph_semantics;
     pub mod stochastic_labelled_petri_net_semantics;
-    pub mod stochastic_nondeterministic_finite_automaton_semantics;
     pub mod stochastic_process_tree_semantics;
 }
 pub mod stochastic_partially_ordered_semantics {
@@ -196,7 +196,6 @@ pub mod techniques {
     pub mod infinitely_many_traces;
     pub mod jensen_shannon_stochastic_conformance;
     pub mod livelock;
-    pub mod livelock_patch;
     pub mod medoid;
     pub mod medoid_non_stochastic;
     pub mod non_decreasing_livelock;
@@ -209,6 +208,7 @@ pub mod techniques {
     pub mod sample_folds;
     pub mod stochastic_markovian_abstraction;
     pub mod stochastic_markovian_abstraction_conformance;
+    pub mod tau_removal;
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;

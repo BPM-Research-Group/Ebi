@@ -53,10 +53,11 @@ pub trait StochasticMarkovianConformance {
 
 impl StochasticMarkovianConformance for MarkovianAbstraction {
     fn markovian_conformance(
-        self,
-        other: MarkovianAbstraction,
+        mut self,
+        mut other: MarkovianAbstraction,
         measure: DistanceMeasure,
     ) -> Result<Fraction> {
+        // Check that the orders match
         if self.order != other.order {
             return Err(anyhow!("order of to-be compared abstractions must match"));
         }
@@ -66,6 +67,11 @@ impl StochasticMarkovianConformance for MarkovianAbstraction {
             return Err(anyhow::anyhow!("order must be at least 1"));
         }
 
+        // Both markovian abstractions have had artificial start and end activities inserted, though these may have different names.
+        // Harmonise them.
+        self.harmonise_start_end(&mut other);
+
+        //compute stochastic languages
         let abslang1 = Box::new(FiniteStochasticLanguage::from(self));
         let abslang2 = Box::new(FiniteStochasticLanguage::from(other));
 

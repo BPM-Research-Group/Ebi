@@ -1,19 +1,12 @@
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    semantics::{
-        labelled_petri_net_semantics::LPNMarking,
-        semantics::Semantics,
-        stochastic_nondeterministic_finite_automaton_semantics::{
-            State as SnfaState, StochasticNondeterministicFiniteAutomaton as Snfa,
-            Transition as SnfaTransition,
-        },
-    },
+    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
-    techniques::livelock_patch,
+    techniques::tau_removal::TauRemoval,
 };
 use anyhow::{Ok, Result, anyhow};
 use ebi_objects::{
-    Activity, ActivityKey,
+    Activity, ActivityKey, HasActivityKey, StochasticNondeterministicFiniteAutomaton,
     ebi_arithmetic::{Fraction, One, Recip, ebi_number::Zero},
     ebi_objects::{
         finite_stochastic_language::FiniteStochasticLanguage,
@@ -23,53 +16,72 @@ use ebi_objects::{
 use itertools::Itertools;
 use rayon::prelude::*;
 use rustc_hash::FxHashMap;
-use std::{collections::VecDeque, fmt::Display};
-
-#[derive(Debug, Eq, PartialEq, Hash, Clone, Copy)]
-pub enum ActivityStartEnd {
-    Activity(Activity),
-    Start,
-    End,
-}
-
-impl ActivityStartEnd {
-    pub fn from_id(id: usize, activity_key: &ActivityKey) -> ActivityStartEnd {
-        match id {
-            0 => ActivityStartEnd::Start,
-            1 => ActivityStartEnd::End,
-            x => ActivityStartEnd::Activity(activity_key.get_activity_by_id(x - 2)),
-        }
-    }
-
-    pub fn to_id(&self) -> usize {
-        match self {
-            ActivityStartEnd::Activity(activity) => activity.id + 2,
-            ActivityStartEnd::Start => 0,
-            ActivityStartEnd::End => 1,
-        }
-    }
-}
-
-impl Display for ActivityStartEnd {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ActivityStartEnd::Activity(activity) => activity.fmt(f),
-            ActivityStartEnd::Start => "+".fmt(f),
-            ActivityStartEnd::End => "-".fmt(f),
-        }
-    }
-}
+use std::{cmp::max, collections::VecDeque, fmt::Display};
 
 #[derive(Debug, Clone)]
 /// Represents a k-th order Markovian abstraction of a stochastic language
 pub struct MarkovianAbstraction {
-    activity_key: ActivityKey,
+    pub activity_key: ActivityKey,
 
     /// The order of the abstraction (k)
     pub order: usize,
 
     /// The mapping from subtraces to normalised frequencies
-    pub abstraction: FxHashMap<Vec<ActivityStartEnd>, Fraction>,
+    pub abstraction: FxHashMap<Vec<Activity>, Fraction>,
+
+    pub start_activity: Activity,
+    pub end_activity: Activity,
+}
+
+impl MarkovianAbstraction {
+    pub fn create_start_end(activity_key: &mut ActivityKey) -> (Activity, Activity) {
+        let max_len = activity_key
+            .activity2name
+            .iter()
+            .map(|name| name.len())
+            .max()
+            .unwrap_or(0);
+        let start_activity = activity_key.process_activity(&"+".repeat(max_len + 1));
+        let end_activity = activity_key.process_activity(&"-".repeat(max_len + 1));
+        (start_activity, end_activity)
+    }
+
+    pub fn harmonise_start_end(&mut self, other: &mut MarkovianAbstraction) {
+        //start
+        {
+            let max_len_start = max(
+                self.activity_key
+                    .get_activity_label(&self.start_activity)
+                    .len(),
+                other
+                    .activity_key
+                    .get_activity_label(&other.start_activity)
+                    .len(),
+            );
+            let self_id = self.activity_key.get_id_from_activity(self.start_activity);
+            self.activity_key.activity2name[self_id] = "+".repeat(max_len_start);
+            let other_id = other
+                .activity_key
+                .get_id_from_activity(other.start_activity);
+            other.activity_key.activity2name[other_id] = "+".repeat(max_len_start);
+        }
+        //end
+        {
+            let max_len_end = max(
+                self.activity_key
+                    .get_activity_label(&self.end_activity)
+                    .len(),
+                other
+                    .activity_key
+                    .get_activity_label(&other.end_activity)
+                    .len(),
+            );
+            let self_id = self.activity_key.get_id_from_activity(self.end_activity);
+            self.activity_key.activity2name[self_id] = "-".repeat(max_len_end);
+            let other_id = other.activity_key.get_id_from_activity(other.end_activity);
+            other.activity_key.activity2name[other_id] = "-".repeat(max_len_end);
+        }
+    }
 }
 
 impl Display for MarkovianAbstraction {
@@ -80,13 +92,7 @@ impl Display for MarkovianAbstraction {
                 "[{}]: {}",
                 trace
                     .iter()
-                    .map(|event| match event {
-                        ActivityStartEnd::Activity(activity) => {
-                            self.activity_key.deprocess_activity(activity)
-                        }
-                        ActivityStartEnd::Start => "start",
-                        ActivityStartEnd::End => "end",
-                    })
+                    .map(|activity| self.activity_key.deprocess_activity(activity))
                     .join(", "),
                 probability
             )?;
@@ -99,35 +105,16 @@ impl Display for MarkovianAbstraction {
 /// Note that the start and end of the traces will show up as normal activities.
 impl From<MarkovianAbstraction> for FiniteStochasticLanguage {
     fn from(ma: MarkovianAbstraction) -> Self {
-        let mut activity_key = ma.activity_key;
-        let start = activity_key.process_activity("+[start of trace]+@$%-/");
-        let end = activity_key.process_activity("-[end of trace]+@$%-/");
+        //repack the traces
+        let traces = ma.abstraction.into_iter().collect();
 
-        //transform the traces
-        let traces = ma
-            .abstraction
-            .into_iter()
-            .map(|(subtrace, probability)| {
-                (
-                    subtrace
-                        .into_iter()
-                        .map(|ase| match ase {
-                            ActivityStartEnd::Activity(activity) => activity,
-                            ActivityStartEnd::Start => start,
-                            ActivityStartEnd::End => end,
-                        })
-                        .collect(),
-                    probability,
-                )
-            })
-            .collect();
-
-        // new_raw is used because we are populating the map manually and don't necessarily want to force re-normalisation immediately
-        FiniteStochasticLanguage::new_raw(traces, activity_key)
+        // new_raw is used because normalisation is guaranteed by construction
+        FiniteStochasticLanguage::new_raw(traces, ma.activity_key)
     }
 }
 
 pub trait AbstractMarkovian {
+    /// Create a Markovian abstraction, that is, a stochastic language of sub-traces.
     fn abstract_markovian(&self, order: usize) -> Result<MarkovianAbstraction>;
 }
 
@@ -139,33 +126,41 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
             ));
         }
 
-        // 0.5 Patch bounded livelocks by adding timeout escapes
-        let patched_net = livelock_patch::patch_livelocks(&self, &Fraction::one())?;
-
         // 1 Build embedded SNFA
-        let mut snfa = build_embedded_snfa(&patched_net)?;
+        let mut snfa = build_embedded_snfa(self)?;
+
+        println!("snfa\n{}", snfa);
 
         // 1.1 Remove tau transitions
-        snfa.remove_tau_transitions();
+        snfa.remove_tau_transitions()?;
 
-        // 2 Patch it
-        add_artificial_start_end_to_snfa(&mut snfa);
+        println!("snfa removed taus\n{}", snfa);
+
+        // 2 Add artificial start and end
+        let (start_activity, end_activity) =
+            MarkovianAbstraction::create_start_end(&mut snfa.activity_key);
+        add_artificial_start_end_to_snfa(&mut snfa, start_activity, end_activity)?;
+
+        println!("snfa start end\n{}", snfa);
 
         //check whether the SNFA has an empty language
-        let initial_state = if let Some(initial) = snfa.initial {
+        let initial_state = if let Some(initial) = snfa.initial_state {
             initial
         } else {
             //empty language
-            let abstraction = MarkovianAbstraction {
+            return Ok(MarkovianAbstraction {
                 activity_key: snfa.activity_key,
                 order,
                 abstraction: FxHashMap::default(),
-            };
-            return Ok(abstraction);
+                start_activity,
+                end_activity,
+            });
         };
 
+        println!("no empty language");
+
         // 3 Build matrix and solve for x
-        let n = snfa.states.len();
+        let n = snfa.number_of_states();
         // Build sparse A = (I - Delta)^T
         let delta = build_delta(&snfa);
         let mut a_sparse: Vec<FxHashMap<usize, Fraction>> = vec![FxHashMap::default(); n];
@@ -195,19 +190,19 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
 
         // 4 Compute phi for each state
         // Compute phi on ID space then translate back to Strings using the shared ActivityKey
-        let phi_ids = compute_phi_ids(&snfa, order);
+        let phi_ids = compute_phi_ids(&snfa, order, start_activity, end_activity);
 
         // helper to translate a trace of usize IDs back to ActivityStartEnds
-        let translate = |ids: &Vec<usize>| -> Vec<ActivityStartEnd> {
-            let mut vec: Vec<ActivityStartEnd> = Vec::with_capacity(ids.len());
+        let translate = |ids: &Vec<usize>| -> Vec<Activity> {
+            let mut vec: Vec<Activity> = Vec::with_capacity(ids.len());
             for id in ids.iter() {
-                vec.push(ActivityStartEnd::from_id(*id, &snfa.activity_key));
+                vec.push(snfa.activity_key.get_activity_by_id(*id));
             }
             vec
         };
 
         // 5 Compute f_l^k
-        let mut f_l_k: FxHashMap<Vec<ActivityStartEnd>, Fraction> = FxHashMap::default();
+        let mut f_l_k: FxHashMap<Vec<Activity>, Fraction> = FxHashMap::default();
         for (q, map) in phi_ids.iter().enumerate() {
             for (gamma_ids, phi_val) in map {
                 let gamma = translate(gamma_ids);
@@ -230,6 +225,8 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
             activity_key: snfa.activity_key,
             order,
             abstraction,
+            start_activity,
+            end_activity,
         })
     }
 }
@@ -249,14 +246,21 @@ impl AbstractMarkovian for dyn EbiTraitFiniteStochasticLanguage {
         }
 
         // Initialise f_l^k which stores the expected number of occurrences of each subtrace
-        let mut f_l_k: FxHashMap<Vec<ActivityStartEnd>, Fraction> = FxHashMap::default();
+        let mut f_l_k: FxHashMap<Vec<Activity>, Fraction> = FxHashMap::default();
 
-        let activity_key = self.activity_key().clone();
+        let mut activity_key = self.activity_key().clone();
+        let (start_activity, end_activity) =
+            MarkovianAbstraction::create_start_end(&mut activity_key);
 
         // For each trace in the log with its probability
         for (trace, probability) in self.iter_traces_probabilities() {
             // Compute M_σ^k for this trace (k-th order multiset Markovian abstraction)
-            let m_sigma_k = compute_multiset_abstraction_for_trace_with_key(&trace, order);
+            let m_sigma_k = compute_multiset_abstraction_for_trace_with_key(
+                &trace,
+                order,
+                start_activity,
+                end_activity,
+            );
 
             // Add contribution to f_l^k
             for (subtrace, occurrences) in m_sigma_k {
@@ -278,7 +282,7 @@ impl AbstractMarkovian for dyn EbiTraitFiniteStochasticLanguage {
             }
         }
 
-        // Calculate the total sum for normalization
+        // Calculate the total sum for normalisation
         let total: Fraction = f_l_k.values().sum();
 
         // Normalise f_l^k to get m_l^k
@@ -293,6 +297,8 @@ impl AbstractMarkovian for dyn EbiTraitFiniteStochasticLanguage {
             activity_key,
             order,
             abstraction,
+            start_activity,
+            end_activity,
         })
     }
 }
@@ -301,20 +307,20 @@ impl AbstractMarkovian for dyn EbiTraitFiniteStochasticLanguage {
 fn compute_multiset_abstraction_for_trace_with_key(
     trace: &[Activity],
     k: usize,
-) -> FxHashMap<Vec<ActivityStartEnd>, usize> {
+    start_activity: Activity,
+    end_activity: Activity,
+) -> FxHashMap<Vec<Activity>, usize> {
     // Convert labels to IDs and add start/end markers in ID space
     let mut augmented_ids = Vec::with_capacity(trace.len() + 2);
-    augmented_ids.push(ActivityStartEnd::Start);
-    for act in trace {
-        augmented_ids.push(ActivityStartEnd::Activity(*act));
-    }
-    augmented_ids.push(ActivityStartEnd::End);
+    augmented_ids.push(start_activity);
+    augmented_ids.extend_from_slice(trace);
+    augmented_ids.push(end_activity);
 
     // Compute multiset over IDs
     let id_multiset = compute_multiset_k_trimmed_subtraces_iterative_ids(augmented_ids, k);
 
     // Reconstruct subtrace keys via the reverse map
-    let mut result: FxHashMap<Vec<ActivityStartEnd>, usize> = FxHashMap::default();
+    let mut result: FxHashMap<Vec<Activity>, usize> = FxHashMap::default();
     result.reserve(id_multiset.len());
     for (sub_ids, cnt) in id_multiset {
         result.insert(sub_ids, cnt);
@@ -326,10 +332,10 @@ fn compute_multiset_abstraction_for_trace_with_key(
 /// multiset keyed by `Arc<[ActivityStartEnd]>`. This avoids heap traffic except when a new
 /// *unique* subtrace is inserted into the map.
 fn compute_multiset_k_trimmed_subtraces_iterative_ids(
-    trace: Vec<ActivityStartEnd>,
+    trace: Vec<Activity>,
     k: usize,
-) -> FxHashMap<Vec<ActivityStartEnd>, usize> {
-    let mut result: FxHashMap<Vec<ActivityStartEnd>, usize> = FxHashMap::default();
+) -> FxHashMap<Vec<Activity>, usize> {
+    let mut result: FxHashMap<Vec<Activity>, usize> = FxHashMap::default();
 
     if trace.len() <= k {
         result.insert(trace, 1);
@@ -343,10 +349,7 @@ fn compute_multiset_k_trimmed_subtraces_iterative_ids(
     // Reusable key construction
     let mut tmp = Vec::with_capacity(k);
     // Helper to build an Arc key representing the current window
-    let make_key = |ring: &Vec<ActivityStartEnd>,
-                    head: usize,
-                    tmp: &mut Vec<ActivityStartEnd>|
-     -> Vec<ActivityStartEnd> {
+    let make_key = |ring: &Vec<Activity>, head: usize, tmp: &mut Vec<Activity>| -> Vec<Activity> {
         tmp.clear();
         tmp.extend_from_slice(&ring[head..]);
         tmp.extend_from_slice(&ring[..head]);
@@ -368,11 +371,12 @@ fn compute_multiset_k_trimmed_subtraces_iterative_ids(
 }
 
 // Embedded-SNFA construction
-fn build_embedded_snfa(net: &StochasticLabelledPetriNet) -> Result<Snfa> {
+fn build_embedded_snfa(
+    net: &StochasticLabelledPetriNet,
+) -> Result<StochasticNondeterministicFiniteAutomaton> {
     // Create a new SNFA without the default initial state
-    let mut snfa = Snfa::new();
-    snfa.states.clear();
-    snfa.activity_key = net.activity_key.clone();
+    let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
+    snfa.activity_key = net.activity_key().clone();
 
     // Reachability exploration queue
     let mut marking2idx: FxHashMap<LPNMarking, usize> = FxHashMap::default();
@@ -385,10 +389,6 @@ fn build_embedded_snfa(net: &StochasticLabelledPetriNet) -> Result<Snfa> {
         return Ok(snfa);
     };
     marking2idx.insert(initial_marking.clone(), 0);
-    snfa.states.push(SnfaState {
-        transitions: vec![],
-        p_final: Fraction::zero(),
-    });
     queue.push_back(initial_marking);
 
     while let Some(state) = queue.pop_front() {
@@ -397,8 +397,7 @@ fn build_embedded_snfa(net: &StochasticLabelledPetriNet) -> Result<Snfa> {
         // Collect enabled transitions and the total enabled weight in this state
         let enabled_transitions = net.get_enabled_transitions(&state);
         if enabled_transitions.is_empty() {
-            // Deadlock state -> make it final with probability 1
-            snfa.states[src_idx].p_final = Fraction::one();
+            // Deadlock state -> it will already have a termination probability 1
             continue;
         }
 
@@ -414,94 +413,73 @@ fn build_embedded_snfa(net: &StochasticLabelledPetriNet) -> Result<Snfa> {
 
             // Map / enqueue successor
             let tgt_idx = *marking2idx.entry(next_state.clone()).or_insert_with(|| {
-                let idx = snfa.states.len();
-                snfa.states.push(SnfaState {
-                    transitions: vec![],
-                    p_final: Fraction::zero(),
-                });
+                let new_state = snfa.add_state();
                 queue.push_back(next_state.clone());
-                idx
+                new_state
             });
 
             // Transition label
-            let label = if let Some(act) = net.get_transition_label(t) {
-                Some(ActivityStartEnd::Activity(act))
-            } else {
-                None
-            };
+            let label = net.get_transition_label(t);
 
-            snfa.states[src_idx].transitions.push(SnfaTransition {
-                target: tgt_idx,
-                label,
-                probability: prob,
-            });
+            snfa.add_transition(src_idx, label, tgt_idx, prob)?;
         }
     }
 
     // The first discovered marking is the initial state of the SNFA
-    snfa.initial = Some(0);
+    snfa.initial_state = Some(0);
     Ok(snfa)
 }
 
 /// Patch the SNFA by adding start and end transitions
-fn add_artificial_start_end_to_snfa(snfa: &mut Snfa) {
-    let initial_state = if let Some(initial) = snfa.initial {
+fn add_artificial_start_end_to_snfa(
+    snfa: &mut StochasticNondeterministicFiniteAutomaton,
+    start_activity: Activity,
+    end_activity: Activity,
+) -> Result<()> {
+    let initial_state = if let Some(initial) = snfa.initial_state {
         initial
     } else {
-        return;
+        return Ok(());
     };
 
-    let q_plus = snfa.states.len();
-    let q_minus = snfa.states.len() + 1;
+    let q_minus = snfa.add_state();
 
     // Redirect original finals to q_minus via '-'
-    for i in 0..snfa.states.len() {
-        let s = &mut snfa.states[i];
-        if !s.p_final.is_zero() {
+    for state in 0..snfa.number_of_states() - 1 {
+        if !snfa.terminating_probabilities[state].is_zero() {
             // Copy the existing p_final value
-            let final_prob = s.p_final.clone();
-            // Reset p_final to zero
-            s.p_final = Fraction::zero();
+            let final_prob = snfa.terminating_probabilities[state].clone();
             // Add a "-" transition with the original final probability
-            s.transitions.push(SnfaTransition {
-                target: q_minus,
-                label: Some(ActivityStartEnd::End),
-                probability: final_prob,
-            });
+            snfa.add_transition(state, Some(end_activity), q_minus, final_prob)?;
         }
     }
 
     // q_plus with + transition to original initial state
-    snfa.states.push(SnfaState {
-        transitions: vec![SnfaTransition {
-            target: initial_state,
-            label: Some(ActivityStartEnd::Start),
-            probability: Fraction::one(),
-        }],
-        p_final: Fraction::zero(),
-    });
+    let q_plus = snfa.add_state();
+    snfa.add_transition(
+        q_plus,
+        Some(start_activity),
+        initial_state,
+        Fraction::one(),
+    )?;
 
-    // q_minus absorbing final state
-    snfa.states.push(SnfaState {
-        transitions: vec![],
-        p_final: Fraction::one(),
-    });
+    snfa.initial_state = Some(q_plus);
 
-    snfa.initial = Some(q_plus);
+    Ok(())
 }
 
 // Build sparse transition matrix
-fn build_delta(snfa: &Snfa) -> Vec<FxHashMap<usize, Fraction>> {
-    let n = snfa.states.len();
+fn build_delta(
+    snfa: &StochasticNondeterministicFiniteAutomaton,
+) -> Vec<FxHashMap<usize, Fraction>> {
+    let n = snfa.number_of_states();
     let mut delta = vec![FxHashMap::<usize, Fraction>::default(); n];
 
-    for (i, state) in snfa.states.iter().enumerate() {
-        for t in &state.transitions {
-            delta[i]
-                .entry(t.target)
-                .and_modify(|v| *v += &t.probability)
-                .or_insert(t.probability.clone());
-        }
+    for transition in 0..snfa.number_of_transitions() {
+        delta[snfa.sources[transition]]
+            .entry(snfa.targets[transition])
+            .and_modify(|v| *v += &snfa.probabilities[transition])
+            .or_insert_with(|| snfa.probabilities[transition].clone());
     }
     delta
 }
@@ -725,11 +703,16 @@ fn solve_sparse_linear_system(
 
 /// Compute Phi maps using integer label IDs for efficiency.
 /// Returns Vec indexed by start state q, each mapping Arc<[u32]> -> Fraction.
-fn compute_phi_ids(snfa: &Snfa, k: usize) -> Vec<FxHashMap<Vec<usize>, Fraction>> {
-    let n = snfa.states.len();
+fn compute_phi_ids(
+    snfa: &StochasticNondeterministicFiniteAutomaton,
+    k: usize,
+    start_activity: Activity,
+    end_activity: Activity,
+) -> Vec<FxHashMap<Vec<usize>, Fraction>> {
+    let n = snfa.number_of_states();
     // Compute numeric IDs for "+" and "-" for quick comparisons
-    let id_plus = ActivityStartEnd::Start.to_id();
-    let id_minus = ActivityStartEnd::End.to_id();
+    let id_plus = snfa.activity_key().get_id_from_activity(start_activity);
+    let id_minus = snfa.activity_key().get_id_from_activity(end_activity);
     let mut phi: Vec<FxHashMap<Vec<usize>, Fraction>> = vec![FxHashMap::default(); n];
 
     // Memoisation cache mapping (state, remaining_len) -> suffix map
@@ -745,7 +728,9 @@ fn compute_phi_ids(snfa: &Snfa, k: usize) -> Vec<FxHashMap<Vec<usize>, Fraction>
     fn collect_suffixes(
         state_idx: usize,
         remaining: usize,
-        snfa: &Snfa,
+        snfa: &StochasticNondeterministicFiniteAutomaton,
+        start_activity: Activity,
+        end_activity: Activity,
         cache: &mut FxHashMap<(usize, usize), SuffixMap>,
     ) -> SuffixMap {
         // Fast path -> already computed
@@ -759,27 +744,31 @@ fn compute_phi_ids(snfa: &Snfa, k: usize) -> Vec<FxHashMap<Vec<usize>, Fraction>
             // No more symbols allowed -> empty suffix with probability 1
             result.insert(Vec::<usize>::new(), Fraction::one());
         } else {
-            for tr in &snfa.states[state_idx].transitions {
-                let label = tr.label.clone();
-                let prob = tr.probability.clone();
-
-                if let Some(ActivityStartEnd::End) = label {
+            for (_, target, label, probability) in snfa.outgoing_edges(state_idx) {
+                if let Some(end_activity) = label {
                     // End marker -> stop exploring beyond this symbol
-                    let arc = vec![ActivityStartEnd::End.to_id()];
+                    let arc = vec![snfa.activity_key().get_id_from_activity(end_activity)];
                     result
                         .entry(arc)
-                        .and_modify(|v| *v += &prob)
-                        .or_insert(prob);
+                        .and_modify(|v| *v += probability)
+                        .or_insert_with(|| probability.clone());
                 } else {
                     // Recurse to target with one fewer remaining symbol
-                    let child_map = collect_suffixes(tr.target, remaining - 1, snfa, cache);
+                    let child_map = collect_suffixes(
+                        *target,
+                        remaining - 1,
+                        snfa,
+                        start_activity,
+                        end_activity,
+                        cache,
+                    );
                     for (suf, w) in &child_map {
                         let mut vec = Vec::with_capacity(1 + suf.len());
                         //at this point, every label should have a transition
                         let label = label.unwrap();
-                        vec.push(label.to_id());
+                        vec.push(snfa.activity_key().get_id_from_activity(label));
                         vec.extend_from_slice(&suf[..]);
-                        let weight = &prob * w;
+                        let weight = probability * w;
                         result
                             .entry(vec)
                             .and_modify(|v| *v += &weight)
@@ -795,7 +784,7 @@ fn compute_phi_ids(snfa: &Snfa, k: usize) -> Vec<FxHashMap<Vec<usize>, Fraction>
 
     // Build phi for every potential start state
     for q in 0..n {
-        let suffixes = collect_suffixes(q, k, snfa, &mut cache);
+        let suffixes = collect_suffixes(q, k, snfa, start_activity, end_activity, &mut cache);
 
         for (trace_slice, prob_suffix) in suffixes.iter() {
             // Valid subtraces follow exactly these conditions
@@ -891,7 +880,12 @@ mod tests {
             check.insert(key, prob.clone());
         }
 
-        assert_eq!(check["+,ac0"], Fraction::from((4, 15)));
+        println!("{:?}", check);
+
+        assert_eq!(
+            check[&format!("{},ac0", abstraction.start_activity)],
+            Fraction::from((4, 15))
+        );
         assert_eq!(check["ac0,ac0"], Fraction::from((1, 10)));
 
         let pair1 = [Fraction::from((7, 30)), Fraction::from((1, 30))];
@@ -918,7 +912,12 @@ mod tests {
         }
 
         assert_pair(&check, "ac0,ac1", "ac0,ac2", pair1);
-        assert_pair(&check, "ac1,-", "ac2,-", pair2);
+        assert_pair(
+            &check,
+            &format!("ac1,{}", abstraction.end_activity),
+            &format!("ac2,{}", abstraction.end_activity),
+            pair2,
+        );
         assert_pair(&check, "ac1,ac2", "ac2,ac1", pair3);
     }
 
@@ -977,6 +976,13 @@ mod tests {
         let mut finite_lang: Box<dyn EbiTraitFiniteStochasticLanguage> =
             Box::new(FiniteStochasticLanguage::from(event_log));
 
+        let finite_lang_abstraction = finite_lang.abstract_markovian(2).unwrap();
+
+        println!("finite language");
+        println!("{}", finite_lang_abstraction);
+
+        println!("\nPetri net");
+
         // Load the Petri net model
         let file_content =
             fs::read_to_string("testfiles/simple_markovian_abstraction.slpn").unwrap();
@@ -985,14 +991,13 @@ mod tests {
         // Ensure both share a common ActivityKey to avoid nondeterministic mappings
         petri_net.translate_using_activity_key(finite_lang.activity_key_mut());
 
+        let petri_net_abstraction = petri_net.abstract_markovian(2).unwrap();
+
+        println!("{}", petri_net_abstraction);
+
         // Compute the m^2-uEMSC distance (k = 2)
-        let conformance = finite_lang
-            .abstract_markovian(2)
-            .unwrap()
-            .markovian_conformance(
-                petri_net.abstract_markovian(2).unwrap(),
-                DistanceMeasure::UEMSC,
-            )
+        let conformance = finite_lang_abstraction
+            .markovian_conformance(petri_net_abstraction, DistanceMeasure::UEMSC)
             .unwrap();
         assert_eq!(conformance, Fraction::from((4, 5))); // Expect 4/5
     }

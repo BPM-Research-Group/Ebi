@@ -16,7 +16,8 @@ use ebi_objects::{
     Activity, ActivityKeyTranslator, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
     DirectlyFollowsModel, LabelledPetriNet, LanguageOfAlignments, ProcessTree,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticProcessTree,
+    StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     ebi_objects::{labelled_petri_net::TransitionIndex, language_of_alignments::Move},
 };
 use rayon::iter::ParallelIterator;
@@ -570,6 +571,7 @@ macro_rules! nodestates {
     };
 }
 usize!(StochasticDeterministicFiniteAutomaton);
+usize!(StochasticNondeterministicFiniteAutomaton);
 nodestates!(ProcessTree);
 nodestates!(StochasticProcessTree);
 usize!(DirectlyFollowsGraph);
