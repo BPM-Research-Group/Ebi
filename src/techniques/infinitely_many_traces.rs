@@ -219,7 +219,7 @@ macro_rules! dfa {
             fn infinitely_many_traces(&self) -> Result<bool> {
                 //in a DFA-like model, we must find a loop that has an activity on it and that has a state that is not in a livelock.
                 let mut queue = vec![];
-                let mut distance_from_initial = vec![usize::MAX; self.get_max_state() + 2];
+                let mut distance_from_initial = vec![usize::MAX; self.number_of_states() + 2];
                 if let Some(initial_state) = self.get_initial_state() {
                     queue.push(initial_state);
                     distance_from_initial[initial_state] = 0;

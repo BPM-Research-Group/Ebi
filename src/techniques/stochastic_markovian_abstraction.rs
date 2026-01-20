@@ -379,20 +379,24 @@ pub fn build_embedded_snfa(
     snfa.activity_key = net.activity_key().clone();
 
     // Reachability exploration queue
-    let mut marking2idx: FxHashMap<LPNMarking, usize> = FxHashMap::default();
+    let mut state2snfa_state: FxHashMap<LPNMarking, usize> = FxHashMap::default();
     let mut queue: VecDeque<LPNMarking> = VecDeque::new();
 
     // Insert the initial state of the Petri net
-    let initial_marking = if let Some(initial) = net.get_initial_state() {
+    let initial_state = if let Some(initial) = net.get_initial_state() {
         initial
     } else {
         return Ok(snfa);
     };
-    marking2idx.insert(initial_marking.clone(), 0);
-    queue.push_back(initial_marking);
+    state2snfa_state.insert(initial_state.clone(), 0);
+    queue.push_back(initial_state);
+
+    println!("{:?}", state2snfa_state);
 
     while let Some(state) = queue.pop_front() {
-        let src_idx = *marking2idx.get(&state).unwrap();
+        let snfa_state = *state2snfa_state.get(&state).unwrap();
+
+        println!("marking {}, snfa state {}", state, snfa_state);
 
         // Collect enabled transitions and the total enabled weight in this state
         let enabled_transitions = net.get_enabled_transitions(&state);
@@ -403,25 +407,27 @@ pub fn build_embedded_snfa(
 
         let weight_sum = net.get_total_weight_of_enabled_transitions(&state)?;
 
-        for &t in &enabled_transitions {
-            let w = net.get_transition_weight(&state, t).clone();
-            let prob = &w / &weight_sum;
+        for &transition in &enabled_transitions {
+            let weight = net.get_transition_weight(&state, transition).clone();
+            let prob = &weight / &weight_sum;
 
             // Fire transition (creates a successor state)
             let mut next_state = state.clone();
-            net.execute_transition(&mut next_state, t)?;
+            net.execute_transition(&mut next_state, transition)?;
 
             // Map / enqueue successor
-            let tgt_idx = *marking2idx.entry(next_state.clone()).or_insert_with(|| {
+            let snfa_target = *state2snfa_state.entry(next_state.clone()).or_insert_with(|| {
                 let new_state = snfa.add_state();
-                queue.push_back(next_state.clone());
+                queue.push_back(next_state);
                 new_state
             });
 
-            // Transition label
-            let label = net.get_transition_label(t);
+            println!("\t{:?}", state2snfa_state);
 
-            snfa.add_transition(src_idx, label, tgt_idx, prob)?;
+            // Transition label
+            let label = net.get_transition_label(transition);
+
+            snfa.add_transition(snfa_state, label, snfa_target, prob)?;
         }
     }
 

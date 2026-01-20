@@ -1,8 +1,10 @@
 stochastic non-deterministic finite automaton
 # initial state
-Some(0)
+0
 # number of states
 7
+# number of transitions
+8
 # transition 0
 # source
 0

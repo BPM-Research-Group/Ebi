@@ -325,12 +325,12 @@ macro_rules! dfa {
 
         impl $u {
             pub fn new(automaton: &$t) -> Self {
-                let mut result = vec![true; automaton.get_max_state() + 2];
-                let mut result_last = vec![true; automaton.get_max_state() + 2];
+                let mut result = vec![true; automaton.number_of_states() + 2];
+                let mut result_last = vec![true; automaton.number_of_states() + 2];
 
                 //stage 1: set final states
-                result[automaton.get_max_state() + 1] = false;
-                for state in 0..=automaton.get_max_state() {
+                result[automaton.number_of_states() + 1] = false;
+                for state in 0..automaton.number_of_states() {
                     if automaton.can_terminate_in_state(state) {
                         result[state] = false;
                     }

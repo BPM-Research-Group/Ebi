@@ -30,7 +30,7 @@ macro_rules! semantics_for_automaton {
                 state: &mut usize,
                 transition: TransitionIndex,
             ) -> Result<()> {
-                if *state > self.max_state {
+                if *state > self.number_of_states() {
                     return Err(anyhow!("Cannot execute a transition in a final state."));
                 }
 
@@ -38,7 +38,7 @@ macro_rules! semantics_for_automaton {
                     //request for termination
                     if self.can_terminate_in_state(*state) {
                         //termination possible
-                        *state = self.get_max_state() + 1;
+                        *state = self.number_of_states() + 1;
                         return Ok(());
                     } else {
                         //termination not possible
@@ -51,7 +51,7 @@ macro_rules! semantics_for_automaton {
             }
 
             fn is_final_state(&self, state: &usize) -> bool {
-                state > &self.max_state
+                state > &self.number_of_states()
             }
 
             fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
@@ -79,7 +79,7 @@ macro_rules! semantics_for_automaton {
                 }
 
                 //if the DFA can terminate, then add a termination silent transition
-                if state <= &self.max_state && self.can_terminate_in_state(*state) {
+                if state < &self.number_of_states() && self.can_terminate_in_state(*state) {
                     result.push(self.sources.len())
                 }
 
@@ -109,7 +109,7 @@ impl Semantics for StochasticNondeterministicFiniteAutomaton {
     }
 
     fn execute_transition(&self, state: &mut usize, transition: TransitionIndex) -> Result<()> {
-        if *state > self.max_state {
+        if *state > self.number_of_states() {
             return Err(anyhow!("Cannot execute a transition in a final state."));
         }
 
@@ -117,7 +117,7 @@ impl Semantics for StochasticNondeterministicFiniteAutomaton {
             //request for termination
             if self.can_terminate_in_state(*state) {
                 //termination possible
-                *state = self.get_max_state() + 1;
+                *state = self.number_of_states() + 1;
                 return Ok(());
             } else {
                 //termination not possible
@@ -130,7 +130,7 @@ impl Semantics for StochasticNondeterministicFiniteAutomaton {
     }
 
     fn is_final_state(&self, state: &usize) -> bool {
-        state > &self.max_state
+        state > &self.number_of_states()
     }
 
     fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
@@ -158,7 +158,7 @@ impl Semantics for StochasticNondeterministicFiniteAutomaton {
         }
 
         //if the DFA can terminate, then add a termination silent transition
-        if state <= &self.max_state && self.can_terminate_in_state(*state) {
+        if state <= &self.number_of_states() && self.can_terminate_in_state(*state) {
             result.push(self.sources.len())
         }
 
@@ -208,9 +208,7 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
         let mut result = vec![];
 
         let (_, mut i) = self.binary_search(*state, 0);
-        while i < <StochasticDeterministicFiniteAutomaton>::get_number_of_transitions(self)
-            && self.get_sources()[i] == *state
-        {
+        while i < self.get_sources().len() && self.get_sources()[i] == *state {
             result.push(self.get_activities()[i]);
             i += 1;
         }

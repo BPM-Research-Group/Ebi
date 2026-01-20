@@ -481,7 +481,6 @@ mod tests {
     #[test]
     fn tau_removal_empty_automaton() {
         let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
-        snfa.max_state = 0;
         snfa.terminating_probabilities.clear();
         snfa.remove_tau_transitions().unwrap(); // should not panic
         assert_eq!(snfa.number_of_states(), 0);

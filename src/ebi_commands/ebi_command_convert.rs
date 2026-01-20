@@ -169,7 +169,9 @@ pub const EBI_CONVERT_SNFA: EbiCommand = EbiCommand::Command {
         &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
     ]],
     input_names: &["FILE"],
-    input_helps: &["Any file supported by Ebi that can be converted."],
+    input_helps: &[
+        "Any file supported by Ebi that can be converted. An SLPN must be livelock-free and bounded.",
+    ],
     execute: |mut inputs, _| {
         let snfa = match inputs.remove(0) {
             EbiInput::Object(EbiObject::StochasticNondeterministicFiniteAutomaton(snfa), _) => snfa,
