@@ -64,9 +64,9 @@ refX="10" refY="3.5" orient="auto">
             x="1012.5" y="32.5" class="a15"><tspan x = "1012.5" dy="1.0em">1</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
             x="150" y="80" class="a15"><tspan x = "150" dy="1.0em">a, 1</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
             x="150" y="130" class="a15"><tspan x = "150" dy="1.0em">τ, 1/4</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
-            x="355" y="80" class="a15"><tspan x = "355" dy="1.0em">c, 3/4</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
-            x="560" y="127.5" class="a15"><tspan x = "560" dy="1.0em">c, 2/5</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="355" y="80" class="a15"><tspan x = "355" dy="1.0em">τ, 3/4</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
             x="560" y="32.5" class="a15"><tspan x = "560" dy="1.0em">b, 3/5</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="560" y="127.5" class="a15"><tspan x = "560" dy="1.0em">c, 2/5</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
             x="750" y="32.5" class="a15"><tspan x = "750" dy="1.0em">c, 1</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
             x="750" y="80" class="a15"><tspan x = "750" dy="1.0em">b, 1</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
             x="925" y="32.5" class="a15"><tspan x = "925" dy="1.0em">τ, 1</tspan></text><g >
@@ -89,13 +89,13 @@ refX="10" refY="3.5" orient="auto">
             </g>
 <text><textPath href="#arrow2" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
 
-            <path id="arrow3" d="M 474.2082661068087 100.20421403326829 C 502.8510080041951 109.12572380458536, 580 142.5, 610 142.5 S 615 142.5, 645 142.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            <path id="arrow3" d="M 474.2082661068087 89.79578596673171 C 502.8510080041951 80.87427619541464, 580 47.5, 610 47.5 S 615 47.5, 645 47.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
             fill="transparent" />
 
             </g>
 <text><textPath href="#arrow3" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
 
-            <path id="arrow4" d="M 474.2082661068087 89.79578596673171 C 502.8510080041951 80.87427619541464, 580 47.5, 610 47.5 S 615 47.5, 645 47.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            <path id="arrow4" d="M 474.2082661068087 100.20421403326829 C 502.8510080041951 109.12572380458536, 580 142.5, 610 142.5 S 615 142.5, 645 142.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
             fill="transparent" />
 
             </g>

@@ -16,7 +16,7 @@ name = "ebi"
 crate-type = ["cdylib", "lib"]
 
 [features]
-default = [ ]
+default = [ "approximatearithmetic" ]
 eexactarithmetic = []
 exactarithmetic = [ "eexactarithmetic", "ebi_objects/exactarithmetic" ]
 approximatearithmetic = [ "eapproximatearithmetic", "ebi_objects/approximatearithmetic" ]

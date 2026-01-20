@@ -32,7 +32,7 @@ silent
 1
 0
 # transition 2
-label c
+silent
 # weight
 3
 # number of input places

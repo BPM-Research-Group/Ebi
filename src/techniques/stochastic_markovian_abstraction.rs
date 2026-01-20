@@ -163,8 +163,12 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
         let n = snfa.number_of_states();
         // Build sparse A = (I - Delta)^T
         let delta = build_delta(&snfa);
+
+        println!("delta {:?}", delta);
+
         let mut a_sparse: Vec<FxHashMap<usize, Fraction>> = vec![FxHashMap::default(); n];
 
+        // compute A = I-delta
         for i in 0..n {
             // Identity contribution
             a_sparse[i].insert(i, Fraction::one());
@@ -180,19 +184,23 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
         }
         let mut b = vec![Fraction::zero(); n];
         b[initial_state] = Fraction::one();
-        let mut a_ref = a_sparse;
+
+        println!("a_sparse {:?}", a_sparse);
+
         let x = if n < 100 {
             // small matrices -> simpler hash map solver avoids conversion overhead
-            solve_sparse_linear_system(&mut a_ref, b)?
+            solve_sparse_linear_system(&mut a_sparse, b)?
         } else {
-            solve_sparse_linear_system_optimized(&mut a_ref, b)?
+            solve_sparse_linear_system_optimized(&mut a_sparse, b)?
         };
+
+        println!("x {:?}", x);
 
         // 4 Compute phi for each state
         // Compute phi on ID space then translate back to Strings using the shared ActivityKey
         let phi_ids = compute_phi_ids(&snfa, order, start_activity, end_activity);
 
-        // helper to translate a trace of usize IDs back to ActivityStartEnds
+        // helper to translate a trace of usize IDs back to Activitys
         let translate = |ids: &Vec<usize>| -> Vec<Activity> {
             let mut vec: Vec<Activity> = Vec::with_capacity(ids.len());
             for id in ids.iter() {
@@ -426,6 +434,8 @@ pub fn build_embedded_snfa(
 
             // Transition label
             let label = net.get_transition_label(transition);
+
+            println!("\t\ttransition {}, label {:?}", transition, label);
 
             snfa.add_transition(snfa_state, label, snfa_target, prob)?;
         }
@@ -1012,5 +1022,7 @@ mod tests {
         let abstraction = petri_net.abstract_markovian(2).unwrap();
 
         println!("abstraction: {}", abstraction);
+
+        assert!(!abstraction.abstraction.is_empty());
     }
 }

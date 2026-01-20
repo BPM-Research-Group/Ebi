@@ -2,9 +2,9 @@ stochastic non-deterministic finite automaton
 # initial state
 0
 # number of states
-6
+5
 # number of transitions
-7
+6
 # transition 0
 # source
 0
@@ -29,41 +29,32 @@ label a
 # target
 2
 # probability
-3/4
+9/20
 # activity
-label c
+label b
 # transition 3
 # source
-2
+1
 # target
-4
+3
 # probability
-2/5
+3/10
 # activity
 label c
 # transition 4
 # source
 2
 # target
-3
-# probability
-3/5
-# activity
-label b
-# transition 5
-# source
-3
-# target
-5
+4
 # probability
 1
 # activity
 label c
-# transition 6
+# transition 5
 # source
-4
+3
 # target
-5
+4
 # probability
 1
 # activity
