@@ -370,8 +370,8 @@ fn compute_multiset_k_trimmed_subtraces_iterative_ids(
     result
 }
 
-// Embedded-SNFA construction
-fn build_embedded_snfa(
+/// Create an SNFA for an SLPN. May not terminate if the SLPN has livelocks or is unbounded.
+pub fn build_embedded_snfa(
     net: &StochasticLabelledPetriNet,
 ) -> Result<StochasticNondeterministicFiniteAutomaton> {
     // Create a new SNFA without the default initial state
@@ -456,12 +456,7 @@ fn add_artificial_start_end_to_snfa(
 
     // q_plus with + transition to original initial state
     let q_plus = snfa.add_state();
-    snfa.add_transition(
-        q_plus,
-        Some(start_activity),
-        initial_state,
-        Fraction::one(),
-    )?;
+    snfa.add_transition(q_plus, Some(start_activity), initial_state, Fraction::one())?;
 
     snfa.initial_state = Some(q_plus);
 
@@ -1000,5 +995,16 @@ mod tests {
             .markovian_conformance(petri_net_abstraction, DistanceMeasure::UEMSC)
             .unwrap();
         assert_eq!(conformance, Fraction::from((4, 5))); // Expect 4/5
+    }
+
+    #[test]
+    fn paper_test() {
+        // Load the Petri net model
+        let file_content = fs::read_to_string("testfiles/xor(a,tau)and(bc).slpn").unwrap();
+        let petri_net = file_content.parse::<StochasticLabelledPetriNet>().unwrap();
+
+        let abstraction = petri_net.abstract_markovian(2).unwrap();
+
+        println!("abstraction: {}", abstraction);
     }
 }

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg width="87.5" height="657.5059999999999" viewBox="0 0 87.5 657.5059999999999" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="startarrow" markerWidth="10" markerHeight="7"
+refX="0" refY="3.5" orient="auto">
+<polygon points="10 0, 10 7, 0 3.5" fill="context-stroke" />
+</marker>
+<marker id="endarrow" markerWidth="10" markerHeight="7"
+refX="10" refY="3.5" orient="auto">
+<polygon points="0 0, 10 3.5, 0 7" fill="context-stroke" />
+</marker>
+
+</defs><style>
+.a15 { font-size: 15px; font-family: Times, serif; }
+</style>
+<g >
+
+            <ellipse cx="47.5" cy="47.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="32.5" class="a15"><tspan x = "47.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="47.5" cy="142.501" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="127.501" class="a15"><tspan x = "47.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="47.5" cy="237.502" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="222.502" class="a15"><tspan x = "47.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="47.5" cy="332.50299999999993" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="317.50299999999993" class="a15"><tspan x = "47.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="47.5" cy="427.5039999999999" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="412.5039999999999" class="a15"><tspan x = "47.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="47.5" cy="522.5049999999999" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="507.5049999999999" class="a15"><tspan x = "47.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="47.5" cy="617.5059999999999" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="602.5059999999999" class="a15"><tspan x = "47.5" dy="1.0em">1</tspan></text></svg>

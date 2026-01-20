@@ -156,6 +156,7 @@ pub mod stochastic_semantics {
     pub mod stochastic_deterministic_finite_automaton_semantics;
     pub mod stochastic_directly_follows_graph_semantics;
     pub mod stochastic_labelled_petri_net_semantics;
+    pub mod stochastic_nondeterministic_finite_automaton_semantics;
     pub mod stochastic_process_tree_semantics;
     pub mod stochastic_semantics;
 }
