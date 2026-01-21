@@ -200,6 +200,8 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
         // Compute phi on ID space then translate back to Strings using the shared ActivityKey
         let phi_ids = compute_phi_ids(&snfa, order, start_activity, end_activity);
 
+        println!("phi ids {:?}", phi_ids);
+
         // helper to translate a trace of usize IDs back to Activitys
         let translate = |ids: &Vec<usize>| -> Vec<Activity> {
             let mut vec: Vec<Activity> = Vec::with_capacity(ids.len());
@@ -726,6 +728,9 @@ fn compute_phi_ids(
     let id_minus = snfa.activity_key().get_id_from_activity(end_activity);
     let mut phi: Vec<FxHashMap<Vec<usize>, Fraction>> = vec![FxHashMap::default(); n];
 
+    println!("\tstart act {}", id_plus);
+    println!("\tend act {}", id_minus);
+
     // Memoisation cache mapping (state, remaining_len) -> suffix map
     // Suffix map: subtrace (starting at the first symbol that leaves the current state) -> probability
     type SuffixMap = FxHashMap<Vec<usize>, Fraction>;
@@ -756,7 +761,7 @@ fn compute_phi_ids(
             result.insert(Vec::<usize>::new(), Fraction::one());
         } else {
             for (_, target, label, probability) in snfa.outgoing_edges(state_idx) {
-                if let Some(end_activity) = label {
+                if label == &Some(end_activity) {
                     // End marker -> stop exploring beyond this symbol
                     let arc = vec![snfa.activity_key().get_id_from_activity(end_activity)];
                     result
@@ -794,8 +799,10 @@ fn compute_phi_ids(
     }
 
     // Build phi for every potential start state
-    for q in 0..n {
-        let suffixes = collect_suffixes(q, k, snfa, start_activity, end_activity, &mut cache);
+    for state in 0..n {
+        let suffixes = collect_suffixes(state, k, snfa, start_activity, end_activity, &mut cache);
+
+        println!("\tstate {}, suffixes {:?}", state, suffixes);
 
         for (trace_slice, prob_suffix) in suffixes.iter() {
             // Valid subtraces follow exactly these conditions
@@ -806,7 +813,7 @@ fn compute_phi_ids(
                 && trace_slice.first().unwrap() == &id_plus;
 
             if is_exact_k || is_short_with_end {
-                phi[q].insert(trace_slice.clone(), prob_suffix.clone());
+                phi[state].insert(trace_slice.clone(), prob_suffix.clone());
             }
         }
     }

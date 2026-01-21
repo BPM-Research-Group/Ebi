@@ -546,7 +546,7 @@ mod tests {
     fn tau_removal_singular_matrix_panics() {
         // single state with tau-self-loop weight 1  ->  I-W singular
         let mut a = StochasticNondeterministicFiniteAutomaton::new();
-        a.add_transition(0, None, 0, f0!()).unwrap();
+        a.add_transition(0, None, 0, f1!()).unwrap();
         a.remove_tau_transitions().unwrap(); // must panic
     }
 
