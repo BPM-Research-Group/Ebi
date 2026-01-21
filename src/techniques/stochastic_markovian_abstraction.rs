@@ -129,19 +129,19 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
         // 1 Build embedded SNFA
         let mut snfa = build_embedded_snfa(self)?;
 
-        println!("snfa\n{}", snfa);
+        // println!("snfa\n{}", snfa);
 
         // 1.1 Remove tau transitions
         snfa.remove_tau_transitions()?;
 
-        println!("snfa removed taus\n{}", snfa);
+        // println!("snfa removed taus\n{}", snfa);
 
         // 2 Add artificial start and end
         let (start_activity, end_activity) =
             MarkovianAbstraction::create_start_end(&mut snfa.activity_key);
         add_artificial_start_end_to_snfa(&mut snfa, start_activity, end_activity)?;
 
-        println!("snfa start end\n{}", snfa);
+        // println!("snfa start end\n{}", snfa);
 
         //check whether the SNFA has an empty language
         let initial_state = if let Some(initial) = snfa.initial_state {
@@ -157,14 +157,14 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
             });
         };
 
-        println!("no empty language");
+        // println!("no empty language");
 
         // 3 Build matrix and solve for x
         let n = snfa.number_of_states();
         // Build sparse A = (I - Delta)^T
         let delta = build_delta(&snfa);
 
-        println!("delta {:?}", delta);
+        // println!("delta {:?}", delta);
 
         let mut a_sparse: Vec<FxHashMap<usize, Fraction>> = vec![FxHashMap::default(); n];
 
@@ -185,7 +185,7 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
         let mut b = vec![Fraction::zero(); n];
         b[initial_state] = Fraction::one();
 
-        println!("a_sparse {:?}", a_sparse);
+        // println!("a_sparse {:?}", a_sparse);
 
         let x = if n < 100 {
             // small matrices -> simpler hash map solver avoids conversion overhead
@@ -194,13 +194,13 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
             solve_sparse_linear_system_optimized(&mut a_sparse, b)?
         };
 
-        println!("x {:?}", x);
+        // println!("x {:?}", x);
 
         // 4 Compute phi for each state
         // Compute phi on ID space then translate back to Strings using the shared ActivityKey
         let phi_ids = compute_phi_ids(&snfa, order, start_activity, end_activity);
 
-        println!("phi ids {:?}", phi_ids);
+        // println!("phi ids {:?}", phi_ids);
 
         // helper to translate a trace of usize IDs back to Activitys
         let translate = |ids: &Vec<usize>| -> Vec<Activity> {
@@ -401,12 +401,12 @@ pub fn build_embedded_snfa(
     state2snfa_state.insert(initial_state.clone(), 0);
     queue.push_back(initial_state);
 
-    println!("{:?}", state2snfa_state);
+    // println!("{:?}", state2snfa_state);
 
     while let Some(state) = queue.pop_front() {
         let snfa_state = *state2snfa_state.get(&state).unwrap();
 
-        println!("marking {}, snfa state {}", state, snfa_state);
+        // println!("marking {}, snfa state {}", state, snfa_state);
 
         // Collect enabled transitions and the total enabled weight in this state
         let enabled_transitions = net.get_enabled_transitions(&state);
@@ -426,18 +426,20 @@ pub fn build_embedded_snfa(
             net.execute_transition(&mut next_state, transition)?;
 
             // Map / enqueue successor
-            let snfa_target = *state2snfa_state.entry(next_state.clone()).or_insert_with(|| {
-                let new_state = snfa.add_state();
-                queue.push_back(next_state);
-                new_state
-            });
+            let snfa_target = *state2snfa_state
+                .entry(next_state.clone())
+                .or_insert_with(|| {
+                    let new_state = snfa.add_state();
+                    queue.push_back(next_state);
+                    new_state
+                });
 
-            println!("\t{:?}", state2snfa_state);
+            // println!("\t{:?}", state2snfa_state);
 
             // Transition label
             let label = net.get_transition_label(transition);
 
-            println!("\t\ttransition {}, label {:?}", transition, label);
+            // println!("\t\ttransition {}, label {:?}", transition, label);
 
             snfa.add_transition(snfa_state, label, snfa_target, prob)?;
         }
@@ -728,8 +730,8 @@ fn compute_phi_ids(
     let id_minus = snfa.activity_key().get_id_from_activity(end_activity);
     let mut phi: Vec<FxHashMap<Vec<usize>, Fraction>> = vec![FxHashMap::default(); n];
 
-    println!("\tstart act {}", id_plus);
-    println!("\tend act {}", id_minus);
+    // println!("\tstart act {}", id_plus);
+    // println!("\tend act {}", id_minus);
 
     // Memoisation cache mapping (state, remaining_len) -> suffix map
     // Suffix map: subtrace (starting at the first symbol that leaves the current state) -> probability
@@ -802,7 +804,7 @@ fn compute_phi_ids(
     for state in 0..n {
         let suffixes = collect_suffixes(state, k, snfa, start_activity, end_activity, &mut cache);
 
-        println!("\tstate {}, suffixes {:?}", state, suffixes);
+        // println!("\tstate {}, suffixes {:?}", state, suffixes);
 
         for (trace_slice, prob_suffix) in suffixes.iter() {
             // Valid subtraces follow exactly these conditions
@@ -845,7 +847,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/empty.slpn").unwrap();
         let slang = fin.parse::<StochasticLabelledPetriNet>().unwrap();
         let abst = slang.abstract_markovian(2).unwrap();
-        println!("{}", abst);
+        abst.to_string();
     }
 
     #[test]
@@ -853,7 +855,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/simple_markovian_abstraction.slpn").unwrap();
         let slang = fin.parse::<StochasticLabelledPetriNet>().unwrap();
         let abst = slang.abstract_markovian(2).unwrap();
-        println!("{}", abst);
+        abst.to_string();
     }
 
     #[test]
@@ -863,7 +865,7 @@ mod tests {
             FiniteStochasticLanguage::from(fin.parse::<EventLog>().unwrap()),
         );
         let abst = slang.abstract_markovian(2).unwrap();
-        println!("{}", abst);
+        abst.to_string();
     }
 
     #[test]
@@ -877,7 +879,7 @@ mod tests {
         // Compute abstraction with k=2 for example log [<a,b>^{5}, <a,a,b,c>^{2}, <a,a,c,b>^{1}]
         let abstraction = finite_lang.abstract_markovian(2).unwrap();
 
-        println!("\nComputed abstraction for example log with k=2:");
+        // println!("\nComputed abstraction for example log with k=2:");
 
         assert_eq!(
             abstraction.abstraction.len(),
@@ -894,11 +896,11 @@ mod tests {
                 .map(|s| s.to_string())
                 .collect::<Vec<_>>()
                 .join(",");
-            println!("{:<12} : {}", key, prob);
+            // println!("{:<12} : {}", key, prob);
             check.insert(key, prob.clone());
         }
 
-        println!("{:?}", check);
+        // println!("{:?}", check);
 
         assert_eq!(
             check[&format!("{},ac0", abstraction.start_activity)],
@@ -996,10 +998,10 @@ mod tests {
 
         let finite_lang_abstraction = finite_lang.abstract_markovian(2).unwrap();
 
-        println!("finite language");
-        println!("{}", finite_lang_abstraction);
+        // println!("finite language");
+        // println!("{}", finite_lang_abstraction);
 
-        println!("\nPetri net");
+        // println!("\nPetri net");
 
         // Load the Petri net model
         let file_content =
@@ -1011,7 +1013,7 @@ mod tests {
 
         let petri_net_abstraction = petri_net.abstract_markovian(2).unwrap();
 
-        println!("{}", petri_net_abstraction);
+        // println!("{}", petri_net_abstraction);
 
         // Compute the m^2-uEMSC distance (k = 2)
         let conformance = finite_lang_abstraction
@@ -1021,14 +1023,19 @@ mod tests {
     }
 
     #[test]
-    fn paper_test() {
+    fn markovian_eduardo_process_science_journal_paper_test() {
         // Load the Petri net model
-        let file_content = fs::read_to_string("testfiles/xor(a,tau)and(bc).slpn").unwrap();
+        let file_content = fs::read_to_string("testfiles/loop(a,tau)and(bc).slpn").unwrap();
         let petri_net = file_content.parse::<StochasticLabelledPetriNet>().unwrap();
 
-        let abstraction = petri_net.abstract_markovian(2).unwrap();
+        let fin2 = fs::read_to_string("testfiles/loop(a,tau)and(bc).snfa").unwrap();
+        let snfa2 = fin2.parse::<StochasticNondeterministicFiniteAutomaton>().unwrap();
 
-        println!("abstraction: {}", abstraction);
+        let snfa = build_embedded_snfa(&petri_net).unwrap();
+
+        assert_eq!(snfa.to_string(), snfa2.to_string());
+
+        let abstraction = petri_net.abstract_markovian(2).unwrap();
 
         assert!(!abstraction.abstraction.is_empty());
     }

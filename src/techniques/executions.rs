@@ -290,7 +290,7 @@ impl C {
 mod tests {
     use std::fs;
 
-    use ebi_objects::{EventLogXes, StochasticDeterministicFiniteAutomaton};
+    use ebi_objects::{EventLogXes, StochasticDeterministicFiniteAutomaton, StochasticNondeterministicFiniteAutomaton};
 
     use crate::techniques::executions::FindExecutions;
 
@@ -309,5 +309,18 @@ mod tests {
         let x = model.find_executions(&mut Box::new(log)).unwrap();
 
         assert_eq!(out, x.to_string());
+    }
+
+    #[test]
+    fn snfa_executions() {
+        let fin = fs::read_to_string("testfiles/simple_log_markovian_abstraction.xes").unwrap();
+        let log = fin.parse::<EventLogXes>().unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/aa-ab-ba.snfa").unwrap();
+        let mut model = fin2
+            .parse::<StochasticNondeterministicFiniteAutomaton>()
+            .unwrap();
+
+        model.find_executions(&mut Box::new(log)).unwrap();
     }
 }
