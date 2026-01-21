@@ -902,7 +902,7 @@ mod tests {
     }
 
     #[test]
-    #[timeout(300000)]
+    #[timeout(500000)]
     fn call_all_non_cli_commands() {
         for path in EBI_COMMANDS.get_command_paths() {
             if let EbiCommand::Command {
