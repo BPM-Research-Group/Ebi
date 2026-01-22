@@ -115,11 +115,11 @@ impl From<MarkovianAbstraction> for FiniteStochasticLanguage {
 
 pub trait AbstractMarkovian {
     /// Create a Markovian abstraction, that is, a stochastic language of sub-traces.
-    fn abstract_markovian(&self, order: usize) -> Result<MarkovianAbstraction>;
+    fn abstract_markovian(&mut self, order: usize) -> Result<MarkovianAbstraction>;
 }
 
 impl AbstractMarkovian for StochasticLabelledPetriNet {
-    fn abstract_markovian(&self, order: usize) -> Result<MarkovianAbstraction> {
+    fn abstract_markovian(&mut self, order: usize) -> Result<MarkovianAbstraction> {
         if order < 1 {
             return Err(anyhow!(
                 "order must be at least 1 for Markovian abstraction"
@@ -131,25 +131,33 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
 
         // println!("snfa\n{}", snfa);
 
+        snfa.abstract_markovian(order)
+    }
+}
+
+impl AbstractMarkovian for StochasticNondeterministicFiniteAutomaton {
+    /// Please note that this method will remove the taus from the SNFA.
+    /// As such, it will be potentially changed considerably.
+    fn abstract_markovian(&mut self, order: usize) -> Result<MarkovianAbstraction> {
         // 1.1 Remove tau transitions
-        snfa.remove_tau_transitions()?;
+        self.remove_tau_transitions()?;
 
         // println!("snfa removed taus\n{}", snfa);
 
         // 2 Add artificial start and end
         let (start_activity, end_activity) =
-            MarkovianAbstraction::create_start_end(&mut snfa.activity_key);
-        add_artificial_start_end_to_snfa(&mut snfa, start_activity, end_activity)?;
+            MarkovianAbstraction::create_start_end(&mut self.activity_key);
+        add_artificial_start_end_to_snfa(self, start_activity, end_activity)?;
 
         // println!("snfa start end\n{}", snfa);
 
         //check whether the SNFA has an empty language
-        let initial_state = if let Some(initial) = snfa.initial_state {
+        let initial_state = if let Some(initial) = self.initial_state {
             initial
         } else {
             //empty language
             return Ok(MarkovianAbstraction {
-                activity_key: snfa.activity_key,
+                activity_key: self.activity_key.clone(),
                 order,
                 abstraction: FxHashMap::default(),
                 start_activity,
@@ -160,9 +168,9 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
         // println!("no empty language");
 
         // 3 Build matrix and solve for x
-        let n = snfa.number_of_states();
+        let n = self.number_of_states();
         // Build sparse A = (I - Delta)^T
-        let delta = build_delta(&snfa);
+        let delta = build_delta(&self);
 
         // println!("delta {:?}", delta);
 
@@ -198,7 +206,7 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
 
         // 4 Compute phi for each state
         // Compute phi on ID space then translate back to Strings using the shared ActivityKey
-        let phi_ids = compute_phi_ids(&snfa, order, start_activity, end_activity);
+        let phi_ids = compute_phi_ids(&self, order, start_activity, end_activity);
 
         // println!("phi ids {:?}", phi_ids);
 
@@ -206,7 +214,7 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
         let translate = |ids: &Vec<usize>| -> Vec<Activity> {
             let mut vec: Vec<Activity> = Vec::with_capacity(ids.len());
             for id in ids.iter() {
-                vec.push(snfa.activity_key.get_activity_by_id(*id));
+                vec.push(self.activity_key.get_activity_by_id(*id));
             }
             vec
         };
@@ -232,7 +240,7 @@ impl AbstractMarkovian for StochasticLabelledPetriNet {
         }
 
         Ok(MarkovianAbstraction {
-            activity_key: snfa.activity_key,
+            activity_key: self.activity_key.clone(),
             order,
             abstraction,
             start_activity,
@@ -246,8 +254,8 @@ impl AbstractMarkovian for dyn EbiTraitFiniteStochasticLanguage {
     /// for a finite stochastic language. First it computes the k-th order multiset
     /// markovian abstraction by adding the special start '+' and end '-' markers and then
     /// computes the k-trimmed subtraces. Afterwards, the k-th order stochastic markovian
-    /// abstraction gets computed by normalizing the multiset markovian abstraction.
-    fn abstract_markovian(&self, order: usize) -> Result<MarkovianAbstraction> {
+    /// abstraction gets computed by normalising the multiset markovian abstraction.
+    fn abstract_markovian(&mut self, order: usize) -> Result<MarkovianAbstraction> {
         // Validate k
         if order < 1 {
             return Err(anyhow!(
@@ -845,7 +853,7 @@ mod tests {
     #[test]
     fn empty_slpn_abstract() {
         let fin = fs::read_to_string("testfiles/empty.slpn").unwrap();
-        let slang = fin.parse::<StochasticLabelledPetriNet>().unwrap();
+        let mut slang = fin.parse::<StochasticLabelledPetriNet>().unwrap();
         let abst = slang.abstract_markovian(2).unwrap();
         abst.to_string();
     }
@@ -853,7 +861,7 @@ mod tests {
     #[test]
     fn slpn_abstract() {
         let fin = fs::read_to_string("testfiles/simple_markovian_abstraction.slpn").unwrap();
-        let slang = fin.parse::<StochasticLabelledPetriNet>().unwrap();
+        let mut slang = fin.parse::<StochasticLabelledPetriNet>().unwrap();
         let abst = slang.abstract_markovian(2).unwrap();
         abst.to_string();
     }
@@ -861,7 +869,7 @@ mod tests {
     #[test]
     fn log_abstract() {
         let fin = fs::read_to_string("testfiles/simple_log_markovian_abstraction.xes").unwrap();
-        let slang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(
+        let mut slang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(
             FiniteStochasticLanguage::from(fin.parse::<EventLog>().unwrap()),
         );
         let abst = slang.abstract_markovian(2).unwrap();
@@ -873,7 +881,7 @@ mod tests {
         let file_content =
             fs::read_to_string("testfiles/simple_log_markovian_abstraction.xes").unwrap();
         let event_log = file_content.parse::<EventLog>().unwrap();
-        let finite_lang: Box<dyn EbiTraitFiniteStochasticLanguage> =
+        let mut finite_lang: Box<dyn EbiTraitFiniteStochasticLanguage> =
             Box::new(FiniteStochasticLanguage::from(event_log));
 
         // Compute abstraction with k=2 for example log [<a,b>^{5}, <a,a,b,c>^{2}, <a,a,c,b>^{1}]
@@ -945,7 +953,7 @@ mod tests {
     fn test_compute_abstraction_for_petri_net() {
         let file_content =
             fs::read_to_string("testfiles/simple_markovian_abstraction.slpn").unwrap();
-        let petri_net = file_content.parse::<StochasticLabelledPetriNet>().unwrap();
+        let mut petri_net = file_content.parse::<StochasticLabelledPetriNet>().unwrap();
 
         // Check that k < 1 is rejected (k = 0)
         let result = petri_net.clone().abstract_markovian(0);
@@ -1026,10 +1034,12 @@ mod tests {
     fn markovian_eduardo_process_science_journal_paper_test() {
         // Load the Petri net model
         let file_content = fs::read_to_string("testfiles/loop(a,tau)and(bc).slpn").unwrap();
-        let petri_net = file_content.parse::<StochasticLabelledPetriNet>().unwrap();
+        let mut petri_net = file_content.parse::<StochasticLabelledPetriNet>().unwrap();
 
         let fin2 = fs::read_to_string("testfiles/loop(a,tau)and(bc).snfa").unwrap();
-        let snfa2 = fin2.parse::<StochasticNondeterministicFiniteAutomaton>().unwrap();
+        let snfa2 = fin2
+            .parse::<StochasticNondeterministicFiniteAutomaton>()
+            .unwrap();
 
         let snfa = build_embedded_snfa(&petri_net).unwrap();
 

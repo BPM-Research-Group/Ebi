@@ -375,10 +375,12 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true,
     input_types: &[
         &[
+            &EbiInputType::Object(EbiObjectType::StochasticNondeterministicFiniteAutomaton),
             &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
             &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
         ],
         &[
+            &EbiInputType::Object(EbiObjectType::StochasticNondeterministicFiniteAutomaton),
             &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
             &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
         ],
@@ -393,13 +395,16 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
         "The stochastic conformance measure to be applied to the abstractions.",
     ],
     execute: |mut inputs, _| {
-        let lang1 = inputs.remove(0);
-        let lang2 = inputs.remove(0);
+        let mut lang1 = inputs.remove(0);
+        let mut lang2 = inputs.remove(0);
         let order = inputs.remove(0).to_type::<usize>()?;
         let measure = inputs.remove(0).to_type::<DistanceMeasure>()?;
 
         //read abstractions
-        let abstraction1 = match lang1 {
+        let abstraction1 = match &mut lang1 {
+            EbiInput::Object(EbiObject::StochasticNondeterministicFiniteAutomaton(snfa), _) => {
+                snfa.abstract_markovian(*order)
+            }
             EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => {
                 slang.abstract_markovian(*order)
             }
@@ -408,7 +413,10 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
             }
             _ => unreachable!(),
         }?;
-        let abstraction2 = match lang2 {
+        let abstraction2 = match &mut lang2 {
+            EbiInput::Object(EbiObject::StochasticNondeterministicFiniteAutomaton(snfa), _) => {
+                snfa.abstract_markovian(*order)
+            }
             EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => {
                 slang.abstract_markovian(*order)
             }
