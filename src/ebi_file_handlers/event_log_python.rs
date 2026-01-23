@@ -7,6 +7,7 @@ use crate::ebi_framework::{
         ImportAsEventLogXesObject, ImportAsFiniteLanguageObject,
         ImportAsFiniteStochasticLanguageObject,
         ImportAsStochasticDeterministicFiniteAutomatonObject,
+        ImportAsStochasticNondeterministicFiniteAutomatonObject,
     },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsEventLogTrait, ImportAsFiniteLanguageTrait,
@@ -90,6 +91,10 @@ pub const EBI_EVENT_LOG_PYTHON: EbiFileHandler = EbiFileHandler {
         ),
         EbiObjectImporter::StochasticDeterministicFiniteAutomaton(
             EventLogPython::import_as_stochastic_deterministic_finite_automaton_object,
+            EventLogPython::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(
+            EventLogPython::import_as_stochastic_nondeterministic_finite_automaton_object,
             EventLogPython::IMPORTER_PARAMETERS,
         ),
     ],

@@ -3,7 +3,9 @@ use crate::ebi_framework::{
     ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     ebi_trait::FromEbiTraitObject,
-    object_importers::ImportAsLabelledPetriNetObject,
+    object_importers::{
+        ImportAsLabelledPetriNetObject, ImportAsStochasticNondeterministicFiniteAutomatonObject,
+    },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsQueriableStochasticLanguageTrait,
         ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait,
@@ -50,6 +52,10 @@ pub const EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFil
     object_importers: &[
         EbiObjectImporter::StochasticDeterministicFiniteAutomaton(
             StochasticDeterministicFiniteAutomaton::import_as_object,
+            StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(
+            StochasticDeterministicFiniteAutomaton::import_as_stochastic_nondeterministic_finite_automaton_object,
             StochasticDeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::LabelledPetriNet(
