@@ -55,7 +55,6 @@ pub const EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = Ebi
         EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(
             StochasticNondeterministicFiniteAutomaton::export_from_object,
         ),
-        EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(StochasticNondeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(StochasticNondeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::FiniteStochasticLanguage(StochasticNondeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::EventLog(StochasticNondeterministicFiniteAutomaton::export_from_object),
