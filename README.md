@@ -10,7 +10,7 @@ Compiled versions are available on [Ebi's  website](https://ebitools.org).
 
 # How to use from ProM
 
-Ebi can be used as a plug-in of the ProM framework~\cite{DBLP:conf/bpm/VerbeekBDA10} (\url{https://promtools.org}) on Windows and Linux. 
+Ebi can be used as a plug-in of the [ProM framework](\url{https://promtools.org}) on Windows and Linux. 
 ProM has limited support for Mac OS X.
 		
 To install, open the ProM Package Manager and install the \verb=Ebi= package.
@@ -60,3 +60,4 @@ The [manual.pdf](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/buil
 1. Go to the project at https://github.com/BPM-Research-Group/Ebi choose "Clone" and "Visual Studio Code (SSH)", and clone it in Visual Studio Code.
 
 1. To run Ebi, use the terminal of Visual Studio Code to give the command "cargo run --" instead of "Ebi". Everything else is equivalent to the commands mentioned in the manual.
+

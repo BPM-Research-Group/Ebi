@@ -28,8 +28,7 @@ use crate::ebi_framework::ebi_command::EbiCommand;"
     );
 
     for path in EBI_COMMANDS.get_command_paths() {
-        if let Some(EbiCommand::Command { cli_command, .. }) = path.last()
-            && cli_command.is_none()
+        if path.last().unwrap().is_in_python()
         {
             let (fn_name, body) = ebi_command_to_pm4py_function(&path)?;
             functions.push_str(&body);
