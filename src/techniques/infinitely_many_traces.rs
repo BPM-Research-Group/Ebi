@@ -13,11 +13,7 @@ use crate::{
 };
 use anyhow::Result;
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
-    FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, ProcessTree,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticProcessTree,
-    ebi_objects::process_tree::{Node, Operator},
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, ebi_objects::process_tree::{Node, Operator}
 };
 
 pub trait InfinitelyManyTraces {
@@ -279,6 +275,7 @@ macro_rules! lang {
 
 dfa!(DeterministicFiniteAutomaton);
 dfa!(StochasticDeterministicFiniteAutomaton);
+dfa!(StochasticNondeterministicFiniteAutomaton);
 dfa!(DirectlyFollowsModel);
 dfa!(StochasticDirectlyFollowsModel);
 dfa!(DirectlyFollowsGraph);

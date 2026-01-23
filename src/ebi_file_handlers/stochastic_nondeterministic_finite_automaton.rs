@@ -1,5 +1,5 @@
 use crate::ebi_framework::{
-    ebi_file_handler::EbiFileHandler, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait, ImportAsStochasticSemanticsTrait}, validate::Validate
+    ebi_file_handler::EbiFileHandler, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait}, validate::Validate
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{EbiObject, Exportable, Importable, StochasticNondeterministicFiniteAutomaton};
@@ -21,10 +21,10 @@ pub const EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = Ebi
         //     StochasticNondeterministicFiniteAutomaton::import_as_queriable_stochastic_language_trait,
         //     StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         // ),
-        // EbiTraitImporter::StochasticDeterministicSemantics(
-        //     StochasticNondeterministicFiniteAutomaton::import_as_stochastic_deterministic_semantics_trait,
-        //     StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
-        // ),
+        EbiTraitImporter::StochasticDeterministicSemantics(
+            StochasticNondeterministicFiniteAutomaton::import_as_stochastic_deterministic_semantics_trait,
+            StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
+        ),
         EbiTraitImporter::StochasticSemantics(
             StochasticNondeterministicFiniteAutomaton::import_as_stochastic_semantics_trait,
             StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,

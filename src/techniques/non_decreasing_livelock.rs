@@ -2,7 +2,7 @@ use anyhow::Result;
 use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet, ProcessTree,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticProcessTree,
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
 };
 
 use crate::{
@@ -155,3 +155,4 @@ is_non_decreasing_livelock_dfm!(DirectlyFollowsModel);
 is_non_decreasing_livelock_dfm!(StochasticDirectlyFollowsModel);
 is_non_decreasing_livelock_dfm!(DeterministicFiniteAutomaton);
 is_non_decreasing_livelock_dfm!(StochasticDeterministicFiniteAutomaton);
+is_non_decreasing_livelock_dfm!(StochasticNondeterministicFiniteAutomaton);
