@@ -11,8 +11,7 @@ use crate::{
 };
 use anyhow::Result;
 use ebi_objects::{
-    Activity, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree,
-    ebi_arithmetic::{Fraction, One, Signed, Zero},
+    Activity, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, ebi_arithmetic::{Fraction, One, Signed, Zero}
 };
 use std::{
     collections::{HashMap, hash_map::Entry},
@@ -338,6 +337,7 @@ macro_rules! default_stochastic_deterministic_semantics {
 default_stochastic_deterministic_semantics!(StochasticLabelledPetriNet, LPNMarking);
 default_stochastic_deterministic_semantics!(StochasticProcessTree, NodeStates);
 default_stochastic_deterministic_semantics!(StochasticDirectlyFollowsModel, usize);
+default_stochastic_deterministic_semantics!(StochasticNondeterministicFiniteAutomaton, usize);
 
 /**
  * Idea: as the computation of next p-states is expensive, it is performed once, and stored in this p-marking struct.

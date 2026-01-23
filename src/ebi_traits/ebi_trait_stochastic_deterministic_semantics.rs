@@ -11,15 +11,10 @@ use crate::{
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogPython,
-    EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticProcessTree,
-    ebi_arithmetic::Fraction,
-    ebi_objects::{
+    Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, ebi_arithmetic::Fraction, ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_csv::EventLogCsv,
-    },
+    }
 };
 
 pub enum EbiTraitStochasticDeterministicSemantics {
@@ -154,6 +149,14 @@ impl ToStochasticDeterministicSemanticsTrait for DirectlyFollowsGraph {
     ) -> EbiTraitStochasticDeterministicSemantics {
         let dfm: StochasticDirectlyFollowsModel = self.into();
         EbiTraitStochasticDeterministicSemantics::UsizeDistribution(Box::new(dfm))
+    }
+}
+
+impl ToStochasticDeterministicSemanticsTrait for StochasticNondeterministicFiniteAutomaton {
+    fn to_stochastic_deterministic_semantics_trait(
+        self,
+    ) -> EbiTraitStochasticDeterministicSemantics {
+        EbiTraitStochasticDeterministicSemantics::UsizeDistribution(Box::new(self))
     }
 }
 

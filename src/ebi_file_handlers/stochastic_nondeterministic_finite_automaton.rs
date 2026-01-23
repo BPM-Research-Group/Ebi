@@ -1,5 +1,8 @@
 use crate::ebi_framework::{
-    ebi_file_handler::EbiFileHandler, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait, ImportAsStochasticSemanticsTrait}, validate::Validate
+    ebi_file_handler::EbiFileHandler, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, object_importers::ImportAsStochasticLabelledPetriNetObject, trait_importers::{
+        ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait,
+        ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait,
+    }, validate::Validate
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{EbiObject, Exportable, Importable, StochasticNondeterministicFiniteAutomaton};
@@ -21,10 +24,10 @@ pub const EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = Ebi
         //     StochasticNondeterministicFiniteAutomaton::import_as_queriable_stochastic_language_trait,
         //     StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         // ),
-        // EbiTraitImporter::StochasticDeterministicSemantics(
-        //     StochasticNondeterministicFiniteAutomaton::import_as_stochastic_deterministic_semantics_trait,
-        //     StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
-        // ),
+        EbiTraitImporter::StochasticDeterministicSemantics(
+            StochasticNondeterministicFiniteAutomaton::import_as_stochastic_deterministic_semantics_trait,
+            StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
+        ),
         EbiTraitImporter::StochasticSemantics(
             StochasticNondeterministicFiniteAutomaton::import_as_stochastic_semantics_trait,
             StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
@@ -43,11 +46,22 @@ pub const EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = Ebi
             StochasticNondeterministicFiniteAutomaton::import_as_object,
             StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
+        EbiObjectImporter::StochasticLabelledPetriNet(
+            StochasticNondeterministicFiniteAutomaton::import_as_stochastic_labelled_petri_net_object,
+            StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
+        ),
     ],
     object_exporters: &[
         EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(
             StochasticNondeterministicFiniteAutomaton::export_from_object,
         ),
+        EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::StochasticDeterministicFiniteAutomaton(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::FiniteStochasticLanguage(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::EventLog(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::EventLogTraceAttributes(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::EventLogXes(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::EventLogCsv(StochasticNondeterministicFiniteAutomaton::export_from_object),
     ],
     object_exporters_fallible: &[],
     java_object_handlers: &[],

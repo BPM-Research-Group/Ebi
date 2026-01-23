@@ -1,19 +1,3 @@
-use anyhow::{Context, Error, Ok, Result};
-use chrono::{DateTime, FixedOffset};
-use ebi_objects::{
-    EventLogXes, Executions, HasActivityKey, IntoTraceIterator, NumberOfTraces,
-    ebi_objects::{
-        executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
-    },
-};
-use process_mining::event_log::{AttributeValue, XESEditableAttribute};
-use rayon::iter::{IndexedParallelIterator, ParallelIterator};
-use std::{
-    fmt::{Debug, Display},
-    hash::Hash,
-    sync::{Arc, Mutex},
-};
-
 use crate::{
     ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
     ebi_traits::{
@@ -22,6 +6,21 @@ use crate::{
     },
     semantics::semantics::Semantics,
     techniques::align::Align,
+};
+use anyhow::{Context, Error, Ok, Result};
+use chrono::{DateTime, FixedOffset};
+use ebi_objects::{
+    EventLogXes, Executions, HasActivityKey, IntoTraceIterator, NumberOfTraces,
+    ebi_objects::{
+        executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
+    },
+};
+use process_mining::core::event_data::case_centric::{AttributeValue, XESEditableAttribute};
+use rayon::iter::{IndexedParallelIterator, ParallelIterator};
+use std::{
+    fmt::{Debug, Display},
+    hash::Hash,
+    sync::{Arc, Mutex},
 };
 
 pub trait FindExecutions {
@@ -290,7 +289,10 @@ impl C {
 mod tests {
     use std::fs;
 
-    use ebi_objects::{EventLogXes, StochasticDeterministicFiniteAutomaton, StochasticNondeterministicFiniteAutomaton};
+    use ebi_objects::{
+        EventLogXes, StochasticDeterministicFiniteAutomaton,
+        StochasticNondeterministicFiniteAutomaton,
+    };
 
     use crate::techniques::executions::FindExecutions;
 
