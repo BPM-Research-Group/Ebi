@@ -80,6 +80,7 @@ pub struct EbiFileHandler {
     pub trait_importers: &'static [EbiTraitImporter],
     /// This file format can be imported as the given objects.
     pub object_importers: &'static [EbiObjectImporter],
+    /// This file format can be exported to from the given objects.
     pub object_exporters: &'static [EbiObjectExporter], //the order matters, because if multiple file handlers can export an object, the one that mentions the object earliest is preferred. Should not fail unless the underlying writer yields an error.
     pub object_exporters_fallible: &'static [EbiObjectExporter], //the order matters, because if multiple file handlers can export an object, the one that mentions the object earliest is preferred.
     pub java_object_handlers: &'static [JavaObjectHandler],

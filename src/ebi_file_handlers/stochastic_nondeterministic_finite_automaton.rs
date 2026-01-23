@@ -1,13 +1,8 @@
 use crate::ebi_framework::{
-    ebi_file_handler::EbiFileHandler,
-    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
-    ebi_output::EbiObjectExporter,
-    ebi_trait::FromEbiTraitObject,
-    trait_importers::{
+    ebi_file_handler::EbiFileHandler, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, object_importers::ImportAsStochasticLabelledPetriNetObject, trait_importers::{
         ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait,
         ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait,
-    },
-    validate::Validate,
+    }, validate::Validate
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{EbiObject, Exportable, Importable, StochasticNondeterministicFiniteAutomaton};
@@ -49,6 +44,10 @@ pub const EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = Ebi
     object_importers: &[
         EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(
             StochasticNondeterministicFiniteAutomaton::import_as_object,
+            StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::StochasticLabelledPetriNet(
+            StochasticNondeterministicFiniteAutomaton::import_as_stochastic_labelled_petri_net_object,
             StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
     ],

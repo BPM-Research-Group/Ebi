@@ -5,7 +5,9 @@ use crate::ebi_framework::{
     ebi_trait::FromEbiTraitObject,
     object_importers::{
         ImportAsDirectlyFollowsModelObject, ImportAsLabelledPetriNetObject,
-        ImportAsStochasticDirectlyFollowsModelObject, ImportAsStochasticLabelledPetriNetObject, ImportAsStochasticNondeterministicFiniteAutomatonObject,
+        ImportAsStochasticDeterministicFiniteAutomatonObject,
+        ImportAsStochasticDirectlyFollowsModelObject, ImportAsStochasticLabelledPetriNetObject,
+        ImportAsStochasticNondeterministicFiniteAutomatonObject,
     },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsQueriableStochasticLanguageTrait,
@@ -69,6 +71,10 @@ pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
         ),
         EbiObjectImporter::StochasticLabelledPetriNet(
             DirectlyFollowsGraph::import_as_stochastic_labelled_petri_net_object,
+            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::StochasticDeterministicFiniteAutomaton(
+            DirectlyFollowsGraph::import_as_stochastic_deterministic_finite_automaton_object,
             DirectlyFollowsGraph::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(
