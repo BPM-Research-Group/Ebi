@@ -76,7 +76,7 @@ pub const EBI_PROBABILITY_TRACE: EbiCommand = EbiCommand::Command {
             Arg::new("trace")
                 .action(ArgAction::Set)
                 .value_name("TRACE")
-                .help("The trace.")
+                .help("The remaining multiple standard arguments after FILE are  interpreted as the TRACE. Provide event labels in trace order, separated as normal command line arguments (e.g., a space).")
                 .required(true)
                 .value_parser(value_parser!(String))
                 .num_args(0..),
