@@ -1,5 +1,13 @@
 use crate::ebi_framework::{
-    ebi_file_handler::EbiFileHandler, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait}, validate::Validate
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    ebi_trait::FromEbiTraitObject,
+    trait_importers::{
+        ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait,
+        ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait,
+    },
+    validate::Validate,
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{EbiObject, Exportable, Importable, StochasticNondeterministicFiniteAutomaton};
@@ -48,6 +56,13 @@ pub const EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = Ebi
         EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(
             StochasticNondeterministicFiniteAutomaton::export_from_object,
         ),
+        EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::StochasticDeterministicFiniteAutomaton(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::FiniteStochasticLanguage(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::EventLog(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::EventLogTraceAttributes(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::EventLogXes(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::EventLogCsv(StochasticNondeterministicFiniteAutomaton::export_from_object),
     ],
     object_exporters_fallible: &[],
     java_object_handlers: &[],
