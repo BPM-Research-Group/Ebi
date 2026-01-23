@@ -2,16 +2,16 @@ use super::non_decreasing_livelock::NonDecreasingLivelock;
 use crate::{
     ebi_framework::displayable::Displayable,
     ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
-    math::markov_model::MarkovModel,
-    semantics::{
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
-        semantics::Semantics,
-    },
+    math::markov_model::MarkovModel, semantics::labelled_petri_net_semantics::LPNMarking,
+    semantics::semantics::Semantics,
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
 use anyhow::Result;
 use ebi_objects::{
-    Activity, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, ebi_arithmetic::{Fraction, One, Signed, Zero}
+    Activity, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    ebi_arithmetic::{Fraction, One, Signed, Zero},
+    ebi_objects::stochastic_process_tree::TreeMarking,
 };
 use std::{
     collections::{HashMap, hash_map::Entry},
@@ -335,7 +335,7 @@ macro_rules! default_stochastic_deterministic_semantics {
 }
 
 default_stochastic_deterministic_semantics!(StochasticLabelledPetriNet, LPNMarking);
-default_stochastic_deterministic_semantics!(StochasticProcessTree, NodeStates);
+default_stochastic_deterministic_semantics!(StochasticProcessTree, TreeMarking);
 default_stochastic_deterministic_semantics!(StochasticDirectlyFollowsModel, usize);
 default_stochastic_deterministic_semantics!(StochasticNondeterministicFiniteAutomaton, usize);
 

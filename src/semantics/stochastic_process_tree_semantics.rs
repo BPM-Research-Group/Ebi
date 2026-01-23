@@ -1,18 +1,56 @@
-use anyhow::{Result, anyhow};
+use crate::{ebi_framework::displayable::Displayable, semantics::semantics::Semantics};
+use anyhow::Result;
 use ebi_objects::{
     Activity, StochasticProcessTree,
-    ebi_objects::labelled_petri_net::TransitionIndex,
-    ebi_objects::process_tree::{Node, Operator},
+    ebi_objects::{
+        labelled_petri_net::TransitionIndex,
+        stochastic_process_tree::{
+            TreeMarking, execute_transition, get_enabled_transitions, get_initial_state,
+            get_number_of_transitions, get_transition_activity, is_final_state,
+        },
+    },
 };
 
-use crate::{
-    semantics::process_tree_semantics::{NodeState, NodeStates},
-    semantics::semantics::Semantics,
-    tree_semantics, tree_semantics_helpers,
-};
+impl Displayable for TreeMarking {}
 
-tree_semantics!(StochasticProcessTree);
-tree_semantics_helpers!(StochasticProcessTree);
+impl Semantics for StochasticProcessTree {
+    type SemState = TreeMarking;
+
+    fn get_initial_state(&self) -> Option<<Self as Semantics>::SemState> {
+        get_initial_state(self)
+    }
+
+    fn execute_transition(
+        &self,
+        state: &mut <Self as Semantics>::SemState,
+        transition: TransitionIndex,
+    ) -> Result<()> {
+        execute_transition(self, state, transition)
+    }
+
+    fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool {
+        is_final_state(self, state)
+    }
+
+    fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
+        self.get_transition_activity(transition).is_none()
+    }
+
+    fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
+        get_transition_activity(self, transition)
+    }
+
+    fn get_enabled_transitions(
+        &self,
+        state: &<Self as Semantics>::SemState,
+    ) -> Vec<TransitionIndex> {
+        get_enabled_transitions(self, state)
+    }
+
+    fn get_number_of_transitions(&self) -> usize {
+        get_number_of_transitions(self)
+    }
+}
 
 #[cfg(test)]
 mod tests {

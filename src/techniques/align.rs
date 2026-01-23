@@ -18,7 +18,10 @@ use ebi_objects::{
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    ebi_objects::{labelled_petri_net::TransitionIndex, language_of_alignments::Move},
+    ebi_objects::{
+        labelled_petri_net::TransitionIndex, language_of_alignments::Move,
+        stochastic_process_tree::TreeMarking,
+    },
 };
 use rayon::iter::ParallelIterator;
 use std::{
@@ -53,6 +56,7 @@ impl Align for EbiTraitSemantics {
             EbiTraitSemantics::Usize(sem) => sem.align_language(log),
             EbiTraitSemantics::Marking(sem) => sem.align_language(log),
             EbiTraitSemantics::NodeStates(sem) => sem.align_language(log),
+            EbiTraitSemantics::TreeMarking(sem) => sem.align_language(log),
         }
     }
 
@@ -64,6 +68,7 @@ impl Align for EbiTraitSemantics {
             EbiTraitSemantics::Usize(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::Marking(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::NodeStates(sem) => sem.align_stochastic_language(log),
+            EbiTraitSemantics::TreeMarking(sem) => sem.align_stochastic_language(log),
         }
     }
 
@@ -72,6 +77,7 @@ impl Align for EbiTraitSemantics {
             EbiTraitSemantics::Usize(sem) => sem.align_trace(trace),
             EbiTraitSemantics::Marking(sem) => sem.align_trace(trace),
             EbiTraitSemantics::NodeStates(sem) => sem.align_trace(trace),
+            EbiTraitSemantics::TreeMarking(sem) => sem.align_trace(trace),
         }
     }
 }
@@ -570,10 +576,31 @@ macro_rules! nodestates {
         }
     };
 }
+macro_rules! treemarking {
+    ($t:ident) => {
+        impl AlignmentHeuristics for $t {
+            type AliState = TreeMarking;
+
+            fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+                vec![]
+            }
+
+            fn underestimate_cost_to_final_synchronous_state(
+                &self,
+                _: &Vec<Activity>,
+                _: &usize,
+                _: &TreeMarking,
+                _: &Vec<Vec<usize>>,
+            ) -> usize {
+                0
+            }
+        }
+    };
+}
 usize!(StochasticDeterministicFiniteAutomaton);
 usize!(StochasticNondeterministicFiniteAutomaton);
 nodestates!(ProcessTree);
-nodestates!(StochasticProcessTree);
+treemarking!(StochasticProcessTree);
 usize!(DirectlyFollowsGraph);
 usize!(DirectlyFollowsModel);
 usize!(StochasticDirectlyFollowsModel);

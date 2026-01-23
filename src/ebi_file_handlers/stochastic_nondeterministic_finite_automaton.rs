@@ -1,8 +1,14 @@
 use crate::ebi_framework::{
-    ebi_file_handler::EbiFileHandler, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, object_importers::ImportAsStochasticLabelledPetriNetObject, trait_importers::{
+    ebi_file_handler::EbiFileHandler,
+    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    ebi_output::EbiObjectExporter,
+    ebi_trait::FromEbiTraitObject,
+    object_importers::ImportAsStochasticLabelledPetriNetObject,
+    trait_importers::{
         ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait,
         ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait,
-    }, validate::Validate
+    },
+    validate::Validate,
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{EbiObject, Exportable, Importable, StochasticNondeterministicFiniteAutomaton};
@@ -57,6 +63,7 @@ pub const EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = Ebi
         ),
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(StochasticNondeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::FiniteStochasticLanguage(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::StochasticProcessTree(StochasticNondeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::EventLog(StochasticNondeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::EventLogTraceAttributes(StochasticNondeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::EventLogXes(StochasticNondeterministicFiniteAutomaton::export_from_object),

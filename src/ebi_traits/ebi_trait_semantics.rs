@@ -20,7 +20,7 @@ use ebi_objects::{
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-        event_log_csv::EventLogCsv,
+        event_log_csv::EventLogCsv, stochastic_process_tree::TreeMarking,
     },
 };
 
@@ -32,6 +32,7 @@ pub enum EbiTraitSemantics {
     Usize(Box<dyn Semantics<SemState = usize, AliState = usize>>),
     Marking(Box<dyn Semantics<SemState = LPNMarking, AliState = LPNMarking>>),
     NodeStates(Box<dyn Semantics<SemState = NodeStates, AliState = NodeStates>>),
+    TreeMarking(Box<dyn Semantics<SemState = TreeMarking, AliState = TreeMarking>>),
 }
 
 impl HasActivityKey for EbiTraitSemantics {
@@ -40,6 +41,7 @@ impl HasActivityKey for EbiTraitSemantics {
             EbiTraitSemantics::Marking(semantics) => semantics.activity_key(),
             EbiTraitSemantics::Usize(semantics) => semantics.activity_key(),
             EbiTraitSemantics::NodeStates(semantics) => semantics.activity_key(),
+            EbiTraitSemantics::TreeMarking(semantics) => semantics.activity_key(),
         }
     }
 
@@ -48,6 +50,7 @@ impl HasActivityKey for EbiTraitSemantics {
             EbiTraitSemantics::Marking(semantics) => semantics.activity_key_mut(),
             EbiTraitSemantics::Usize(semantics) => semantics.activity_key_mut(),
             EbiTraitSemantics::NodeStates(semantics) => semantics.activity_key_mut(),
+            EbiTraitSemantics::TreeMarking(semantics) => semantics.activity_key_mut(),
         }
     }
 }
@@ -62,6 +65,9 @@ impl TranslateActivityKey for EbiTraitSemantics {
                 semantics.translate_using_activity_key(to_activity_key)
             }
             EbiTraitSemantics::NodeStates(semantics) => {
+                semantics.translate_using_activity_key(to_activity_key)
+            }
+            EbiTraitSemantics::TreeMarking(semantics) => {
                 semantics.translate_using_activity_key(to_activity_key)
             }
         }
@@ -112,7 +118,7 @@ impl ToSemanticsTrait for LolaNet {
 
 impl ToSemanticsTrait for StochasticProcessTree {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::NodeStates(Box::new(self))
+        EbiTraitSemantics::TreeMarking(Box::new(self))
     }
 }
 

@@ -13,7 +13,7 @@ use ebi_objects::{
     LabelledPetriNet, NumberOfTraces, ProcessTree, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    ebi_arithmetic::ebi_number::Zero, ebi_objects::event_log_csv::EventLogCsv,
+    ebi_arithmetic::ebi_number::Zero, ebi_objects::{event_log_csv::EventLogCsv, stochastic_process_tree::TreeMarking},
 };
 
 pub trait AnyTraces {
@@ -34,7 +34,7 @@ impl AnyTraces for ProcessTree {
 }
 
 impl AnyTraces for StochasticProcessTree {
-    type LivState = NodeStates;
+    type LivState = TreeMarking;
 
     fn any_traces(&self) -> Result<bool> {
         Ok(self.get_initial_state().is_none()) //an empty tree has no traces, otherwise a tree has traces

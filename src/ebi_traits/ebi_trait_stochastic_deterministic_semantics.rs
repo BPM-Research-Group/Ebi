@@ -11,10 +11,15 @@ use crate::{
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, ebi_arithmetic::Fraction, ebi_objects::{
+    Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogPython,
+    EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    ebi_arithmetic::Fraction,
+    ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-        event_log_csv::EventLogCsv,
-    }
+        event_log_csv::EventLogCsv, stochastic_process_tree::TreeMarking,
+    },
 };
 
 pub enum EbiTraitStochasticDeterministicSemantics {
@@ -35,6 +40,14 @@ pub enum EbiTraitStochasticDeterministicSemantics {
             dyn StochasticDeterministicSemantics<
                     DetState = PMarking<NodeStates>,
                     LivState = NodeStates,
+                >,
+        >,
+    ),
+    TreeMarkingDistribution(
+        Box<
+            dyn StochasticDeterministicSemantics<
+                    DetState = PMarking<TreeMarking>,
+                    LivState = TreeMarking,
                 >,
         >,
     ),
@@ -132,7 +145,7 @@ impl ToStochasticDeterministicSemanticsTrait for StochasticProcessTree {
     fn to_stochastic_deterministic_semantics_trait(
         self,
     ) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::NodeStatesDistribution(Box::new(self))
+        EbiTraitStochasticDeterministicSemantics::TreeMarkingDistribution(Box::new(self))
     }
 }
 
