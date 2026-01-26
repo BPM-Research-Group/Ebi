@@ -78,3 +78,33 @@ impl StochasticMarkovianConformance for MarkovianAbstraction {
         return measure.apply(abslang1, abslang2);
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        techniques::{stochastic_markovian_abstraction::AbstractMarkovian, stochastic_markovian_abstraction_conformance::{DistanceMeasure, StochasticMarkovianConformance}},
+    };
+    use ebi_objects::{FiniteStochasticLanguage, StochasticLabelledPetriNet, ebi_arithmetic::Fraction};
+    use std::fs;
+
+    #[test]
+    fn eduardo_paper_test() {
+        let fin3 = fs::read_to_string("testfiles/seq(a,xor(seq(f,and(c,b)),seq(f,loop(d,e))).slpn")
+            .unwrap();
+        let mut slpn = fin3.parse::<StochasticLabelledPetriNet>().unwrap();
+
+        let slpn_abstraction = slpn.abstract_markovian(2).unwrap();
+        println!("{}", slpn_abstraction);
+
+        let fin4 = fs::read_to_string("testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap();
+        let mut slang: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(fin4.parse::<FiniteStochasticLanguage>().unwrap());
+
+        let slang_abstraction = slang.abstract_markovian(2).unwrap();
+        println!("{}", slang_abstraction);
+
+        let result = slpn_abstraction.markovian_conformance(slang_abstraction, DistanceMeasure::UEMSC).unwrap();
+        assert_eq!(result, Fraction::from((6383, 10005)));
+    }
+}
