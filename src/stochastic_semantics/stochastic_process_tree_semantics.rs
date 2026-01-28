@@ -5,9 +5,8 @@ use ebi_objects::{
     ebi_arithmetic::Fraction,
     ebi_objects::{
         labelled_petri_net::TransitionIndex,
-        stochastic_process_tree::{
-            TreeMarking, get_total_weight_of_enabled_transitions, get_transition_weight,
-        },
+        process_tree::TreeMarking,
+        stochastic_process_tree::{get_total_weight_of_enabled_transitions, get_transition_weight},
     },
 };
 

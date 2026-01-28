@@ -1,17 +1,16 @@
-use crate::{ebi_framework::displayable::Displayable, semantics::semantics::Semantics};
+use crate::semantics::semantics::Semantics;
 use anyhow::Result;
 use ebi_objects::{
     Activity, StochasticProcessTree,
     ebi_objects::{
         labelled_petri_net::TransitionIndex,
+        process_tree::TreeMarking,
         stochastic_process_tree::{
-            TreeMarking, execute_transition, get_enabled_transitions, get_initial_state,
+            execute_transition, get_enabled_transitions, get_initial_state,
             get_number_of_transitions, get_transition_activity, is_final_state,
         },
     },
 };
-
-impl Displayable for TreeMarking {}
 
 impl Semantics for StochasticProcessTree {
     type SemState = TreeMarking;

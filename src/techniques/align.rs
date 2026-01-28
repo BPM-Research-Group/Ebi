@@ -7,8 +7,7 @@ use crate::{
     },
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
-        semantics::Semantics,
+        labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
     },
 };
 use anyhow::{Context, Error, Result, anyhow};
@@ -20,7 +19,7 @@ use ebi_objects::{
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     ebi_objects::{
         labelled_petri_net::TransitionIndex, language_of_alignments::Move,
-        stochastic_process_tree::TreeMarking,
+        process_tree::TreeMarking,
     },
 };
 use rayon::iter::ParallelIterator;
@@ -55,7 +54,6 @@ impl Align for EbiTraitSemantics {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.align_language(log),
             EbiTraitSemantics::Marking(sem) => sem.align_language(log),
-            EbiTraitSemantics::NodeStates(sem) => sem.align_language(log),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_language(log),
         }
     }
@@ -67,7 +65,6 @@ impl Align for EbiTraitSemantics {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::Marking(sem) => sem.align_stochastic_language(log),
-            EbiTraitSemantics::NodeStates(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_stochastic_language(log),
         }
     }
@@ -76,7 +73,6 @@ impl Align for EbiTraitSemantics {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.align_trace(trace),
             EbiTraitSemantics::Marking(sem) => sem.align_trace(trace),
-            EbiTraitSemantics::NodeStates(sem) => sem.align_trace(trace),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_trace(trace),
         }
     }
@@ -558,7 +554,7 @@ macro_rules! usize {
 macro_rules! nodestates {
     ($t:ident) => {
         impl AlignmentHeuristics for $t {
-            type AliState = NodeStates;
+            type AliState = TreeMarking;
 
             fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
                 vec![]
@@ -568,7 +564,7 @@ macro_rules! nodestates {
                 &self,
                 _: &Vec<Activity>,
                 _: &usize,
-                _: &NodeStates,
+                _: &TreeMarking,
                 _: &Vec<Vec<usize>>,
             ) -> usize {
                 0

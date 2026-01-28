@@ -27,9 +27,6 @@ impl EscapingEdgesPrecision for EbiTraitSemantics {
         match self {
             EbiTraitSemantics::Usize(semantics) => semantics.escaping_edges_precision(alignments),
             EbiTraitSemantics::Marking(semantics) => semantics.escaping_edges_precision(alignments),
-            EbiTraitSemantics::NodeStates(semantics) => {
-                semantics.escaping_edges_precision(alignments)
-            }
             EbiTraitSemantics::TreeMarking(semantics) => {
                 semantics.escaping_edges_precision(alignments)
             }

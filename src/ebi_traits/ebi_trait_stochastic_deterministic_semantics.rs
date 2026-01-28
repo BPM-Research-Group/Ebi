@@ -3,7 +3,7 @@ use crate::{
         displayable::Displayable, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
         ebi_trait_object::EbiTraitObject, trait_importers::ToStochasticDeterministicSemanticsTrait,
     },
-    semantics::{labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates},
+    semantics::labelled_petri_net_semantics::LPNMarking,
     techniques::{
         deterministic_semantics_for_stochastic_semantics::PMarking,
         infinitely_many_traces::InfinitelyManyTraces,
@@ -18,7 +18,7 @@ use ebi_objects::{
     ebi_arithmetic::Fraction,
     ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-        event_log_csv::EventLogCsv, stochastic_process_tree::TreeMarking,
+        event_log_csv::EventLogCsv, process_tree::TreeMarking,
     },
 };
 
@@ -32,14 +32,6 @@ pub enum EbiTraitStochasticDeterministicSemantics {
             dyn StochasticDeterministicSemantics<
                     DetState = PMarking<LPNMarking>,
                     LivState = LPNMarking,
-                >,
-        >,
-    ),
-    NodeStatesDistribution(
-        Box<
-            dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<NodeStates>,
-                    LivState = NodeStates,
                 >,
         >,
     ),

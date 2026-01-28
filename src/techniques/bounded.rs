@@ -2,10 +2,7 @@ use std::collections::{HashMap, hash_map::Entry};
 
 use crate::{
     ebi_framework::displayable::Displayable,
-    semantics::{
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
-        semantics::Semantics,
-    },
+    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
 };
 use anyhow::Result;
 use ebi_objects::{
@@ -14,7 +11,7 @@ use ebi_objects::{
     LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    ebi_objects::event_log_csv::EventLogCsv,
+    ebi_objects::{event_log_csv::EventLogCsv, process_tree::TreeMarking},
 };
 
 pub trait Bounded {
@@ -27,7 +24,7 @@ pub trait Bounded {
 }
 
 impl Bounded for ProcessTree {
-    type LivState = NodeStates;
+    type LivState = TreeMarking;
 
     fn bounded(&self) -> Result<bool> {
         Ok(true)
@@ -35,7 +32,7 @@ impl Bounded for ProcessTree {
 }
 
 impl Bounded for StochasticProcessTree {
-    type LivState = NodeStates;
+    type LivState = TreeMarking;
 
     fn bounded(&self) -> Result<bool> {
         Ok(true)

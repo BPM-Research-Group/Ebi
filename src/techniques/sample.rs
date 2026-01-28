@@ -28,7 +28,6 @@ impl Sampler for EbiTraitStochasticSemantics {
         match self {
             EbiTraitStochasticSemantics::Marking(s) => s.sample(number_of_traces),
             EbiTraitStochasticSemantics::Usize(s) => s.sample(number_of_traces),
-            EbiTraitStochasticSemantics::NodeStates(s) => s.sample(number_of_traces),
             EbiTraitStochasticSemantics::TreeMarking(s) => s.sample(number_of_traces),
         }
     }

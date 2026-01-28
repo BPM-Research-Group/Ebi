@@ -5,10 +5,7 @@ use std::{
 
 use crate::{
     ebi_framework::displayable::Displayable,
-    semantics::{
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
-        semantics::Semantics,
-    },
+    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
     techniques::livelock::IsPartOfLivelock,
 };
 use anyhow::Result;
@@ -18,8 +15,8 @@ use ebi_objects::{
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     ebi_objects::{
+        process_tree::TreeMarking,
         process_tree::{Node, Operator},
-        stochastic_process_tree::TreeMarking,
     },
 };
 
@@ -33,27 +30,6 @@ pub trait InfinitelyManyTraces {
 }
 
 macro_rules! tree {
-    ($t:ident) => {
-        impl InfinitelyManyTraces for $t {
-            type LivState = NodeStates;
-
-            fn infinitely_many_traces(&self) -> Result<bool> {
-                for node in 0..self.get_number_of_nodes() {
-                    if let Some(Node::Operator(Operator::Loop, _)) = self.get_node(node) {
-                        //see whether at least one leaf in the loop is an activity
-                        for child in self.get_descendants(node) {
-                            if let Node::Activity(_) = child {
-                                return Ok(true);
-                            }
-                        }
-                    }
-                }
-                return Ok(false);
-            }
-        }
-    };
-}
-macro_rules! tree2 {
     ($t:ident) => {
         impl InfinitelyManyTraces for $t {
             type LivState = TreeMarking;
@@ -75,7 +51,7 @@ macro_rules! tree2 {
     };
 }
 tree!(ProcessTree);
-tree2!(StochasticProcessTree);
+tree!(StochasticProcessTree);
 
 macro_rules! lpn {
     ($t:ident) => {

@@ -8,7 +8,7 @@ use anyhow::{Context, Result, anyhow};
 use ebi_objects::{
     StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet, StochasticProcessTree,
     ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, GaussJordan, One, Zero},
-    ebi_objects::stochastic_process_tree::TreeMarking,
+    ebi_objects::process_tree::TreeMarking,
 };
 use std::{
     collections::{HashMap, HashSet},

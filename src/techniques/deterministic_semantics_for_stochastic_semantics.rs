@@ -11,7 +11,7 @@ use ebi_objects::{
     Activity, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     ebi_arithmetic::{Fraction, One, Signed, Zero},
-    ebi_objects::stochastic_process_tree::TreeMarking,
+    ebi_objects::process_tree::TreeMarking,
 };
 use std::{
     collections::{HashMap, hash_map::Entry},

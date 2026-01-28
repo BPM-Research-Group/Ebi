@@ -3,16 +3,13 @@ use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, HasActivityKey,
     LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton,
+    StochasticNondeterministicFiniteAutomaton, ebi_objects::process_tree::TreeMarking,
 };
 use std::collections::{HashMap, HashSet, hash_map::Entry};
 
 use crate::{
     ebi_framework::displayable::Displayable,
-    semantics::{
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
-        semantics::Semantics,
-    },
+    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
 };
 
 pub trait IsPartOfLivelock {
@@ -37,7 +34,7 @@ pub trait LiveLockCache {
 }
 
 impl IsPartOfLivelock for ProcessTree {
-    type LivState = NodeStates;
+    type LivState = TreeMarking;
 
     fn is_state_part_of_livelock(&self, _: &Self::LivState) -> Result<bool> {
         Ok(false)
@@ -51,7 +48,7 @@ impl IsPartOfLivelock for ProcessTree {
 pub struct LiveLockCacheProcessTree {}
 
 impl LiveLockCache for LiveLockCacheProcessTree {
-    type LivState = NodeStates;
+    type LivState = TreeMarking;
 
     fn is_state_part_of_livelock(&mut self, _: &Self::LivState) -> Result<bool> {
         Ok(false)
@@ -388,35 +385,11 @@ dfa!(
 mod tests {
     use std::fs;
 
+    use crate::{semantics::semantics::Semantics, techniques::livelock::IsPartOfLivelock};
     use ebi_objects::{
-        DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet, ProcessTree,
+        DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet,
         StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
     };
-
-    use crate::{
-        semantics::{process_tree_semantics::NodeStates, semantics::Semantics},
-        techniques::livelock::IsPartOfLivelock,
-    };
-
-    #[test]
-    fn livelock_tree() {
-        let fin = fs::read_to_string("testfiles/empty.ptree").unwrap();
-        let tree = fin.parse::<ProcessTree>().unwrap();
-
-        let state = NodeStates {
-            terminated: false,
-            states: vec![],
-        };
-
-        assert!(!tree.is_state_part_of_livelock(&state).unwrap());
-
-        assert!(
-            !tree
-                .get_livelock_cache()
-                .is_state_part_of_livelock(&state)
-                .unwrap()
-        );
-    }
 
     #[test]
     fn livelock_lpn() {

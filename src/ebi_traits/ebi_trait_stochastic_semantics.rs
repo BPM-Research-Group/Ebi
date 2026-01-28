@@ -5,7 +5,7 @@ use crate::{
     },
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
+        labelled_petri_net_semantics::LPNMarking,
     },
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
@@ -18,7 +18,7 @@ use ebi_objects::{
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-        event_log_csv::EventLogCsv, stochastic_process_tree::TreeMarking,
+        event_log_csv::EventLogCsv, process_tree::TreeMarking,
     },
 };
 
@@ -30,15 +30,6 @@ pub enum EbiTraitStochasticSemantics {
                     StoSemState = LPNMarking,
                     SemState = LPNMarking,
                     AliState = LPNMarking,
-                >,
-        >,
-    ),
-    NodeStates(
-        Box<
-            dyn StochasticSemantics<
-                    StoSemState = NodeStates,
-                    SemState = NodeStates,
-                    AliState = NodeStates,
                 >,
         >,
     ),
@@ -71,7 +62,6 @@ impl HasActivityKey for EbiTraitStochasticSemantics {
         match self {
             EbiTraitStochasticSemantics::Marking(semantics) => semantics.activity_key(),
             EbiTraitStochasticSemantics::Usize(semantics) => semantics.activity_key(),
-            EbiTraitStochasticSemantics::NodeStates(semantics) => semantics.activity_key(),
             EbiTraitStochasticSemantics::TreeMarking(semantics) => semantics.activity_key(),
         }
     }
@@ -80,7 +70,6 @@ impl HasActivityKey for EbiTraitStochasticSemantics {
         match self {
             EbiTraitStochasticSemantics::Marking(semantics) => semantics.activity_key_mut(),
             EbiTraitStochasticSemantics::Usize(semantics) => semantics.activity_key_mut(),
-            EbiTraitStochasticSemantics::NodeStates(semantics) => semantics.activity_key_mut(),
             EbiTraitStochasticSemantics::TreeMarking(semantics) => semantics.activity_key_mut(),
         }
     }
@@ -93,9 +82,6 @@ impl TranslateActivityKey for EbiTraitStochasticSemantics {
                 semantics.translate_using_activity_key(to_activity_key)
             }
             EbiTraitStochasticSemantics::Usize(semantics) => {
-                semantics.translate_using_activity_key(to_activity_key)
-            }
-            EbiTraitStochasticSemantics::NodeStates(semantics) => {
                 semantics.translate_using_activity_key(to_activity_key)
             }
             EbiTraitStochasticSemantics::TreeMarking(semantics) => {

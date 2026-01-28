@@ -54,9 +54,6 @@ impl ProbabilityQueries for EbiTraitStochasticDeterministicSemantics {
             EbiTraitStochasticDeterministicSemantics::LPNMarkingDistribution(sem) => {
                 sem.analyse_minimum_probability(at_least)
             }
-            EbiTraitStochasticDeterministicSemantics::NodeStatesDistribution(sem) => {
-                sem.analyse_minimum_probability(at_least)
-            }
             EbiTraitStochasticDeterministicSemantics::TreeMarkingDistribution(sem) => {
                 sem.analyse_minimum_probability(at_least)
             }
@@ -77,9 +74,7 @@ impl ProbabilityQueries for EbiTraitStochasticDeterministicSemantics {
             EbiTraitStochasticDeterministicSemantics::LPNMarkingDistribution(sem) => {
                 sem.analyse_most_likely_traces(number_of_traces)
             }
-            EbiTraitStochasticDeterministicSemantics::NodeStatesDistribution(sem) => {
-                sem.analyse_most_likely_traces(number_of_traces)
-            }
+
             EbiTraitStochasticDeterministicSemantics::TreeMarkingDistribution(sem) => {
                 sem.analyse_most_likely_traces(number_of_traces)
             }
@@ -98,9 +93,6 @@ impl ProbabilityQueries for EbiTraitStochasticDeterministicSemantics {
                 sem.analyse_probability_coverage(coverage)
             }
             EbiTraitStochasticDeterministicSemantics::LPNMarkingDistribution(sem) => {
-                sem.analyse_probability_coverage(coverage)
-            }
-            EbiTraitStochasticDeterministicSemantics::NodeStatesDistribution(sem) => {
                 sem.analyse_probability_coverage(coverage)
             }
             EbiTraitStochasticDeterministicSemantics::TreeMarkingDistribution(sem) => {

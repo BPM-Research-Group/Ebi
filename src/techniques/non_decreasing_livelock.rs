@@ -1,16 +1,13 @@
 use crate::{
     ebi_framework::displayable::Displayable,
-    semantics::{
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
-        semantics::Semantics,
-    },
+    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
 };
 use anyhow::Result;
 use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet, ProcessTree,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    ebi_objects::stochastic_process_tree::TreeMarking,
+    ebi_objects::process_tree::TreeMarking,
 };
 
 pub trait NonDecreasingLivelock {
@@ -25,20 +22,6 @@ pub trait NonDecreasingLivelock {
 macro_rules! tree {
     ($t:ident) => {
         impl NonDecreasingLivelock for $t {
-            type LivState = NodeStates;
-
-            fn is_part_of_non_decreasing_livelock(
-                &self,
-                _state: &mut Self::LivState,
-            ) -> Result<bool> {
-                Ok(false)
-            }
-        }
-    };
-}
-macro_rules! tree2 {
-    ($t:ident) => {
-        impl NonDecreasingLivelock for $t {
             type LivState = TreeMarking;
 
             fn is_part_of_non_decreasing_livelock(
@@ -50,9 +33,8 @@ macro_rules! tree2 {
         }
     };
 }
-
 tree!(ProcessTree);
-tree2!(StochasticProcessTree);
+tree!(StochasticProcessTree);
 
 macro_rules! lpn {
     ($t:ident, $v:expr) => {
