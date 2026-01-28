@@ -1,15 +1,15 @@
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, HasActivityKey, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, HasActivityKey,
+    LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton, ebi_objects::process_tree::TreeMarking,
 };
 use std::collections::{HashMap, HashSet, hash_map::Entry};
 
 use crate::{
     ebi_framework::displayable::Displayable,
-    semantics::{
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
-        semantics::Semantics,
-    },
+    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
 };
 
 pub trait IsPartOfLivelock {
@@ -34,7 +34,7 @@ pub trait LiveLockCache {
 }
 
 impl IsPartOfLivelock for ProcessTree {
-    type LivState = NodeStates;
+    type LivState = TreeMarking;
 
     fn is_state_part_of_livelock(&self, _: &Self::LivState) -> Result<bool> {
         Ok(false)
@@ -48,7 +48,7 @@ impl IsPartOfLivelock for ProcessTree {
 pub struct LiveLockCacheProcessTree {}
 
 impl LiveLockCache for LiveLockCacheProcessTree {
-    type LivState = NodeStates;
+    type LivState = TreeMarking;
 
     fn is_state_part_of_livelock(&mut self, _: &Self::LivState) -> Result<bool> {
         Ok(false)
@@ -322,12 +322,12 @@ macro_rules! dfa {
 
         impl $u {
             pub fn new(automaton: &$t) -> Self {
-                let mut result = vec![true; automaton.get_max_state() + 2];
-                let mut result_last = vec![true; automaton.get_max_state() + 2];
+                let mut result = vec![true; automaton.number_of_states() + 2];
+                let mut result_last = vec![true; automaton.number_of_states() + 2];
 
                 //stage 1: set final states
-                result[automaton.get_max_state() + 1] = false;
-                for state in 0..=automaton.get_max_state() {
+                result[automaton.number_of_states() + 1] = false;
+                for state in 0..automaton.number_of_states() {
                     if automaton.can_terminate_in_state(state) {
                         result[state] = false;
                     }
@@ -376,40 +376,20 @@ dfa!(
     StochasticDeterministicFiniteAutomaton,
     LivelockCacheStochasticDeterministicAutomaton
 );
+dfa!(
+    StochasticNondeterministicFiniteAutomaton,
+    LivelockCacheStochasticNondeterministicAutomaton
+);
 
 #[cfg(test)]
 mod tests {
     use std::fs;
 
+    use crate::{semantics::semantics::Semantics, techniques::livelock::IsPartOfLivelock};
     use ebi_objects::{
-        DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet, ProcessTree,
+        DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet,
         StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
     };
-
-    use crate::{
-        semantics::{process_tree_semantics::NodeStates, semantics::Semantics},
-        techniques::livelock::IsPartOfLivelock,
-    };
-
-    #[test]
-    fn livelock_tree() {
-        let fin = fs::read_to_string("testfiles/empty.ptree").unwrap();
-        let tree = fin.parse::<ProcessTree>().unwrap();
-
-        let state = NodeStates {
-            terminated: false,
-            states: vec![],
-        };
-
-        assert!(!tree.is_state_part_of_livelock(&state).unwrap());
-
-        assert!(
-            !tree
-                .get_livelock_cache()
-                .is_state_part_of_livelock(&state)
-                .unwrap()
-        );
-    }
 
     #[test]
     fn livelock_lpn() {

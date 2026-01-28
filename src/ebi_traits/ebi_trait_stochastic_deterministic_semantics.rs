@@ -3,7 +3,7 @@ use crate::{
         displayable::Displayable, ebi_input::EbiInput, ebi_trait::FromEbiTraitObject,
         ebi_trait_object::EbiTraitObject, trait_importers::ToStochasticDeterministicSemanticsTrait,
     },
-    semantics::{labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates},
+    semantics::labelled_petri_net_semantics::LPNMarking,
     techniques::{
         deterministic_semantics_for_stochastic_semantics::PMarking,
         infinitely_many_traces::InfinitelyManyTraces,
@@ -14,11 +14,11 @@ use ebi_objects::{
     Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogPython,
     EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticProcessTree,
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     ebi_arithmetic::Fraction,
     ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-        event_log_csv::EventLogCsv,
+        event_log_csv::EventLogCsv, process_tree::TreeMarking,
     },
 };
 
@@ -35,11 +35,11 @@ pub enum EbiTraitStochasticDeterministicSemantics {
                 >,
         >,
     ),
-    NodeStatesDistribution(
+    TreeMarkingDistribution(
         Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<NodeStates>,
-                    LivState = NodeStates,
+                    DetState = PMarking<TreeMarking>,
+                    LivState = TreeMarking,
                 >,
         >,
     ),
@@ -137,7 +137,7 @@ impl ToStochasticDeterministicSemanticsTrait for StochasticProcessTree {
     fn to_stochastic_deterministic_semantics_trait(
         self,
     ) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::NodeStatesDistribution(Box::new(self))
+        EbiTraitStochasticDeterministicSemantics::TreeMarkingDistribution(Box::new(self))
     }
 }
 
@@ -154,6 +154,14 @@ impl ToStochasticDeterministicSemanticsTrait for DirectlyFollowsGraph {
     ) -> EbiTraitStochasticDeterministicSemantics {
         let dfm: StochasticDirectlyFollowsModel = self.into();
         EbiTraitStochasticDeterministicSemantics::UsizeDistribution(Box::new(dfm))
+    }
+}
+
+impl ToStochasticDeterministicSemanticsTrait for StochasticNondeterministicFiniteAutomaton {
+    fn to_stochastic_deterministic_semantics_trait(
+        self,
+    ) -> EbiTraitStochasticDeterministicSemantics {
+        EbiTraitStochasticDeterministicSemantics::UsizeDistribution(Box::new(self))
     }
 }
 

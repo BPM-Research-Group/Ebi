@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg width="812.5" height="284" viewBox="0 0 812.5 284" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="startarrow" markerWidth="10" markerHeight="7"
+refX="0" refY="3.5" orient="auto">
+<polygon points="10 0, 10 7, 0 3.5" fill="context-stroke" />
+</marker>
+<marker id="endarrow" markerWidth="10" markerHeight="7"
+refX="10" refY="3.5" orient="auto">
+<polygon points="0 0, 10 3.5, 0 7" fill="context-stroke" />
+</marker>
+
+</defs><style>
+.a15 { font-size: 15px; font-family: Times, serif; }
+</style>
+<g >
+
+            <ellipse cx="47.5" cy="156.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="149" class="a15"></text><g >
+
+            <ellipse cx="772.5" cy="47.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="772.5" y="40" class="a15"></text><g >
+
+            <ellipse cx="212.5" cy="156.5" rx="2.5" ry="2.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="212.5" y="149" class="a15"></text><g >
+
+            <rect x="125" y="144" width="25" height="25" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="137.5" y="141.5" class="a15"><tspan x = "137.5" dy="1.0em">a</tspan></text><g >
+
+            <ellipse cx="362.5" cy="90" rx="2.5" ry="2.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="362.5" y="82.5" class="a15"></text><g >
+
+            <rect x="275" y="77.5" width="25" height="25" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="287.5" y="75" class="a15"><tspan x = "287.5" dy="1.0em">f</tspan></text><g >
+
+            <rect x="425" y="80" width="20" height="20" fill="#00a1cff3" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="435" y="75" class="a15"><tspan x = "435" dy="1.0em">+</tspan></text><g >
+
+            <rect x="590" y="37.5" width="20" height="20" fill="#00a1cff3" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="600" y="32.5" class="a15"><tspan x = "600" dy="1.0em">+</tspan></text><g >
+
+            <rect x="505" y="35" width="25" height="25" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="517.5" y="32.5" class="a15"><tspan x = "517.5" dy="1.0em">c</tspan></text><g >
+
+            <rect x="505" y="120" width="25" height="25" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="517.5" y="117.5" class="a15"><tspan x = "517.5" dy="1.0em">b</tspan></text><g >
+
+            <ellipse cx="362.5" cy="241.5" rx="2.5" ry="2.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="362.5" y="234" class="a15"></text><g >
+
+            <ellipse cx="682.5" cy="165.75" rx="2.5" ry="2.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="682.5" y="158.25" class="a15"></text><g >
+
+            <rect x="275" y="229" width="25" height="25" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="287.5" y="226.5" class="a15"><tspan x = "287.5" dy="1.0em">f</tspan></text><g >
+
+            <ellipse cx="435" cy="241.5" rx="2.5" ry="2.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="435" y="234" class="a15"></text><g >
+
+            <ellipse cx="600" cy="217.5" rx="2.5" ry="2.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="600" y="210" class="a15"></text><g >
+
+            <rect x="505" y="205" width="25" height="25" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="517.5" y="202.5" class="a15"><tspan x = "517.5" dy="1.0em">d</tspan></text><g >
+
+            <rect x="670" y="242.5" width="25" height="25" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="682.5" y="240" class="a15"><tspan x = "682.5" dy="1.0em">e</tspan></text><g >
+
+            <path id="arrow0" d="M 65 156.5 C 95 156.5, 95 156.5, 125 156.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow0" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow1" d="M 150 156.5 C 180 156.5, 180 156.5, 210 156.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow1" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow2" d="M 214.37058594864982 154.84141379219716 C 236.81761733244775 134.938379298563, 253.46116126560287 116.94203615178509, 275 96.05954525693173 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow2" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow3" d="M 300 90 C 330 90, 330 90, 360 90 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow3" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow4" d="M 365 90 C 395 90, 395 90, 425 90 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow4" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow5" d="M 610 47.5 C 640 47.5, 653 47.5, 683 47.5 S 725 47.5, 755 47.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow5" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow6" d="M 445 87.25806451612904 C 471.3043722601396 72.83308617992347, 479.27659377554966 66.68793581089959, 505 51.2507608034084 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow6" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow7" d="M 530 47.5 C 560 47.5, 560 47.5, 590 47.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow7" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow8" d="M 445 92.74193548387096 C 471.3043722601396 107.16691382007653, 479.27659377554966 113.31206418910041, 505 128.7492391965916 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow8" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow9" d="M 530 125.5327868852459 C 550.0326276698813 103.20133308931258, 570.7992315984822 76.5531292789975, 590 53.502522068095836 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow9" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow10" d="M 214.1540540927171 158.37459463841273 C 234.0027032053225 180.8697302993655, 256.1573326507113 210.41260542186228, 275 233.75685283239255 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow10" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow11" d="M 300 241.5 C 330 241.5, 330 241.5, 360 241.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow11" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow12" d="M 365 241.5 C 395 241.5, 402.5 241.5, 432.5 241.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow12" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow13" d="M 602.1178296764382 216.17154320296152 C 627.5317857936963 200.2300616384996, 654.9682142063037 183.0199383615004, 680.3821703235618 167.07845679703848 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow13" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow14" d="M 437.4004882415089 240.80167614792467 C 466.2063471396162 232.42178992302075, 476.3903824709312 228.49922665649152, 505 219.47205739695067 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow14" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow15" d="M 530 217.5 C 560 217.5, 567.5 217.5, 597.5 217.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow15" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow16" d="M 602.2759161936565 218.53450736075297 C 629.5869105175346 230.94859568978848, 643.0917275197388 238.65464391252894, 670 251.919065201376 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow16" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow17" d="M 437.2782603999447 242.5293345180473 C 464.61738519928144 254.8813487346151, 488 279, 518 279 S 570.5 279, 600.5 279 S 641.4010918021097 266.0412382409158, 670 256.980198019802 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow17" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow18" d="M 684.0140941006163 163.76064858446804 C 702.1832233080116 139.88843159808465, 743.7322120882907 85.29767689510703, 761.901341295686 61.425459908723646 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow18" startOffset="50%" text-anchor="middle" class="a15"></textPath></text></svg>

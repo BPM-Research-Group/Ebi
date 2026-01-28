@@ -1,21 +1,26 @@
 use crate::{
     ebi_framework::{
         ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
-        trait_importers::{ToSemanticsTrait},
+        trait_importers::ToSemanticsTrait,
     },
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
-        semantics::Semantics,
+        labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
     },
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    ActivityKey, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, LabelledPetriNet, LolaNet, PetriNetMarkupLanguage, ProcessTree, ProcessTreeMarkupLanguage, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticProcessTree, TranslateActivityKey, ebi_objects::{
+    ActivityKey, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
+    EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage,
+    FiniteStochasticLanguage, HasActivityKey, LabelledPetriNet, LolaNet, PetriNetMarkupLanguage,
+    ProcessTree, ProcessTreeMarkupLanguage, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TranslateActivityKey,
+    ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-        event_log_csv::EventLogCsv,
-    }
+        event_log_csv::EventLogCsv, process_tree::TreeMarking,
+    },
 };
 
 ///
@@ -25,7 +30,7 @@ use ebi_objects::{
 pub enum EbiTraitSemantics {
     Usize(Box<dyn Semantics<SemState = usize, AliState = usize>>),
     Marking(Box<dyn Semantics<SemState = LPNMarking, AliState = LPNMarking>>),
-    NodeStates(Box<dyn Semantics<SemState = NodeStates, AliState = NodeStates>>),
+    TreeMarking(Box<dyn Semantics<SemState = TreeMarking, AliState = TreeMarking>>),
 }
 
 impl HasActivityKey for EbiTraitSemantics {
@@ -33,7 +38,7 @@ impl HasActivityKey for EbiTraitSemantics {
         match self {
             EbiTraitSemantics::Marking(semantics) => semantics.activity_key(),
             EbiTraitSemantics::Usize(semantics) => semantics.activity_key(),
-            EbiTraitSemantics::NodeStates(semantics) => semantics.activity_key(),
+            EbiTraitSemantics::TreeMarking(semantics) => semantics.activity_key(),
         }
     }
 
@@ -41,7 +46,7 @@ impl HasActivityKey for EbiTraitSemantics {
         match self {
             EbiTraitSemantics::Marking(semantics) => semantics.activity_key_mut(),
             EbiTraitSemantics::Usize(semantics) => semantics.activity_key_mut(),
-            EbiTraitSemantics::NodeStates(semantics) => semantics.activity_key_mut(),
+            EbiTraitSemantics::TreeMarking(semantics) => semantics.activity_key_mut(),
         }
     }
 }
@@ -55,7 +60,7 @@ impl TranslateActivityKey for EbiTraitSemantics {
             EbiTraitSemantics::Usize(semantics) => {
                 semantics.translate_using_activity_key(to_activity_key)
             }
-            EbiTraitSemantics::NodeStates(semantics) => {
+            EbiTraitSemantics::TreeMarking(semantics) => {
                 semantics.translate_using_activity_key(to_activity_key)
             }
         }
@@ -106,7 +111,7 @@ impl ToSemanticsTrait for LolaNet {
 
 impl ToSemanticsTrait for StochasticProcessTree {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::NodeStates(Box::new(self))
+        EbiTraitSemantics::TreeMarking(Box::new(self))
     }
 }
 
@@ -153,6 +158,12 @@ impl ToSemanticsTrait for StochasticDeterministicFiniteAutomaton {
     }
 }
 
+impl ToSemanticsTrait for StochasticNondeterministicFiniteAutomaton {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::Usize(Box::new(self))
+    }
+}
+
 impl ToSemanticsTrait for FiniteLanguage {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
         Into::<DeterministicFiniteAutomaton>::into(self).to_semantics_trait()
@@ -176,6 +187,6 @@ impl ToSemanticsTrait for ProcessTreeMarkupLanguage {
 
 impl ToSemanticsTrait for ProcessTree {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::NodeStates(Box::new(self))
+        EbiTraitSemantics::TreeMarking(Box::new(self))
     }
 }

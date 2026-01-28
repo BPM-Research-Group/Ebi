@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg width="1847.5" height="372.5" viewBox="0 0 1847.5 372.5" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="startarrow" markerWidth="10" markerHeight="7"
+refX="0" refY="3.5" orient="auto">
+<polygon points="10 0, 10 7, 0 3.5" fill="context-stroke" />
+</marker>
+<marker id="endarrow" markerWidth="10" markerHeight="7"
+refX="10" refY="3.5" orient="auto">
+<polygon points="0 0, 10 3.5, 0 7" fill="context-stroke" />
+</marker>
+
+</defs><style>
+.a15 { font-size: 15px; font-family: Times, serif; }
+</style>
+<g >
+
+            <ellipse cx="47.5" cy="187.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="172.5" class="a15"><tspan x = "47.5" dy="1.0em">0</tspan></text><g >
+
+            <ellipse cx="222.5" cy="187.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="222.5" y="172.5" class="a15"><tspan x = "222.5" dy="1.0em">0</tspan></text><g >
+
+            <ellipse cx="472.5" cy="77.5" rx="47.5" ry="47.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="472.5" y="62.5" class="a15"><tspan x = "472.5" dy="1.0em">20/27</tspan></text><g >
+
+            <ellipse cx="722.5" cy="77.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="722.5" y="62.5" class="a15"><tspan x = "722.5" dy="1.0em">0</tspan></text><g >
+
+            <ellipse cx="927.5" cy="77.5" rx="47.5" ry="47.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="927.5" y="62.5" class="a15"><tspan x = "927.5" dy="1.0em">20/23</tspan></text><g >
+
+            <ellipse cx="1177.5" cy="77.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="1177.5" y="62.5" class="a15"><tspan x = "1177.5" dy="1.0em">0</tspan></text><g >
+
+            <ellipse cx="1382.5" cy="77.5" rx="47.5" ry="47.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="1382.5" y="62.5" class="a15"><tspan x = "1382.5" dy="1.0em">20/21</tspan></text><g >
+
+            <ellipse cx="1632.5" cy="77.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="1632.5" y="62.5" class="a15"><tspan x = "1632.5" dy="1.0em">0</tspan></text><g >
+
+            <ellipse cx="1807.5" cy="77.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="1807.5" y="62.5" class="a15"><tspan x = "1807.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="472.5" cy="202.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="472.5" y="187.5" class="a15"><tspan x = "472.5" dy="1.0em">0</tspan></text><g >
+
+            <ellipse cx="722.5" cy="202.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="722.5" y="187.5" class="a15"><tspan x = "722.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="472.5" cy="297.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="472.5" y="282.5" class="a15"><tspan x = "472.5" dy="1.0em">0</tspan></text><g >
+
+            <ellipse cx="722.5" cy="297.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="722.5" y="282.5" class="a15"><tspan x = "722.5" dy="1.0em">1</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="135" y="172.5" class="a15"><tspan x = "135" dy="1.0em">a, 1</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="332.5" y="282.5" class="a15"><tspan x = "332.5" dy="1.0em">c, 1/10</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="332.5" y="187.5" class="a15"><tspan x = "332.5" dy="1.0em">b, 3/20</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="332.5" y="117.5" class="a15"><tspan x = "332.5" dy="1.0em">d, 3/4</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="612.5" y="62.5" class="a15"><tspan x = "612.5" dy="1.0em">e, 7/27</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="810" y="62.5" class="a15"><tspan x = "810" dy="1.0em">d, 1</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="1067.5" y="62.5" class="a15"><tspan x = "1067.5" dy="1.0em">e, 3/23</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="1265" y="62.5" class="a15"><tspan x = "1265" dy="1.0em">d, 1</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="1522.5" y="62.5" class="a15"><tspan x = "1522.5" dy="1.0em">e, 1/21</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="1720" y="62.5" class="a15"><tspan x = "1720" dy="1.0em">d, 1</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="612.5" y="187.5" class="a15"><tspan x = "612.5" dy="1.0em">c, 1</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="612.5" y="282.5" class="a15"><tspan x = "612.5" dy="1.0em">b, 1</tspan></text><g >
+
+            <path id="arrow0" d="M 65 187.5 C 95 187.5, 140 187.5, 170 187.5 S 175 187.5, 205 187.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow0" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow1" d="M 237.12770810338984 197.1062560678978 C 262.2037791377724 213.57412361286546, 360 297.5, 390 297.5 S 425 297.5, 455 297.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow1" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow2" d="M 239.93024772949605 189.06091770711905 C 269.8106724086321 191.73677663360886, 360 202.5, 390 202.5 S 425 202.5, 455 202.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow2" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow3" d="M 239.04951548783515 181.81110405105667 C 267.42011346698115 172.05871099572522, 355.7645596729331 145.72728203805508, 382.5 132.5 S 406.37065789197317 117.91237573268306, 431.96911290153196 102.26887544906381 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow3" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow4" d="M 520 77.5 C 550 77.5, 640 77.5, 670 77.5 S 675 77.5, 705 77.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow4" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow5" d="M 740 77.5 C 770 77.5, 815 77.5, 845 77.5 S 850 77.5, 880 77.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow5" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow6" d="M 975 77.5 C 1005 77.5, 1095 77.5, 1125 77.5 S 1130 77.5, 1160 77.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow6" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow7" d="M 1195 77.5 C 1225 77.5, 1270 77.5, 1300 77.5 S 1305 77.5, 1335 77.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow7" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow8" d="M 1430 77.5 C 1460 77.5, 1550 77.5, 1580 77.5 S 1585 77.5, 1615 77.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow8" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow9" d="M 1650 77.5 C 1680 77.5, 1725 77.5, 1755 77.5 S 1760 77.5, 1790 77.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow9" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow10" d="M 490 202.5 C 520 202.5, 617.5 202.5, 647.5 202.5 S 675 202.5, 705 202.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow10" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow11" d="M 490 297.5 C 520 297.5, 617.5 297.5, 647.5 297.5 S 675 297.5, 705 297.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow11" startOffset="50%" text-anchor="middle" class="a15"></textPath></text></svg>

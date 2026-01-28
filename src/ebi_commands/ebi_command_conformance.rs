@@ -1,26 +1,33 @@
-use anyhow::{Context, anyhow};
-
 use super::ebi_command_sample::{self, SAMPLED_OBJECT_INPUTS};
 use crate::{
+    EbiInputTypeEnum,
     ebi_framework::{
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
         ebi_output::{EbiOutput, EbiOutputType},
-        ebi_trait::EbiTrait, ebi_trait_object::EbiTraitObject,
+        ebi_trait::EbiTrait,
+        ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
     techniques::{
+        chi_square_stochastic_conformance::ChiSquareStochasticConformance,
         earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
         entropic_relevance::EntropicRelvance,
-        jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
-        unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
         hellinger_stochastic_conformance::HellingerStochasticConformance,
-        chi_square_stochastic_conformance::ChiSquareStochasticConformance,
+        jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
+        stochastic_markovian_abstraction::AbstractMarkovian,
+        stochastic_markovian_abstraction_conformance::{
+            DistanceMeasure, StochasticMarkovianConformance,
+        },
+        unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
     },
 };
+use anyhow::{Context, anyhow};
+use ebi_objects::{EbiObject, EbiObjectType};
+use strum::VariantNames;
 
 pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
     name_short: "conf",
@@ -35,6 +42,7 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
         &CONFORMANCE_HSC,
         &CONFORMANCE_JSSC,
         &CONFORMANCE_JSSC_SAMPLE,
+        &CONFORMANCE_MARKOVIAN,
         &CONFORMANCE_UEMSC,
     ],
 };
@@ -59,9 +67,10 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
         "A queriable stochastic language (model) to compare.",
     ],
     execute: |mut inputs, _| {
-        let log = inputs
+        let log: Box<dyn EbiTraitFiniteStochasticLanguage> = inputs
             .remove(0)
-            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>(
+        )?;
         let model = inputs
             .remove(0)
             .to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
@@ -354,3 +363,72 @@ pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
+pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
+    name_short: "sma",
+    name_long: Some("stochastic-markovian-abstraction-based-conformance"),
+    explanation_short: "Compute the conformance between two stochastic languages using a stochastic Markovian abstraction.",
+    explanation_long: Some(
+        "Compute the conformance between two stochastic languages using a stochastic Markovian abstraction, which represents languages based on the expected frequency of subtraces to handle partially matching traces.",
+    ),
+    latex_link: Some("\\cite{DBLP:conf/icpm/RochaLA24}"),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[
+            &EbiInputType::Object(EbiObjectType::StochasticNondeterministicFiniteAutomaton),
+            &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
+            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
+        ],
+        &[
+            &EbiInputType::Object(EbiObjectType::StochasticNondeterministicFiniteAutomaton),
+            &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
+            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
+        ],
+        &[&EbiInputType::Usize(Some(1), None, None)],
+        &[&EbiInputTypeEnum!(DistanceMeasure)],
+    ],
+    input_names: &["FILE_1", "FILE_2", "K_ORDER", "MEASURE"],
+    input_helps: &[
+        "A finite stochastic language or a stochastic labelled Petri net (log) to compare. An SLPN must be livelock-free and bounded.",
+        "A finite stochastic language or a stochastic labelled Petri net (model) to compare. An SLPN must be livelock-free and bounded.",
+        "The order of the Markovian abstraction (length of subtraces).",
+        "The stochastic conformance measure to be applied to the abstractions.",
+    ],
+    execute: |mut inputs, _| {
+        let mut lang1 = inputs.remove(0);
+        let mut lang2 = inputs.remove(0);
+        let order = inputs.remove(0).to_type::<usize>()?;
+        let measure = inputs.remove(0).to_type::<DistanceMeasure>()?;
+
+        //read abstractions
+        let abstraction1 = match &mut lang1 {
+            EbiInput::Object(EbiObject::StochasticNondeterministicFiniteAutomaton(snfa), _) => {
+                snfa.abstract_markovian(*order)
+            }
+            EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => {
+                slang.abstract_markovian(*order)
+            }
+            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
+                slpn.abstract_markovian(*order)
+            }
+            _ => unreachable!(),
+        }?;
+        let abstraction2 = match &mut lang2 {
+            EbiInput::Object(EbiObject::StochasticNondeterministicFiniteAutomaton(snfa), _) => {
+                snfa.abstract_markovian(*order)
+            }
+            EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => {
+                slang.abstract_markovian(*order)
+            }
+            EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
+                slpn.abstract_markovian(*order)
+            }
+            _ => unreachable!(),
+        }?;
+
+        let result = abstraction1.markovian_conformance(abstraction2, *measure)?;
+
+        Ok(EbiOutput::Fraction(result))
+    },
+    output_type: &EbiOutputType::Fraction,
+};

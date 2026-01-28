@@ -6,8 +6,10 @@ dependencies = [
 ]
 authors = [
   {name = "Sander Leemans"},
-  {name = "Leonhard Mühlmeyer"},
   {name = "Tian Li"},
+  {name = "Philipp Moch"},
+  {name = "Leonhard Mühlmeyer"},
+  {name = "Adam Burke"}
 ]
 description = "Ebi: a stochastic process mining utility"
 readme = "README.md"

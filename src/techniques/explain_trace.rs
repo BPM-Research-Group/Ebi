@@ -93,7 +93,7 @@ impl ExplainTrace for EbiTraitStochasticSemantics {
         match self {
             EbiTraitStochasticSemantics::Usize(sem) => sem.explain_trace(trace, balance),
             EbiTraitStochasticSemantics::Marking(sem) => sem.explain_trace(trace, balance),
-            EbiTraitStochasticSemantics::NodeStates(sem) => sem.explain_trace(trace, balance),
+            EbiTraitStochasticSemantics::TreeMarking(sem) => sem.explain_trace(trace, balance),
         }
     }
 }

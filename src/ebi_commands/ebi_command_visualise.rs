@@ -37,6 +37,9 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => {
                 sdfa.to_string()
             }
+            EbiInput::Object(EbiObject::StochasticNondeterministicFiniteAutomaton(snfa), _) => {
+                snfa.to_string()
+            }
             EbiInput::Object(EbiObject::EventLog(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::EventLogCsv(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::EventLogPython(log), _) => log.to_string(),

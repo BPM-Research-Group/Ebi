@@ -5,10 +5,7 @@ use std::{
 
 use crate::{
     ebi_framework::displayable::Displayable,
-    semantics::{
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
-        semantics::Semantics,
-    },
+    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
     techniques::livelock::IsPartOfLivelock,
 };
 use anyhow::Result;
@@ -16,8 +13,11 @@ use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
     FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, ProcessTree,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticProcessTree,
-    ebi_objects::process_tree::{Node, Operator},
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    ebi_objects::{
+        process_tree::TreeMarking,
+        process_tree::{Node, Operator},
+    },
 };
 
 pub trait InfinitelyManyTraces {
@@ -32,7 +32,7 @@ pub trait InfinitelyManyTraces {
 macro_rules! tree {
     ($t:ident) => {
         impl InfinitelyManyTraces for $t {
-            type LivState = NodeStates;
+            type LivState = TreeMarking;
 
             fn infinitely_many_traces(&self) -> Result<bool> {
                 for node in 0..self.get_number_of_nodes() {
@@ -219,7 +219,7 @@ macro_rules! dfa {
             fn infinitely_many_traces(&self) -> Result<bool> {
                 //in a DFA-like model, we must find a loop that has an activity on it and that has a state that is not in a livelock.
                 let mut queue = vec![];
-                let mut distance_from_initial = vec![usize::MAX; self.get_max_state() + 2];
+                let mut distance_from_initial = vec![usize::MAX; self.number_of_states() + 2];
                 if let Some(initial_state) = self.get_initial_state() {
                     queue.push(initial_state);
                     distance_from_initial[initial_state] = 0;
@@ -279,6 +279,7 @@ macro_rules! lang {
 
 dfa!(DeterministicFiniteAutomaton);
 dfa!(StochasticDeterministicFiniteAutomaton);
+dfa!(StochasticNondeterministicFiniteAutomaton);
 dfa!(DirectlyFollowsModel);
 dfa!(StochasticDirectlyFollowsModel);
 dfa!(DirectlyFollowsGraph);

@@ -198,8 +198,6 @@ pub fn extract_parameter_values(
             *parameter,
             match parameter {
                 ImporterParameter::Flag { name, .. } => {
-                    println!("flag {}", name);
-
                     if let Some(cli_matches) = cli_matches {
                         ImporterParameterValue::Boolean(
                             *cli_matches

@@ -1,16 +1,14 @@
 use crate::{
     ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     follower_semantics::FollowerSemantics,
-    semantics::{
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
-        semantics::Semantics,
-    },
+    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
 use anyhow::{Context, Result, anyhow};
 use ebi_objects::{
     StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet, StochasticProcessTree,
     ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, GaussJordan, One, Zero},
+    ebi_objects::process_tree::TreeMarking,
 };
 use std::{
     collections::{HashMap, HashSet},
@@ -158,7 +156,7 @@ macro_rules! default_trace_probability {
 }
 
 default_trace_probability!(StochasticLabelledPetriNet, LPNMarking);
-default_trace_probability!(StochasticProcessTree, NodeStates);
+default_trace_probability!(StochasticProcessTree, TreeMarking);
 
 impl EbiTraitQueriableStochasticLanguage for StochasticDeterministicFiniteAutomaton {
     fn get_probability(&self, follower: &FollowerSemantics) -> Result<Fraction> {

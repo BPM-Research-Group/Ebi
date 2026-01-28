@@ -1,16 +1,13 @@
+use crate::{
+    ebi_framework::displayable::Displayable,
+    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
+};
 use anyhow::Result;
 use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet, ProcessTree,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticProcessTree,
-};
-
-use crate::{
-    ebi_framework::displayable::Displayable,
-    semantics::{
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
-        semantics::Semantics,
-    },
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    ebi_objects::process_tree::TreeMarking,
 };
 
 pub trait NonDecreasingLivelock {
@@ -25,7 +22,7 @@ pub trait NonDecreasingLivelock {
 macro_rules! tree {
     ($t:ident) => {
         impl NonDecreasingLivelock for $t {
-            type LivState = NodeStates;
+            type LivState = TreeMarking;
 
             fn is_part_of_non_decreasing_livelock(
                 &self,
@@ -36,7 +33,6 @@ macro_rules! tree {
         }
     };
 }
-
 tree!(ProcessTree);
 tree!(StochasticProcessTree);
 
@@ -155,3 +151,4 @@ is_non_decreasing_livelock_dfm!(DirectlyFollowsModel);
 is_non_decreasing_livelock_dfm!(StochasticDirectlyFollowsModel);
 is_non_decreasing_livelock_dfm!(DeterministicFiniteAutomaton);
 is_non_decreasing_livelock_dfm!(StochasticDeterministicFiniteAutomaton);
+is_non_decreasing_livelock_dfm!(StochasticNondeterministicFiniteAutomaton);

@@ -12,7 +12,7 @@ use ebi_objects::{
     ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
 };
 use intmap::IntMap;
-use process_mining::event_log::AttributeValue;
+use process_mining::core::event_data::case_centric::AttributeValue;
 use std::collections::HashMap;
 
 pub const ATTRIBUTE_TIME: &str = "time:timestamp";

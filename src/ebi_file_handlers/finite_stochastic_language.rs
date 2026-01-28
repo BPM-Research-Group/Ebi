@@ -3,7 +3,10 @@ use crate::ebi_framework::{
     ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     ebi_trait::FromEbiTraitObject,
-    object_importers::ImportAsStochasticDeterministicFiniteAutomatonObject,
+    object_importers::{
+        ImportAsStochasticDeterministicFiniteAutomatonObject,
+        ImportAsStochasticNondeterministicFiniteAutomatonObject,
+    },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsFiniteLanguageTrait,
         ImportAsFiniteStochasticLanguageTrait, ImportAsIterableLanguageTrait,
@@ -68,6 +71,10 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
         ),
         EbiObjectImporter::StochasticDeterministicFiniteAutomaton(
             FiniteStochasticLanguage::import_as_stochastic_deterministic_finite_automaton_object,
+            FiniteStochasticLanguage::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(
+            FiniteStochasticLanguage::import_as_stochastic_nondeterministic_finite_automaton_object,
             FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
     ],

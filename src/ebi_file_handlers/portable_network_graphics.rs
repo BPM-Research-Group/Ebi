@@ -23,6 +23,9 @@ pub const EBI_PORTABLE_NETWORK_GRAPHCIS: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
             PortableNetworkGraphics::export_from_object,
         ),
+        EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(
+            PortableNetworkGraphics::export_from_object,
+        ),
         EbiObjectExporter::StochasticLabelledPetriNet(PortableNetworkGraphics::export_from_object),
         EbiObjectExporter::StochasticProcessTree(PortableNetworkGraphics::export_from_object),
         EbiObjectExporter::ScalableVectorGraphics(PortableNetworkGraphics::export_from_object),
