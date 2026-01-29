@@ -95,6 +95,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => {
                 sdfa.bounded()?
             }
+            EbiInput::Object(EbiObject::StochasticNondeterministicFiniteAutomaton(sdfa), _) => {
+                sdfa.bounded()?
+            }
             EbiInput::Object(EbiObject::EventLog(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::EventLogCsv(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::EventLogPython(object), _) => object.bounded()?,
@@ -246,6 +249,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
                 dfa.any_traces()?
             }
             EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => {
+                sdfa.any_traces()?
+            }
+            EbiInput::Object(EbiObject::StochasticNondeterministicFiniteAutomaton(sdfa), _) => {
                 sdfa.any_traces()?
             }
             EbiInput::Object(EbiObject::EventLog(object), _) => object.any_traces()?,

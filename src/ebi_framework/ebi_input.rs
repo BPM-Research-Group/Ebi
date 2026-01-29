@@ -83,9 +83,10 @@ pub enum EbiInputType {
     FileHandler,
 
     ///Fields: allowed values, default value.
+    /// If the allowed values are limited, consider using an enum with a #[derive(EbiInputEnum)] and &[&EbiInputTypeEnum!(type)] as input type.
     String(Option<&'static [&'static str]>, Option<&'static str>),
 
-    //Fields: minimum, maximum, default value.
+    ///Fields: minimum, maximum, default value.
     Usize(Option<usize>, Option<usize>, Option<usize>),
 
     //Fields: minimum, maximum, default value.
@@ -586,6 +587,10 @@ pub enum EbiObjectImporter {
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
     ),
+    StochasticNondeterministicFiniteAutomaton(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
     StochasticLabelledPetriNet(
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
@@ -638,6 +643,9 @@ impl EbiObjectImporter {
             EbiObjectImporter::StochasticDeterministicFiniteAutomaton(_, _) => {
                 EbiObjectType::StochasticDeterministicFiniteAutomaton
             }
+            EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(_, _) => {
+                EbiObjectType::StochasticNondeterministicFiniteAutomaton
+            }
             EbiObjectImporter::StochasticLabelledPetriNet(_, _) => {
                 EbiObjectType::StochasticLabelledPetriNet
             }
@@ -667,6 +675,9 @@ impl EbiObjectImporter {
             EbiObjectImporter::FiniteStochasticLanguage(_, parameters) => parameters,
             EbiObjectImporter::LabelledPetriNet(_, parameters) => parameters,
             EbiObjectImporter::StochasticDeterministicFiniteAutomaton(_, parameters) => parameters,
+            EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(_, parameters) => {
+                parameters
+            }
             EbiObjectImporter::StochasticLabelledPetriNet(_, parameters) => parameters,
             EbiObjectImporter::LanguageOfAlignments(_, parameters) => parameters,
             EbiObjectImporter::DeterministicFiniteAutomaton(_, parameters) => parameters,
@@ -700,6 +711,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::FiniteStochasticLanguage(importer, _) => *importer,
             EbiObjectImporter::LabelledPetriNet(importer, _) => *importer,
             EbiObjectImporter::StochasticDeterministicFiniteAutomaton(importer, _) => *importer,
+            EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(importer, _) => *importer,
             EbiObjectImporter::StochasticLabelledPetriNet(importer, _) => *importer,
             EbiObjectImporter::LanguageOfAlignments(importer, _) => *importer,
             EbiObjectImporter::StochasticLanguageOfAlignments(importer, _) => *importer,

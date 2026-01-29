@@ -4,6 +4,8 @@
 /builds
 /python-runtime
 
+*.swp
+
 # Added by cargo
 #
 # already existing elements were commented out
@@ -34,3 +36,4 @@ manual/manual.pdf
 manual/graph.svg
 manual/graph.pdf
 manual/functions.tex
+*/.DS_Store

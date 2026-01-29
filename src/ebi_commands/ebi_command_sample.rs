@@ -1,6 +1,3 @@
-use anyhow::{Context, Result, anyhow};
-use ebi_objects::{EbiObject, EbiObjectType, EventLog, FiniteStochasticLanguage};
-
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
@@ -9,8 +6,11 @@ use crate::{
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
     },
+    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     techniques::{sample::Sampler, sample_folds::FoldsSampler},
 };
+use anyhow::{Context, Result, anyhow};
+use ebi_objects::{EbiObject, EbiObjectType, EventLog, FiniteStochasticLanguage};
 
 pub const SAMPLED_OBJECT_INPUTS: &[&EbiInputType] = &[
     &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
@@ -30,6 +30,22 @@ pub fn get_sampled_object(
             .context("Sample semantics."),
         _ => unreachable!(),
     }
+}
+
+pub fn get_sampled_object_if_necessary(
+    object: EbiInput,
+    number_of_traces: usize,
+) -> Result<Box<dyn EbiTraitFiniteStochasticLanguage>> {
+    Ok(match object {
+        EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => slang,
+        EbiInput::Trait(EbiTraitObject::StochasticSemantics(semantics), _) => {
+            let slang = semantics
+                .sample(number_of_traces)
+                .context("Sample semantics.")?;
+            Box::new(slang)
+        }
+        _ => unreachable!(),
+    })
 }
 
 pub const EBI_SAMPLE: EbiCommand = EbiCommand::Group {

@@ -11,7 +11,7 @@ impl StochasticSemantics for StochasticDeterministicFiniteAutomaton {
     type StoSemState = usize;
 
     fn get_transition_weight(&self, state: &usize, transition: TransitionIndex) -> &Fraction {
-        if transition == self.get_number_of_transitions() {
+        if transition == self.number_of_transitions() {
             //terminating transition
             &self.get_termination_probability(*state)
         } else {

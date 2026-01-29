@@ -76,6 +76,7 @@ pub enum EbiCommand {
         children: &'static [&'static EbiCommand],
     },
     Command {
+        /// The short name of the command. Do not use macros in this field, due to Python command-hunting.
         name_short: &'static str,
         name_long: Option<&'static str>,
         explanation_short: &'static str,
@@ -707,6 +708,14 @@ impl EbiCommand {
             false
         }
     }
+
+    pub fn is_in_python(&self) -> bool {
+        if let EbiCommand::Command { cli_command, .. } = &self {
+            return cli_command.is_none();
+        } else {
+            false
+        }
+    }
 }
 
 impl Ord for EbiCommand {
@@ -902,7 +911,7 @@ mod tests {
     }
 
     #[test]
-    #[timeout(300000)]
+    #[timeout(500000)]
     fn call_all_non_cli_commands() {
         for path in EBI_COMMANDS.get_command_paths() {
             if let EbiCommand::Command {

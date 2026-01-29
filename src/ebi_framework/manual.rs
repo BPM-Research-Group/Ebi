@@ -71,7 +71,11 @@ pub fn manual() -> Result<EbiOutput> {
             }
 
             //pm4py
-            writeln!(f, "\\\\This command is available in the {} Python package using the function {}.", PYTHON_PACKAGE, pm4py_function_name(&path).escape_latex())?;
+            if path.last().unwrap().is_in_python() {
+                writeln!(f, "\\\\This command is available in the {} Python package using the function {}.", PYTHON_PACKAGE, pm4py_function_name(&path).escape_latex())?;
+            } else {
+                writeln!(f, "\\\\This command is not available in the {} Python package.", PYTHON_PACKAGE)?;
+            }
 
             //parameters table
             writeln!(f, "\\begin{{tabularx}}{{\\linewidth}}{{lX}}")?;
