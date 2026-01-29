@@ -6,7 +6,8 @@ use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject, EventLog, EventLogCsv,
     EventLogXes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, LanguageOfAlignments,
     ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticProcessTree,
+    StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     traits::importable::{Importable, ImporterParameterValues},
 };
 
@@ -70,6 +71,10 @@ import_as_object!(StochasticLabelledPetriNet, stochastic_labelled_petri_net);
 import_as_object!(
     StochasticDeterministicFiniteAutomaton,
     stochastic_deterministic_finite_automaton
+);
+import_as_object!(
+    StochasticNondeterministicFiniteAutomaton,
+    stochastic_nondeterministic_finite_automaton
 );
 import_as_object!(FiniteLanguage, finite_language);
 import_as_object!(FiniteStochasticLanguage, finite_stochastic_language);

@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+  <extension name="Concept" prefix="concept" uri="http://code.deckfour.org/xes/concept.xesext"/>
+  <extension name="Time" prefix="time" uri="http://code.deckfour.org/xes/time.xesext"/>
+  <extension name="Organizational" prefix="org" uri="http://code.deckfour.org/xes/org.xesext"/>
+  <global scope="trace">
+    <string key="concept:name" value="name"/>
+  </global>
+  <global scope="event">
+    <string key="concept:name" value="name"/>
+  </global>
+  <classifier name="Activity" keys="concept:name"/>
+
+  <!-- Trace: ⟨a,b⟩^5 -->
+  <trace>
+    <string key="concept:name" value="trace_1_1"/>
+    <event>
+      <string key="concept:name" value="a"/>
+    </event>
+    <event>
+      <string key="concept:name" value="b"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="trace_1_2"/>
+    <event>
+      <string key="concept:name" value="a"/>
+    </event>
+    <event>
+      <string key="concept:name" value="b"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="trace_1_3"/>
+    <event>
+      <string key="concept:name" value="a"/>
+    </event>
+    <event>
+      <string key="concept:name" value="b"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="trace_1_4"/>
+    <event>
+      <string key="concept:name" value="a"/>
+    </event>
+    <event>
+      <string key="concept:name" value="b"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="trace_1_5"/>
+    <event>
+      <string key="concept:name" value="a"/>
+    </event>
+    <event>
+      <string key="concept:name" value="b"/>
+    </event>
+  </trace>
+
+  <!-- Trace: ⟨a,a,b,c⟩^2 -->
+  <trace>
+    <string key="concept:name" value="trace_2_1"/>
+    <event>
+      <string key="concept:name" value="a"/>
+    </event>
+    <event>
+      <string key="concept:name" value="a"/>
+    </event>
+    <event>
+      <string key="concept:name" value="b"/>
+    </event>
+    <event>
+      <string key="concept:name" value="c"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="trace_2_2"/>
+    <event>
+      <string key="concept:name" value="a"/>
+    </event>
+    <event>
+      <string key="concept:name" value="a"/>
+    </event>
+    <event>
+      <string key="concept:name" value="b"/>
+    </event>
+    <event>
+      <string key="concept:name" value="c"/>
+    </event>
+  </trace>
+
+  <!-- Trace: ⟨a,a,c,b⟩^1 -->
+  <trace>
+    <string key="concept:name" value="trace_3_1"/>
+    <event>
+      <string key="concept:name" value="a"/>
+    </event>
+    <event>
+      <string key="concept:name" value="a"/>
+    </event>
+    <event>
+      <string key="concept:name" value="c"/>
+    </event>
+    <event>
+      <string key="concept:name" value="b"/>
+    </event>
+  </trace>
+</log>

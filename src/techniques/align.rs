@@ -1,18 +1,3 @@
-use anyhow::{Context, Error, Result, anyhow};
-use ebi_objects::{
-    Activity, ActivityKeyTranslator, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
-    DirectlyFollowsModel, LabelledPetriNet, LanguageOfAlignments, ProcessTree,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticProcessTree,
-    ebi_objects::{labelled_petri_net::TransitionIndex, language_of_alignments::Move},
-};
-use rayon::iter::ParallelIterator;
-use std::{
-    fmt::{Debug, Display},
-    hash::Hash,
-    sync::{Arc, Mutex},
-};
-
 use crate::{
     ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
     ebi_traits::{
@@ -22,9 +7,26 @@ use crate::{
     },
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
-        labelled_petri_net_semantics::LPNMarking, process_tree_semantics::NodeStates,
-        semantics::Semantics,
+        labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
     },
+};
+use anyhow::{Context, Error, Result, anyhow};
+use ebi_objects::{
+    Activity, ActivityKeyTranslator, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
+    DirectlyFollowsModel, LabelledPetriNet, LanguageOfAlignments, ProcessTree,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    ebi_objects::{
+        labelled_petri_net::TransitionIndex, language_of_alignments::Move,
+        process_tree::TreeMarking,
+    },
+};
+use rayon::iter::ParallelIterator;
+use std::{
+    fmt::{Debug, Display},
+    hash::Hash,
+    sync::{Arc, Mutex},
 };
 
 pub trait Align {
@@ -52,7 +54,7 @@ impl Align for EbiTraitSemantics {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.align_language(log),
             EbiTraitSemantics::Marking(sem) => sem.align_language(log),
-            EbiTraitSemantics::NodeStates(sem) => sem.align_language(log),
+            EbiTraitSemantics::TreeMarking(sem) => sem.align_language(log),
         }
     }
 
@@ -63,7 +65,7 @@ impl Align for EbiTraitSemantics {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::Marking(sem) => sem.align_stochastic_language(log),
-            EbiTraitSemantics::NodeStates(sem) => sem.align_stochastic_language(log),
+            EbiTraitSemantics::TreeMarking(sem) => sem.align_stochastic_language(log),
         }
     }
 
@@ -71,7 +73,7 @@ impl Align for EbiTraitSemantics {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.align_trace(trace),
             EbiTraitSemantics::Marking(sem) => sem.align_trace(trace),
-            EbiTraitSemantics::NodeStates(sem) => sem.align_trace(trace),
+            EbiTraitSemantics::TreeMarking(sem) => sem.align_trace(trace),
         }
     }
 }
@@ -552,7 +554,7 @@ macro_rules! usize {
 macro_rules! nodestates {
     ($t:ident) => {
         impl AlignmentHeuristics for $t {
-            type AliState = NodeStates;
+            type AliState = TreeMarking;
 
             fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
                 vec![]
@@ -562,7 +564,28 @@ macro_rules! nodestates {
                 &self,
                 _: &Vec<Activity>,
                 _: &usize,
-                _: &NodeStates,
+                _: &TreeMarking,
+                _: &Vec<Vec<usize>>,
+            ) -> usize {
+                0
+            }
+        }
+    };
+}
+macro_rules! treemarking {
+    ($t:ident) => {
+        impl AlignmentHeuristics for $t {
+            type AliState = TreeMarking;
+
+            fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+                vec![]
+            }
+
+            fn underestimate_cost_to_final_synchronous_state(
+                &self,
+                _: &Vec<Activity>,
+                _: &usize,
+                _: &TreeMarking,
                 _: &Vec<Vec<usize>>,
             ) -> usize {
                 0
@@ -571,8 +594,9 @@ macro_rules! nodestates {
     };
 }
 usize!(StochasticDeterministicFiniteAutomaton);
+usize!(StochasticNondeterministicFiniteAutomaton);
 nodestates!(ProcessTree);
-nodestates!(StochasticProcessTree);
+treemarking!(StochasticProcessTree);
 usize!(DirectlyFollowsGraph);
 usize!(DirectlyFollowsModel);
 usize!(StochasticDirectlyFollowsModel);

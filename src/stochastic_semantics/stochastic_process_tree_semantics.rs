@@ -1,48 +1,30 @@
-use crate::{
-    semantics::{
-        process_tree_semantics::NodeStates,
-        stochastic_process_tree_semantics::{can_execute, can_terminate},
-    },
-    stochastic_semantics::stochastic_semantics::StochasticSemantics,
-};
+use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;
 use anyhow::Result;
 use ebi_objects::{
     StochasticProcessTree,
-    ebi_arithmetic::{Fraction, Zero},
-    ebi_objects::labelled_petri_net::TransitionIndex,
+    ebi_arithmetic::Fraction,
+    ebi_objects::{
+        labelled_petri_net::TransitionIndex,
+        process_tree::TreeMarking,
+        stochastic_process_tree::{get_total_weight_of_enabled_transitions, get_transition_weight},
+    },
 };
 
 impl StochasticSemantics for StochasticProcessTree {
-    type StoSemState = NodeStates;
+    type StoSemState = TreeMarking;
 
     fn get_transition_weight(
         &self,
-        _state: &<Self as StochasticSemantics>::StoSemState,
+        state: &<Self as StochasticSemantics>::StoSemState,
         transition: TransitionIndex,
     ) -> &Fraction {
-        if transition < self.transition2node.len() {
-            &self.weights[transition]
-        } else {
-            &self.termination_weight
-        }
+        get_transition_weight(self, state, transition)
     }
 
     fn get_total_weight_of_enabled_transitions(
         &self,
         state: &<Self as StochasticSemantics>::StoSemState,
     ) -> Result<Fraction> {
-        let mut sum = if !state.terminated && can_terminate(self, state, self.root()) {
-            self.termination_weight.clone()
-        } else {
-            Fraction::zero()
-        };
-
-        for (transition, node) in self.transition2node.iter().enumerate() {
-            if can_execute(self, state, *node) {
-                sum += &self.weights[transition];
-            }
-        }
-
-        Ok(sum)
+        Ok(get_total_weight_of_enabled_transitions(self, state))
     }
 }

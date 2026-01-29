@@ -1,19 +1,3 @@
-use anyhow::{Context, Error, Ok, Result};
-use chrono::{DateTime, FixedOffset};
-use ebi_objects::{
-    EventLogXes, Executions, HasActivityKey, IntoTraceIterator, NumberOfTraces,
-    ebi_objects::{
-        executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
-    },
-};
-use process_mining::event_log::{AttributeValue, XESEditableAttribute};
-use rayon::iter::{IndexedParallelIterator, ParallelIterator};
-use std::{
-    fmt::{Debug, Display},
-    hash::Hash,
-    sync::{Arc, Mutex},
-};
-
 use crate::{
     ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
     ebi_traits::{
@@ -22,6 +6,21 @@ use crate::{
     },
     semantics::semantics::Semantics,
     techniques::align::Align,
+};
+use anyhow::{Context, Error, Ok, Result};
+use chrono::{DateTime, FixedOffset};
+use ebi_objects::{
+    EventLogXes, Executions, HasActivityKey, IntoTraceIterator, NumberOfTraces,
+    ebi_objects::{
+        executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
+    },
+};
+use process_mining::core::event_data::case_centric::{AttributeValue, XESEditableAttribute};
+use rayon::iter::{IndexedParallelIterator, ParallelIterator};
+use std::{
+    fmt::{Debug, Display},
+    hash::Hash,
+    sync::{Arc, Mutex},
 };
 
 pub trait FindExecutions {
@@ -33,7 +32,7 @@ impl FindExecutions for EbiTraitSemantics {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.find_executions(log),
             EbiTraitSemantics::Marking(sem) => sem.find_executions(log),
-            EbiTraitSemantics::NodeStates(sem) => sem.find_executions(log),
+            EbiTraitSemantics::TreeMarking(sem) => sem.find_executions(log),
         }
     }
 }
@@ -290,7 +289,10 @@ impl C {
 mod tests {
     use std::fs;
 
-    use ebi_objects::{EventLogXes, StochasticDeterministicFiniteAutomaton};
+    use ebi_objects::{
+        EventLogXes, StochasticDeterministicFiniteAutomaton,
+        StochasticNondeterministicFiniteAutomaton,
+    };
 
     use crate::techniques::executions::FindExecutions;
 
@@ -309,5 +311,18 @@ mod tests {
         let x = model.find_executions(&mut Box::new(log)).unwrap();
 
         assert_eq!(out, x.to_string());
+    }
+
+    #[test]
+    fn snfa_executions() {
+        let fin = fs::read_to_string("testfiles/simple_log_markovian_abstraction.xes").unwrap();
+        let log = fin.parse::<EventLogXes>().unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/aa-ab-ba.snfa").unwrap();
+        let mut model = fin2
+            .parse::<StochasticNondeterministicFiniteAutomaton>()
+            .unwrap();
+
+        model.find_executions(&mut Box::new(log)).unwrap();
     }
 }

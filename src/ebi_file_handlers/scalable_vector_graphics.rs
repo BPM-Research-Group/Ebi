@@ -22,6 +22,9 @@ pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
             ScalableVectorGraphics::export_from_object,
         ),
+        EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(
+            ScalableVectorGraphics::export_from_object,
+        ),
         EbiObjectExporter::StochasticLabelledPetriNet(ScalableVectorGraphics::export_from_object),
         EbiObjectExporter::StochasticProcessTree(ScalableVectorGraphics::export_from_object),
         EbiObjectExporter::ScalableVectorGraphics(ScalableVectorGraphics::export_from_object),
