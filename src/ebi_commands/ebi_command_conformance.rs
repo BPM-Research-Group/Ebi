@@ -55,7 +55,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
     name_long: Some("unit-earth-movers"),
     explanation_short: "Compute unit-earth movers' stochastic conformance.",
     explanation_long: Some(
-        "Compute unit-earth movers' stochastic conformance, which is 1 - total variation distance.",
+        "Compute unit-earth movers' stochastic conformance, which is 1 - the total variation distance.",
     ),
     latex_link: Some("\\cite{DBLP:conf/bpm/LeemansSA19}"),
     cli_command: None,
@@ -88,9 +88,9 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_UEMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "uemsc-sample",
     name_long: Some("unit-earth-movers-sample"),
-    explanation_short: "Compute unit-earth movers' stochastic conformance, which is 1 - total variation distance, if both inputs need to be sampled.",
+    explanation_short: "Compute unit-earth movers' stochastic conformance, which is 1 - the total variation distance, if both inputs need to be sampled.",
     explanation_long: Some(
-        "Compute unit-earth movers' stochastic conformance, which is 1 - total variation distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `uemsc`.",
+        "Compute unit-earth movers' stochastic conformance, which is 1 - the total variation distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `uemsc`.",
     ),
     latex_link: None,
     cli_command: None,
@@ -182,7 +182,7 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
     name_short: "jssc",
     name_long: Some("jensen-shannon"),
-    explanation_short: "Compute Jensen-Shannon stochastic conformance.",
+    explanation_short: "Compute Jensen-Shannon stochastic conformance, which is 1 - the Jensen-Shannon distance.",
     explanation_long: None,
     latex_link: None,
     cli_command: None,
@@ -220,9 +220,9 @@ pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "jssc-sample",
     name_long: Some("jensen-shannon-sample"),
-    explanation_short: "Compute Jensen-Shannon stochastic conformance, if both inputs need to be sampled.",
+    explanation_short: "Compute Jensen-Shannon stochastic conformance, which is 1 - the Jensen-Shannon distance, if both inputs need to be sampled.",
     explanation_long: Some(
-        "Compute Jensen-Shannon stochastic conformance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `jssc`.",
+        "Compute Jensen-Shannon stochastic conformance, which is 1 - the Jensen-Shannon distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `jssc`.",
     ),
     latex_link: None,
     cli_command: None,
