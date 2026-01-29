@@ -57,7 +57,18 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
     explanation_long: Some(
         "Compute unit-earth movers' stochastic conformance, which is 1 - the total variation distance.",
     ),
-    latex_link: Some("\\cite{DBLP:conf/bpm/LeemansSA19}"),
+    latex_link: Some(
+        r"Unit earth movers' stochastic conformance is computed as follows:
+        
+        \begin{definition}[Unit earth movers' stochastic conformance~\cite{DBLP:conf/bpm/LeemansSA19}]
+            \label{def:uemsc}
+                Let $L$ be a finite stochastic language and let $M$ be a queriable stochastic langauge.
+                Then, the \emph{unit earth movers' stochastic conformance ($\text{uemsc}$) of $L$ and $M$} is defined as follows: 
+                \begin{align*}
+                    \text{uemsc}(L, M) ={}& 1 - \sum_{t \in L} \max(L(t) - M(t),0)
+                \end{align*}       
+            \end{definition}",
+    ),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
@@ -92,7 +103,7 @@ pub const CONFORMANCE_UEMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     explanation_long: Some(
         "Compute unit-earth movers' stochastic conformance, which is 1 - the total variation distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `uemsc`.",
     ),
-    latex_link: None,
+    latex_link: Some("see \\cref{def:uemsc}"),
     cli_command: None,
     exact_arithmetic: false,
     input_types: &[
@@ -267,9 +278,23 @@ pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
     name_long: Some("earth-movers"),
     explanation_short: "Compute Earth mover's stochastic conformance.",
     explanation_long: Some(
-        "Compute Earth mover's stochastic conformance, which is 1 - Wasserstein distance.",
+        "Compute Earth mover's stochastic conformance, which is 1 - the Wasserstein distance.",
     ),
-    latex_link: Some("\\cite{DBLP:journals/is/LeemansABP21}"),
+    latex_link: Some(
+        r"Earth movers' stochastic conformance is computed as follows:
+        
+        \begin{definition}[Earth movers' stochastic conformance~\cite{DBLP:journals/is/LeemansABP21}]
+            \label{def:emsc}
+                Let $L$ and $L'$ be a finite stochastic languages.
+                Then, the \emph{Earth movers' stochastic conformance ($\text{emsc}$) of $L$ and $L'$} is defined as follows, with reallocation matrix $R$ and normalised Levenshtein distance $\delta$:
+                \begin{align*}
+                    \text{emsc}(L, L') ={}& 1 - \min_{R} \sum_{t \in L}\sum_{t' \in L'} R(t, t') \delta(t,t')\\
+                    \text{ such that } & \forall_{t\in L} L(t) \leq \sum_{t' \in L'} R(t, t') \land{}\\
+                    & \forall_{t' \in L'} L'(t') \leq \sum_{t \in L} R(t, t') \land{}\\
+                    & \sum_{t \in L} \sum_{t' \in L'} R(t,t') = 1
+                \end{align*}       
+            \end{definition}",
+    ),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
@@ -303,11 +328,11 @@ pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "emsc-sample",
     name_long: Some("earth-movers-sample"),
-    explanation_short: "Compute Earth mover's stochastic conformance, which is 1 - Wasserstein distance, where one or both of the inputs needs to be sampled.",
+    explanation_short: "Compute Earth mover's stochastic conformance, which is 1 - the Wasserstein distance, where one or both of the inputs needs to be sampled.",
     explanation_long: Some(
-        "Compute Earth mover's stochastic conformance, which is 1 - Wasserstein distance, where one or both of the inputs needs to be sampled. If both inputs are logs or finite stochastic languages, then use `emsc`.",
+        "Compute Earth mover's stochastic conformance, which is 1 - the Wasserstein distance, where one or both of the inputs needs to be sampled. If both inputs are logs or finite stochastic languages, then use `emsc`.",
     ),
-    latex_link: Some("\\cite{DBLP:journals/is/LeemansABP21}"),
+    latex_link: Some("see \\cref{def:emsc}"),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
