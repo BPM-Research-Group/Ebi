@@ -346,7 +346,7 @@ pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
     name_long: Some("hellinger"),
     explanation_short: "Compute Hellinger stochastic conformance.",
     explanation_long: Some(
-        "Compute Hellinger stochastic conformance, also known as the Hellinger distance.",
+        "Compute Hellinger stochastic conformance, which is 1 - the Hellinger distance.",
     ),
     latex_link: None,
     cli_command: None,
@@ -378,9 +378,9 @@ pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_HSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "hsc-sample",
     name_long: Some("hellinger-sample"),
-    explanation_short: "Compute Hellinger stochastic conformance, also known as the Hellinger distance, if both inputs need to be sampled.",
+    explanation_short: "Compute Hellinger stochastic conformance, which is 1 - the Hellinger distance, if both inputs need to be sampled.",
     explanation_long: Some(
-        "Compute Hellinger stochastic conformance, also known as the Hellinger distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `hsc`.",
+        "Compute Hellinger stochastic conformance, which is 1 - the Hellinger distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `hsc`.",
     ),
     latex_link: None,
     cli_command: None,
