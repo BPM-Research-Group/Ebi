@@ -268,5 +268,5 @@ fn search_child(
         }
     }
 
-    return Err(anyhow!("todo file not found"));
+    return Err(anyhow!("todo file not found {}", child_command));
 }

@@ -76,6 +76,7 @@ pub enum EbiCommand {
         children: &'static [&'static EbiCommand],
     },
     Command {
+        /// The short name of the command. Do not use macros in this field, due to Python command-hunting.
         name_short: &'static str,
         name_long: Option<&'static str>,
         explanation_short: &'static str,
