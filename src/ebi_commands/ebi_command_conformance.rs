@@ -88,8 +88,10 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_UEMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "uemsc-sample",
     name_long: Some("unit-earth-movers-sample"),
-    explanation_short: "Compute unit-earth movers' stochastic conformance, which is 1 - total variation distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `uemsc`",
-    explanation_long: None,
+    explanation_short: "Compute unit-earth movers' stochastic conformance, which is 1 - total variation distance, if both inputs need to be sampled.",
+    explanation_long: Some(
+        "Compute unit-earth movers' stochastic conformance, which is 1 - total variation distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `uemsc`.",
+    ),
     latex_link: None,
     cli_command: None,
     exact_arithmetic: false,
@@ -218,8 +220,10 @@ pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "jssc-sample",
     name_long: Some("jensen-shannon-sample"),
-    explanation_short: "Compute Jensen-Shannon stochastic conformance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `jssc`",
-    explanation_long: None,
+    explanation_short: "Compute Jensen-Shannon stochastic conformance, if both inputs need to be sampled.",
+    explanation_long: Some(
+        "Compute Jensen-Shannon stochastic conformance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `jssc`.",
+    ),
     latex_link: None,
     cli_command: None,
     exact_arithmetic: false,
@@ -299,8 +303,10 @@ pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "emsc-sample",
     name_long: Some("earth-movers-sample"),
-    explanation_short: "Compute Earth mover's stochastic conformance, which is 1 - Wasserstein distance, where one or both of the inputs needs to be sampled. If both inputs are logs or finite stochastic languages, then use `emsc`.",
-    explanation_long: None,
+    explanation_short: "Compute Earth mover's stochastic conformance, which is 1 - Wasserstein distance, where one or both of the inputs needs to be sampled.",
+    explanation_long: Some(
+        "Compute Earth mover's stochastic conformance, which is 1 - Wasserstein distance, where one or both of the inputs needs to be sampled. If both inputs are logs or finite stochastic languages, then use `emsc`.",
+    ),
     latex_link: Some("\\cite{DBLP:journals/is/LeemansABP21}"),
     cli_command: None,
     exact_arithmetic: true,
@@ -372,8 +378,10 @@ pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_HSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "hsc-sample",
     name_long: Some("hellinger-sample"),
-    explanation_short: "Compute Hellinger stochastic conformance, also known as the Hellinger distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `hsc`",
-    explanation_long: None,
+    explanation_short: "Compute Hellinger stochastic conformance, also known as the Hellinger distance, if both inputs need to be sampled.",
+    explanation_long: Some(
+        "Compute Hellinger stochastic conformance, also known as the Hellinger distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `hsc`.",
+    ),
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
@@ -447,8 +455,10 @@ pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
 pub const CONFORMANCE_CSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "cssc-sample",
     name_long: Some("chi-square-sample"),
-    explanation_short: "Compute chi-square stochastic conformance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `cssc`",
-    explanation_long: None,
+    explanation_short: "Compute chi-square stochastic conformance, if both inputs need to be sampled.",
+    explanation_long: Some(
+        "Compute chi-square stochastic conformance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `cssc`.",
+    ),
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
