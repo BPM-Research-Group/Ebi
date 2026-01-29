@@ -709,20 +709,12 @@ impl EbiCommand {
     }
 
     pub fn is_in_python(&self) -> bool {
-        if let EbiCommand::Command {
-            cli_command,
-            output_type,
-            input_types: input_typess,
-            ..
-        } = &self
-        {
+        if let EbiCommand::Command { cli_command, .. } = &self {
             return cli_command.is_none();
         } else {
             false
         }
     }
-
-
 }
 
 impl Ord for EbiCommand {

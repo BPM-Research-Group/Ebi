@@ -29,9 +29,8 @@ use ebi_objects::{
     ebi_arithmetic::{Fraction, is_exact_globally},
     marking::Marking,
 };
-use process_mining::event_log::{
-    AttributeValue, Attributes, Event, Trace,
-    event_log_struct::{EventLogClassifier, to_attributes},
+use process_mining::core::event_data::case_centric::{
+    AttributeValue, Attributes, Event, EventLogClassifier, Trace, to_attributes,
 };
 use pyo3::{
     Bound, PyAny, PyResult,

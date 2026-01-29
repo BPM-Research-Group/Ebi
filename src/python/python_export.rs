@@ -8,7 +8,7 @@ use ebi_objects::{
         Fraction, MaybeExact, fraction::approximate::Approximate, malachite::Natural,
     },
 };
-use process_mining::event_log::AttributeValue;
+use process_mining::core::event_data::case_centric::AttributeValue;
 use pyo3::{
     IntoPyObjectExt, Py, PyAny, PyResult, Python,
     exceptions::PyValueError,
