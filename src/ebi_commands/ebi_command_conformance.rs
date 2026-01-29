@@ -601,3 +601,45 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
     },
     output_type: &EbiOutputType::Fraction,
 };
+
+#[cfg(test)]
+pub mod tests {
+    use crate::{
+        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        techniques::{
+            earth_movers_stochastic_conformance::EarthMoversStochasticConformance, sample::Sampler,
+        },
+    };
+    use ebi_objects::StochasticNondeterministicFiniteAutomaton;
+    use std::fs;
+
+    #[test]
+    fn emsc_sample() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.snfa").unwrap();
+        let object_a = fin
+            .parse::<StochasticNondeterministicFiniteAutomaton>()
+            .unwrap();
+
+        println!("object a {}", object_a);
+
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.snfa").unwrap();
+        let object_b = fin
+            .parse::<StochasticNondeterministicFiniteAutomaton>()
+            .unwrap();
+
+        let number_of_traces = 1;
+
+        let mut lang_a: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(object_a.sample(number_of_traces).unwrap());
+        let mut lang_b: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(object_b.sample(number_of_traces).unwrap());
+
+        println!("lang a {}", lang_a);
+        println!("lang b {}", lang_b);
+
+        // Compute EMSC
+        lang_a
+            .earth_movers_stochastic_conformance(lang_b.as_mut())
+            .unwrap();
+    }
+}
