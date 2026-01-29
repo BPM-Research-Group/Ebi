@@ -36,23 +36,32 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[
         &CONFORMANCE_CSSC,
+        &CONFORMANCE_CSSC_SAMPLE,
         &CONFORMANCE_EMSC,
         &CONFORMANCE_EMSC_SAMPLE,
         &CONFORMANCE_ER,
         &CONFORMANCE_HSC,
+        &CONFORMANCE_HSC_SAMPLE,
         &CONFORMANCE_JSSC,
         &CONFORMANCE_JSSC_SAMPLE,
         &CONFORMANCE_MARKOVIAN,
         &CONFORMANCE_UEMSC,
+        &CONFORMANCE_UEMSC_SAMPLE,
     ],
 };
 
+macro_rules! uemsc {
+    () => {
+        "uemsc"
+    };
+}
+
 pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
-    name_short: "uemsc",
-    name_long: Some("unit-earth-movers-stochastic-conformance"),
+    name_short: uemsc!(),
+    name_long: Some("unit-earth-movers"),
     explanation_short: "Compute unit-earth movers' stochastic conformance.",
     explanation_long: Some(
-        "Compute unit-earth movers' stochastic conformance, also known as total variation distance.",
+        "Compute unit-earth movers' stochastic conformance, which is 1 - total variation distance.",
     ),
     latex_link: Some("\\cite{DBLP:conf/bpm/LeemansSA19}"),
     cli_command: None,
@@ -78,6 +87,52 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
             .unit_earth_movers_stochastic_conformance(model)
             .context("cannot compute uEMSC")?;
         Ok(EbiOutput::Fraction(uemsc))
+    },
+    output_type: &EbiOutputType::Fraction,
+};
+
+pub const CONFORMANCE_UEMSC_SAMPLE: EbiCommand = EbiCommand::Command {
+    name_short: concat!(uemsc!(), "-sample"),
+    name_long: Some("unit-earth-movers-sample"),
+    explanation_short: concat!(
+        "Compute unit-earth movers' stochastic conformance, which is 1 - total variation distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use ",
+        uemsc!()
+    ),
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[
+        SAMPLED_OBJECT_INPUTS,
+        SAMPLED_OBJECT_INPUTS,
+        &[&EbiInputType::Usize(Some(1), None, None)],
+    ],
+    input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"],
+    input_helps: &[
+        "A sampleable stochastic language to compare.",
+        "A sampleable stochastic language to compare.",
+        "Number of traces to sample.",
+    ],
+    execute: |mut inputs, _| {
+        let object1 = inputs.remove(0);
+        let object2 = inputs.remove(0);
+        let number_of_traces = inputs.remove(0).to_type::<usize>()?;
+
+        let lang1 = Box::new(ebi_command_sample::get_sampled_object(
+            object1,
+            *number_of_traces,
+        )?);
+        let lang2 = Box::new(ebi_command_sample::get_sampled_object(
+            object2,
+            *number_of_traces,
+        )?);
+
+        let lang1: Box<dyn EbiTraitFiniteStochasticLanguage> = lang1;
+        Ok(EbiOutput::Fraction(
+            lang1
+                .unit_earth_movers_stochastic_conformance(lang2)
+                .context("Compute JSSC by sampling.")?,
+        ))
     },
     output_type: &EbiOutputType::Fraction,
 };
@@ -131,8 +186,14 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::LogDiv,
 };
 
+macro_rules! jssc {
+    () => {
+        "jssc"
+    };
+}
+
 pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
-    name_short: "jssc",
+    name_short: jssc!(),
     name_long: Some("jensen-shannon"),
     explanation_short: "Compute Jensen-Shannon stochastic conformance.",
     explanation_long: None,
@@ -170,9 +231,12 @@ pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
 };
 
 pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
-    name_short: "jssc-sample",
+    name_short: concat!(jssc!(), "-sample"),
     name_long: Some("jensen-shannon-sample"),
-    explanation_short: "Compute Jensen-Shannon stochastic conformance with sampling.",
+    explanation_short: concat!(
+        "Compute Jensen-Shannon stochastic conformance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use ",
+        jssc!()
+    ),
     explanation_long: None,
     latex_link: None,
     cli_command: None,
@@ -184,8 +248,8 @@ pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     ],
     input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"],
     input_helps: &[
-        "A queriable stochastic language to compare.",
-        "A queriable stochastic language to compare.",
+        "A sampleable stochastic language to compare.",
+        "A sampleable stochastic language to compare.",
         "Number of traces to sample.",
     ],
     execute: |mut inputs, _| {
@@ -212,12 +276,18 @@ pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::RootLogDiv,
 };
 
+macro_rules! emsc {
+    () => {
+        "emsc"
+    };
+}
+
 pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
-    name_short: "emsc",
-    name_long: Some("earth-movers-stochastic-conformance"),
+    name_short: emsc!(),
+    name_long: Some("earth-movers"),
     explanation_short: "Compute Earth mover's stochastic conformance.",
     explanation_long: Some(
-        "Compute Earth mover's stochastic conformance, also known as the Wasserstein distance.",
+        "Compute Earth mover's stochastic conformance, which is 1 - Wasserstein distance, where one of the inputs needs to be sampled.",
     ),
     latex_link: Some("\\cite{DBLP:journals/is/LeemansABP21}"),
     cli_command: None,
@@ -251,39 +321,36 @@ pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
 };
 
 pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
-    name_short: "emsc-sample",
-    name_long: Some("earth-movers-stochastic-conformance-sample"),
-    explanation_short: "Compute Earth mover's stochastic conformance with sampling.",
-    explanation_long: Some(
-        "Compute Earth mover's stochastic conformance with sampling, also known as the Wasserstein distance.",
+    name_short: concat!(emsc!(), "-sample"),
+    name_long: Some("earth-movers-sample"),
+    explanation_short: concat!(
+        "Compute Earth mover's stochastic conformance, which is 1 - Wasserstein distance, where one or both of the inputs needs to be sampled. If both inputs are logs or finite stochastic languages, then use ",
+        emsc!()
     ),
+    explanation_long: None,
     latex_link: Some("\\cite{DBLP:journals/is/LeemansABP21}"),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        SAMPLED_OBJECT_INPUTS,
         SAMPLED_OBJECT_INPUTS,
         &[&EbiInputType::Usize(Some(1), None, None)],
     ],
     input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"],
     input_helps: &[
-        "A finite stochastic language to compare.",
-        "A queriable stochastic language to compare.",
+        "A stochastic language (log or model) to compare.",
+        "A stochastic language (log or model) to compare.",
         "Number of traces to sample.",
     ],
     execute: |mut inputs, _| {
-        let mut lang_a = inputs
-            .remove(0)
-            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-
-        let sampled_object = inputs.remove(0);
+        let object_a = inputs.remove(0);
+        let object_b = inputs.remove(0);
         let number_of_traces = inputs.remove(0).to_type::<usize>()?;
 
-        // Sample the second input with the specified number of traces
-        let mut lang_b = Box::new(ebi_command_sample::get_sampled_object(
-            sampled_object,
-            *number_of_traces,
-        )?);
+        let mut lang_a =
+            ebi_command_sample::get_sampled_object_if_necessary(object_a, *number_of_traces)?;
+        let mut lang_b =
+            ebi_command_sample::get_sampled_object_if_necessary(object_b, *number_of_traces)?;
 
         // Compute EMSC
         Ok(EbiOutput::Fraction(
@@ -295,9 +362,15 @@ pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
+macro_rules! hsc {
+    () => {
+        "hsc"
+    };
+}
+
 pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
-    name_short: "hsc",
-    name_long: Some("hellinger-stochastic-conformance"),
+    name_short: hsc!(),
+    name_long: Some("hellinger"),
     explanation_short: "Compute Hellinger stochastic conformance.",
     explanation_long: Some(
         "Compute Hellinger stochastic conformance, also known as the Hellinger distance.",
@@ -329,13 +402,63 @@ pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
-pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
-    name_short: "cssc",
-    name_long: Some("chi-square-stochastic-conformance"),
-    explanation_short: "Compute Chi-Square stochastic conformance.",
-    explanation_long: Some(
-        "Compute Chi-Square stochastic conformance, also known as the Chi-Square distance.",
+pub const CONFORMANCE_HSC_SAMPLE: EbiCommand = EbiCommand::Command {
+    name_short: concat!(hsc!(), "-sample"),
+    name_long: Some("hellinger-sample"),
+    explanation_short: concat!(
+        "Compute Hellinger stochastic conformance, also known as the Hellinger distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use ",
+        hsc!()
     ),
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        SAMPLED_OBJECT_INPUTS,
+        SAMPLED_OBJECT_INPUTS,
+        &[&EbiInputType::Usize(Some(1), None, None)],
+    ],
+    input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"],
+    input_helps: &[
+        "A sampleable stochastic language to compare.",
+        "A sampleable stochastic language to compare.",
+        "Number of traces to sample.",
+    ],
+    execute: |mut inputs, _| {
+        let object1 = inputs.remove(0);
+        let object2 = inputs.remove(0);
+        let number_of_traces = inputs.remove(0).to_type::<usize>()?;
+
+        let lang1 = Box::new(ebi_command_sample::get_sampled_object(
+            object1,
+            *number_of_traces,
+        )?);
+        let lang2 = Box::new(ebi_command_sample::get_sampled_object(
+            object2,
+            *number_of_traces,
+        )?);
+
+        let lang1: Box<dyn EbiTraitFiniteStochasticLanguage> = lang1;
+        Ok(EbiOutput::Fraction(
+            lang1
+                .hellinger_stochastic_conformance(lang2)
+                .context("Compute HSC by sampling.")?,
+        ))
+    },
+    output_type: &EbiOutputType::Fraction,
+};
+
+macro_rules! cssc {
+    () => {
+        "cssc"
+    };
+}
+
+pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
+    name_short: cssc!(),
+    name_long: Some("chi-square"),
+    explanation_short: "Compute Chi-Square stochastic conformance.",
+    explanation_long: Some("Compute chi-square stochastic conformance."),
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,
@@ -363,9 +486,55 @@ pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
+pub const CONFORMANCE_CSSC_SAMPLE: EbiCommand = EbiCommand::Command {
+    name_short: concat!(cssc!(), "-sample"),
+    name_long: Some("chi-square-sample"),
+    explanation_short: concat!(
+        "Compute chi-square stochastic conformance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use ",
+        cssc!()
+    ),
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        SAMPLED_OBJECT_INPUTS,
+        SAMPLED_OBJECT_INPUTS,
+        &[&EbiInputType::Usize(Some(1), None, None)],
+    ],
+    input_names: &["FILE_1", "FILE_2", "NUMBER_OF_TRACES"],
+    input_helps: &[
+        "A sampleable stochastic language to compare.",
+        "A sampleable stochastic language to compare.",
+        "Number of traces to sample.",
+    ],
+    execute: |mut inputs, _| {
+        let object1 = inputs.remove(0);
+        let object2 = inputs.remove(0);
+        let number_of_traces = inputs.remove(0).to_type::<usize>()?;
+
+        let lang1 = Box::new(ebi_command_sample::get_sampled_object(
+            object1,
+            *number_of_traces,
+        )?);
+        let lang2 = Box::new(ebi_command_sample::get_sampled_object(
+            object2,
+            *number_of_traces,
+        )?);
+
+        let lang1: Box<dyn EbiTraitFiniteStochasticLanguage> = lang1;
+        Ok(EbiOutput::Fraction(
+            lang1
+                .chi_square_stochastic_conformance(lang2)
+                .context("Compute CSSC by sampling.")?,
+        ))
+    },
+    output_type: &EbiOutputType::Fraction,
+};
+
 pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
     name_short: "sma",
-    name_long: Some("stochastic-markovian-abstraction-based-conformance"),
+    name_long: Some("markovian"),
     explanation_short: "Compute the conformance between two stochastic languages using a stochastic Markovian abstraction.",
     explanation_long: Some(
         "Compute the conformance between two stochastic languages using a stochastic Markovian abstraction, which represents languages based on the expected frequency of subtraces to handle partially matching traces.",
