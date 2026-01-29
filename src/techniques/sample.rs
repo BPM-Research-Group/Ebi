@@ -85,6 +85,7 @@ where
                             self.get_transition_weight(&current_state, *transition) / &total_weight,
                         );
                     }
+
                     // get firing transition
                     let i = Fraction::choose_randomly(&outgoing_probabilities)?;
                     let chosen_transition = enabled_transitions[i];
@@ -221,5 +222,28 @@ mod tests {
         let slpn: EbiTraitStochasticSemantics = slpn.to_stochastic_semantics_trait();
 
         assert!(slpn.sample(10).is_err());
+    }
+
+    #[cfg(test)]
+    pub mod tests {
+        use crate::techniques::sample::Sampler;
+        use ebi_objects::StochasticNondeterministicFiniteAutomaton;
+        use std::fs;
+
+        #[test]
+        fn snfa_sample() {
+            let fin = fs::read_to_string("testfiles/aa-ab-ba.snfa").unwrap();
+            let snfa = fin
+                .parse::<StochasticNondeterministicFiniteAutomaton>()
+                .unwrap();
+
+            println!("snfa {}", snfa);
+
+            let sample = snfa.sample(10).unwrap();
+            println!("{}", sample);
+            for (trace, _) in sample {
+                assert_eq!(trace.len(), 2);
+            }
+        }
     }
 }

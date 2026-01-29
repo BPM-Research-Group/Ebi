@@ -606,40 +606,24 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
 pub mod tests {
     use crate::{
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        techniques::{
-            earth_movers_stochastic_conformance::EarthMoversStochasticConformance, sample::Sampler,
-        },
+        techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
     };
-    use ebi_objects::StochasticNondeterministicFiniteAutomaton;
+    use ebi_objects::FiniteStochasticLanguage;
     use std::fs;
 
     #[test]
-    fn emsc_sample() {
-        let fin = fs::read_to_string("testfiles/aa-ab-ba.snfa").unwrap();
-        let object_a = fin
-            .parse::<StochasticNondeterministicFiniteAutomaton>()
-            .unwrap();
+    fn emsc_empty_traces() {
+        let fin1 = fs::read_to_string("testfiles/empty_trace.slang").unwrap();
+        let mut object_a: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(fin1.parse::<FiniteStochasticLanguage>().unwrap());
 
-        println!("object a {}", object_a);
-
-        let fin = fs::read_to_string("testfiles/aa-ab-ba.snfa").unwrap();
-        let object_b = fin
-            .parse::<StochasticNondeterministicFiniteAutomaton>()
-            .unwrap();
-
-        let number_of_traces = 1;
-
-        let mut lang_a: Box<dyn EbiTraitFiniteStochasticLanguage> =
-            Box::new(object_a.sample(number_of_traces).unwrap());
-        let mut lang_b: Box<dyn EbiTraitFiniteStochasticLanguage> =
-            Box::new(object_b.sample(number_of_traces).unwrap());
-
-        println!("lang a {}", lang_a);
-        println!("lang b {}", lang_b);
+        let fin2 = fs::read_to_string("testfiles/empty_trace.slang").unwrap();
+        let mut object_b: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(fin2.parse::<FiniteStochasticLanguage>().unwrap());
 
         // Compute EMSC
-        lang_a
-            .earth_movers_stochastic_conformance(lang_b.as_mut())
+        object_a
+            .earth_movers_stochastic_conformance(object_b.as_mut())
             .unwrap();
     }
 }

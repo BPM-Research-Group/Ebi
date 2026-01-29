@@ -13,7 +13,7 @@ stochastic non-deterministic finite automaton
 # probability
 1/2
 # activity
-a
+label a
 # transition 1
 # source
 1
@@ -22,7 +22,7 @@ a
 # probability
 1
 # activity
-a
+label a
 # transition 2
 # source
 0
@@ -31,7 +31,7 @@ a
 # probability
 1/3
 # activity
-a
+label a
 # transition 3
 # source
 2
@@ -40,7 +40,7 @@ a
 # probability
 1
 # activity
-b
+label b
 # transition 4
 # source
 0
@@ -49,7 +49,7 @@ b
 # probability
 1/6
 # activity
-b
+label b
 # transition 5
 # source
 3
@@ -58,5 +58,5 @@ b
 # probability
 1
 # activity
-a
+label a
 

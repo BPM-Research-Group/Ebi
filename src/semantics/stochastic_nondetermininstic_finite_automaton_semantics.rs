@@ -1,7 +1,8 @@
 use crate::semantics::semantics::Semantics;
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    Activity, StochasticNondeterministicFiniteAutomaton, ebi_objects::labelled_petri_net::TransitionIndex
+    Activity, StochasticNondeterministicFiniteAutomaton,
+    ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
 impl Semantics for StochasticNondeterministicFiniteAutomaton {
@@ -46,6 +47,7 @@ impl Semantics for StochasticNondeterministicFiniteAutomaton {
     }
 
     fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
+        println!("transition activity {}", transition);
         if transition == self.number_of_transitions() {
             None
         } else {
@@ -75,5 +77,27 @@ impl Semantics for StochasticNondeterministicFiniteAutomaton {
 
     fn get_number_of_transitions(&self) -> usize {
         self.sources.len() + 1
+    }
+}
+
+#[cfg(test)]
+pub mod tests {
+    use std::fs;
+
+    use ebi_objects::StochasticNondeterministicFiniteAutomaton;
+
+    use crate::semantics::semantics::Semantics;
+
+    #[test]
+    fn snfa_semantics() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.snfa").unwrap();
+        let snfa = fin
+            .parse::<StochasticNondeterministicFiniteAutomaton>()
+            .unwrap();
+
+        let state = Semantics::get_initial_state(&snfa).unwrap();
+
+        assert_eq!(Semantics::is_final_state(&snfa, &state), false);
+        assert_eq!(Semantics::get_enabled_transitions(&snfa, &state).len(), 3);
     }
 }

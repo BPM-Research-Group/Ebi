@@ -28,7 +28,7 @@ extension-module = ["pyo3/extension-module"]
 [dependencies]
 ebi_derive = "0.2.7"
 ebi_optimisation = "0.3.2"
-ebi_objects = "0.3.100"
+ebi_objects = "0.3.103"
 bitvec = "1.0.1"
 clap = { version = "4.5.54", features = ["derive", "cargo", "string"] }
 anyhow = "1.0.100"
