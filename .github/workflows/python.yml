@@ -113,6 +113,8 @@ jobs:
         with:
           python-version: 3.x
           architecture: ${{ matrix.platform.target }}
+      - name: prepare rustup
+        run: rustup target add ${{ matrix.platform.rusttarget }}
       - name: autogen Ebi python files
         run: cargo run --target ${{ matrix.platform.rusttarget }} --features python -- itself python -o src/python/python_module_autogen.rs
       - name: Build wheels

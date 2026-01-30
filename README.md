@@ -34,7 +34,7 @@ The [manual.pdf](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/buil
         with open('mymodel.slpn', 'r') as file:
             model = file.read()
         # Call the Ebi function
-        result = ebi.conformance_earth_movers_stochastic_conformance_sample(
+        result = ebi.conformance_earth_movers_sample(
             log,
             model,
             1000
