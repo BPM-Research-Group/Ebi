@@ -103,8 +103,10 @@ jobs:
         platform:
           - runner: windows-latest
             target: x64
+            rusttarget: x86_64-pc-windows-gnu
           - runner: windows-latest
             target: x86
+            rusttarget: i686-pc-windows-msvc
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -112,7 +114,7 @@ jobs:
           python-version: 3.x
           architecture: ${{ matrix.platform.target }}
       - name: autogen Ebi python files
-        run: cargo run --target ${{ matrix.platform.runner }} --features python -- itself python -o src/python/python_module_autogen.rs
+        run: cargo run --target ${{ matrix.platform.rusttarget }} --features python -- itself python -o src/python/python_module_autogen.rs
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
