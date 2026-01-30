@@ -34,6 +34,7 @@ pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::DeterministicFiniteAutomaton(LolaNet::export_from_object),
         EbiObjectExporter::StochasticLabelledPetriNet(LolaNet::export_from_object),
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(LolaNet::export_from_object),
+        EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(LolaNet::export_from_object),
         EbiObjectExporter::StochasticDirectlyFollowsModel(LolaNet::export_from_object),
         EbiObjectExporter::DirectlyFollowsModel(LolaNet::export_from_object),
         EbiObjectExporter::DirectlyFollowsGraph(LolaNet::export_from_object),

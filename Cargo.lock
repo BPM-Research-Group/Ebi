@@ -750,9 +750,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
-version = "0.3.104"
+version = "0.3.107"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9d98a203e3773d63aba3fbbb79a3aa999248240c9b7ca35238fdc1cd9306f9e7"
+checksum = "bb295e57a605ba627ceed6fedc94e591ccd263eb6b0398257b8f7a6e26bc837f"
 dependencies = [
  "anyhow",
  "chrono",

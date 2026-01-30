@@ -46,6 +46,9 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
             PetriNetMarkupLanguage::export_from_object,
         ),
+        EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(
+            PetriNetMarkupLanguage::export_from_object,
+        ),
     ],
     object_exporters_fallible: &[],
     java_object_handlers: &[], //java translations covered by LabelledPetrinet

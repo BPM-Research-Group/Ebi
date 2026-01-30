@@ -47,6 +47,9 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
             DeterministicFiniteAutomaton::export_from_object,
         ),
+        EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(
+            DeterministicFiniteAutomaton::export_from_object,
+        ),
         EbiObjectExporter::EventLog(DeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::EventLogTraceAttributes(
             DeterministicFiniteAutomaton::export_from_object,
@@ -54,6 +57,11 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::EventLogCsv(DeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::EventLogXes(DeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::FiniteStochasticLanguage(
+            DeterministicFiniteAutomaton::export_from_object,
+        ),
+        EbiObjectExporter::StochasticProcessTree(DeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::DirectlyFollowsModel(DeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::StochasticDirectlyFollowsModel(
             DeterministicFiniteAutomaton::export_from_object,
         ),
     ],
