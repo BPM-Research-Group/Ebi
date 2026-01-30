@@ -106,7 +106,7 @@ jobs:
             rusttarget: x86_64-pc-windows-gnu
           - runner: windows-latest
             target: x86
-            rusttarget: i686-pc-windows-msvc
+            rusttarget: i686-pc-windows-gnu
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
