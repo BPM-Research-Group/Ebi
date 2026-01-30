@@ -30,10 +30,12 @@ jobs:
           - runner: ubuntu-22.04
             target: ppc64le
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4  
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
+      - name: autogen Ebi python files
+        run: cargo run --features python itself python -o src/python/python_module_autogen.rs  
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
