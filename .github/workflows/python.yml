@@ -112,9 +112,9 @@ jobs:
           python-version: 3.x
           architecture: ${{ matrix.platform.target }}
       - name: autogen Ebi python files
+        run: cargo run --features python itself python -o src/python/python_module_autogen.rs  
         with:
           target: ${{ matrix.platform.target }}
-        run: cargo run --features python itself python -o src/python/python_module_autogen.rs  
       - name: Build wheels
         uses: PyO3/maturin-action@v1
         with:
