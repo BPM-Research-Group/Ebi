@@ -6,7 +6,8 @@ use crate::{
 };
 use anyhow::{Context, Result, anyhow};
 use ebi_objects::{
-    StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet, StochasticProcessTree,
+    StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, GaussJordan, One, Zero},
     ebi_objects::process_tree::TreeMarking,
 };
@@ -157,6 +158,7 @@ macro_rules! default_trace_probability {
 
 default_trace_probability!(StochasticLabelledPetriNet, LPNMarking);
 default_trace_probability!(StochasticProcessTree, TreeMarking);
+default_trace_probability!(StochasticNondeterministicFiniteAutomaton, usize);
 
 impl EbiTraitQueriableStochasticLanguage for StochasticDeterministicFiniteAutomaton {
     fn get_probability(&self, follower: &FollowerSemantics) -> Result<Fraction> {
