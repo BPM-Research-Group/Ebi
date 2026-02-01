@@ -873,6 +873,7 @@ mod tests {
     use ebi_objects::{EbiObject, ebi_arithmetic::Fraction};
     use itertools::Itertools;
     use ntest::timeout;
+    use rayon::iter::{IntoParallelIterator, ParallelIterator};
     use std::{
         collections::HashSet,
         fmt::Debug,
@@ -913,7 +914,7 @@ mod tests {
     #[test]
     #[timeout(500000)]
     fn call_all_non_cli_commands() {
-        for path in EBI_COMMANDS.get_command_paths() {
+        EBI_COMMANDS.get_command_paths().into_par_iter().for_each(|path| {
             if let EbiCommand::Command {
                 input_types,
                 execute,
@@ -948,7 +949,7 @@ mod tests {
                     }
                 }
             }
-        }
+        });
     }
 
     fn find_inputs(input_typess: &[&[&'static EbiInputType]]) -> Vec<Vec<TestInput>> {

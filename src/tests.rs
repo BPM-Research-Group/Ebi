@@ -97,91 +97,105 @@ pub fn get_all_test_files() -> Vec<(
     let files = fs::read_dir("./testfiles").unwrap();
     for path in files {
         let file = path.unwrap();
+        result.extend(get_all_test_files_for_file(file));
+    }
+    result
+}
 
-        let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
+#[cfg(test)]
+pub fn get_all_test_files_for_file(
+    file: DirEntry,
+) -> Vec<(
+    EbiInput,
+    Option<EbiObjectImporter>,
+    Option<EbiTraitImporter>,
+    std::string::String,
+)> {
+    let mut result = vec![];
+    let mut reader = MultipleReader::from_file(File::open(file.path()).unwrap());
 
-        //look for file handlers that should accept this file
-        for file_handler in EBI_FILE_HANDLERS {
-            if !file.file_name().into_string().unwrap().contains("invalid")
-                && file
-                    .file_name()
-                    .into_string()
-                    .unwrap()
-                    .ends_with(&(".".to_string() + file_handler.file_extension))
-            {
-                //file handler should be able to accept this file
-                for importer in file_handler.object_importers {
-                    if should_file_be_tested(&file, importer, file_handler) {
-                        println!(
-                            "import {:?}, file handler {}, importer {}",
-                            file.file_name(),
-                            file_handler,
-                            importer
-                        );
-                        let object = EbiInput::Object(
-                            (importer.get_importer())(
-                                &mut reader.get().unwrap(),
-                                &importer.default_parameter_values(),
-                            )
-                            .unwrap(),
-                            file_handler,
-                        );
-
-                        result.push((object, Some(importer.clone()), None, format!("{:?}", file)));
-                    }
-                }
-
-                for importer in file_handler.trait_importers {
-                    let object = EbiInput::Trait(
-                        importer
-                            .import(
-                                &mut reader.get().unwrap(),
-                                &importer.default_parameter_values(),
-                            )
-                            .unwrap(),
-                        file_handler,
-                    );
-
-                    result.push((object, None, Some(importer.clone()), format!("{:?}", file)));
-                }
-            } else {
-                //file handler should not accept this file
-
-                for importer in file_handler.object_importers {
+    //look for file handlers that should accept this file
+    for file_handler in EBI_FILE_HANDLERS {
+        if !file.file_name().into_string().unwrap().contains("invalid")
+            && file
+                .file_name()
+                .into_string()
+                .unwrap()
+                .ends_with(&(".".to_string() + file_handler.file_extension))
+        {
+            //file handler should be able to accept this file
+            for importer in file_handler.object_importers {
+                if should_file_be_tested(&file, importer, file_handler) {
                     println!(
-                        "import {:?}, file handler {}, importer {} (should fail)",
+                        "import {:?}, file handler {}, importer {}",
                         file.file_name(),
                         file_handler,
                         importer
                     );
-                    assert!(
+                    let object = EbiInput::Object(
                         (importer.get_importer())(
+                            &mut reader.get().unwrap(),
+                            &importer.default_parameter_values(),
+                        )
+                        .unwrap(),
+                        file_handler,
+                    );
+
+                    result.push((object, Some(importer.clone()), None, format!("{:?}", file)));
+                }
+            }
+
+            for importer in file_handler.trait_importers {
+                let object = EbiInput::Trait(
+                    importer
+                        .import(
+                            &mut reader.get().unwrap(),
+                            &importer.default_parameter_values(),
+                        )
+                        .unwrap(),
+                    file_handler,
+                );
+
+                result.push((object, None, Some(importer.clone()), format!("{:?}", file)));
+            }
+        } else {
+            //file handler should not accept this file
+
+            for importer in file_handler.object_importers {
+                println!(
+                    "import {:?}, file handler {}, importer {} (should fail)",
+                    file.file_name(),
+                    file_handler,
+                    importer
+                );
+                assert!(
+                    (importer.get_importer())(
+                        &mut reader.get().unwrap(),
+                        &importer.default_parameter_values()
+                    )
+                    .is_err()
+                );
+            }
+
+            for importer in file_handler.trait_importers {
+                println!(
+                    "import {:?}, file handler {}, importer {} (should fail)",
+                    file.file_name(),
+                    file_handler,
+                    importer
+                );
+                assert!(
+                    importer
+                        .import(
                             &mut reader.get().unwrap(),
                             &importer.default_parameter_values()
                         )
                         .is_err()
-                    );
-                }
-
-                for importer in file_handler.trait_importers {
-                    println!(
-                        "import {:?}, file handler {}, importer {} (should fail)",
-                        file.file_name(),
-                        file_handler,
-                        importer
-                    );
-                    assert!(
-                        importer
-                            .import(
-                                &mut reader.get().unwrap(),
-                                &importer.default_parameter_values()
-                            )
-                            .is_err()
-                    );
-                }
+                );
             }
         }
     }
+
     result
 }
 
@@ -210,7 +224,8 @@ pub mod tests {
 
     use crate::{
         ebi_framework::{
-            ebi_input::EbiInput, ebi_trait_object::EbiTraitObject,
+            ebi_input::EbiInput,
+            ebi_trait_object::EbiTraitObject,
             trait_importers::{ImportAsSemanticsTrait, ToSemanticsTrait},
         },
         ebi_traits::{

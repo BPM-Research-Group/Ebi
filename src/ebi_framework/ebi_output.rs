@@ -4,7 +4,24 @@ use super::{
 };
 use crate::{
     ebi_file_handlers::{
-        compressed_event_log::EBI_COMPRESSED_EVENT_LOG, deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON, directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH, directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_csv::EBI_EVENT_LOG_CSV, event_log_python::EBI_EVENT_LOG_PYTHON, executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE, finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE, labelled_petri_net::EBI_LABELLED_PETRI_NET, language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS, portable_document_format::EBI_PORTABLE_DOCUMENT_FORMAT, portable_network_graphics::EBI_PORTABLE_NETWORK_GRAPHCIS, process_tree::EBI_PROCESS_TREE, scalable_vector_graphics::EBI_SCALABLE_VECTOR_GRAPHICS, stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON, stochastic_directly_follows_model::EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL, stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET, stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS, stochastic_nondeterministic_finite_automaton::EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON, stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE
+        compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
+        deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
+        directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
+        directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_csv::EBI_EVENT_LOG_CSV,
+        event_log_python::EBI_EVENT_LOG_PYTHON, executions::EBI_EXECUTIONS,
+        finite_language::EBI_FINITE_LANGUAGE,
+        finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
+        labelled_petri_net::EBI_LABELLED_PETRI_NET,
+        language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS,
+        portable_document_format::EBI_PORTABLE_DOCUMENT_FORMAT,
+        portable_network_graphics::EBI_PORTABLE_NETWORK_GRAPHCIS, process_tree::EBI_PROCESS_TREE,
+        scalable_vector_graphics::EBI_SCALABLE_VECTOR_GRAPHICS,
+        stochastic_deterministic_finite_automaton::EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON,
+        stochastic_directly_follows_model::EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL,
+        stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
+        stochastic_language_of_alignments::EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
+        stochastic_nondeterministic_finite_automaton::EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON,
+        stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE,
     },
     math::{log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv},
     prom::java_object_handler::{
@@ -581,42 +598,48 @@ mod tests {
             root::{ContainsRoot, Root},
             root_log_div::RootLogDiv,
         },
+        tests::get_all_test_files_for_file,
     };
     use ebi_objects::ebi_arithmetic::{Fraction, One, Zero};
-    use std::{io::Cursor, path::PathBuf};
+    use rayon::iter::{IntoParallelIterator, ParallelIterator};
+    use std::{fs, io::Cursor, path::PathBuf};
     use strum::IntoEnumIterator;
 
     #[test]
     fn all_exporters() {
-        for (object, importer, _, f) in crate::tests::get_all_test_files() {
-            if let EbiInput::Object(object, file_handler) = object {
-                for file_handler2 in EBI_FILE_HANDLERS {
-                    for exporter in file_handler2.object_exporters {
-                        if exporter.get_type() == importer.clone().unwrap().get_type() {
-                            println!(
-                                "file {}\n\tfile handler\t{}\n\timporter\t{:?}\n\tfile handler\t{}\n\texporter\t{}\n\tobject\t\t{}",
-                                f,
-                                file_handler,
-                                importer,
-                                file_handler2,
-                                exporter,
-                                object.get_type()
-                            );
+        let files = fs::read_dir("./testfiles").unwrap();
+        let files = files.into_iter().map(|d| d.unwrap()).collect::<Vec<_>>();
+        files.into_par_iter().for_each(|file| {
+            for (object, importer, _, f) in get_all_test_files_for_file(file) {
+                if let EbiInput::Object(object, file_handler) = object {
+                    for file_handler2 in EBI_FILE_HANDLERS {
+                        for exporter in file_handler2.object_exporters {
+                            if exporter.get_type() == importer.clone().unwrap().get_type() {
+                                println!(
+                                    "file {}\n\tfile handler\t{}\n\timporter\t{:?}\n\tfile handler\t{}\n\texporter\t{}\n\tobject\t\t{}",
+                                    f,
+                                    file_handler,
+                                    importer,
+                                    file_handler2,
+                                    exporter,
+                                    object.get_type()
+                                );
 
-                            if importer.clone().unwrap().get_type() != object.get_type() {
-                                assert!(false)
+                                if importer.clone().unwrap().get_type() != object.get_type() {
+                                    assert!(false)
+                                }
+
+                                let mut c = Cursor::new(Vec::new());
+                                println!("\tobject type\t{}", object.get_type());
+                                exporter
+                                    .export(EbiOutput::Object(object.clone()), &mut c)
+                                    .unwrap();
                             }
-
-                            let mut c = Cursor::new(Vec::new());
-                            println!("\tobject type\t{}", object.get_type());
-                            exporter
-                                .export(EbiOutput::Object(object.clone()), &mut c)
-                                .unwrap();
                         }
                     }
                 }
             }
-        }
+    });
     }
 
     #[test]

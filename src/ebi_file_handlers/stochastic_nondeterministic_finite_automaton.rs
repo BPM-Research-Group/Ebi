@@ -75,6 +75,7 @@ pub const EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = Ebi
         EbiObjectExporter::EventLogTraceAttributes(StochasticNondeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::EventLogXes(StochasticNondeterministicFiniteAutomaton::export_from_object),
         EbiObjectExporter::EventLogCsv(StochasticNondeterministicFiniteAutomaton::export_from_object),
+        EbiObjectExporter::StochasticDirectlyFollowsModel(StochasticNondeterministicFiniteAutomaton::export_from_object)
     ],
     object_exporters_fallible: &[],
     java_object_handlers: &[],
