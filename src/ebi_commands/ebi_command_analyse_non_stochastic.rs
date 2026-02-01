@@ -78,6 +78,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
         &EbiInputType::Object(EbiObjectType::FiniteStochasticLanguage),
         &EbiInputType::Object(EbiObjectType::FiniteLanguage),
         &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
+        &EbiInputType::Object(EbiObjectType::StochasticNondeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
         &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
@@ -231,6 +232,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
         &EbiInputType::Object(EbiObjectType::FiniteLanguage),
         &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
+        &EbiInputType::Object(EbiObjectType::StochasticNondeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
         &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
     ]],
@@ -331,6 +333,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
         &EbiInputType::Object(EbiObjectType::ProcessTree),
         &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::DeterministicFiniteAutomaton),
+        &EbiInputType::Object(EbiObjectType::StochasticNondeterministicFiniteAutomaton),
         &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
         &EbiInputType::Object(EbiObjectType::LabelledPetriNet),
     ]],
@@ -356,6 +359,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
                 object.infinitely_many_traces()?
             }
             EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(object), _) => {
+                object.infinitely_many_traces()?
+            }
+            EbiInput::Object(EbiObject::StochasticNondeterministicFiniteAutomaton(object), _) => {
                 object.infinitely_many_traces()?
             }
             EbiInput::Object(EbiObject::LabelledPetriNet(object), _) => {

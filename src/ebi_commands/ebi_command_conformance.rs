@@ -384,7 +384,18 @@ pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
     explanation_long: Some(
         "Compute Hellinger stochastic conformance, which is 1 - the Hellinger distance.",
     ),
-    latex_link: None,
+    latex_link: Some(
+        r"Hellinger stochastic conformance is computed as follows:
+        
+        \begin{definition}[Hellinger stochastic conformance~\cite{hellinger1909neue}]
+            \label{def:hsc}
+                Let $L$ be a finite stochastic language and let $M$ be a queriable stochastic langauge.
+                Then, the \emph{Hellinger stochastic conformance ($\text{hsc}$) of $L$ and $M$} is defined as follows: 
+                \begin{align*}
+                    \text{hsc}(L, M) ={}& \frac{1}{\sqrt{2}}\sqrt{\sum_{\sigma \in L \cup M}(\sqrt{L(x)}-\sqrt{M(x)})^2}
+                \end{align*}       
+            \end{definition}",
+    ),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
@@ -418,7 +429,7 @@ pub const CONFORMANCE_HSC_SAMPLE: EbiCommand = EbiCommand::Command {
     explanation_long: Some(
         "Compute Hellinger stochastic conformance, which is 1 - the Hellinger distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `hsc`.",
     ),
-    latex_link: None,
+    latex_link: Some("see \\cref{def:hsc}"),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
@@ -458,10 +469,21 @@ pub const CONFORMANCE_HSC_SAMPLE: EbiCommand = EbiCommand::Command {
 
 pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
     name_short: "cssc",
-    name_long: Some("chi-square"),
+    name_long: Some("chi-squared"),
     explanation_short: "Compute Chi-Square stochastic conformance.",
     explanation_long: Some("Compute chi-square stochastic conformance."),
-    latex_link: None,
+    latex_link: Some(
+        r"Chi-squared stochastic conformance is computed as follows:
+        
+        \begin{definition}[Chi-squared stochastic conformance~\cite{DBLP:conf/eccv/PeleW10}]
+            \label{def:cssc}
+                Let $L$ be a finite stochastic language and let $M$ be a queriable stochastic langauge.
+                Then, the \emph{chi-squared stochastic conformance ($\text{cssc}$) of $L$ and $M$} is defined as follows: 
+                \begin{align*}
+                    \text{cssc}(L, L') ={}& 1 - \frac{1}{2} \sum_{\sigma \in L \cup M} \frac{(L(\sigma)-M(\sigma))^2}{L(\sigma)+M(\sigma)}
+                \end{align*}       
+            \end{definition}",
+    ),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
@@ -490,12 +512,12 @@ pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
 
 pub const CONFORMANCE_CSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "cssc-sample",
-    name_long: Some("chi-square-sample"),
-    explanation_short: "Compute chi-square stochastic conformance, if both inputs need to be sampled.",
+    name_long: Some("chi-squared-sample"),
+    explanation_short: "Compute chi-squared stochastic conformance, if both inputs need to be sampled.",
     explanation_long: Some(
         "Compute chi-square stochastic conformance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `cssc`.",
     ),
-    latex_link: None,
+    latex_link: Some("see \\cref{def:cssc}"),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
