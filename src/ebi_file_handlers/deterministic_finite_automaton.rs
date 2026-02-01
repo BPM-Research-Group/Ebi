@@ -64,6 +64,9 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::StochasticDirectlyFollowsModel(
             DeterministicFiniteAutomaton::export_from_object,
         ),
+        EbiObjectExporter::DirectlyFollowsGraph(
+            DeterministicFiniteAutomaton::export_from_object,
+        ),
     ],
     object_exporters_fallible: &[],
     java_object_handlers: &[],
