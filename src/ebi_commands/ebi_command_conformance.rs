@@ -540,7 +540,7 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
     explanation_long: Some(
         "Compute the conformance between two stochastic languages using a stochastic Markovian abstraction, which represents languages based on the expected frequency of subtraces to handle partially matching traces.",
     ),
-    latex_link: Some("\\cite{DBLP:conf/icpm/RochaLA24}"),
+    latex_link: Some("\\cite{DBLP:journals/procsci/RochaLA25}"),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
