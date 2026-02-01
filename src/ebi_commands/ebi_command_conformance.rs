@@ -195,7 +195,18 @@ pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
     name_long: Some("jensen-shannon"),
     explanation_short: "Compute Jensen-Shannon stochastic conformance, which is 1 - the Jensen-Shannon distance.",
     explanation_long: None,
-    latex_link: None,
+    latex_link: Some(
+        r"Compute Jensen-Shannon stochastic conformance is computed as follows:
+        
+        \begin{definition}[Jensen-Shannon stochastic conformance~\cite{DBLP:conf/icpm/LiLP24}]
+            \label{def:jssc}
+                Let $L$ be a finite stochastic language, let $M$ be a queriable stochastic langauge, and let $\Sigma$ be their combined alphabet.
+                Then, the \emph{Jensen-Shannon stochastic conformance ($\text{jssc}$) of $L$ and $M$} is defined as follows: 
+                \begin{align*}
+                    \text{jssc}(L, M) ={}& 1 - \sqrt{\frac{\sum_{\sigma \in \Sigma^*} L(\sigma) \log_2 \frac{2 L(\sigma)}{L(\sigma) + M(\sigma)} + M(\sigma) \log_2 \frac{2M(\sigma)}{L(\sigma)+ M(\sigma)}}{2}}
+                \end{align*}       
+            \end{definition}",
+    ),
     cli_command: None,
     exact_arithmetic: false,
     input_types: &[
@@ -235,7 +246,7 @@ pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     explanation_long: Some(
         "Compute Jensen-Shannon stochastic conformance, which is 1 - the Jensen-Shannon distance, if both inputs need to be sampled. If one input is a log or a finite stochastic language, then use `jssc`.",
     ),
-    latex_link: None,
+    latex_link: Some("see \\cref{def:jssc}"),
     cli_command: None,
     exact_arithmetic: false,
     input_types: &[

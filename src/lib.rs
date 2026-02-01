@@ -221,3 +221,5 @@ pub mod line_reader;
 pub mod multiple_reader;
 pub mod tests;
 pub mod text;
+
+pub use ebi_objects;

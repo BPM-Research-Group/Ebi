@@ -152,6 +152,35 @@ print(result)\end{lstlisting}
             The inputs of a command function in Python are the mandatory parameters, indicated by $\langle$ $\rangle$ at the command in this manual.
             The optional parameters cannot be given from Python, and neither can the output format be selected.
 
+    \subsection{Rust crate}
+                Ebi can be used as a Rust crate, available on \href{https://crates.io/crates/ebi}{crates.io}.
+
+                To add it a Rust project, add the following line to the \texttt{cargo.toml} file in the \texttt{[dependencies]} section:
+                \begin{lstlisting}[language=rust, style=boxed]
+ebi = "*"\end{lstlisting}
+
+                It may be necessary to Box an object and to cast it to a trait in order to call certain commands on it (due to the runtime type checking that Ebi performs). 
+                For instance:
+                \begin{lstlisting}[language=rust, style=boxed]
+use std::fs;
+use ebi_objects::FiniteStochasticLanguage;
+use ebi::ebi_objects::{
+    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
+};
+
+let fin1 = fs::read_to_string("log1.slang").unwrap();
+let mut object_a: Box<dyn EbiTraitFiniteStochasticLanguage> =
+    Box::new(fin1.parse::<FiniteStochasticLanguage>().unwrap());
+
+let fin2 = fs::read_to_string("log2.slang").unwrap();
+let mut object_b: Box<dyn EbiTraitFiniteStochasticLanguage> =
+    Box::new(fin2.parse::<FiniteStochasticLanguage>().unwrap());
+
+// Compute EMSC
+let emsc = object_a
+    .earth_movers_stochastic_conformance(object_b.as_mut())?;\end{lstlisting}
+
 	\subsection{Speed tricks}
 	\label{sec:speedtricks}
 		\begin{enumerate}
