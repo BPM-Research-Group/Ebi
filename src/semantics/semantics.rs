@@ -9,34 +9,30 @@ pub trait Semantics:
 {
     type SemState: Displayable;
 
-    /**
-     * Get the initial state.
-     * If it does not exist, then the language is empty.
-     */
+    /// Returns the initial state, if it exists.
+    /// If it does not exist, then the language is empty.
     fn get_initial_state(&self) -> Option<<Self as Semantics>::SemState>;
 
-    /**
-     * Update the state to reflect execution of the transition. This alters the state to avoid repeated memory allocations in simple walkthroughs.
-     * May return an error when the transition is not enabled, or when the marking cannot be represented (unbounded).
-     *
-     * @param transition
-     */
+    /// Update the state to reflect execution of `transition`.
+    /// May (up to the implementation) return an error when `transition` is not enabled, or when the marking cannot be represented (unbounded).
+    /// This alters the state to avoid repeated memory allocations in simple walkthroughs.
     fn execute_transition(
         &self,
         state: &mut <Self as Semantics>::SemState,
         transition: TransitionIndex,
     ) -> Result<()>;
 
-    /**
-     *
-     * @return whether the current state is a final state. In a final state, no other transitions may be enabled.
-     */
+    /// Returns whether the current state is a final state. In a final state, no other transitions may be enabled.
+    /// That is, if and only if `get_enabled_transitions(state)` returns an empty `Vec`, then `is_final_state(state)` returns `true`.
+    /// Depending on the implementation, it may be more efficient ot call `is_final_state` rather than `get_enabled_transitions`.
     fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool;
 
     fn is_transition_silent(&self, transition: TransitionIndex) -> bool;
 
     fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity>;
 
+    /// Returns the enabled transitions in `state`.
+    /// If and only if there are no transitions enabled, then `is_final_state(state)` returns `true`.
     fn get_enabled_transitions(
         &self,
         state: &<Self as Semantics>::SemState,

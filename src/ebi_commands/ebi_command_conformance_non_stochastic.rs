@@ -39,7 +39,9 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS: EbiCommand = EbiCommand::Co
         "Compute alignments.\nThe model must be able to terminate and its states must be bounded. The search performed is not optimised. For Petri nets, the ProM implementation may be more efficient.",
     ),
     latex_link: Some(
-        "Compute alignments according to the method described by Adriansyah~\\cite{DBLP:conf/edoc/AdriansyahDA11}. By default, all traces are computed concurrently on all CPU cores. If this requires too much RAM, please see speed trick~\\ref{speedtrick:multithreaded} in Section~\\ref{sec:speedtricks} for how to reduce the number of CPU cores utilised.",
+        "Alignments are computed according to the method described by Adriansyah~\\cite{DBLP:conf/edoc/AdriansyahDA11}. 
+        By default, all traces are computed concurrently on all CPU cores. 
+        If this requires too much RAM, please see speed trick~\\ref{speedtrick:multithreaded} in Section~\\ref{sec:speedtricks} for how to reduce the number of CPU cores utilised.",
     ),
     cli_command: None,
     exact_arithmetic: true,
