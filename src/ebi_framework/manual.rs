@@ -179,21 +179,21 @@ pub fn manual() -> Result<EbiOutput> {
     //file handlers
     writeln!(f, "\\long\\def\\ebifilehandlers{{")?;
     let file_handlers: BTreeSet::<_> = EBI_FILE_HANDLERS.iter().collect();
-    for (i, file_handler) in file_handlers.iter().enumerate() {
-        if i != 0 {
-            writeln!(f, "\\clearpage")?;
-        }
+    for file_handler in file_handlers.iter() {
+        writeln!(f, "\\clearpage")?;
         writeln!(f, "\\section{{{} (.{})}}", file_handler.name.to_sentence_case(), file_handler.file_extension)?;
         writeln!(f, "\\label{{filehandler:{}}}", file_handler.name)?;
         writeln!(f, "Import as objects: {}.", or_none(&file_handler.object_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
         writeln!(f, "\\\\Import as traits: {}.", or_none(&file_handler.trait_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
-        writeln!(f, "\\\\Input to commands: {}.", or_none(&file_handler.get_applicable_commands().iter().map(
-            |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (\\cref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
-            .collect::<Vec<_>>().join("")))?;
-        writeln!(f, "\\\\Output of commands: {}.", or_none(&file_handler.get_producing_commands().iter().map(
-            |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (\\cref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
-            .collect::<Vec<_>>().join("")))?;
+        writeln!(f, "\\subsection*{{Input to commands}} {}", or_none(&file_handler.get_applicable_commands().iter().map(
+            |path| format!("\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (\\cref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
+            .collect::<Vec<_>>().join("\\\\")))?;
+        
+        writeln!(f, "\\subsection*{{Output of commands}} {}", or_none(&file_handler.get_producing_commands().iter().map(
+            |path| format!("\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (\\cref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
+            .collect::<Vec<_>>().join("\\\\")))?;
 
+        writeln!(f, "\\subsection*{{Java \\& Python}}")?;
         {
             let mut to_java = false;
             let mut from_java = false;
@@ -206,17 +206,17 @@ pub fn manual() -> Result<EbiOutput> {
                 }
             }
             if to_java && from_java {
-                writeln!(f, "\\\\{} {} can be imported and exported between Ebi, and ProM and Java.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
+                writeln!(f, "{} {} can be imported and exported between Ebi, and ProM and Java.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
             } else if to_java {
-                writeln!(f, "\\\\{} {} can be exported from Ebi to ProM and Java.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
+                writeln!(f, "{} {} can be exported from Ebi to ProM and Java.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
             } else if from_java {
-                writeln!(f, "\\\\{} {} can be imported from ProM and Java to Ebi.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
+                writeln!(f, "{} {} can be imported from ProM and Java to Ebi.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
             } else {
-                writeln!(f, "\\\\{} {} can be neither imported nor exported between Ebi, and ProM and Java.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
+                writeln!(f, "{} {} can be neither imported nor exported between Ebi, and ProM and Java.", file_handler.article.to_string().to_sentence_case(), file_handler)?;
             }
         }
 
-        writeln!(f, "\\\\File format specification:\n{}", file_handler.format_specification)?;
+        writeln!(f, "\\subsection*{{File format specification}}{}", file_handler.format_specification)?;
     }
     writeln!(f, "}}")?;
 
