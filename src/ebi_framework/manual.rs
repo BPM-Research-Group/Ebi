@@ -28,17 +28,17 @@ pub fn manual() -> Result<EbiOutput> {
     writeln!(f, "\\def\\numberoftraits{{{}}}", EbiTrait::iter().len())?;
     writeln!(f, "\\def\\numberoffilehandlers{{{}}}", EBI_FILE_HANDLERS.len())?;
 
-    //command list
-    writeln!(f, "\\def\\ebicommandlist{{\\begin{{itemize}}")?;
-    for path in EBI_COMMANDS.get_command_paths() {
-        writeln!(f, "\\item\\texttt{{{}}} or \\texttt{{{}}} (Section~\\ref{{command:{}}})", EbiCommand::path_to_string(&path), EbiCommand::path_to_short_string(&path), EbiCommand::path_to_string(&path))?;
-    }
-    writeln!(f, "\\end{{itemize}}}}")?;
+    // //command list
+    // writeln!(f, "\\def\\ebicommandlist{{\\begin{{itemize}}")?;
+    // for path in EBI_COMMANDS.get_command_paths() {
+    //     writeln!(f, "\\item\\texttt{{{}}} or \\texttt{{{}}} (\\cref{{command:{}}})", EbiCommand::path_to_string(&path), EbiCommand::path_to_short_string(&path), EbiCommand::path_to_string(&path))?;
+    // }
+    // writeln!(f, "\\end{{itemize}}}}")?;
 
     //commands
     writeln!(f, "\\def\\ebicommands{{")?;
     for path in EBI_COMMANDS.get_command_paths() {
-        writeln!(f, "\\subsection{{\\texttt{{{}}}}}", EbiCommand::path_to_string(&path))?;
+        writeln!(f, "\\clearpage\\section{{\\texttt{{{}}}}}", EbiCommand::path_to_string(&path))?;
         writeln!(f, "\\label{{command:{}}}", EbiCommand::path_to_string(&path))?;
 
         if let EbiCommand::Command { name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_typess, input_names, input_helps, output_type, .. } = path[path.len()-1] {
@@ -183,15 +183,15 @@ pub fn manual() -> Result<EbiOutput> {
         if i != 0 {
             writeln!(f, "\\clearpage")?;
         }
-        writeln!(f, "\\subsection{{{} (.{})}}", file_handler.name.to_sentence_case(), file_handler.file_extension)?;
+        writeln!(f, "\\section{{{} (.{})}}", file_handler.name.to_sentence_case(), file_handler.file_extension)?;
         writeln!(f, "\\label{{filehandler:{}}}", file_handler.name)?;
         writeln!(f, "Import as objects: {}.", or_none(&file_handler.object_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
         writeln!(f, "\\\\Import as traits: {}.", or_none(&file_handler.trait_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
         writeln!(f, "\\\\Input to commands: {}.", or_none(&file_handler.get_applicable_commands().iter().map(
-            |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (Section~\\ref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
+            |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (\\cref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
             .collect::<Vec<_>>().join("")))?;
         writeln!(f, "\\\\Output of commands: {}.", or_none(&file_handler.get_producing_commands().iter().map(
-            |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (Section~\\ref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
+            |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (\\cref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
             .collect::<Vec<_>>().join("")))?;
 
         {
@@ -224,30 +224,30 @@ pub fn manual() -> Result<EbiOutput> {
     let file_handlers: BTreeSet::<_> = EBI_FILE_HANDLERS.iter().collect();
     writeln!(f, "\\def\\ebifilehandlerlist{{\\begin{{itemize}}")?;
     for file_handler in file_handlers {
-        writeln!(f, "\\item {} (.{}) (Section~\\ref{{filehandler:{}}})", file_handler.name, file_handler.file_extension, file_handler.name)?;
+        writeln!(f, "\\item {} (.{}) (\\cref{{filehandler:{}}})", file_handler.name, file_handler.file_extension, file_handler.name)?;
     }
     writeln!(f, "\\end{{itemize}}}}")?;
 
     //trait list
-    writeln!(f, "\\def\\ebitraitlist{{\\begin{{itemize}}")?;
+    writeln!(f, "\\long\\def\\ebitraitlist{{")?;
     for etrait in EbiTrait::iter() {
-        writeln!(f, "\\item {}.", etrait.to_string().to_sentence_case())?;
-        writeln!(f, "\\\\{}", etrait.get_explanation())?;
+        writeln!(f, "\\subsection{{{}}}", etrait.to_string().to_sentence_case())?;
+        writeln!(f, "{}", etrait.get_explanation())?;
 
         writeln!(f, "\\\\File types that can be imported as {} {}: {}.", 
             etrait.get_article(), 
             etrait, 
             or_none(
                     &etrait.get_file_handlers().iter().map(|file_handler| 
-                        format!("\\\\\\null\\qquad\\hyperref[filehandler:{}]{{{}}} (.{} -- Section~\\ref{{filehandler:{}}})", file_handler.name, file_handler.name, file_handler.file_extension, file_handler.name)
+                        format!("\\\\\\null\\qquad\\hyperref[filehandler:{}]{{{}}} (.{} -- \\cref{{filehandler:{}}})", file_handler.name, file_handler.name, file_handler.file_extension, file_handler.name)
                     ).collect::<Vec<_>>().join(", "))
             )?;
 
         writeln!(f, "\\\\Commands that accept {} {} as input: {}", etrait.get_article(), etrait, or_none(&etrait.get_applicable_commands().iter().map(
-            |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (Section~\\ref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
+            |path| format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (\\cref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
             .collect::<Vec<_>>().join("")))?;
     }
-    writeln!(f, "\\end{{itemize}}}}")?;
+    writeln!(f, "}}")?;
 
     //object type list
     writeln!(f, "\\def\\ebiobjecttypelist{{\\begin{{itemize}}")?;
@@ -262,7 +262,7 @@ pub fn manual() -> Result<EbiOutput> {
             |path| 
             {
                 if path.last().unwrap().is_in_java() {
-                    Some(format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (Section~\\ref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
+                    Some(format!("\\\\\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (\\cref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
                 } else {
                     None
                 }
@@ -347,7 +347,7 @@ pub fn output_types(output_type: &EbiOutputType) -> String {
         |exp| exp.get_article().to_string() 
         + " " 
         + match exp {
-            EbiExporter::Object(_, file_handler) => format!("{} (.{} -- Section~\\ref{{filehandler:{}}})", file_handler.name, file_handler.file_extension, file_handler.name),
+            EbiExporter::Object(_, file_handler) => format!("{} (.{} -- \\cref{{filehandler:{}}})", file_handler.name, file_handler.file_extension, file_handler.name),
             _ => exp.to_string()
         }.as_str()
     ).collect::<Vec<_>>();

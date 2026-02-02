@@ -1,4 +1,4 @@
-\documentclass{article}
+\documentclass{book}
 \usepackage{amsmath,amsfonts,booktabs,stmaryrd,tabularx,multirow,xfrac,nicematrix,listings,listings-rust}
 \usepackage{ltablex,comment}
 \usepackage{tikz}
@@ -59,6 +59,9 @@
     morecomment=[f][\color{numb}][0]{\#},
 }
 
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
 
 \input{functions}
 
@@ -76,6 +79,7 @@ Sander J.J. Leemans, Tian Li, Leonhard Mühlmeyer, Philipp Moch, Adam Burke}
 \def\ebiCommand#1{\texttt{#1}}
 
 \usepackage{hyperref}
+\hypersetup{pdfpagelayout=TwoPageRight}
 \usepackage{cleveref}
 \begin{document}
 
@@ -84,17 +88,17 @@ Sander J.J. Leemans, Tian Li, Leonhard Mühlmeyer, Philipp Moch, Adam Burke}
 \tableofcontents
 
 \clearpage
-\section{Ebi: introduction}
+\chapter{Ebi: introduction}
 	Ebi is a process mining tool, ProM plug-in and library, and is focused on stochastic process mining algorithms.
 	Ebi works completely offline and installation is in most cases not necessary.
 		
 	A command is an algorithm in Ebi that a user can call.
-	Ebi has \numberofcommands{} commands; for an overview of commands please refer to Section~\ref{sec:commands} or give the command-line parameter \verb=--help=.
-	\numberoffilehandlers{} different types of files are supported; Section~\ref{sec:filehandlers} contains an overview of the files that Ebi supports.
+	Ebi has \numberofcommands{} commands; for an overview of commands please refer to \cref{sec:commands} or give the command-line parameter \verb=--help=.
+	\numberoffilehandlers{} different types of files are supported; \cref{sec:filehandlers} contains an overview of the files that Ebi supports.
 	
-	The architecture of Ebi and how to develop new commands can be found in Section~\ref{sec:architecture}.
+	The architecture of Ebi and how to develop new commands can be found in \cref{sec:architecture}.
 	
-	\subsection{Command-line application}
+	\section{Command-line application}
 		Ebi can be used as a stand-alone command-line application; installation is not necessary.
 		
 		On Windows, simply download the executable from \url{http://ebitools.org} and run it from a console.
@@ -114,10 +118,10 @@ Sander J.J. Leemans, Tian Li, Leonhard Mühlmeyer, Philipp Moch, Adam Burke}
 		The following commands are available as ProM plug-ins:
 		\promcommands
 
-    \subsection{Python/PM4Py plug-in}
+    \section{Python/PM4Py plug-in}
         Ebi can be used as a plug-in of the PM4Py Python library~\cite{DBLP:journals/simpa/BertiZS23} (\url{https://pm4py.org}).
         
-        \subsubsection{Installation}
+        \subsection{Installation}
             Ebi can be installed in Python using \verb=pip install ebi-pm=.
 
             The Ebi Python library is available on Windows, Mac OS and Linux. 
@@ -127,8 +131,8 @@ Sander J.J. Leemans, Tian Li, Leonhard Mühlmeyer, Philipp Moch, Adam Burke}
             %install Maturin, and generate a .whl file using \verb=maturin build --features python=.
             %Finally, install the Ebi python package using \verb=pip install ⟨file name⟩.whl -force-reinstall=.
 
-        \subsubsection{Usage}
-            Every command can be used as a Python plug-in; the function name can be found with the respective command in Section~\ref{sec:commands}.
+        \subsection{Usage}
+            Every command can be used as a Python plug-in; the function name can be found with the respective command in \cref{sec:commands}.
         
             Then, Ebi can be used as follows:
             \begin{lstlisting}[language=python, style=boxed]
@@ -152,7 +156,7 @@ print(result)\end{lstlisting}
             The inputs of a command function in Python are the mandatory parameters, indicated by $\langle$ $\rangle$ at the command in this manual.
             The optional parameters cannot be given from Python, and neither can the output format be selected.
 
-    \subsection{Rust crate}
+    \section{Rust crate}
                 Ebi can be used as a Rust crate, available on \href{https://crates.io/crates/ebi}{crates.io}.
 
                 To add it a Rust project, add the following line to the \texttt{cargo.toml} file in the \texttt{[dependencies]} section:
@@ -181,7 +185,7 @@ let mut object_b: Box<dyn EbiTraitFiniteStochasticLanguage> =
 let emsc = object_a
     .earth_movers_stochastic_conformance(object_b.as_mut())?;\end{lstlisting}
 
-	\subsection{Speed tricks}
+	\section{Speed tricks}
 	\label{sec:speedtricks}
 		\begin{enumerate}
 			\item
@@ -200,17 +204,16 @@ let emsc = object_a
             To do this, use \verb=cargo run --features exactarithmetic=, but a faster binary is obtained by compiling for release: \verb=cargo build --release --features exactarithmetic=.
 		\end{enumerate}
 
-\section{Commands}
+\chapter{Commands}
 \label{sec:commands}
 
-	This section lists the commands supported by Ebi.
+	This chapter lists the commands supported by Ebi.
 
     \ebicommands
 
-\clearpage
-\section{Supported files}
+\chapter{Supported files}
 \label{sec:filehandlers}
-	This section lists the file types that are supported by Ebi, and for each file type which commands can use it as input or produce it as output.
+	This chapter lists the file types that are supported by Ebi, and for each file type which commands can use it as input or produce it as output.
 	
     Please note that Ebi does not consider input file extensions.
     Instead, it will attempt to parse the input file in all of the formats that are supported by the called command.
@@ -218,156 +221,135 @@ let emsc = object_a
     
     \ebifilehandlers
 
-\clearpage
-\section{Architecture}
+\chapter{Architecture}
 \label{sec:architecture}
 
-    \subsection{Files and objects}
-        Figure~\ref{fig:traits} shows the main architectural concepts of Ebi with regards to files and objects.
-        It's a bit verbose, but it enables commands to be completely detached from any I/O, and reduces overhead when adding new functionality, and guarantees the documentation is up-to-date.
-    
-        \begin{figure}
-            \centering
-            \begin{tikzpicture}
-                \def\dx{1.5cm}
-                \def\dy{1cm}
-                \node (command) {command\strut};
-    
-                \node (trait) [left=\dx of command] {trait\strut};
-    
-                \node (objecttype) [left=\dx of trait, align=center] {object\\type};
-    
-                \node (filehandler) [left=\dx of objecttype, align=center] {file\\handler};
-    
-                \draw [->] (objecttype) to node[above, font=\scriptsize] {implements} (trait);
-                \draw [->] (trait) to node[above, font=\scriptsize] {input to} (command);
-    
-                \draw [->, out=-20, in=200] (objecttype) to node[below, font=\scriptsize] {input to} (command);
-    
-                \draw [->] (filehandler) to node[above, font=\scriptsize] {imports} (objecttype);
-    
-                \node [align=center] (inputtype) at ($(trait)!0.5!(command)+(0,\dy)$) {input\\type};
-                \draw [dotted] (inputtype) to ++(0,-2*\dy);
-                
-            \end{tikzpicture}\\
-            \begin{tikzpicture}
-                \def\dx{1.5cm}
-                \def\dy{1cm}
-                \node (command) {command\strut};  
-    
-                \node (objecttype) [left=\dx of trait, align=center] {object\\type};
-    
-                \node (filehandler) [left=\dx of objecttype, align=center] {file\\handler};
-    
-                \draw [<-, out=-20, in=200] (objecttype) to node[below, font=\scriptsize] {output of} (command);
-    
-                \draw [<-] (filehandler) to node[above, font=\scriptsize] {exported by} (objecttype);
-    
-                \node [align=center] (inputtype) at ($(trait)!0.5!(command)+(0,\dy)$) {output\\type};
-                \draw [dotted] (inputtype) to ++(0,-2*\dy);
-                
-            \end{tikzpicture}
-            \caption{Traits and object types in Ebi.}
-            \label{fig:traits}
-        \end{figure}
-        
-        
-        \newgeometry{top=1mm,bottom=1mm,right=30mm,left=30mm}
-        	\includegraphics[width=0.5\linewidth]{graph}
-        \restoregeometry
-    
-        \subsubsection{Commands}
-            A command is a function of Ebi that users can call.
-            A command declares what types of inputs it needs and what type of output it generates. 
-            Preferably, commands take traits as inputs rather than object types.
-    
-            Commands can circumvent the Ebi object handling on their inputs by declaring an \texttt{cli\_command} function, which gives direct access to the command line interface building process.
-            This is for instance used in the \ebiCommand{validate} command, where we want to obtain the parsing error for a particular object type.
-    
-            The actual input for a command gets wrapped in the \texttt{EbiInput} enum, and the output must be wrapped in the \texttt{EbiOutput} enum.
-            The Ebi machinery verifies whether the output of a command matches the declared output type at run time.
+    Figure~\ref{fig:traits} shows the main architectural concepts of Ebi with regards to files and objects.
+    It's a bit verbose, but it enables commands to be completely detached from any I/O, and reduces overhead when adding new functionality, and guarantees the documentation is up-to-date.
+
+    \begin{figure}[tb]
+        \centering
+        \begin{tikzpicture}
+            \def\dx{1.5cm}
+            \def\dy{1cm}
+            \node (command) {command\strut};
+
+            \node (trait) [left=\dx of command] {trait\strut};
+
+            \node (objecttype) [left=\dx of trait, align=center] {object\\type};
+
+            \node (filehandler) [left=\dx of objecttype, align=center] {file\\handler};
+
+            \draw [->] (objecttype) to node[above, font=\scriptsize] {implements} (trait);
+            \draw [->] (trait) to node[above, font=\scriptsize] {input to} (command);
+
+            \draw [->, out=-20, in=200] (objecttype) to node[below, font=\scriptsize] {input to} (command);
+
+            \draw [->] (filehandler) to node[above, font=\scriptsize] {imports} (objecttype);
+
+            \node [align=center] (inputtype) at ($(trait)!0.5!(command)+(0,\dy)$) {input\\type};
+            \draw [dotted] (inputtype) to ++(0,-2*\dy);
             
-            Commands define a number of inputs, and for each input a list of acceptable types.
-            However, these types need to be similar: a command cannot ask for either a file and a fraction, for instance.
-    
-            Ebi has the following commands:
-            \ebicommandlist
-    
-        \subsubsection{Input types}
-            An input type is a declaration of what a command needs as input.
-            An input type can be:
-            \begin{itemize}
-                \item a trait;
-                \item an object type;
-                \item a basic data type such as fraction, integer or string. A fraction and an integer can have a minimum, a maximum and a default value; a string can have a list of allowed values and a default value;
-                \item the ``any object" input type, which denotes that any object type will be accepted;
-                \item a ``file handler", which indicates the (name of) a file handler (for instance used in the \ebiCommand{validate} command).
-            \end{itemize}
-    
-            The actual input for a command gets wrapped in the \texttt{EbiInput} enum.
-    
-        \subsubsection{Traits}
-        \label{sec:traits}
-            A ``trait" is like an interface: it provides some functions but does not say how these are implemented.
-            For instance ``finite stochastic language" is a trait, which allows to iterate over traces and their probabilities, and to obtain the number of traces.
-            Preferably, commands should require traits as inputs.
+        \end{tikzpicture}\\
+        \begin{tikzpicture}
+            \def\dx{1.5cm}
+            \def\dy{1cm}
+            \node (command) {command\strut};  
 
-            Ebi has the following traits:
-            \ebitraitlist
-    
-        \subsubsection{Object types}
-        \label{sec:objecttypes}
-            An object type is a struct or class.
-            It is a specific implementation with a fixed data structure.
-            The output of a command is an object of a specific object type.
-            The input of a command rather not uses object types, but sometimes this is unavoidable.
-            Objects are wrapped in an \texttt{EbiObject} enum to ensure type safety by the compiler.
+            \node (objecttype) [left=\dx of trait, align=center] {object\\type};
 
-            Ebi has the following object types:
-            \ebiobjecttypelist
-    
-        \subsubsection{File handlers}
-            A file handler is an importer for a particular file format.
-            In Ebi, a file handler defines how a file type is to be handled, and as which objects and traits it can be imported, and which objects can be exported to it.
-    
-            Ebi has the following file handlers:
-            \ebifilehandlerlist
+            \node (filehandler) [left=\dx of objecttype, align=center] {file\\handler};
 
-        \subsubsection{File Handlers $\rightarrow$ Objects (importers)}
+            \draw [<-, out=-20, in=200] (objecttype) to node[below, font=\scriptsize] {output of} (command);
+
+            \draw [<-] (filehandler) to node[above, font=\scriptsize] {exported by} (objecttype);
+
+            \node [align=center] (inputtype) at ($(trait)!0.5!(command)+(0,\dy)$) {output\\type};
+            \draw [dotted] (inputtype) to ++(0,-2*\dy);
+            
+        \end{tikzpicture}
+        \caption{Traits and object types in Ebi.}
+        \label{fig:traits}
+    \end{figure}
+        
+    % \newgeometry{top=1mm,bottom=1mm,right=30mm,left=30mm}
+    %     \includegraphics[width=0.5\linewidth]{graph}
+    % \restoregeometry
+
+        A command is a function of Ebi that users can call.
+        A command declares what types of inputs it needs and what type of output it generates. 
+        Preferably, commands take traits as inputs rather than object types.
+
+        Commands can circumvent the Ebi object handling on their inputs by declaring an \texttt{cli\_command} function, which gives direct access to the command line interface building process.
+        This is for instance used in the \ebiCommand{validate} command, where we want to obtain the parsing error for a particular object type.
+
+        The actual input for a command gets wrapped in the \texttt{EbiInput} enum, and the output must be wrapped in the \texttt{EbiOutput} enum.
+        The Ebi machinery verifies whether the output of a command matches the declared output type at run time.
+        
+        Commands define a number of inputs, and for each input a list of acceptable types.
+        However, these types need to be similar: a command cannot ask for either a file and a fraction, for instance.
+        For the commands of Ebi, please refer to \cref{sec:commands}.
+    
+        An input type is a declaration of what a command needs as input.
+        An input type can be:
+        \begin{itemize}
+            \item a trait;
+            \item an object type;
+            \item a basic data type such as fraction, integer or string. A fraction and an integer can have a minimum, a maximum and a default value; a string can have a list of allowed values and a default value;
+            \item the ``any object" input type, which denotes that any object type will be accepted;
+            \item a ``file handler", which indicates the (name of) a file handler (for instance used in the \ebiCommand{validate} command).
+        \end{itemize}
+
+        The actual input for a command gets wrapped in the \texttt{EbiInput} enum.
+    
+    \section{Traits}
+    \label{sec:traits}
+        A ``trait" is like an interface: it provides some functions but does not say how these are implemented.
+        For instance ``finite stochastic language" is a trait, which allows to iterate over traces and their probabilities, and to obtain the number of traces.
+        Preferably, commands should require traits as inputs.
+
+        Ebi has the following traits:
+        \ebitraitlist
+    
+    \section{Object types}
+    \label{sec:objecttypes}
+        An object type is a struct or class.
+        It is a specific implementation with a fixed data structure.
+        The output of a command is an object of a specific object type.
+        The input of a command rather not uses object types, but sometimes this is unavoidable.
+        Objects are wrapped in an \texttt{EbiObject} enum to ensure type safety by the compiler.
+
+        Ebi has the following object types; please refer to the \href{https://docs.rs/ebi_objects/0.3.111/ebi_objects/ebi_objects/index.html}{documentation} for more information.
+        \ebiobjecttypelist
+    
+    \section{File handlers}
+        A file handler is an importer for a particular file format.
+        In Ebi, a file handler defines how a file type is to be handled, and as which objects and traits it can be imported, and which objects can be exported to it.
+
+        Ebi has the following file handlers:
+        \ebifilehandlerlist
+
+        \clearpage
+        \subsection{File Handlers $\rightarrow$ Objects (importers)}
             \filehandlersobjecttypes
 
-        \subsubsection{File Handlers $\rightarrow$ Traits (importers)}
+        \clearpage
+        \subsection{File Handlers $\rightarrow$ Traits (importers)}
             \filehandlerstraits
-
-        \subsubsection{Objects $\rightarrow$ file handlers (exporters)}
-            In this table, \CIRCLE{} means that the export is always possible, and \LEFTcircle{} means that a conversion is involved that may fail.
+        
+        \clearpage
+        \subsection{Objects $\rightarrow$ file handlers (exporters)}
+        \objecttypesfilehandlers
+        In this table, \CIRCLE{} means that the export is always possible, and \LEFTcircle{} means that a conversion is involved that may fail.
             
-            \noindent\objecttypesfilehandlers
-            
-		\subsubsection{ProM support}
-			Ebi automatically exports the commands it supports to ProM.
-			A command is automatically supported if:
-			\begin{enumerate}
-				\item The command does not access the command line directly.
-				That is, \verb=cli_command= of the command must be \verb=None=.
-				\item There is a combination of inputs to the command that are all supported by ProM.
-				The following input types are supported by ProM:
-				\ebiprominput
-				
-				\item The output of the command is supported by ProM.
-				The following output types are supported by ProM:
-				\ebipromoutput
-			\end{enumerate}
-			For each combination of input parameter types and output types, one plug-in is added to ProM automatically.
-            
-	\subsection{Implementing a new command/algorithm/technique}
+	\section{Implementing a new command/algorithm/technique}
 	\label{sec:implement}
 		There are two steps to take: set up the technique (that is, the implementation), and set up the command (i.e. where \& how Ebi can call it).
 		
-		\subsubsection{Conventions and Hints}
+		\subsection{Conventions and Hints}
 			\begin{enumerate}
 				\item Ebi only uses floating point numbers (f64) when the user asks for it.
-				Commands should use \verb=Fraction= or other exact numeric classes (see Section~\ref{sec:exact}); these perform computations with the arithmetic type selected by the user.
+				Commands should use \verb=Fraction= or other exact numeric classes (see \cref{sec:exact}); these perform computations with the arithmetic type selected by the user.
 				\item It is important that errors are propagated appropriately.
 				Therefore, avoid \verb=.unwrap()= but instead propagate errors using \verb=.with_context(|| "error message")?=.
 				The \verb=anyhow= package formats the error messages nicely to the user.
@@ -383,7 +365,7 @@ EbiCommand::get_progress_bar_message(message);
                 \item Compilation for release will fail if there are any warnings.
 			\end{enumerate}
             
-		\subsubsection{The technique}
+		\subsection{The technique}
 			The technique is the place where the code for the algorithm lives.
 			This should go in its own file in the \verb=techniques= folder.
 			As an example, we'll use the unit Earth Movers' Stochastic Conformance, (uEMSC) which takes a finite stochastic language (log) and a queriable stochastic language (model), and returns a fraction to indicate the conformance of the log and model.
@@ -392,13 +374,13 @@ EbiCommand::get_progress_bar_message(message);
 				\item First, decide on the input and output of your technique.
 				
 				For the inputs, preferably use Ebi traits for the inputs whenever possible: as the framework expands, all new objects and files will be automatically supported by your technique.
-				See Section~\ref{sec:traits} for an overview of Ebi traits.
-				Alternatively, object types can be used as inputs; please see Section~\ref{sec:objecttypes} for an overview of available object types.
+				See \cref{sec:traits} for an overview of Ebi traits.
+				Alternatively, object types can be used as inputs; please see \cref{sec:objecttypes} for an overview of available object types.
 				
 				For our example, uEMSC needs to walk through a finite set of traces (EbiTraitFiniteStochasticLanguage) and needs to ask the model for a probability of each trace (EbiTraitQueriableStochasticLanguage).
 				
 				For the output: Ebi supports only a single output.
-				Ebi deliberately does not support floating point numbers (f32, f64) as these are not exact (see Section~\ref{sec:exact}).
+				Ebi deliberately does not support floating point numbers (f32, f64) as these are not exact (see \cref{sec:exact}).
 				
 				For our example, the output of uEMSC is a fraction.
 				
@@ -436,7 +418,7 @@ for dyn EbiTraitFiniteStochasticLanguage {
 				An example of this can be found in the file \verb=techniques\align.rs=.
 			\end{enumerate}
 			
-		\subsubsection{The command}
+		\subsection{The command}
 			Having implemented the algorithm, Ebi needs to be made aware of the new technique, by creating commands for it.
 			
 			\begin{enumerate}
@@ -466,12 +448,12 @@ for dyn EbiTraitFiniteStochasticLanguage {
 					
 					\item \verb=execute= should call the implemented algorithm.
 					As a first step, the inputs should be retrieved from the variable \verb=inputs=, and transformed into the correct types.
-					Ebi tests the \verb=execute= function automatally, see Section~\ref{sec:tests}.
+					Ebi tests the \verb=execute= function automatally, see \cref{sec:tests}.
 					
 					The output of the algorithm should be wrapped in the appropriate \verb=EbiOutput= enum.
 					
 					\item \verb=output_type= indicates the single output type of the command.
-                    Ebi automatally tests whether the output of \verb=execute= matches the declared \verb=output_type=; see Section~\ref{sec:tests}.
+                    Ebi automatally tests whether the output of \verb=execute= matches the declared \verb=output_type=; see \cref{sec:tests}.
 					
 				\end{itemize}
 				
@@ -514,7 +496,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
 				Add your new command here, while maintaining the alphabetical order.
 			\end{enumerate}
 
-        \subsubsection{Tests}
+        \subsection{Tests}
         \label{sec:tests}
             Ebi automatically tests each command, importer, exporter, graphable and infoable, if a corresponding test file is provided in the \verb=testfiles= folder.
             Files with \verb=_invalid= in their file names must not be importable using any importer, that is, importing should give an error message for the test to pass.
@@ -554,7 +536,7 @@ mod tests {
             Tests can be run using \verb=cargo test=, and test coverage can be obtained using \verb=cargo llvm-cov --html=.
 		
 
-    \subsection{Exact Computation}
+    \section{Exact Computation}
     \label{sec:exact}
         In Ebi, several computations are performed without rounding.
         To this end, it uses positive fractions: 
@@ -568,7 +550,7 @@ mod tests {
         This can be done with \verb=Fraction::set_exact_globally(exact: bool)=.
         Please note that exact and approximate (double precision) arithmetic cannot be combined, thus functions should set this function as early as possible.
 
-        \subsubsection{Square roots}
+        \subsection{Square roots}
             Square roots can only be expressed in $\mathbb{N}$ or in $\mathbb{I}$.
             Thus, we need to represent square roots symbolically.
             For this, we use the following operations:
@@ -580,7 +562,7 @@ mod tests {
     
             Thus, we can represent all of these square root operations with the square root of a fractional number.
 
-        \subsubsection{Logdiv}
+        \subsection{Logdiv}
             Logarithms can often not be expressed in $\mathbb{Q}$.
             For instance, $\log_2(3) \notin \mathbb{Q}$ is not a rational number.
             To perform computations exactly and to delay rounding to the very last moment, Ebi uses \emph{log division} objects.
@@ -593,14 +575,14 @@ mod tests {
                 &{}= \log \sqrt[\leftroot{-1}\uproot{2}\scriptstyle c]{\frac{a}{b}}
             \end{align*}
 
-            \paragraph{From a fraction}
+            \paragraph*{From a fraction}
                 Any non-negative fraction can be written as a $\logdiv$:
                 \begin{align*}
                     \frac{a}{b} ={}& \frac{\log(2^a)}{b} \\
                     {}={}& \logdiv(\frac{2^a}{1}, b)
                 \end{align*}
     
-            \paragraph{Sum \& Difference}
+            \paragraph*{Sum \& Difference}
                 $\Logdiv$s are closed under addition:
                 \begin{align*}
                     \logdiv(\frac{a}{b}, c) + \logdiv(\frac{d}{e}, f) = {}& 
@@ -621,12 +603,12 @@ mod tests {
                 \end{align*}
                 As $a$, $b$, $d$ and $e$ are all positive integers, the difference between two $\logdiv$s is also a $\logdiv$.
 
-            \paragraph{Additive identity (0)}
+            \paragraph*{Additive identity (0)}
                 The additive identity of $\logdiv$ is $\logdiv(\frac{1}{1}, 1) = 0$.
                 
                 While there are infinitely many $\logdiv$s that equal 0, such as $\logdiv(\frac{5}{5}, 100) = 0$, only a second argument of 1 guarantees that addition and subtraction work as intended.
                 
-            \paragraph{$n \log n$}
+            \paragraph*{$n \log n$}
                 Given a fraction $\frac{a}{b} \in \mathbb{Q}$, the value $\frac{a}{b} \log \frac{a}{b}$ can be represented by
                 \begin{align*}
                     \frac{a}{b} \log \frac{a}{b} ={} & 
@@ -635,7 +617,7 @@ mod tests {
                     {}={}& \logdiv(\frac{a^a}{b^a}, b)\\
                 \end{align*}
 
-            \paragraph{Approximation}
+            \paragraph*{Approximation}
                 In order to provide readable results that can be used in other tools, at the end of the computation chain, $\logdiv$s need to be approximated to a fraction.
                 To this end, we consider that:
                 \begin{align*}
@@ -697,7 +679,7 @@ mod tests {
                         As multiplications are prohibitively expensive, and squaring roughly doubles the number of bits each iteration, we truncate $a$ and $b$ by the same number of bit-shifts every iteration, such that in each number enough bits are left.
                     \end{itemize}
 
-        \subsubsection{RootLogDiv}
+        \subsection{RootLogDiv}
             A RootLogDiv is the following:
             \begin{align*}
                 \text{RootLogDiv}(\frac{a}{b},c) ={}& \sqrt{\logdiv(\frac{a}{b}, c)}\\
@@ -705,6 +687,22 @@ mod tests {
             \end{align*}
 
             There is an option to perform the 1- operation on a RootLogDiv.
+
+    \section{ProM support}
+        Ebi automatically exports the commands it supports to ProM.
+        A command is automatically supported if:
+        \begin{enumerate}
+            \item The command does not access the command line directly.
+            That is, \verb=cli_command= of the command must be \verb=None=.
+            \item There is a combination of inputs to the command that are all supported by ProM.
+            The following input types are supported by ProM:
+            \ebiprominput
+            
+            \item The output of the command is supported by ProM.
+            The following output types are supported by ProM:
+            \ebipromoutput
+        \end{enumerate}
+        For each combination of input parameter types and output types, one plug-in is added to ProM automatically.
             
     \bibliographystyle{plain}
     \bibliography{bibliography}
