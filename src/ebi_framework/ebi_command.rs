@@ -870,7 +870,7 @@ mod tests {
         },
         multiple_reader::MultipleReader,
     };
-    use ebi_objects::{EbiObject, ebi_arithmetic::Fraction};
+    use ebi_objects::{EbiObject, ebi_arithmetic::Fraction, activity_key::has_activity_key::TestActivityKey};
     use itertools::Itertools;
     use ntest::timeout;
     use rayon::iter::{IntoParallelIterator, ParallelIterator};
@@ -942,10 +942,14 @@ mod tests {
                         //we do not know whether a command should succeed (giving an error is fine in general), but no command should panic
                         let output = (execute)(transform(inputs), None);
 
-                        //verify that the output is of the correct type
+                        
                         if let Ok(output) = output {
+                            //verify that the output is of the correct type
                             assert_eq!(output.get_type(), output_type.to_owned().to_owned());
-                        }
+
+                            //verify that the activities test passes
+                            output.test_activity_key();
+                        } 
                     }
                 }
             }
