@@ -4,7 +4,10 @@ use crate::ebi_framework::{
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    Activity, CompressedEventLog, EventLog, EventLogCsv, EventLogPython, EventLogTraceAttributes, EventLogXes, HasActivityKey, Importable, IntoRefTraceIterator, NumberOfTraces, ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes
+    Activity, CompressedEventLog, EventLog, EventLogCsv, EventLogOcel, EventLogPython,
+    EventLogTraceAttributes, EventLogXes, HasActivityKey, Importable, IntoRefTraceIterator,
+    NumberOfTraces,
+    ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
 };
 use std::collections::HashMap;
 
@@ -81,23 +84,17 @@ impl ToEventLogTrait for CompressedEventLogTraceAttributes {
     }
 }
 
-impl ToEventLogTrait for EventLogCsv {
-    fn to_event_log_trait(self) -> Box<dyn EbiTraitEventLog> {
-        let log: EventLog = self.into();
-        Box::new(log)
-    }
+macro_rules! via_log {
+    ($t:ident) => {
+        impl ToEventLogTrait for $t {
+            fn to_event_log_trait(self) -> Box<dyn EbiTraitEventLog> {
+                Box::new(EventLog::from(self))
+            }
+        }
+    };
 }
 
-impl ToEventLogTrait for EventLogPython {
-    fn to_event_log_trait(self) -> Box<dyn EbiTraitEventLog> {
-        let log: EventLog = self.into();
-        Box::new(log)
-    }
-}
-
-impl ToEventLogTrait for EventLogXes {
-    fn to_event_log_trait(self) -> Box<dyn EbiTraitEventLog> {
-        let log: EventLog = self.into();
-        Box::new(log)
-    }
-}
+via_log!(EventLogCsv);
+via_log!(EventLogOcel);
+via_log!(EventLogPython);
+via_log!(EventLogXes);

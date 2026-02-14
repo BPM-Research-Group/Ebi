@@ -8,8 +8,8 @@ use crate::{
         deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
         directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
         directly_follows_model::EBI_DIRECTLY_FOLLOWS_MODEL, event_log_csv::EBI_EVENT_LOG_CSV,
-        event_log_python::EBI_EVENT_LOG_PYTHON, executions::EBI_EXECUTIONS,
-        finite_language::EBI_FINITE_LANGUAGE,
+        event_log_ocel::EBI_EVENT_LOG_OCEL, event_log_python::EBI_EVENT_LOG_PYTHON,
+        executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE,
         finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
         labelled_petri_net::EBI_LABELLED_PETRI_NET,
         language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS,
@@ -41,10 +41,10 @@ use ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         deterministic_finite_automaton::DeterministicFiniteAutomaton,
         directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel,
-        event_log_csv::EventLogCsv, executions::Executions, finite_language::FiniteLanguage,
-        finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet,
-        language_of_alignments::LanguageOfAlignments, process_tree::ProcessTree,
-        scalable_vector_graphics::ScalableVectorGraphics,
+        event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, executions::Executions,
+        finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage,
+        labelled_petri_net::LabelledPetriNet, language_of_alignments::LanguageOfAlignments,
+        process_tree::ProcessTree, scalable_vector_graphics::ScalableVectorGraphics,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
         stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
@@ -213,6 +213,10 @@ impl EbiOutputType {
             EbiOutputType::ObjectType(EbiObjectType::EventLogCsv) => EbiExporter::Object(
                 &EbiObjectExporter::EventLog(EventLogCsv::export_from_object),
                 &EBI_EVENT_LOG_CSV,
+            ),
+            EbiOutputType::ObjectType(EbiObjectType::EventLogOcel) => EbiExporter::Object(
+                &EbiObjectExporter::EventLog(EventLogOcel::export_from_object),
+                &EBI_EVENT_LOG_OCEL,
             ),
             EbiOutputType::ObjectType(EbiObjectType::EventLogPython) => EbiExporter::Object(
                 &EbiObjectExporter::EventLogPython(EventLogPython::export_from_object),
@@ -452,6 +456,7 @@ impl Display for EbiExporter {
 pub enum EbiObjectExporter {
     EventLog(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogCsv(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
+    EventLogOcel(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogTraceAttributes(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogXes(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogPython(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
@@ -484,6 +489,7 @@ impl EbiObjectExporter {
         match self {
             EbiObjectExporter::EventLog(_) => EbiObjectType::EventLog,
             EbiObjectExporter::EventLogCsv(_) => EbiObjectType::EventLogCsv,
+            EbiObjectExporter::EventLogOcel(_) => EbiObjectType::EventLogOcel,
             EbiObjectExporter::EventLogPython(_) => EbiObjectType::EventLogPython,
             EbiObjectExporter::EventLogTraceAttributes(_) => EbiObjectType::EventLogTraceAttributes,
             EbiObjectExporter::EventLogXes(_) => EbiObjectType::EventLogXes,
@@ -527,6 +533,7 @@ impl EbiObjectExporter {
             match self {
                 EbiObjectExporter::EventLog(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogCsv(exporter) => (exporter)(object, f),
+                EbiObjectExporter::EventLogOcel(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogPython(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogTraceAttributes(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogXes(exporter) => (exporter)(object, f),

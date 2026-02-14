@@ -101,6 +101,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
             }
             EbiInput::Object(EbiObject::EventLog(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::EventLogCsv(object), _) => object.bounded()?,
+            EbiInput::Object(EbiObject::EventLogOcel(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::EventLogPython(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::EventLogTraceAttributes(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::EventLogXes(object), _) => object.bounded()?,
@@ -258,6 +259,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
             }
             EbiInput::Object(EbiObject::EventLog(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::EventLogCsv(object), _) => object.any_traces()?,
+            EbiInput::Object(EbiObject::EventLogOcel(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::EventLogPython(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::EventLogTraceAttributes(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::EventLogXes(object), _) => object.any_traces()?,

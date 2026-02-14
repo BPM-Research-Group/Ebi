@@ -11,7 +11,7 @@ use ebi_objects::{
     LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    ebi_objects::{event_log_csv::EventLogCsv, process_tree::TreeMarking},
+    ebi_objects::{event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking},
 };
 
 pub trait Bounded {
@@ -165,6 +165,7 @@ usize!(StochasticDirectlyFollowsModel);
 usize!(FiniteLanguage);
 usize!(EventLog);
 usize!(EventLogCsv);
+usize!(EventLogOcel);
 usize!(EventLogPython);
 usize!(EventLogTraceAttributes);
 usize!(EventLogXes);

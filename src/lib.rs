@@ -36,6 +36,7 @@ pub mod ebi_file_handlers {
     pub mod directly_follows_graph;
     pub mod directly_follows_model;
     pub mod event_log_csv;
+    pub mod event_log_ocel;
     pub mod event_log_python;
     pub mod event_log_xes;
     pub mod executions;

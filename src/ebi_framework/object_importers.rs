@@ -4,9 +4,9 @@ use std::io::BufRead;
 
 use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject, EventLog, EventLogCsv,
-    EventLogXes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, LanguageOfAlignments,
-    ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
+    EventLogOcel, EventLogXes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet,
+    LanguageOfAlignments, ProcessTree, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     traits::importable::{Importable, ImporterParameterValues},
 };
@@ -61,6 +61,7 @@ macro_rules! import_as_object {
 import_as_object!(EventLog, event_log);
 import_as_object!(EventLogXes, event_log_xes);
 import_as_object!(EventLogCsv, event_log_csv);
+import_as_object!(EventLogOcel, event_log_ocel);
 import_as_object!(LabelledPetriNet, labelled_petri_net);
 import_as_object!(DirectlyFollowsModel, directly_follows_model);
 import_as_object!(

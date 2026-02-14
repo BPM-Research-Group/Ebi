@@ -555,6 +555,10 @@ pub enum EbiObjectImporter {
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
     ),
+    EventLogOcel(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
     EventLogXes(
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
@@ -626,6 +630,7 @@ impl EbiObjectImporter {
         match self {
             EbiObjectImporter::EventLog(_, _) => EbiObjectType::EventLog,
             EbiObjectImporter::EventLogCsv(_, _) => EbiObjectType::EventLogCsv,
+            EbiObjectImporter::EventLogOcel(_, _) => EbiObjectType::EventLogOcel,
             EbiObjectImporter::EventLogTraceAttributes(_, _) => {
                 EbiObjectType::EventLogTraceAttributes
             }
@@ -666,6 +671,7 @@ impl EbiObjectImporter {
         match self {
             EbiObjectImporter::EventLog(_, parameters) => parameters,
             EbiObjectImporter::EventLogCsv(_, parameters) => parameters,
+            EbiObjectImporter::EventLogOcel(_, parameters) => parameters,
             EbiObjectImporter::EventLogTraceAttributes(_, parameters) => parameters,
             EbiObjectImporter::EventLogXes(_, parameters) => parameters,
             EbiObjectImporter::DirectlyFollowsGraph(_, parameters) => parameters,
@@ -702,6 +708,7 @@ impl EbiObjectImporter {
         match self {
             EbiObjectImporter::EventLog(importer, _) => *importer,
             EbiObjectImporter::EventLogCsv(importer, _) => *importer,
+            EbiObjectImporter::EventLogOcel(importer, _) => *importer,
             EbiObjectImporter::EventLogTraceAttributes(importer, _) => *importer,
             EbiObjectImporter::EventLogXes(importer, _) => *importer,
             EbiObjectImporter::DirectlyFollowsGraph(importer, _) => *importer,

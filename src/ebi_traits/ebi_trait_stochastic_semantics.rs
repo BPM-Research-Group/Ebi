@@ -16,9 +16,7 @@ use ebi_objects::{
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TranslateActivityKey,
     ebi_objects::{
-        compressed_event_log::CompressedEventLog,
-        compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-        event_log_csv::EventLogCsv, process_tree::TreeMarking,
+        compressed_event_log::CompressedEventLog, compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes, event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking
     },
 };
 
@@ -106,6 +104,7 @@ via_fslang!(EventLog);
 via_fslang!(EventLogTraceAttributes);
 via_fslang!(EventLogXes);
 via_fslang!(EventLogCsv);
+via_fslang!(EventLogOcel);
 via_fslang!(EventLogPython);
 
 impl ToStochasticSemanticsTrait for StochasticProcessTree {
