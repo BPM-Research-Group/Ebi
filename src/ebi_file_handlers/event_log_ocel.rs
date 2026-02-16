@@ -5,10 +5,7 @@ use crate::ebi_framework::{
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     object_importers::{
-        ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogObject,
-        ImportAsFiniteLanguageObject, ImportAsFiniteStochasticLanguageObject,
-        ImportAsStochasticDeterministicFiniteAutomatonObject,
-        ImportAsStochasticNondeterministicFiniteAutomatonObject,
+        ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogObject, ImportAsEventLogTraceAttributesObject, ImportAsFiniteLanguageObject, ImportAsFiniteStochasticLanguageObject, ImportAsStochasticDeterministicFiniteAutomatonObject, ImportAsStochasticNondeterministicFiniteAutomatonObject
     },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait,
@@ -76,6 +73,10 @@ pub const EBI_EVENT_LOG_OCEL: EbiFileHandler = EbiFileHandler {
     object_importers: &[
         EbiObjectImporter::EventLog(
             EventLogOcel::import_as_event_log_object,
+            EventLogOcel::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::EventLogTraceAttributes(
+            EventLogOcel::import_as_event_log_trace_attributes_object,
             EventLogOcel::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::EventLogOcel(
