@@ -1,8 +1,3 @@
-use ebi_objects::{
-    EbiObject, EbiObjectType, EventLog, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet,
-    StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
-};
-
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
@@ -10,6 +5,10 @@ use crate::{
         ebi_output::{EbiOutput, EbiOutputType},
     },
     techniques::stochastic_markovian_abstraction::build_embedded_snfa,
+};
+use ebi_objects::{
+    EbiObject, EbiObjectType, EventLog, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet,
+    StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
 };
 
 pub const EBI_CONVERT: EbiCommand = EbiCommand::Group {
@@ -165,7 +164,7 @@ pub const EBI_CONVERT_SNFA: EbiCommand = EbiCommand::Command {
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[&[
-        &EbiInputType::Object(EbiObjectType::StochasticNondeterministicFiniteAutomaton), //every object that can be imported as an SDFA will be supported by the framework
+        &EbiInputType::Object(EbiObjectType::StochasticNondeterministicFiniteAutomaton), //every object that can be imported as an NDFA will be supported by the framework
         &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
     ]],
     input_names: &["FILE"],
