@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg width="292.5" height="312.5" viewBox="0 0 292.5 312.5" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="startarrow" markerWidth="10" markerHeight="7"
+refX="0" refY="3.5" orient="auto">
+<polygon points="10 0, 10 7, 0 3.5" />
+</marker>
+<marker id="endarrow" markerWidth="10" markerHeight="7"
+refX="10" refY="3.5" orient="auto">
+<polygon points="0 0, 10 3.5, 0 7" />
+</marker>
+
+</defs><style>
+.a15 { font-size: 15px; font-family: Times, serif; }
+</style>
+<ellipse cx="47.5" cy="160" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="145" class="a15"><tspan x = "47.5" dy="1.0em">0</tspan></text><ellipse cx="252.5" cy="47.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="252.5" y="32.5" class="a15"><tspan x = "252.5" dy="1.0em">1</tspan></text><ellipse cx="252.5" cy="142.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="252.5" y="127.5" class="a15"><tspan x = "252.5" dy="1.0em">1</tspan></text><ellipse cx="252.5" cy="272.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="252.5" y="257.5" class="a15"><tspan x = "252.5" dy="1.0em">0</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="150" y="32.5" class="a15"><tspan x = "150" dy="1.0em">a, 2/5</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="150" y="127.5" class="a15"><tspan x = "150" dy="1.0em">b, 1/5</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="150" y="201.25" class="a15"><tspan x = "150" dy="1.0em">c, 2/5</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="252.5" y="192.501" class="a15"><tspan x = "252.5" dy="1.0em">a, 1</tspan></text><path id="arrow0" d="M 61.5826722799714 149.6111434000211 C 85.7243961884938 131.80167494291442, 170 47.5, 200 47.5 S 205 47.5, 235 47.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+<text><textPath href="#arrow0" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><path id="arrow1" d="M 64.88590125171018 158.0048965776726 C 94.69030339749906 154.5847192822542, 170 142.5, 200 142.5 S 205 142.5, 235 142.5 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+<text><textPath href="#arrow1" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><path id="arrow2" d="M 63.91870566026988 166.05607995665693 C 92.06505822073254 176.43793131092593, 176.8695704794774 198.32165747869186, 200 216.25 S 220.08988310789948 237.77487475846374, 240.55943061869982 259.7065328057498 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+<text><textPath href="#arrow2" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><path id="arrow3" d="M 260.79684585614916 257.091809034176 C 275.0200101809763 230.6777673784777, 261.08595834430173 193.27783567517284, 287.5 207.501 S 275.0200101809763 230.6777673784777, 260.79684585614916 257.091809034176 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+<text><textPath href="#arrow3" startOffset="50%" text-anchor="middle" class="a15"></textPath></text></svg>

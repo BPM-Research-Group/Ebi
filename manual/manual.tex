@@ -1,0 +1,711 @@
+\documentclass{book}
+\usepackage{amsmath,amsfonts,booktabs,stmaryrd,tabularx,multirow,xfrac,nicematrix,listings,listings-rust}
+\usepackage{ltablex,comment}
+\usepackage{tikz}
+\usetikzlibrary{decorations.pathmorphing,calc,positioning}
+\usepackage{imakeidx}
+\makeindex
+\def\indexx#1{\index{#1}#1}
+\usepackage{geometry}
+
+\usepackage{amsmath,amsthm}
+\newtheorem{definition}{Definition}
+
+\usepackage{todonotes}
+\setuptodonotes{inline}
+\usepackage[british]{babel}
+\usepackage{wasysym}
+
+\definecolor{eclipseStrings}{RGB}{42,0.0,255}
+\definecolor{eclipseKeywords}{RGB}{127,0,85}
+\colorlet{numb}{magenta!60!black}
+\lstdefinelanguage{json}{
+    basicstyle=\normalfont\ttfamily,
+    commentstyle=\color{eclipseStrings}, % style of comment
+    stringstyle=\color{eclipseKeywords}, % style of strings
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    string=[s]{"}{"},
+    comment=[l]{:\ "},
+    morecomment=[l]{:"},
+    literate=
+        *{0}{{{\color{numb}0}}}{1}
+         {1}{{{\color{numb}1}}}{1}
+         {2}{{{\color{numb}2}}}{1}
+         {3}{{{\color{numb}3}}}{1}
+         {4}{{{\color{numb}4}}}{1}
+         {5}{{{\color{numb}5}}}{1}
+         {6}{{{\color{numb}6}}}{1}
+         {7}{{{\color{numb}7}}}{1}
+         {8}{{{\color{numb}8}}}{1}
+         {9}{{{\color{numb}9}}}{1}
+}
+\lstdefinelanguage{ebilines}{
+    basicstyle=\normalfont\ttfamily,
+    commentstyle=\color{eclipseStrings}, % style of comment
+    stringstyle=\color{eclipseKeywords}, % style of strings
+    numbers=left,
+    numberstyle=\scriptsize,
+    stepnumber=1,
+    numbersep=8pt,
+    showstringspaces=false,
+    breaklines=true,
+    frame=lines,
+    morecomment=[f][\color{numb}][0]{\#},
+}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+
+
+\input{functions}
+
+\title{Ebi - a stochastic process mining tool\\{\small\version}\\Manual}
+\author{The BPM group at RWTH Aachen University\\
+Sander J.J. Leemans, Tian Li, Leonhard Mühlmeyer, Philipp Moch, Adam Burke}
+\date{\today}
+
+\DeclareMathOperator{\logdiv}{logdiv}
+\DeclareMathOperator{\Logdiv}{Logdiv}
+\newcommand\xsnakearrow[1]{\overset{#1}{\rightsquigarrow}}
+\DeclareMathOperator{\multisetminus}{\mathbin{{\setminus}\mspace{-7mu}{-}}}
+\DeclareMathOperator{\entrel}{\smash{\text{ER}}}
+
+\def\ebiCommand#1{\texttt{#1}}
+
+\usepackage{hyperref}
+\hypersetup{pdfpagelayout=TwoPageRight}
+\usepackage{cleveref}
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\clearpage
+\chapter{Ebi: introduction}
+	Ebi is a process mining tool, ProM plug-in and library, and is focused on stochastic process mining algorithms.
+	Ebi works completely offline and installation is in most cases not necessary.
+		
+	A command is an algorithm in Ebi that a user can call.
+	Ebi has \numberofcommands{} commands; for an overview of commands please refer to \cref{sec:commands} or give the command-line parameter \verb=--help=.
+	\numberoffilehandlers{} different types of files are supported; \cref{sec:filehandlers} contains an overview of the files that Ebi supports.
+	
+	The architecture of Ebi and how to develop new commands can be found in \cref{sec:architecture}.
+	
+	\section{Command-line application}
+		Ebi can be used as a stand-alone command-line application; installation is not necessary.
+		
+		On Windows, simply download the executable from \url{http://ebitools.org} and run it from a console.
+		
+		On Linux, simply download the executable from \url{http://ebitools.org}, give the file execution permissions, and run it from a console.
+		
+		On Mac OS X, self-compilation is required. 
+		Please refer to \url{http://ebitools.org} and click through to the source code for a getting-started of 5 easy steps.
+		
+	\section{Java/ProM plug-in}
+		Ebi can be used as a plug-in of the ProM framework~\cite{DBLP:conf/bpm/VerbeekBDA10} (\url{https://promtools.org}) on Windows and Linux. 
+		ProM has limited support for Mac OS X.
+		
+		To install, open the ProM Package Manager and install the \verb=Ebi= package.
+		Then, a selection of Ebi commands can be run, just as any other ProM plug-in.
+		
+		The following commands are available as ProM plug-ins:
+		\promcommands
+
+    \section{Python/PM4Py plug-in}
+        Ebi can be used as a plug-in of the PM4Py Python library~\cite{DBLP:journals/simpa/BertiZS23} (\url{https://pm4py.org}).
+        
+        \subsection*{Installation}
+            Ebi can be installed in Python using \verb=pip install ebi-pm=.
+
+            The Ebi Python library is available on Windows, Mac OS and Linux. 
+
+            %Alternatively, Ebi can be installed in Python manually:
+            %first set up Ebi for local development,
+            %install Maturin, and generate a .whl file using \verb=maturin build --features python=.
+            %Finally, install the Ebi python package using \verb=pip install ⟨file name⟩.whl -force-reinstall=.
+
+        \subsection*{Usage}
+            Every command can be used as a Python plug-in; the function name can be found with the respective command in \cref{sec:commands}.
+        
+            Then, Ebi can be used as follows:
+            \begin{lstlisting}[language=python, style=boxed]
+import pm4py
+import ebi-pm
+# Load a log using PM4Py
+log = pm4py.read_xes("myLog.xes", return_legacy_log_object=True)
+# Load a model as a string
+with open('mymodel.slpn', 'r') as file:
+    model = file.read()
+# Call the Ebi function
+result = ebi.conformance_earth_movers_sample(
+    log,
+    model,
+    1000
+)
+print(result)\end{lstlisting}
+
+            Currently, logs, Petri nets, process trees and numbers are linked to the PM4Py data structures.
+            All other Ebi inputs and outputs are treated as strings.
+            The inputs of a command function in Python are the mandatory parameters, indicated by $\langle$ $\rangle$ at the command in this manual.
+            The optional parameters cannot be given from Python, and neither can the output format be selected.
+
+    \section{Rust crate}
+                Ebi can be used as a Rust crate, available on \href{https://crates.io/crates/ebi}{crates.io}.
+
+                To add it a Rust project, add the following line to the \texttt{cargo.toml} file in the \texttt{[dependencies]} section:
+                \begin{lstlisting}[language=rust, style=boxed]
+ebi = "*"\end{lstlisting}
+
+                It may be necessary to Box an object and to cast it to a trait in order to call certain commands on it (due to the runtime type checking that Ebi performs). 
+                For instance:
+                \begin{lstlisting}[language=rust, style=boxed]
+use std::fs;
+use ebi_objects::FiniteStochasticLanguage;
+use ebi::ebi_objects::{
+    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
+};
+
+let fin1 = fs::read_to_string("log1.slang").unwrap();
+let mut object_a: Box<dyn EbiTraitFiniteStochasticLanguage> =
+    Box::new(fin1.parse::<FiniteStochasticLanguage>().unwrap());
+
+let fin2 = fs::read_to_string("log2.slang").unwrap();
+let mut object_b: Box<dyn EbiTraitFiniteStochasticLanguage> =
+    Box::new(fin2.parse::<FiniteStochasticLanguage>().unwrap());
+
+// Compute EMSC
+let emsc = object_a
+    .earth_movers_stochastic_conformance(object_b.as_mut())?;\end{lstlisting}
+
+	\section{Speed tricks}
+	\label{sec:speedtricks}
+		\begin{enumerate}
+			\item
+			\label{speedtrick:multithreaded}
+			If Ebi uses all CPU cores and runs out of RAM, one can try to reduce the CPU cores that Ebi will use by setting the environment variable \verb!RAYON_NUM_THREADS=1! or some other desired number of cores.
+			This will trade run time for RAM in multi-threaded algorithms.
+
+			\item By default, Ebi uses exact arithmetic for most commands.
+			To disable this, provide the \verb=-a= parameter.
+			The results are then not guaranteed, but it may be faster.
+
+   			\item By default, Ebi is compiled with support for both exact and approximate arithmetic, and the user can select the arithmetic with the \verb=-a= parameter.
+            However, this comes with a performance penalty.
+            By selecting one of the features \verb=exactarithmetic= or \verb=approximatearithmetic=, the arithmetic is chosen at compilation time, yielding a performance benefit.
+
+            To do this, use \verb=cargo run --features exactarithmetic=, but a faster binary is obtained by compiling for release: \verb=cargo build --release --features exactarithmetic=.
+		\end{enumerate}
+
+\chapter{Commands}
+\label{sec:commands}
+
+	This chapter lists the commands supported by Ebi.
+
+    \ebicommands
+
+\chapter{Supported files}
+\label{sec:filehandlers}
+	This chapter lists the file types that are supported by Ebi, and for each file type which commands can use it as input or produce it as output.
+	
+    Please note that Ebi does not consider input file extensions.
+    Instead, it will attempt to parse the input file in all of the formats that are supported by the called command.
+    For plug-ins with multiple output file formats, the file extension is used to determine the output format.
+    
+    \ebifilehandlers
+
+\chapter{Architecture}
+\label{sec:architecture}
+
+    Figure~\ref{fig:traits} shows the main architectural concepts of Ebi with regards to files and objects.
+    It's a bit verbose, but it enables commands to be completely detached from any I/O, and reduces overhead when adding new functionality, and guarantees the documentation is up-to-date.
+
+    \begin{figure}[tb]
+        \centering
+        \begin{tikzpicture}
+            \def\dx{1.5cm}
+            \def\dy{1cm}
+            \node (command) {command\strut};
+
+            \node (trait) [left=\dx of command] {trait\strut};
+
+            \node (objecttype) [left=\dx of trait, align=center] {object\\type};
+
+            \node (filehandler) [left=\dx of objecttype, align=center] {file\\handler};
+
+            \draw [->] (objecttype) to node[above, font=\scriptsize] {implements} (trait);
+            \draw [->] (trait) to node[above, font=\scriptsize] {input to} (command);
+
+            \draw [->, out=-20, in=200] (objecttype) to node[below, font=\scriptsize] {input to} (command);
+
+            \draw [->] (filehandler) to node[above, font=\scriptsize] {imports} (objecttype);
+
+            \node [align=center] (inputtype) at ($(trait)!0.5!(command)+(0,\dy)$) {input\\type};
+            \draw [dotted] (inputtype) to ++(0,-2*\dy);
+            
+        \end{tikzpicture}\\
+        \begin{tikzpicture}
+            \def\dx{1.5cm}
+            \def\dy{1cm}
+            \node (command) {command\strut};  
+
+            \node (objecttype) [left=\dx of trait, align=center] {object\\type};
+
+            \node (filehandler) [left=\dx of objecttype, align=center] {file\\handler};
+
+            \draw [<-, out=-20, in=200] (objecttype) to node[below, font=\scriptsize] {output of} (command);
+
+            \draw [<-] (filehandler) to node[above, font=\scriptsize] {exported by} (objecttype);
+
+            \node [align=center] (inputtype) at ($(trait)!0.5!(command)+(0,\dy)$) {output\\type};
+            \draw [dotted] (inputtype) to ++(0,-2*\dy);
+            
+        \end{tikzpicture}
+        \caption{Traits and object types in Ebi.}
+        \label{fig:traits}
+    \end{figure}
+        
+    % \newgeometry{top=1mm,bottom=1mm,right=30mm,left=30mm}
+    %     \includegraphics[width=0.5\linewidth]{graph}
+    % \restoregeometry
+
+        A command is a function of Ebi that users can call.
+        A command declares what types of inputs it needs and what type of output it generates. 
+        Preferably, commands take traits as inputs rather than object types.
+
+        Commands can circumvent the Ebi object handling on their inputs by declaring an \texttt{cli\_command} function, which gives direct access to the command line interface building process.
+        This is for instance used in the \ebiCommand{validate} command, where we want to obtain the parsing error for a particular object type.
+
+        The actual input for a command gets wrapped in the \texttt{EbiInput} enum, and the output must be wrapped in the \texttt{EbiOutput} enum.
+        The Ebi machinery verifies whether the output of a command matches the declared output type at run time.
+        
+        Commands define a number of inputs, and for each input a list of acceptable types.
+        However, these types need to be similar: a command cannot ask for either a file and a fraction, for instance.
+        For the commands of Ebi, please refer to \cref{sec:commands}.
+    
+        An input type is a declaration of what a command needs as input.
+        An input type can be:
+        \begin{itemize}
+            \item a trait;
+            \item an object type;
+            \item a basic data type such as fraction, integer or string. A fraction and an integer can have a minimum, a maximum and a default value; a string can have a list of allowed values and a default value;
+            \item the ``any object" input type, which denotes that any object type will be accepted;
+            \item a ``file handler", which indicates the (name of) a file handler (for instance used in the \ebiCommand{validate} command).
+        \end{itemize}
+
+        The actual input for a command gets wrapped in the \texttt{EbiInput} enum.
+    
+    \section{Traits}
+    \label{sec:traits}
+        A ``trait" is like an interface: it provides some functions but does not say how these are implemented.
+        For instance ``finite stochastic language" is a trait, which allows to iterate over traces and their probabilities, and to obtain the number of traces.
+        Preferably, commands should require traits as inputs.
+
+        Ebi has the following traits:
+        \ebitraitlist
+    
+    \section{Object types}
+    \label{sec:objecttypes}
+        An object type is a struct or class.
+        It is a specific implementation with a fixed data structure.
+        The output of a command is an object of a specific object type.
+        The input of a command rather not uses object types, but sometimes this is unavoidable.
+        Objects are wrapped in an \texttt{EbiObject} enum to ensure type safety by the compiler.
+
+        Ebi has the following object types; please refer to the \href{https://docs.rs/ebi_objects/0.3.111/ebi_objects/ebi_objects/index.html}{documentation} for more information.
+        \ebiobjecttypelist
+    
+    \section{File handlers}
+        A file handler is an importer for a particular file format.
+        In Ebi, a file handler defines how a file type is to be handled, and as which objects and traits it can be imported, and which objects can be exported to it.
+
+        Ebi has the following file handlers:
+        \ebifilehandlerlist
+
+        \clearpage
+        \subsection{File Handlers $\rightarrow$ Objects (importers)}
+            \filehandlersobjecttypes
+
+        \clearpage
+        \subsection{File Handlers $\rightarrow$ Traits (importers)}
+            \filehandlerstraits
+        
+        \clearpage
+        \subsection{Objects $\rightarrow$ file handlers (exporters)}
+        \objecttypesfilehandlers
+        In this table, \CIRCLE{} means that the export is always possible, and \LEFTcircle{} means that a conversion is involved that may fail.
+            
+	\section{Implementing a new command/algorithm/technique}
+	\label{sec:implement}
+		There are two steps to take: set up the technique (that is, the implementation), and set up the command (i.e. where \& how Ebi can call it).
+		
+		\subsection{Conventions and Hints}
+			\begin{enumerate}
+				\item Ebi only uses floating point numbers (f64) when the user asks for it.
+				Commands should use \verb=Fraction= or other exact numeric classes (see \cref{sec:exact}); these perform computations with the arithmetic type selected by the user.
+				\item It is important that errors are propagated appropriately.
+				Therefore, avoid \verb=.unwrap()= but instead propagate errors using \verb=.with_context(|| "error message")?=.
+				The \verb=anyhow= package formats the error messages nicely to the user.
+				\item For speed considerations, avoid .clone(), but use references instead, especially on heap-based structs such as \verb=Fraction=.
+				\item \verb|a += b| is usually faster than \verb|c = a + b|, as it saves a memory allocation, especially on heap-based structs such as \verb=Fraction=.
+				\item Rather than using a numeric struct, using traits such as \verb=Add= and \verb=Mul= allows code to be used regardless of the arithmetic type.
+				\item To provide debug output, avoid \verb=println= as it prevents piping of results, but use \verb=log::info()= or \verb=log::debug()= instead.
+				For consistency, Ebi provides two types of progress bars: one where a total integer number of steps is available, and one where a message is used that can be updated, e.g. to denote a probability:
+\begin{lstlisting}[language=Rust, style=boxed]
+EbiCommand::get_progress_bar_ticks(total_steps);
+EbiCommand::get_progress_bar_message(message);
+\end{lstlisting}
+                \item Compilation for release will fail if there are any warnings.
+			\end{enumerate}
+            
+		\subsection{The technique}
+			The technique is the place where the code for the algorithm lives.
+			This should go in its own file in the \verb=techniques= folder.
+			As an example, we'll use the unit Earth Movers' Stochastic Conformance, (uEMSC) which takes a finite stochastic language (log) and a queriable stochastic language (model), and returns a fraction to indicate the conformance of the log and model.
+			
+			\begin{enumerate}
+				\item First, decide on the input and output of your technique.
+				
+				For the inputs, preferably use Ebi traits for the inputs whenever possible: as the framework expands, all new objects and files will be automatically supported by your technique.
+				See \cref{sec:traits} for an overview of Ebi traits.
+				Alternatively, object types can be used as inputs; please see \cref{sec:objecttypes} for an overview of available object types.
+				
+				For our example, uEMSC needs to walk through a finite set of traces (EbiTraitFiniteStochasticLanguage) and needs to ask the model for a probability of each trace (EbiTraitQueriableStochasticLanguage).
+				
+				For the output: Ebi supports only a single output.
+				Ebi deliberately does not support floating point numbers (f32, f64) as these are not exact (see \cref{sec:exact}).
+				
+				For our example, the output of uEMSC is a fraction.
+				
+				\item Second, create a Rust trait that will contain the method to call.
+				The idea is that this trait will be implemented on one of the Ebi traits, such that it can be called for each Rust struct for which it is available.
+				
+				For our example, we define a Rust trait that will be implemented on the log (that is, \texttt{self} will be the log):
+\begin{lstlisting}[language=Rust, style=boxed]
+use anyhow::Result;
+
+pub trait UnitEarthMoversStochasticConformance {
+    fn unit_earth_movers_stochastic_conformance(
+    	&self, 
+    	language2: Box<dyn EbiTraitQueriableStochasticLanguage>
+    ) -> Result<Fraction>;
+}
+\end{lstlisting}				
+				
+				 \item Third, implement the new Rust trait for the appropriate struct and/or trait.
+				 
+				 For our example:
+\begin{lstlisting}[language=Rust, style=boxed]
+impl UnitEarthMoversStochasticConformance 
+for dyn EbiTraitFiniteStochasticLanguage {
+    fn unit_earth_movers_stochastic_conformance(
+    	&self, 
+    	mut language2: Box<dyn EbiTraitQueriableStochasticLanguage>
+    ) -> Result<Fraction> {   
+    	... here comes the algorithm ...
+    }
+}
+\end{lstlisting}
+
+				In case the inputs involve the Ebi traits \texttt{EbiTraitSemantics}, \texttt{EbiTraitStochasticSemantics} or \texttt{EbiTraitStochasticDeterministicSemantics} (or any other Ebi-trait-that-is-actually-an-enum), one more step is necessary: one has to implement the new Rust trait (e.g. \texttt{UnitEarthMoversStochasticConformance}) for these enums, as well as for the actual trait.
+				An example of this can be found in the file \verb=techniques\align.rs=.
+			\end{enumerate}
+			
+		\subsection{The command}
+			Having implemented the algorithm, Ebi needs to be made aware of the new technique, by creating commands for it.
+			
+			\begin{enumerate}
+				\item Identify the position in the command tree where your command will live.
+				This tree can be found in the \verb=ebi_commands= folder.
+				By convention, first-level sub-commands (such as \verb=Ebi conformance=) get their own file, and this file contains all commands within that sub-command.
+				
+				\item Add a new command to this file.
+				Most of the fields are self-explanatory, and we explain the key ones here:
+				\begin{itemize}
+					\item \verb=latex_link= will end up in the manual, and can be used to cite a paper where the algorithm is explained.
+					
+					\item \verb=cli_command= provides access to the command line interface arguments that the user provided.
+					This should be \verb=None= for the far majority of plug-ins.
+					If it is not \verb=None=, then the command will not be callable from external libraries (such as ProM, PM4PY or Knime).
+					Furthermore, parameters defined through \verb=cli_command= are not read, parsed or imported by the Ebi framework.
+					An example of an optional attribute can be found in \verb=ebi_commands/ebi_command_association.rs=.
+					
+					\item \verb=exact_arithmetic= indicates whether your plug-in \emph{can} handle exact arithmetic. 
+					That is, even if this is \verb=true=, the user can still disable exact arithmetic (which will be handled by Ebi).
+					The far majority of plug-ins support exact arithmetic; only set this to \verb=false= if exact arithmetic is unbearably slow.
+					
+					\item \verb=input_types= gives a sequence of inputs.
+					That is, the number of inputs is fixed per command (unless through \verb=cli_command=).
+					Each input is again a list of possible traits or objects that can be accepted.
+					For each input, Ebi will try to parse the file given, and return the first trait/object type using which the file can be parsed.
+					
+					\item \verb=execute= should call the implemented algorithm.
+					As a first step, the inputs should be retrieved from the variable \verb=inputs=, and transformed into the correct types.
+					Ebi tests the \verb=execute= function automatally, see \cref{sec:tests}.
+					
+					The output of the algorithm should be wrapped in the appropriate \verb=EbiOutput= enum.
+					
+					\item \verb=output_type= indicates the single output type of the command.
+                    Ebi automatally tests whether the output of \verb=execute= matches the declared \verb=output_type=; see \cref{sec:tests}.
+					
+				\end{itemize}
+				
+				For our example:
+
+\begin{lstlisting}[language=Rust, style=boxed]		
+pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
+    name_short: "uemsc",
+    name_long: ... , 
+    explanation_short: ... , 
+    explanation_long: ... , 
+    latex_link: ... , 
+    cli_command: None, 
+    exact_arithmetic: true, 
+    input_types: &[ 
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)], 
+        &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)]
+    ], 
+    input_names: &["FILE_1", "FILE_2"], 
+    input_helps: &[
+    	"A finite stochastic language (log) to compare.", 
+    	"A queriable stochastic language (model) to compare."
+    ],
+    execute: |mut inputs, _| {
+        let log = 
+        	inputs.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let model =
+        	inputs.remove(0).to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
+        let uemsc =
+        	log.unit_earth_movers_stochastic_conformance(model)
+        	.context("cannot compute uEMSC")?;
+        Ok(EbiOutput::Fraction(uemsc))
+    },
+    output_type: &EbiOutputType::Fraction
+};
+\end{lstlisting}
+				
+				\item Add your command to the higher-level command.		
+				At the top of the file, there is a command declaration (e.g. \verb=EBI_CONFORMANCE=) that contains the sub-commands.
+				Add your new command here, while maintaining the alphabetical order.
+			\end{enumerate}
+
+        \subsection{Tests}
+        \label{sec:tests}
+            Ebi automatically tests each command, importer, exporter, graphable and infoable, if a corresponding test file is provided in the \verb=testfiles= folder.
+            Files with \verb=_invalid= in their file names must not be importable using any importer, that is, importing should give an error message for the test to pass.
+
+            Ebi tests every command automatally.
+            The following commands will however \emph{not} be tested automatically:
+            \begin{itemize}
+                \item A command that manipulates the command-line interface (i.e. \verb=cli_command= is not \verb=None=);
+            \end{itemize}
+            The automated command test will fail if either:
+            \begin{itemize}
+                \item There is no (combination of) test files in the \verb=testfiles= folder that allows the command to be run.
+                \item The \verb=execute= function of the command panics.
+                Note that it is fine to return an error message, as this is normal behaviour.
+                \item The \verb=execute= function returns an object that does not match the \verb=output_type= field of the command.
+                \item The total time of all the command tests together exceeds 5 minutes.
+            \end{itemize}
+            Note that every combination of files in the \verb=testfiles= folder to which the command applies is tested.
+            Tests will be performed using all applicable arithmetic modes (exact/approximate) for each command, thus respecting the \verb=exact_arithmetic= command parameter.
+
+            Further tests can (and should) be located at the bottom of the relevant source file, following Rust conventions.
+            For instance:
+\begin{lstlisting}[language=Rust, style=boxed]
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    #[test]
+    fn a_test() {
+        let fin = fs::read_to_string("testfiles/aa.ptree").unwrap();
+        let tree = fin.parse::<ProcessTree>().unwrap();
+        ... here comes the test ...
+    }
+}
+\end{lstlisting}
+
+            Tests can be run using \verb=cargo test=, and test coverage can be obtained using \verb=cargo llvm-cov --html=.
+		
+
+    \section{Exact Computation}
+    \label{sec:exact}
+        In Ebi, several computations are performed without rounding.
+        To this end, it uses positive fractions: 
+        $$\mathbb{Q} = \{ \frac{x}{y} \mid x, y \in \mathbb{N} \}$$
+    
+        Fractions are well-supported by standard libraries.
+        Even for seemingly small fractions, the natural numbers that compose the fraction can get \emph{huge}.
+        Therefore, simple 32 or 64 bit integers do not suffice for $x$ and $y$, and a large, unbounded, integer library is necessary.
+    
+        By default, Ebi uses exact arithmetic, unless it is disabled by a function explicitly.
+        This can be done with \verb=Fraction::set_exact_globally(exact: bool)=.
+        Please note that exact and approximate (double precision) arithmetic cannot be combined, thus functions should set this function as early as possible.
+
+        \subsection{Square roots}
+            Square roots can only be expressed in $\mathbb{N}$ or in $\mathbb{I}$.
+            Thus, we need to represent square roots symbolically.
+            For this, we use the following operations:
+            \begin{align*}
+                \frac{a}{b} ={}& \sqrt{\frac{a^2}{b^2}}\\
+                \sqrt{a} \sqrt{b} ={}& \sqrt{a b}\\
+                \frac{\sqrt{a}}{\sqrt{b}} ={}& \sqrt{\frac{a}{b}}
+            \end{align*}
+    
+            Thus, we can represent all of these square root operations with the square root of a fractional number.
+
+        \subsection{Logdiv}
+            Logarithms can often not be expressed in $\mathbb{Q}$.
+            For instance, $\log_2(3) \notin \mathbb{Q}$ is not a rational number.
+            To perform computations exactly and to delay rounding to the very last moment, Ebi uses \emph{log division} objects.
+            That is, computations that involve logarithms are performed symbolically in order not to have to evaluate the logarithm.
+            
+            A log division object ($\logdiv$) is a base-2 logarithm of a positive fraction, divided by a natural number:
+            \begin{align*}
+                \logdiv &{}\colon \mathbb{Q} \times \mathbb{N} \rightarrow \mathbb{I}\\
+                \logdiv(\frac{a}{b}, c) &{}= \frac{\log(\frac{a}{b})}{c}\\
+                &{}= \log \sqrt[\leftroot{-1}\uproot{2}\scriptstyle c]{\frac{a}{b}}
+            \end{align*}
+
+            \paragraph*{From a fraction}
+                Any non-negative fraction can be written as a $\logdiv$:
+                \begin{align*}
+                    \frac{a}{b} ={}& \frac{\log(2^a)}{b} \\
+                    {}={}& \logdiv(\frac{2^a}{1}, b)
+                \end{align*}
+    
+            \paragraph*{Sum \& Difference}
+                $\Logdiv$s are closed under addition:
+                \begin{align*}
+                    \logdiv(\frac{a}{b}, c) + \logdiv(\frac{d}{e}, f) = {}& 
+                    \frac{\log(\frac{a}{b})}{c} + \frac{\log(\frac{d}{e})}{f}\\
+                    {}={}& \frac{f\log(\frac{a}{b}) + c\log(\frac{d}{e})}{cf}\\
+                    {}={}& \frac{\log(\frac{a^f}{b^f}) + \log(\frac{d^c}{e^c})}{cf}\\
+                    {}={}& \frac{\log(\frac{a^f d^c}{b^f e^c})}{cf}\\
+                    {}={}& \logdiv(\frac{a^f d^c}{b^f e^c}, cf)
+                \end{align*}
+                As $a$, $b$, $c$, $d$, $e$ and $f$ are all positive integers, the sum of two $\logdiv$s is also a $\logdiv$.
+                Similarly, for subtraction:
+                \begin{align*}
+                    \logdiv(\frac{a}{b}, c) - \logdiv(\frac{d}{e}, f) = {}& 
+                    \frac{\log(\frac{a}{b})}{c} - \frac{\log(\frac{d}{e})}{f}\\
+                    {}={}& \frac{\log(\frac{a^f}{b^f}) - \log(\frac{d^c}{e^c})}{cf}\\
+                    {}={}& \frac{\log(\frac{a^f}{b^f} / \frac{d^c}{e^c})}{cf}\\
+                    {}={}& \logdiv(\frac{a^f e^c}{b^f d^c}, cf)\\
+                \end{align*}
+                As $a$, $b$, $d$ and $e$ are all positive integers, the difference between two $\logdiv$s is also a $\logdiv$.
+
+            \paragraph*{Additive identity (0)}
+                The additive identity of $\logdiv$ is $\logdiv(\frac{1}{1}, 1) = 0$.
+                
+                While there are infinitely many $\logdiv$s that equal 0, such as $\logdiv(\frac{5}{5}, 100) = 0$, only a second argument of 1 guarantees that addition and subtraction work as intended.
+                
+            \paragraph*{$n \log n$}
+                Given a fraction $\frac{a}{b} \in \mathbb{Q}$, the value $\frac{a}{b} \log \frac{a}{b}$ can be represented by
+                \begin{align*}
+                    \frac{a}{b} \log \frac{a}{b} ={} & 
+                    \frac{a \log(\frac{a}{b})}{b}\\
+                    {}={}& \frac{\log(\frac{a^a}{b^a})}{b}\\
+                    {}={}& \logdiv(\frac{a^a}{b^a}, b)\\
+                \end{align*}
+
+            \paragraph*{Approximation}
+                In order to provide readable results that can be used in other tools, at the end of the computation chain, $\logdiv$s need to be approximated to a fraction.
+                To this end, we consider that:
+                \begin{align*}
+                    \logdiv(\frac{a}{b}, c) ={}& \frac{\log(\frac{a}{b})}{c}
+                \end{align*}
+    
+                Thus, we need to compute $\log(q)$ with $q \in \mathbb{Q}$.
+                As the libraries we use do not support computing logarithms on fractions with arbitrary large representations, we must implement this ourselves.
+
+                \subparagraph{Taylor expansion}
+                    Using Taylor expansion, we translate the approximation of the logarithm base 2 to $q$ to smaller and smaller values, until we end up with a $q' \leq 2$.
+                    That is, we repeatedly divide $q$ by two and add one to the result, until $q$ drops below 2.
+                    Then, we can approximate $\log_2(q)$ with a Taylor series on the natural logarithm\footnote{\url{https://en.wikipedia.org/wiki/Logarithm}}.
+                    
+                    \begin{align*}
+                        \log(q) ={}& \begin{cases}
+                            1 + \log(\frac{q}{2}) & \text{ if } q > 2\\ 
+                            \frac{\ln(q)}{\ln(2)} & \text{ if } 0 < q \leq 2
+                        \end{cases}\\
+                        \ln(q) ={}& \sum_{k=1}^{\infty} (-1)^{k+1} \frac{(z-1)^k}{k} \text{ for } 0 < q \leq 2
+                    \end{align*}
+                    We then approximate $\ln(q)$ up until the terms become small enough for the required precision.
+
+                \subparagraph{Bits}
+                    As even standard multiplications are expensive for fractions, we need a more efficient strategy to bring the approximation to acceptable speed:
+                    \begin{itemize}
+                        \item If $\frac{a}{b} < \frac{1}{2}$:
+                        \begin{align*}
+                            \log(\frac{a}{b}) ={}& \log(a) - \log(b)\\
+                            {}={}& -(\log(b) - \log(a))\\
+                            {}={}& -\log(\frac{b}{a})
+                        \end{align*}
+                        In which $\frac{b}{a}$ is larger than 2.
+    
+                        Complexity: pointer swap.
+                        
+                        \item While $\frac{a}{b} > 1$:
+                        \begin{align*}
+                            \log(\frac{a}{b}) ={}& \begin{cases}
+                                1 + \log(\frac{a}{2b}) & \text{if } a \text{ is odd}\\
+                                1 + \log(\frac{a/2}{b}) & \text{if } a \text{ is even} \end{cases}
+                        \end{align*}
+                        Complexity: for each iteration a left or right bit shift plus a comparison (right bit shift).
+                        
+                        \item Then, $\frac{1}{2} < \frac{a}{b} < 1$.
+                        %https://math.stackexchange.com/questions/1706939/approximation-log-2x
+                        As $a$ and $b$ may be \emph{huge}, we cannot easily translate our fraction to a standard floating-point number.
+                        Therefore, we use the following procedure to obtain as many digits as necessary for the required precision (where 3.3 bits yield one decimal):
+                        \begin{align*}
+                            \log(\frac{a}{b})_n ={}& \begin{cases}
+                                1 & \text{if } a = b\\
+                                \log(\frac{a^2}{2 b^2})_{n+1} - \frac{1}{2^n} & \text{if } \frac{a^2}{b^2} > 2 \qquad \text{report a binary } 1\\
+                                \log(\frac{a^2}{b^2})_{n+1} & \text{otherwise} \qquad \text{report a binary } 0\\
+                            \end{cases}
+                        \end{align*}
+                        In which $n$ denotes the iteration.
+    
+                        Complexity: two multiplications and at most one bit shift per bit precision.
+                        As multiplications are prohibitively expensive, and squaring roughly doubles the number of bits each iteration, we truncate $a$ and $b$ by the same number of bit-shifts every iteration, such that in each number enough bits are left.
+                    \end{itemize}
+
+        \subsection{RootLogDiv}
+            A RootLogDiv is the following:
+            \begin{align*}
+                \text{RootLogDiv}(\frac{a}{b},c) ={}& \sqrt{\logdiv(\frac{a}{b}, c)}\\
+                {}={}& \sqrt{\frac{\log\frac{a}{b}}{c}}& 
+            \end{align*}
+
+            There is an option to perform the 1- operation on a RootLogDiv.
+
+    \section{ProM support}
+        Ebi automatically exports the commands it supports to ProM.
+        A command is automatically supported if:
+        \begin{enumerate}
+            \item The command does not access the command line directly.
+            That is, \verb=cli_command= of the command must be \verb=None=.
+            \item There is a combination of inputs to the command that are all supported by ProM.
+            The following input types are supported by ProM:
+            \ebiprominput
+            
+            \item The output of the command is supported by ProM.
+            The following output types are supported by ProM:
+            \ebipromoutput
+        \end{enumerate}
+        For each combination of input parameter types and output types, one plug-in is added to ProM automatically.
+            
+    \bibliographystyle{plain}
+    \bibliography{bibliography}
+
+    \printindex
+\end{document}

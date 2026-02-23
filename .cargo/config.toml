@@ -1,0 +1,3 @@
+[env]
+GUROBI_HOME = "/Library/gurobi1202/macos_universal2"
+GUROBI_LIBNAME = "gurobi120"

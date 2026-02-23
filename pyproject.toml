@@ -1,0 +1,24 @@
+[project]
+name = 'ebi-pm'
+dynamic = ["version"]
+dependencies = [
+  "pm4py"
+]
+authors = [
+  {name = "Sander Leemans"},
+  {name = "Tian Li"},
+  {name = "Philipp Moch"},
+  {name = "Leonhard Mühlmeyer"},
+  {name = "Adam Burke"}
+]
+description = "Ebi: a stochastic process mining utility"
+readme = "README.md"
+keywords = ["process mining", "stochastic process mining", "business process analysis"]
+
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+bindings = "pyo3"
+features = [ "python", "pyo3/extension-module" ]

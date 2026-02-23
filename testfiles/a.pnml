@@ -1,0 +1,25 @@
+<pnml>
+ <net id="Rust PetriNet Export" type="http://www.pnml.org/version-2009/grammar/pnmlcoremodel">
+  <page id="n0">
+   <place id="00d13d78-0e36-432e-9130-2a44b853a740">
+    <initialMarking>
+     <text>1</text>
+    </initialMarking>
+   </place>
+   <transition id="40aab7a5-f227-405d-8389-fdb38c7c8ee6">
+    <name>
+     <text>a</text>
+    </name>
+   </transition>
+
+   <arc 
+     id="00d13d78-0e36-432e-9130-2a44b853a74040aab7a5-f227-405d-8389-fdb38c7c8ee6"
+     source="00d13d78-0e36-432e-9130-2a44b853a740" 
+     target="40aab7a5-f227-405d-8389-fdb38c7c8ee6">
+    <inscription>
+     <text>1</text>
+    </inscription>
+   </arc>
+  </page>
+ </net>
+</pnml>

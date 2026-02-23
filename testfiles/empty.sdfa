@@ -1,0 +1,4 @@
+{
+"transitions": [
+{"from":0,"to":0,"label":"a","prob":"1/3"}
+]}

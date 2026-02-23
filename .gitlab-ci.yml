@@ -1,0 +1,87 @@
+stages:
+  - build
+  - compile_manual
+
+buildlatex: 
+  stage: compile_manual
+  script:
+    - echo "Hello, $GITLAB_USER_LOGIN!"
+    - cargo update
+    - mkdir -p build
+    - mkdir -p build/nightly
+    - git config --global user.name "CI pipeline"
+    - git config --global user.email "cipipeline@example.com"
+    
+    #compile manual
+    - cd manual
+    - cargo run itself manual -o functions.tex
+    - cargo run itself graph -o graph.pdf
+    - lualatex -shell-escape manual.tex
+    - bibtex manual
+    - lualatex -shell-escape manual.tex
+    - lualatex -shell-escape manual.tex
+    - cd ..
+    - mv manual/manual.pdf build/nightly/manual.pdf
+    - git add build/nightly/manual.pdf
+
+    #compile html
+    - cargo run itself html -o build/nightly/commands.html
+    - git add build/nightly/commands.html
+
+    #compile linux 64 bit
+    - cargo build --target x86_64-unknown-linux-gnu --release
+    - mv target/x86_64-unknown-linux-gnu/release/ebi build/nightly/Ebi-x86_64-linux
+    - git add build/nightly/Ebi-x86_64-linux
+    - cd target/x86_64-unknown-linux-gnu/release
+    - mkdir -p lib
+    - mv libebi.so lib/ 
+    - zip ../../../build/prom-rust/Rust-6.15.3-lin64.zip lib/libebi.so
+    - cd ../../..
+    - git add build/prom-rust/Rust-6.15.3-lin64.zip
+
+    #compile windows 64 bit
+    - export PYO3_CROSS_PYTHON_VERSION="3.12"
+    - cargo build --target x86_64-pc-windows-gnu --release
+    - mv target/x86_64-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-x86_64-windows.exe
+    - git add build/nightly/Ebi-x86_64-windows.exe
+    - cd target/x86_64-pc-windows-gnu/release
+    - mkdir -p lib
+    - mv ebi.dll lib/ 
+    - zip ../../../build/prom-rust/Rust-6.15.3-win64.zip lib/ebi.dll
+    - cd ../../..
+    - git add build/prom-rust/Rust-6.15.3-win64.zip
+
+    #write packages.xml
+    - printf "<packages>\n" > build/prom-rust/packages.xml
+    
+    - printf "\t<package name=\"Rust\" version=\"6.15." >> build/prom-rust/packages.xml
+    - echo -n `date +%s` >> build/prom-rust/packages.xml
+    - printf "\" os=\"win64\" url=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/prom-rust/Rust-6.15.3-win64.zip\" desc=\"Rust\" org=\"RWTH Aachen\" license=\"GPL\" author=\"S.J.J. Leemans\" auto=\"false\" hasPlugins=\"true\" logo=\"prom_subtitle_hat_300.png\" />\n" >> build/prom-rust/packages.xml
+    
+    - printf "\t<package name=\"Rust\" version=\"6.15." >> build/prom-rust/packages.xml
+    - echo -n `date +%s` >> build/prom-rust/packages.xml
+    - printf "\" os=\"win32\" url=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/prom-rust/Rust-6.15.3-win32.zip\" desc=\"Rust\" org=\"RWTH Aachen\" license=\"GPL\" author=\"S.J.J. Leemans\" auto=\"false\" hasPlugins=\"true\" logo=\"prom_subtitle_hat_300.png\" />\n" >> build/prom-rust/packages.xml
+    
+    - printf "\t<package name=\"Rust\" version=\"6.15." >> build/prom-rust/packages.xml
+    - echo -n `date +%s` >> build/prom-rust/packages.xml
+    - printf "\" os=\"lin32\" url=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/prom-rust/Rust-6.15.3-lin32.zip\" desc=\"Rust\" org=\"RWTH Aachen\" license=\"GPL\" author=\"S.J.J. Leemans\" auto=\"false\" hasPlugins=\"true\" logo=\"prom_subtitle_hat_300.png\" />\n" >> build/prom-rust/packages.xml
+
+    - printf "\t<package name=\"Rust\" version=\"6.15." >> build/prom-rust/packages.xml
+    - echo -n `date +%s` >> build/prom-rust/packages.xml
+    - printf "\" os=\"lin64\" url=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/prom-rust/Rust-6.15.3-lin64.zip\" desc=\"Rust\" org=\"RWTH Aachen\" license=\"GPL\" author=\"S.J.J. Leemans\" auto=\"false\" hasPlugins=\"true\" logo=\"prom_subtitle_hat_300.png\" />\n" >> build/prom-rust/packages.xml
+
+    - printf "</packages>\n" >> build/prom-rust/packages.xml
+    - git add build/prom-rust/packages.xml
+
+    #push to git
+    - git commit -m "Automatically triggered compilation [skip ci]"
+    - git push -f https://ci_token:$ACCESS_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main
+
+    #generate Java code and push to ProM git
+    - git clone https://github.com/promworkbench/Ebi.git
+    - cargo run --features java itself java -o Ebi/src/org/processmining/ebi/plugins/EbiPlugins.java
+    - cd Ebi
+    - git add src/org/processmining/ebi/plugins/EbiPlugins.java
+    - git commit -m "update Ebi plugins"
+    - git push -f https://ci_token:$PROM_GIT_TOKEN@github.com/promworkbench/Ebi HEAD:main
+    - cd ..

@@ -1,0 +1,9 @@
+<pnml>
+	<net id="Rust PetriNet Export" type="http://www.pnml.org/version-2009/grammar/pnmlcoremodel">
+		<page id="n0">
+			
+
+			
+		</page>
+	</net>
+</pnml>

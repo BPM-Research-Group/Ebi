@@ -1,0 +1,4 @@
+{"activities":{"start":1487,"Completed":1568,"end":1487,"Queued":450,"Unmatched":435,"Accepted":4207},
+"directly_follows_relations":[[["Queued","Queued"],16],[["Accepted","Queued"],388],[["start","Unmatched"],24],[["Accepted","Accepted"],1882],[["Accepted","Completed"],1562],[["Unmatched","Unmatched"],13],[["start","Completed"],1],[["Completed","Accepted"],81],[["Queued","Unmatched"],23],[["start","Queued"],30],[["Queued","Accepted"],411],[["Unmatched","Accepted"],401],[["Unmatched","Queued"],16],[["start","Accepted"],1432],[["Completed","end"],1487],[["Unmatched","Completed"],5],[["Accepted","Unmatched"],375]],
+"start_activities":["start"],
+"end_activities":["end"]}

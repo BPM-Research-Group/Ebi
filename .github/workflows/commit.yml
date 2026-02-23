@@ -1,0 +1,56 @@
+name: Run Rust tests and push to gitlab
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Generate and test link to python
+      run: |
+        cargo run --features python itself python -o src/python/python_module_autogen.rs
+        cargo build --features python
+    - name: Compile with link to java
+      run: cargo build --features java
+    - name: Run tests mixed mode 1
+      run: cargo test --verbose
+    - name: Run tests mixed mode 2
+      run: cargo test --verbose --features exactarithmetic,approximatearithmetic
+    - name: Run tests exact mode
+      run: cargo test --verbose --features exactarithmetic
+    - name: Run tests approximate mode
+      run: cargo test --verbose --features approximatearithmetic
+    - name: clean
+      run: cargo clean
+    - name: commit to Gitlab
+      env:
+        GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
+      run: |
+        git clone https://ci_token:$GITLAB_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary --depth 1
+        cd rustlibrary
+        git config user.name "Github auto committer"
+        git config user.email "cipipeline@example.com"
+        rm -rf src/*
+        rm -rf testfiles/*
+        rm README.md
+        rm Cargo.toml
+        rm -rf manual/*
+        rm .gitlab-ci.yml
+        cp -R -a ../src/. src/
+        cp -R -a ../testfiles/. testfiles/
+        cp ../README.md README.md
+        cp ../Cargo.toml Cargo.toml
+        cp -R -a ../manual/. manual/
+        cp ../.gitlab-ci.yml .gitlab-ci.yml
+        git add --all
+        git commit -a -m "github CI"
+        git gc
+        git push -f https://ci_token:$GITLAB_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main

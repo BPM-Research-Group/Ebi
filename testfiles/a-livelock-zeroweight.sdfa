@@ -1,0 +1,7 @@
+{
+"initialState": 0,
+"transitions": [
+{"from":0,"to":1,"label":"a","prob":"1/2"},
+{"from":1,"to":1,"label":"a","prob":"1"},
+{"from":0,"to":2,"label":"b","prob":"0"}
+]}

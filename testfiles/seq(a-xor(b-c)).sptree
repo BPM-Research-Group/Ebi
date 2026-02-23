@@ -1,0 +1,12 @@
+stochastic process tree
+sequence
+2
+	activity a
+	1
+	xor
+	2
+		activity b
+		1
+		activity c
+		2
+4

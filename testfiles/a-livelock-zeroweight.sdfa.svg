@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg width="322.5" height="217.501" viewBox="0 0 322.5 217.501" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="startarrow" markerWidth="10" markerHeight="7"
+refX="0" refY="3.5" orient="auto">
+<polygon points="10 0, 10 7, 0 3.5" />
+</marker>
+<marker id="endarrow" markerWidth="10" markerHeight="7"
+refX="10" refY="3.5" orient="auto">
+<polygon points="0 0, 10 3.5, 0 7" />
+</marker>
+
+</defs><style>
+.a15 { font-size: 15px; font-family: Times, serif; }
+</style>
+<ellipse cx="62.5" cy="130.001" rx="32.5" ry="32.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="62.5" y="115.001" class="a15"><tspan x = "62.5" dy="1.0em">1/2</tspan></text><ellipse cx="282.5" cy="82.501" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="282.5" y="67.501" class="a15"><tspan x = "282.5" dy="1.0em">0</tspan></text><ellipse cx="282.5" cy="177.501" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="282.5" y="162.501" class="a15"><tspan x = "282.5" dy="1.0em">1</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="180" y="67.501" class="a15"><tspan x = "180" dy="1.0em">a, 1/2</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="180" y="138.751" class="a15"><tspan x = "180" dy="1.0em">b, 0</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="282.5" y="2.5" class="a15"><tspan x = "282.5" dy="1.0em">a, 1</tspan></text><path id="arrow0" d="M 93.7670778078025 121.13421674107094 C 122.62899578423557 112.94949373282873, 200 82.501, 230 82.501 S 235 82.501, 265 82.501 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+<text><textPath href="#arrow0" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><path id="arrow1" d="M 94.61289633240855 135.00218877308004 C 124.25556987001644 139.61867071746158, 186.20360429036924 145.76988348107938, 215 153.751 S 237.69266143522395 161.73545494943065, 265.99203316034567 171.69264129715867 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+<text><textPath href="#arrow1" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><path id="arrow2" d="M 290.7966479520946 67.09270247045428 C 305.01947301282814 40.67847813409019, 291.0857756636359 3.277174939266427, 317.5 17.5 S 305.01947301282814 40.67847813409019, 290.7966479520946 67.09270247045428 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+<text><textPath href="#arrow2" startOffset="50%" text-anchor="middle" class="a15"></textPath></text></svg>

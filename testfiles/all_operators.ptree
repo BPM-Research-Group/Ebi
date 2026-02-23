@@ -1,0 +1,25 @@
+process tree
+xor
+2
+	sequence
+	2
+		activity a0
+		activity b1
+	concurrent
+	4
+		activity c2
+		loop
+		2
+			activity d3
+			activity e4
+		interleaved
+		2
+			activity f5
+			sequence
+			2
+				tau
+				activity g7
+		or
+		2
+			activity h8
+			activity i9

@@ -1,0 +1,48 @@
+stochastic language of alignments
+# number of alignments
+3
+# alignment 0
+# probability
+1/5
+# number of moves
+3
+# move 0
+synchronous move
+label a
+0
+# move 1
+silent move
+4
+# move 2
+log move
+label a
+# alignment 1
+# probability
+3/5
+# number of moves
+3
+# move 0
+synchronous move
+label b
+1
+# move 1
+silent move
+4
+# move 2
+log move
+label a
+# alignment 2
+# probability
+1/5
+# number of moves
+3
+# move 0
+synchronous move
+label a
+0
+# move 1
+silent move
+4
+# move 2
+log move
+label b

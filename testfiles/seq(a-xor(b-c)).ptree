@@ -1,0 +1,8 @@
+process tree
+sequence
+2
+	activity a
+	xor
+	2
+		activity b
+		activity c

@@ -1,0 +1,51 @@
+language of alignments
+# number of alignments
+3
+# alignment 0
+# number of moves
+4
+# move 0
+synchronous move
+label a
+0
+# move 1
+model move
+label b
+1
+# move 2
+silent move
+2
+# move 3
+log move
+label a
+# alignment 1
+# number of moves
+3
+# move 0
+synchronous move
+label a
+0
+# move 1
+synchronous move
+label b
+1
+# move 2
+silent move
+2
+# alignment 2
+# number of moves
+4
+# move 0
+model move
+label a
+0
+# move 1
+synchronous move
+label b
+1
+# move 2
+silent move
+2
+# move 3
+log move
+label a

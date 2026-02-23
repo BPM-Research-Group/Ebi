@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg width="1880" height="705.25" viewBox="0 0 1880 705.25" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="startarrow" markerWidth="10" markerHeight="7"
+refX="0" refY="3.5" orient="auto">
+<polygon points="10 0, 10 7, 0 3.5" fill="context-stroke" />
+</marker>
+<marker id="endarrow" markerWidth="10" markerHeight="7"
+refX="10" refY="3.5" orient="auto">
+<polygon points="0 0, 10 3.5, 0 7" fill="context-stroke" />
+</marker>
+
+</defs><style>
+.a15 { font-size: 15px; font-family: Times, serif; }
+</style>
+<g >
+
+            <ellipse cx="47.5" cy="212" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="197" class="a15"><tspan x = "47.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="47.5" cy="117" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="102" class="a15"><tspan x = "47.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="692.5" cy="435.25" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="692.5" y="420.25" class="a15"><tspan x = "692.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="47.5" cy="461.75" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="446.75" class="a15"><tspan x = "47.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="692.5" cy="340.25" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="692.5" y="332.75" class="a15"></text><g >
+
+            <ellipse cx="692.5" cy="164.5" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="692.5" y="149.5" class="a15"><tspan x = "692.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="1277.5" cy="239.75" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="1277.5" y="224.75" class="a15"><tspan x = "1277.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="1277.5" cy="144.75" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="1277.5" y="129.75" class="a15"><tspan x = "1277.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="47.5" cy="343" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="47.5" y="328" class="a15"><tspan x = "47.5" dy="1.0em">1</tspan></text><g >
+
+            <ellipse cx="692.5" cy="530.25" rx="17.5" ry="17.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="692.5" y="515.25" class="a15"><tspan x = "692.5" dy="1.0em">1</tspan></text><g >
+
+            <rect x="125" y="320.25" width="490" height="40" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="370" y="317.75" class="a15"><tspan x = "370" dy="1.0em">ac0</tspan><tspan x = "370" dy="1.0em">9634149558137841/100000000000000</tspan></text><g >
+
+            <rect x="770" y="172.25" width="430" height="40" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="985" y="169.75" class="a15"><tspan x = "985" dy="1.0em">ac2</tspan><tspan x = "985" dy="1.0em">89914891846243/1250000000000</tspan></text><g >
+
+            <rect x="1355" y="219.75" width="520" height="40" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff" rx="0"  />
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="1615" y="217.25" class="a15"><tspan x = "1615" dy="1.0em">ac1</tspan><tspan x = "1615" dy="1.0em">15705263212824121/1000000000000000</tspan></text><g >
+
+            <path id="arrow0" d="M 63.76134976163867 218.46672281218653 C 91.63794935301925 229.55253334736346, 192.31934318896538 303.6758703048815, 217.32530697461843 320.25 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow0" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow1" d="M 61.888764889002765 126.9605946092089 C 86.55521898443608 144.035899653567, 210.40141215597512 297.61930613409146, 230.09536288069083 320.25 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow1" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow2" d="M 63.87635076437891 455.5803050608619 C 91.95009493188562 445.0036851651966, 190.2521904033511 376.20619285604994, 215.65691259314374 360.25 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow2" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow3" d="M 64.99936380490016 342.8507806187179 C 94.998273184729 342.59497596509146, 95.00304581689089 342.4232040562804, 125 341.99572337080707 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow3" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow4" d="M 63.76134976163867 218.46672281218653 C 91.63794935301925 229.55253334736346, 192.31934318896538 303.6758703048815, 217.32530697461843 320.25 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow4" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow5" d="M 61.888764889002765 126.9605946092089 C 86.55521898443608 144.035899653567, 210.40141215597512 297.61930613409146, 230.09536288069083 320.25 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow5" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow6" d="M 63.87635076437891 455.5803050608619 C 91.95009493188562 445.0036851651966, 190.2521904033511 376.20619285604994, 215.65691259314374 360.25 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow6" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow7" d="M 615 340.25 C 645 340.25, 645 340.25, 675 340.25 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow7" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow8" d="M 64.99936380490016 342.8507806187179 C 94.998273184729 342.59497596509146, 95.00304581689089 342.4232040562804, 125 341.99572337080707 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow8" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow9" d="M 705.9608315284091 424.0671553456293 C 729.0365427199677 404.89656450956534, 844.8555581218038 236.36553187225832, 862.7004767968243 212.25 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow9" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow10" d="M 708.11492835078 332.3491131763575 C 734.8833769521171 318.8047357643989, 830.2019502738732 231.370418092831, 853.3192514129626 212.25 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow10" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow11" d="M 709.9217719309311 166.15283477293448 C 739.7876666696701 168.98626581225074, 740.3572973237775 170.89259687748597, 770 175.50889171740585 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow11" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow12" d="M 64.24077258058725 337.9013204253397 C 92.93923986159398 329.1607268687792, 340.5 244.625, 370.5 244.625 S 663 244.625, 693 244.625 S 778.1868438070846 220.44255585693196, 807.046539379475 212.25 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow12" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow13" d="M 703.9515930276815 517.0170480569014 C 723.5828953608498 494.33198758301813, 852.6732726728853 238.70910087913805, 866.8124374525884 212.25 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow13" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow14" d="M 64.78790831954042 214.71628900067083 C 94.4243225816097 219.37278443039224, 340.5 262.75, 370.5 262.75 S 663 262.75, 693 262.75 S 797.135784663408 222.95827740503924, 825.1595744680851 212.25 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow14" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow15" d="M 64.19140225501586 122.25805009116986 C 92.8052346921859 131.27185024746106, 340.5 218.75, 370.5 218.75 S 663 218.75, 693 218.75 S 740.304742736415 211.95555185628726, 770 207.69037940379403 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow15" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow16" d="M 708.11492835078 332.3491131763575 C 734.8833769521171 318.8047357643989, 830.2019502738732 231.370418092831, 853.3192514129626 212.25 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow16" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow17" d="M 709.9217719309311 166.15283477293448 C 739.7876666696701 168.98626581225074, 740.3572973237775 170.89259687748597, 770 175.50889171740585 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow17" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow18" d="M 1170.3947368421052 212.25 C 1199.4522289015256 219.71070742066198, 1231.492304239251 227.93721325061853, 1260.5497962986715 235.3979206712805 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow18" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow19" d="M 1170.3947368421052 172.25 C 1199.4522289015256 164.78929257933802, 1231.492304239251 156.56278674938147, 1260.5497962986715 149.1020793287195 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow19" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow20" d="M 64.04212137846984 111.28963921455298 C 92.40004374156099 101.50044929664381, 340.5 5.5, 370.5 5.5 S 663 5.5, 693 5.5 S 955.5 5.5, 985.5 5.5 S 1248 5.5, 1278 5.5 S 1447.4612668594505 197.2695737286295, 1467.3265741728922 219.75 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow20" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow21" d="M 709.9427907385771 433.8361219111222 C 739.844717718995 431.41233090161734, 955.5 411.5, 985.5 411.5 S 1248 411.5, 1278 411.5 S 1437.8074710697156 278.9061200182432, 1460.8951965065503 259.75 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow21" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow22" d="M 1295 239.75 C 1325 239.75, 1325 239.75, 1355 239.75 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow22" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow23" d="M 1294.3453747529368 149.4916610415674 C 1323.2231600436855 157.62022282711152, 1415.6385893361148 206.91342073409817, 1442.7535710390446 219.75 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow23" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow24" d="M 710 530.25 C 740 530.25, 955.5 530.25, 985.5 530.25 S 1248 530.25, 1278 530.25 S 1453.339419515604 284.1818774430775, 1470.748709122203 259.75 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow24" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow25" d="M 63.30593366500099 204.4885114006884 C 90.40181994785983 191.61167380186848, 340.5 58.5, 370.5 58.5 S 663 58.5, 693 58.5 S 955.5 58.5, 985.5 58.5 S 1248 58.5, 1278 58.5 S 1439.5880756384406 199.98714352399696, 1462.1586206896552 219.75 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow25" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow26" d="M 709.9427907385771 436.6638780888778 C 739.844717718995 439.08766909838266, 955.5 459, 985.5 459 S 1248 459, 1278 459 S 1445.522392002204 281.56384325370436, 1466.1174458380844 259.75 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow26" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow27" d="M 63.87950014313196 467.9113290012091 C 91.9586432456439 478.4736072889961, 340.5 583.25, 370.5 583.25 S 663 583.25, 693 583.25 S 955.5 583.25, 985.5 583.25 S 1248 583.25, 1278 583.25 S 1457.4632517813918 285.4450387105891, 1472.9475982532751 259.75 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow27" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow28" d="M 710 340.25 C 740 340.25, 955.5 340.25, 985.5 340.25 S 1248 340.25, 1278 340.25 S 1416.8185299055858 272.8525977994619, 1443.8059701492537 259.75 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow28" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow29" d="M 709.4672253750739 160.21476219196086 C 738.5538974466292 152.86864023532232, 955.5 90.5, 985.5 90.5 S 1248 90.5, 1278 90.5 S 1432.926987877556 202.2046035783828, 1457.2613065326634 219.75 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow29" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow30" d="M 1295 239.75 C 1325 239.75, 1325 239.75, 1355 239.75 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow30" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow31" d="M 1294.3453747529368 149.4916610415674 C 1323.2231600436855 157.62022282711152, 1415.6385893361148 206.91342073409817, 1442.7535710390446 219.75 " stroke="#000000ff" stroke-width="2"  marker-start="url(#startarrow)"  
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow31" startOffset="50%" text-anchor="middle" class="a15"></textPath></text></svg>
