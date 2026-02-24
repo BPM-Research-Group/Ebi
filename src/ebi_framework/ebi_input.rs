@@ -543,6 +543,10 @@ impl Display for EbiTraitImporter {
 
 #[derive(Clone, IntoStaticStr)]
 pub enum EbiObjectImporter {
+    BusinessProcessModelAndNotation(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
     EventLog(
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
@@ -628,6 +632,9 @@ pub enum EbiObjectImporter {
 impl EbiObjectImporter {
     pub fn get_type(&self) -> EbiObjectType {
         match self {
+            EbiObjectImporter::BusinessProcessModelAndNotation(_, _) => {
+                EbiObjectType::BusinessProcessModelAndNotation
+            }
             EbiObjectImporter::EventLog(_, _) => EbiObjectType::EventLog,
             EbiObjectImporter::EventLogCsv(_, _) => EbiObjectType::EventLogCsv,
             EbiObjectImporter::EventLogOcel(_, _) => EbiObjectType::EventLogOcel,
@@ -669,6 +676,7 @@ impl EbiObjectImporter {
 
     pub fn parameters(&self) -> &'static [ImporterParameter] {
         match self {
+            EbiObjectImporter::BusinessProcessModelAndNotation(_, parameters) => parameters,
             EbiObjectImporter::EventLog(_, parameters) => parameters,
             EbiObjectImporter::EventLogCsv(_, parameters) => parameters,
             EbiObjectImporter::EventLogOcel(_, parameters) => parameters,
@@ -706,6 +714,7 @@ impl EbiObjectImporter {
         &self,
     ) -> fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject> {
         match self {
+            EbiObjectImporter::BusinessProcessModelAndNotation(importer, _) => *importer,
             EbiObjectImporter::EventLog(importer, _) => *importer,
             EbiObjectImporter::EventLogCsv(importer, _) => *importer,
             EbiObjectImporter::EventLogOcel(importer, _) => *importer,

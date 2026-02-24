@@ -31,6 +31,7 @@ pub mod ebi_commands {
     pub mod ebi_command_visualise;
 }
 pub mod ebi_file_handlers {
+    pub mod business_process_model_and_notation;
     pub mod compressed_event_log;
     pub mod deterministic_finite_automaton;
     pub mod directly_follows_graph;

@@ -1,15 +1,13 @@
-use std::{
-    fmt::{Debug, Display, Formatter},
-    hash::Hasher,
-};
-
+use crate::{ebi_framework::displayable::Displayable, semantics::semantics::Semantics};
 use anyhow::Context;
 use bitvec::{bitvec, vec::BitVec};
 use ebi_objects::{
     Activity, LabelledPetriNet, ebi_objects::labelled_petri_net::TransitionIndex, marking::Marking,
 };
-
-use crate::{ebi_framework::displayable::Displayable, semantics::semantics::Semantics};
+use std::{
+    fmt::{Debug, Display, Formatter},
+    hash::Hasher,
+};
 
 fn compute_enabled_transition(
     lpn: &LabelledPetriNet,

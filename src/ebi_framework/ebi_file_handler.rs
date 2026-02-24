@@ -7,6 +7,7 @@ use super::{
 use crate::{
     ebi_commands::ebi_command_validate::EBI_VALIDATE,
     ebi_file_handlers::{
+        business_process_model_and_notation::EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION,
         compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
         deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
         directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
@@ -47,6 +48,8 @@ pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_DIRECTLY_FOLLOWS_MODEL,
     EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL,
     EBI_EXECUTIONS,
+    EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION,
+    EBI_EVENT_LOG_OCEL,
     EBI_EVENT_LOG_XES,
     EBI_FINITE_LANGUAGE,
     EBI_FINITE_STOCHASTIC_LANGUAGE,
@@ -60,7 +63,6 @@ pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
     EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS,
     EBI_STOCHASTIC_PROCESS_TREE,
     EBI_PROCESS_TREE_MARKUP_LANGUAGE,
-    EBI_EVENT_LOG_OCEL,
     EBI_EVENT_LOG_CSV,
     EBI_PORTABLE_DOCUMENT_FORMAT,
     EBI_SCALABLE_VECTOR_GRAPHICS,

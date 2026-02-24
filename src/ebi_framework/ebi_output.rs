@@ -4,6 +4,7 @@ use super::{
 };
 use crate::{
     ebi_file_handlers::{
+        business_process_model_and_notation::EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION,
         compressed_event_log::EBI_COMPRESSED_EVENT_LOG,
         deterministic_finite_automaton::EBI_DETERMINISTIC_FINITE_AUTOMATON,
         directly_follows_graph::EBI_DIRECTLY_FOLLOWS_GRAPH,
@@ -33,8 +34,9 @@ use crate::{
 };
 use anyhow::{Context, Result, anyhow};
 use ebi_objects::{
-    CompressedEventLogXes, EbiObject, EbiObjectType, EventLogPython, Exportable,
-    PortableDocumentFormat, PortableNetworkGraphics, StochasticNondeterministicFiniteAutomaton,
+    BusinessProcessModelAndNotation, CompressedEventLogXes, EbiObject, EbiObjectType,
+    EventLogPython, Exportable, PortableDocumentFormat, PortableNetworkGraphics,
+    StochasticNondeterministicFiniteAutomaton,
     ebi_arithmetic::{Exporter, Fraction},
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
@@ -170,6 +172,14 @@ impl EbiOutputType {
 
     pub fn get_default_exporter(&self) -> EbiExporter {
         match self {
+            EbiOutputType::ObjectType(EbiObjectType::BusinessProcessModelAndNotation) => {
+                EbiExporter::Object(
+                    &EbiObjectExporter::BusinessProcessModelAndNotation(
+                        BusinessProcessModelAndNotation::export_from_object,
+                    ),
+                    &EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION,
+                )
+            }
             EbiOutputType::ObjectType(EbiObjectType::LanguageOfAlignments) => EbiExporter::Object(
                 &EbiObjectExporter::LanguageOfAlignments(LanguageOfAlignments::export_from_object),
                 &EBI_LANGUAGE_OF_ALIGNMENTS,
@@ -454,6 +464,7 @@ impl Display for EbiExporter {
 
 #[derive(Hash, IntoStaticStr)]
 pub enum EbiObjectExporter {
+    BusinessProcessModelAndNotation(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLog(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogCsv(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogOcel(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
@@ -487,6 +498,9 @@ pub enum EbiObjectExporter {
 impl EbiObjectExporter {
     pub fn get_type(&self) -> EbiObjectType {
         match self {
+            EbiObjectExporter::BusinessProcessModelAndNotation(_) => {
+                EbiObjectType::BusinessProcessModelAndNotation
+            }
             EbiObjectExporter::EventLog(_) => EbiObjectType::EventLog,
             EbiObjectExporter::EventLogCsv(_) => EbiObjectType::EventLogCsv,
             EbiObjectExporter::EventLogOcel(_) => EbiObjectType::EventLogOcel,
@@ -531,6 +545,9 @@ impl EbiObjectExporter {
     pub fn export(&self, object: EbiOutput, f: &mut dyn std::io::Write) -> Result<()> {
         if let EbiOutput::Object(object) = object {
             match self {
+                EbiObjectExporter::BusinessProcessModelAndNotation(exporter) => {
+                    (exporter)(object, f)
+                }
                 EbiObjectExporter::EventLog(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogCsv(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogOcel(exporter) => (exporter)(object, f),

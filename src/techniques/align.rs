@@ -12,15 +12,16 @@ use crate::{
 };
 use anyhow::{Context, Error, Result, anyhow};
 use ebi_objects::{
-    Activity, ActivityKeyTranslator, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
-    DirectlyFollowsModel, LabelledPetriNet, LanguageOfAlignments, ProcessTree,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    Activity, ActivityKeyTranslator, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
+    DirectlyFollowsGraph, DirectlyFollowsModel, LabelledPetriNet, LanguageOfAlignments,
+    ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     ebi_objects::{
         labelled_petri_net::TransitionIndex, language_of_alignments::Move,
         process_tree::TreeMarking,
     },
+    marking::Marking,
 };
 use rayon::iter::ParallelIterator;
 use std::{
@@ -457,6 +458,24 @@ pub trait AlignmentHeuristics {
     ) -> usize;
 }
 
+impl AlignmentHeuristics for BusinessProcessModelAndNotation {
+    type AliState = Marking;
+
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(
+        &self,
+        _: &Vec<Activity>,
+        _: &usize,
+        _: &Marking,
+        _: &Vec<Vec<usize>>,
+    ) -> usize {
+        0
+    }
+}
+
 impl AlignmentHeuristics for DeterministicFiniteAutomaton {
     type AliState = usize;
 
@@ -551,27 +570,6 @@ macro_rules! usize {
     };
 }
 
-macro_rules! nodestates {
-    ($t:ident) => {
-        impl AlignmentHeuristics for $t {
-            type AliState = TreeMarking;
-
-            fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
-                vec![]
-            }
-
-            fn underestimate_cost_to_final_synchronous_state(
-                &self,
-                _: &Vec<Activity>,
-                _: &usize,
-                _: &TreeMarking,
-                _: &Vec<Vec<usize>>,
-            ) -> usize {
-                0
-            }
-        }
-    };
-}
 macro_rules! treemarking {
     ($t:ident) => {
         impl AlignmentHeuristics for $t {
@@ -593,9 +591,10 @@ macro_rules! treemarking {
         }
     };
 }
+
 usize!(StochasticDeterministicFiniteAutomaton);
 usize!(StochasticNondeterministicFiniteAutomaton);
-nodestates!(ProcessTree);
+treemarking!(ProcessTree);
 treemarking!(StochasticProcessTree);
 usize!(DirectlyFollowsGraph);
 usize!(DirectlyFollowsModel);

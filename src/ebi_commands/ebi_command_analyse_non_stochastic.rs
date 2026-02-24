@@ -69,6 +69,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::BusinessProcessModelAndNotation),
         &EbiInputType::Object(EbiObjectType::DirectlyFollowsGraph),
         &EbiInputType::Object(EbiObjectType::StochasticProcessTree),
         &EbiInputType::Object(EbiObjectType::ProcessTree),
@@ -113,6 +114,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
             }
             EbiInput::Object(EbiObject::DirectlyFollowsGraph(object), _) => object.bounded()?,
 
+            EbiInput::Object(EbiObject::BusinessProcessModelAndNotation(_), _) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
             EbiInput::Trait(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
@@ -223,6 +227,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::BusinessProcessModelAndNotation),
         &EbiInputType::Object(EbiObjectType::DirectlyFollowsGraph),
         &EbiInputType::Object(EbiObjectType::StochasticProcessTree),
         &EbiInputType::Object(EbiObjectType::ProcessTree),
@@ -270,6 +275,10 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
             EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::DirectlyFollowsGraph(object), _) => object.any_traces()?,
+            
+            EbiInput::Object(EbiObject::BusinessProcessModelAndNotation(_), _) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
             EbiInput::Trait(_, _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
