@@ -79,10 +79,10 @@ pub const EBI_EVENT_LOG_OCEL: EbiFileHandler = EbiFileHandler {
             EventLogOcel::import_as_event_log_trace_attributes_object,
             EventLogOcel::IMPORTER_PARAMETERS,
         ),
-        EbiObjectImporter::EventLogOcel(
-            EventLogOcel::import_as_object,
-            EventLogOcel::IMPORTER_PARAMETERS,
-        ),
+        // EbiObjectImporter::EventLogOcel(
+        //     EventLogOcel::import_as_object,
+        //     EventLogOcel::IMPORTER_PARAMETERS,
+        // ),
         EbiObjectImporter::FiniteLanguage(
             EventLogOcel::import_as_finite_language_object,
             EventLogOcel::IMPORTER_PARAMETERS,
