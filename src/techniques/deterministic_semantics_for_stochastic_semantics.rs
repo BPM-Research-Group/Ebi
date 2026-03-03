@@ -292,7 +292,7 @@ macro_rules! default_stochastic_deterministic_semantics {
                         let mut new_marking = marking.clone();
                         self.execute_transition(&mut new_marking, transition)?;
 
-                        if self.is_transition_silent(transition) {
+                        if Semantics::is_transition_silent(self, transition, &marking) {
                             //we follow a silent transition
 
                             if self.is_final_state(&new_marking) {
@@ -318,7 +318,7 @@ macro_rules! default_stochastic_deterministic_semantics {
                             }
                         } else {
                             //we follow a labelled transition, and then we end up in an absorbing state
-                            let activity = self.get_transition_activity(transition).unwrap();
+                            let activity = self.get_transition_activity(transition, &marking).unwrap();
                             let (new_markov_index, _) = markov.add_or_find_state(
                                 MarkovMarking::AfterExecutingActivity(new_marking, activity),
                                 Fraction::zero(),

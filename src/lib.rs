@@ -139,6 +139,7 @@ pub mod python {
 }
 
 pub mod semantics {
+    pub mod business_process_model_and_notation_semantics;
     pub mod directly_follows_graph_semantics;
     pub mod finite_stochastic_language_semantics;
     pub mod labelled_petri_net_semantics;

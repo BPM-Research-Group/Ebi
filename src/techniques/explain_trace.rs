@@ -141,7 +141,7 @@ impl<State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState =
                     let transition_weight = self.get_transition_weight(&state, transition);
                     let transition_probability = transition_weight / &total_weight;
 
-                    if let Some(activity) = self.get_transition_activity(transition) {
+                    if let Some(activity) = self.get_transition_activity(transition, state) {
                         //non-silent model move
                         result.push((
                             (*trace_index, new_state.clone()),

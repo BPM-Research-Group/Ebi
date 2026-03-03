@@ -3,7 +3,7 @@ use ebi_objects::{BusinessProcessModelAndNotation, Importable};
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
-    trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait},
+    trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
 };
 
@@ -21,6 +21,10 @@ pub const EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = EbiFileHandl
         ),
         EbiTraitImporter::Graphable(
             BusinessProcessModelAndNotation::import_as_graphable_trait,
+            BusinessProcessModelAndNotation::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Semantics(
+            BusinessProcessModelAndNotation::import_as_semantics_trait,
             BusinessProcessModelAndNotation::IMPORTER_PARAMETERS,
         ),
     ],

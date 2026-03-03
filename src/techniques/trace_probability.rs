@@ -89,7 +89,7 @@ macro_rules! default_trace_probability {
                             let mut new_state_a = state_a.clone();
                             self.execute_transition(&mut new_state_a, transition)
                                 .unwrap();
-                            if self.is_transition_silent(transition) {
+                            if Semantics::is_transition_silent(self, transition, state_a) {
                                 //silent transition; only A takes a step
                                 let new_state_b = state_ab.state_b.clone();
 
@@ -116,7 +116,9 @@ macro_rules! default_trace_probability {
                                 } else {
                                     let new_state_b = follower_b.take_step(
                                         &state_ab.state_b,
-                                        &self.get_transition_activity(transition).unwrap(),
+                                        &self
+                                            .get_transition_activity(transition, &state_ab.state_a)
+                                            .unwrap(),
                                     );
                                     if new_state_b.is_some() {
                                         process_new_state(

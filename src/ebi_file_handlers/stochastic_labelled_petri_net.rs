@@ -104,11 +104,8 @@ impl FromEbiTraitObject for StochasticLabelledPetriNet {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
     use ebi_objects::StochasticLabelledPetriNet;
-
-    use crate::semantics::semantics::Semantics;
+    use std::fs;
 
     #[test]
     fn empty_slpn() {

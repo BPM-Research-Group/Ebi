@@ -27,9 +27,17 @@ pub trait Semantics:
     /// Depending on the implementation, it may be more efficient ot call `is_final_state` rather than `get_enabled_transitions`.
     fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool;
 
-    fn is_transition_silent(&self, transition: TransitionIndex) -> bool;
+    fn is_transition_silent(
+        &self,
+        transition: TransitionIndex,
+        state: &<Self as Semantics>::SemState,
+    ) -> bool;
 
-    fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity>;
+    fn get_transition_activity(
+        &self,
+        transition: TransitionIndex,
+        state: &<Self as Semantics>::SemState,
+    ) -> Option<Activity>;
 
     /// Returns the enabled transitions in `state`.
     /// If and only if there are no transitions enabled, then `is_final_state(state)` returns `true`.
@@ -38,5 +46,5 @@ pub trait Semantics:
         state: &<Self as Semantics>::SemState,
     ) -> Vec<TransitionIndex>;
 
-    fn get_number_of_transitions(&self) -> usize;
+    fn number_of_transitions(&self, state: &<Self as Semantics>::SemState) -> usize;
 }

@@ -49,11 +49,19 @@ macro_rules! semantics_for_automaton {
                 state > &self.node_2_activity.len()
             }
 
-            fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
+            fn is_transition_silent(
+                &self,
+                transition: TransitionIndex,
+                _state: &<Self as Semantics>::SemState,
+            ) -> bool {
                 transition == self.sources.len()
             }
 
-            fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
+            fn get_transition_activity(
+                &self,
+                transition: TransitionIndex,
+                _state: &<Self as Semantics>::SemState,
+            ) -> Option<Activity> {
                 if transition == self.sources.len() {
                     //end
                     None
@@ -112,7 +120,7 @@ macro_rules! semantics_for_automaton {
                 }
             }
 
-            fn get_number_of_transitions(&self) -> usize {
+            fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState,) -> usize {
                 self.sources.len() + 1 + self.sources.len()
             }
         }

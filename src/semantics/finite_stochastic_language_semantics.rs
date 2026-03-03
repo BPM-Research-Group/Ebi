@@ -151,11 +151,19 @@ impl Semantics for FiniteStochasticLanguageSemantics {
         self.nodes[*state].is_empty()
     }
 
-    fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
+    fn is_transition_silent(
+        &self,
+        transition: TransitionIndex,
+        _state: &<Self as Semantics>::SemState,
+    ) -> bool {
         transition == 0
     }
 
-    fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
+    fn get_transition_activity(
+        &self,
+        transition: TransitionIndex,
+        _state: &<Self as Semantics>::SemState,
+    ) -> Option<Activity> {
         self.transition_index_to_activity(transition)
     }
 
@@ -167,7 +175,7 @@ impl Semantics for FiniteStochasticLanguageSemantics {
         return result;
     }
 
-    fn get_number_of_transitions(&self) -> usize {
+    fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState,) -> usize {
         self.activity_key.get_number_of_activities()
     }
 }

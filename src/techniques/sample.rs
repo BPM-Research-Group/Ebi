@@ -90,10 +90,12 @@ where
                     let i = Fraction::choose_randomly(&outgoing_probabilities)?;
                     let chosen_transition = enabled_transitions[i];
 
+                    let activity = self.get_transition_activity(chosen_transition, &current_state);
+
                     // execute transition
                     self.execute_transition(&mut current_state, chosen_transition)?;
 
-                    match self.get_transition_activity(chosen_transition) {
+                    match activity {
                         Some(activity) => trace.push(activity),
                         None => {}
                     }

@@ -48,11 +48,19 @@ impl Semantics for DirectlyFollowsGraph {
         state > &self.activity_key.get_number_of_activities()
     }
 
-    fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
+    fn is_transition_silent(
+        &self,
+        transition: TransitionIndex,
+        _state: &<Self as Semantics>::SemState,
+    ) -> bool {
         transition == self.sources.len()
     }
 
-    fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
+    fn get_transition_activity(
+        &self,
+        transition: TransitionIndex,
+        _state: &<Self as Semantics>::SemState,
+    ) -> Option<Activity> {
         if transition == self.sources.len() {
             //end
             None
@@ -116,7 +124,7 @@ impl Semantics for DirectlyFollowsGraph {
         }
     }
 
-    fn get_number_of_transitions(&self) -> usize {
+    fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState) -> usize {
         self.sources.len() + 1 + self.sources.len()
     }
 }

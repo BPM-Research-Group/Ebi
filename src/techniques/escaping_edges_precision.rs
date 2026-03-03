@@ -30,6 +30,9 @@ impl EscapingEdgesPrecision for EbiTraitSemantics {
             EbiTraitSemantics::TreeMarking(semantics) => {
                 semantics.escaping_edges_precision(alignments)
             }
+            EbiTraitSemantics::BPMNMarking(semantics) => {
+                semantics.escaping_edges_precision(alignments)
+            }
         }
     }
 }

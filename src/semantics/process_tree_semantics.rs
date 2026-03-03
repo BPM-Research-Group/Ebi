@@ -30,11 +30,19 @@ impl Semantics for ProcessTree {
         is_final_state(self, state)
     }
 
-    fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
-        self.get_transition_activity(transition).is_none()
+    fn is_transition_silent(
+        &self,
+        transition: TransitionIndex,
+        state: &<Self as Semantics>::SemState,
+    ) -> bool {
+        self.get_transition_activity(transition, state).is_none()
     }
 
-    fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
+    fn get_transition_activity(
+        &self,
+        transition: TransitionIndex,
+        _state: &<Self as Semantics>::SemState,
+    ) -> Option<Activity> {
         get_transition_activity(self, transition)
     }
 
@@ -45,7 +53,7 @@ impl Semantics for ProcessTree {
         get_enabled_transitions(self, state)
     }
 
-    fn get_number_of_transitions(&self) -> usize {
+    fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState) -> usize {
         get_number_of_transitions(self)
     }
 }

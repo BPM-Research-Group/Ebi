@@ -17,11 +17,11 @@ use ebi_objects::{
     ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    ebi_bpmn::semantics::BPMNMarking,
     ebi_objects::{
         labelled_petri_net::TransitionIndex, language_of_alignments::Move,
         process_tree::TreeMarking,
     },
-    marking::Marking,
 };
 use rayon::iter::ParallelIterator;
 use std::{
@@ -56,6 +56,7 @@ impl Align for EbiTraitSemantics {
             EbiTraitSemantics::Usize(sem) => sem.align_language(log),
             EbiTraitSemantics::Marking(sem) => sem.align_language(log),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_language(log),
+            EbiTraitSemantics::BPMNMarking(sem) => sem.align_language(log),
         }
     }
 
@@ -67,6 +68,7 @@ impl Align for EbiTraitSemantics {
             EbiTraitSemantics::Usize(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::Marking(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_stochastic_language(log),
+            EbiTraitSemantics::BPMNMarking(sem) => sem.align_stochastic_language(log),
         }
     }
 
@@ -75,6 +77,7 @@ impl Align for EbiTraitSemantics {
             EbiTraitSemantics::Usize(sem) => sem.align_trace(trace),
             EbiTraitSemantics::Marking(sem) => sem.align_trace(trace),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_trace(trace),
+            EbiTraitSemantics::BPMNMarking(sem) => sem.align_trace(trace),
         }
     }
 }
@@ -249,7 +252,7 @@ where
                 let mut new_state = state.clone();
                 let _ = semantics.execute_transition(&mut new_state, transition);
 
-                if let Some(activity) = semantics.get_transition_activity(transition) {
+                if let Some(activity) = semantics.get_transition_activity(transition, state) {
                     //non-silent model move
                     result.push(((*trace_index, new_state.clone()), 10000));
                     // log::debug!("\tmodel move t{} {} to {} {}", transition, activity, trace_index, new_state);
@@ -350,7 +353,9 @@ where
                 //otherwise, we take an arbitrary labelled model move
                 let transition = find_labelled_transition(semantics, &previous_state, &state)?;
                 alignment.push(Move::ModelMove(
-                    semantics.get_transition_activity(transition).unwrap(),
+                    semantics
+                        .get_transition_activity(transition, &previous_state)
+                        .unwrap(),
                     transition,
                 ));
             }
@@ -377,7 +382,7 @@ where
     // log::debug!("is there a silent transition enabled from {} to {}", from, to);
     // log::debug!("enabled transitions {:?}", semantics.get_enabled_transitions(from));
     for transition in semantics.get_enabled_transitions(from) {
-        if semantics.is_transition_silent(transition) {
+        if semantics.is_transition_silent(transition, from) {
             let mut from = from.clone();
             let _ = semantics.execute_transition(&mut from, transition);
             if &from == to {
@@ -403,7 +408,7 @@ where
     // log::debug!("find transition with label {}", label);
     for transition in semantics.get_enabled_transitions(from) {
         // log::debug!("transition {} is enabled", transition);
-        if semantics.get_transition_activity(transition) == Some(label) {
+        if semantics.get_transition_activity(transition, from) == Some(label) {
             let mut from = from.clone();
             semantics.execute_transition(&mut from, transition)?;
             if &from == to {
@@ -425,7 +430,7 @@ where
     FS: Display + Debug + Clone + Hash + Eq,
 {
     for transition in semantics.get_enabled_transitions(from) {
-        if !semantics.is_transition_silent(transition) {
+        if !semantics.is_transition_silent(transition, from) {
             let mut from = from.clone();
             semantics.execute_transition(&mut from, transition)?;
             if &from == to {
@@ -459,7 +464,7 @@ pub trait AlignmentHeuristics {
 }
 
 impl AlignmentHeuristics for BusinessProcessModelAndNotation {
-    type AliState = Marking;
+    type AliState = BPMNMarking;
 
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
         vec![]
@@ -469,7 +474,7 @@ impl AlignmentHeuristics for BusinessProcessModelAndNotation {
         &self,
         _: &Vec<Activity>,
         _: &usize,
-        _: &Marking,
+        _: &BPMNMarking,
         _: &Vec<Vec<usize>>,
     ) -> usize {
         0

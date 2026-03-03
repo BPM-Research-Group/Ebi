@@ -42,11 +42,19 @@ impl Semantics for StochasticNondeterministicFiniteAutomaton {
         state > &self.number_of_states()
     }
 
-    fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
+    fn is_transition_silent(
+        &self,
+        transition: TransitionIndex,
+        _state: &<Self as Semantics>::SemState,
+    ) -> bool {
         transition >= self.number_of_transitions() || self.activities[transition].is_none()
     }
 
-    fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
+    fn get_transition_activity(
+        &self,
+        transition: TransitionIndex,
+        _state: &<Self as Semantics>::SemState,
+    ) -> Option<Activity> {
         println!("transition activity {}", transition);
         if transition == self.number_of_transitions() {
             None
@@ -75,7 +83,7 @@ impl Semantics for StochasticNondeterministicFiniteAutomaton {
         return result;
     }
 
-    fn get_number_of_transitions(&self) -> usize {
+    fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState) -> usize {
         self.sources.len() + 1
     }
 }

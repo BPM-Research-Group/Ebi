@@ -104,15 +104,23 @@ impl Semantics for LabelledPetriNet {
         result
     }
 
-    fn is_transition_silent(&self, transition: TransitionIndex) -> bool {
+    fn is_transition_silent(
+        &self,
+        transition: TransitionIndex,
+        _state: &<Self as Semantics>::SemState,
+    ) -> bool {
         self.labels[transition].is_none()
     }
 
-    fn get_transition_activity(&self, transition: TransitionIndex) -> Option<Activity> {
+    fn get_transition_activity(
+        &self,
+        transition: TransitionIndex,
+        _state: &<Self as Semantics>::SemState,
+    ) -> Option<Activity> {
         self.labels[transition]
     }
 
-    fn get_number_of_transitions(&self) -> usize {
+    fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState) -> usize {
         self.transition2input_places.len()
     }
 }

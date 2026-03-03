@@ -10,12 +10,14 @@ use crate::{
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    ActivityKey, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
-    EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage,
-    FiniteStochasticLanguage, HasActivityKey, LabelledPetriNet, LolaNet, PetriNetMarkupLanguage,
-    ProcessTree, ProcessTreeMarkupLanguage, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TranslateActivityKey,
+    ActivityKey, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
+    DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogPython, EventLogTraceAttributes,
+    EventLogXes, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, LabelledPetriNet,
+    LolaNet, PetriNetMarkupLanguage, ProcessTree, ProcessTreeMarkupLanguage,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    TranslateActivityKey,
+    ebi_bpmn::semantics::BPMNMarking,
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
@@ -31,6 +33,7 @@ pub enum EbiTraitSemantics {
     Usize(Box<dyn Semantics<SemState = usize, AliState = usize>>),
     Marking(Box<dyn Semantics<SemState = LPNMarking, AliState = LPNMarking>>),
     TreeMarking(Box<dyn Semantics<SemState = TreeMarking, AliState = TreeMarking>>),
+    BPMNMarking(Box<dyn Semantics<SemState = BPMNMarking, AliState = BPMNMarking>>),
 }
 
 impl HasActivityKey for EbiTraitSemantics {
@@ -39,6 +42,7 @@ impl HasActivityKey for EbiTraitSemantics {
             EbiTraitSemantics::Marking(semantics) => semantics.activity_key(),
             EbiTraitSemantics::Usize(semantics) => semantics.activity_key(),
             EbiTraitSemantics::TreeMarking(semantics) => semantics.activity_key(),
+            EbiTraitSemantics::BPMNMarking(semantics) => semantics.activity_key(),
         }
     }
 
@@ -47,6 +51,7 @@ impl HasActivityKey for EbiTraitSemantics {
             EbiTraitSemantics::Marking(semantics) => semantics.activity_key_mut(),
             EbiTraitSemantics::Usize(semantics) => semantics.activity_key_mut(),
             EbiTraitSemantics::TreeMarking(semantics) => semantics.activity_key_mut(),
+            EbiTraitSemantics::BPMNMarking(semantics) => semantics.activity_key_mut(),
         }
     }
 }
@@ -61,6 +66,9 @@ impl TranslateActivityKey for EbiTraitSemantics {
                 semantics.translate_using_activity_key(to_activity_key)
             }
             EbiTraitSemantics::TreeMarking(semantics) => {
+                semantics.translate_using_activity_key(to_activity_key)
+            }
+            EbiTraitSemantics::BPMNMarking(semantics) => {
                 semantics.translate_using_activity_key(to_activity_key)
             }
         }
@@ -97,6 +105,12 @@ via_lang!(EventLogXes);
 via_lang!(EventLogCsv);
 via_lang!(EventLogOcel);
 via_lang!(EventLogPython);
+
+impl ToSemanticsTrait for BusinessProcessModelAndNotation {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::BPMNMarking(Box::new(self))
+    }
+}
 
 impl ToSemanticsTrait for DeterministicFiniteAutomaton {
     fn to_semantics_trait(self) -> EbiTraitSemantics {

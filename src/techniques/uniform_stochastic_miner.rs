@@ -1,7 +1,7 @@
-use crate::semantics::semantics::Semantics;
 use ebi_objects::{
     LabelledPetriNet, ProcessTree, StochasticLabelledPetriNet, StochasticProcessTree,
     ebi_arithmetic::{Fraction, One},
+    ebi_objects::process_tree::get_number_of_transitions,
 };
 
 pub trait UniformStochasticMinerLPN {
@@ -14,14 +14,14 @@ pub trait UniformStochasticMinerTree {
 
 impl UniformStochasticMinerLPN for LabelledPetriNet {
     fn mine_uniform_stochastic_lpn(self) -> StochasticLabelledPetriNet {
-        let len = self.get_number_of_transitions();
+        let len = self.transition2input_places.len();
         (self, vec![Fraction::one(); len]).into()
     }
 }
 
 impl UniformStochasticMinerTree for ProcessTree {
     fn mine_uniform_stochastic_tree(self) -> StochasticProcessTree {
-        let len = self.get_number_of_transitions() - 1;
+        let len = get_number_of_transitions(&self) - 1;
         (self, vec![Fraction::one(); len], Fraction::one())
             .try_into()
             .unwrap()
