@@ -90,8 +90,8 @@ impl EbiOutput {
     }
 }
 
-#[cfg(feature = "testactivities")]
-impl ebi_objects::activity_key::has_activity_key::TestActivityKey for EbiOutput {
+#[cfg(any(test, feature = "testactivities"))]
+impl ebi_objects::ebi_activity_key::has_activity_key::TestActivityKey for EbiOutput {
     fn test_activity_key(&self) {
         match self {
             EbiOutput::Object(ebi_object) => ebi_object.test_activity_key(),

@@ -870,7 +870,7 @@ mod tests {
         },
         multiple_reader::MultipleReader,
     };
-    use ebi_objects::{EbiObject, ebi_arithmetic::Fraction, activity_key::has_activity_key::TestActivityKey};
+    use ebi_objects::{EbiObject, ebi_activity_key::TestActivityKey, ebi_arithmetic::Fraction};
     use itertools::Itertools;
     use ntest::timeout;
     use rayon::iter::{IntoParallelIterator, ParallelIterator};
