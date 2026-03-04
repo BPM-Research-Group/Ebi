@@ -14,6 +14,7 @@ pub const EBI_PORTABLE_DOCUMENT_FORMAT: EbiFileHandler = EbiFileHandler {
     trait_importers: &[],
     object_importers: &[],
     object_exporters: &[
+        EbiObjectExporter::BusinessProcessModelAndNotation(PortableDocumentFormat::export_from_object),
         EbiObjectExporter::DeterministicFiniteAutomaton(PortableDocumentFormat::export_from_object),
         EbiObjectExporter::DirectlyFollowsModel(PortableDocumentFormat::export_from_object),
         EbiObjectExporter::DirectlyFollowsGraph(PortableDocumentFormat::export_from_object),

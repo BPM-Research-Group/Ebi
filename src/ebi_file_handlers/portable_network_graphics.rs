@@ -1,6 +1,7 @@
 use crate::ebi_framework::{ebi_file_handler::EbiFileHandler, ebi_output::EbiObjectExporter};
 use ebi_objects::{
-    Exportable, PortableNetworkGraphics, ebi_objects::portable_network_graphics::FORMAT_SPECIFICATION
+    Exportable, PortableNetworkGraphics,
+    ebi_objects::portable_network_graphics::FORMAT_SPECIFICATION,
 };
 
 pub const EBI_PORTABLE_NETWORK_GRAPHCIS: EbiFileHandler = EbiFileHandler {
@@ -13,6 +14,9 @@ pub const EBI_PORTABLE_NETWORK_GRAPHCIS: EbiFileHandler = EbiFileHandler {
     trait_importers: &[],
     object_importers: &[],
     object_exporters: &[
+        EbiObjectExporter::BusinessProcessModelAndNotation(
+            PortableNetworkGraphics::export_from_object,
+        ),
         EbiObjectExporter::DeterministicFiniteAutomaton(
             PortableNetworkGraphics::export_from_object,
         ),

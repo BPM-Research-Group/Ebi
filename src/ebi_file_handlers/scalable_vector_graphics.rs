@@ -14,6 +14,9 @@ pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
     trait_importers: &[],
     object_importers: &[],
     object_exporters: &[
+        EbiObjectExporter::BusinessProcessModelAndNotation(
+            ScalableVectorGraphics::export_from_object,
+        ),
         EbiObjectExporter::DeterministicFiniteAutomaton(ScalableVectorGraphics::export_from_object),
         EbiObjectExporter::DirectlyFollowsModel(ScalableVectorGraphics::export_from_object),
         EbiObjectExporter::DirectlyFollowsGraph(ScalableVectorGraphics::export_from_object),
