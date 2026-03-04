@@ -875,10 +875,7 @@ mod tests {
     use ntest::timeout;
     use rayon::iter::{IntoParallelIterator, ParallelIterator};
     use std::{
-        collections::HashSet,
-        fmt::Debug,
-        fs::{self, File},
-        path::PathBuf,
+        collections::HashSet, fmt::Debug, fs::{self, File}, path::PathBuf
     };
 
     #[test]
@@ -939,9 +936,9 @@ mod tests {
                     //apply the command to all input combinations
                     for inputs in inputss {
                         eprintln!("\t\t{}\t{:?}", EbiCommand::path_to_string(&path), inputs);
+
                         //we do not know whether a command should succeed (giving an error is fine in general), but no command should panic
                         let output = (execute)(transform(inputs), None);
-
                         
                         if let Ok(output) = output {
                             //verify that the output is of the correct type
