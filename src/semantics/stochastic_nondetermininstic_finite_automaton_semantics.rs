@@ -55,7 +55,6 @@ impl Semantics for StochasticNondeterministicFiniteAutomaton {
         transition: TransitionIndex,
         _state: &<Self as Semantics>::SemState,
     ) -> Option<Activity> {
-        println!("transition activity {}", transition);
         if transition == self.number_of_transitions() {
             None
         } else {
