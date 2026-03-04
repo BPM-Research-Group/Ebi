@@ -4,7 +4,9 @@ use crate::{
         ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
-        object_importers::ImportAsLabelledPetriNetObject,
+        object_importers::{
+            ImportAsBusinessProcessModelAndNotationObject, ImportAsLabelledPetriNetObject,
+        },
         trait_importers::{
             ImportAsActivitiesTrait, ImportAsGraphableTrait,
             ImportAsQueriableStochasticLanguageTrait, ImportAsSemanticsTrait,
@@ -51,6 +53,10 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
         ),
     ],
     object_importers: &[
+        EbiObjectImporter::BusinessProcessModelAndNotation(
+            StochasticLabelledPetriNet::import_as_business_process_model_and_notation_object,
+            StochasticLabelledPetriNet::IMPORTER_PARAMETERS,
+        ),
         EbiObjectImporter::StochasticLabelledPetriNet(
             StochasticLabelledPetriNet::import_as_object,
             StochasticLabelledPetriNet::IMPORTER_PARAMETERS,

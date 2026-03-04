@@ -2,7 +2,7 @@ use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
-    object_importers::ImportAsLabelledPetriNetObject,
+    object_importers::{ImportAsBusinessProcessModelAndNotationObject, ImportAsLabelledPetriNetObject},
     trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
 };
@@ -30,6 +30,10 @@ pub const EBI_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
         ),
     ],
     object_importers: &[
+        EbiObjectImporter::BusinessProcessModelAndNotation(
+            DirectlyFollowsModel::import_as_business_process_model_and_notation_object,
+            DirectlyFollowsModel::IMPORTER_PARAMETERS,
+        ),
         EbiObjectImporter::DirectlyFollowsModel(
             DirectlyFollowsModel::import_as_object,
             DirectlyFollowsModel::IMPORTER_PARAMETERS,

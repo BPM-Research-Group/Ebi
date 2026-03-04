@@ -7,8 +7,9 @@ use crate::{
     techniques::stochastic_markovian_abstraction::build_embedded_snfa,
 };
 use ebi_objects::{
-    EbiObject, EbiObjectType, EventLog, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet,
-    StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
+    BusinessProcessModelAndNotation, EbiObject, EbiObjectType, EventLog, FiniteLanguage,
+    FiniteStochasticLanguage, LabelledPetriNet, StochasticDeterministicFiniteAutomaton,
+    StochasticLabelledPetriNet,
 };
 
 pub const EBI_CONVERT: EbiCommand = EbiCommand::Group {
@@ -17,6 +18,7 @@ pub const EBI_CONVERT: EbiCommand = EbiCommand::Group {
     explanation_short: "Convert an object into something else.",
     explanation_long: None,
     children: &[
+        &EBI_CONVERT_BPMN,
         &EBI_CONVERT_LANG,
         &EBI_CONVERT_LOG,
         &EBI_CONVERT_LPN,
@@ -25,6 +27,30 @@ pub const EBI_CONVERT: EbiCommand = EbiCommand::Group {
         &EBI_CONVERT_SLPN,
         &EBI_CONVERT_SNFA,
     ],
+};
+
+pub const EBI_CONVERT_BPMN: EbiCommand = EbiCommand::Command {
+    name_short: "bpmn",
+    name_long: Some("business-process-model-and-notation"),
+    explanation_short: "Convert an object to a Business Process Model and Notation.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::BusinessProcessModelAndNotation), //every object that can be imported as an LPN will be supported by the framework
+    ]],
+    input_names: &["FILE"],
+    input_helps: &["Any file supported by Ebi that can be converted."],
+    execute: |mut inputs, _| {
+        let lpn = inputs
+            .remove(0)
+            .to_type::<BusinessProcessModelAndNotation>()?;
+        Ok(EbiOutput::Object(
+            EbiObject::BusinessProcessModelAndNotation(*lpn),
+        ))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::BusinessProcessModelAndNotation),
 };
 
 pub const EBI_CONVERT_LOG: EbiCommand = EbiCommand::Command {

@@ -2,7 +2,9 @@ use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
-    object_importers::ImportAsLabelledPetriNetObject,
+    object_importers::{
+        ImportAsBusinessProcessModelAndNotationObject, ImportAsLabelledPetriNetObject,
+    },
     trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
 };
@@ -30,6 +32,10 @@ pub const EBI_PROCESS_TREE_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
         ),
     ],
     object_importers: &[
+        EbiObjectImporter::BusinessProcessModelAndNotation(
+            ProcessTreeMarkupLanguage::import_as_business_process_model_and_notation_object,
+            ProcessTreeMarkupLanguage::IMPORTER_PARAMETERS,
+        ),
         EbiObjectImporter::ProcessTree(ProcessTreeMarkupLanguage::import_as_object, &[]),
         EbiObjectImporter::LabelledPetriNet(
             ProcessTreeMarkupLanguage::import_as_labelled_petri_net_object,

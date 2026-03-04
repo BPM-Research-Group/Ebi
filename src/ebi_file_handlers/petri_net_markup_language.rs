@@ -1,9 +1,5 @@
 use crate::ebi_framework::{
-    ebi_file_handler::EbiFileHandler,
-    ebi_input::{EbiObjectImporter, EbiTraitImporter},
-    ebi_output::EbiObjectExporter,
-    trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
-    validate::Validate,
+    ebi_file_handler::EbiFileHandler, ebi_input::{EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, object_importers::ImportAsBusinessProcessModelAndNotationObject, trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait}, validate::Validate
 };
 use ebi_objects::{Exportable, Importable, PetriNetMarkupLanguage};
 
@@ -28,10 +24,16 @@ pub const EBI_PETRI_NET_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
             PetriNetMarkupLanguage::IMPORTER_PARAMETERS,
         ),
     ],
-    object_importers: &[EbiObjectImporter::LabelledPetriNet(
-        PetriNetMarkupLanguage::import_as_object,
-        PetriNetMarkupLanguage::IMPORTER_PARAMETERS,
-    )],
+    object_importers: &[
+        EbiObjectImporter::BusinessProcessModelAndNotation(
+            PetriNetMarkupLanguage::import_as_business_process_model_and_notation_object,
+            PetriNetMarkupLanguage::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::LabelledPetriNet(
+            PetriNetMarkupLanguage::import_as_object,
+            PetriNetMarkupLanguage::IMPORTER_PARAMETERS,
+        ),
+    ],
     object_exporters: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(PetriNetMarkupLanguage::export_from_object),
         EbiObjectExporter::DirectlyFollowsModel(PetriNetMarkupLanguage::export_from_object),
