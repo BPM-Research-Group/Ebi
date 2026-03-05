@@ -5,7 +5,7 @@ use super::{
 };
 use crate::{
     ebi_framework::{
-        ebi_file_handler::{EbiFileHandler, get_file_handlers},
+        ebi_file_handler::{EbiFileHandler, get_file_handlers, get_file_handlers_fallible},
         ebi_importer_parameters,
         ebi_trait_object::EbiTraitObject,
     },
@@ -153,6 +153,7 @@ impl EbiInputType {
                 }
                 EbiInputType::Object(o) => {
                     result.extend(Self::show_file_handlers(get_file_handlers(o)));
+                    result.extend(Self::show_file_handlers(get_file_handlers_fallible(o)));
                 }
                 EbiInputType::AnyObject => {
                     result.extend(Self::show_file_handlers(EBI_FILE_HANDLERS.iter().collect()));
@@ -210,16 +211,24 @@ impl EbiInputType {
         result.into_iter().collect::<Vec<_>>()
     }
 
-    pub fn get_possible_inputs_with_latex(traits: &[&EbiInputType]) -> Vec<String> {
+    pub fn get_possible_inputs_with_latex(input_types: &[&EbiInputType]) -> Vec<String> {
         let mut result = HashSet::new();
 
-        for input_type in traits {
+        for input_type in input_types {
             match input_type {
                 EbiInputType::Trait(t) => {
                     result.extend(Self::show_file_handlers_latex(t.get_file_handlers()));
                 }
                 EbiInputType::Object(o) => {
                     result.extend(Self::show_file_handlers_latex(get_file_handlers(o)));
+                    result.extend(
+                        Self::show_file_handlers_latex(get_file_handlers_fallible(o))
+                            .into_iter()
+                            .map(|mut s| {
+                                s += "\\textsuperscript{\\textdagger}";
+                                s
+                            }),
+                    );
                 }
                 EbiInputType::AnyObject => {
                     result.extend(Self::show_file_handlers_latex(
@@ -753,6 +762,238 @@ impl Debug for EbiObjectImporter {
     }
 }
 
+pub enum FallibleImporterError {
+    ImporterError(anyhow::Error),
+    ConversionError(anyhow::Error),
+}
+
+#[derive(Clone, IntoStaticStr)]
+pub enum EbiObjectImporterFallible {
+    BusinessProcessModelAndNotation(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    EventLog(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    EventLogTraceAttributes(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    EventLogCsv(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    EventLogOcel(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    EventLogXes(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    DirectlyFollowsGraph(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    DirectlyFollowsModel(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    StochasticDirectlyFollowsModel(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    FiniteLanguage(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    FiniteStochasticLanguage(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    LabelledPetriNet(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    StochasticDeterministicFiniteAutomaton(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    StochasticNondeterministicFiniteAutomaton(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    StochasticLabelledPetriNet(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    LanguageOfAlignments(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    DeterministicFiniteAutomaton(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    ProcessTree(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    Executions(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    StochasticLanguageOfAlignments(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+    StochasticProcessTree(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>,
+        &'static [ImporterParameter],
+    ),
+}
+
+impl EbiObjectImporterFallible {
+    pub fn get_type(&self) -> EbiObjectType {
+        match self {
+            EbiObjectImporterFallible::BusinessProcessModelAndNotation(_, _) => {
+                EbiObjectType::BusinessProcessModelAndNotation
+            }
+            EbiObjectImporterFallible::EventLog(_, _) => EbiObjectType::EventLog,
+            EbiObjectImporterFallible::EventLogCsv(_, _) => EbiObjectType::EventLogCsv,
+            EbiObjectImporterFallible::EventLogOcel(_, _) => EbiObjectType::EventLogOcel,
+            EbiObjectImporterFallible::EventLogTraceAttributes(_, _) => {
+                EbiObjectType::EventLogTraceAttributes
+            }
+            EbiObjectImporterFallible::EventLogXes(_, _) => EbiObjectType::EventLogXes,
+            EbiObjectImporterFallible::DirectlyFollowsGraph(_, _) => {
+                EbiObjectType::DirectlyFollowsGraph
+            }
+            EbiObjectImporterFallible::DirectlyFollowsModel(_, _) => {
+                EbiObjectType::DirectlyFollowsModel
+            }
+            EbiObjectImporterFallible::StochasticDirectlyFollowsModel(_, _) => {
+                EbiObjectType::StochasticDirectlyFollowsModel
+            }
+            EbiObjectImporterFallible::FiniteLanguage(_, _) => EbiObjectType::FiniteLanguage,
+            EbiObjectImporterFallible::FiniteStochasticLanguage(_, _) => {
+                EbiObjectType::FiniteStochasticLanguage
+            }
+            EbiObjectImporterFallible::LabelledPetriNet(_, _) => EbiObjectType::LabelledPetriNet,
+            EbiObjectImporterFallible::StochasticDeterministicFiniteAutomaton(_, _) => {
+                EbiObjectType::StochasticDeterministicFiniteAutomaton
+            }
+            EbiObjectImporterFallible::StochasticNondeterministicFiniteAutomaton(_, _) => {
+                EbiObjectType::StochasticNondeterministicFiniteAutomaton
+            }
+            EbiObjectImporterFallible::StochasticLabelledPetriNet(_, _) => {
+                EbiObjectType::StochasticLabelledPetriNet
+            }
+            EbiObjectImporterFallible::LanguageOfAlignments(_, _) => {
+                EbiObjectType::LanguageOfAlignments
+            }
+            EbiObjectImporterFallible::StochasticLanguageOfAlignments(_, _) => {
+                EbiObjectType::StochasticLanguageOfAlignments
+            }
+            EbiObjectImporterFallible::DeterministicFiniteAutomaton(_, _) => {
+                EbiObjectType::DeterministicFiniteAutomaton
+            }
+            EbiObjectImporterFallible::ProcessTree(_, _) => EbiObjectType::ProcessTree,
+            EbiObjectImporterFallible::StochasticProcessTree(_, _) => {
+                EbiObjectType::StochasticProcessTree
+            }
+            EbiObjectImporterFallible::Executions(_, _) => EbiObjectType::Executions,
+        }
+    }
+
+    pub fn parameters(&self) -> &'static [ImporterParameter] {
+        match self {
+            EbiObjectImporterFallible::BusinessProcessModelAndNotation(_, parameters) => parameters,
+            EbiObjectImporterFallible::EventLog(_, parameters) => parameters,
+            EbiObjectImporterFallible::EventLogCsv(_, parameters) => parameters,
+            EbiObjectImporterFallible::EventLogOcel(_, parameters) => parameters,
+            EbiObjectImporterFallible::EventLogTraceAttributes(_, parameters) => parameters,
+            EbiObjectImporterFallible::EventLogXes(_, parameters) => parameters,
+            EbiObjectImporterFallible::DirectlyFollowsGraph(_, parameters) => parameters,
+            EbiObjectImporterFallible::DirectlyFollowsModel(_, parameters) => parameters,
+            EbiObjectImporterFallible::StochasticDirectlyFollowsModel(_, parameters) => parameters,
+            EbiObjectImporterFallible::FiniteLanguage(_, parameters) => parameters,
+            EbiObjectImporterFallible::FiniteStochasticLanguage(_, parameters) => parameters,
+            EbiObjectImporterFallible::LabelledPetriNet(_, parameters) => parameters,
+            EbiObjectImporterFallible::StochasticDeterministicFiniteAutomaton(_, parameters) => {
+                parameters
+            }
+            EbiObjectImporterFallible::StochasticNondeterministicFiniteAutomaton(_, parameters) => {
+                parameters
+            }
+            EbiObjectImporterFallible::StochasticLabelledPetriNet(_, parameters) => parameters,
+            EbiObjectImporterFallible::LanguageOfAlignments(_, parameters) => parameters,
+            EbiObjectImporterFallible::DeterministicFiniteAutomaton(_, parameters) => parameters,
+            EbiObjectImporterFallible::ProcessTree(_, parameters) => parameters,
+            EbiObjectImporterFallible::Executions(_, parameters) => parameters,
+            EbiObjectImporterFallible::StochasticLanguageOfAlignments(_, parameters) => parameters,
+            EbiObjectImporterFallible::StochasticProcessTree(_, parameters) => parameters,
+        }
+    }
+
+    pub fn default_parameter_values(&self) -> ImporterParameterValues {
+        let mut result = ImporterParameterValues::new();
+        for parameter in self.parameters() {
+            result.insert(*parameter, parameter.default());
+        }
+        result
+    }
+
+    pub fn get_importer(
+        &self,
+    ) -> fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject, FallibleImporterError>
+    {
+        match self {
+            EbiObjectImporterFallible::BusinessProcessModelAndNotation(importer, _) => *importer,
+            EbiObjectImporterFallible::EventLog(importer, _) => *importer,
+            EbiObjectImporterFallible::EventLogCsv(importer, _) => *importer,
+            EbiObjectImporterFallible::EventLogOcel(importer, _) => *importer,
+            EbiObjectImporterFallible::EventLogTraceAttributes(importer, _) => *importer,
+            EbiObjectImporterFallible::EventLogXes(importer, _) => *importer,
+            EbiObjectImporterFallible::DirectlyFollowsGraph(importer, _) => *importer,
+            EbiObjectImporterFallible::DirectlyFollowsModel(importer, _) => *importer,
+            EbiObjectImporterFallible::StochasticDirectlyFollowsModel(importer, _) => *importer,
+            EbiObjectImporterFallible::FiniteLanguage(importer, _) => *importer,
+            EbiObjectImporterFallible::FiniteStochasticLanguage(importer, _) => *importer,
+            EbiObjectImporterFallible::LabelledPetriNet(importer, _) => *importer,
+            EbiObjectImporterFallible::StochasticDeterministicFiniteAutomaton(importer, _) => {
+                *importer
+            }
+            EbiObjectImporterFallible::StochasticNondeterministicFiniteAutomaton(importer, _) => {
+                *importer
+            }
+            EbiObjectImporterFallible::StochasticLabelledPetriNet(importer, _) => *importer,
+            EbiObjectImporterFallible::LanguageOfAlignments(importer, _) => *importer,
+            EbiObjectImporterFallible::StochasticLanguageOfAlignments(importer, _) => *importer,
+            EbiObjectImporterFallible::DeterministicFiniteAutomaton(importer, _) => *importer,
+            EbiObjectImporterFallible::ProcessTree(importer, _) => *importer,
+            EbiObjectImporterFallible::StochasticProcessTree(importer, _) => *importer,
+            EbiObjectImporterFallible::Executions(importer, _) => *importer,
+        }
+    }
+}
+
+impl Debug for EbiObjectImporterFallible {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        let right: &'static str = self.into();
+        write!(f, "{}", right)
+    }
+}
+
+impl Display for EbiObjectImporterFallible {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let right: &'static str = self.into();
+        write!(f, "{}", right)
+    }
+}
+
 pub fn get_reader_file(from_file: &PathBuf) -> Result<MultipleReader> {
     if from_file.as_os_str() == "-" {
         return MultipleReader::from_stdin();
@@ -817,6 +1058,7 @@ pub fn read_as_object(
     cli_matches: Option<&ArgMatches>,
     input_index: usize,
 ) -> Result<(EbiObject, &'static EbiFileHandler)> {
+    let mut conversion_error = None;
     for file_handler in EBI_FILE_HANDLERS {
         for importer in file_handler.object_importers {
             if &importer.get_type() == etype {
@@ -839,10 +1081,45 @@ pub fn read_as_object(
                 }
             }
         }
+        //try as fallible importer
+        for importer in file_handler.object_importers_fallible {
+            if &importer.get_type() == etype {
+                //attempt to import
+                match ebi_importer_parameters::extract_parameter_values(
+                    cli_matches,
+                    importer.parameters(),
+                    input_index,
+                ) {
+                    Ok(importer_parameter_values) => {
+                        match (importer.get_importer())(
+                            reader.get().context("Could not obtain reader.")?.as_mut(),
+                            &importer_parameter_values,
+                        ) {
+                            Ok(object) => return Ok((object, file_handler)), //object parsed; return it
+                            Err(FallibleImporterError::ConversionError(e)) => {
+                                conversion_error = Some((e, file_handler));
+                            }
+                            Err(FallibleImporterError::ImporterError(_)) => {}
+                        }
+                    }
+                    Err(_) => {}
+                }
+            }
+        }
     }
-    Err(anyhow!(
-        "File could not be recognised. If you know the file format, try validating it with `Ebi validate [file type]'."
-    ))
+
+    if let Some((error, file_handler)) = conversion_error {
+        Err(error).context(anyhow!(
+            "File was recognised as {} .{}, but could not be converted to {}.",
+            file_handler.article,
+            file_handler.file_extension,
+            etype
+        ))
+    } else {
+        Err(anyhow!(
+            "File could not be recognised. If you know the file format, try validating it with `Ebi validate [file type]'."
+        ))
+    }
 }
 
 pub fn read_as_any_object(

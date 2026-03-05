@@ -1,6 +1,6 @@
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
-    ebi_input::{EbiObjectImporter, EbiTraitImporter},
+    ebi_input::{EbiObjectImporter, EbiObjectImporterFallible, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     object_importers::{
         ImportAsDirectlyFollowsModelObject, ImportAsLabelledPetriNetObject, ImportAsStochasticLabelledPetriNetObject, ImportAsStochasticNondeterministicFiniteAutomatonObject, TryToBusinessProcessModelAndNotationObject
@@ -52,10 +52,6 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
         ),
     ],
     object_importers: &[
-        EbiObjectImporter::BusinessProcessModelAndNotation(
-            StochasticDirectlyFollowsModel::try_import_as_business_process_model_and_notation_object,
-            StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
-        ),
         EbiObjectImporter::StochasticDirectlyFollowsModel(
             StochasticDirectlyFollowsModel::import_as_object,
             StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
@@ -77,6 +73,10 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
              StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
     ],
+    object_importers_fallible: &[EbiObjectImporterFallible::BusinessProcessModelAndNotation(
+            StochasticDirectlyFollowsModel::try_import_as_business_process_model_and_notation_object,
+            StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
+        )],
     object_exporters: &[
         EbiObjectExporter::StochasticDirectlyFollowsModel(
             StochasticDirectlyFollowsModel::export_from_object,

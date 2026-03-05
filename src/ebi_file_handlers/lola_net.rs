@@ -29,6 +29,7 @@ pub const EBI_LOLA_NET: EbiFileHandler = EbiFileHandler {
         ),
     ],
     object_importers: &[],
+    object_importers_fallible: &[],
     object_exporters: &[
         EbiObjectExporter::LabelledPetriNet(LolaNet::export_from_object),
         EbiObjectExporter::DeterministicFiniteAutomaton(LolaNet::export_from_object),

@@ -26,6 +26,7 @@ use ebi_objects::{
 };
 
 pub const EBI_EVENT_LOG_XES: EbiFileHandler = EbiFileHandler {
+    
     name: "extensible event stream",
     article: "an",
     file_extension: "xes",
@@ -113,6 +114,7 @@ pub const EBI_EVENT_LOG_XES: EbiFileHandler = EbiFileHandler {
             EventLog::IMPORTER_PARAMETERS,
         ),
     ],
+    object_importers_fallible: &[],
     object_exporters: &[
         EbiObjectExporter::EventLog(EventLog::export_from_object),
         EbiObjectExporter::EventLogTraceAttributes(EventLog::export_from_object),

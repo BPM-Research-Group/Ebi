@@ -19,6 +19,7 @@ pub const EBI_EXECUTIONS: EbiFileHandler = EbiFileHandler {
         Executions::import_as_object,
         Executions::IMPORTER_PARAMETERS,
     )],
+    object_importers_fallible: &[],
     object_exporters: &[EbiObjectExporter::Executions(
         Executions::export_from_object,
     )],

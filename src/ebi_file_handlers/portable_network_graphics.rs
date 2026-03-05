@@ -13,6 +13,7 @@ pub const EBI_PORTABLE_NETWORK_GRAPHCIS: EbiFileHandler = EbiFileHandler {
     validator: None,
     trait_importers: &[],
     object_importers: &[],
+    object_importers_fallible: &[],
     object_exporters: &[
         EbiObjectExporter::BusinessProcessModelAndNotation(
             PortableNetworkGraphics::export_from_object,

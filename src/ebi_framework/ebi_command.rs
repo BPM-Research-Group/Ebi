@@ -81,12 +81,18 @@ pub enum EbiCommand {
         name_long: Option<&'static str>,
         explanation_short: &'static str,
         explanation_long: Option<&'static str>,
-        latex_link: Option<&'static str>, //insert a link to a Latex target
-        cli_command: Option<fn(command: Command) -> Command>, //create the cli command. An output -o argument is always added
 
-        exact_arithmetic: bool, //if set to true, then Ebi will use exact arithmetic by default, but allow the user to disable it. If false, the command will only be available in approximate mode.
+        /// Latex code to be inserted in the manual.
+        latex_link: Option<&'static str>,
+        
+        /// Provides access to adapt the cli command. If this is not set to None, the command will be unavailable in other environments than the CLI.
+        cli_command: Option<fn(command: Command) -> Command>,
 
-        input_types: &'static [&'static [&'static EbiInputType]], //for each fixed-position input parameter, the ebi traits that are accepted. If accept_source_file is true, that is the first parameter
+        /// Ff set to true, then Ebi will use exact arithmetic by default, but allow the user to disable it. If false, the command will only be available in approximate mode.
+        exact_arithmetic: bool,
+
+        /// for each fixed-position input parameter, the ebi traits that are accepted. If accept_source_file is true, that is the first parameter
+        input_types: &'static [&'static [&'static EbiInputType]], 
         input_names: &'static [&'static str],
         input_helps: &'static [&'static str],
 

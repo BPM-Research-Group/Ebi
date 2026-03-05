@@ -30,7 +30,10 @@ use crate::{
         stochastic_nondeterministic_finite_automaton::EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON,
         stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE,
     },
-    ebi_framework::{ebi_command::get_applicable_commands, ebi_trait::EbiTrait},
+    ebi_framework::{
+        ebi_command::get_applicable_commands, ebi_input::EbiObjectImporterFallible,
+        ebi_trait::EbiTrait,
+    },
     prom::java_object_handler::JavaObjectHandler,
 };
 use anyhow::{Error, Result, anyhow};
@@ -80,13 +83,28 @@ pub struct EbiFileHandler {
     pub is_binary: bool,
     pub format_specification: &'static str,
     pub validator: Option<fn(&mut dyn BufRead) -> Result<()>>,
+
     /// This file format can be imported as the given traits.
+    /// The order matters: importers are attempted in order.
     pub trait_importers: &'static [EbiTraitImporter],
+
     /// This file format can be imported as the given objects.
+    /// The order matters: importers are attempted in order, fallible importers last.
+    /// These importers should only fail if the parser failed or the underlying reader fails. If there is a conversion involved that may fail, list it under `trait_importers_fallible`.
     pub object_importers: &'static [EbiObjectImporter],
+
+    /// This file format can be imported as the given objects.
+    /// The order matters: importers are attempted in order, fallible importers last.
+    /// These importers perform a conversion that may fail.
+    pub object_importers_fallible: &'static [EbiObjectImporterFallible],
+
     /// This file format can be exported to from the given objects.
-    pub object_exporters: &'static [EbiObjectExporter], //the order matters, because if multiple file handlers can export an object, the one that mentions the object earliest is preferred. Should not fail unless the underlying writer yields an error.
-    pub object_exporters_fallible: &'static [EbiObjectExporter], //the order matters, because if multiple file handlers can export an object, the one that mentions the object earliest is preferred.
+    /// The order matters, because if multiple file handlers can export an object, the one that mentions the object earliest is preferred. Should not fail unless the underlying writer yields an error.
+    pub object_exporters: &'static [EbiObjectExporter],
+
+    /// This file format can be exported to from the given objects.
+    /// The order matters, because if multiple file handlers can export an object, the one that mentions the object earliest is preferred.
+    pub object_exporters_fallible: &'static [EbiObjectExporter],
     pub java_object_handlers: &'static [JavaObjectHandler],
 }
 
@@ -231,6 +249,19 @@ pub fn get_file_handlers(object_type: &EbiObjectType) -> Vec<&'static EbiFileHan
     let mut result = vec![];
     for file_handler in EBI_FILE_HANDLERS.iter() {
         for importer in file_handler.object_importers {
+            if &importer.get_type() == object_type {
+                result.push(file_handler);
+                break;
+            }
+        }
+    }
+    result
+}
+
+pub fn get_file_handlers_fallible(object_type: &EbiObjectType) -> Vec<&'static EbiFileHandler> {
+    let mut result = vec![];
+    for file_handler in EBI_FILE_HANDLERS.iter() {
+        for importer in file_handler.object_importers_fallible {
             if &importer.get_type() == object_type {
                 result.push(file_handler);
                 break;

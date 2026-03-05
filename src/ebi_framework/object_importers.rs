@@ -1,7 +1,5 @@
+use crate::ebi_framework::ebi_input::FallibleImporterError;
 use anyhow::Result;
-use pastey::paste;
-use std::io::BufRead;
-
 use ebi_objects::{
     BusinessProcessModelAndNotation, DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject,
     EventLog, EventLogCsv, EventLogOcel, EventLogTraceAttributes, EventLogXes, FiniteLanguage,
@@ -11,6 +9,8 @@ use ebi_objects::{
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     traits::importable::{Importable, ImporterParameterValues},
 };
+use pastey::paste;
+use std::io::BufRead;
 
 macro_rules! import_as_object {
     ($t:ident, $u:expr) => {
@@ -43,16 +43,23 @@ macro_rules! import_as_object {
 
             pub trait [<TryTo $t Object>] {
                 /// A TryTo will first import, and then try to convert. The latter conversion may fail.
-                fn [<try_import_as_ $u _object>](reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) -> Result<EbiObject>;
+                fn [<try_import_as_ $u _object>](reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) ->  Result<EbiObject, FallibleImporterError>;
             }
 
             impl<T: Importable> [<TryTo $t Object>] for T
             where
                 T: TryInto<$t, Error = anyhow::Error>,
             {
-                fn [<try_import_as_ $u _object>](reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) -> Result<EbiObject> {
-                    let x = Self::import(reader, parameter_values)?.try_into()?;
-                    Ok(EbiObject::$t(x))
+                fn [<try_import_as_ $u _object>](reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) ->  Result<EbiObject, FallibleImporterError> {
+                    match Self::import(reader, parameter_values) {
+                        Ok(object) => {
+                            match object.try_into() {
+                                Ok(converted) => Ok(EbiObject::$t(converted)),
+                                Err(err) => Err(FallibleImporterError::ConversionError(err.into()))
+                            }
+                        },
+                        Err(err) => Err(FallibleImporterError::ImporterError(err))
+                    }
                 }
             }
         }

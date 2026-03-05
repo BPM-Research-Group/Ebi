@@ -1,7 +1,7 @@
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+        ebi_input::{EbiInput, EbiObjectImporter, EbiObjectImporterFallible, EbiTraitImporter},
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
         object_importers::TryToBusinessProcessModelAndNotationObject,
@@ -36,16 +36,14 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
             LabelledPetriNet::IMPORTER_PARAMETERS,
         ),
     ],
-    object_importers: &[
-        EbiObjectImporter::BusinessProcessModelAndNotation(
-            LabelledPetriNet::try_import_as_business_process_model_and_notation_object,
-            LabelledPetriNet::IMPORTER_PARAMETERS,
-        ),
-        EbiObjectImporter::LabelledPetriNet(
-            LabelledPetriNet::import_as_object,
-            LabelledPetriNet::IMPORTER_PARAMETERS,
-        ),
-    ],
+    object_importers: &[EbiObjectImporter::LabelledPetriNet(
+        LabelledPetriNet::import_as_object,
+        LabelledPetriNet::IMPORTER_PARAMETERS,
+    )],
+    object_importers_fallible: &[EbiObjectImporterFallible::BusinessProcessModelAndNotation(
+        LabelledPetriNet::try_import_as_business_process_model_and_notation_object,
+        LabelledPetriNet::IMPORTER_PARAMETERS,
+    )],
     object_exporters: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(LabelledPetriNet::export_from_object),
         EbiObjectExporter::DirectlyFollowsGraph(LabelledPetriNet::export_from_object),

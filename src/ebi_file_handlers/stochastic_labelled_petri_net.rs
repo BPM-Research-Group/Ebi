@@ -1,7 +1,7 @@
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+        ebi_input::{EbiInput, EbiObjectImporter, EbiObjectImporterFallible, EbiTraitImporter},
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
         object_importers::{
@@ -53,10 +53,6 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
         ),
     ],
     object_importers: &[
-        EbiObjectImporter::BusinessProcessModelAndNotation(
-            StochasticLabelledPetriNet::try_import_as_business_process_model_and_notation_object,
-            StochasticLabelledPetriNet::IMPORTER_PARAMETERS,
-        ),
         EbiObjectImporter::StochasticLabelledPetriNet(
             StochasticLabelledPetriNet::import_as_object,
             StochasticLabelledPetriNet::IMPORTER_PARAMETERS,
@@ -66,6 +62,10 @@ pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
             StochasticLabelledPetriNet::IMPORTER_PARAMETERS,
         ),
     ],
+    object_importers_fallible: &[EbiObjectImporterFallible::BusinessProcessModelAndNotation(
+        StochasticLabelledPetriNet::try_import_as_business_process_model_and_notation_object,
+        StochasticLabelledPetriNet::IMPORTER_PARAMETERS,
+    )],
     object_exporters: &[
         EbiObjectExporter::StochasticLabelledPetriNet(
             StochasticLabelledPetriNet::export_from_object,

@@ -31,6 +31,7 @@ pub const EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler
             StochasticLanguageOfAlignments::IMPORTER_PARAMETERS,
         ),
     ],
+    object_importers_fallible: &[],
     object_exporters: &[EbiObjectExporter::StochasticLanguageOfAlignments(
         StochasticLanguageOfAlignments::export_from_object,
     )],

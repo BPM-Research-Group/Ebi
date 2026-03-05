@@ -1,6 +1,6 @@
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
-    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    ebi_input::{EbiInput, EbiObjectImporter, EbiObjectImporterFallible, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     ebi_trait::FromEbiTraitObject,
     object_importers::{
@@ -52,10 +52,6 @@ pub const EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = Ebi
         ),
     ],
     object_importers: &[
-        EbiObjectImporter::BusinessProcessModelAndNotation(
-            StochasticNondeterministicFiniteAutomaton::try_import_as_business_process_model_and_notation_object,
-            StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
-        ),
         EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(
             StochasticNondeterministicFiniteAutomaton::import_as_object,
             StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
@@ -69,6 +65,10 @@ pub const EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = Ebi
             StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
     ],
+    object_importers_fallible: &[EbiObjectImporterFallible::BusinessProcessModelAndNotation(
+            StochasticNondeterministicFiniteAutomaton::try_import_as_business_process_model_and_notation_object,
+            StochasticNondeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
+        ),],
     object_exporters: &[
         EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(
             StochasticNondeterministicFiniteAutomaton::export_from_object,

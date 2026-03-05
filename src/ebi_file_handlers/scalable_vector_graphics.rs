@@ -13,6 +13,7 @@ pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
     validator: None,
     trait_importers: &[],
     object_importers: &[],
+    object_importers_fallible: &[],
     object_exporters: &[
         EbiObjectExporter::BusinessProcessModelAndNotation(
             ScalableVectorGraphics::export_from_object,

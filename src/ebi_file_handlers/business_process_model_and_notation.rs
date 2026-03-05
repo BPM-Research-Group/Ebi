@@ -34,6 +34,7 @@ pub const EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = EbiFileHandl
         BusinessProcessModelAndNotation::import_as_object,
         BusinessProcessModelAndNotation::IMPORTER_PARAMETERS,
     )],
+    object_importers_fallible: &[],
     object_exporters: &[EbiObjectExporter::BusinessProcessModelAndNotation(
         BusinessProcessModelAndNotation::export_from_object,
     )],

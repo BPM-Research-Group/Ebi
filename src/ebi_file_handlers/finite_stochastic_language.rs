@@ -78,6 +78,7 @@ pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
             FiniteStochasticLanguage::IMPORTER_PARAMETERS,
         ),
     ],
+    object_importers_fallible: &[],
     object_exporters: &[
         EbiObjectExporter::FiniteStochasticLanguage(FiniteStochasticLanguage::export_from_object),
         EbiObjectExporter::EventLog(FiniteStochasticLanguage::export_from_object),

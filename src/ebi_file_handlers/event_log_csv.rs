@@ -1,9 +1,12 @@
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
-    ebi_input::{EbiObjectImporter, EbiTraitImporter},
+    ebi_input::{EbiObjectImporter, EbiObjectImporterFallible, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     object_importers::{
-        ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogObject, ImportAsFiniteLanguageObject, ImportAsFiniteStochasticLanguageObject, ImportAsStochasticDeterministicFiniteAutomatonObject, ImportAsStochasticNondeterministicFiniteAutomatonObject, TryToEventLogXesObject
+        ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogObject,
+        ImportAsFiniteLanguageObject, ImportAsFiniteStochasticLanguageObject,
+        ImportAsStochasticDeterministicFiniteAutomatonObject,
+        ImportAsStochasticNondeterministicFiniteAutomatonObject, TryToEventLogXesObject,
     },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsEventLogTrait, ImportAsFiniteLanguageTrait,
@@ -70,10 +73,6 @@ pub const EBI_EVENT_LOG_CSV: EbiFileHandler = EbiFileHandler {
             EventLogCsv::import_as_event_log_object,
             EventLogCsv::IMPORTER_PARAMETERS,
         ),
-        EbiObjectImporter::EventLogXes(
-            EventLogCsv::try_import_as_event_log_xes_object,
-            EventLogCsv::IMPORTER_PARAMETERS,
-        ),
         EbiObjectImporter::EventLogCsv(
             EventLogCsv::import_as_object,
             EventLogCsv::IMPORTER_PARAMETERS,
@@ -96,6 +95,12 @@ pub const EBI_EVENT_LOG_CSV: EbiFileHandler = EbiFileHandler {
         ),
         EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(
             EventLogCsv::import_as_stochastic_nondeterministic_finite_automaton_object,
+            EventLogCsv::IMPORTER_PARAMETERS,
+        ),
+    ],
+    object_importers_fallible: &[
+        EbiObjectImporterFallible::EventLogXes(
+            EventLogCsv::try_import_as_event_log_xes_object,
             EventLogCsv::IMPORTER_PARAMETERS,
         ),
     ],

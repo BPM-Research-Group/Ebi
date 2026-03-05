@@ -1,6 +1,6 @@
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
-    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    ebi_input::{EbiInput, EbiObjectImporter, EbiObjectImporterFallible, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     ebi_trait::FromEbiTraitObject,
     object_importers::{
@@ -50,10 +50,6 @@ pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
         ),
     ],
     object_importers: &[
-        EbiObjectImporter::BusinessProcessModelAndNotation(
-            DirectlyFollowsGraph::try_import_as_business_process_model_and_notation_object,
-            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
-        ),
         EbiObjectImporter::DirectlyFollowsGraph(
             DirectlyFollowsGraph::import_as_object,
             DirectlyFollowsGraph::IMPORTER_PARAMETERS,
@@ -80,6 +76,12 @@ pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
         ),
         EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(
             DirectlyFollowsGraph::import_as_stochastic_nondeterministic_finite_automaton_object,
+            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
+        ),
+    ],
+    object_importers_fallible: &[
+        EbiObjectImporterFallible::BusinessProcessModelAndNotation(
+            DirectlyFollowsGraph::try_import_as_business_process_model_and_notation_object,
             DirectlyFollowsGraph::IMPORTER_PARAMETERS,
         ),
     ],

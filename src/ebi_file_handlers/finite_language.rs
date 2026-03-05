@@ -48,6 +48,7 @@ pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
             &[],
         ),
     ],
+    object_importers_fallible: &[],
     object_exporters: &[
         EbiObjectExporter::EventLog(FiniteLanguage::export_from_object),
         EbiObjectExporter::EventLogTraceAttributes(FiniteLanguage::export_from_object),

@@ -22,6 +22,7 @@ pub const EBI_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
         LanguageOfAlignments::import_as_object,
         LanguageOfAlignments::IMPORTER_PARAMETERS,
     )],
+    object_importers_fallible: &[],
     object_exporters: &[
         EbiObjectExporter::LanguageOfAlignments(LanguageOfAlignments::export_from_object),
         EbiObjectExporter::StochasticLanguageOfAlignments(LanguageOfAlignments::export_from_object),

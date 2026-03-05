@@ -1,4 +1,4 @@
-use anyhow::Result;
+use anyhow::{Ok, Result};
 use clap::Command;
 use ebi_objects::EbiObjectType;
 use inflector::Inflector;
@@ -35,146 +35,7 @@ pub fn manual() -> Result<EbiOutput> {
     // }
     // writeln!(f, "\\end{{itemize}}}}")?;
 
-    //commands
-    writeln!(f, "\\def\\ebicommands{{")?;
-    for path in EBI_COMMANDS.get_command_paths() {
-        writeln!(f, "\\clearpage\\section{{\\texttt{{{}}}}}", EbiCommand::path_to_string(&path))?;
-        writeln!(f, "\\label{{command:{}}}", EbiCommand::path_to_string(&path))?;
-
-        if let EbiCommand::Command { name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_typess, input_names, input_helps, output_type, .. } = path[path.len()-1] {
-
-            //alias
-            if let Some(_) = name_long {
-                writeln!(f, "Alias: \\texttt{{{}}}.\\\\", EbiCommand::path_to_short_string(&path))?;
-            }
-
-            //explanation
-            if let Some(l) = explanation_long {
-                writeln!(f, "{}\\\\", l)?;
-            } else {
-                writeln!(f, "{}\\\\", explanation_short)?;
-            }
-
-            //latex link
-            if let Some(link) = latex_link {
-                writeln!(f, "More information: {}.\\\\", link)?;
-            }
-            
-            //output
-            writeln!(f, "\\noindent Output: {}, which can be written as {}.\\\\", output_type, output_types(output_type))?;
-
-            //ProM
-            if path.last().unwrap().is_in_java() {
-                writeln!(f, "\\\\This command is available in Java and ProM.")?;
-            } else {
-                writeln!(f, "\\\\This command is not available in Java and ProM.")?;
-            }
-
-            //pm4py
-            if path.last().unwrap().is_in_python() {
-                writeln!(f, "\\\\This command is available in the {} Python package using the function {}.", PYTHON_PACKAGE, pm4py_function_name(&path).escape_latex())?;
-            } else {
-                writeln!(f, "\\\\This command is not available in the {} Python package.", PYTHON_PACKAGE)?;
-            }
-
-            //parameters table
-            writeln!(f, "\\begin{{tabularx}}{{\\linewidth}}{{lX}}")?;
-            writeln!(f, "\\toprule")?;
-            writeln!(f, "Parameter \\\\\\midrule")?;
-
-            //standard parameters
-            for (input_name, (input_types, input_help)) in input_names.iter().zip(input_typess.iter().zip(input_helps.iter())) {
-                write!(f, "<\\texttt{{{}}}>", input_name.escape_latex())?;    
-                writeln!(f, "&{}\\\\", input_help)?;
-
-                //mandatoryness
-                if let Some(default) = ebi_input::default(input_types) {
-                    writeln!(f, "&\\textit{{Mandatory:}} \\quad no: if no value is provided, a default of {} will be used. It can also be provided on STDIN by giving a `-' on the command line.\\\\", default)?;
-                } else {
-                    writeln!(f, "&\\textit{{Mandatory:}} \\quad yes, though it can be given on STDIN by giving a `-' on the command line.\\\\")?;
-                }
-
-                //accepted values
-                writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", EbiInputType::get_possible_inputs_with_latex(input_types).join_with(", ", " and "))?;
-            }
-
-            //custom parameters
-            if let Some(fu) = cli_command {
-                for arg in (fu)(Command::new("")).get_arguments() {
-                    if let Some(short) = arg.get_short() {
-                        if let Some(long) = arg.get_long() {
-                            writeln!(f, "-\\texttt{{{}}} or --\\texttt{{{}}}", short, long)?;
-                        } else {
-                            writeln!(f, "-\\texttt{{{}}}", short)?;
-                        }
-                    } else {
-                        if let Some(long) = arg.get_long() {
-                            writeln!(f, "--\\texttt{{{}}}", long)?;
-                        } else {
-                            writeln!(f, "<\\texttt{{{}}}>", arg.get_value_names().unwrap()[0])?;
-                        }
-                    }
-                    writeln!(f, "&{}\\\\", if let Some(h) = arg.get_long_help() {h.to_string()} else {arg.get_help().unwrap().to_string()})?;
-
-                    if arg.get_short().is_none() && arg.get_long().is_none() {
-                        //custom argument
-                        if let Some(default) = arg.get_default_values().iter().next() {
-                            writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes".to_owned()} else {format!("no; if not provided, a default value of {} will be used", default.to_string_lossy())} )?;
-                        } else {
-                            writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes"} else {"no"} )?;
-                        }
-                    } else {
-                        writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
-                    }
-                }
-            }
-
-            //output-type
-            if output_type.get_exporters().len() > 1 {
-                let output_extensions = output_type
-                        .get_exporters()
-                        .iter()
-                        .map(|exporter| exporter.get_extension())
-                        .collect::<Vec<_>>()
-                        .join_with(", ", " and ");
-                writeln!(f, "\\texttt{{-t}} or \\texttt{{--output\\_type}} <\\texttt{{OUTPUT\\_TYPE}}> &")?;
-                writeln!(f, "The output file extension (without period). The default is {}. Possible values are {}.\\\\", output_type.get_default_exporter().get_extension(), output_extensions)?;
-                writeln!(f, "&\\textit{{Mandatory:}} \\quad no\\\\")?;
-            }
-
-            //output
-            writeln!(f, "\\texttt{{-o}} or \\texttt{{--output}} <\\texttt{{FILE}}> &")?;
-            if output_type.get_exporters().len() == 1 {
-                let exporter = output_type.get_exporters().remove(0);
-                writeln!(f, "The {} file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\\\", exporter)?;
-            } else {
-                writeln!(f, "The file to which the results must be written. Based on the file extension, Ebi will output either {}.", output_types(output_type))?;
-                writeln!(f, "If the parameter is not given, the results will be written to STDOUT as {} {}.\\\\", output_type.get_default_exporter().get_article(), output_type.get_default_exporter())?;
-            }
-            writeln!(f, "&\\textit{{Mandatory:}} \\quad no\\\\")?;
-            
-            //exact arithmetic flag
-            if *exact_arithmetic {
-                writeln!(f, "\\texttt{{-a}} or \\texttt{{--approximate}} & Use approximate arithmetic instead of exact arithmetic.\\\\")?;
-                writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
-            }
-
-            //importer parameters
-            for (input_index, (input_types, input_name)) in input_typess.iter().zip(input_names.iter()).enumerate() {
-                for parameter in ebi_importer_parameters::merge_importer_parameters(input_types) { 
-                    writeln!(f, "\\texttt{{--{}}} & {}. This parameter applies to some of the importers of the {} input {}. {}\\\\", ebi_importer_parameters::name_to_id(parameter.name(), input_index).escape_latex(), parameter.explanation().escape_latex(), input_index.rank(), input_name.escape_latex(), ebi_importer_parameters::explanation_with_values(parameter).escape_latex())?;
-                    writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
-                    if ebi_importer_parameters::has_accepted_values(parameter) {
-                        writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", ebi_importer_parameters::explanation_with_values(parameter).escape_latex())?;
-                    }
-                }
-            }
-
-            writeln!(f, "\\bottomrule")?;
-            writeln!(f, "\\end{{tabularx}}")?;
-        }
-    }
-    writeln!(f, "}}")?;
+    write_commands(&mut f)?;
 
     //file handlers
     writeln!(f, "\\long\\def\\ebifilehandlers{{")?;
@@ -184,6 +45,7 @@ pub fn manual() -> Result<EbiOutput> {
         writeln!(f, "\\section{{{} (.{})}}", file_handler.name.to_sentence_case(), file_handler.file_extension)?;
         writeln!(f, "\\label{{filehandler:{}}}", file_handler.name)?;
         writeln!(f, "Import as objects: {}.", or_none(&file_handler.object_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
+        writeln!(f, "\\\\Fallible import as objects: {}.", or_none(&file_handler.object_importers_fallible.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
         writeln!(f, "\\\\Import as traits: {}.", or_none(&file_handler.trait_importers.iter().map(|importer| importer.to_string()).collect::<Vec<_>>().join(", ")))?;
         writeln!(f, "\\subsection*{{Input to commands}} {}", or_none(&file_handler.get_applicable_commands().iter().map(
             |path| format!("\\null\\qquad\\hyperref[command:{}]{{\\texttt{{{}}}}} (\\cref{{command:{}}})", EbiCommand::path_to_string(path), EbiCommand::path_to_string(path), EbiCommand::path_to_string(path)))
@@ -333,6 +195,155 @@ pub fn manual() -> Result<EbiOutput> {
     
 
     Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
+}
+
+fn write_commands(f: &mut Vec<u8>) -> Result<()> {
+    writeln!(f, "\\def\\ebicommands{{")?;
+    for path in EBI_COMMANDS.get_command_paths() {
+        write_command(f, path)?;
+    }
+    writeln!(f, "}}")?;
+    Ok(())
+}
+
+fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
+    writeln!(f, "\\clearpage\\section{{\\texttt{{{}}}}}", EbiCommand::path_to_string(&path))?;
+    writeln!(f, "\\label{{command:{}}}", EbiCommand::path_to_string(&path))?;
+
+    if let EbiCommand::Command { name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_typess, input_names, input_helps, output_type, .. } = path[path.len()-1] {
+
+        //alias
+        if let Some(_) = name_long {
+            writeln!(f, "Alias: \\texttt{{{}}}.\\\\", EbiCommand::path_to_short_string(&path))?;
+        }
+
+        //explanation
+        if let Some(l) = explanation_long {
+            writeln!(f, "{}\\\\", l)?;
+        } else {
+            writeln!(f, "{}\\\\", explanation_short)?;
+        }
+
+        //latex link
+        if let Some(link) = latex_link {
+            writeln!(f, "More information: {}.\\\\", link)?;
+        }
+        
+        //output
+        writeln!(f, "\\noindent Output: {}, which can be written as {}.\\\\", output_type, output_types(output_type))?;
+
+        //ProM
+        if path.last().unwrap().is_in_java() {
+            writeln!(f, "\\\\This command is available in Java and ProM.")?;
+        } else {
+            writeln!(f, "\\\\This command is not available in Java and ProM.")?;
+        }
+
+        //pm4py
+        if path.last().unwrap().is_in_python() {
+            writeln!(f, "\\\\This command is available in the {} Python package using the function {}.", PYTHON_PACKAGE, pm4py_function_name(&path).escape_latex())?;
+        } else {
+            writeln!(f, "\\\\This command is not available in the {} Python package.", PYTHON_PACKAGE)?;
+        }
+
+        //parameters table
+        writeln!(f, "\\begin{{tabularx}}{{\\linewidth}}{{lX}}")?;
+        writeln!(f, "\\toprule")?;
+        writeln!(f, "Parameter \\\\\\midrule")?;
+
+        //standard parameters
+        for (input_name, (input_types, input_help)) in input_names.iter().zip(input_typess.iter().zip(input_helps.iter())) {
+            write!(f, "<\\texttt{{{}}}>", input_name.escape_latex())?;    
+            writeln!(f, "&{}\\\\", input_help)?;
+
+            //mandatoryness
+            if let Some(default) = ebi_input::default(input_types) {
+                writeln!(f, "&\\textit{{Mandatory:}} \\quad no: if no value is provided, a default of {} will be used. It can also be provided on STDIN by giving a `-' on the command line.\\\\", default)?;
+            } else {
+                writeln!(f, "&\\textit{{Mandatory:}} \\quad yes, though it can be given on STDIN by giving a `-' on the command line.\\\\")?;
+            }
+
+            //accepted values
+            writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", EbiInputType::get_possible_inputs_with_latex(input_types).join_with(", ", " and "))?;
+        }
+
+        //custom parameters
+        if let Some(fu) = cli_command {
+            for arg in (fu)(Command::new("")).get_arguments() {
+                if let Some(short) = arg.get_short() {
+                    if let Some(long) = arg.get_long() {
+                        writeln!(f, "-\\texttt{{{}}} or --\\texttt{{{}}}", short, long)?;
+                    } else {
+                        writeln!(f, "-\\texttt{{{}}}", short)?;
+                    }
+                } else {
+                    if let Some(long) = arg.get_long() {
+                        writeln!(f, "--\\texttt{{{}}}", long)?;
+                    } else {
+                        writeln!(f, "<\\texttt{{{}}}>", arg.get_value_names().unwrap()[0])?;
+                    }
+                }
+                writeln!(f, "&{}\\\\", if let Some(h) = arg.get_long_help() {h.to_string()} else {arg.get_help().unwrap().to_string()})?;
+
+                if arg.get_short().is_none() && arg.get_long().is_none() {
+                    //custom argument
+                    if let Some(default) = arg.get_default_values().iter().next() {
+                        writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes".to_owned()} else {format!("no; if not provided, a default value of {} will be used", default.to_string_lossy())} )?;
+                    } else {
+                        writeln!(f, "&\\textit{{Mandatory:}}\\quad {}\\\\", if arg.is_required_set() {"yes"} else {"no"} )?;
+                    }
+                } else {
+                    writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
+                }
+            }
+        }
+
+        //output-type
+        if output_type.get_exporters().len() > 1 {
+            let output_extensions = output_type
+                    .get_exporters()
+                    .iter()
+                    .map(|exporter| exporter.get_extension())
+                    .collect::<Vec<_>>()
+                    .join_with(", ", " and ");
+            writeln!(f, "\\texttt{{-t}} or \\texttt{{--output\\_type}} <\\texttt{{OUTPUT\\_TYPE}}> &")?;
+            writeln!(f, "The output file extension (without period). The default is {}. Possible values are {}.\\\\", output_type.get_default_exporter().get_extension(), output_extensions)?;
+            writeln!(f, "&\\textit{{Mandatory:}} \\quad no\\\\")?;
+        }
+
+        //output
+        writeln!(f, "\\texttt{{-o}} or \\texttt{{--output}} <\\texttt{{FILE}}> &")?;
+        if output_type.get_exporters().len() == 1 {
+            let exporter = output_type.get_exporters().remove(0);
+            writeln!(f, "The {} file to which the result must be written. If the parameter is not given, the results will be written to STDOUT.\\\\", exporter)?;
+        } else {
+            writeln!(f, "The file to which the results must be written. Based on the file extension, Ebi will output either {}.", output_types(output_type))?;
+            writeln!(f, "If the parameter is not given, the results will be written to STDOUT as {} {}.\\\\", output_type.get_default_exporter().get_article(), output_type.get_default_exporter())?;
+        }
+        writeln!(f, "&\\textit{{Mandatory:}} \\quad no\\\\")?;
+        
+        //exact arithmetic flag
+        if *exact_arithmetic {
+            writeln!(f, "\\texttt{{-a}} or \\texttt{{--approximate}} & Use approximate arithmetic instead of exact arithmetic.\\\\")?;
+            writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
+        }
+
+        //importer parameters
+        for (input_index, (input_types, input_name)) in input_typess.iter().zip(input_names.iter()).enumerate() {
+            for parameter in ebi_importer_parameters::merge_importer_parameters(input_types) { 
+                writeln!(f, "\\texttt{{--{}}} & {}. This parameter applies to some of the importers of the {} input {}. {}\\\\", ebi_importer_parameters::name_to_id(parameter.name(), input_index).escape_latex(), parameter.explanation().escape_latex(), input_index.rank(), input_name.escape_latex(), ebi_importer_parameters::explanation_with_values(parameter).escape_latex())?;
+                writeln!(f, "&\\textit{{Mandatory:}}\\quad no\\\\")?;
+                if ebi_importer_parameters::has_accepted_values(parameter) {
+                    writeln!(f, "&\\textit{{Accepted values:}}\\quad {}.\\\\", ebi_importer_parameters::explanation_with_values(parameter).escape_latex())?;
+                }
+            }
+        }
+
+        writeln!(f, "\\bottomrule")?;
+        writeln!(f, "\\end{{tabularx}}")?;
+        writeln!(f, "A \\textdagger{{}} indicates that the file type is converted on import, but that this conversion may fail.")?;
+    }
+    Ok(())
 }
 
 pub fn or_none(string: &str) -> &str {
