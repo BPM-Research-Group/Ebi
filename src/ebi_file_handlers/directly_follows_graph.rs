@@ -4,7 +4,7 @@ use crate::ebi_framework::{
     ebi_output::EbiObjectExporter,
     ebi_trait::FromEbiTraitObject,
     object_importers::{
-        ImportAsBusinessProcessModelAndNotationObject, ImportAsDirectlyFollowsModelObject, ImportAsLabelledPetriNetObject, ImportAsStochasticDeterministicFiniteAutomatonObject, ImportAsStochasticDirectlyFollowsModelObject, ImportAsStochasticLabelledPetriNetObject, ImportAsStochasticNondeterministicFiniteAutomatonObject
+        ImportAsDirectlyFollowsModelObject, ImportAsLabelledPetriNetObject, ImportAsStochasticDeterministicFiniteAutomatonObject, ImportAsStochasticDirectlyFollowsModelObject, ImportAsStochasticLabelledPetriNetObject, ImportAsStochasticNondeterministicFiniteAutomatonObject, TryToBusinessProcessModelAndNotationObject
     },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsQueriableStochasticLanguageTrait,
@@ -51,7 +51,7 @@ pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
     ],
     object_importers: &[
         EbiObjectImporter::BusinessProcessModelAndNotation(
-            DirectlyFollowsGraph::import_as_business_process_model_and_notation_object,
+            DirectlyFollowsGraph::try_import_as_business_process_model_and_notation_object,
             DirectlyFollowsGraph::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::DirectlyFollowsGraph(

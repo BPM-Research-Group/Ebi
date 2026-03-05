@@ -4,7 +4,7 @@ use crate::{
         ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
-        object_importers::ImportAsBusinessProcessModelAndNotationObject,
+        object_importers::TryToBusinessProcessModelAndNotationObject,
         trait_importers::{
             ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait,
         },
@@ -38,7 +38,7 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     ],
     object_importers: &[
         EbiObjectImporter::BusinessProcessModelAndNotation(
-            LabelledPetriNet::import_as_business_process_model_and_notation_object,
+            LabelledPetriNet::try_import_as_business_process_model_and_notation_object,
             LabelledPetriNet::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::LabelledPetriNet(

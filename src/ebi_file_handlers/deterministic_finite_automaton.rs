@@ -2,7 +2,7 @@ use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
-    object_importers::{ImportAsBusinessProcessModelAndNotationObject, ImportAsLabelledPetriNetObject},
+    object_importers::{ImportAsLabelledPetriNetObject, TryToBusinessProcessModelAndNotationObject},
     trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
 };
@@ -31,7 +31,7 @@ pub const EBI_DETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     ],
     object_importers: &[
         EbiObjectImporter::BusinessProcessModelAndNotation(
-            DeterministicFiniteAutomaton::import_as_business_process_model_and_notation_object,
+            DeterministicFiniteAutomaton::try_import_as_business_process_model_and_notation_object,
             DeterministicFiniteAutomaton::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::DeterministicFiniteAutomaton(

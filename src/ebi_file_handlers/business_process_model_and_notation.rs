@@ -34,10 +34,10 @@ pub const EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = EbiFileHandl
         BusinessProcessModelAndNotation::import_as_object,
         BusinessProcessModelAndNotation::IMPORTER_PARAMETERS,
     )],
-    object_exporters: &[
-        EbiObjectExporter::BusinessProcessModelAndNotation(
-            BusinessProcessModelAndNotation::export_from_object,
-        ),
+    object_exporters: &[EbiObjectExporter::BusinessProcessModelAndNotation(
+        BusinessProcessModelAndNotation::export_from_object,
+    )],
+    object_exporters_fallible: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(
             BusinessProcessModelAndNotation::export_from_object,
         ),
@@ -65,7 +65,6 @@ pub const EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = EbiFileHandl
             BusinessProcessModelAndNotation::export_from_object,
         ),
     ],
-    object_exporters_fallible: &[],
     java_object_handlers: &[],
 };
 
