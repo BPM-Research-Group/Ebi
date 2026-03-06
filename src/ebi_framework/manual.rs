@@ -15,7 +15,7 @@ use std::{
     io::Write,
 };
 use strum::IntoEnumIterator;
-use crate::{ebi_commands::ebi_command_itself::EBI_ITSELF, ebi_framework::{ebi_command::{EBI_COMMANDS, EbiCommand, get_applicable_commands}, ebi_file_handler::{EBI_FILE_HANDLERS, Tri, get_file_handlers}, ebi_importer_parameters, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, prom::java_object_handler::{JavaObjectHandlerQueryExport, JavaObjectHandlerQueryImport}, python::python::{PYTHON_PACKAGE, pm4py_function_name}, text::{Joiner, LatexEscaper, Rank}};
+use crate::{ebi_commands::ebi_command_itself::EBI_ITSELF, ebi_framework::{ebi_command::{EBI_COMMANDS, EbiCommand, get_applicable_commands}, ebi_file_handler::{EBI_FILE_HANDLERS, get_file_handlers}, ebi_importer_parameters, ebi_input::{self, EbiInputType}, ebi_output::{EbiExporter, EbiOutput, EbiOutputType}, ebi_trait::EbiTrait}, prom::java_object_handler::{JavaObjectHandlerQueryExport, JavaObjectHandlerQueryImport}, python::python::{PYTHON_PACKAGE, pm4py_function_name}, text::{Joiner, LatexEscaper, Rank}};
 
 pub fn manual() -> Result<EbiOutput> {
     let mut f = vec![];
@@ -538,13 +538,8 @@ pub fn object_importers_table() -> Result<String> {
     //body
     for file_handler in handlers {
         writeln!(f, "{}\\hfill .{}", file_handler.name, file_handler.file_extension)?;
-
         for object_type in &types {
-            if file_handler.can_import_as_object(&object_type) {
-                write!(f, "&\\CIRCLE")?;
-            } else {
-                write!(f, "&\\Circle")?;
-            }
+            write!(f, "&{}", file_handler.can_import_as_object(&object_type).to_latex_circle())?;
         }
         writeln!(f, "\\\\")?;
     }
@@ -552,6 +547,7 @@ pub fn object_importers_table() -> Result<String> {
     //footer
     writeln!(f, "\\bottomrule")?;
     writeln!(f, "\\end{{tabular}}")?;
+    
 
     Ok(String::from_utf8(f)?)
 }
@@ -620,11 +616,7 @@ pub fn object_exporters_table() -> Result<String> {
         writeln!(f, "{}", object_type)?;
 
         for file_handler in &handlers {
-            write!(f, "&{}", match file_handler.can_export_as_object(&object_type) {
-                Tri::Yes => "\\CIRCLE",
-                Tri::Fallible => "\\LEFTcircle",
-                Tri::No => "\\Circle"
-            })?;
+            write!(f, "&{}", file_handler.can_export_as_object(&object_type).to_latex_circle())?;
         }
         writeln!(f, "\\\\")?;
     }

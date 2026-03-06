@@ -329,18 +329,26 @@ let emsc = object_a
         Ebi has the following file handlers:
         \ebifilehandlerlist
 
-        \clearpage
+        \newgeometry{left=1cm,right=1cm,bottom=1cm}
         \subsection{File Handlers $\rightarrow$ Objects (importers)}
-            \filehandlersobjecttypes
+            \begin{center}
+                \filehandlersobjecttypes
+            \end{center}
+            In this table, \CIRCLE{} means that the export is always possible, and \LEFTcircle{} means that a conversion is involved that may fail.
 
         \clearpage
         \subsection{File Handlers $\rightarrow$ Traits (importers)}
-            \filehandlerstraits
+            \begin{center}
+                \filehandlerstraits
+            \end{center}
         
         \clearpage
         \subsection{Objects $\rightarrow$ file handlers (exporters)}
-        \objecttypesfilehandlers
-        In this table, \CIRCLE{} means that the export is always possible, and \LEFTcircle{} means that a conversion is involved that may fail.
+            \begin{center}
+                \objecttypesfilehandlers
+            \end{center}
+            In this table, \CIRCLE{} means that the export is always possible, and \LEFTcircle{} means that a conversion is involved that may fail.
+        \restoregeometry
             
 	\section{Implementing a new command/algorithm/technique}
 	\label{sec:implement}
