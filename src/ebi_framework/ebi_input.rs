@@ -584,6 +584,10 @@ pub enum EbiObjectImporter {
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
     ),
+    StochasticBusinessProcessModelAndNotation(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
     StochasticDirectlyFollowsModel(
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
@@ -661,6 +665,9 @@ impl EbiObjectImporter {
                 EbiObjectType::FiniteStochasticLanguage
             }
             EbiObjectImporter::LabelledPetriNet(_, _) => EbiObjectType::LabelledPetriNet,
+            EbiObjectImporter::StochasticBusinessProcessModelAndNotation(_, _) => {
+                EbiObjectType::StochasticBusinessProcessModelAndNotation
+            }
             EbiObjectImporter::StochasticDeterministicFiniteAutomaton(_, _) => {
                 EbiObjectType::StochasticDeterministicFiniteAutomaton
             }
@@ -693,6 +700,9 @@ impl EbiObjectImporter {
             EbiObjectImporter::EventLogXes(_, parameters) => parameters,
             EbiObjectImporter::DirectlyFollowsGraph(_, parameters) => parameters,
             EbiObjectImporter::DirectlyFollowsModel(_, parameters) => parameters,
+            EbiObjectImporter::StochasticBusinessProcessModelAndNotation(_, parameters) => {
+                parameters
+            }
             EbiObjectImporter::StochasticDirectlyFollowsModel(_, parameters) => parameters,
             EbiObjectImporter::FiniteLanguage(_, parameters) => parameters,
             EbiObjectImporter::FiniteStochasticLanguage(_, parameters) => parameters,
@@ -735,6 +745,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::FiniteLanguage(importer, _) => *importer,
             EbiObjectImporter::FiniteStochasticLanguage(importer, _) => *importer,
             EbiObjectImporter::LabelledPetriNet(importer, _) => *importer,
+            EbiObjectImporter::StochasticBusinessProcessModelAndNotation(importer, _) => *importer,
             EbiObjectImporter::StochasticDeterministicFiniteAutomaton(importer, _) => *importer,
             EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(importer, _) => *importer,
             EbiObjectImporter::StochasticLabelledPetriNet(importer, _) => *importer,

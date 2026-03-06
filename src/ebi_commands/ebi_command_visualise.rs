@@ -34,6 +34,9 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::BusinessProcessModelAndNotation(bpmn), _) => {
                 bpmn.to_string()
             }
+            EbiInput::Object(EbiObject::StochasticBusinessProcessModelAndNotation(bpmn), _) => {
+                bpmn.to_string()
+            }
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => slpn.to_string(),
             EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn.to_string(),
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(lang), _) => lang.to_string(),

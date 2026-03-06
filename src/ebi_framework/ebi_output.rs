@@ -36,7 +36,7 @@ use anyhow::{Context, Result, anyhow};
 use ebi_objects::{
     BusinessProcessModelAndNotation, CompressedEventLogXes, EbiObject, EbiObjectType,
     EventLogPython, Exportable, PortableDocumentFormat, PortableNetworkGraphics,
-    StochasticNondeterministicFiniteAutomaton,
+    StochasticBusinessProcessModelAndNotation, StochasticNondeterministicFiniteAutomaton,
     ebi_arithmetic::{Exporter, Fraction},
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
@@ -176,6 +176,14 @@ impl EbiOutputType {
                 EbiExporter::Object(
                     &EbiObjectExporter::BusinessProcessModelAndNotation(
                         BusinessProcessModelAndNotation::export_from_object,
+                    ),
+                    &EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION,
+                )
+            }
+            EbiOutputType::ObjectType(EbiObjectType::StochasticBusinessProcessModelAndNotation) => {
+                EbiExporter::Object(
+                    &EbiObjectExporter::StochasticBusinessProcessModelAndNotation(
+                        StochasticBusinessProcessModelAndNotation::export_from_object,
                     ),
                     &EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION,
                 )
@@ -476,6 +484,9 @@ pub enum EbiObjectExporter {
     FiniteLanguage(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     FiniteStochasticLanguage(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     LabelledPetriNet(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
+    StochasticBusinessProcessModelAndNotation(
+        fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>,
+    ),
     StochasticDeterministicFiniteAutomaton(
         fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>,
     ),
@@ -508,6 +519,9 @@ impl EbiObjectExporter {
             EbiObjectExporter::EventLogTraceAttributes(_) => EbiObjectType::EventLogTraceAttributes,
             EbiObjectExporter::EventLogXes(_) => EbiObjectType::EventLogXes,
             EbiObjectExporter::DirectlyFollowsModel(_) => EbiObjectType::DirectlyFollowsModel,
+            EbiObjectExporter::StochasticBusinessProcessModelAndNotation(_) => {
+                EbiObjectType::StochasticBusinessProcessModelAndNotation
+            }
             EbiObjectExporter::StochasticDirectlyFollowsModel(_) => {
                 EbiObjectType::StochasticDirectlyFollowsModel
             }
@@ -555,6 +569,9 @@ impl EbiObjectExporter {
                 EbiObjectExporter::EventLogTraceAttributes(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogXes(exporter) => (exporter)(object, f),
                 EbiObjectExporter::DirectlyFollowsModel(exporter) => (exporter)(object, f),
+                EbiObjectExporter::StochasticBusinessProcessModelAndNotation(exporter) => {
+                    (exporter)(object, f)
+                }
                 EbiObjectExporter::StochasticDirectlyFollowsModel(exporter) => {
                     (exporter)(object, f)
                 }

@@ -12,16 +12,10 @@ use crate::{
 };
 use anyhow::{Context, Error, Result, anyhow};
 use ebi_objects::{
-    Activity, ActivityKeyTranslator, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
-    DirectlyFollowsGraph, DirectlyFollowsModel, LabelledPetriNet, LanguageOfAlignments,
-    ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    ebi_bpmn::semantics::BPMNMarking,
-    ebi_objects::{
+    Activity, ActivityKeyTranslator, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, LabelledPetriNet, LanguageOfAlignments, ProcessTree, StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, ebi_bpmn::semantics::BPMNMarking, ebi_objects::{
         labelled_petri_net::TransitionIndex, language_of_alignments::Move,
         process_tree::TreeMarking,
-    },
+    }
 };
 use rayon::iter::ParallelIterator;
 use std::{
@@ -464,6 +458,24 @@ pub trait AlignmentHeuristics {
 }
 
 impl AlignmentHeuristics for BusinessProcessModelAndNotation {
+    type AliState = BPMNMarking;
+
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(
+        &self,
+        _: &Vec<Activity>,
+        _: &usize,
+        _: &BPMNMarking,
+        _: &Vec<Vec<usize>>,
+    ) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for StochasticBusinessProcessModelAndNotation {
     type AliState = BPMNMarking;
 
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {

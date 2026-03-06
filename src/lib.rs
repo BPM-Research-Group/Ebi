@@ -52,6 +52,7 @@ pub mod ebi_file_handlers {
     pub mod process_tree;
     pub mod process_tree_markup_language;
     pub mod scalable_vector_graphics;
+    pub mod stochastic_business_process_model_and_notation;
     pub mod stochastic_deterministic_finite_automaton;
     pub mod stochastic_directly_follows_model;
     pub mod stochastic_labelled_petri_net;
@@ -145,6 +146,7 @@ pub mod semantics {
     pub mod labelled_petri_net_semantics;
     pub mod process_tree_semantics;
     pub mod semantics;
+    pub mod stochastic_business_process_model_and_notation_semantics;
     pub mod stochastic_deterministic_finite_automaton_semantics;
     pub mod stochastic_directly_follows_graph_semantics;
     pub mod stochastic_labelled_petri_net_semantics;

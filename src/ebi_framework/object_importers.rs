@@ -4,8 +4,8 @@ use ebi_objects::{
     BusinessProcessModelAndNotation, DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject,
     EventLog, EventLogCsv, EventLogOcel, EventLogTraceAttributes, EventLogXes, FiniteLanguage,
     FiniteStochasticLanguage, LabelledPetriNet, LanguageOfAlignments, ProcessTree,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
+    StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     traits::importable::{Importable, ImporterParameterValues},
 };
@@ -69,6 +69,10 @@ macro_rules! import_as_object {
 import_as_object!(
     BusinessProcessModelAndNotation,
     business_process_model_and_notation
+);
+import_as_object!(
+    StochasticBusinessProcessModelAndNotation,
+    stochastic_business_process_model_and_notation
 );
 import_as_object!(EventLog, event_log);
 import_as_object!(EventLogTraceAttributes, event_log_trace_attributes);
