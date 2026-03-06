@@ -1,10 +1,9 @@
-use anyhow::{Context, Result};
 use clap::crate_version;
-use env_logger::Builder;
-use log::LevelFilter;
-
 use ebi;
 use ebi::ebi_framework::ebi_command::EBI_COMMANDS;
+use ebi_objects::anyhow::{Context, Result};
+use env_logger::Builder;
+use log::LevelFilter;
 
 pub fn main() -> Result<()> {
     //enable debugging

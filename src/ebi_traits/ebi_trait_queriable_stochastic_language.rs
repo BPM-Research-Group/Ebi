@@ -6,11 +6,11 @@ use crate::{
     },
     follower_semantics::FollowerSemantics,
 };
-use anyhow::{Context, Error, Result, anyhow};
 use ebi_objects::{
     ActivityKeyTranslator, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogPython,
     EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, Importable,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    anyhow::{Context, Error, Result, anyhow},
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,

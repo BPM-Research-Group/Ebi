@@ -26,10 +26,10 @@ use crate::{
     multiple_reader::MultipleReader,
     text::Joiner,
 };
-use anyhow::{Context, Result, anyhow};
 use clap::{ArgMatches, builder::ValueParser, value_parser};
 use ebi_objects::{
     EbiObject, EbiObjectType,
+    anyhow::{Context, Error, Result, anyhow},
     ebi_arithmetic::{ConstFraction, Fraction, parsing::FractionNotParsedYet},
     traits::importable::{ImporterParameter, ImporterParameterValues},
 };
@@ -774,8 +774,8 @@ impl Debug for EbiObjectImporter {
 }
 
 pub enum FallibleImporterError {
-    ImporterError(anyhow::Error),
-    ConversionError(anyhow::Error),
+    ImporterError(Error),
+    ConversionError(Error),
 }
 
 #[derive(Clone, IntoStaticStr)]

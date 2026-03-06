@@ -16,8 +16,7 @@ use crate::{
         permutation_test::PermutationTest,
     },
 };
-use anyhow::{Context, anyhow};
-use ebi_objects::ebi_arithmetic::{ConstFraction, Fraction};
+use ebi_objects::{anyhow::{Context, anyhow}, ebi_arithmetic::{ConstFraction, Fraction}};
 use std::io::Write;
 
 pub const DEFAULT_P_VALUE: ConstFraction = ConstFraction::of(1, 20);

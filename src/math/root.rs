@@ -1,6 +1,6 @@
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     Infoable,
+    anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, OneMinus, Signed, Sqrt, Zero},
 };
 use fraction::Sign;

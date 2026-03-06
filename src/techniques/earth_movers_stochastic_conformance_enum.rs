@@ -1,13 +1,15 @@
 use crate::math::distances::WeightedDistances;
-use anyhow::{Context, Result};
-use ebi_objects::ebi_arithmetic::{
-    One,
-    exact::{MaybeExact, is_exact_globally},
-    fraction::{fraction_enum::FractionEnum, signed::Numerator},
-    malachite::{
-        Integer,
-        base::num::basic::traits::{One as MOne, Zero as MZero},
-        rational::Rational,
+use ebi_objects::{
+    anyhow::{Context, Result},
+    ebi_arithmetic::{
+        One,
+        exact::{MaybeExact, is_exact_globally},
+        fraction::{fraction_enum::FractionEnum, signed::Numerator},
+        malachite::{
+            Integer,
+            base::num::basic::traits::{One as MOne, Zero as MZero},
+            rational::Rational,
+        },
     },
 };
 use ebi_optimisation::network_simplex::NetworkSimplex;

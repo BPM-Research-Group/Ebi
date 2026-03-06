@@ -32,11 +32,11 @@ use crate::{
         JavaObjectHandler,
     },
 };
-use anyhow::{Context, Result, anyhow};
 use ebi_objects::{
     BusinessProcessModelAndNotation, CompressedEventLogXes, EbiObject, EbiObjectType,
     EventLogPython, Exportable, PortableDocumentFormat, PortableNetworkGraphics,
     StochasticBusinessProcessModelAndNotation, StochasticNondeterministicFiniteAutomaton,
+    anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{Exporter, Fraction},
     ebi_objects::{
         compressed_event_log::CompressedEventLog,

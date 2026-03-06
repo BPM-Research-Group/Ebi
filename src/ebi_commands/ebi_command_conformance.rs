@@ -25,8 +25,7 @@ use crate::{
         unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
     },
 };
-use anyhow::{Context, anyhow};
-use ebi_objects::{EbiObject, EbiObjectType};
+use ebi_objects::{anyhow::{Context, anyhow}, EbiObject, EbiObjectType};
 use strum::VariantNames;
 
 pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {

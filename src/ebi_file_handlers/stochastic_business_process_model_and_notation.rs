@@ -7,8 +7,10 @@ use crate::ebi_framework::{
     trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
 };
-use anyhow::{Result, anyhow};
-use ebi_objects::{EbiObject, Exportable, Importable, StochasticBusinessProcessModelAndNotation};
+use ebi_objects::{
+    EbiObject, Exportable, Importable, StochasticBusinessProcessModelAndNotation,
+    anyhow::{Result, anyhow},
+};
 
 pub const EBI_STOCHASTIC_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = EbiFileHandler {
     name: "stochastic business process model and notation",

@@ -1,9 +1,8 @@
+use crate::semantics::semantics::Semantics;
 use ebi_objects::{
-    Activity, DirectlyFollowsModel, StochasticDirectlyFollowsModel,
+    Activity, DirectlyFollowsModel, StochasticDirectlyFollowsModel, anyhow::Result,
     ebi_objects::labelled_petri_net::TransitionIndex,
 };
-
-use crate::semantics::semantics::Semantics;
 
 /**
  * States:
@@ -31,7 +30,7 @@ macro_rules! semantics_for_automaton {
                 &self,
                 state: &mut <Self as Semantics>::SemState,
                 transition: TransitionIndex,
-            ) -> anyhow::Result<()> {
+            ) -> Result<()> {
                 if transition == self.sources.len() {
                     //end
                     *state = self.node_2_activity.len() + 1
@@ -120,7 +119,7 @@ macro_rules! semantics_for_automaton {
                 }
             }
 
-            fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState,) -> usize {
+            fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState) -> usize {
                 self.sources.len() + 1 + self.sources.len()
             }
         }

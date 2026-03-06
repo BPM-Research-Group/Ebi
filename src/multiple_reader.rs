@@ -1,17 +1,21 @@
-use std::{fs::File, io::{self, BufRead, BufReader, Cursor, Read, Seek}};
-use anyhow::{Context, Result};
+use ebi_objects::anyhow::{Context, Result};
+use std::{
+    fs::File,
+    io::{self, BufRead, BufReader, Cursor, Read, Seek},
+};
 
 pub enum MultipleReader {
     String(String),
     File(File),
-    Bytes(Vec<u8>)
+    Bytes(Vec<u8>),
 }
 
 impl MultipleReader {
     pub fn from_stdin() -> Result<Self> {
         let stdin = io::stdin();
         let mut reader = stdin.lock();
-        if cfg!(windows) { //windows does not support reading bytes from STDIN, so read it as text
+        if cfg!(windows) {
+            //windows does not support reading bytes from STDIN, so read it as text
             let mut buf = String::new();
             reader.read_to_string(&mut buf).context("Could not read text from STDIN (on Windows, reading bytes from STDIN is not supported.")?;
             log::info!("read from stdin in text mode with length {}", buf.len());
@@ -34,7 +38,7 @@ impl MultipleReader {
             MultipleReader::File(file) => {
                 file.seek(io::SeekFrom::Start(0))?;
                 return Ok(Box::new(BufReader::new(file)));
-            },
+            }
             MultipleReader::Bytes(b) => Ok(Box::new(Cursor::new(b))),
         }
     }

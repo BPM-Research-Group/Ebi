@@ -6,8 +6,10 @@ use crate::ebi_framework::{
     trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
 };
-use anyhow::{Result, anyhow};
-use ebi_objects::{BusinessProcessModelAndNotation, EbiObject, Exportable, Importable};
+use ebi_objects::{
+    BusinessProcessModelAndNotation, EbiObject, Exportable, Importable,
+    anyhow::{Result, anyhow},
+};
 
 pub const EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = EbiFileHandler {
     name: "business process model and notation",

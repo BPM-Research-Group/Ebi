@@ -3,8 +3,10 @@ use crate::ebi_framework::{
     ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
     trait_importers::ToFiniteLanguageTrait,
 };
-use anyhow::{Result, anyhow};
-use ebi_objects::{FiniteLanguage, FiniteStochasticLanguage, Importable, NumberOfTraces};
+use ebi_objects::{
+    FiniteLanguage, FiniteStochasticLanguage, Importable, NumberOfTraces,
+    anyhow::{Result, anyhow},
+};
 use std::fmt::Display;
 
 pub trait EbiTraitFiniteLanguage:

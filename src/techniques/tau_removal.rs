@@ -1,6 +1,6 @@
-use anyhow::{Context, Ok, Result};
 use ebi_objects::{
     Activity, StochasticNondeterministicFiniteAutomaton,
+    anyhow::{Context, Ok, Result},
     ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, Inversion, One, Zero},
 };
 use std::collections::{HashMap, VecDeque};

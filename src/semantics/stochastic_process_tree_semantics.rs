@@ -1,7 +1,7 @@
 use crate::semantics::semantics::Semantics;
-use anyhow::Result;
 use ebi_objects::{
     Activity, StochasticProcessTree,
+    anyhow::Result,
     ebi_objects::{
         labelled_petri_net::TransitionIndex,
         process_tree::TreeMarking,

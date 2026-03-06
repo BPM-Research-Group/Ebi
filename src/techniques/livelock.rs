@@ -1,16 +1,16 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, HasActivityKey,
-    LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton, ebi_objects::process_tree::TreeMarking,
-};
-use std::collections::{HashMap, HashSet, hash_map::Entry};
-
 use crate::{
     ebi_framework::displayable::Displayable,
     semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
 };
+use ebi_objects::{
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, HasActivityKey,
+    LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton,
+    anyhow::{Result, anyhow},
+    ebi_objects::process_tree::TreeMarking,
+};
+use std::collections::{HashMap, HashSet, hash_map::Entry};
 
 pub trait IsPartOfLivelock {
     type LivState: Displayable;

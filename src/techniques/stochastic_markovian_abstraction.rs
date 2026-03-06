@@ -4,9 +4,9 @@ use crate::{
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
     techniques::tau_removal::TauRemoval,
 };
-use anyhow::{Ok, Result, anyhow};
 use ebi_objects::{
     Activity, ActivityKey, HasActivityKey, StochasticNondeterministicFiniteAutomaton,
+    anyhow::{Ok, Result, anyhow},
     ebi_arithmetic::{Fraction, One, Recip, ebi_number::Zero},
     ebi_objects::{
         finite_stochastic_language::FiniteStochasticLanguage,
@@ -590,7 +590,7 @@ fn solve_sparse_linear_system_optimized(
         // 1. Pivot search (find first row r >= i with non zero col i)
         let pivot = (i..n)
             .find(|&r| find_col(&a[r], i).map_or(false, |idx| !a[r][idx].1.is_zero()))
-            .ok_or_else(|| anyhow::anyhow!("Matrix is singular"))?;
+            .ok_or_else(|| anyhow!("Matrix is singular"))?;
 
         if pivot != i {
             a.swap(i, pivot);
@@ -681,7 +681,7 @@ fn solve_sparse_linear_system(
             pivot += 1;
         }
         if pivot == n {
-            return Err(anyhow::anyhow!("Matrix is singular"));
+            return Err(anyhow!("Matrix is singular"));
         }
         if pivot != i {
             a.swap(i, pivot);

@@ -2,8 +2,10 @@ use crate::ebi_framework::{
     ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
     trait_importers::ToActivitiesTrait,
 };
-use anyhow::{Result, anyhow};
-use ebi_objects::{HasActivityKey, Importable};
+use ebi_objects::{
+    HasActivityKey, Importable,
+    anyhow::{Result, anyhow},
+};
 
 pub trait EbiTraitActivities: HasActivityKey {}
 

@@ -9,7 +9,7 @@ use crate::{
     ebi_traits::ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
     techniques::association::Associations,
 };
-use anyhow::{Context, anyhow};
+use ebi_objects::anyhow::{Context, anyhow};
 use std::io::Write;
 
 pub const DEFAULT_NUMBER_OF_SAMPLES: usize = 500;

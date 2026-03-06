@@ -2,8 +2,7 @@ use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::{distances::WeightedDistances, distances_matrix::WeightedDistanceMatrix},
 };
-use anyhow::Result;
-use ebi_objects::ebi_arithmetic::Fraction;
+use ebi_objects::{anyhow::Result, ebi_arithmetic::Fraction};
 
 pub trait EarthMoversStochasticConformance {
     fn earth_movers_stochastic_conformance(

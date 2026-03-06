@@ -8,13 +8,21 @@ use crate::{
         labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
     },
 };
-use anyhow::{Result, anyhow};
 use ebi_objects::{
-    ActivityKey, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, LabelledPetriNet, LolaNet, PetriNetMarkupLanguage, ProcessTree, ProcessTreeMarkupLanguage, StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TranslateActivityKey, ebi_bpmn::semantics::BPMNMarking, ebi_objects::{
+    ActivityKey, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
+    DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogPython, EventLogTraceAttributes,
+    EventLogXes, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, LabelledPetriNet,
+    LolaNet, PetriNetMarkupLanguage, ProcessTree, ProcessTreeMarkupLanguage,
+    StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TranslateActivityKey,
+    anyhow::{Result, anyhow},
+    ebi_bpmn::semantics::BPMNMarking,
+    ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking,
-    }
+    },
 };
 
 ///

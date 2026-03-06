@@ -2,9 +2,9 @@ use crate::{
     ebi_framework::{ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType},
     text::Joiner,
 };
-use anyhow::{Result, anyhow};
 use clap::{Arg, ArgAction, ArgMatches, Command, builder::ValueParser, value_parser};
 use ebi_objects::{
+    anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, parsing::FractionNotParsedYet},
     traits::importable::{ImporterParameter, ImporterParameterValue, ImporterParameterValues},
 };

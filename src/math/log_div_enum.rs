@@ -1,6 +1,6 @@
-use anyhow::{Error, Result, anyhow};
 use ebi_objects::{
     Infoable,
+    anyhow::{Error, Result, anyhow},
     ebi_arithmetic::{
         Recip, Signed,
         ebi_number::{One, Zero},

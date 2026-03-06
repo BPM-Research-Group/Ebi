@@ -1,5 +1,5 @@
 use super::log_div::LogDiv;
-use ebi_objects::ebi_arithmetic::{Fraction, OneMinus, Sqrt};
+use ebi_objects::{anyhow::Result, ebi_arithmetic::{Fraction, OneMinus, Sqrt}};
 use std::fmt::Display;
 
 #[derive(PartialEq, Eq, Debug, Clone)]
@@ -30,7 +30,7 @@ impl RootLogDiv {
         r
     }
 
-    pub fn export(&self, f: &mut dyn std::io::Write) -> anyhow::Result<()> {
+    pub fn export(&self, f: &mut dyn std::io::Write) -> Result<()> {
         if self.one_minus {
             write!(f, "1-")?;
         }

@@ -2,9 +2,9 @@ use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::distances::TriangularDistanceMatrix,
 };
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     FiniteLanguage,
+    anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, One, Zero, f},
 };
 

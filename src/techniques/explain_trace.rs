@@ -4,9 +4,9 @@ use crate::{
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
     techniques::align::transform_alignment,
 };
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     Activity, LanguageOfAlignments,
+    anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, One, OneMinus, Zero},
 };
 use ebi_optimisation::astar;

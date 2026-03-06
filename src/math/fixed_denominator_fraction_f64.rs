@@ -1,5 +1,7 @@
-use anyhow::Result;
-use ebi_objects::ebi_arithmetic::{MaybeExact, Zero, fraction::fraction_f64::FractionF64};
+use ebi_objects::{
+    anyhow::Result,
+    ebi_arithmetic::{MaybeExact, Zero, fraction::fraction_f64::FractionF64},
+};
 use std::{
     borrow::Borrow,
     ops::{AddAssign, Mul},

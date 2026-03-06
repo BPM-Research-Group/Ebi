@@ -4,10 +4,10 @@ use crate::{
     semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
-use anyhow::{Context, Result, anyhow};
 use ebi_objects::{
     StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, GaussJordan, One, Zero},
     ebi_objects::process_tree::TreeMarking,
 };
@@ -23,7 +23,7 @@ use std::{
 macro_rules! default_trace_probability {
     ($t:ident, $s:ident) => {
         impl EbiTraitQueriableStochasticLanguage for $t {
-            fn get_probability(&self, follower_b: &FollowerSemantics) -> anyhow::Result<Fraction> {
+            fn get_probability(&self, follower_b: &FollowerSemantics) -> Result<Fraction> {
                 let mut result = CrossProductResultImpl::new();
                 let mut z: Z<$s> = Z {
                     seen: HashMap::<Rc<ABState<$s>>, usize>::new(),

@@ -5,9 +5,9 @@ use crate::{
     },
     follower_semantics::FollowerSemantics,
 };
-use anyhow::Result;
 use ebi_objects::{
     ActivityKeyTranslator,
+    anyhow::Result,
     ebi_arithmetic::{Fraction, One, OneMinus, Sqrt, Zero},
 };
 use rayon::iter::ParallelIterator;

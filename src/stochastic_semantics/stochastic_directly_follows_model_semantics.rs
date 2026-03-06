@@ -1,6 +1,6 @@
-use anyhow::Result;
 use ebi_objects::{
     StochasticDirectlyFollowsModel,
+    anyhow::Result,
     ebi_arithmetic::{Fraction, Signed, Zero},
     ebi_objects::labelled_petri_net::TransitionIndex,
 };

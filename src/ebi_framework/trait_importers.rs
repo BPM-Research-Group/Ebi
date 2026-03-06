@@ -14,8 +14,7 @@ use crate::{
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
 };
-use anyhow::Result;
-use ebi_objects::{Importable, traits::importable::ImporterParameterValues};
+use ebi_objects::{Importable, anyhow::Result, traits::importable::ImporterParameterValues};
 use pastey::paste;
 use std::io::BufRead;
 

@@ -2,11 +2,11 @@ use crate::ebi_framework::{
     ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
     trait_importers::ToEventLogTrait,
 };
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     Activity, CompressedEventLog, EventLog, EventLogCsv, EventLogOcel, EventLogPython,
     EventLogTraceAttributes, EventLogXes, HasActivityKey, Importable, IntoRefTraceIterator,
     NumberOfTraces,
+    anyhow::{Result, anyhow},
     ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
 };
 use std::collections::HashMap;

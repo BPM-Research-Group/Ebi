@@ -1,6 +1,3 @@
-use anyhow::Context;
-use ebi_objects::{EbiObject, EbiObjectType, StochasticLanguageOfAlignments};
-
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
@@ -17,6 +14,7 @@ use crate::{
         align::Align, escaping_edges_precision::EscapingEdgesPrecision, fitness::Fitness,
     },
 };
+use ebi_objects::{EbiObject, EbiObjectType, StochasticLanguageOfAlignments, anyhow::Context};
 
 pub const EBI_CONFORMANCE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     name_short: "confns",

@@ -7,10 +7,10 @@ use crate::{
     semantics::semantics::Semantics,
     techniques::align::Align,
 };
-use anyhow::{Context, Error, Ok, Result};
 use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
     EventLogXes, Executions, HasActivityKey, IntoTraceIterator, NumberOfTraces,
+    anyhow::{Context, Error, Ok, Result},
     ebi_objects::{
         executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
     },

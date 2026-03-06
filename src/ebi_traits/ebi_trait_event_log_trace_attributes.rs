@@ -5,10 +5,11 @@ use crate::{
     },
     ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
 };
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     Activity, Attribute, EventLogOcel, EventLogTraceAttributes, Importable, IntoAttributeIterator,
-    IntoAttributeTraceIterator, TraceAttributes, attribute_key::has_attribute_key::HasAttributeKey,
+    IntoAttributeTraceIterator, TraceAttributes,
+    anyhow::{Result, anyhow},
+    attribute_key::has_attribute_key::HasAttributeKey,
     ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
 };
 use intmap::IntMap;

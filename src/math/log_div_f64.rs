@@ -1,6 +1,6 @@
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     Infoable,
+    anyhow::{Result, anyhow},
     ebi_arithmetic::{
         MaybeExact, One, Recip, Signed, Zero,
         fraction::fraction_f64::FractionF64,

@@ -2,9 +2,9 @@ use crate::{
     ebi_framework::displayable::Displayable, ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
     semantics::semantics::Semantics,
 };
-use anyhow::{Context, Result, anyhow};
 use ebi_objects::{
     StochasticLanguageOfAlignments,
+    anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::language_of_alignments::Move,
 };

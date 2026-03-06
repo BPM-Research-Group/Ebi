@@ -8,17 +8,8 @@ use std::sync::Arc;
     all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use anyhow::Result;
-#[cfg(any(
-    all(
-        not(feature = "eexactarithmetic"),
-        not(feature = "eapproximatearithmetic")
-    ),
-    all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
-    all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
-))]
 use ebi_objects::ebi_arithmetic::malachite::Natural;
-use ebi_objects::ebi_arithmetic::{Fraction, Zero};
+use ebi_objects::{anyhow::Result, ebi_arithmetic::{Fraction, Zero}};
 use rayon::iter::{IndexedParallelIterator, ParallelIterator};
 
 #[cfg(any(

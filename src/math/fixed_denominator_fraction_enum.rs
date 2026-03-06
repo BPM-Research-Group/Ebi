@@ -1,9 +1,11 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::ebi_arithmetic::{
-    ebi_number::Zero,
-    exact::is_exact_globally,
-    fraction::fraction_enum::FractionEnum,
-    malachite::{Natural, base::num::arithmetic::traits::Lcm, rational::Rational},
+use ebi_objects::{
+    anyhow::{Result, anyhow},
+    ebi_arithmetic::{
+        ebi_number::Zero,
+        exact::is_exact_globally,
+        fraction::fraction_enum::FractionEnum,
+        malachite::{Natural, base::num::arithmetic::traits::Lcm, rational::Rational},
+    },
 };
 use std::{
     borrow::Borrow,

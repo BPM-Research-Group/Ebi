@@ -12,8 +12,10 @@ use crate::{
     },
     prom::java_object_handler::JavaObjectHandler,
 };
-use anyhow::{Ok, Result, anyhow};
-use ebi_objects::{EbiObject, Exportable, Importable, LabelledPetriNet};
+use ebi_objects::{
+    EbiObject, Exportable, Importable, LabelledPetriNet,
+    anyhow::{Ok, Result, anyhow},
+};
 
 pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "labelled Petri net",

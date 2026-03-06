@@ -1,7 +1,7 @@
 use crate::semantics::semantics::Semantics;
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     Activity, StochasticNondeterministicFiniteAutomaton,
+    anyhow::{Result, anyhow},
     ebi_objects::labelled_petri_net::TransitionIndex,
 };
 

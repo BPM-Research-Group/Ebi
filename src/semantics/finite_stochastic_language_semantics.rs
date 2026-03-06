@@ -1,8 +1,8 @@
 use crate::semantics::semantics::Semantics;
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     Activity, ActivityKey, ActivityKeyTranslator, FiniteStochasticLanguage, HasActivityKey,
     IntoRefTraceProbabilityIterator, NumberOfTraces, TranslateActivityKey,
+    anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::labelled_petri_net::TransitionIndex,
 };
@@ -175,7 +175,7 @@ impl Semantics for FiniteStochasticLanguageSemantics {
         return result;
     }
 
-    fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState,) -> usize {
+    fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState) -> usize {
         self.activity_key.get_number_of_activities()
     }
 }

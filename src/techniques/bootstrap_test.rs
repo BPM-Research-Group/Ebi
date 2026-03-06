@@ -12,9 +12,9 @@ use crate::{
     },
     techniques::sample::{self, Resampler},
 };
-use anyhow::{Context, Result, anyhow};
 use ebi_objects::{
     Attribute,
+    anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{Fraction, OneMinus},
 };
 use rayon::iter::{IntoParallelIterator, ParallelIterator};

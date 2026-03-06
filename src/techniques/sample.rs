@@ -6,9 +6,9 @@ use crate::{
     },
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     FiniteStochasticLanguage,
+    anyhow::{Result, anyhow},
     ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One, Zero},
 };
 use rand::RngExt;

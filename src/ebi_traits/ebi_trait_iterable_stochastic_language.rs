@@ -2,10 +2,10 @@ use crate::ebi_framework::{
     ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
     trait_importers::ToIterableStochasticLanguageTrait,
 };
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     FiniteStochasticLanguage, Importable, IntoRefProbabilityIterator, IntoRefTraceIterator,
     IntoRefTraceProbabilityIterator,
+    anyhow::{Result, anyhow},
 };
 
 pub trait EbiTraitIterableStochasticLanguage:

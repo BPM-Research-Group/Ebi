@@ -6,8 +6,7 @@
     all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use anyhow::Result;
-use ebi_objects::ebi_arithmetic::Fraction;
+use ebi_objects::{ebi_arithmetic::Fraction};
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),
@@ -38,6 +37,7 @@ use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator};
 ))]
 use ebi_objects::ebi_arithmetic::exact::MaybeExact;
 
+use ebi_objects::anyhow::Result;
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,

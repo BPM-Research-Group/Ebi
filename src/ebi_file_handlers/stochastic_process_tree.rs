@@ -15,8 +15,10 @@ use crate::ebi_framework::{
     },
     validate::Validate,
 };
-use anyhow::{Result, anyhow};
-use ebi_objects::{EbiObject, Exportable, Importable, StochasticProcessTree};
+use ebi_objects::{
+    EbiObject, Exportable, Importable, StochasticProcessTree,
+    anyhow::{Result, anyhow},
+};
 
 pub const EBI_STOCHASTIC_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     name: "stochastic process tree",

@@ -14,8 +14,10 @@ use crate::ebi_framework::{
     },
     validate::Validate,
 };
-use anyhow::{Result, anyhow};
-use ebi_objects::{EbiObject, Exportable, Importable, StochasticNondeterministicFiniteAutomaton};
+use ebi_objects::{
+    EbiObject, Exportable, Importable, StochasticNondeterministicFiniteAutomaton,
+    anyhow::{Result, anyhow},
+};
 
 pub const EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON: EbiFileHandler = EbiFileHandler {
     name: "stochastic non-deterministic finite automaton",

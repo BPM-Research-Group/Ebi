@@ -1,8 +1,9 @@
 use crate::semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics};
-use anyhow::Context;
 use bitvec::bitvec;
 use ebi_objects::{
-    Activity, StochasticLabelledPetriNet, ebi_arithmetic::Signed,
+    Activity, StochasticLabelledPetriNet,
+    anyhow::{Context, Result},
+    ebi_arithmetic::Signed,
     ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
@@ -70,7 +71,7 @@ impl Semantics for StochasticLabelledPetriNet {
         &self,
         state: &mut LPNMarking,
         transition: TransitionIndex,
-    ) -> anyhow::Result<()> {
+    ) -> Result<()> {
         for (place_pos, place) in self.transition2input_places[transition].iter().enumerate() {
             let arc_weight = self.transition2input_places_cardinality[transition][place_pos];
             state

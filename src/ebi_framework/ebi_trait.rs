@@ -3,8 +3,10 @@ use super::{
     ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
     ebi_input::{EbiInput, EbiInputType},
 };
-use anyhow::{Result, anyhow};
-use ebi_objects::ebi_arithmetic::Fraction;
+use ebi_objects::{
+    anyhow::{Result, anyhow},
+    ebi_arithmetic::Fraction,
+};
 use std::{
     collections::{BTreeSet, HashSet},
     fmt::{Debug, Display},

@@ -1,4 +1,4 @@
-use anyhow::{Ok, Result};
+use ebi_objects::anyhow::{Ok, Result};
 use clap::Command;
 use ebi_objects::EbiObjectType;
 use inflector::Inflector;

@@ -7,10 +7,10 @@ use crate::{
         },
     },
 };
-use anyhow::{Result, anyhow};
 use core::hash::Hash;
 use ebi_objects::{
     Activity, FiniteStochasticLanguage,
+    anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, One, OneMinus, Signed, Zero},
 };
 use priority_queue::PriorityQueue;

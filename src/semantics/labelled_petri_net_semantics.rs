@@ -1,8 +1,8 @@
 use crate::{ebi_framework::displayable::Displayable, semantics::semantics::Semantics};
-use anyhow::Context;
 use bitvec::{bitvec, vec::BitVec};
 use ebi_objects::{
-    Activity, LabelledPetriNet, ebi_objects::labelled_petri_net::TransitionIndex, marking::Marking,
+    Activity, LabelledPetriNet, anyhow::Context, anyhow::Result,
+    ebi_objects::labelled_petri_net::TransitionIndex, marking::Marking,
 };
 use std::{
     fmt::{Debug, Display, Formatter},
@@ -65,7 +65,7 @@ impl Semantics for LabelledPetriNet {
         &self,
         state: &mut LPNMarking,
         transition: TransitionIndex,
-    ) -> anyhow::Result<()> {
+    ) -> Result<()> {
         for (place_pos, place) in self.transition2input_places[transition].iter().enumerate() {
             let arc_weight = self.transition2input_places_cardinality[transition][place_pos];
             state

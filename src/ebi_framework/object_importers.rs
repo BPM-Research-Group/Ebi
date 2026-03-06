@@ -1,5 +1,4 @@
 use crate::ebi_framework::ebi_input::FallibleImporterError;
-use anyhow::Result;
 use ebi_objects::{
     BusinessProcessModelAndNotation, DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject,
     EventLog, EventLogCsv, EventLogOcel, EventLogTraceAttributes, EventLogXes, FiniteLanguage,
@@ -7,6 +6,7 @@ use ebi_objects::{
     StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    anyhow::{Error, Result},
     traits::importable::{Importable, ImporterParameterValues},
 };
 use pastey::paste;
@@ -48,7 +48,7 @@ macro_rules! import_as_object {
 
             impl<T: Importable> [<TryTo $t Object>] for T
             where
-                T: TryInto<$t, Error = anyhow::Error>,
+                T: TryInto<$t, Error = Error>,
             {
                 fn [<try_import_as_ $u _object>](reader: &mut dyn BufRead, parameter_values: &ImporterParameterValues) ->  Result<EbiObject, FallibleImporterError> {
                     match Self::import(reader, parameter_values) {

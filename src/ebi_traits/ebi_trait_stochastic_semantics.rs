@@ -9,14 +9,16 @@ use crate::{
     },
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     ActivityKey, DirectlyFollowsGraph, EventLog, EventLogPython, EventLogTraceAttributes,
     EventLogXes, FiniteStochasticLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TranslateActivityKey,
+    anyhow::{Result, anyhow},
     ebi_objects::{
-        compressed_event_log::CompressedEventLog, compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes, event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking
+        compressed_event_log::CompressedEventLog,
+        compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
+        event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking,
     },
 };
 

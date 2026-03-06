@@ -16,8 +16,10 @@ use crate::ebi_framework::{
     },
     validate::Validate,
 };
-use anyhow::{Result, anyhow};
-use ebi_objects::{EbiObject, Exportable, FiniteStochasticLanguage, Importable};
+use ebi_objects::{
+    EbiObject, Exportable, FiniteStochasticLanguage, Importable,
+    anyhow::{Result, anyhow},
+};
 
 pub const EBI_FINITE_STOCHASTIC_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "finite stochastic language",

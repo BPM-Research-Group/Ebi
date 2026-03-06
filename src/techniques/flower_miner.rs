@@ -1,14 +1,15 @@
-use std::collections::HashSet;
-
-use anyhow::{Result, anyhow};
+use crate::{
+    ebi_traits::{
+        ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics,
+    },
+    semantics::semantics::Semantics,
+};
 use ebi_objects::{
     DeterministicFiniteAutomaton, HasActivityKey, ProcessTree,
+    anyhow::{Result, anyhow},
     ebi_objects::process_tree::{Node, Operator},
 };
-
-use crate::{ebi_traits::{
-    ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics,
-}, semantics::semantics::Semantics};
+use std::collections::HashSet;
 
 pub trait FlowerMinerTree {
     fn mine_flower_tree(&self) -> ProcessTree;

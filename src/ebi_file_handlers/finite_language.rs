@@ -10,8 +10,10 @@ use crate::ebi_framework::{
     },
     validate::Validate,
 };
-use anyhow::{Result, anyhow};
-use ebi_objects::{EbiObject, Exportable, FiniteLanguage, Importable};
+use ebi_objects::{
+    EbiObject, Exportable, FiniteLanguage, Importable,
+    anyhow::{Result, anyhow},
+};
 
 pub const EBI_FINITE_LANGUAGE: EbiFileHandler = EbiFileHandler {
     name: "finite language",

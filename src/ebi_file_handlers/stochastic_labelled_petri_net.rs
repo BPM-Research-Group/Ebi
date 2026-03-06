@@ -16,8 +16,10 @@ use crate::{
     },
     prom::java_object_handler::JavaObjectHandler,
 };
-use anyhow::{Result, anyhow};
-use ebi_objects::{EbiObject, Exportable, Importable, StochasticLabelledPetriNet};
+use ebi_objects::{
+    EbiObject, Exportable, Importable, StochasticLabelledPetriNet,
+    anyhow::{Result, anyhow},
+};
 
 pub const EBI_STOCHASTIC_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
     name: "stochastic labelled Petri net",

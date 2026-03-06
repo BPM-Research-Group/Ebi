@@ -6,9 +6,9 @@ use crate::{
     follower_semantics::FollowerSemantics,
     math::log_div::LogDiv,
 };
-use anyhow::{Context, Result};
 use ebi_objects::{
     Activity, ActivityKeyTranslator,
+    anyhow::{Context, Result},
     ebi_arithmetic::{Fraction, One, Signed, Zero},
 };
 use std::collections::HashSet;

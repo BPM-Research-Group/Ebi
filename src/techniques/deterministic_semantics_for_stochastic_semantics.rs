@@ -6,10 +6,10 @@ use crate::{
     semantics::semantics::Semantics,
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
-use anyhow::Result;
 use ebi_objects::{
     Activity, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    anyhow::Result,
     ebi_arithmetic::{Fraction, One, Signed, Zero},
     ebi_objects::process_tree::TreeMarking,
 };

@@ -3,13 +3,13 @@ use crate::{
     semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
     techniques::livelock::IsPartOfLivelock,
 };
-use anyhow::Result;
 use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
     EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
     LabelledPetriNet, NumberOfTraces, ProcessTree, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    anyhow::Result,
     ebi_arithmetic::ebi_number::Zero,
     ebi_objects::{
         event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking,

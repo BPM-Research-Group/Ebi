@@ -7,7 +7,8 @@ use crate::{
         object_importers::{
             ImportAsDeterministicFiniteAutomatonObject, ImportAsFiniteLanguageObject,
             ImportAsFiniteStochasticLanguageObject,
-            ImportAsStochasticDeterministicFiniteAutomatonObject, ImportAsStochasticNondeterministicFiniteAutomatonObject,
+            ImportAsStochasticDeterministicFiniteAutomatonObject,
+            ImportAsStochasticNondeterministicFiniteAutomatonObject,
         },
         trait_importers::{
             ImportAsActivitiesTrait, ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait,
@@ -20,13 +21,12 @@ use crate::{
     },
     prom::java_object_handler::JavaObjectHandler,
 };
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     EbiObject, EventLog, EventLogTraceAttributes, EventLogXes, Exportable, Importable,
+    anyhow::{Result, anyhow},
 };
 
 pub const EBI_EVENT_LOG_XES: EbiFileHandler = EbiFileHandler {
-    
     name: "extensible event stream",
     article: "an",
     file_extension: "xes",

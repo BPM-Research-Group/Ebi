@@ -7,8 +7,10 @@ use crate::{
     },
     techniques::sample::Resampler,
 };
-use anyhow::{Context, Result, anyhow};
-use ebi_objects::ebi_arithmetic::{Fraction, OneMinus};
+use ebi_objects::{
+    anyhow::{Context, Result, anyhow},
+    ebi_arithmetic::{Fraction, OneMinus},
+};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::sync::{
     Arc,

@@ -1,6 +1,6 @@
 use crate::semantics::semantics::Semantics;
 use ebi_objects::{
-    Activity, DirectlyFollowsGraph, ebi_arithmetic::ebi_number::Signed,
+    Activity, DirectlyFollowsGraph, anyhow::Result, ebi_arithmetic::ebi_number::Signed,
     ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
@@ -28,7 +28,7 @@ impl Semantics for DirectlyFollowsGraph {
         &self,
         state: &mut <Self as Semantics>::SemState,
         transition: TransitionIndex,
-    ) -> anyhow::Result<()> {
+    ) -> Result<()> {
         if transition == self.sources.len() {
             //end
             *state = self.activity_key.get_number_of_activities() + 1

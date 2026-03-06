@@ -2,9 +2,9 @@ use crate::{
     ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
     semantics::semantics::Semantics, techniques::non_decreasing_livelock::NonDecreasingLivelock,
 };
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     Activity, DeterministicFiniteAutomaton, HasActivityKey, StochasticDeterministicFiniteAutomaton,
+    anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, One, Zero},
     ebi_objects::labelled_petri_net::TransitionIndex,
 };

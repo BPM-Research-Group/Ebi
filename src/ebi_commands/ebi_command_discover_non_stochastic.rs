@@ -1,6 +1,4 @@
-use anyhow::Context;
-use ebi_objects::{EbiObject, EbiObjectType, HasActivityKey};
-
+use ebi_objects::{anyhow::Context, EbiObject, EbiObjectType, HasActivityKey};
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,

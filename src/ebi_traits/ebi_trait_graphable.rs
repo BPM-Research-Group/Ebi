@@ -2,9 +2,10 @@ use crate::ebi_framework::{
     ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
     trait_importers::ToGraphableTrait,
 };
-use anyhow::{Result, anyhow};
 use ebi_objects::{
-    Graphable, Importable, ScalableVectorGraphics, ebi_objects::scalable_vector_graphics::ToSVG,
+    Graphable, Importable, ScalableVectorGraphics,
+    anyhow::{Result, anyhow},
+    ebi_objects::scalable_vector_graphics::ToSVG,
 };
 use layout::backends::svg::SVGWriter;
 

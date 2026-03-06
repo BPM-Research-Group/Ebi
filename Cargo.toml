@@ -18,8 +18,8 @@ crate-type = ["cdylib", "lib"]
 [features]
 default = [ ]
 eexactarithmetic = []
-exactarithmetic = [ "eexactarithmetic", "ebi_objects/exactarithmetic" ]
-approximatearithmetic = [ "eapproximatearithmetic", "ebi_objects/approximatearithmetic" ]
+exactarithmetic = [ "eexactarithmetic", "ebi_objects/exactarithmetic", "ebi_optimisation/exactarithmetic" ]
+approximatearithmetic = [ "eapproximatearithmetic", "ebi_objects/approximatearithmetic", "ebi_optimisation/approximatearithmetic" ]
 eapproximatearithmetic = []
 testactivities = [ "ebi_objects/testactivities" ]
 python = [ "java", "dep:pyo3", "dep:polars", "dep:num-traits", "dep:syn", "dep:num-bigint" ]
@@ -27,12 +27,11 @@ java = [ "dep:jni" ]
 extension-module = ["pyo3/extension-module"]
 
 [dependencies]
+ebi_optimisation = "0.3.3"
+ebi_objects = "0.3.143"
 ebi_derive = "0.2.10"
-ebi_optimisation = "0.3.2"
-ebi_objects = "0.3.139"
 bitvec = "1.0.1"
 clap = { version = "4.5.60", features = ["derive", "cargo", "string"] }
-anyhow = "1.0.102"
 clap-verbosity-flag = "3.0.3"
 log = { version = "0.4.28", features = ["release_max_level_debug"] }
 env_logger = "0.11.9"

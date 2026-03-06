@@ -3,9 +3,9 @@ use crate::ebi_traits::{
     ebi_trait_event_log::EbiTraitEventLog,
     ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
 };
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     Activity, DirectlyFollowsGraph,
+    anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, One},
 };
 use std::collections::HashSet;

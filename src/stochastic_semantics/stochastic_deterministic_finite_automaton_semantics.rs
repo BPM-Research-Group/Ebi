@@ -1,6 +1,6 @@
-use anyhow::Result;
 use ebi_objects::{
     StochasticDeterministicFiniteAutomaton,
+    anyhow::Result,
     ebi_arithmetic::{Fraction, One},
     ebi_objects::labelled_petri_net::TransitionIndex,
 };

@@ -4,7 +4,11 @@ use crate::ebi_framework::{
     ebi_output::EbiObjectExporter,
     ebi_trait::FromEbiTraitObject,
     object_importers::{
-        ImportAsDirectlyFollowsModelObject, ImportAsLabelledPetriNetObject, ImportAsStochasticDeterministicFiniteAutomatonObject, ImportAsStochasticDirectlyFollowsModelObject, ImportAsStochasticLabelledPetriNetObject, ImportAsStochasticNondeterministicFiniteAutomatonObject, TryToBusinessProcessModelAndNotationObject
+        ImportAsDirectlyFollowsModelObject, ImportAsLabelledPetriNetObject,
+        ImportAsStochasticDeterministicFiniteAutomatonObject,
+        ImportAsStochasticDirectlyFollowsModelObject, ImportAsStochasticLabelledPetriNetObject,
+        ImportAsStochasticNondeterministicFiniteAutomatonObject,
+        TryToBusinessProcessModelAndNotationObject,
     },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsQueriableStochasticLanguageTrait,
@@ -13,8 +17,10 @@ use crate::ebi_framework::{
     },
     validate::Validate,
 };
-use anyhow::{Result, anyhow};
-use ebi_objects::{DirectlyFollowsGraph, EbiObject, Exportable, Importable};
+use ebi_objects::{
+    DirectlyFollowsGraph, EbiObject, Exportable, Importable,
+    anyhow::{Result, anyhow},
+};
 
 pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
     name: "directly follows graph",
@@ -79,12 +85,10 @@ pub const EBI_DIRECTLY_FOLLOWS_GRAPH: EbiFileHandler = EbiFileHandler {
             DirectlyFollowsGraph::IMPORTER_PARAMETERS,
         ),
     ],
-    object_importers_fallible: &[
-        EbiObjectImporterFallible::BusinessProcessModelAndNotation(
-            DirectlyFollowsGraph::try_import_as_business_process_model_and_notation_object,
-            DirectlyFollowsGraph::IMPORTER_PARAMETERS,
-        ),
-    ],
+    object_importers_fallible: &[EbiObjectImporterFallible::BusinessProcessModelAndNotation(
+        DirectlyFollowsGraph::try_import_as_business_process_model_and_notation_object,
+        DirectlyFollowsGraph::IMPORTER_PARAMETERS,
+    )],
     object_exporters: &[EbiObjectExporter::DirectlyFollowsGraph(
         DirectlyFollowsGraph::export_from_object,
     )],

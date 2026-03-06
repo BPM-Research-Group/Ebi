@@ -7,8 +7,10 @@ use crate::ebi_framework::{
     trait_importers::ImportAsActivitiesTrait,
     validate::Validate,
 };
-use anyhow::{Result, anyhow};
-use ebi_objects::{EbiObject, Exportable, Importable, StochasticLanguageOfAlignments};
+use ebi_objects::{
+    EbiObject, Exportable, Importable, StochasticLanguageOfAlignments,
+    anyhow::{Result, anyhow},
+};
 
 pub const EBI_STOCHASTIC_LANGUAGE_OF_ALIGNMENTS: EbiFileHandler = EbiFileHandler {
     name: "stochastic language of alignments",

@@ -1,11 +1,10 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::{
-    FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, Importable, IntoRefTraceIterator,
-};
-
 use crate::ebi_framework::{
     ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
     trait_importers::ToIterableLanguageTrait,
+};
+use ebi_objects::{
+    FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, Importable, IntoRefTraceIterator,
+    anyhow::{Result, anyhow},
 };
 
 pub trait EbiTraitIterableLanguage: HasActivityKey + IntoRefTraceIterator {}

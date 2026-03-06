@@ -1,8 +1,8 @@
-use anyhow::Result;
-use ebi_objects::{Activity, HasActivityKey, ebi_objects::labelled_petri_net::TransitionIndex};
-use std::fmt::Debug;
-
 use crate::{ebi_framework::displayable::Displayable, techniques::align::AlignmentHeuristics};
+use ebi_objects::{
+    Activity, HasActivityKey, anyhow::Result, ebi_objects::labelled_petri_net::TransitionIndex,
+};
+use std::fmt::Debug;
 
 pub trait Semantics:
     Debug + Send + Sync + AlignmentHeuristics<AliState = Self::SemState> + HasActivityKey

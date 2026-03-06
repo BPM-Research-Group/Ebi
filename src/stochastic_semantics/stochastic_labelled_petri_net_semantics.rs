@@ -2,9 +2,9 @@ use crate::{
     semantics::labelled_petri_net_semantics::LPNMarking,
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
-use anyhow::anyhow;
 use ebi_objects::{
     StochasticLabelledPetriNet,
+    anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, Zero},
 };
 
@@ -15,10 +15,7 @@ impl StochasticSemantics for StochasticLabelledPetriNet {
         &self.weights[transition]
     }
 
-    fn get_total_weight_of_enabled_transitions(
-        &self,
-        state: &LPNMarking,
-    ) -> anyhow::Result<Fraction> {
+    fn get_total_weight_of_enabled_transitions(&self, state: &LPNMarking) -> Result<Fraction> {
         let mut sum = Fraction::zero();
         for index in state.enabled_transitions.iter_ones() {
             sum += &self.weights[index];

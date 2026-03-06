@@ -1,23 +1,22 @@
-use std::{
-    collections::{HashMap, hash_map::Entry},
-    fmt::Display,
-};
-
 use crate::{
     ebi_framework::displayable::Displayable,
     semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
     techniques::livelock::IsPartOfLivelock,
 };
-use anyhow::Result;
 use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
     FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, ProcessTree,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    anyhow::Result,
     ebi_objects::{
         process_tree::TreeMarking,
         process_tree::{Node, Operator},
     },
+};
+use std::{
+    collections::{HashMap, hash_map::Entry},
+    fmt::Display,
 };
 
 pub trait InfinitelyManyTraces {

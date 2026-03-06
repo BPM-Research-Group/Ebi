@@ -10,12 +10,18 @@ use crate::{
         labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
     },
 };
-use anyhow::{Context, Error, Result, anyhow};
 use ebi_objects::{
-    Activity, ActivityKeyTranslator, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, LabelledPetriNet, LanguageOfAlignments, ProcessTree, StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, ebi_bpmn::semantics::BPMNMarking, ebi_objects::{
+    Activity, ActivityKeyTranslator, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
+    DirectlyFollowsGraph, DirectlyFollowsModel, LabelledPetriNet, LanguageOfAlignments,
+    ProcessTree, StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    anyhow::{Context, Error, Result, anyhow},
+    ebi_bpmn::semantics::BPMNMarking,
+    ebi_objects::{
         labelled_petri_net::TransitionIndex, language_of_alignments::Move,
         process_tree::TreeMarking,
-    }
+    },
 };
 use rayon::iter::ParallelIterator;
 use std::{

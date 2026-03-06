@@ -14,8 +14,10 @@ use crate::{
     },
     prom::java_object_handler::JavaObjectHandler,
 };
-use anyhow::{Result, anyhow};
-use ebi_objects::{EbiObject, Exportable, Importable, ProcessTree};
+use ebi_objects::{
+    EbiObject, Exportable, Importable, ProcessTree,
+    anyhow::{Result, anyhow},
+};
 
 pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
     name: "process tree",

@@ -1,18 +1,19 @@
-use std::collections::{HashMap, hash_map::Entry};
-
 use crate::{
     ebi_framework::displayable::Displayable,
     semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
 };
-use anyhow::Result;
 use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
     EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
     LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    ebi_objects::{event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking},
+    anyhow::Result,
+    ebi_objects::{
+        event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking,
+    },
 };
+use std::collections::{HashMap, hash_map::Entry};
 
 pub trait Bounded {
     type LivState: Displayable;

@@ -13,10 +13,10 @@ use crate::{
     follower_semantics::FollowerSemantics,
     techniques::explain_trace::ExplainTrace,
 };
-use anyhow::{Context, anyhow};
 use clap::{Arg, ArgAction, value_parser};
 use ebi_objects::{
     EbiObject, EbiObjectType, HasActivityKey,
+    anyhow::{Context, anyhow},
     ebi_arithmetic::{ConstFraction, Fraction},
 };
 

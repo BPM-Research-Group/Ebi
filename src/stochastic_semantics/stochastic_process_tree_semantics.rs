@@ -1,7 +1,7 @@
 use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;
-use anyhow::Result;
 use ebi_objects::{
     StochasticProcessTree,
+    anyhow::Result,
     ebi_arithmetic::Fraction,
     ebi_objects::{
         labelled_petri_net::TransitionIndex,

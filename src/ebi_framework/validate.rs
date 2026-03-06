@@ -1,7 +1,5 @@
-use anyhow::Result;
+use ebi_objects::{Importable, anyhow::Result};
 use std::io::BufRead;
-
-use ebi_objects::Importable;
 
 pub trait Validate: Importable {
     fn validate(reader: &mut dyn BufRead) -> Result<()>

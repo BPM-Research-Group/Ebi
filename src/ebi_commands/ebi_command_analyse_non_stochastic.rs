@@ -14,8 +14,7 @@ use crate::{
         infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic,
     },
 };
-use anyhow::anyhow;
-use ebi_objects::{EbiObject, EbiObjectType, EventLogXes};
+use ebi_objects::{anyhow::anyhow, EbiObject, EbiObjectType, EventLogXes};
 use std::io::Write;
 
 pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {

@@ -2,12 +2,11 @@ use crate::{
     ebi_framework::displayable::Displayable,
     semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
 };
-use anyhow::Result;
 use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet, ProcessTree,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    ebi_objects::process_tree::TreeMarking,
+    anyhow::Result, ebi_objects::process_tree::TreeMarking,
 };
 
 pub trait NonDecreasingLivelock {

@@ -37,8 +37,10 @@ use crate::{
     },
     prom::java_object_handler::JavaObjectHandler,
 };
-use anyhow::{Error, Result, anyhow};
-use ebi_objects::EbiObjectType;
+use ebi_objects::{
+    EbiObjectType,
+    anyhow::{Error, Result, anyhow},
+};
 use std::{collections::BTreeSet, fmt::Display, hash::Hash, io::BufRead, str::FromStr};
 
 /**

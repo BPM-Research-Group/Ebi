@@ -1,5 +1,7 @@
 use crate::semantics::semantics::Semantics;
-use ebi_objects::{ebi_arithmetic::Fraction, ebi_objects::labelled_petri_net::TransitionIndex};
+use ebi_objects::{
+    anyhow::Result, ebi_arithmetic::Fraction, ebi_objects::labelled_petri_net::TransitionIndex,
+};
 
 pub trait StochasticSemantics:
     Semantics<SemState = <Self as StochasticSemantics>::StoSemState>
@@ -25,5 +27,5 @@ pub trait StochasticSemantics:
     fn get_total_weight_of_enabled_transitions(
         &self,
         state: &<Self as StochasticSemantics>::StoSemState,
-    ) -> anyhow::Result<Fraction>;
+    ) -> Result<Fraction>;
 }

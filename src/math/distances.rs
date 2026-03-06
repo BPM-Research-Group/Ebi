@@ -9,7 +9,7 @@ use crate::math::levenshtein;
     all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use anyhow::Result;
+use ebi_objects::anyhow::Result;
 use ebi_objects::ebi_arithmetic::Fraction;
 use ebi_objects::ebi_arithmetic::Zero;
 #[cfg(any(

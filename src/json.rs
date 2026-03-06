@@ -1,5 +1,7 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::ebi_arithmetic::Fraction;
+use ebi_objects::{
+    anyhow::{Result, anyhow},
+    ebi_arithmetic::Fraction,
+};
 use serde_json::{Map, Value};
 
 pub fn read_field_number(json: &Value, field: &str) -> Result<usize> {

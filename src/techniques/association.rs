@@ -2,9 +2,9 @@ use crate::{
     ebi_traits::ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
     math::{correlation::correlation, levenshtein, root::ContainsRoot},
 };
-use anyhow::{Result, anyhow};
 use ebi_objects::{
     Attribute, DataType,
+    anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, Signed, Zero},
 };
 use rand::RngExt;

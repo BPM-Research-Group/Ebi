@@ -1,9 +1,3 @@
-use anyhow::{Context, anyhow};
-use ebi_objects::{
-    EbiObject, EbiObjectType, LabelledPetriNet, ProcessTree,
-    ebi_arithmetic::{ConstFraction, Fraction},
-};
-
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
@@ -22,6 +16,11 @@ use crate::{
         uniform_stochastic_miner::{UniformStochasticMinerLPN, UniformStochasticMinerTree},
     },
 };
+use ebi_objects::{
+    BusinessProcessModelAndNotation, EbiObject, EbiObjectType, LabelledPetriNet, ProcessTree,
+    anyhow::{Context, anyhow},
+    ebi_arithmetic::{ConstFraction, Fraction},
+};
 
 pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
     name_short: "disc",
@@ -36,9 +35,58 @@ pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
     ],
 };
 
-pub const EBI_DISCOVER_ALIGNMENTS: EbiCommand = EbiCommand::Command {
+pub const EBI_DISCOVER_ALIGNMENTS: EbiCommand = EbiCommand::Group {
     name_short: "ali",
     name_long: Some("alignments"),
+    explanation_short: "Give each transition a weight that matches the aligned occurrences of its label.",
+    explanation_long: Some(
+        "Give each transition a weight that matches the aligned occurrences of its label. The model must be livelock-free.",
+    ),
+    children: &[&EBI_DISCOVER_ALIGNMENTS_BPMN, &EBI_DISCOVER_ALIGNMENTS_SLPN],
+};
+
+pub const EBI_DISCOVER_ALIGNMENTS_BPMN: EbiCommand = EbiCommand::Command {
+    name_short: "sbpmn",
+    name_long: Some("stochastic-business-process-model-and-notation"),
+    explanation_short: "Give each transition a weight that matches the aligned occurrences of its label.",
+    explanation_long: Some(
+        "Give each transition a weight that matches the aligned occurrences of its label. The model must be livelock-free.",
+    ),
+    latex_link: Some("~\\cite{DBLP:conf/icpm/BurkeLW20}"),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Object(
+            EbiObjectType::BusinessProcessModelAndNotation,
+        )],
+    ],
+    input_names: &["FILE_1", "FILE_2"],
+    input_helps: &[
+        "A finite stochastic language (log) to get the occurrences from.",
+        "A business process model and notation with the control flow.",
+    ],
+    execute: |mut inputs, _| {
+        let language = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let bpmn = inputs
+            .remove(0)
+            .to_type::<BusinessProcessModelAndNotation>()?;
+        Ok(EbiOutput::Object(
+            EbiObject::StochasticBusinessProcessModelAndNotation(
+                bpmn.mine_stochastic_alignment(language)?,
+            ),
+        ))
+    },
+    output_type: &EbiOutputType::ObjectType(
+        EbiObjectType::StochasticBusinessProcessModelAndNotation,
+    ),
+};
+
+pub const EBI_DISCOVER_ALIGNMENTS_SLPN: EbiCommand = EbiCommand::Command {
+    name_short: "slpn",
+    name_long: Some("stochastic-labelled-Petri-nets"),
     explanation_short: "Give each transition a weight that matches the aligned occurrences of its label.",
     explanation_long: Some(
         "Give each transition a weight that matches the aligned occurrences of its label. The model must be livelock-free.",

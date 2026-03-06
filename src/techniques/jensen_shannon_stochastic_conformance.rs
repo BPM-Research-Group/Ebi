@@ -6,9 +6,9 @@ use crate::{
     follower_semantics::FollowerSemantics,
     math::{log_div::LogDiv, root_log_div::RootLogDiv},
 };
-use anyhow::Result;
 use ebi_objects::{
     ActivityKeyTranslator,
+    anyhow::Result,
     ebi_arithmetic::{Fraction, OneMinus, Signed, Zero},
 };
 

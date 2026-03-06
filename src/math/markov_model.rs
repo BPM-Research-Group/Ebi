@@ -1,6 +1,6 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::ebi_arithmetic::{
-    EbiMatrix, Fraction, FractionMatrix, IdentityMinus, Inversion, Signed, Zero,
+use ebi_objects::{
+    anyhow::{Result, anyhow},
+    ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, IdentityMinus, Inversion, Signed, Zero},
 };
 use std::fmt::{Debug, Display};
 

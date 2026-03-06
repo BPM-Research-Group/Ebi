@@ -9,8 +9,10 @@ use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     techniques::{sample::Sampler, sample_folds::FoldsSampler},
 };
-use anyhow::{Context, Result, anyhow};
-use ebi_objects::{EbiObject, EbiObjectType, EventLog, FiniteStochasticLanguage};
+use ebi_objects::{
+    EbiObject, EbiObjectType, EventLog, FiniteStochasticLanguage,
+    anyhow::{Context, Result, anyhow},
+};
 
 pub const SAMPLED_OBJECT_INPUTS: &[&EbiInputType] = &[
     &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
