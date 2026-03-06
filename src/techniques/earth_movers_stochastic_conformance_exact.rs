@@ -1,9 +1,11 @@
 use crate::math::distances::WeightedDistances;
-use anyhow::{Context, Result};
-use ebi_objects::ebi_arithmetic::{
-    MaybeExact, One, Zero,
-    fraction::{fraction_exact::FractionExact, signed::Numerator},
-    malachite::{Integer, base::num::basic::traits::One as MOne},
+use ebi_objects::{
+    anyhow::{Context, Result},
+    ebi_arithmetic::{
+        MaybeExact, One, Zero,
+        fraction::{fraction_exact::FractionExact, signed::Numerator},
+        malachite::{Integer, base::num::basic::traits::One as MOne},
+    },
 };
 use ebi_optimisation::network_simplex::NetworkSimplex;
 use rayon::iter::ParallelIterator;

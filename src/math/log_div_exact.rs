@@ -1,6 +1,6 @@
-use anyhow::{Error, Result, anyhow};
 use ebi_objects::{
     Infoable,
+    anyhow::{Error, Result, anyhow},
     ebi_arithmetic::{
         Fraction, Recip, Signed,
         ebi_number::{One, Zero},
@@ -542,8 +542,8 @@ impl Display for FractionRaw {
 
 #[cfg(test)]
 mod tests {
-    use ebi_objects::ebi_arithmetic::ebi_number::Zero;
     use crate::math::log_div_exact::LogDivExact;
+    use ebi_objects::ebi_arithmetic::ebi_number::Zero;
 
     #[test]
     fn zero_log_div() {

@@ -1,8 +1,10 @@
-use anyhow::{Result, anyhow};
-use ebi_objects::ebi_arithmetic::{
-    MaybeExact, One, Zero,
-    fraction::fraction_exact::FractionExact,
-    malachite::{Natural, base::num::arithmetic::traits::Lcm, rational::Rational},
+use ebi_objects::{
+    anyhow::{Result, anyhow},
+    ebi_arithmetic::{
+        MaybeExact, One, Zero,
+        fraction::fraction_exact::FractionExact,
+        malachite::{Natural, base::num::arithmetic::traits::Lcm, rational::Rational},
+    },
 };
 use std::{
     borrow::Borrow,
