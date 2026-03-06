@@ -2,7 +2,7 @@ use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStoch
 use ebi_objects::{
     BusinessProcessModelAndNotation, LabelledPetriNet, StochasticBusinessProcessModelAndNotation,
     StochasticLabelledPetriNet,
-    anyhow::{Result, anyhow},
+    anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::language_of_alignments::Move,
 };
@@ -73,7 +73,7 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
             }
         }
 
-        self.try_into()
+        self.try_into().with_context(|| anyhow!("Creating SBPMN."))
     }
 }
 

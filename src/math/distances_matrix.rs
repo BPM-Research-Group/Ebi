@@ -1,12 +1,4 @@
-#[cfg(any(
-    all(
-        not(feature = "eexactarithmetic"),
-        not(feature = "eapproximatearithmetic")
-    ),
-    all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
-    all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
-))]
-use ebi_objects::{ebi_arithmetic::Fraction};
+use ebi_objects::ebi_arithmetic::Fraction;
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),
@@ -37,7 +29,6 @@ use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator};
 ))]
 use ebi_objects::ebi_arithmetic::exact::MaybeExact;
 
-use ebi_objects::anyhow::Result;
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
@@ -154,7 +145,9 @@ impl WeightedDistances for WeightedDistanceMatrix {
         all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
         all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
-    fn lowest_common_multiple_denominators_distances(&self) -> Result<Natural> {
+    fn lowest_common_multiple_denominators_distances(
+        &self,
+    ) -> ebi_objects::anyhow::Result<Natural> {
         // 2a. Calculate the Least Common Multiple (LCM) of all denominators of distances (i.e. the elements in the DistanceMatrix).
 
         use ebi_objects::ebi_arithmetic::malachite::{
@@ -190,7 +183,7 @@ impl WeightedDistances for WeightedDistanceMatrix {
         all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
         all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
-    fn lowest_common_multiple_denominators_weights(&self) -> Result<Natural> {
+    fn lowest_common_multiple_denominators_weights(&self) -> ebi_objects::anyhow::Result<Natural> {
         use ebi_objects::ebi_arithmetic::malachite::Natural;
         use ebi_objects::ebi_arithmetic::malachite::base::num::arithmetic::traits::Lcm;
         use ebi_objects::ebi_arithmetic::malachite::base::num::basic::traits::One;

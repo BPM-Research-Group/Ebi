@@ -16,7 +16,7 @@ name = "ebi"
 crate-type = ["cdylib", "lib"]
 
 [features]
-default = [ "exactarithmetic" ]
+default = [ ]
 eexactarithmetic = []
 exactarithmetic = [ "eexactarithmetic", "ebi_objects/exactarithmetic", "ebi_optimisation/exactarithmetic" ]
 approximatearithmetic = [ "eapproximatearithmetic", "ebi_objects/approximatearithmetic", "ebi_optimisation/approximatearithmetic" ]
@@ -28,7 +28,7 @@ extension-module = ["pyo3/extension-module"]
 
 [dependencies]
 ebi_optimisation = "0.3.3"
-ebi_objects = "0.3.143"
+ebi_objects = "0.3.144"
 ebi_derive = "0.2.10"
 bitvec = "1.0.1"
 clap = { version = "4.5.60", features = ["derive", "cargo", "string"] }

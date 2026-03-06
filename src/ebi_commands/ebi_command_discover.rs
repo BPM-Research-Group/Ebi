@@ -75,7 +75,8 @@ pub const EBI_DISCOVER_ALIGNMENTS_BPMN: EbiCommand = EbiCommand::Command {
             .to_type::<BusinessProcessModelAndNotation>()?;
         Ok(EbiOutput::Object(
             EbiObject::StochasticBusinessProcessModelAndNotation(
-                bpmn.mine_stochastic_alignment(language)?,
+                bpmn.mine_stochastic_alignment(language)
+                    .with_context(|| anyhow!("Discovering using alignments."))?,
             ),
         ))
     },

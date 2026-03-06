@@ -1,5 +1,8 @@
 use super::log_div::LogDiv;
-use ebi_objects::{anyhow::Result, ebi_arithmetic::{Fraction, OneMinus, Sqrt}};
+use ebi_objects::{
+    anyhow::Result,
+    ebi_arithmetic::{Fraction, OneMinus, Sqrt},
+};
 use std::fmt::Display;
 
 #[derive(PartialEq, Eq, Debug, Clone)]

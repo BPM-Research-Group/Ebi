@@ -9,7 +9,7 @@ use std::sync::Arc;
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use ebi_objects::ebi_arithmetic::malachite::Natural;
-use ebi_objects::{anyhow::Result, ebi_arithmetic::{Fraction, Zero}};
+use ebi_objects::ebi_arithmetic::{Fraction, Zero};
 use rayon::iter::{IndexedParallelIterator, ParallelIterator};
 
 #[cfg(any(
@@ -149,7 +149,7 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
         all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
         all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
-    fn lowest_common_multiple_denominators_distances(&self) -> Result<Natural> {
+    fn lowest_common_multiple_denominators_distances(&self) -> ebi_objects::anyhow::Result<Natural> {
         use ebi_objects::ebi_arithmetic::malachite::base::num::arithmetic::traits::Lcm;
         use ebi_objects::ebi_arithmetic::malachite::base::num::basic::traits::One;
         // 2a. Calculate the Least Common Multiple (LCM) of all denominators of distances (i.e. the elements in the DistanceMatrix).
@@ -179,7 +179,7 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
         all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
         all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
-    fn lowest_common_multiple_denominators_weights(&self) -> Result<Natural> {
+    fn lowest_common_multiple_denominators_weights(&self) -> ebi_objects::anyhow::Result<Natural> {
         use ebi_objects::ebi_arithmetic::malachite::base::num::arithmetic::traits::Lcm;
         use ebi_objects::ebi_arithmetic::malachite::base::num::basic::traits::One;
         use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator, ParallelIterator};
