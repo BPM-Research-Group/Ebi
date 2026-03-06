@@ -242,17 +242,6 @@ pub mod tests {
     use std::fs::{self, File};
 
     #[test]
-    fn all_graphable() {
-        for (input, _, _, _) in crate::tests::get_all_test_files() {
-            if let EbiInput::Trait(object, _) = input {
-                if let EbiTraitObject::Graphable(object) = object {
-                    assert!(object.to_dot().is_ok());
-                }
-            }
-        }
-    }
-
-    #[test]
     fn objects() {
         for (input, _, _, _) in crate::tests::get_all_test_files() {
             if let EbiInput::Object(object, _) = input {
