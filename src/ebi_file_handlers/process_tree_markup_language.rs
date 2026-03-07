@@ -1,9 +1,9 @@
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
-    ebi_input::{EbiObjectImporter, EbiObjectImporterFallible, EbiTraitImporter},
+    ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     object_importers::{
-        ImportAsLabelledPetriNetObject, TryToBusinessProcessModelAndNotationObject,
+        ImportAsBusinessProcessModelAndNotationObject, ImportAsLabelledPetriNetObject,
     },
     trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
@@ -37,11 +37,12 @@ pub const EBI_PROCESS_TREE_MARKUP_LANGUAGE: EbiFileHandler = EbiFileHandler {
             ProcessTreeMarkupLanguage::import_as_labelled_petri_net_object,
             ProcessTreeMarkupLanguage::IMPORTER_PARAMETERS,
         ),
+        EbiObjectImporter::BusinessProcessModelAndNotation(
+            ProcessTreeMarkupLanguage::import_as_business_process_model_and_notation_object,
+            ProcessTreeMarkupLanguage::IMPORTER_PARAMETERS,
+        ),
     ],
-    object_importers_fallible: &[EbiObjectImporterFallible::BusinessProcessModelAndNotation(
-        ProcessTreeMarkupLanguage::try_import_as_business_process_model_and_notation_object,
-        ProcessTreeMarkupLanguage::IMPORTER_PARAMETERS,
-    )],
+    object_importers_fallible: &[],
     object_exporters: &[
         EbiObjectExporter::ProcessTree(ProcessTreeMarkupLanguage::export_from_object),
         EbiObjectExporter::StochasticProcessTree(ProcessTreeMarkupLanguage::export_from_object),
