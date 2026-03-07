@@ -1,11 +1,11 @@
 use crate::{
     ebi_framework::{
         ebi_file_handler::EbiFileHandler,
-        ebi_input::{EbiInput, EbiObjectImporter, EbiObjectImporterFallible, EbiTraitImporter},
+        ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
         ebi_output::EbiObjectExporter,
         ebi_trait::FromEbiTraitObject,
         object_importers::{
-            ImportAsLabelledPetriNetObject, TryToBusinessProcessModelAndNotationObject,
+            ImportAsBusinessProcessModelAndNotationObject, ImportAsLabelledPetriNetObject,
         },
         trait_importers::{
             ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait,
@@ -49,11 +49,12 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
             ProcessTree::import_as_labelled_petri_net_object,
             ProcessTree::IMPORTER_PARAMETERS,
         ),
+        EbiObjectImporter::BusinessProcessModelAndNotation(
+            ProcessTree::import_as_business_process_model_and_notation_object,
+            ProcessTree::IMPORTER_PARAMETERS,
+        ),
     ],
-    object_importers_fallible: &[EbiObjectImporterFallible::BusinessProcessModelAndNotation(
-        ProcessTree::try_import_as_business_process_model_and_notation_object,
-        ProcessTree::IMPORTER_PARAMETERS,
-    )],
+    object_importers_fallible: &[],
     object_exporters: &[
         EbiObjectExporter::ProcessTree(ProcessTree::export_from_object),
         EbiObjectExporter::StochasticProcessTree(ProcessTree::export_from_object),

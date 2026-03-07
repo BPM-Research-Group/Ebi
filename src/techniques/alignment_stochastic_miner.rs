@@ -38,6 +38,8 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
             }
         }
 
+        println!("conversion done");
+
         let alignments = self.align_stochastic_language(language)?;
         for index in 0..alignments.len() {
             let probability = alignments

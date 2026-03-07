@@ -915,7 +915,7 @@ mod tests {
     }
 
     #[test]
-    #[timeout(600000)]
+    #[timeout(500000)]
     fn call_all_non_cli_commands() {
         EBI_COMMANDS.get_command_paths().into_par_iter().for_each(|path| {
             if let EbiCommand::Command {
