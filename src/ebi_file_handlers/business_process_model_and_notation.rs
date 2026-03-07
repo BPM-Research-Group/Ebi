@@ -44,6 +44,10 @@ pub const EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = EbiFileHandl
         EbiObjectExporter::StochasticBusinessProcessModelAndNotation(
             BusinessProcessModelAndNotation::export_from_object,
         ),
+        EbiObjectExporter::ProcessTree(BusinessProcessModelAndNotation::export_from_object),
+        EbiObjectExporter::StochasticProcessTree(
+            BusinessProcessModelAndNotation::export_from_object,
+        ),
     ],
     object_exporters_fallible: &[
         EbiObjectExporter::DeterministicFiniteAutomaton(
@@ -59,10 +63,6 @@ pub const EBI_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = EbiFileHandl
             BusinessProcessModelAndNotation::export_from_object,
         ),
         EbiObjectExporter::LabelledPetriNet(BusinessProcessModelAndNotation::export_from_object),
-        EbiObjectExporter::ProcessTree(BusinessProcessModelAndNotation::export_from_object),
-        EbiObjectExporter::StochasticProcessTree(
-            BusinessProcessModelAndNotation::export_from_object,
-        ),
         EbiObjectExporter::StochasticLabelledPetriNet(
             BusinessProcessModelAndNotation::export_from_object,
         ),
