@@ -8,7 +8,7 @@ use crate::{
     python::python_import::PYTHON_IMPORTERS,
     text::Joiner,
 };
-use anyhow::{Result, anyhow};
+use ebi_objects::anyhow::{Result, anyhow};
 use polars::prelude::*;
 use pyo3::{exceptions::PyValueError, prelude::*, types::PyAny};
 use std::io::Cursor;

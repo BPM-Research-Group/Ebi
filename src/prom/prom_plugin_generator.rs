@@ -8,7 +8,7 @@ use crate::{
     prom::java_object_handler::{JavaInputTypes, JavaObjectHandler, get_possible_inputs_with_java},
     text::JavaEscaper,
 };
-use anyhow::Result;
+use ebi_objects::anyhow::Result;
 use itertools::Itertools;
 use std::io::Write;
 use strum::IntoEnumIterator;

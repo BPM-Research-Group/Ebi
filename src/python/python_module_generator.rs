@@ -1,5 +1,3 @@
-use std::{fs, path::PathBuf};
-
 use crate::{
     ebi_framework::{
         ebi_command::{EBI_COMMANDS, EbiCommand},
@@ -7,7 +5,8 @@ use crate::{
     },
     python::python::pm4py_function_name,
 };
-use anyhow::{Result, anyhow};
+use ebi_objects::anyhow::{Result, anyhow};
+use std::{fs, path::PathBuf};
 use syn::Item;
 
 pub fn generate_pm4py_module() -> Result<EbiOutput> {
@@ -28,8 +27,7 @@ use crate::ebi_framework::ebi_command::EbiCommand;"
     );
 
     for path in EBI_COMMANDS.get_command_paths() {
-        if path.last().unwrap().is_in_python()
-        {
+        if path.last().unwrap().is_in_python() {
             let (fn_name, body) = ebi_command_to_pm4py_function(&path)?;
             functions.push_str(&body);
             module.push_str(&format!(

@@ -23,9 +23,9 @@ use crate::{
     ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
     text::Joiner,
 };
-use anyhow::Result;
 use ebi_objects::{
     ActivityKey, EbiObject, EbiObjectType, EventLogPython, LabelledPetriNet, ProcessTree,
+    anyhow::Result,
     ebi_arithmetic::{Fraction, is_exact_globally},
     marking::Marking,
 };
