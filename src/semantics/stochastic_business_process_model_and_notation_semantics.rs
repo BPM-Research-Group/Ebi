@@ -8,7 +8,7 @@ impl Semantics for StochasticBusinessProcessModelAndNotation {
     type SemState = BPMNMarking;
 
     fn get_initial_state(&self) -> Option<<Self as Semantics>::SemState> {
-        Some(self.get_initial_marking().unwrap())
+        self.get_initial_marking().unwrap()
     }
 
     fn execute_transition(

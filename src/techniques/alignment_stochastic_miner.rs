@@ -1,3 +1,4 @@
+use super::align::Align;
 use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
 use ebi_objects::{
     BusinessProcessModelAndNotation, LabelledPetriNet, StochasticBusinessProcessModelAndNotation,
@@ -6,7 +7,6 @@ use ebi_objects::{
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::language_of_alignments::Move,
 };
-use super::align::Align;
 
 pub trait AlignmentMiner {
     type T;
@@ -38,38 +38,36 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
             }
         }
 
-        println!("conversion done");
-
         let alignments = self.align_stochastic_language(language)?;
         for index in 0..alignments.len() {
             let probability = alignments
                 .get_probability(index)
                 .ok_or_else(|| anyhow!("should not happen"))?;
 
-            let mut marking = self.get_initial_marking()?;
+            if let Some(mut marking) = self.get_initial_marking()? {
+                for movee in alignments
+                    .get(index)
+                    .ok_or_else(|| anyhow!("should not happen"))?
+                {
+                    match movee {
+                        Move::LogMove(_) => {}
+                        Move::ModelMove(_, transition_index)
+                        | Move::SynchronousMove(_, transition_index)
+                        | Move::SilentMove(transition_index) => {
+                            for sequence_flow_index in self
+                                .transition_2_marked_sequence_flows(*transition_index, &marking)
+                                .ok_or_else(|| anyhow!("this should not happen"))?
+                            {
+                                let sequence_flow = self
+                                    .global_index_2_sequence_flow_mut(sequence_flow_index)
+                                    .ok_or_else(|| anyhow!("sequence flow not found"))?;
 
-            for movee in alignments
-                .get(index)
-                .ok_or_else(|| anyhow!("should not happen"))?
-            {
-                match movee {
-                    Move::LogMove(_) => {}
-                    Move::ModelMove(_, transition_index)
-                    | Move::SynchronousMove(_, transition_index)
-                    | Move::SilentMove(transition_index) => {
-                        for sequence_flow_index in self
-                            .transition_2_marked_sequence_flows(*transition_index, &marking)
-                            .ok_or_else(|| anyhow!("this should not happen"))?
-                        {
-                            let sequence_flow = self
-                                .global_index_2_sequence_flow_mut(sequence_flow_index)
-                                .ok_or_else(|| anyhow!("sequence flow not found"))?;
+                                *sequence_flow.weight.get_or_insert_with(|| Fraction::zero()) +=
+                                    probability;
+                            }
 
-                            *sequence_flow.weight.get_or_insert_with(|| Fraction::zero()) +=
-                                probability;
+                            self.execute_transition(&mut marking, *transition_index)?;
                         }
-
-                        self.execute_transition(&mut marking, *transition_index)?;
                     }
                 }
             }
