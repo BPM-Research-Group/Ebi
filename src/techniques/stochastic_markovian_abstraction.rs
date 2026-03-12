@@ -110,8 +110,8 @@ impl MarkovianAbstraction {
                 self.activity_key.name2activity.remove(&self_name);
                 self.activity_key
                     .name2activity
-                    .insert("+".repeat(max_len_end), self.end_activity);
-                self.activity_key.activity2name[self_id] = "+".repeat(max_len_end);
+                    .insert("-".repeat(max_len_end), self.end_activity);
+                self.activity_key.activity2name[self_id] = "-".repeat(max_len_end);
             }
 
             //other
@@ -125,8 +125,8 @@ impl MarkovianAbstraction {
                 other
                     .activity_key
                     .name2activity
-                    .insert("+".repeat(max_len_end), other.end_activity);
-                other.activity_key.activity2name[other_id] = "+".repeat(max_len_end);
+                    .insert("-".repeat(max_len_end), other.end_activity);
+                other.activity_key.activity2name[other_id] = "-".repeat(max_len_end);
             }
         }
     }
