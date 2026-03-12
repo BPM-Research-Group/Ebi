@@ -58,12 +58,36 @@ impl MarkovianAbstraction {
                     .get_activity_label(&other.start_activity)
                     .len(),
             );
-            let self_id = self.activity_key.get_id_from_activity(self.start_activity);
-            self.activity_key.activity2name[self_id] = "+".repeat(max_len_start);
-            let other_id = other
-                .activity_key
-                .get_id_from_activity(other.start_activity);
-            other.activity_key.activity2name[other_id] = "+".repeat(max_len_start);
+            //self
+            {
+                let self_name = self
+                    .activity_key
+                    .get_activity_label(&self.start_activity)
+                    .to_string();
+                let self_id = self.activity_key.get_id_from_activity(self.start_activity);
+                self.activity_key.name2activity.remove(&self_name);
+                self.activity_key
+                    .name2activity
+                    .insert("+".repeat(max_len_start), self.start_activity);
+                self.activity_key.activity2name[self_id] = "+".repeat(max_len_start);
+            }
+
+            //other
+            {
+                let other_name = other
+                    .activity_key
+                    .get_activity_label(&other.start_activity)
+                    .to_string();
+                let other_id = other
+                    .activity_key
+                    .get_id_from_activity(other.start_activity);
+                other.activity_key.name2activity.remove(&other_name);
+                other
+                    .activity_key
+                    .name2activity
+                    .insert("+".repeat(max_len_start), other.start_activity);
+                other.activity_key.activity2name[other_id] = "+".repeat(max_len_start);
+            }
         }
         //end
         {
@@ -76,10 +100,34 @@ impl MarkovianAbstraction {
                     .get_activity_label(&other.end_activity)
                     .len(),
             );
-            let self_id = self.activity_key.get_id_from_activity(self.end_activity);
-            self.activity_key.activity2name[self_id] = "-".repeat(max_len_end);
-            let other_id = other.activity_key.get_id_from_activity(other.end_activity);
-            other.activity_key.activity2name[other_id] = "-".repeat(max_len_end);
+            //self
+            {
+                let self_name = self
+                    .activity_key
+                    .get_activity_label(&self.end_activity)
+                    .to_string();
+                let self_id = self.activity_key.get_id_from_activity(self.end_activity);
+                self.activity_key.name2activity.remove(&self_name);
+                self.activity_key
+                    .name2activity
+                    .insert("+".repeat(max_len_end), self.end_activity);
+                self.activity_key.activity2name[self_id] = "+".repeat(max_len_end);
+            }
+
+            //other
+            {
+                let other_name = other
+                    .activity_key
+                    .get_activity_label(&other.end_activity)
+                    .to_string();
+                let other_id = other.activity_key.get_id_from_activity(other.end_activity);
+                other.activity_key.name2activity.remove(&other_name);
+                other
+                    .activity_key
+                    .name2activity
+                    .insert("+".repeat(max_len_end), other.end_activity);
+                other.activity_key.activity2name[other_id] = "+".repeat(max_len_end);
+            }
         }
     }
 }
