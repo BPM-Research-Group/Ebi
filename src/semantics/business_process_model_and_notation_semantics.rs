@@ -1,6 +1,6 @@
 use crate::semantics::semantics::Semantics;
 use ebi_objects::{
-    Activity, BusinessProcessModelAndNotation, anyhow::Result, ebi_bpmn::semantics::BPMNMarking,
+    Activity, BusinessProcessModelAndNotation, anyhow::Result, ebi_bpmn::BPMNMarking,
     ebi_objects::labelled_petri_net::TransitionIndex,
 };
 

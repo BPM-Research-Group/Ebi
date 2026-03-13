@@ -17,7 +17,7 @@ use ebi_objects::{
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::{Context, Error, Result, anyhow},
-    ebi_bpmn::semantics::BPMNMarking,
+    ebi_bpmn::BPMNMarking,
     ebi_objects::{
         labelled_petri_net::TransitionIndex, language_of_alignments::Move,
         process_tree::TreeMarking,

@@ -1,7 +1,7 @@
 use crate::semantics::semantics::Semantics;
 use ebi_objects::{
     Activity, StochasticBusinessProcessModelAndNotation, anyhow::Result,
-    ebi_bpmn::semantics::BPMNMarking, ebi_objects::labelled_petri_net::TransitionIndex,
+    ebi_bpmn::BPMNMarking, ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
 impl Semantics for StochasticBusinessProcessModelAndNotation {

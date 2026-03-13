@@ -1,6 +1,6 @@
 [package]
 name = "ebi"
-version = "0.3.10"
+version = "0.3.11"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 keywords = ["stochastic-processes", "process-mining", "business-processes"]
@@ -28,7 +28,7 @@ extension-module = ["pyo3/extension-module"]
 
 [dependencies]
 ebi_optimisation = "0.3.3"
-ebi_objects = "0.3.147"
+ebi_objects = "0.3.149"
 ebi_derive = "0.2.10"
 bitvec = "1.0.1"
 clap = { version = "4.5.60", features = ["derive", "cargo", "string"] }

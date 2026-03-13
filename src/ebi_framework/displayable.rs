@@ -1,4 +1,4 @@
-use ebi_objects::{ebi_bpmn::semantics::BPMNMarking, ebi_objects::process_tree::TreeMarking, marking::Marking};
+use ebi_objects::{ebi_bpmn::BPMNMarking, ebi_objects::process_tree::TreeMarking, marking::Marking};
 use std::{
     fmt::{Debug, Display},
     hash::Hash,
