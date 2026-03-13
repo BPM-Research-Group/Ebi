@@ -131,7 +131,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA: EbiCommand = EbiCommand::Command
 };
 
 pub const EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE: EbiCommand = EbiCommand::Command {
-    name_short: "tree",
+    name_short: "ptree",
     name_long: Some("process-tree"),
     explanation_short: "Discover a process tree that is a prefix tree of the log.",
     explanation_long: None,
