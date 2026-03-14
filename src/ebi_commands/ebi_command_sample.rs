@@ -17,6 +17,7 @@ use ebi_objects::{
 pub const SAMPLED_OBJECT_INPUTS: &[&EbiInputType] = &[
     &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
     &EbiInputType::Trait(EbiTrait::StochasticSemantics),
+    &EbiInputType::Trait(EbiTrait::StochasticPartiallyOrderedSemantics),
 ];
 
 pub fn get_sampled_object(
@@ -30,6 +31,11 @@ pub fn get_sampled_object(
         EbiInput::Trait(EbiTraitObject::StochasticSemantics(semantics), _) => semantics
             .sample(number_of_traces)
             .context("Sample semantics."),
+        EbiInput::Trait(EbiTraitObject::StochasticPartiallyOrderedSemantics(semantics), _) => {
+            semantics
+                .sample(number_of_traces)
+                .context("Sample semantics.")
+        }
         _ => unreachable!(),
     }
 }
@@ -41,6 +47,12 @@ pub fn get_sampled_object_if_necessary(
     Ok(match object {
         EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => slang,
         EbiInput::Trait(EbiTraitObject::StochasticSemantics(semantics), _) => {
+            let slang = semantics
+                .sample(number_of_traces)
+                .context("Sample semantics.")?;
+            Box::new(slang)
+        }
+        EbiInput::Trait(EbiTraitObject::StochasticPartiallyOrderedSemantics(semantics), _) => {
             let slang = semantics
                 .sample(number_of_traces)
                 .context("Sample semantics.")?;

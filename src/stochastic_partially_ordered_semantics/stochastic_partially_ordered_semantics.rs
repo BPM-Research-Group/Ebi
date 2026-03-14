@@ -7,11 +7,11 @@ pub trait StochasticPartiallyOrderedSemantics:
     type StoPOSemState;
 
     /// Returns the probabilistic penalty of firing the transition when in the state.
-    /// Returns a value between Some(0) (extremely large penalty) and Some(1) (no penalty).
-    /// The value Some(1) will not be returned (in exact mode) and is instead represented by None.
+    /// Returns a value between 0 (infinitely large penalty) and 1 (no penalty).
+    /// Returns None if the transition does not exist.
     fn get_transition_probabilistic_penalty(
         &self,
         state: &<Self as StochasticPartiallyOrderedSemantics>::StoPOSemState,
         transition: TransitionIndex,
-    ) -> Option<&Fraction>;
+    ) -> Option<Fraction>;
 }

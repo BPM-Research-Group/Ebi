@@ -11,6 +11,7 @@ use crate::{
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
         ebi_trait_semantics::EbiTraitSemantics,
         ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics,
+        ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics,
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
 };
@@ -24,6 +25,7 @@ pub enum EbiTraitObject {
     IterableStochasticLanguage(Box<dyn EbiTraitIterableStochasticLanguage>),
     QueriableStochasticLanguage(Box<dyn EbiTraitQueriableStochasticLanguage>),
     StochasticDeterministicSemantics(EbiTraitStochasticDeterministicSemantics),
+    StochasticPartiallyOrderedSemantics(EbiTraitStochasticPartiallyOrderedSemantics),
     StochasticSemantics(EbiTraitStochasticSemantics),
     Semantics(EbiTraitSemantics),
     Graphable(Box<dyn EbiTraitGraphable>),
@@ -42,6 +44,9 @@ impl EbiTraitObject {
             EbiTraitObject::QueriableStochasticLanguage(_) => EbiTrait::QueriableStochasticLanguage,
             EbiTraitObject::StochasticDeterministicSemantics(_) => {
                 EbiTrait::StochasticDeterministicSemantics
+            }
+            EbiTraitObject::StochasticPartiallyOrderedSemantics(_) => {
+                EbiTrait::StochasticPartiallyOrderedSemantics
             }
             EbiTraitObject::StochasticSemantics(_) => EbiTrait::StochasticSemantics,
             EbiTraitObject::Semantics(_) => EbiTrait::Semantics,

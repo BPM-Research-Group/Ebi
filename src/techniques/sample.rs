@@ -2,14 +2,17 @@ use crate::{
     ebi_framework::displayable::Displayable,
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics,
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
+    stochastic_partially_ordered_semantics::stochastic_partially_ordered_semantics::StochasticPartiallyOrderedSemantics,
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
 use ebi_objects::{
     FiniteStochasticLanguage,
     anyhow::{Result, anyhow},
     ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One, Zero},
+    ebi_bpmn::BPMNMarking,
 };
 use rand::RngExt;
 use std::collections::{HashMap, hash_map::Entry};
@@ -148,6 +151,82 @@ impl Resampler for dyn EbiTraitFiniteStochasticLanguage {
             .into_iter()
             .map(|c| Fraction::from((c, number_of_traces)))
             .collect()
+    }
+}
+
+impl Sampler for EbiTraitStochasticPartiallyOrderedSemantics {
+    fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage> {
+        match self {
+            EbiTraitStochasticPartiallyOrderedSemantics::BPMNMarking(bpmn) => {
+                bpmn.sample(number_of_traces)
+            }
+        }
+    }
+}
+
+impl Sampler
+    for dyn StochasticPartiallyOrderedSemantics<
+            StoPOSemState = BPMNMarking,
+            SemState = BPMNMarking,
+            AliState = BPMNMarking,
+        >
+{
+    fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage> {
+        if let Some(initial_state) = self.get_initial_state() {
+            let mut result = HashMap::new();
+
+            for _ in 0..number_of_traces {
+                let mut current_state = initial_state.clone();
+                let mut trace = vec![];
+
+                let mut outgoing_probabilities = vec![];
+
+                while !self.is_final_state(&current_state) {
+                    let enabled_transitions = self.get_enabled_transitions(&current_state);
+
+                    outgoing_probabilities.clear();
+                    for transition in &enabled_transitions {
+                        outgoing_probabilities.push(
+                            self.get_transition_probabilistic_penalty(&current_state, *transition)
+                                .ok_or_else(|| anyhow!("transition not found"))?,
+                        );
+                    }
+
+                    // get firing transition
+                    let i = Fraction::choose_randomly(&outgoing_probabilities)?;
+                    let chosen_transition = enabled_transitions[i];
+
+                    let activity = self.get_transition_activity(chosen_transition, &current_state);
+
+                    // execute transition
+                    self.execute_transition(&mut current_state, chosen_transition)?;
+
+                    match activity {
+                        Some(activity) => trace.push(activity),
+                        None => {}
+                    }
+                }
+
+                match result.entry(trace) {
+                    Entry::Occupied(mut e) => *e.get_mut() += 1,
+                    Entry::Vacant(e) => {
+                        e.insert(Fraction::one());
+                    }
+                };
+            }
+
+            if result.is_empty() {
+                return Err(anyhow!(
+                    "Analysis resulted in an empty language; there are no traces in the model."
+                ));
+            }
+
+            // log::debug!("Sampled {:?} traces", result);
+
+            Ok((self.activity_key().clone(), result).into())
+        } else {
+            return Err(anyhow!("Language contains no traces, so cannot sample."));
+        }
     }
 }
 

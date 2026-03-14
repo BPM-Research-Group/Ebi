@@ -27,6 +27,7 @@ pub enum EbiTrait {
     QueriableStochasticLanguage,
     Semantics,
     StochasticDeterministicSemantics,
+    StochasticPartiallyOrderedSemantics,
     StochasticSemantics,
 }
 
@@ -59,6 +60,7 @@ impl EbiTrait {
             EbiTrait::IterableStochasticLanguage => "an",
             EbiTrait::QueriableStochasticLanguage => "a",
             EbiTrait::StochasticDeterministicSemantics => "a",
+            EbiTrait::StochasticPartiallyOrderedSemantics => "a",
             EbiTrait::StochasticSemantics => "a",
             EbiTrait::Semantics => "a",
             EbiTrait::Graphable => "a",
@@ -124,6 +126,9 @@ impl EbiTrait {
             EbiTrait::Semantics => {
                 "An object in which the state space can be traversed. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
             }
+            EbiTrait::StochasticPartiallyOrderedSemantics => {
+                "An object in which the state space can be traversed, with probabilities; multiple options may be available at the same time. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
+            }
             EbiTrait::StochasticDeterministicSemantics => {
                 "An object in which the state space can be traversed deterministically, that is, in each state every activity appears at most once and silent steps are not present. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
             }
@@ -166,6 +171,8 @@ impl Display for EbiTrait {
                 EbiTrait::IterableStochasticLanguage => "iterable stochastic language",
                 EbiTrait::QueriableStochasticLanguage => "queriable stochastic language",
                 EbiTrait::StochasticDeterministicSemantics => "stochastic deterministic semantics",
+                EbiTrait::StochasticPartiallyOrderedSemantics =>
+                    "stochastic partially ordered semantics",
                 EbiTrait::StochasticSemantics => "stochastic semantics",
                 EbiTrait::Semantics => "semantics",
                 EbiTrait::Graphable => "graphable",

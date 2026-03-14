@@ -20,6 +20,7 @@ use crate::{
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
         ebi_trait_semantics::EbiTraitSemantics,
         ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics,
+        ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics,
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
     ebi_validate,
@@ -432,6 +433,13 @@ pub enum EbiTraitImporter {
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiTraitStochasticSemantics>,
         &'static [ImporterParameter],
     ),
+    StochasticPartiallyOrderedSemantics(
+        fn(
+            &mut dyn BufRead,
+            &ImporterParameterValues,
+        ) -> Result<EbiTraitStochasticPartiallyOrderedSemantics>,
+        &'static [ImporterParameter],
+    ),
     StochasticDeterministicSemantics(
         fn(
             &mut dyn BufRead,
@@ -465,6 +473,9 @@ impl EbiTraitImporter {
             EbiTraitImporter::EventLogTraceAttributes(_, _) => EbiTrait::EventLogTraceAttributes,
             EbiTraitImporter::Semantics(_, _) => EbiTrait::Semantics,
             EbiTraitImporter::StochasticSemantics(_, _) => EbiTrait::StochasticSemantics,
+            EbiTraitImporter::StochasticPartiallyOrderedSemantics(_, _) => {
+                EbiTrait::StochasticPartiallyOrderedSemantics
+            }
             EbiTraitImporter::StochasticDeterministicSemantics(_, _) => {
                 EbiTrait::StochasticDeterministicSemantics
             }
@@ -484,6 +495,7 @@ impl EbiTraitImporter {
             | EbiTraitImporter::EventLogTraceAttributes(_, importer_parameters)
             | EbiTraitImporter::Semantics(_, importer_parameters)
             | EbiTraitImporter::StochasticSemantics(_, importer_parameters)
+            | EbiTraitImporter::StochasticPartiallyOrderedSemantics(_, importer_parameters)
             | EbiTraitImporter::StochasticDeterministicSemantics(_, importer_parameters)
             | EbiTraitImporter::Graphable(_, importer_parameters)
             | EbiTraitImporter::Activities(_, importer_parameters) => importer_parameters,
@@ -530,6 +542,9 @@ impl EbiTraitImporter {
             }
             EbiTraitImporter::StochasticSemantics(f, _) => {
                 EbiTraitObject::StochasticSemantics((f)(reader, parameter_values)?)
+            }
+            EbiTraitImporter::StochasticPartiallyOrderedSemantics(f, _) => {
+                EbiTraitObject::StochasticPartiallyOrderedSemantics((f)(reader, parameter_values)?)
             }
             EbiTraitImporter::StochasticDeterministicSemantics(f, _) => {
                 EbiTraitObject::StochasticDeterministicSemantics((f)(reader, parameter_values)?)
