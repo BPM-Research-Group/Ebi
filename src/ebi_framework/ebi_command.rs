@@ -371,7 +371,7 @@ impl EbiCommand {
 
                     //read input
                     log::info!("Reading {}", input_name);
-                    let input = Self::attempt_parse(input_types, cli_matches, &cli_id)
+                    let input = Self::attempt_parse(input_types, cli_matches, &cli_id, i)
                         .with_context(|| format!("Reading parameter {}.", input_name))?;
                     inputs.push(input);
                 }
@@ -483,6 +483,7 @@ impl EbiCommand {
         input_types: &[&'static EbiInputType],
         cli_matches: &ArgMatches,
         cli_id: &str,
+        input_index: usize,
     ) -> Result<EbiInput> {
         //an input may be of several types; go through each of them
         let mut error = None;
@@ -495,7 +496,7 @@ impl EbiCommand {
             }
         };
 
-        for (input_index, input_type) in input_types.iter().enumerate() {
+        for input_type in input_types.iter() {
             //try to parse the input as this type
             match input_type {
                 EbiInputType::Trait(etrait) => {
