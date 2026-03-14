@@ -11,7 +11,8 @@ use crate::{
         alignment_stochastic_miner::AlignmentMiner,
         directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
         occurrences_stochastic_miner::{
-            OccurrencesStochasticMinerLPN, OccurrencesStochasticMinerTree,
+            OccurrencesStochasticMinerBPMN, OccurrencesStochasticMinerLPN,
+            OccurrencesStochasticMinerTree,
         },
         uniform_stochastic_miner::{
             UniformStochasticBusinessProcessModelAndNotation, UniformStochasticMinerLPN,
@@ -168,9 +169,58 @@ pub const EBI_DISCOVER_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsGraph),
 };
 
-pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Command {
+pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Group {
     name_short: "occ",
     name_long: Some("occurrence"),
+    explanation_short: "Give each transition a weight that matches the occurrences of its label; silent transitions get a weight of 1.",
+    explanation_long: None,
+    children: &[
+        &EBI_DISCOVER_OCCURRENCE_SBPMN,
+        &EBI_DISCOVER_OCCURRENCE_SLPN,
+        &EBI_DISCOVER_OCCURRENCE_SPTREE,
+    ],
+};
+
+pub const EBI_DISCOVER_OCCURRENCE_SBPMN: EbiCommand = EbiCommand::Command {
+    name_short: "sbpmn",
+    name_long: Some("stochastic-business-process-model-and-notation"),
+    explanation_short: "Give each sequence flow to a task a weight that matches the occurrences of its label; other sequence flows get a weight of 1.",
+    explanation_long: None,
+    latex_link: Some("~\\cite{DBLP:conf/icpm/BurkeLW20}"),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Object(
+            EbiObjectType::BusinessProcessModelAndNotation,
+        )],
+    ],
+    input_names: &["LANG", "TREE"],
+    input_helps: &[
+        "A finite stochastic language (log) to get the occurrences from.",
+        "A business process model and notation model with the control flow.",
+    ],
+    execute: |mut inputs, _| {
+        let language = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let bpmn = inputs
+            .remove(0)
+            .to_type::<BusinessProcessModelAndNotation>()?;
+        Ok(EbiOutput::Object(
+            EbiObject::StochasticBusinessProcessModelAndNotation(
+                bpmn.mine_occurrences_stochastic_bpmn(language)?,
+            ),
+        ))
+    },
+    output_type: &EbiOutputType::ObjectType(
+        EbiObjectType::StochasticBusinessProcessModelAndNotation,
+    ),
+};
+
+pub const EBI_DISCOVER_OCCURRENCE_SLPN: EbiCommand = EbiCommand::Command {
+    name_short: "slpn",
+    name_long: Some("stochastic-labelled-Petri-net"),
     explanation_short: "Give each transition a weight that matches the occurrences of its label; silent transitions get a weight of 1.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:conf/icpm/BurkeLW20}"),
@@ -197,9 +247,9 @@ pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
 };
 
-pub const EBI_DISCOVER_OCCURRENCE_PTREE: EbiCommand = EbiCommand::Command {
-    name_short: "ptree",
-    name_long: Some("process-tree"),
+pub const EBI_DISCOVER_OCCURRENCE_SPTREE: EbiCommand = EbiCommand::Command {
+    name_short: "sptree",
+    name_long: Some("stochastic-process-tree"),
     explanation_short: "Give each leaf a weight that matches the occurrences of its label; silent leaves get a weight of 1.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:conf/icpm/BurkeLW20}"),
@@ -240,7 +290,7 @@ pub const EBI_DISCOVER_UNIFORM: EbiCommand = EbiCommand::Group {
 
 pub const EBI_DISCOVER_UNIFORM_SLPN: EbiCommand = EbiCommand::Command {
     name_short: "slpn",
-    name_long: Some("uniform"),
+    name_long: Some("stochastic-labelled-Petri-net"),
     explanation_short: "Give each transition a weight of 1.",
     explanation_long: None,
     latex_link: None,

@@ -1,11 +1,22 @@
 use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
 use ebi_objects::{
-    ActivityKeyTranslator, HasActivityKey, LabelledPetriNet, ProcessTree,
-    StochasticLabelledPetriNet, StochasticProcessTree,
+    ActivityKeyTranslator, BusinessProcessModelAndNotation, HasActivityKey, LabelledPetriNet,
+    ProcessTree, StochasticBusinessProcessModelAndNotation, StochasticLabelledPetriNet,
+    StochasticProcessTree,
+    anyhow::anyhow,
     ebi_arithmetic::{Fraction, One, Zero},
+    ebi_bpmn::traits::objectable::BPMNObject,
     ebi_objects::process_tree::Node,
 };
+use ebi_optimisation::anyhow::Result;
 use std::collections::HashMap;
+
+pub trait OccurrencesStochasticMinerBPMN {
+    fn mine_occurrences_stochastic_bpmn(
+        self,
+        language: Box<dyn EbiTraitFiniteStochasticLanguage>,
+    ) -> Result<StochasticBusinessProcessModelAndNotation>;
+}
 
 pub trait OccurrencesStochasticMinerLPN {
     fn mine_occurrences_stochastic_lpn(
@@ -19,6 +30,58 @@ pub trait OccurrencesStochasticMinerTree {
         self,
         language: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> StochasticProcessTree;
+}
+
+impl OccurrencesStochasticMinerBPMN for BusinessProcessModelAndNotation {
+    fn mine_occurrences_stochastic_bpmn(
+        mut self,
+        language: Box<dyn EbiTraitFiniteStochasticLanguage>,
+    ) -> Result<StochasticBusinessProcessModelAndNotation> {
+        let translator =
+            ActivityKeyTranslator::new(language.activity_key(), self.activity_key_mut());
+
+        let mut model_activity2frequency = HashMap::new();
+        for activity in self.activity_key().get_activities() {
+            model_activity2frequency.insert(*activity, Fraction::zero());
+        }
+        for (trace, probability) in language.iter_traces_probabilities() {
+            for log_activity in trace {
+                let model_activity = translator.translate_activity(log_activity);
+                model_activity2frequency
+                    .entry(model_activity)
+                    .and_modify(|f: &mut Fraction| *f += probability);
+            }
+        }
+
+        //find the sequence flows that lead to something with a label
+        let flows = self
+            .sequence_flows()
+            .iter()
+            .filter_map(|sequence_flow| {
+                let activity = self
+                    .global_index_2_element(sequence_flow.target_global_index())?
+                    .activity();
+                Some((sequence_flow.global_index(), activity))
+            })
+            .collect::<Vec<_>>();
+
+        //update the weights
+        for (sequence_flow_global_index, activity) in flows {
+            let sequence_flow = self
+                .global_index_2_sequence_flow_mut(sequence_flow_global_index)
+                .ok_or_else(|| anyhow!("sequence flow not found"))?;
+            if let Some(activity) = activity {
+                if let Some(weight) = model_activity2frequency.get(&activity) {
+                    sequence_flow.weight = Some(weight.clone());
+                } else {
+                    sequence_flow.weight = Some(Fraction::one());
+                }
+            } else {
+                sequence_flow.weight = Some(Fraction::one());
+            }
+        }
+        self.try_into()
+    }
 }
 
 impl OccurrencesStochasticMinerLPN for LabelledPetriNet {

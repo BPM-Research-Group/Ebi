@@ -28,10 +28,10 @@ extension-module = ["pyo3/extension-module"]
 
 [dependencies]
 ebi_optimisation = "0.3.3"
-ebi_objects = "0.3.149"
+ebi_objects = "0.3.150"
 ebi_derive = "0.2.10"
 bitvec = "1.0.1"
-clap = { version = "4.5.60", features = ["derive", "cargo", "string"] }
+clap = { version = "4.6.0", features = ["derive", "cargo", "string"] }
 clap-verbosity-flag = "3.0.3"
 log = { version = "0.4.28", features = ["release_max_level_debug"] }
 env_logger = "0.11.9"
@@ -51,7 +51,7 @@ strum = "0.28.0"
 strum_macros = "0.28.0"
 indicatif = "0.18.4"
 indexmap = "2.13.0"
-pathfinding="4.14.0"
+pathfinding="4.15.0"
 fnv = "1.0.7"
 itertools = "0.14.0"
 serde = "1.0.228"
