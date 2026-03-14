@@ -16,6 +16,7 @@ use crate::{
         chi_square_stochastic_conformance::ChiSquareStochasticConformance,
         earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
         entropic_relevance::EntropicRelvance,
+        gain_precision_recall::{potential_gain_precision, potential_gain_recall},
         hellinger_stochastic_conformance::HellingerStochasticConformance,
         jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
         stochastic_markovian_abstraction::AbstractMarkovian,
@@ -25,7 +26,15 @@ use crate::{
         unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
     },
 };
-use ebi_objects::{anyhow::{Context, anyhow}, EbiObject, EbiObjectType};
+use ebi_objects::ebi_arithmetic::{f, Fraction};
+use ebi_objects::{
+    anyhow::{Context, anyhow},
+    EbiObject,
+    EbiObjectType,
+    EventLog,
+    StochasticDeterministicFiniteAutomaton,
+};
+use std::time::Instant;
 use strum::VariantNames;
 
 pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
@@ -39,6 +48,7 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
         &CONFORMANCE_EMSC,
         &CONFORMANCE_EMSC_SAMPLE,
         &CONFORMANCE_ER,
+        &CONFORMANCE_GAIN,
         &CONFORMANCE_HSC,
         &CONFORMANCE_HSC_SAMPLE,
         &CONFORMANCE_JSSC,
@@ -622,6 +632,87 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
         Ok(EbiOutput::Fraction(result))
     },
     output_type: &EbiOutputType::Fraction,
+};
+
+pub const CONFORMANCE_GAIN: EbiCommand = EbiCommand::Command {
+    name_short: "gain",
+    name_long: Some("gain-precision-recall"),
+    explanation_short: "Compute gain-based precision and recall with a fixed lambda.",
+    explanation_long: Some(
+        "Compute gain-based precision and recall for an event log and an SDFA. The smoothing parameter lambda is fixed internally to 1e-6.",
+    ),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[
+        &[
+            &EbiInputType::Object(EbiObjectType::EventLog),
+            &EbiInputType::Object(EbiObjectType::EventLogXes),
+            &EbiInputType::Object(EbiObjectType::EventLogCsv),
+        ],
+        &[&EbiInputType::Object(
+            EbiObjectType::StochasticDeterministicFiniteAutomaton,
+        )],
+    ],
+    input_names: &["LOG_FILE", "SDFA_FILE"],
+    input_helps: &[
+        "An event log (.xes or .csv) to compare.",
+        "A stochastic deterministic finite automaton (SDFA) to compare.",
+    ],
+    execute: |mut inputs, _| {
+        let log: EventLog = match inputs.remove(0) {
+            EbiInput::Object(obj, _) => match obj {
+                EbiObject::EventLog(log) => log,
+                _ => return Err(anyhow!("LOG_FILE is not an EventLog object")),
+            },
+            _ => return Err(anyhow!("wrong LOG_FILE input given (expected EventLog object)")),
+        };
+
+        let sdfa: StochasticDeterministicFiniteAutomaton = match inputs.remove(0) {
+            EbiInput::Object(obj, _) => match obj {
+                EbiObject::StochasticDeterministicFiniteAutomaton(sdfa) => sdfa,
+                _ => return Err(anyhow!("SDFA_FILE is not a SDFA object")),
+            },
+            _ => {
+                return Err(anyhow!(
+                    "wrong SDFA_FILE input given (expected SDFA object)"
+                ))
+            }
+        };
+
+        let lambda: Fraction = f!(1i64, 1_000_000i64);
+        let start = Instant::now();
+
+        let precision = potential_gain_precision(log.clone(), &sdfa, Some(&lambda))
+            .context("cannot compute gain precision")?;
+
+        let recall = potential_gain_recall(log, &sdfa, Some(&lambda))
+            .context("cannot compute gain recall")?;
+
+        let runtime_ms = start.elapsed().as_secs_f64() * 1000.0;
+
+        let output = format!(
+            "\n{:-^44}\n\
+             {:<18}: {}\n\
+             {:<18}: {}\n\
+             {:<18}: {}\n\
+             {:<18}: {:.2} ms\n\
+             {:-^44}\n",
+            " Gain Precision/Recall Results ",
+            "Smoothing lambda",
+            lambda,
+            "Precision (Gain)",
+            precision,
+            "Recall (Gain)",
+            recall,
+            "Runtime",
+            runtime_ms,
+            ""
+        );
+
+        Ok(EbiOutput::String(output))
+    },
+    output_type: &EbiOutputType::String,
 };
 
 #[cfg(test)]
