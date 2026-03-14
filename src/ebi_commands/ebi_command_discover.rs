@@ -14,6 +14,7 @@ use crate::{
             OccurrencesStochasticMinerBPMN, OccurrencesStochasticMinerLPN,
             OccurrencesStochasticMinerTree,
         },
+        random_stochastic_miner::{RandomMinerSBPMN, RandomMinerSTREE},
         uniform_stochastic_miner::{
             UniformStochasticBusinessProcessModelAndNotation, UniformStochasticMinerLPN,
             UniformStochasticMinerTree,
@@ -23,7 +24,7 @@ use crate::{
 use ebi_objects::{
     BusinessProcessModelAndNotation, EbiObject, EbiObjectType, LabelledPetriNet, ProcessTree,
     anyhow::{Context, anyhow},
-    ebi_arithmetic::{ConstFraction, Fraction},
+    ebi_arithmetic::{ConstFraction, Fraction, Random},
 };
 
 pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
@@ -35,6 +36,7 @@ pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
         &EBI_DISCOVER_ALIGNMENTS,
         &EBI_DISCOVER_DIRECTLY_FOLLOWS,
         &EBI_DISCOVER_OCCURRENCE,
+        &EBI_DISCOVER_RANDOM,
         &EBI_DISCOVER_UNIFORM,
     ],
 };
@@ -195,7 +197,7 @@ pub const EBI_DISCOVER_OCCURRENCE_SBPMN: EbiCommand = EbiCommand::Command {
             EbiObjectType::BusinessProcessModelAndNotation,
         )],
     ],
-    input_names: &["LANG", "TREE"],
+    input_names: &["LANG", "BPMN"],
     input_helps: &[
         "A finite stochastic language (log) to get the occurrences from.",
         "A business process model and notation model with the control flow.",
@@ -276,6 +278,88 @@ pub const EBI_DISCOVER_OCCURRENCE_SPTREE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticProcessTree),
 };
 
+pub const EBI_DISCOVER_RANDOM: EbiCommand = EbiCommand::Group {
+    name_short: "rnd",
+    name_long: Some("random"),
+    explanation_short: "Give each transition a random weight between 0 (exclusive) and 1 (inclusive).",
+    explanation_long: None,
+    children: &[
+        &EBI_DISCOVER_RANDOM_SBPMN,
+        &EBI_DISCOVER_RANDOM_SLPN,
+        &EBI_DISCOVER_RANDOM_SPTREE,
+    ],
+};
+
+pub const EBI_DISCOVER_RANDOM_SBPMN: EbiCommand = EbiCommand::Command {
+    name_short: "sbpmn",
+    name_long: Some("stochastic-business-process-model-and-notation"),
+    explanation_short: "Give each sequence flow a random weight between 0 (exclusive) and 1 (inclusive).",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[&EbiInputType::Object(
+        EbiObjectType::BusinessProcessModelAndNotation,
+    )]],
+    input_names: &["BPMN"],
+    input_helps: &["A business process model and notation model with the control flow."],
+    execute: |mut inputs, _| {
+        let bpmn = inputs
+            .remove(0)
+            .to_type::<BusinessProcessModelAndNotation>()?;
+        Ok(EbiOutput::Object(
+            EbiObject::StochasticBusinessProcessModelAndNotation(
+                bpmn.mine_random_stochastic_business_process_model_and_notation(
+                    Fraction::random_seed(),
+                )?,
+            ),
+        ))
+    },
+    output_type: &EbiOutputType::ObjectType(
+        EbiObjectType::StochasticBusinessProcessModelAndNotation,
+    ),
+};
+
+pub const EBI_DISCOVER_RANDOM_SLPN: EbiCommand = EbiCommand::Command {
+    name_short: "slpn",
+    name_long: Some("stochastic-labelled-Petri-net"),
+    explanation_short: "Give each transition a random weight between 0 (exclusive) and 1 (inclusive).",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)]],
+    input_names: &["LPN"],
+    input_helps: &["A labelled Petri net."],
+    execute: |mut inputs, _| {
+        let lpn = inputs.remove(0).to_type::<LabelledPetriNet>()?;
+        Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(
+            lpn.mine_uniform_stochastic_lpn(),
+        )))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
+};
+
+pub const EBI_DISCOVER_RANDOM_SPTREE: EbiCommand = EbiCommand::Command {
+    name_short: "sptree",
+    name_long: Some("stochastic-process-tree"),
+    explanation_short: "Give each leaf a random weight between 0 (exclusive) and 1 (inclusive).",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[&EbiInputType::Object(EbiObjectType::ProcessTree)]],
+    input_names: &["TREE"],
+    input_helps: &["A process tree."],
+    execute: |mut inputs, _| {
+        let tree = inputs.remove(0).to_type::<ProcessTree>()?;
+        Ok(EbiOutput::Object(EbiObject::StochasticProcessTree(
+            tree.mine_random_stochastic_process_tree(Fraction::random_seed()),
+        )))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticProcessTree),
+};
+
 pub const EBI_DISCOVER_UNIFORM: EbiCommand = EbiCommand::Group {
     name_short: "uni",
     name_long: Some("uniform"),
@@ -297,7 +381,7 @@ pub const EBI_DISCOVER_UNIFORM_SLPN: EbiCommand = EbiCommand::Command {
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[&[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)]],
-    input_names: &["LPN_FILE"],
+    input_names: &["LPN"],
     input_helps: &["A labelled Petri net."],
     execute: |mut inputs, _| {
         let lpn = inputs.remove(0).to_type::<LabelledPetriNet>()?;

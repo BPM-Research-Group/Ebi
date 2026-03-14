@@ -27,7 +27,7 @@ java = [ "dep:jni" ]
 extension-module = ["pyo3/extension-module"]
 
 [dependencies]
-ebi_optimisation = "0.3.3"
+ebi_optimisation = "0.3.4"
 ebi_objects = "0.3.150"
 ebi_derive = "0.2.10"
 bitvec = "1.0.1"
