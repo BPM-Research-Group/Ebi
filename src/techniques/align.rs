@@ -326,21 +326,14 @@ where
             //we did a move on the log
             let activity = trace[previous_trace_index];
 
-            if previous_state == state {
-                //we did not move on the model => log move
-                alignment.push(Move::LogMove(activity));
-            } else {
-                //we moved on the model => synchronous move
-                let transition =
-                    find_transition_with_label(semantics, &previous_state, &state, activity)
-                        .with_context(|| {
-                            format!(
-                                "Map synchronous move from {} {} to {} {} with label {}",
-                                previous_trace_index, previous_state, trace_index, state, activity
-                            )
-                        })?;
-                alignment.push(Move::SynchronousMove(activity, transition));
-            }
+                //we are in the same model state, check whether we did a self-loop
+                if let Ok(transition) = find_transition_with_label(semantics, &state, &state, activity) {
+                    // Synchronous move
+                    alignment.push(Move::SynchronousMove(activity, transition));
+                } else {
+                    //log move
+                    alignment.push(Move::LogMove(activity));
+                }
         } else {
             //we did not do a move on the log
 
