@@ -33,6 +33,9 @@ impl EscapingEdgesPrecision for EbiTraitSemantics {
             EbiTraitSemantics::BPMNMarking(semantics) => {
                 semantics.escaping_edges_precision(alignments)
             }
+            EbiTraitSemantics::FspolangMarking(semantics) => {
+                semantics.escaping_edges_precision(alignments)
+            }
         }
     }
 }

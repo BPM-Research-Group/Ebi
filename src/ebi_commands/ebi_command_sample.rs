@@ -7,10 +7,14 @@ use crate::{
         ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    techniques::{sample::Sampler, sample_folds::FoldsSampler},
+    techniques::{
+        sample::{PartiallyOrderedSampler, Sampler},
+        sample_folds::FoldsSampler,
+    },
 };
 use ebi_objects::{
     EbiObject, EbiObjectType, EventLog, FiniteStochasticLanguage,
+    StochasticBusinessProcessModelAndNotation,
     anyhow::{Context, Result, anyhow},
 };
 
@@ -67,7 +71,11 @@ pub const EBI_SAMPLE: EbiCommand = EbiCommand::Group {
     name_long: Some("sample"),
     explanation_short: "Draw traces randomly from a model or an event log.",
     explanation_long: None,
-    children: &[&EBI_SAMPLE_FOLDS, &EBI_SAMPLE_TRACES],
+    children: &[
+        &EBI_SAMPLE_FOLDS,
+        &EBI_SAMPLE_PARTIALLY_ORDERED_TRACES,
+        &EBI_SAMPLE_TRACES,
+    ],
 };
 
 pub const EBI_SAMPLE_TRACES: EbiCommand = EbiCommand::Command {
@@ -98,6 +106,44 @@ pub const EBI_SAMPLE_TRACES: EbiCommand = EbiCommand::Command {
         )));
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage),
+};
+
+pub const EBI_SAMPLE_PARTIALLY_ORDERED_TRACES: EbiCommand = EbiCommand::Command {
+    name_short: "potr",
+    name_long: Some("partially-ordered-traces"),
+    explanation_short: "Draw partially ordered traces randomly from a model.",
+    explanation_long: Some(
+        "Sample traces randomly. Please note that this may run forever if the model contains a livelock.",
+    ),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Object(
+            EbiObjectType::StochasticBusinessProcessModelAndNotation,
+        )],
+        &[&EbiInputType::Usize(Some(1), None, None)],
+    ],
+    input_names: &["MODEL", "NUMBER_OF_TRACES"],
+    input_helps: &[
+        "The model with partially ordered semantics to sample from.",
+        "The number of traces to be sampled.",
+    ],
+    execute: |mut inputs, _| {
+        let sbpmn = inputs
+            .remove(0)
+            .to_type::<StochasticBusinessProcessModelAndNotation>()?;
+        let number_of_traces = inputs.remove(0).to_type::<usize>()?;
+
+        let result = sbpmn.sample_partially_ordered(*number_of_traces)?;
+
+        return Ok(EbiOutput::Object(
+            EbiObject::FiniteStochasticPartiallyOrderedLanguage(result),
+        ));
+    },
+    output_type: &EbiOutputType::ObjectType(
+        EbiObjectType::FiniteStochasticPartiallyOrderedLanguage,
+    ),
 };
 
 pub const EBI_SAMPLE_FOLDS: EbiCommand = EbiCommand::Command {

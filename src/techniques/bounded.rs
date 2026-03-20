@@ -5,9 +5,9 @@ use crate::{
 use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
     EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
-    LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet, ProcessTree,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::Result,
     ebi_objects::{
         event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking,
@@ -24,20 +24,16 @@ pub trait Bounded {
     fn bounded(&self) -> Result<bool>;
 }
 
-impl Bounded for ProcessTree {
-    type LivState = TreeMarking;
+macro_rules! TreeMarking {
+    ($t:ty) => {
+        impl Bounded for $t {
+            type LivState = TreeMarking;
 
-    fn bounded(&self) -> Result<bool> {
-        Ok(true)
-    }
-}
-
-impl Bounded for StochasticProcessTree {
-    type LivState = TreeMarking;
-
-    fn bounded(&self) -> Result<bool> {
-        Ok(true)
-    }
+            fn bounded(&self) -> Result<bool> {
+                Ok(true)
+            }
+        }
+    };
 }
 
 macro_rules! LPNMarking {
@@ -174,6 +170,16 @@ usize!(FiniteStochasticLanguage);
 usize!(DirectlyFollowsGraph);
 LPNMarking!(LabelledPetriNet);
 LPNMarking!(StochasticLabelledPetriNet);
+TreeMarking!(ProcessTree);
+TreeMarking!(StochasticProcessTree);
+
+impl Bounded for FiniteStochasticPartiallyOrderedLanguage {
+    type LivState = usize;
+
+    fn bounded(&self) -> Result<bool> {
+        Ok(true)
+    }
+}
 
 #[cfg(test)]
 mod tests {

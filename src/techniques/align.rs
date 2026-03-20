@@ -7,14 +7,16 @@ use crate::{
     },
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
+        finite_stochastic_partially_ordered_language_semantics::FspolangMarking,
         labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
     },
 };
 use ebi_objects::{
     Activity, ActivityKeyTranslator, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
-    DirectlyFollowsGraph, DirectlyFollowsModel, LabelledPetriNet, LanguageOfAlignments,
-    ProcessTree, StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
+    DirectlyFollowsGraph, DirectlyFollowsModel, FiniteStochasticPartiallyOrderedLanguage,
+    LabelledPetriNet, LanguageOfAlignments, ProcessTree, StochasticBusinessProcessModelAndNotation,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::{Context, Error, Result, anyhow},
     ebi_bpmn::BPMNMarking,
@@ -57,6 +59,7 @@ impl Align for EbiTraitSemantics {
             EbiTraitSemantics::Marking(sem) => sem.align_language(log),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_language(log),
             EbiTraitSemantics::BPMNMarking(sem) => sem.align_language(log),
+            EbiTraitSemantics::FspolangMarking(sem) => sem.align_language(log),
         }
     }
 
@@ -69,6 +72,7 @@ impl Align for EbiTraitSemantics {
             EbiTraitSemantics::Marking(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::BPMNMarking(sem) => sem.align_stochastic_language(log),
+            EbiTraitSemantics::FspolangMarking(sem) => sem.align_stochastic_language(log),
         }
     }
 
@@ -78,6 +82,7 @@ impl Align for EbiTraitSemantics {
             EbiTraitSemantics::Marking(sem) => sem.align_trace(trace),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_trace(trace),
             EbiTraitSemantics::BPMNMarking(sem) => sem.align_trace(trace),
+            EbiTraitSemantics::FspolangMarking(sem) => sem.align_trace(trace),
         }
     }
 }
@@ -326,20 +331,15 @@ where
             //we did a move on the log
             let activity = trace[previous_trace_index];
 
-            if previous_state == state {
-                //we did not move on the model => log move
-                alignment.push(Move::LogMove(activity));
-            } else {
-                //we moved on the model => synchronous move
-                let transition =
-                    find_transition_with_label(semantics, &previous_state, &state, activity)
-                        .with_context(|| {
-                            format!(
-                                "Map synchronous move from {} {} to {} {} with label {}",
-                                previous_trace_index, previous_state, trace_index, state, activity
-                            )
-                        })?;
+            //we are in the same model state, check whether we did a self-loop
+            if let Ok(transition) =
+                find_transition_with_label(semantics, &previous_state, &state, activity)
+            {
+                //we could have moved on the model => synchronous move (this assumes that a synchronous move is cheaper than a log move)
                 alignment.push(Move::SynchronousMove(activity, transition));
+            } else {
+                //we could not have moved on the model => log move
+                alignment.push(Move::LogMove(activity));
             }
         } else {
             //we did not do a move on the log
@@ -530,6 +530,24 @@ impl AlignmentHeuristics for FiniteStochasticLanguageSemantics {
         _: &usize,
         _: &usize,
         _: &Vec<Vec<usize>>,
+    ) -> usize {
+        0
+    }
+}
+
+impl AlignmentHeuristics for FiniteStochasticPartiallyOrderedLanguage {
+    type AliState = FspolangMarking;
+
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(
+        &self,
+        _trace: &Vec<Activity>,
+        _trace_index: &usize,
+        _state: &Self::AliState,
+        _cache: &Vec<Vec<usize>>,
     ) -> usize {
         0
     }

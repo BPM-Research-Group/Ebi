@@ -34,6 +34,9 @@ pub const EBI_PORTABLE_NETWORK_GRAPHCIS: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::StochasticLabelledPetriNet(PortableNetworkGraphics::export_from_object),
         EbiObjectExporter::StochasticProcessTree(PortableNetworkGraphics::export_from_object),
         EbiObjectExporter::ScalableVectorGraphics(PortableNetworkGraphics::export_from_object),
+        EbiObjectExporter::FiniteStochasticPartiallyOrderedLanguage(
+            PortableNetworkGraphics::export_from_object,
+        ),
     ],
     object_exporters_fallible: &[],
     java_object_handlers: &[],

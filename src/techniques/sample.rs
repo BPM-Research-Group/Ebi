@@ -9,16 +9,24 @@ use crate::{
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
 use ebi_objects::{
-    FiniteStochasticLanguage,
+    FiniteStochasticLanguage, FiniteStochasticPartiallyOrderedLanguage, HasActivityKey,
+    StochasticBusinessProcessModelAndNotation,
     anyhow::{Result, anyhow},
-    ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One, Zero},
-    ebi_bpmn::BPMNMarking,
+    ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One, Recip, Zero, f},
+    ebi_bpmn::partially_ordered_run::PartiallyOrderedRun,
 };
 use rand::RngExt;
 use std::collections::{HashMap, hash_map::Entry};
 
 pub trait Sampler {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage>;
+}
+
+pub trait PartiallyOrderedSampler {
+    fn sample_partially_ordered(
+        &self,
+        number_of_traces: usize,
+    ) -> Result<FiniteStochasticPartiallyOrderedLanguage>;
 }
 
 pub trait Resampler {
@@ -58,6 +66,23 @@ impl Sampler for dyn EbiTraitFiniteStochasticLanguage {
         }
 
         Ok((self.activity_key().clone(), result).into())
+    }
+}
+
+impl PartiallyOrderedSampler for StochasticBusinessProcessModelAndNotation {
+    fn sample_partially_ordered(
+        &self,
+        number_of_traces: usize,
+    ) -> Result<FiniteStochasticPartiallyOrderedLanguage> {
+        let mut traces = Vec::with_capacity(number_of_traces);
+        let probabilities = vec![f!(number_of_traces).recip(); number_of_traces];
+
+        for _ in 0..number_of_traces {
+            let run = PartiallyOrderedRun::new_random(self)?;
+            traces.push(run.into());
+        }
+
+        Ok((self.activity_key().clone(), traces, probabilities).into())
     }
 }
 

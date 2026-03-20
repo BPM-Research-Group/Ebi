@@ -813,9 +813,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_arithmetic"
-version = "0.3.10"
+version = "0.3.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8c77487f9da75006b1ccbb84b6850f2f0aa0059b29e3f8903f5ea13df90cf27f"
+checksum = "a7b76bcfca3042eb8c037a980f919e9a455c6171202730a7f6a835f6ede92d75"
 dependencies = [
  "anyhow",
  "itertools",
@@ -827,9 +827,15 @@ dependencies = [
 
 [[package]]
 name = "ebi_bpmn"
+<<<<<<< HEAD
 version = "0.0.34"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "ac2474d2fa9ba74646d552e46fdafef70550a87d940da0c21ccbe730d1f84d42"
+=======
+version = "0.0.41"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "748d868753afbdfbac269268aa548010b175f81dc7418fe2a2e5a30bbe9230eb"
+>>>>>>> a6101ef1e145aa824f8871e595bdaa7d6ef882b8
 dependencies = [
  "anyhow",
  "bitvec",
@@ -837,6 +843,7 @@ dependencies = [
  "ebi_arithmetic",
  "ebi_derive",
  "itertools",
+ "layout-rs",
  "quick-xml 0.39.2",
  "strum",
  "strum_macros 0.28.0",
@@ -856,9 +863,15 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
+<<<<<<< HEAD
 version = "0.3.151"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9a5587b4d8efdd2fedc2d888cb6d4de67a78012942c83208e37f4dfd072d58bc"
+=======
+version = "0.3.163"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "aabb251dc737b459c05e26b9418f6e396658fab52411188a6180f492114df3cc"
+>>>>>>> a6101ef1e145aa824f8871e595bdaa7d6ef882b8
 dependencies = [
  "anyhow",
  "bitvec",
@@ -889,9 +902,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_optimisation"
-version = "0.3.4"
+version = "0.3.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f59614a5fd4cad4bcabbc101eca5a5fbd7f152de4fe111335b4aff9052e1473f"
+checksum = "c032864bf0f9fb25567a9969a241f9813b4075b261bd7247f38db5729f2c7823"
 dependencies = [
  "ebi_arithmetic",
  "indexmap 2.13.0",

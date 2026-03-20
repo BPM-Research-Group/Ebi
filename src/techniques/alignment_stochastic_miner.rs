@@ -5,6 +5,7 @@ use ebi_objects::{
     StochasticLabelledPetriNet,
     anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{Fraction, Zero},
+    ebi_bpmn::Token,
     ebi_objects::language_of_alignments::Move,
 };
 
@@ -54,16 +55,18 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
                         Move::ModelMove(_, transition_index)
                         | Move::SynchronousMove(_, transition_index)
                         | Move::SilentMove(transition_index) => {
-                            for sequence_flow_index in self
-                                .transition_2_marked_sequence_flows(*transition_index, &marking)
-                                .ok_or_else(|| anyhow!("this should not happen"))?
+                            for token in
+                                self.transition_2_produced_tokens(*transition_index, &marking)?
                             {
-                                let sequence_flow = self
-                                    .global_index_2_sequence_flow_mut(sequence_flow_index)
-                                    .ok_or_else(|| anyhow!("sequence flow not found"))?;
+                                if let Token::SequenceFlow(sequence_flow_index) = token {
+                                    let sequence_flow = self
+                                        .global_index_2_sequence_flow_mut(sequence_flow_index)
+                                        .ok_or_else(|| anyhow!("sequence flow not found"))?;
 
-                                *sequence_flow.weight.get_or_insert_with(|| Fraction::zero()) +=
-                                    probability;
+                                    *sequence_flow
+                                        .weight
+                                        .get_or_insert_with(|| Fraction::zero()) += probability;
+                                }
                             }
 
                             self.execute_transition(&mut marking, *transition_index)?;

@@ -175,11 +175,9 @@ impl Debug for LPNMarking {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_objects::LabelledPetriNet;
-
     use crate::semantics::semantics::Semantics;
+    use ebi_objects::LabelledPetriNet;
+    use std::fs;
 
     #[test]
     fn lpn_empty() {
@@ -189,4 +187,23 @@ mod tests {
         let state = lpn.get_initial_state().unwrap();
         assert_eq!(lpn.get_enabled_transitions(&state).len(), 0);
     }
+
+    // #[test]
+    // fn hospital_log() {
+    //     let fin = fs::read_to_string("SplitMiner0104_hospital_train_fold1.pnml").unwrap();
+    //     let pnml = fin.parse::<PetriNetMarkupLanguage>().unwrap();
+    //     let lpn = LabelledPetriNet::from(pnml);
+
+    //     println!("{:?}", lpn.activity_key);
+    //     let state = lpn.get_initial_state().unwrap();
+    //     for transition in lpn.get_enabled_transitions(&state) {
+    //         println!("{:?}", lpn.get_transition_label(transition));
+    //     }
+
+    //     let fin2 = fs::read_to_string("hospital_train_fold1.slang").unwrap();
+    //     let slang: FiniteStochasticLanguage = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+
+    //     let mut lpn = lpn.to_semantics_trait();
+    //     println!("{}", lpn.align_stochastic_language(Box::new(slang)).unwrap());
+    // }
 }
