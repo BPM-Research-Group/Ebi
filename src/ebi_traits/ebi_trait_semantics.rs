@@ -5,14 +5,16 @@ use crate::{
     },
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
+        finite_stochastic_partially_ordered_language_semantics::FspolangMarking,
         labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
     },
 };
 use ebi_objects::{
     ActivityKey, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
     DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogPython, EventLogTraceAttributes,
-    EventLogXes, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey, LabelledPetriNet,
-    LolaNet, PetriNetMarkupLanguage, ProcessTree, ProcessTreeMarkupLanguage,
+    EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
+    FiniteStochasticPartiallyOrderedLanguage, HasActivityKey, LabelledPetriNet, LolaNet,
+    PetriNetMarkupLanguage, ProcessTree, ProcessTreeMarkupLanguage,
     StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TranslateActivityKey,
@@ -34,6 +36,7 @@ pub enum EbiTraitSemantics {
     Marking(Box<dyn Semantics<SemState = LPNMarking, AliState = LPNMarking>>),
     TreeMarking(Box<dyn Semantics<SemState = TreeMarking, AliState = TreeMarking>>),
     BPMNMarking(Box<dyn Semantics<SemState = BPMNMarking, AliState = BPMNMarking>>),
+    FspolangMarking(Box<dyn Semantics<SemState = FspolangMarking, AliState = FspolangMarking>>),
 }
 
 impl HasActivityKey for EbiTraitSemantics {
@@ -43,6 +46,7 @@ impl HasActivityKey for EbiTraitSemantics {
             EbiTraitSemantics::Usize(semantics) => semantics.activity_key(),
             EbiTraitSemantics::TreeMarking(semantics) => semantics.activity_key(),
             EbiTraitSemantics::BPMNMarking(semantics) => semantics.activity_key(),
+            EbiTraitSemantics::FspolangMarking(semantics) => semantics.activity_key(),
         }
     }
 
@@ -52,6 +56,7 @@ impl HasActivityKey for EbiTraitSemantics {
             EbiTraitSemantics::Usize(semantics) => semantics.activity_key_mut(),
             EbiTraitSemantics::TreeMarking(semantics) => semantics.activity_key_mut(),
             EbiTraitSemantics::BPMNMarking(semantics) => semantics.activity_key_mut(),
+            EbiTraitSemantics::FspolangMarking(semantics) => semantics.activity_key_mut(),
         }
     }
 }
@@ -69,6 +74,9 @@ impl TranslateActivityKey for EbiTraitSemantics {
                 semantics.translate_using_activity_key(to_activity_key)
             }
             EbiTraitSemantics::BPMNMarking(semantics) => {
+                semantics.translate_using_activity_key(to_activity_key)
+            }
+            EbiTraitSemantics::FspolangMarking(semantics) => {
                 semantics.translate_using_activity_key(to_activity_key)
             }
         }
@@ -196,6 +204,12 @@ impl ToSemanticsTrait for FiniteStochasticLanguage {
         EbiTraitSemantics::Usize(Box::new(FiniteStochasticLanguageSemantics::from_language(
             &self,
         )))
+    }
+}
+
+impl ToSemanticsTrait for FiniteStochasticPartiallyOrderedLanguage {
+    fn to_semantics_trait(self) -> EbiTraitSemantics {
+        EbiTraitSemantics::FspolangMarking(Box::new(self))
     }
 }
 

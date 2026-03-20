@@ -1,0 +1,65 @@
+finite stochastic partially ordered language
+# number of traces
+1
+# trace 0
+#	probability
+1
+#	number of edges
+7
+#	edge 0
+silent
+#		number of input states
+1
+0
+#		number of output states
+1
+1
+#	edge 1
+multiline label Register claim
+(2min)#
+#		number of input states
+1
+1
+#		number of output states
+1
+2
+#	edge 2
+silent
+#		number of input states
+1
+2
+#		number of output states
+1
+3
+#	edge 3
+multiline label Check easy claim
+(5 min)#
+#		number of input states
+1
+3
+#		number of output states
+1
+4
+#	edge 4
+silent
+#		number of input states
+1
+4
+#		number of output states
+1
+5
+#	edge 5
+silent
+#		number of input states
+1
+5
+#		number of output states
+1
+6
+#	edge 6
+silent
+#		number of input states
+1
+6
+#		number of output states
+0

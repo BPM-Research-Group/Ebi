@@ -4,16 +4,9 @@ use crate::{
     techniques::livelock::IsPartOfLivelock,
 };
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
-    EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
-    LabelledPetriNet, NumberOfTraces, ProcessTree, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    anyhow::Result,
-    ebi_arithmetic::ebi_number::Zero,
-    ebi_objects::{
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage, FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet, NumberOfTraces, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, anyhow::Result, ebi_arithmetic::ebi_number::Zero, ebi_objects::{
         event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking,
-    },
+    }
 };
 
 pub trait AnyTraces {
@@ -99,6 +92,7 @@ macro_rules! dfm {
 
 lang!(FiniteLanguage);
 lang!(FiniteStochasticLanguage);
+lang!(FiniteStochasticPartiallyOrderedLanguage);
 lang!(EventLog);
 lang!(EventLogCsv);
 lang!(EventLogPython);

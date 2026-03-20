@@ -107,6 +107,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::EventLogXes(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::FiniteLanguage(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => object.bounded()?,
+            EbiInput::Object(EbiObject::FiniteStochasticPartiallyOrderedLanguage(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(object), _) => {
                 object.bounded()?
@@ -272,6 +273,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
             EbiInput::Object(EbiObject::EventLogXes(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::FiniteLanguage(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => {
+                object.any_traces()?
+            }
+            EbiInput::Object(EbiObject::FiniteStochasticPartiallyOrderedLanguage(object), _) => {
                 object.any_traces()?
             }
             EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.any_traces()?,

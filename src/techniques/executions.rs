@@ -34,6 +34,7 @@ impl FindExecutions for EbiTraitSemantics {
             EbiTraitSemantics::Marking(sem) => sem.find_executions(log),
             EbiTraitSemantics::TreeMarking(sem) => sem.find_executions(log),
             EbiTraitSemantics::BPMNMarking(sem) => sem.find_executions(log),
+            EbiTraitSemantics::FspolangMarking(sem) => sem.find_executions(log),
         }
     }
 }

@@ -600,6 +600,10 @@ pub enum EbiObjectImporter {
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
     ),
+    FiniteStochasticPartiallyOrderedLanguage(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
     LabelledPetriNet(
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
@@ -664,6 +668,9 @@ impl EbiObjectImporter {
             EbiObjectImporter::FiniteStochasticLanguage(_, _) => {
                 EbiObjectType::FiniteStochasticLanguage
             }
+            EbiObjectImporter::FiniteStochasticPartiallyOrderedLanguage(_, _) => {
+                EbiObjectType::FiniteStochasticPartiallyOrderedLanguage
+            }
             EbiObjectImporter::LabelledPetriNet(_, _) => EbiObjectType::LabelledPetriNet,
             EbiObjectImporter::StochasticBusinessProcessModelAndNotation(_, _) => {
                 EbiObjectType::StochasticBusinessProcessModelAndNotation
@@ -706,6 +713,9 @@ impl EbiObjectImporter {
             EbiObjectImporter::StochasticDirectlyFollowsModel(_, parameters) => parameters,
             EbiObjectImporter::FiniteLanguage(_, parameters) => parameters,
             EbiObjectImporter::FiniteStochasticLanguage(_, parameters) => parameters,
+            EbiObjectImporter::FiniteStochasticPartiallyOrderedLanguage(_, parameters) => {
+                parameters
+            }
             EbiObjectImporter::LabelledPetriNet(_, parameters) => parameters,
             EbiObjectImporter::StochasticDeterministicFiniteAutomaton(_, parameters) => parameters,
             EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(_, parameters) => {
@@ -744,6 +754,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::StochasticDirectlyFollowsModel(importer, _) => *importer,
             EbiObjectImporter::FiniteLanguage(importer, _) => *importer,
             EbiObjectImporter::FiniteStochasticLanguage(importer, _) => *importer,
+            EbiObjectImporter::FiniteStochasticPartiallyOrderedLanguage(importer, _) => *importer,
             EbiObjectImporter::LabelledPetriNet(importer, _) => *importer,
             EbiObjectImporter::StochasticBusinessProcessModelAndNotation(importer, _) => *importer,
             EbiObjectImporter::StochasticDeterministicFiniteAutomaton(importer, _) => *importer,
