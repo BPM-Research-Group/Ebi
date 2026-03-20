@@ -34,9 +34,8 @@ impl Semantics for FiniteStochasticPartiallyOrderedLanguage {
             state.edges.set(transition, true);
         } else {
             state.trace = Some(transition);
-            state.states.clear();
             state.states = bitvec!(0; self.traces[transition].number_of_states());
-            state.states.fill(false);
+            state.edges = bitvec!(0; self.traces[transition].number_of_edges());
         }
         Ok(())
     }

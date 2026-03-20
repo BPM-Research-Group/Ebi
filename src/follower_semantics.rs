@@ -17,7 +17,7 @@ impl FollowerSemantics<'_> {
     /**
      *
      * @param label
-     * @return The new state, or null if the step cannot be taken.
+     * @return The new state, or None if the step cannot be taken.
      */
     pub fn take_step(&self, state: &usize, label: &Activity) -> Option<usize> {
         match self {

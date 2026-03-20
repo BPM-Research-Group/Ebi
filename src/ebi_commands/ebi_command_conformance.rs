@@ -18,6 +18,7 @@ use crate::{
         entropic_relevance::EntropicRelvance,
         hellinger_stochastic_conformance::HellingerStochasticConformance,
         jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
+        partially_ordered_earth_movers_stochastic_conformance::PartiallyOrderedEarthMoversStochasticConformance,
         stochastic_markovian_abstraction::AbstractMarkovian,
         stochastic_markovian_abstraction_conformance::{
             DistanceMeasure, StochasticMarkovianConformance,
@@ -25,7 +26,10 @@ use crate::{
         unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
     },
 };
-use ebi_objects::{anyhow::{Context, anyhow}, EbiObject, EbiObjectType};
+use ebi_objects::{
+    EbiObject, EbiObjectType,
+    anyhow::{Context, anyhow},
+};
 use strum::VariantNames;
 
 pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
@@ -303,34 +307,80 @@ pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
                     & \forall_{t' \in L'} L'(t') \leq \sum_{t \in L} R(t, t') \land{}\\
                     & \sum_{t \in L} \sum_{t' \in L'} R(t,t') = 1
                 \end{align*}       
-            \end{definition}",
+            \end{definition}
+            
+        In case one or both of the inputs are partially ordered, EMSC is computed with a corresponding distance function.",
     ),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
-        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[
+            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
+            &EbiInputType::Object(EbiObjectType::FiniteStochasticPartiallyOrderedLanguage),
+        ],
+        &[
+            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
+            &EbiInputType::Object(EbiObjectType::FiniteStochasticPartiallyOrderedLanguage),
+        ],
     ],
     input_names: &["FILE_1", "FILE_2"],
     input_helps: &[
-        "A finite stochastic language to compare.",
-        "A finite stochastic language to compare.",
+        "A finite stochastic language to compare (may be partially ordered).",
+        "A finite stochastic language to compare (may be partially ordered).",
     ],
     execute: |mut inputs, _| {
-        let mut lang_a = inputs
-            .remove(0)
-            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let lang_a = inputs.remove(0);
+        let lang_b = inputs.remove(0);
 
-        let mut lang_b = inputs
-            .remove(0)
-            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        // .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
 
-        // Compute EMSC
-        Ok(EbiOutput::Fraction(
-            lang_a
-                .earth_movers_stochastic_conformance(lang_b.as_mut())
-                .context("Compute EMSC.")?,
-        ))
+        match (lang_a, lang_b) {
+            (
+                EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(mut lang_a), _),
+                EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(mut lang_b), _),
+            ) => Ok(EbiOutput::Fraction(
+                lang_a
+                    .earth_movers_stochastic_conformance(lang_b.as_mut())
+                    .with_context(|| anyhow!("Error while computing EMSC."))?,
+            )),
+            (
+                EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(mut lang_a), _),
+                EbiInput::Object(
+                    EbiObject::FiniteStochasticPartiallyOrderedLanguage(mut lang_b),
+                    _,
+                ),
+            ) => Ok(EbiOutput::Fraction(
+                lang_a
+                    .partially_ordered_earth_movers_stochastic_conformance(&mut lang_b)
+                    .with_context(|| anyhow!("Error while computing partially ordered EMSC."))?,
+            )),
+            (
+                EbiInput::Object(
+                    EbiObject::FiniteStochasticPartiallyOrderedLanguage(mut lang_a),
+                    _,
+                ),
+                EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(mut lang_b), _),
+            ) => Ok(EbiOutput::Fraction(
+                lang_b
+                    .partially_ordered_earth_movers_stochastic_conformance(&mut lang_a)
+                    .with_context(|| anyhow!("Error while computing partially ordered EMSC."))?,
+            )),
+            (
+                EbiInput::Object(
+                    EbiObject::FiniteStochasticPartiallyOrderedLanguage(mut lang_a),
+                    _,
+                ),
+                EbiInput::Object(
+                    EbiObject::FiniteStochasticPartiallyOrderedLanguage(mut lang_b),
+                    _,
+                ),
+            ) => Ok(EbiOutput::Fraction(
+                lang_a
+                    .partially_ordered_earth_movers_stochastic_conformance(&mut lang_b)
+                    .with_context(|| anyhow!("Error while computing partially ordered EMSC."))?,
+            )),
+            _ => Err(anyhow!("Inputs not recognised.")),
+        }
     },
     output_type: &EbiOutputType::Fraction,
 };

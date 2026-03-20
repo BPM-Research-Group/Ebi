@@ -12,6 +12,6 @@ impl StochasticPartiallyOrderedSemantics for StochasticBusinessProcessModelAndNo
         state: &<Self as StochasticPartiallyOrderedSemantics>::StoPOSemState,
         transition: TransitionIndex,
     ) -> Option<Fraction> {
-        self.get_transition_weight(transition, state)
+        self.get_transition_probabilistic_penalty(transition, state)
     }
 }

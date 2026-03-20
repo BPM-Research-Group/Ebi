@@ -13,7 +13,7 @@ use ebi_objects::{
     StochasticBusinessProcessModelAndNotation,
     anyhow::{Result, anyhow},
     ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One, Recip, Zero, f},
-    ebi_bpmn::partially_ordered_run::PartiallyOrderedRun,
+    ebi_bpmn::{BPMNMarking, partially_ordered_run::PartiallyOrderedRun},
 };
 use rand::RngExt;
 use std::collections::{HashMap, hash_map::Entry};

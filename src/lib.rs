@@ -209,6 +209,8 @@ pub mod techniques {
     pub mod medoid_non_stochastic;
     pub mod non_decreasing_livelock;
     pub mod occurrences_stochastic_miner;
+    pub mod partially_ordered_earth_movers_stochastic_conformance;
+    pub mod partially_ordered_trace_distance;
     pub mod permutation_test;
     pub mod prefix_tree_miner;
     pub mod probability_queries;

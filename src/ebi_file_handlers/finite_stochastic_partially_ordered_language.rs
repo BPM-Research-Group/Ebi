@@ -2,7 +2,7 @@ use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
-    trait_importers::{ImportAsActivitiesTrait, ImportAsSemanticsTrait},
+    trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
     validate::Validate,
 };
 use ebi_objects::{Exportable, FiniteStochasticPartiallyOrderedLanguage, Importable};
@@ -17,6 +17,10 @@ pub const EBI_FINITE_STOCHASTIC_PARTIALLY_ORDERED_LANGUAGE: EbiFileHandler = Ebi
     trait_importers: &[
         EbiTraitImporter::Activities(
             FiniteStochasticPartiallyOrderedLanguage::import_as_activities_trait,
+            FiniteStochasticPartiallyOrderedLanguage::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::Graphable(
+            FiniteStochasticPartiallyOrderedLanguage::import_as_graphable_trait,
             FiniteStochasticPartiallyOrderedLanguage::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
