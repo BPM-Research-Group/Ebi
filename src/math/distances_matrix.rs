@@ -7,8 +7,10 @@
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use ebi_objects::ebi_arithmetic::malachite::Natural;
-use ebi_objects::{FiniteStochasticPartiallyOrderedLanguage, ebi_arithmetic::Fraction};
-use rayon::iter::ParallelIterator;
+use ebi_objects::{
+    FiniteStochasticPartiallyOrderedLanguage,
+    ebi_arithmetic::Fraction,
+};
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),
@@ -17,7 +19,8 @@ use rayon::iter::ParallelIterator;
     all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator};
+use rayon::iter::IntoParallelIterator;
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 #[cfg(any(
     all(
@@ -104,7 +107,7 @@ impl WeightedDistanceMatrix {
         lang_a: &FiniteStochasticPartiallyOrderedLanguage,
         lang_b: &FiniteStochasticPartiallyOrderedLanguage,
     ) -> Self {
-        log::info!("Compute distances");
+        log::info!("Compute partially ordered - partially ordered distances.");
 
         // Pre-allocate the entire matrix
         let mut distances = Vec::with_capacity(lang_a.number_of_traces());

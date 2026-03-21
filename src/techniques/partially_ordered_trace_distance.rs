@@ -1,12 +1,12 @@
-use std::fmt::{Debug, Display};
-
 use bitvec::{bitvec, vec::BitVec};
 use ebi_objects::{
-    Activity, ebi_arithmetic::Fraction,
+    Activity,
+    ebi_arithmetic::Fraction,
     ebi_objects::finite_stochastic_partially_ordered_language::PartiallyOrderedTrace,
 };
 use itertools::Itertools;
 use pathfinding::prelude::astar;
+use std::fmt::{Debug, Display};
 
 pub trait PartiallyOrderedTraceDistance {
     /// Applies a generalisation of the Levenshtein distance: returns the minimum number of insertions, deletions and substitutions that is necessary to transform one trace into the other.
@@ -38,11 +38,7 @@ impl PartiallyOrderedTraceDistance for Vec<Activity> {
 
             //model moves and silent moves
             for edge in state.enabled_edges(other) {
-                let mut new_state = state.clone();
-                //execute transition
-                for output in &other.edge_2_outputs[edge] {
-                    new_state.states.set(*output, true);
-                }
+                let mut new_state = state.execute_edge(edge, other);
                 new_state.edges.set(edge, true);
                 if other.edge_2_activity[edge].is_some() {
                     //model move
@@ -86,7 +82,7 @@ impl PartiallyOrderedTraceDistance for Vec<Activity> {
         other: &PartiallyOrderedTrace,
     ) -> Fraction {
         let distance = self.partially_ordered_trace_distance(other);
-        Fraction::from((distance, self.len().min(other.number_of_edges())))
+        Fraction::from((distance, self.len().max(other.number_of_labelled_edges())))
     }
 }
 
@@ -108,14 +104,13 @@ impl PartiallyOrderedTraceDistance for PartiallyOrderedTrace {
             let mut successors_self = vec![];
             for edge in marking_self.enabled_edges(self) {
                 //execute transition
-                let mut new_marking_self = marking_self.clone();
-                for output in &self.edge_2_outputs[edge] {
-                    new_marking_self.states.set(*output, true);
-                }
+                let mut new_marking_self = marking_self.execute_edge(edge, self);
                 new_marking_self.edges.set(edge, true);
                 if let Some(activity) = self.edge_2_activity[edge] {
                     //labelled
                     successors_self.push((new_marking_self.clone(), activity));
+
+                    //self move
                     result.push(((new_marking_self, marking_other.clone()), 1));
                 } else {
                     //silent
@@ -126,14 +121,13 @@ impl PartiallyOrderedTraceDistance for PartiallyOrderedTrace {
             //other move
             let mut successors_other = vec![];
             for edge in marking_other.enabled_edges(other) {
-                let mut new_marking_other = marking_other.clone();
-                //execute transition
-                for output in &other.edge_2_outputs[edge] {
-                    new_marking_other.states.set(*output, true);
-                }
+                let mut new_marking_other = marking_other.execute_edge(edge, other);
+
                 new_marking_other.edges.set(edge, true);
                 if let Some(activity) = other.edge_2_activity[edge] {
                     //labelled
+
+                    //other move
                     successors_other.push((new_marking_other.clone(), activity));
                     result.push(((marking_self.clone(), new_marking_other), 1));
                 } else {
@@ -177,9 +171,11 @@ impl PartiallyOrderedTraceDistance for PartiallyOrderedTrace {
         other: &PartiallyOrderedTrace,
     ) -> Fraction {
         let distance = self.partially_ordered_trace_distance(other);
+
         Fraction::from((
             distance,
-            self.number_of_edges().min(other.number_of_edges()),
+            self.number_of_labelled_edges()
+                .max(other.number_of_labelled_edges()),
         ))
     }
 }
@@ -211,6 +207,14 @@ impl PartiallyOrderedTraceMarking {
                 .all(|input| self.states[*input])
         })
     }
+
+    pub fn execute_edge(&self, edge: usize, po_trace: &PartiallyOrderedTrace) -> Self {
+        let mut result = self.clone();
+        for output in &po_trace.edge_2_outputs[edge] {
+            result.states.set(*output, true);
+        }
+        result
+    }
 }
 
 impl Debug for PartiallyOrderedTraceMarking {
@@ -233,7 +237,10 @@ impl Display for PartiallyOrderedTraceMarking {
 #[cfg(test)]
 mod tests {
     use crate::techniques::partially_ordered_trace_distance::PartiallyOrderedTraceDistance;
-    use ebi_objects::{FiniteStochasticPartiallyOrderedLanguage, HasActivityKey, ebi_arithmetic::{Fraction, One, Zero}};
+    use ebi_objects::{
+        FiniteStochasticPartiallyOrderedLanguage, HasActivityKey,
+        ebi_arithmetic::{Fraction, One, Zero},
+    };
     use std::fs;
 
     #[test]
@@ -250,10 +257,16 @@ mod tests {
 
         let trace = vec![ac0, ac1];
         assert_eq!(trace.partially_ordered_trace_distance(po_trace), 0);
-        assert_eq!(trace.normalised_partially_ordered_trace_distance(po_trace), Fraction::zero());
+        assert_eq!(
+            trace.normalised_partially_ordered_trace_distance(po_trace),
+            Fraction::zero()
+        );
 
         let trace = vec![ac1, ac0];
         assert_eq!(trace.partially_ordered_trace_distance(po_trace), 2);
-        assert_eq!(trace.normalised_partially_ordered_trace_distance(po_trace), Fraction::one());
+        assert_eq!(
+            trace.normalised_partially_ordered_trace_distance(po_trace),
+            Fraction::one()
+        );
     }
 }

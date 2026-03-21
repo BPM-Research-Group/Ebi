@@ -821,9 +821,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
-version = "0.3.165"
+version = "0.3.166"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5bf1baf056a144f644ce5a76ed83d4ae0f3f851328b3cf87d4d0ec00a63e6d52"
+checksum = "147a47740f62f87c105cbd87093922409f10c5aaaa3b9cae73fb219d9ee8606a"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -854,9 +854,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_optimisation"
-version = "0.3.5"
+version = "0.3.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c032864bf0f9fb25567a9969a241f9813b4075b261bd7247f38db5729f2c7823"
+checksum = "4e71d417c233739ef94384de518e9bef96bc996a7ec5b42c62369e22ea5963bf"
 dependencies = [
  "ebi_arithmetic",
  "indexmap 2.13.0",

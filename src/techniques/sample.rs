@@ -1,5 +1,5 @@
 use crate::{
-    ebi_framework::displayable::Displayable,
+    ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics,
@@ -16,6 +16,7 @@ use ebi_objects::{
     ebi_bpmn::{BPMNMarking, partially_ordered_run::PartiallyOrderedRun},
 };
 use rand::RngExt;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::collections::{HashMap, hash_map::Entry};
 
 pub trait Sampler {
@@ -74,13 +75,26 @@ impl PartiallyOrderedSampler for StochasticBusinessProcessModelAndNotation {
         &self,
         number_of_traces: usize,
     ) -> Result<FiniteStochasticPartiallyOrderedLanguage> {
-        let mut traces = Vec::with_capacity(number_of_traces);
         let probabilities = vec![f!(number_of_traces).recip(); number_of_traces];
 
-        for _ in 0..number_of_traces {
-            let run = PartiallyOrderedRun::new_random(self)?;
-            traces.push(run.into());
-        }
+        let progress_bar = EbiCommand::get_progress_bar_ticks(number_of_traces);
+
+        // Create thread pool with custom configuration
+        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
+
+        let mut traces = Vec::with_capacity(number_of_traces);
+        pool.install(|| {
+            traces = (0..number_of_traces)
+                .into_par_iter()
+                .map(|_| {
+                    let run = PartiallyOrderedRun::new_random(self).unwrap().into();
+                    progress_bar.inc(1);
+                    run
+                })
+                .collect();
+        });
+
+        progress_bar.finish_and_clear();
 
         Ok((self.activity_key().clone(), traces, probabilities).into())
     }
