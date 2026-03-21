@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" exporter="Ebi-bpmn">
+	<process id="process_1" isExecutable="true">
+		<startEvent id="startevent_2">
+			<outgoing>sequenceflow_6</outgoing>
+		</startEvent>
+		<endEvent id="startevent_3">
+			<incoming>sequenceflow_7</incoming>
+		</endEvent>
+		<exclusiveGateway id="exclusivegateway_4">
+			<incoming>sequenceflow_6</incoming>
+			<outgoing>sequenceflow_8</outgoing>
+		</exclusiveGateway>
+		<exclusiveGateway id="exclusivegateway_5">
+			<incoming>sequenceflow_8</incoming>
+			<outgoing>sequenceflow_7</outgoing>
+		</exclusiveGateway>
+		<task id="task_9" name="a">
+			<incoming>sequenceflow_10</incoming>
+			<outgoing>sequenceflow_11</outgoing>
+		</task>
+		<sequenceFlow id="sequenceflow_6" sourceRef="startevent_2" targetRef="exclusivegateway_4"/>
+		<sequenceFlow id="sequenceflow_7" sourceRef="exclusivegateway_5" targetRef="startevent_3"/>
+		<sequenceFlow id="sequenceflow_8" sourceRef="exclusivegateway_4" targetRef="exclusivegateway_5"/>
+		<sequenceFlow id="sequenceflow_10" sourceRef="exclusivegateway_5" targetRef="task_9"/>
+		<sequenceFlow id="sequenceflow_11" sourceRef="task_9" targetRef="exclusivegateway_4"/>
+	</process>
+</definitions>

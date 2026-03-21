@@ -40,16 +40,20 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
         }
 
         let alignments = self.align_stochastic_language(language)?;
+        println!("alignments {}", alignments.len());
         for index in 0..alignments.len() {
             let probability = alignments
                 .get_probability(index)
                 .ok_or_else(|| anyhow!("should not happen"))?;
+
+            println!("probability {}", probability);
 
             if let Some(mut marking) = self.get_initial_marking()? {
                 for movee in alignments
                     .get(index)
                     .ok_or_else(|| anyhow!("should not happen"))?
                 {
+                    println!("move {:?}", movee);
                     match movee {
                         Move::LogMove(_) => {}
                         Move::ModelMove(_, transition_index)
@@ -58,6 +62,7 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
                             for token in
                                 self.transition_2_produced_tokens(*transition_index, &marking)?
                             {
+                                println!("token {:?}", token);
                                 if let Token::SequenceFlow(sequence_flow_index) = token {
                                     let sequence_flow = self
                                         .global_index_2_sequence_flow_mut(sequence_flow_index)
@@ -73,6 +78,7 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
                         }
                     }
                 }
+                panic!()
             }
         }
 

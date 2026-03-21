@@ -646,12 +646,17 @@ mod tests {
     use std::fs;
 
     use ebi_objects::{
-        DeterministicFiniteAutomaton, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey,
-        StochasticDeterministicFiniteAutomaton, TranslateActivityKey,
+        BusinessProcessModelAndNotation, DeterministicFiniteAutomaton, FiniteLanguage,
+        FiniteStochasticLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton,
+        TranslateActivityKey,
+        ebi_arithmetic::{Fraction, One},
         ebi_objects::language_of_alignments::Move,
     };
 
-    use crate::{ebi_framework::trait_importers::ToSemanticsTrait, techniques::align::Align};
+    use crate::{
+        ebi_framework::trait_importers::ToSemanticsTrait,
+        techniques::{align::Align, fitness::Fitness},
+    };
 
     #[test]
     fn align_sdfa_trace() {
@@ -815,5 +820,19 @@ mod tests {
             Move::LogMove(b),
         ]; //other options may be valid, please check semantically when this fails
         assert_eq!(*alignment.get(0).unwrap(), correct_1);
+    }
+
+    #[test]
+    fn align_flower() {
+        let fin2 = fs::read_to_string("testfiles/aa.slang").unwrap();
+        let mut lang = Box::new(fin2.parse::<FiniteStochasticLanguage>().unwrap());
+
+        let fin1 = fs::read_to_string("testfiles/flower.bpmn").unwrap();
+        let mut bpmn = fin1.parse::<BusinessProcessModelAndNotation>().unwrap();
+        bpmn.translate_using_activity_key(lang.activity_key_mut());
+
+        let alignment = bpmn.align_stochastic_language(lang).unwrap();
+        println!("{}", alignment);
+        assert_eq!(alignment.trace_fitness(), Fraction::one());
     }
 }
