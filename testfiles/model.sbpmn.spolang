@@ -16,7 +16,7 @@ silent
 1
 #	edge 1
 multiline label Register claim
-(2min)#
+(2min)$
 #		number of input states
 1
 1
@@ -33,7 +33,7 @@ silent
 3
 #	edge 3
 multiline label Check easy claim
-(5 min)#
+(5 min)$
 #		number of input states
 1
 3
