@@ -1,0 +1,675 @@
+finite stochastic partially ordered language
+# number of traces
+10
+# trace 0
+#	probability
+1/10
+#	number of edges
+16
+#	edge 0
+silent
+#		number of input states
+1
+0
+#		number of output states
+1
+1
+#	edge 1
+silent
+#		number of input states
+1
+1
+#		number of output states
+1
+2
+#	edge 2
+silent
+#		number of input states
+1
+2
+#		number of output states
+1
+3
+#	edge 3
+label a
+#		number of input states
+1
+3
+#		number of output states
+1
+4
+#	edge 4
+silent
+#		number of input states
+1
+4
+#		number of output states
+1
+5
+#	edge 5
+silent
+#		number of input states
+1
+5
+#		number of output states
+1
+6
+#	edge 6
+label a
+#		number of input states
+1
+6
+#		number of output states
+1
+7
+#	edge 7
+silent
+#		number of input states
+1
+7
+#		number of output states
+1
+8
+#	edge 8
+silent
+#		number of input states
+1
+8
+#		number of output states
+1
+9
+#	edge 9
+label a
+#		number of input states
+1
+9
+#		number of output states
+1
+10
+#	edge 10
+silent
+#		number of input states
+1
+10
+#		number of output states
+1
+11
+#	edge 11
+silent
+#		number of input states
+1
+11
+#		number of output states
+1
+12
+#	edge 12
+label a
+#		number of input states
+1
+12
+#		number of output states
+1
+13
+#	edge 13
+silent
+#		number of input states
+1
+13
+#		number of output states
+1
+14
+#	edge 14
+silent
+#		number of input states
+1
+14
+#		number of output states
+1
+15
+#	edge 15
+silent
+#		number of input states
+1
+15
+#		number of output states
+0
+# trace 1
+#	probability
+1/10
+#	number of edges
+10
+#	edge 0
+silent
+#		number of input states
+1
+0
+#		number of output states
+1
+1
+#	edge 1
+silent
+#		number of input states
+1
+1
+#		number of output states
+1
+2
+#	edge 2
+silent
+#		number of input states
+1
+2
+#		number of output states
+1
+3
+#	edge 3
+label a
+#		number of input states
+1
+3
+#		number of output states
+1
+4
+#	edge 4
+silent
+#		number of input states
+1
+4
+#		number of output states
+1
+5
+#	edge 5
+silent
+#		number of input states
+1
+5
+#		number of output states
+1
+6
+#	edge 6
+label a
+#		number of input states
+1
+6
+#		number of output states
+1
+7
+#	edge 7
+silent
+#		number of input states
+1
+7
+#		number of output states
+1
+8
+#	edge 8
+silent
+#		number of input states
+1
+8
+#		number of output states
+1
+9
+#	edge 9
+silent
+#		number of input states
+1
+9
+#		number of output states
+0
+# trace 2
+#	probability
+1/10
+#	number of edges
+4
+#	edge 0
+silent
+#		number of input states
+1
+0
+#		number of output states
+1
+1
+#	edge 1
+silent
+#		number of input states
+1
+1
+#		number of output states
+1
+2
+#	edge 2
+silent
+#		number of input states
+1
+2
+#		number of output states
+1
+3
+#	edge 3
+silent
+#		number of input states
+1
+3
+#		number of output states
+0
+# trace 3
+#	probability
+1/10
+#	number of edges
+7
+#	edge 0
+silent
+#		number of input states
+1
+0
+#		number of output states
+1
+1
+#	edge 1
+silent
+#		number of input states
+1
+1
+#		number of output states
+1
+2
+#	edge 2
+silent
+#		number of input states
+1
+2
+#		number of output states
+1
+3
+#	edge 3
+label a
+#		number of input states
+1
+3
+#		number of output states
+1
+4
+#	edge 4
+silent
+#		number of input states
+1
+4
+#		number of output states
+1
+5
+#	edge 5
+silent
+#		number of input states
+1
+5
+#		number of output states
+1
+6
+#	edge 6
+silent
+#		number of input states
+1
+6
+#		number of output states
+0
+# trace 4
+#	probability
+1/10
+#	number of edges
+10
+#	edge 0
+silent
+#		number of input states
+1
+0
+#		number of output states
+1
+1
+#	edge 1
+silent
+#		number of input states
+1
+1
+#		number of output states
+1
+2
+#	edge 2
+silent
+#		number of input states
+1
+2
+#		number of output states
+1
+3
+#	edge 3
+label a
+#		number of input states
+1
+3
+#		number of output states
+1
+4
+#	edge 4
+silent
+#		number of input states
+1
+4
+#		number of output states
+1
+5
+#	edge 5
+silent
+#		number of input states
+1
+5
+#		number of output states
+1
+6
+#	edge 6
+label a
+#		number of input states
+1
+6
+#		number of output states
+1
+7
+#	edge 7
+silent
+#		number of input states
+1
+7
+#		number of output states
+1
+8
+#	edge 8
+silent
+#		number of input states
+1
+8
+#		number of output states
+1
+9
+#	edge 9
+silent
+#		number of input states
+1
+9
+#		number of output states
+0
+# trace 5
+#	probability
+1/10
+#	number of edges
+4
+#	edge 0
+silent
+#		number of input states
+1
+0
+#		number of output states
+1
+1
+#	edge 1
+silent
+#		number of input states
+1
+1
+#		number of output states
+1
+2
+#	edge 2
+silent
+#		number of input states
+1
+2
+#		number of output states
+1
+3
+#	edge 3
+silent
+#		number of input states
+1
+3
+#		number of output states
+0
+# trace 6
+#	probability
+1/10
+#	number of edges
+10
+#	edge 0
+silent
+#		number of input states
+1
+0
+#		number of output states
+1
+1
+#	edge 1
+silent
+#		number of input states
+1
+1
+#		number of output states
+1
+2
+#	edge 2
+silent
+#		number of input states
+1
+2
+#		number of output states
+1
+3
+#	edge 3
+label a
+#		number of input states
+1
+3
+#		number of output states
+1
+4
+#	edge 4
+silent
+#		number of input states
+1
+4
+#		number of output states
+1
+5
+#	edge 5
+silent
+#		number of input states
+1
+5
+#		number of output states
+1
+6
+#	edge 6
+label a
+#		number of input states
+1
+6
+#		number of output states
+1
+7
+#	edge 7
+silent
+#		number of input states
+1
+7
+#		number of output states
+1
+8
+#	edge 8
+silent
+#		number of input states
+1
+8
+#		number of output states
+1
+9
+#	edge 9
+silent
+#		number of input states
+1
+9
+#		number of output states
+0
+# trace 7
+#	probability
+1/10
+#	number of edges
+10
+#	edge 0
+silent
+#		number of input states
+1
+0
+#		number of output states
+1
+1
+#	edge 1
+silent
+#		number of input states
+1
+1
+#		number of output states
+1
+2
+#	edge 2
+silent
+#		number of input states
+1
+2
+#		number of output states
+1
+3
+#	edge 3
+label a
+#		number of input states
+1
+3
+#		number of output states
+1
+4
+#	edge 4
+silent
+#		number of input states
+1
+4
+#		number of output states
+1
+5
+#	edge 5
+silent
+#		number of input states
+1
+5
+#		number of output states
+1
+6
+#	edge 6
+label a
+#		number of input states
+1
+6
+#		number of output states
+1
+7
+#	edge 7
+silent
+#		number of input states
+1
+7
+#		number of output states
+1
+8
+#	edge 8
+silent
+#		number of input states
+1
+8
+#		number of output states
+1
+9
+#	edge 9
+silent
+#		number of input states
+1
+9
+#		number of output states
+0
+# trace 8
+#	probability
+1/10
+#	number of edges
+4
+#	edge 0
+silent
+#		number of input states
+1
+0
+#		number of output states
+1
+1
+#	edge 1
+silent
+#		number of input states
+1
+1
+#		number of output states
+1
+2
+#	edge 2
+silent
+#		number of input states
+1
+2
+#		number of output states
+1
+3
+#	edge 3
+silent
+#		number of input states
+1
+3
+#		number of output states
+0
+# trace 9
+#	probability
+1/10
+#	number of edges
+4
+#	edge 0
+silent
+#		number of input states
+1
+0
+#		number of output states
+1
+1
+#	edge 1
+silent
+#		number of input states
+1
+1
+#		number of output states
+1
+2
+#	edge 2
+silent
+#		number of input states
+1
+2
+#		number of output states
+1
+3
+#	edge 3
+silent
+#		number of input states
+1
+3
+#		number of output states
+0

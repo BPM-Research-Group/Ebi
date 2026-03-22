@@ -242,41 +242,41 @@ where
         let successors = |(trace_index, state): &(usize, State)| {
             let mut result = vec![];
 
-            // log::debug!("successors of log {} model {}", trace_index, state);
+            // println!("compute successors of ({} -- {})", trace_index, state);
 
             if trace_index < &trace.len() {
                 //we can do a log move
                 let new_trace_index = trace_index + 1;
                 let new_state = state.clone();
-                // log::debug!("\tlog move {} to {} {}", trace[*trace_index], new_trace_index, new_state);
+                // println!("\tlog move {} to ({} -- {})", trace[*trace_index], new_trace_index, new_state);
                 result.push(((new_trace_index, new_state), 10000));
             }
+
+            // println!("\t\tenabled {:?}", semantics.get_enabled_transitions(&state));
 
             //walk through the enabled transitions in the model
             for transition in semantics.get_enabled_transitions(&state) {
                 let mut new_state = state.clone();
-                let _ = semantics.execute_transition(&mut new_state, transition);
+                let _ = semantics.execute_transition(&mut new_state, transition).unwrap();
 
                 if let Some(activity) = semantics.get_transition_activity(transition, state) {
                     //non-silent model move
                     result.push(((*trace_index, new_state.clone()), 10000));
-                    // log::debug!("\tmodel move t{} {} to {} {}", transition, activity, trace_index, new_state);
+                    // println!("\tmodel move on activity {} to ({} -- {})", activity, trace_index, new_state);
 
                     //which may also be a synchronous move
                     if trace_index < &trace.len() && activity == trace[*trace_index] {
-                        //synchronous move
+                        //synchronous movelog
                         let new_trace_index = trace_index + 1;
-                        // log::debug!("\tsynchronous move t{} {} to {} {}", transition, activity, new_trace_index, new_state);
+                        // println!("\tsynchronous move t{} {} to {} {}", transition, activity, new_trace_index, new_state);
                         result.push(((new_trace_index, new_state), 0));
                     }
                 } else {
                     //silent move
-                    // log::debug!("\tsilent move t{} to {} {}", transition, trace_index, new_state);
+                    // println!("\tsilent move to ({} -- {})", trace_index, new_state);
                     result.push(((*trace_index, new_state), 1));
                 }
             }
-
-            // log::debug!("successors of {} {}: {:?}", trace_index, state, result);
             result
         };
 
@@ -293,7 +293,7 @@ where
         //function that returns whether we are in a final synchronous product state
         let success = |(trace_index, state): &(usize, State)| {
             let result = trace_index == &trace.len() && semantics.is_final_state(&state);
-            // log::debug!("state {} {} is final: {}", trace_index, state, result);
+            // println!("state {} {} is final: {}", trace_index, state, result);
             result
         };
 
@@ -318,7 +318,6 @@ where
     T: Semantics<SemState = State> + ?Sized,
     State: Display + Debug + Clone + Hash + Eq,
 {
-    // log::debug!("transform alignment {:?}", states);
     let mut alignment = vec![];
 
     let mut it = states.into_iter();
@@ -326,7 +325,14 @@ where
     let (mut previous_trace_index, mut previous_state) = it.next().unwrap();
 
     for (trace_index, state) in it {
-        // log::debug!("transform {} from {} to {}", trace_index, previous_state, state);
+        // println!(
+        //     "transform:
+        //     previous_trace_index {}
+        //     trace_index          {}
+        //     previous_state       {:?}
+        //     state                {:?}",
+        //     previous_trace_index, trace_index, previous_state, state
+        // );
         if trace_index != previous_trace_index {
             //we did a move on the log
             let activity = trace[previous_trace_index];
