@@ -1,6 +1,6 @@
 use crate::math::distances::WeightedDistances;
 use ebi_objects::{
-    anyhow::{Context, Result},
+    anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{OneMinus, Zero, fraction::fraction_f64::FractionF64},
 };
 use ebi_optimisation::network_simplex::NetworkSimplex;
