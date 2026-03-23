@@ -438,7 +438,7 @@ impl ImportableFromPM4Py for LabelledPetriNet {
 
         Ok(LabelledPetriNet {
             activity_key,
-            initial_marking,
+            initial_marking: Some(initial_marking),
             labels,
             place2output_transitions,
             transition2input_places,
