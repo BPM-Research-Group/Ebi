@@ -1,7 +1,7 @@
 use bitvec::{bitvec, vec::BitVec};
 use ebi_objects::{
     Activity,
-    ebi_arithmetic::Fraction,
+    ebi_arithmetic::{Fraction, Zero},
     ebi_objects::finite_stochastic_partially_ordered_language::PartiallyOrderedTrace,
 };
 use itertools::Itertools;
@@ -81,8 +81,12 @@ impl PartiallyOrderedTraceDistance for Vec<Activity> {
         &self,
         other: &PartiallyOrderedTrace,
     ) -> Fraction {
-        let distance = self.partially_ordered_trace_distance(other);
-        Fraction::from((distance, self.len().max(other.number_of_labelled_edges())))
+        if !self.is_empty() || other.number_of_labelled_edges() != 0 {
+            let distance = self.partially_ordered_trace_distance(other);
+            Fraction::from((distance, self.len().max(other.number_of_labelled_edges())))
+        } else {
+            Fraction::zero()
+        }
     }
 }
 
@@ -170,13 +174,17 @@ impl PartiallyOrderedTraceDistance for PartiallyOrderedTrace {
         &self,
         other: &PartiallyOrderedTrace,
     ) -> Fraction {
-        let distance = self.partially_ordered_trace_distance(other);
+        if self.number_of_labelled_edges() > 0 || other.number_of_labelled_edges() > 0 {
+            let distance = self.partially_ordered_trace_distance(other);
 
-        Fraction::from((
-            distance,
-            self.number_of_labelled_edges()
-                .max(other.number_of_labelled_edges()),
-        ))
+            Fraction::from((
+                distance,
+                self.number_of_labelled_edges()
+                    .max(other.number_of_labelled_edges()),
+            ))
+        } else {
+            Fraction::zero()
+        }
     }
 }
 
@@ -238,7 +246,7 @@ impl Display for PartiallyOrderedTraceMarking {
 mod tests {
     use crate::techniques::partially_ordered_trace_distance::PartiallyOrderedTraceDistance;
     use ebi_objects::{
-        FiniteStochasticPartiallyOrderedLanguage, HasActivityKey,
+        FiniteStochasticLanguage, FiniteStochasticPartiallyOrderedLanguage, HasActivityKey,
         ebi_arithmetic::{Fraction, One, Zero},
     };
     use std::fs;
@@ -268,5 +276,41 @@ mod tests {
             trace.normalised_partially_ordered_trace_distance(po_trace),
             Fraction::one()
         );
+    }
+
+    #[test]
+    fn po_trace_distance_flower() {
+        let fin1 = fs::read_to_string("testfiles/flower.sbpmn.spolang").unwrap();
+        let spolang = fin1
+            .parse::<FiniteStochasticPartiallyOrderedLanguage>()
+            .unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/empty_trace.slang").unwrap();
+        let slang = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+        let (slangtrace, _) = slang.traces.iter().next().unwrap();
+
+        for spotrace in spolang.traces {
+            println!(
+                "trace length {:?}, distance {}",
+                spotrace.number_of_labelled_edges(),
+                slangtrace.partially_ordered_trace_distance(&spotrace)
+            );
+
+            assert_eq!(
+                spotrace.number_of_labelled_edges(),
+                slangtrace.partially_ordered_trace_distance(&spotrace)
+            );
+            if spotrace.number_of_labelled_edges() == 0 {
+                assert_eq!(
+                    slangtrace.normalised_partially_ordered_trace_distance(&spotrace),
+                    Fraction::zero()
+                );
+            } else {
+                assert_eq!(
+                    slangtrace.normalised_partially_ordered_trace_distance(&spotrace),
+                    Fraction::one()
+                );
+            }
+        }
     }
 }

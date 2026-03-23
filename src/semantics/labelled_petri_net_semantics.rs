@@ -50,9 +50,8 @@ impl Semantics for LabelledPetriNet {
     }
 
     fn get_initial_state(&self) -> Option<LPNMarking> {
-        //an LPN does supports the empty language, but only in livelocks
         let mut result = LPNMarking {
-            marking: self.initial_marking.clone(),
+            marking: self.initial_marking.as_ref()?.clone(),
             enabled_transitions: bitvec![0; self.get_number_of_transitions()],
             number_of_enabled_transitions: 0,
         };

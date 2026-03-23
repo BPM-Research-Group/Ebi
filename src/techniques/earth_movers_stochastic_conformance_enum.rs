@@ -1,6 +1,6 @@
 use crate::math::distances::WeightedDistances;
 use ebi_objects::{
-    anyhow::{Context, Result},
+    anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{
         One,
         exact::{MaybeExact, is_exact_globally},
@@ -45,6 +45,9 @@ impl dyn WeightedDistances {
     ///     b. Run the `NetworkSimplex` algorithm to find the optimal flow between the supply and demand nodes.<br>
     ///     c. Calculate the EMSC value as `1 - result`.
     pub fn earth_movers_stochastic_conformance(&self) -> Result<FractionEnum> {
+        if self.len_a() == 0 || self.len_b() == 0 {
+            return Err(anyhow!("One of the languages is empty."));
+        }
         if is_exact_globally() {
             //exact mode
             // 2. Is exact arithmetic required?

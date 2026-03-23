@@ -12,7 +12,7 @@ use crate::{
     },
     techniques::{
         align::Align, escaping_edges_precision::EscapingEdgesPrecision, fitness::Fitness,
-    },
+    }, tests::test_ebi_command,
 };
 use ebi_objects::{EbiObject, EbiObjectType, StochasticLanguageOfAlignments, anyhow::Context};
 
@@ -28,6 +28,7 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
         &EBI_CONFORMANCE_NON_STOCHASTIC_TRACE_FITNESS,
     ],
 };
+test_ebi_command!(EBI_CONFORMANCE_NON_STOCHASTIC);
 
 pub const EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS: EbiCommand = EbiCommand::Command {
     name_short: "ali",

@@ -1,8 +1,8 @@
-use crate::ebi_framework::{
+use crate::{ebi_framework::{
     ebi_command::EbiCommand,
     ebi_output::{EbiOutput, EbiOutputType},
     manual::{graph, html, manual},
-};
+}, tests::test_ebi_command};
 #[cfg(feature = "java")]
 use crate::prom::prom_plugin_generator::print_java_plugins;
 use ebi_objects::{EbiObject, EbiObjectType, ebi_objects::scalable_vector_graphics::ToSVGMut};
@@ -40,6 +40,7 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
         &EBI_ITSELF_PYTHON,
     ],
 };
+test_ebi_command!(EBI_ITSELF);
 
 pub const EBI_ITSELF_LOGO: EbiCommand = EbiCommand::Command {
     name_short: "log",

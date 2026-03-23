@@ -5,7 +5,7 @@ use crate::{
         ebi_input::{self, EbiInputType},
         ebi_output::{EbiOutput, EbiOutputType},
     },
-    ebi_info,
+    ebi_info, tests::test_ebi_command,
 };
 use clap::{Arg, ArgAction, value_parser};
 use ebi_objects::anyhow::{Context, Ok, anyhow};
@@ -61,3 +61,4 @@ pub const EBI_VALIDATE: EbiCommand = EbiCommand::Command {
     },
     output_type: &EbiOutputType::String,
 };
+test_ebi_command!(EBI_VALIDATE);

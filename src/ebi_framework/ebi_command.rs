@@ -867,7 +867,7 @@ pub fn get_applicable_commands(object_type: &EbiObjectType) -> BTreeSet<Vec<&'st
 }
 
 #[cfg(test)]
-mod tests {
+pub(crate) mod tests {
     use super::{EBI_COMMANDS, EbiCommand};
     use crate::{
         ebi_framework::{
@@ -877,10 +877,8 @@ mod tests {
         },
         multiple_reader::MultipleReader,
     };
-    use ebi_objects::{EbiObject, ebi_activity_key::TestActivityKey, ebi_arithmetic::Fraction};
+    use ebi_objects::{EbiObject, ebi_arithmetic::Fraction};
     use itertools::Itertools;
-    use ntest::timeout;
-    use rayon::iter::{IntoParallelIterator, ParallelIterator};
     use std::{
         collections::HashSet, fmt::Debug, fs::{self, File}, path::PathBuf
     };
@@ -915,52 +913,47 @@ mod tests {
         }
     }
 
-    #[test]
-    #[timeout(600000)]
-    fn call_all_non_cli_commands() {
-        EBI_COMMANDS.get_command_paths().into_par_iter().for_each(|path| {
-            if let EbiCommand::Command {
-                input_types,
-                execute,
-                cli_command,
-                exact_arithmetic,
-                output_type,
-                ..
-            } = path.last().unwrap()
-            {
+    pub(crate) fn ebi_command_test(command: &EbiCommand) {
+        match command {
+            EbiCommand::Group { children, .. } => {
+                println!("Group: {}", command.long_name());
+                for child in children.iter() {
+                    ebi_command_test(child);
+                }
+            },
+            EbiCommand::Command { cli_command, exact_arithmetic, input_types, execute, output_type, .. } => {
+                println!("Command: {}", command.long_name());
                 if cli_command.is_none() // only test commands that do not use the cli directly
-                    && (*exact_arithmetic // do not test approximate commands in exact mode
-                        || cfg!(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic")))
+                        && (*exact_arithmetic // do not test approximate commands in exact mode
+                            || cfg!(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic")))
                 {
-                    println!("command {}", EbiCommand::path_to_string(&path));
-
                     //for each input type, find all input combinations
-                    let inputss = find_inputs(input_types);
+                    let inputss = crate::ebi_framework::ebi_command::tests::find_inputs(input_types);
                     if inputss.is_empty() && input_types.len() > 0 {
                         panic!("Could not find input to call command.");
                     }
 
                     //apply the command to all input combinations
                     for inputs in inputss {
-                        eprintln!("\t\t{}\t{:?}", EbiCommand::path_to_string(&path), inputs);
+                        eprintln!("\t{:?}", inputs);
 
                         //we do not know whether a command should succeed (giving an error is fine in general), but no command should panic
-                        let output = (execute)(transform(inputs), None);
+                        let output = (execute)(crate::ebi_framework::ebi_command::tests::transform(inputs), None);
                         
                         if let Ok(output) = output {
                             //verify that the output is of the correct type
                             assert_eq!(output.get_type(), output_type.to_owned().to_owned());
 
                             //verify that the activities test passes
-                            output.test_activity_key();
+                            ebi_objects::ebi_activity_key::TestActivityKey::test_activity_key(&output);
                         } 
                     }
                 }
-            }
-        });
+            },
+        }
     }
 
-    fn find_inputs(input_typess: &[&[&'static EbiInputType]]) -> Vec<Vec<TestInput>> {
+    pub(crate) fn find_inputs(input_typess: &[&[&'static EbiInputType]]) -> Vec<Vec<TestInput>> {
         let mut it = input_typess.iter();
         let mut result = if let Some(input_types) = it.next() {
             find_inputs_for_position(input_types)
@@ -985,7 +978,7 @@ mod tests {
         return result;
     }
 
-    fn transform(inputs: Vec<TestInput>) -> Vec<EbiInput> {
+    pub(crate) fn transform(inputs: Vec<TestInput>) -> Vec<EbiInput> {
         inputs
             .into_iter()
             .map(|x| x.to_ebi_input())
@@ -993,7 +986,7 @@ mod tests {
     }
 
     #[derive(Clone)]
-    enum TestInput {
+    pub(crate) enum TestInput {
         Trait(EbiTrait, PathBuf), //a trait cannot be cloned, thus we must parse it every time in the cartesian product
         Object(EbiObject, &'static EbiFileHandler, PathBuf),
         String(String, &'static EbiInputType),
@@ -1071,7 +1064,8 @@ mod tests {
                     result.push(TestInput::String("some string".to_string(), &input_type));
                 }
                 EbiInputType::Usize(_, _, Some(default)) => {
-                    result.push(TestInput::Usize(*default, &input_type));
+                    //to keep testing feasible, do not use a default more than 10
+                    result.push(TestInput::Usize(*default.min(&10), &input_type));
                 }
                 EbiInputType::Usize(Some(min), _, _) => {
                     result.push(TestInput::Usize(*min, &input_type));
@@ -1090,8 +1084,8 @@ mod tests {
 
                         //for now, we skip files with loops and livelocks, as the techniques cannot handle them yet
                         if !file.file_name().into_string().unwrap().contains("livelock")
-                            && !file.file_name().into_string().unwrap().contains("empty")
                             && !file.file_name().into_string().unwrap().contains("infinite")
+                            && !file.file_name().into_string().unwrap().contains("unbounded")
                             && !file.file_name().into_string().unwrap().contains("loop")
                             && !file.file_name().into_string().unwrap().contains("pdc")
                             && !file

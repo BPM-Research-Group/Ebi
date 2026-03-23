@@ -665,7 +665,7 @@ mod tests {
 
     #[test]
     fn slpn_cover_silent_livelock() {
-        let fin = fs::read_to_string("testfiles/empty_lang_multiple_silent.slpn").unwrap();
+        let fin = fs::read_to_string("testfiles/livelock_empty_lang_multiple_silent.slpn").unwrap();
         let slpn: Box<
             dyn StochasticDeterministicSemantics<
                     DetState = PMarking<LPNMarking>,
@@ -731,7 +731,7 @@ mod tests {
 
     #[test]
     fn slpn_empty_lang_labelled_cover() {
-        let fin = fs::read_to_string("testfiles/empty_lang_labelled.slpn").unwrap();
+        let fin = fs::read_to_string("testfiles/livelock_empty_lang_labelled.slpn").unwrap();
 
         let slpn = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
         let state = slpn.get_deterministic_initial_state().unwrap().unwrap();
@@ -764,7 +764,7 @@ mod tests {
 
     #[test]
     fn slpn_empty_lang_silent_cover() {
-        let fin = fs::read_to_string("testfiles/empty_lang_silent.slpn").unwrap();
+        let fin = fs::read_to_string("testfiles/livelock_empty_lang_silent.slpn").unwrap();
 
         let slpn = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
         let state = slpn.get_deterministic_initial_state().unwrap().unwrap();
@@ -835,7 +835,7 @@ mod tests {
 
     #[test]
     fn slpn_cover_empty() {
-        let fin = fs::read_to_string("testfiles/empty_lang_labelled.slpn").unwrap();
+        let fin = fs::read_to_string("testfiles/livelock_empty_lang_labelled.slpn").unwrap();
         let slpn: Box<
             dyn StochasticDeterministicSemantics<
                     DetState = PMarking<LPNMarking>,

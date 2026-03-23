@@ -14,7 +14,7 @@ use crate::{
     techniques::{
         bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
         permutation_test::PermutationTest,
-    },
+    }, tests::test_ebi_command,
 };
 use ebi_objects::{anyhow::{Context, anyhow}, ebi_arithmetic::{ConstFraction, Fraction}};
 use std::io::Write;
@@ -28,6 +28,7 @@ pub const EBI_TEST: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[&EBI_BOOTSTRAP_TEST, &EBI_TEST_LOG_ATTRIBUTE],
 };
+test_ebi_command!(EBI_TEST);
 
 pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     name_short: "lcat",

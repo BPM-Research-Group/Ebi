@@ -11,7 +11,7 @@ use crate::{
     techniques::{
         flower_miner::{FlowerMinerDFA, FlowerMinerTree},
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
-    },
+    }, tests::test_ebi_command,
 };
 
 pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
@@ -24,6 +24,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
         &EBI_DISCOVER_NON_STOCHASTIC_PREFIX,
     ],
 };
+test_ebi_command!(EBI_DISCOVER_NON_STOCHASTIC);
 
 pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER: EbiCommand = EbiCommand::Group {
     name_short: "flw",

@@ -24,7 +24,7 @@ use crate::{
             DistanceMeasure, StochasticMarkovianConformance,
         },
         unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
-    },
+    }, tests::test_ebi_command,
 };
 use ebi_objects::{
     EbiObject, EbiObjectType,
@@ -52,6 +52,7 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
         &CONFORMANCE_UEMSC_SAMPLE,
     ],
 };
+test_ebi_command!(EBI_CONFORMANCE);
 
 pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
     name_short: "uemsc",

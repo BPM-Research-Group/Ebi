@@ -1,28 +1,3 @@
-//all tests have been moved to their respective code, as is standard in Rust projects.
-
-//test disabled due to inconsistent output order (which is within spec)
-// #[test]
-// fn slang_to_sdfa() {
-//     let fin = fs::read_to_string("testfiles/aa-ab-ba.slang").unwrap();
-//     let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
-//     let sdfa = slang.to_stochastic_deterministic_finite_automaton();
-//     let fout = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
-//     assert_eq!(fout, sdfa.to_string())
-// }
-
-// #[test]
-// fn sdfa_minprob_zero_loop() {
-//     let fin = fs::read_to_string("testfiles/a-loop.sdfa").unwrap();
-//     let sdfa = fin
-//         .parse::<StochasticDeterministicFiniteAutomaton>()
-//         .unwrap();
-//     let semantics = sdfa.to_stochastic_deterministic_semantics();
-
-//     assert!(semantics
-//         .analyse_minimum_probability(&Fraction::zero())
-//         .is_err());
-// }
-
 // #[test] //disabled until we can handle livelocks
 // fn sample_sdfa_no_language() {
 //     let fin1 = fs::read_to_string("testfiles/a-livelock-zeroweight.sdfa").unwrap();
@@ -75,9 +50,6 @@
 //     Fraction::set_exact_globally(true);
 // }
 #[cfg(test)]
-use std::fs::{self, DirEntry, File};
-
-#[cfg(test)]
 use crate::{
     ebi_framework::{
         ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
@@ -85,6 +57,8 @@ use crate::{
     },
     multiple_reader::MultipleReader,
 };
+#[cfg(test)]
+use std::fs::{self, DirEntry, File};
 
 #[cfg(test)]
 pub fn get_all_test_files() -> Vec<(
@@ -218,6 +192,21 @@ pub fn should_file_be_tested(
         && (file.file_name().into_string().unwrap() == "empty.ptree"
             || file.file_name().into_string().unwrap() == "empty_2.ptree"))
 }
+
+macro_rules! test_ebi_command {
+    ($name:ident) => {
+        #[cfg(test)]
+        pastey::paste! {
+            #[test]
+            #[ntest::timeout(200000)]
+            #[allow(non_snake_case)]
+            fn [<test_ebi_command_ $name>]() {
+                crate::ebi_framework::ebi_command::tests::ebi_command_test(&$name);
+            }
+        }
+    };
+}
+pub(crate) use test_ebi_command;
 
 #[cfg(test)]
 pub mod tests {

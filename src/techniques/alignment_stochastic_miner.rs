@@ -176,7 +176,7 @@ mod tests {
             bpmn.execute_transition(&mut marking, 2).unwrap();
         }
 
-        let sbpmn = bpmn.mine_stochastic_alignment(lang).unwrap();
+        let _sbpmn = bpmn.mine_stochastic_alignment(lang).unwrap();
         // dbg!(sbpmn);
     }
 }
