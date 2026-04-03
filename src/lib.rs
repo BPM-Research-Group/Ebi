@@ -1,5 +1,6 @@
 pub mod ebi_framework {
     pub mod displayable;
+    pub mod documentation;
     pub mod ebi_command;
     pub mod ebi_file_handler;
     pub mod ebi_importer_parameters;

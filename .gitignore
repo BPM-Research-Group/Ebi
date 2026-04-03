@@ -37,3 +37,5 @@ manual/graph.svg
 manual/graph.pdf
 manual/functions.tex
 */.DS_Store
+documentation/commands.html
+documentation/file_handlers.html

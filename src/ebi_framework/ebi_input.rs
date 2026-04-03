@@ -237,7 +237,87 @@ impl EbiInputType {
                     ));
                 }
                 EbiInputType::String(Some(allowed_values), _) => {
-                    result.insert(format!("either one of `{}`", allowed_values.join("`, `")));
+                    result.insert(format!(
+                        "either one of `{}`",
+                        allowed_values.join_with("`, `", "` or `")
+                    ));
+                }
+                EbiInputType::String(None, _) => {
+                    result.insert("text".to_string());
+                }
+                EbiInputType::Usize(Some(min), Some(max), _) => {
+                    result.insert(format!("integer between {} and {}", min, max));
+                }
+                EbiInputType::Usize(None, Some(max), _) => {
+                    result.insert(format!("integer below {}", max));
+                }
+                EbiInputType::Usize(Some(min), _, _) => {
+                    result.insert(format!("integer above {}", min));
+                }
+                EbiInputType::Usize(_, _, _) => {
+                    result.insert("integer".to_string());
+                }
+                EbiInputType::FileHandler => {
+                    let extensions: Vec<String> = EBI_FILE_HANDLERS
+                        .iter()
+                        .filter_map(|file_type| {
+                            if file_type.validator.is_some() {
+                                Some(file_type.file_extension.to_string())
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
+                    result.insert(
+                        "the file extension of any file type supported by Ebi (".to_owned()
+                            + extensions.join_with(", ", " or ").as_str()
+                            + ")",
+                    );
+                }
+                EbiInputType::Fraction(Some(min), Some(max), _) => {
+                    result.insert(format!("fraction between {} and {}", min, max));
+                }
+                EbiInputType::Fraction(None, Some(max), _) => {
+                    result.insert(format!("fraction below {}", max));
+                }
+                EbiInputType::Fraction(Some(min), _, _) => {
+                    result.insert(format!("fraction above {}", min));
+                }
+                EbiInputType::Fraction(_, _, _) => {
+                    result.insert("fraction".to_string());
+                }
+            };
+        }
+
+        result.into_iter().collect::<Vec<_>>()
+    }
+
+    pub fn get_possible_inputs_with_html(input_types: &[&EbiInputType]) -> Vec<String> {
+        let mut result = BTreeSet::new();
+
+        for input_type in input_types {
+            match input_type {
+                EbiInputType::Trait(t) => {
+                    result.extend(Self::show_file_handlers_html(t.get_file_handlers()));
+                }
+                EbiInputType::Object(o) => {
+                    result.extend(Self::show_file_handlers_html(get_file_handlers(o)));
+                    result.extend(
+                        Self::show_file_handlers_html(get_file_handlers_fallible(o))
+                            .into_iter()
+                            .map(|mut s| {
+                                s += "<span title=\"This file type is converted on import, and this conversion may fail.\">*</span>";
+                                s
+                            }),
+                    );
+                }
+                EbiInputType::AnyObject => {
+                    result.extend(Self::show_file_handlers_html(
+                        EBI_FILE_HANDLERS.iter().collect(),
+                    ));
+                }
+                EbiInputType::String(Some(allowed_values), _) => {
+                    result.extend(allowed_values.iter().map(|x| format!("`{}`", x)));
                 }
                 EbiInputType::String(None, _) => {
                     result.insert("text".to_string());
@@ -311,6 +391,18 @@ impl EbiInputType {
                 format!(
                     "\\hyperref[filehandler:{}]{{{}}}",
                     file_handler.name, file_handler
+                )
+            })
+            .collect::<Vec<_>>()
+    }
+
+    pub fn show_file_handlers_html(file_handlers: Vec<&'static EbiFileHandler>) -> Vec<String> {
+        file_handlers
+            .iter()
+            .map(|file_handler| {
+                format!(
+                    "{} (<a href=\"file_handlers.html#{}\">.{}</a>)",
+                    file_handler.name, file_handler.file_extension, file_handler.file_extension
                 )
             })
             .collect::<Vec<_>>()

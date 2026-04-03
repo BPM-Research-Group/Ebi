@@ -38,6 +38,11 @@ pub trait JavaEscaper {
     fn escape_java_code(&self) -> String;
 }
 
+pub trait HTMLEscaper {
+    fn escape_html(&self) -> String;
+    fn latex_to_html_string(&self) -> String;
+}
+
 impl<T> Joiner for &[T]
 where
     T: Display,
@@ -97,6 +102,19 @@ where
             .replace(' ', "_")
             .replace("-", "_")
             .replace(".", "_")
+    }
+}
+
+impl<T> HTMLEscaper for T
+where
+    T: AsRef<str>,
+{
+    fn escape_html(&self) -> String {
+        self.as_ref().replace('<', "&lt;").replace(">", "&gt;")
+    }
+
+    fn latex_to_html_string(&self) -> String {
+        self.as_ref().replace("\\_", "_")
     }
 }
 

@@ -1,10 +1,14 @@
-use crate::{ebi_framework::{
-    ebi_command::EbiCommand,
-    ebi_output::{EbiOutput, EbiOutputType},
-    manual::{graph, html, manual},
-}, tests::test_ebi_command};
 #[cfg(feature = "java")]
 use crate::prom::prom_plugin_generator::print_java_plugins;
+use crate::{
+    ebi_framework::{
+        documentation::{documentation_commands, documentation_filehandlers},
+        ebi_command::EbiCommand,
+        ebi_output::{EbiOutput, EbiOutputType},
+        manual::{graph, html, manual},
+    },
+    tests::test_ebi_command,
+};
 use ebi_objects::{EbiObject, EbiObjectType, ebi_objects::scalable_vector_graphics::ToSVGMut};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
@@ -30,6 +34,7 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
     explanation_short: "Print things on Ebi.",
     explanation_long: None,
     children: &[
+        &EBI_ITSELF_DOCUMENTATION,
         &EBI_ITSELF_GRAPH,
         &EBI_ITSELF_HTML,
         #[cfg(feature = "java")]
@@ -41,6 +46,47 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
     ],
 };
 test_ebi_command!(EBI_ITSELF);
+
+pub const EBI_ITSELF_DOCUMENTATION: EbiCommand = EbiCommand::Group {
+    name_short: "docs",
+    name_long: Some("documentation"),
+    explanation_short: "Print the HTML documentation of Ebi.",
+    explanation_long: None,
+    children: &[
+        &EBI_ITSELF_DOCUMENTATION_COMMANDS,
+        &EBI_ITSELF_DOCUMENTATION_FILE_HANDLERS,
+    ],
+};
+
+pub const EBI_ITSELF_DOCUMENTATION_COMMANDS: EbiCommand = EbiCommand::Command {
+    name_short: "comm",
+    name_long: Some("commands"),
+    explanation_short: "Print the HTML documentation of Ebi's commands.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[],
+    input_names: &[],
+    input_helps: &[],
+    execute: |_, _| Ok(documentation_commands()?),
+    output_type: &EbiOutputType::String,
+};
+
+pub const EBI_ITSELF_DOCUMENTATION_FILE_HANDLERS: EbiCommand = EbiCommand::Command {
+    name_short: "fhs",
+    name_long: Some("file_handlers"),
+    explanation_short: "Print the HTML documentation of Ebi's file handlers.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[],
+    input_names: &[],
+    input_helps: &[],
+    execute: |_, _| Ok(documentation_filehandlers()?),
+    output_type: &EbiOutputType::String,
+};
 
 pub const EBI_ITSELF_LOGO: EbiCommand = EbiCommand::Command {
     name_short: "log",
