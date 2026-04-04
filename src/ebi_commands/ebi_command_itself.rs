@@ -75,7 +75,7 @@ pub const EBI_ITSELF_DOCUMENTATION_COMMANDS: EbiCommand = EbiCommand::Command {
 
 pub const EBI_ITSELF_DOCUMENTATION_FILE_HANDLERS: EbiCommand = EbiCommand::Command {
     name_short: "fhs",
-    name_long: Some("file_handlers"),
+    name_long: Some("file-handlers"),
     explanation_short: "Print the HTML documentation of Ebi's file handlers.",
     explanation_long: None,
     latex_link: None,

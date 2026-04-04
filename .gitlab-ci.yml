@@ -27,7 +27,7 @@ buildlatex:
     #compile documentation
     - cd documentation
     - cargo run itself documentation commands -o commands.html
-    - cargo run itself documentation file_handlers -o file_handlers.html
+    - cargo run itself documentation file-handlers -o file_handlers.html
     - cd ..
     - mv documentation/commands.html build/nightly/commands.html
     - mv documentation/file_handlers.html build/nightly/file_handlers.html
