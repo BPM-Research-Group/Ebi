@@ -891,6 +891,7 @@ impl Debug for EbiObjectImporter {
     }
 }
 
+#[derive(Debug)]
 pub enum FallibleImporterError {
     ImporterError(Error),
     ConversionError(Error),

@@ -1,15 +1,23 @@
 use crate::{
     ebi_framework::{
         ebi_command::{EBI_COMMANDS, EbiCommand},
+        ebi_file_handler::EBI_FILE_HANDLERS,
         ebi_input::{self, EbiInputType},
         ebi_output::{EbiExporter, EbiOutput, EbiOutputType},
     },
+    multiple_reader::MultipleReader,
     text::HTMLEscaper,
 };
 use clap::Command;
 use ebi_optimisation::anyhow::Result;
 use inflector::Inflector;
-use std::io::Write;
+use itertools::Itertools;
+use regex::{Captures, Regex};
+use std::{
+    collections::BTreeSet,
+    fs::{self, File},
+    io::Write,
+};
 
 pub fn page_start(f: &mut Vec<u8>) -> Result<()> {
     // #016764, #005958, #014848, #00312F, #001E1E
@@ -20,30 +28,25 @@ pub fn page_start(f: &mut Vec<u8>) -> Result<()> {
         <head>
             <title>Ebi - a stochastic process mining tool</title>
             <link rel=\"shortcut icon\" href=\"https://bpm.rwth-aachen.de/favicon.png\">
-            <style>
-            body {{
-                background-color: #001E1E;
-                color: #019a94;
-            }}
-            td {{
-                vertical-align: top;
-            }}
-            a {{
-                color: #019a94;
-            }}
-            table tr:not(:first-child) td {{
-                padding-top: 20px;
-            }}
-            .selectable {{
-                display: none;
-            }}
-            .selectable:target {{
-                display: block;
-            }}
-            .parameter {{
-                font-family: monospace;
-            }}
-            </style>
+            <link rel=\"stylesheet\" href=\"documentation.css\">
+            <script>
+                function myFunction0() {{
+                    var x = document.getElementById(\"menu0\");
+                    if (x.className === \"menu0\") {{
+                        x.className += \" responsive\";
+                    }} else {{
+                        x.className = \"menu0\";
+                    }}
+                }}
+                function myFunction1() {{
+                    var x = document.getElementById(\"menu1\");
+                    if (x.className === \"menu1\") {{
+                        x.className += \" responsive\";
+                    }} else {{
+                        x.className = \"menu1\";
+                    }}
+                }}
+            </script>
         </head>
         <body>"
     )?;
@@ -62,7 +65,8 @@ fn page_end(f: &mut Vec<u8>) -> Result<()> {
 pub fn documentation_filehandlers() -> Result<EbiOutput> {
     let mut f = vec![];
     page_start(&mut f)?;
-    writeln!(f, "file handlers")?;
+    menu_file_handlers(&mut f)?;
+    file_handlers(&mut f)?;
     page_end(&mut f)?;
     Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
 }
@@ -76,8 +80,22 @@ pub fn documentation_commands() -> Result<EbiOutput> {
     Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
 }
 
+fn menu_0(f: &mut Vec<u8>) -> Result<()> {
+    writeln!(f, "<div class=\"menu0\" id =\"menu0\">")?;
+    writeln!(f, "<a href=\"../index.html\">Ebi</a>")?;
+    writeln!(f, "<a href=\"commands.html\">Commands</a>")?;
+    writeln!(f, "<a href=\"file_handlers.html\">Files</a>")?;
+    writeln!(
+        f,
+        "<a href=\"javascript:void(0);\" class=\"expand\" onclick=\"myFunction0()\">...</a>"
+    )?;
+    writeln!(f, "</div>")?;
+    Ok(())
+}
+
 fn menu_commands(f: &mut Vec<u8>) -> Result<()> {
-    writeln!(f, "<div class=\"menu\">")?;
+    menu_0(f)?;
+    writeln!(f, "<div class=\"menu1\" id =\"menu1\">")?;
     for path in EBI_COMMANDS.get_command_paths() {
         writeln!(
             f,
@@ -86,8 +104,142 @@ fn menu_commands(f: &mut Vec<u8>) -> Result<()> {
             EbiCommand::path_to_string(&[path.last().unwrap()])
         )?;
     }
-
+    writeln!(
+        f,
+        "<a href=\"javascript:void(0);\" class=\"expand\" onclick=\"myFunction1()\">...</a>"
+    )?;
     writeln!(f, "</div>")?;
+    Ok(())
+}
+
+fn menu_file_handlers(f: &mut Vec<u8>) -> Result<()> {
+    menu_0(f)?;
+    writeln!(f, "<div class=\"menu1\" id =\"menu1\">")?;
+    let file_handlers: BTreeSet<_> = EBI_FILE_HANDLERS
+        .iter()
+        .map(|file_handler| file_handler.file_extension)
+        .collect();
+    for extension in file_handlers {
+        writeln!(f, "<a href=\"#{}\">{}</a>", extension, extension)?;
+    }
+    writeln!(
+        f,
+        "<a href=\"javascript:void(0);\" class=\"expand\" onclick=\"myFunction1()\">...</a>"
+    )?;
+    writeln!(f, "</div>")?;
+    Ok(())
+}
+
+fn file_handlers(f: &mut Vec<u8>) -> Result<()> {
+    for file_handler in EBI_FILE_HANDLERS {
+        writeln!(
+            f,
+            "<div class=\"selectable command\" id=\"{}\">",
+            file_handler.file_extension
+        )?;
+        writeln!(
+            f,
+            "<h1>{} (.{})</h1>",
+            file_handler.name.to_sentence_case(),
+            file_handler.file_extension
+        )?;
+
+        //input
+        if file_handler.get_applicable_commands().is_empty() {
+            writeln!(
+                f,
+                "<div>{} {} file cannot serve as input to any command.</div>",
+                file_handler.article.to_sentence_case(),
+                file_handler.name
+            )?;
+        } else {
+            writeln!(
+                f,
+                "<div>{} {} file can serve as input to the following commands: <ul><li>{}</li></ul></div>",
+                file_handler.article.to_sentence_case(),
+                file_handler.name,
+                file_handler
+                    .get_applicable_commands()
+                    .iter()
+                    .map(|path| format!(
+                        "<a href=\"commands.html#{}\">{}</a>",
+                        EbiCommand::path_to_short_string(path),
+                        EbiCommand::path_to_string(path)
+                    ))
+                    .join("</li><li>")
+            )?;
+        }
+
+        //output
+        if file_handler.get_producing_commands().is_empty() {
+            writeln!(
+                f,
+                "<div>{} {} file cannot be the output of any command.</div>",
+                file_handler.article.to_sentence_case(),
+                file_handler.name
+            )?;
+        } else {
+            writeln!(
+                f,
+                "<div>{} {} file can be the output of the following commands: <ul><li>{}</li></ul></div>",
+                file_handler.article.to_sentence_case(),
+                file_handler.name,
+                file_handler
+                    .get_producing_commands()
+                    .iter()
+                    .map(|path| format!(
+                        "<a href=\"commands.html#{}\">{}</a>",
+                        EbiCommand::path_to_short_string(path),
+                        EbiCommand::path_to_string(path)
+                    ))
+                    .join("</li><li>")
+            )?;
+        }
+
+        let regex = Regex::new("\\\\lstinputlisting\\[[^\\]]*\\]\\{([^\\}]*)\\}").unwrap();
+        writeln!(
+            f,
+            "<div>File format specification: {}</div>",
+            regex.replace_all(
+                &file_handler.format_specification.latex_to_html_string(),
+                |caps: &Captures| {
+                    let file_name = &caps[1].replacen(".", "", 1); //the files are in a subdirectory and use `..`; remove the first `.`.
+
+                    //test whether the file is actually valid for this file handler.
+                    {
+                        let mut reader =
+                            MultipleReader::from_file(File::open(file_name).expect(&format!(
+                                "Something went wrong with reading {}.",
+                                file_name
+                            )));
+                        if let Some(importer) = &file_handler.object_importers.iter().next() {
+                            (importer.get_importer())(
+                                &mut reader.get().unwrap(),
+                                &importer.default_parameter_values(),
+                            )
+                            .unwrap();
+                        } else if let Some(importer) =
+                            &file_handler.object_importers_fallible.iter().next()
+                        {
+                            (importer.get_importer())(
+                                &mut reader.get().unwrap(),
+                                &importer.default_parameter_values(),
+                            )
+                            .unwrap();
+                        } else {
+                            //no importer found
+                        }
+                    }
+                    format!(
+                        "<pre>{}</pre>",
+                        fs::read_to_string(file_name).unwrap().escape_html()
+                    )
+                }
+            )
+        )?;
+
+        writeln!(f, "</div>")?;
+    }
     Ok(())
 }
 
@@ -286,7 +438,7 @@ fn command_output_type(f: &mut Vec<u8>, output_type: &EbiOutputType) -> Result<(
         )?;
         writeln!(
             f,
-            "<td>The file format as which Ebi should write the result. Given as the file extension without period. Possible values are: <ul><li>{}</li></ul>",
+            "<td>The file format as which Ebi should write the result. To be given as the file extension without period. Possible values are: <ul><li>{}</li></ul>",
             output_extensions
         )?;
         writeln!(

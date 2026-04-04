@@ -114,7 +114,21 @@ where
     }
 
     fn latex_to_html_string(&self) -> String {
-        self.as_ref().replace("\\_", "_")
+        let regex_cite = Regex::new("~\\\\cite\\{[^\\}]*\\}").unwrap();
+        let regex_texttt = Regex::new("\\\\texttt\\{([^\\}]*)\\}").unwrap();
+        regex_texttt
+            .replace_all(
+                &regex_cite.replace_all(
+                    &self
+                        .as_ref()
+                        .replace("\\_", "_")
+                        .replace("\\$", "$")
+                        .replace("$\\leq$", "&lt;"),
+                    "",
+                ),
+                "<span class=\"texttt\">${1}</span>",
+            )
+            .to_string()
     }
 }
 
