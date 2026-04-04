@@ -8,6 +8,9 @@ td {
 a {
     color: #019a94;
 }
+a:hover {
+    color: white;
+}
 table tr:not(:first-child) td {
     padding-top: 20px;
 }
@@ -18,11 +21,30 @@ table tr:not(:first-child) td {
     display: block;
 }
 .parameter {
-    font-family: monospace;
+    font-family: monospace, monospace;
 }
 .texttt {
-    font-family: monospace;
+    font-family: monospace, monospace;
 }
+pre {
+    background-color: #00312F;
+    counter-reset: line;
+    overflow-x: scroll;
+}
+pre code {
+    counter-increment: line;
+}
+pre code:before {
+    content: counter(line);
+    display: inline-block;
+    border-right: 2px solid #001E1E;
+    padding: 0 .5em;
+    margin-right: .5em;
+    color: #888;
+    width: 1.3em;
+    text-align: right;
+}
+
 .menu0 {
     background-color: #016764;
     overflow: hidden;
@@ -62,6 +84,24 @@ table tr:not(:first-child) td {
 }
 .menu1 a.expand {
     display: none;
+}
+
+a.selectable {
+    display: block;
+    background-color: #00312F;
+    color: white;
+    margin-top: 1px;
+    padding: 5px 10px;
+    text-decoration: none;
+    font-size: 14px;
+}
+a.selectable:hover {
+    background-color: white;
+    color: #005958;
+}
+div.selectable {
+    padding-left: 20px;
+    margin-bottom: 30px;
 }
 
 

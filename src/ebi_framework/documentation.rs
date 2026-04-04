@@ -65,7 +65,7 @@ fn page_end(f: &mut Vec<u8>) -> Result<()> {
 pub fn documentation_filehandlers() -> Result<EbiOutput> {
     let mut f = vec![];
     page_start(&mut f)?;
-    menu_file_handlers(&mut f)?;
+    menu_0(&mut f)?;
     file_handlers(&mut f)?;
     page_end(&mut f)?;
     Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
@@ -74,7 +74,7 @@ pub fn documentation_filehandlers() -> Result<EbiOutput> {
 pub fn documentation_commands() -> Result<EbiOutput> {
     let mut f = vec![];
     page_start(&mut f)?;
-    menu_commands(&mut f)?;
+    menu_0(&mut f)?;
     commands(&mut f)?;
     page_end(&mut f)?;
     Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
@@ -93,48 +93,17 @@ fn menu_0(f: &mut Vec<u8>) -> Result<()> {
     Ok(())
 }
 
-fn menu_commands(f: &mut Vec<u8>) -> Result<()> {
-    menu_0(f)?;
-    writeln!(f, "<div class=\"menu1\" id =\"menu1\">")?;
-    for path in EBI_COMMANDS.get_command_paths() {
-        writeln!(
-            f,
-            "<a href=\"#{}\">{}</a>",
-            EbiCommand::path_to_short_string(&path),
-            EbiCommand::path_to_string(&[path.last().unwrap()])
-        )?;
-    }
-    writeln!(
-        f,
-        "<a href=\"javascript:void(0);\" class=\"expand\" onclick=\"myFunction1()\">...</a>"
-    )?;
-    writeln!(f, "</div>")?;
-    Ok(())
-}
-
-fn menu_file_handlers(f: &mut Vec<u8>) -> Result<()> {
-    menu_0(f)?;
-    writeln!(f, "<div class=\"menu1\" id =\"menu1\">")?;
-    let file_handlers: BTreeSet<_> = EBI_FILE_HANDLERS
-        .iter()
-        .map(|file_handler| file_handler.file_extension)
-        .collect();
-    for extension in file_handlers {
-        writeln!(f, "<a href=\"#{}\">{}</a>", extension, extension)?;
-    }
-    writeln!(
-        f,
-        "<a href=\"javascript:void(0);\" class=\"expand\" onclick=\"myFunction1()\">...</a>"
-    )?;
-    writeln!(f, "</div>")?;
-    Ok(())
-}
-
 fn file_handlers(f: &mut Vec<u8>) -> Result<()> {
-    for file_handler in EBI_FILE_HANDLERS {
+    let file_handlers = EBI_FILE_HANDLERS.iter().collect::<BTreeSet<_>>();
+    for file_handler in file_handlers {
         writeln!(
             f,
-            "<div class=\"selectable command\" id=\"{}\">",
+            "<a href=\"#{}\" class=\"selectable\">{} (.{})</a>",
+            file_handler.file_extension, file_handler.name, file_handler.file_extension
+        )?;
+        writeln!(
+            f,
+            "<div class=\"selectable filehandler\" id=\"{}\">",
             file_handler.file_extension
         )?;
         writeln!(
@@ -231,8 +200,11 @@ fn file_handlers(f: &mut Vec<u8>) -> Result<()> {
                         }
                     }
                     format!(
-                        "<pre>{}</pre>",
-                        fs::read_to_string(file_name).unwrap().escape_html()
+                        "<pre><code>{}</code></pre>",
+                        fs::read_to_string(file_name)
+                            .unwrap()
+                            .escape_html()
+                            .replace("\n", "</code>\n<code>")
                     )
                 }
             )
@@ -259,7 +231,14 @@ fn commands(f: &mut Vec<u8>) -> Result<()> {
             output_type,
             ..
         } = path[path.len() - 1]
+            && input_typess.len() > 0
         {
+            writeln!(
+                f,
+                "<a href=\"#{}\" class=\"selectable\">{}</a>",
+                EbiCommand::path_to_short_string(&path),
+                EbiCommand::path_to_string(&path)
+            )?;
             writeln!(
                 f,
                 "<div class=\"selectable command\" id=\"{}\">",
@@ -423,9 +402,12 @@ fn command_output_type(f: &mut Vec<u8>, output_type: &EbiOutputType) -> Result<(
         let output_extensions = output_type
             .get_exporters()
             .iter()
+            .collect::<BTreeSet<_>>()
+            .iter()
             .map(|exporter| {
                 format!(
-                    "<span class=\"parameter\">{}</span> ({})",
+                    "<a href=\"file_handlers.html#{}\" class=\"parameter\">{}</a> ({})",
+                    exporter.get_extension(),
                     exporter.get_extension(),
                     exporter.get_name()
                 )
@@ -501,6 +483,8 @@ pub fn output_types(output_type: &EbiOutputType) -> String {
     let mut list = output_type
         .get_exporters()
         .into_iter()
+        .collect::<BTreeSet<_>>()
+        .iter()
         .map(|exp| match exp {
             EbiExporter::Object(_, file_handler) => format!(
                 "{} (<a href=\"file_handlers.html#{}\">.{}</a>)",

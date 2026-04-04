@@ -1,4 +1,4 @@
-use regex::Regex;
+use regex::{Captures, Regex};
 use std::fmt::Display;
 
 pub trait Rank {
@@ -114,21 +114,57 @@ where
     }
 
     fn latex_to_html_string(&self) -> String {
+        let regex_tabularx = Regex::new(
+            "(?s)\\\\begin\\{tabularx\\}\\{[^\\}]*\\}\\{[^\\}]*\\}(.*)\\\\end\\{tabularx\\}",
+        )
+        .unwrap();
+        let base = regex_tabularx.replace_all(self.as_ref(), |caps: &Captures| {
+            let x = caps[1].to_string();
+            let x = x
+                .replace("&", "</td><td>")
+                .replace("\\\\", "</td></tr><tr><td>")
+                .replace("\\toprule", "")
+                .replace("\\midrule", "")
+                .replace("\\bottomrule", "");
+            format!("<table><tr><td>{}</td></tr></table>", x)
+        });
+
+        let base = &base
+            .replace("\\\\", "<br>")
+            .replace("\\_", "_")
+            .replace("\\$", "$")
+            .replace("\\#", "#")
+            .replace("$\\leq$", "&lt;");
+
         let regex_cite = Regex::new("~\\\\cite\\{[^\\}]*\\}").unwrap();
+        let base = regex_cite.replace_all(base, "");
+
         let regex_texttt = Regex::new("\\\\texttt\\{([^\\}]*)\\}").unwrap();
-        regex_texttt
-            .replace_all(
-                &regex_cite.replace_all(
-                    &self
-                        .as_ref()
-                        .replace("\\_", "_")
-                        .replace("\\$", "$")
-                        .replace("$\\leq$", "&lt;"),
-                    "",
-                ),
-                "<span class=\"texttt\">${1}</span>",
-            )
-            .to_string()
+        let base = regex_texttt.replace_all(&base, "<span class=\"texttt\">${1}</span>");
+
+        let regex_center = Regex::new("(?s)\\\\begin\\{center\\}(.*)\\\\end\\{center\\}").unwrap();
+        let base = regex_center.replace_all(&base, "<br>${1}<br>");
+
+        let regex_rotate = Regex::new("(?s)\\\\rotatebox\\{([0-9]+)\\}\\{([^\\}]*)\\}").unwrap();
+        let base = regex_rotate.replace_all(&base, "${2}");
+
+        let regex_link =
+            Regex::new("\\\\hyperref\\[filehandler:[^\\]]*\\]\\{([^(]*)\\(\\.([^)]*)\\)\\}")
+                .unwrap();
+        let base = regex_link.replace_all(
+            &base,
+            "${1} (<a href=\"file_handlers.html#${2}\">.${2}</a>)",
+        );
+
+        let regex_itemize =
+            Regex::new("(?s)\\\\begin\\{itemize\\}(.*)\\\\end\\{itemize\\}").unwrap();
+        let base = regex_itemize.replace_all(&base, |caps: &Captures| {
+            let x = caps[1].to_string();
+            let x = x.replace("\\item", "<li>");
+            format!("<ul>{}</ul>", x)
+        });
+
+        base.to_string()
     }
 }
 

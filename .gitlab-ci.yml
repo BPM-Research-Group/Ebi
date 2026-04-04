@@ -24,6 +24,16 @@ buildlatex:
     - mv manual/manual.pdf build/nightly/manual.pdf
     - git add build/nightly/manual.pdf
 
+    #compile documentation
+    - cd documentation
+    - cargo run itself documentation commands -o commands.html
+    - cargo run itself documentation file_handlers -o file_handlers.html
+    - cd ..
+    - mv documentation/commands.html build/nightly/commands.html
+    - mv documentation/file_handlers.html build/nightly/file_handlers.html
+    - git add build/nightly/commands.html
+    - git add build/nightly/file_handlers.html
+
     #compile html
     - cargo run itself html -o build/nightly/commands.html
     - git add build/nightly/commands.html

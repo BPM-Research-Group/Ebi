@@ -366,7 +366,7 @@ impl Display for EbiOutputType {
     }
 }
 
-#[derive(Debug, Clone, Hash)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum EbiExporter {
     Object(&'static EbiObjectExporter, &'static EbiFileHandler),
     String,
@@ -480,7 +480,7 @@ impl Display for EbiExporter {
     }
 }
 
-#[derive(Hash, IntoStaticStr)]
+#[derive(Hash, IntoStaticStr, Eq)]
 pub enum EbiObjectExporter {
     BusinessProcessModelAndNotation(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLog(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
@@ -634,6 +634,24 @@ impl Debug for EbiObjectExporter {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let right: &'static str = self.into();
         write!(f, "{}", right)
+    }
+}
+
+impl PartialEq for EbiObjectExporter {
+    fn eq(&self, other: &Self) -> bool {
+        self.get_type() == other.get_type()
+    }
+}
+
+impl PartialOrd for EbiObjectExporter {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.get_type().partial_cmp(&other.get_type())
+    }
+}
+
+impl Ord for EbiObjectExporter {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.get_type().cmp(&other.get_type())
     }
 }
 
