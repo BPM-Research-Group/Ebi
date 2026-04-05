@@ -171,11 +171,21 @@ where
     fn md_to_html_string(&self) -> String {
         let base = self.as_ref();
 
-        let regex_enumerate = Regex::new("(?m)(?s)(((^1\\.[^\\n]*\\n)+(\\n|(    |\\t)[^\\n]*\\n)*)+)").unwrap();
+        let regex_enumerate =
+            Regex::new("(?m)(?s)(((^1\\.[^\\n]*\\n)+(\\n|(    |\\t)[^\\n]*\\n)*)+)").unwrap();
         let base = regex_enumerate.replace_all(&base, |caps: &Captures| {
             let regex_item = Regex::new("(?m)^1\\.").unwrap();
             let x = caps[1].to_string();
             let x = regex_item.replace_all(&x, "<li>\n");
+
+            let regex_code = Regex::new("(?m)((^(?:        |\\t\\t)([^\\n]*\\n))+)").unwrap();
+            let x = regex_code.replace_all(&x, |caps: &Captures| {
+                let regex_space = Regex::new("(?:        |\\t\\t)(([^\\n]*\\n))").unwrap();
+                format!(
+                    "<pre>{}</pre>",
+                    regex_space.replace_all(&caps[1], "<code>${1}</code>")
+                )
+            });
             format!("<ol>{}</ol>\n", x)
         });
 
@@ -187,8 +197,6 @@ where
 
         let regex_link = Regex::new("\\[([^\\]]*)\\]\\(([^\\)]*)\\)").unwrap();
         let base = regex_link.replace_all(&base, "<a href=\"${2}\">${1}</a>");
-
-        println!("{:?}", base);
 
         let regex_newline = Regex::new("(?m)\\n\\n+").unwrap();
         let base = regex_newline.replace_all(&base, "<p>\n");

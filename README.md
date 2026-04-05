@@ -23,8 +23,8 @@ Please see below.
 
         pip install ebi-pm
 
-1. Then, one can use it as follows:
-        
+1. Then, one can use Ebi as follows:
+
         import pm4py
         import ebi
         # Load a log using PM4Py
@@ -63,4 +63,5 @@ Ebi is hosted on [Github](https://github.com/BPM-Research-Group/Ebi), and we wel
 1. In Visual Studio Code, install the extension [rust-analyzer](https://code.visualstudio.com/docs/languages/rust)
 1. With a browser, go to the project on [Github](https://github.com/BPM-Research-Group/Ebi), choose "Clone", "Visual Studio Code (SSH)", and clone it in Visual Studio Code.
 1. To run Ebi, use the terminal of Visual Studio Code to give the command "cargo run --" instead of "Ebi". Everything else is equivalent to the commands mentioned in the manual.
+1. To compile Ebi, give the command "cargo build --release". The binary is then placed in the project folder, in the "build/release" sub-folder.
 
