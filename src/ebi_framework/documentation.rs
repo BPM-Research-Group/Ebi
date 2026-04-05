@@ -19,6 +19,10 @@ use std::{
     io::Write,
 };
 
+pub const COMMANDS_PAGE: &str = "https://leemans.ch/ebi/commands.php";
+pub const FILE_HANDLERS_PAGE: &str = "https://leemans.ch/ebi/file_handlers.php";
+pub const CSS: &str = "https://leemans.ch/ebi/stijlen.php";
+
 pub fn page_start(f: &mut Vec<u8>) -> Result<()> {
     // #016764, #005958, #014848, #00312F, #001E1E
     writeln!(
@@ -28,7 +32,7 @@ pub fn page_start(f: &mut Vec<u8>) -> Result<()> {
         <head>
             <title>Ebi - a stochastic process mining tool</title>
             <link rel=\"shortcut icon\" href=\"https://bpm.rwth-aachen.de/favicon.png\">
-            <link rel=\"stylesheet\" href=\"documentation.css\">
+            <link rel=\"stylesheet\" href=\"{}\">
             <script>
                 function myFunction0() {{
                     var x = document.getElementById(\"menu0\");
@@ -40,7 +44,8 @@ pub fn page_start(f: &mut Vec<u8>) -> Result<()> {
                 }}
             </script>
         </head>
-        <body>"
+        <body>",
+        CSS
     )?;
     Ok(())
 }
@@ -75,8 +80,8 @@ pub fn documentation_commands() -> Result<EbiOutput> {
 fn menu_0(f: &mut Vec<u8>) -> Result<()> {
     writeln!(f, "<div class=\"menu0\" id =\"menu0\">")?;
     writeln!(f, "<a href=\"index.html\">Ebi</a>")?;
-    writeln!(f, "<a href=\"commands.html\">Commands</a>")?;
-    writeln!(f, "<a href=\"file_handlers.html\">Files</a>")?;
+    writeln!(f, "<a href=\"{}\">Commands</a>", COMMANDS_PAGE)?;
+    writeln!(f, "<a href=\"{}\">Files</a>", FILE_HANDLERS_PAGE)?;
     writeln!(
         f,
         "<a href=\"javascript:void(0);\" class=\"expand\" onclick=\"myFunction0()\">...</a>"
@@ -125,7 +130,8 @@ fn file_handlers(f: &mut Vec<u8>) -> Result<()> {
                     .get_applicable_commands()
                     .iter()
                     .map(|path| format!(
-                        "<a href=\"commands.html#{}\">{}</a>",
+                        "<a href=\"{}#{}\">{}</a>",
+                        COMMANDS_PAGE,
                         EbiCommand::path_to_short_string(path),
                         EbiCommand::path_to_string(path)
                     ))
@@ -151,7 +157,8 @@ fn file_handlers(f: &mut Vec<u8>) -> Result<()> {
                     .get_producing_commands()
                     .iter()
                     .map(|path| format!(
-                        "<a href=\"commands.html#{}\">{}</a>",
+                        "<a href=\"{}#{}\">{}</a>",
+                        COMMANDS_PAGE,
                         EbiCommand::path_to_short_string(path),
                         EbiCommand::path_to_string(path)
                     ))
@@ -400,7 +407,8 @@ fn command_output_type(f: &mut Vec<u8>, output_type: &EbiOutputType) -> Result<(
             .iter()
             .map(|exporter| {
                 format!(
-                    "<a href=\"file_handlers.html#{}\" class=\"parameter\">{}</a> ({})",
+                    "<a href=\"{}#{}\" class=\"parameter\">{}</a> ({})",
+                    FILE_HANDLERS_PAGE,
                     exporter.get_extension(),
                     exporter.get_extension(),
                     exporter.get_name()
@@ -450,16 +458,18 @@ fn command_output(f: &mut Vec<u8>, output_type: &EbiOutputType) -> Result<()> {
     }
     let default = if output_type.get_exporters().len() > 1 {
         format!(
-            "in the file format specified by <span class=\"parameter\">-t</span>, which by default is {} {} (<a href=\"file_handlers.html#{}\">.{}</a>)",
+            "in the file format specified by <span class=\"parameter\">-t</span>, which by default is {} {} (<a href=\"{}#{}\">.{}</a>)",
             output_type.get_default_exporter().get_extension(),
             output_type.get_default_exporter().get_name(),
+            FILE_HANDLERS_PAGE,
             output_type.get_default_exporter().get_extension(),
             output_type.get_default_exporter().get_extension()
         )
     } else {
         format!(
-            "in the file format of {} (<a href=\"file_handlers.html#{}\">.{}</a>)",
+            "in the file format of {} (<a href=\"{}#{}\">.{}</a>)",
             output_type.get_default_exporter().get_name(),
+            FILE_HANDLERS_PAGE,
             output_type.get_default_exporter().get_extension(),
             output_type.get_default_exporter().get_extension()
         )
@@ -481,8 +491,11 @@ pub fn output_types(output_type: &EbiOutputType) -> String {
         .iter()
         .map(|exp| match exp {
             EbiExporter::Object(_, file_handler) => format!(
-                "{} (<a href=\"file_handlers.html#{}\">.{}</a>)",
-                file_handler.name, file_handler.file_extension, file_handler.file_extension
+                "{} (<a href=\"{}#{}\">.{}</a>)",
+                file_handler.name,
+                FILE_HANDLERS_PAGE,
+                file_handler.file_extension,
+                file_handler.file_extension
             ),
             _ => exp.to_string(),
         })
@@ -511,7 +524,11 @@ pub fn documentation_home() -> Result<EbiOutput> {
     let mut f = vec![];
     page_start(&mut f)?;
     menu_0(&mut f)?;
-    writeln!(f, "{}", fs::read_to_string("README.md").unwrap().md_to_html_string())?;
+    writeln!(
+        f,
+        "{}",
+        fs::read_to_string("README.md").unwrap().md_to_html_string()
+    )?;
     page_end(&mut f)?;
     Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
 }

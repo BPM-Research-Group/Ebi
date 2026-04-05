@@ -31,11 +31,11 @@ buildlatex:
     - mv documentation/index.html build/nightly/index.html
     - mv documentation/commands.html build/nightly/commands.html
     - mv documentation/file_handlers.html build/nightly/file_handlers.html
-    - mv documentation/documentation.css build/nightly/documentation.css
+    - mv documentation/documentation.css build/nightly/stijlen.css
     - git add build/nightly/index.html
     - git add build/nightly/commands.html
     - git add build/nightly/file_handlers.html
-    - git add build/nightly/documentation.css
+    - git add build/nightly/stijlen.css
 
     #compile linux 64 bit
     - cargo build --target x86_64-unknown-linux-gnu --release
