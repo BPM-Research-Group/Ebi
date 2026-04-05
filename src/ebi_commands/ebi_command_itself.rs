@@ -2,7 +2,7 @@
 use crate::prom::prom_plugin_generator::print_java_plugins;
 use crate::{
     ebi_framework::{
-        documentation::{documentation_commands, documentation_filehandlers},
+        documentation::{documentation_commands, documentation_filehandlers, documentation_home},
         ebi_command::EbiCommand,
         ebi_output::{EbiOutput, EbiOutputType},
         manual::{graph, html, manual},
@@ -55,6 +55,7 @@ pub const EBI_ITSELF_DOCUMENTATION: EbiCommand = EbiCommand::Group {
     children: &[
         &EBI_ITSELF_DOCUMENTATION_COMMANDS,
         &EBI_ITSELF_DOCUMENTATION_FILE_HANDLERS,
+        &EBI_ITSELF_DOCUMENTATION_HOME,
     ],
 };
 
@@ -85,6 +86,21 @@ pub const EBI_ITSELF_DOCUMENTATION_FILE_HANDLERS: EbiCommand = EbiCommand::Comma
     input_names: &[],
     input_helps: &[],
     execute: |_, _| Ok(documentation_filehandlers()?),
+    output_type: &EbiOutputType::String,
+};
+
+pub const EBI_ITSELF_DOCUMENTATION_HOME: EbiCommand = EbiCommand::Command {
+    name_short: "home",
+    name_long: None,
+    explanation_short: "Print the HTML home of Ebi's documentation.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[],
+    input_names: &[],
+    input_helps: &[],
+    execute: |_, _| Ok(documentation_home()?),
     output_type: &EbiOutputType::String,
 };
 

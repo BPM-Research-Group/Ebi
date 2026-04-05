@@ -38,14 +38,6 @@ pub fn page_start(f: &mut Vec<u8>) -> Result<()> {
                         x.className = \"menu0\";
                     }}
                 }}
-                function myFunction1() {{
-                    var x = document.getElementById(\"menu1\");
-                    if (x.className === \"menu1\") {{
-                        x.className += \" responsive\";
-                    }} else {{
-                        x.className = \"menu1\";
-                    }}
-                }}
             </script>
         </head>
         <body>"
@@ -82,7 +74,7 @@ pub fn documentation_commands() -> Result<EbiOutput> {
 
 fn menu_0(f: &mut Vec<u8>) -> Result<()> {
     writeln!(f, "<div class=\"menu0\" id =\"menu0\">")?;
-    writeln!(f, "<a href=\"../index.html\">Ebi</a>")?;
+    writeln!(f, "<a href=\"index.html\">Ebi</a>")?;
     writeln!(f, "<a href=\"commands.html\">Commands</a>")?;
     writeln!(f, "<a href=\"file_handlers.html\">Files</a>")?;
     writeln!(
@@ -99,7 +91,9 @@ fn file_handlers(f: &mut Vec<u8>) -> Result<()> {
         writeln!(
             f,
             "<a href=\"#{}\" class=\"selectable\">{} (.{})</a>",
-            file_handler.file_extension, file_handler.name, file_handler.file_extension
+            file_handler.file_extension,
+            file_handler.name.to_sentence_case(),
+            file_handler.file_extension
         )?;
         writeln!(
             f,
@@ -511,4 +505,13 @@ fn command_exact_arithmetic(f: &mut Vec<u8>, exact_arithmetic: bool) -> Result<(
         )?;
     }
     Ok(())
+}
+
+pub fn documentation_home() -> Result<EbiOutput> {
+    let mut f = vec![];
+    page_start(&mut f)?;
+    menu_0(&mut f)?;
+    writeln!(f, "{}", fs::read_to_string("README.md").unwrap().md_to_html_string())?;
+    page_end(&mut f)?;
+    Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
 }

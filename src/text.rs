@@ -41,6 +41,7 @@ pub trait JavaEscaper {
 pub trait HTMLEscaper {
     fn escape_html(&self) -> String;
     fn latex_to_html_string(&self) -> String;
+    fn md_to_html_string(&self) -> String;
 }
 
 impl<T> Joiner for &[T]
@@ -163,6 +164,34 @@ where
             let x = x.replace("\\item", "<li>");
             format!("<ul>{}</ul>", x)
         });
+
+        base.to_string()
+    }
+
+    fn md_to_html_string(&self) -> String {
+        let base = self.as_ref();
+
+        let regex_enumerate = Regex::new("(?m)(?s)(((^1\\.[^\\n]*\\n)+(\\n|(    |\\t)[^\\n]*\\n)*)+)").unwrap();
+        let base = regex_enumerate.replace_all(&base, |caps: &Captures| {
+            let regex_item = Regex::new("(?m)^1\\.").unwrap();
+            let x = caps[1].to_string();
+            let x = regex_item.replace_all(&x, "<li>\n");
+            format!("<ol>{}</ol>\n", x)
+        });
+
+        let regex_h1 = Regex::new("(?m)\\n*^# (.*)$\\n+").unwrap();
+        let base = regex_h1.replace_all(&base, "\n<h1>${1}</h1>\n");
+
+        let regex_h2 = Regex::new("(?m)\\n*^## (.*)$\\n+").unwrap();
+        let base = regex_h2.replace_all(&base, "\n<h2>${1}</h2>\n");
+
+        let regex_link = Regex::new("\\[([^\\]]*)\\]\\(([^\\)]*)\\)").unwrap();
+        let base = regex_link.replace_all(&base, "<a href=\"${2}\">${1}</a>");
+
+        println!("{:?}", base);
+
+        let regex_newline = Regex::new("(?m)\\n\\n+").unwrap();
+        let base = regex_newline.replace_all(&base, "<p>\n");
 
         base.to_string()
     }
