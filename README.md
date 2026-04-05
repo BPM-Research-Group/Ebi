@@ -6,18 +6,20 @@ Ebi can be used as a command-line utility, as a Python package, as a Rust crate,
 
 More information on its use can be found in its [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
 
-## How to use from the command line
+## Use Ebi from the command line
 
 1. Download Ebi for [Windows](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/Ebi-x86_64-windows.exe?ref_type=heads&inline=false) or for [Linux](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/Ebi-x86_64-linux?ref_type=heads&inline=false).
 1. In Linux, give the file execution permissions.
 1. Open a command prompt and run the executable.
     Installation is not necessary, and Ebi does not require internet access.
-1. For an overview of the commands, refer to the [commands page](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/commands.html?ref_type=heads&inline=true) or the [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
+1. For an overview of the commands, refer to the [commands page](https://leemans.ch/ebi/commands.php) or the [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
 
 Ebi runs on Mac OS X, however, due to Apple's restrictions, only by self-compilation.
 Please see below.
 
-## How to use from Python
+## Use Ebi from Python
+
+Ebi can be used as a Python package, which integrates with [PM4Py](https://pypi.org/project/pm4py/).
 
 1. Install the Ebi-pm package using pip: 
 
@@ -44,7 +46,40 @@ The names of the Ebi functions can be found in the [PDF manual](https://git.rwth
 
 Please note that for fractional numbers, Ebi returns an array consisting of 1) a 4-decimal approximation, 2) the full numerator, and 3) the full denominator.
 
-## How to use from ProM
+## Use Ebi from Rust
+
+Ebi can be used as a Rust crate, available from [crates.io](https://crates.io/crates/ebi).
+
+1. Add the following to the Cargo.toml file:
+
+        [dependencies]
+        ebi = "*"
+
+1. Then, one can use Ebi as follows:
+
+        use ebi::ebi_objects::FiniteStochasticLanguage;
+        use ebi::{
+            ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+            techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
+        };
+        use ebi_objects::ebi_arithmetic::{Fraction, One};
+        use std::fs;
+        // Read the first file and box it
+        let fin1 = fs::read_to_string("testfiles/empty_trace.slang").unwrap();
+        let slang1 = fin1.parse::<FiniteStochasticLanguage>().unwrap();
+        let mut object1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang1);
+        // Read the second file and box it
+        let fin2 = fs::read_to_string("testfiles/empty_trace.slang").unwrap();
+        let slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+        let mut object2: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang2);
+        // Compute EMSC
+        let emsc = object1
+            .earth_movers_stochastic_conformance(object2.as_mut())
+            .unwrap();
+        assert_eq!(emsc, Fraction::one());
+        
+
+## Use Ebi in ProM
 
 Ebi is also available in the [ProM framework](\url{https://promtools.org}) on Windows and Linux.
 In the ProM Package Manager, install Ebi. 

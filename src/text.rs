@@ -1,5 +1,8 @@
+use const_format::concatcp;
 use regex::{Captures, Regex};
 use std::fmt::Display;
+
+use crate::ebi_framework::documentation::FILE_HANDLERS_PAGE;
 
 pub trait Rank {
     fn rank(&self) -> String;
@@ -154,7 +157,7 @@ where
                 .unwrap();
         let base = regex_link.replace_all(
             &base,
-            "${1} (<a href=\"file_handlers.html#${2}\">.${2}</a>)",
+            concatcp!("${1} (<a href=\"", FILE_HANDLERS_PAGE, "#${2}\">.${2}</a>)"),
         );
 
         let regex_itemize =

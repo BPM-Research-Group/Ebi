@@ -5,6 +5,7 @@ use super::{
 };
 use crate::{
     ebi_framework::{
+        documentation::FILE_HANDLERS_PAGE,
         ebi_file_handler::{EbiFileHandler, get_file_handlers, get_file_handlers_fallible},
         ebi_importer_parameters,
         ebi_trait_object::EbiTraitObject,
@@ -401,8 +402,11 @@ impl EbiInputType {
             .iter()
             .map(|file_handler| {
                 format!(
-                    "{} (<a href=\"file_handlers.html#{}\">.{}</a>)",
-                    file_handler.name, file_handler.file_extension, file_handler.file_extension
+                    "{} (<a href=\"{}#{}\">.{}</a>)",
+                    file_handler.name,
+                    FILE_HANDLERS_PAGE,
+                    file_handler.file_extension,
+                    file_handler.file_extension
                 )
             })
             .collect::<Vec<_>>()

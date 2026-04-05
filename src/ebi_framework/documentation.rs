@@ -19,9 +19,8 @@ use std::{
     io::Write,
 };
 
-pub const COMMANDS_PAGE: &str = "https://leemans.ch/ebi/commands.php";
-pub const FILE_HANDLERS_PAGE: &str = "https://leemans.ch/ebi/file_handlers.php";
-pub const CSS: &str = "https://leemans.ch/ebi/stijlen.php";
+pub const COMMANDS_PAGE: &'static str = "https://leemans.ch/ebi/commands.php";
+pub const FILE_HANDLERS_PAGE: &'static str = "https://leemans.ch/ebi/file_handlers.php";
 
 pub fn page_start(f: &mut Vec<u8>) -> Result<()> {
     // #016764, #005958, #014848, #00312F, #001E1E
@@ -32,7 +31,9 @@ pub fn page_start(f: &mut Vec<u8>) -> Result<()> {
         <head>
             <title>Ebi - a stochastic process mining tool</title>
             <link rel=\"shortcut icon\" href=\"https://bpm.rwth-aachen.de/favicon.png\">
-            <link rel=\"stylesheet\" href=\"{}\">
+            <style>
+                {}
+            </style>
             <script>
                 function myFunction0() {{
                     var x = document.getElementById(\"menu0\");
@@ -45,7 +46,7 @@ pub fn page_start(f: &mut Vec<u8>) -> Result<()> {
             </script>
         </head>
         <body>",
-        CSS
+        fs::read_to_string("documentation/stijlen.css").unwrap()
     )?;
     Ok(())
 }
@@ -53,7 +54,7 @@ pub fn page_start(f: &mut Vec<u8>) -> Result<()> {
 fn page_end(f: &mut Vec<u8>) -> Result<()> {
     writeln!(
         f,
-        "</body>
+        "</div></body>
     </html>"
     )?;
     Ok(())
@@ -79,7 +80,7 @@ pub fn documentation_commands() -> Result<EbiOutput> {
 
 fn menu_0(f: &mut Vec<u8>) -> Result<()> {
     writeln!(f, "<div class=\"menu0\" id =\"menu0\">")?;
-    writeln!(f, "<a href=\"index.html\">Ebi</a>")?;
+    writeln!(f, "<a href=\"index.php\">Ebi</a>")?;
     writeln!(f, "<a href=\"{}\">Commands</a>", COMMANDS_PAGE)?;
     writeln!(f, "<a href=\"{}\">Files</a>", FILE_HANDLERS_PAGE)?;
     writeln!(
@@ -87,6 +88,7 @@ fn menu_0(f: &mut Vec<u8>) -> Result<()> {
         "<a href=\"javascript:void(0);\" class=\"expand\" onclick=\"myFunction0()\">...</a>"
     )?;
     writeln!(f, "</div>")?;
+    writeln!(f, "<div class=\"content\">")?;
     Ok(())
 }
 
