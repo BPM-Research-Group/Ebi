@@ -1,11 +1,13 @@
 use crate::{
     ebi_framework::{
         ebi_command::{EBI_COMMANDS, EbiCommand},
-        ebi_file_handler::EBI_FILE_HANDLERS,
+        ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+        ebi_importer_parameters,
         ebi_input::{self, EbiInputType},
         ebi_output::{EbiExporter, EbiOutput, EbiOutputType},
     },
     multiple_reader::MultipleReader,
+    python::python::{PYTHON_PACKAGE, pm4py_function_name},
     text::HTMLEscaper,
 };
 use clap::Command;
@@ -83,6 +85,12 @@ fn menu_0(f: &mut Vec<u8>) -> Result<()> {
     writeln!(f, "<a href=\"index.php\">Ebi</a>")?;
     writeln!(f, "<a href=\"{}\">Commands</a>", COMMANDS_PAGE)?;
     writeln!(f, "<a href=\"{}\">Files</a>", FILE_HANDLERS_PAGE)?;
+    writeln!(
+        f,
+        "<a href=\"https://github.com/BPM-Research-Group/Ebi\">Github</a>"
+    )?;
+    writeln!(f, "<a href=\"https://crates.io/crates/ebi\">crates.io</a>")?;
+    writeln!(f, "<a href=\"https://pypi.org/project/ebi-pm/\">PyPI</a>")?;
     writeln!(
         f,
         "<a href=\"javascript:void(0);\" class=\"expand\" onclick=\"myFunction0()\">...</a>"
@@ -168,6 +176,9 @@ fn file_handlers(f: &mut Vec<u8>) -> Result<()> {
             )?;
         }
 
+        file_handler_importer_parameters(f, file_handler)?;
+
+        //file format
         let regex = Regex::new("\\\\lstinputlisting\\[[^\\]]*\\]\\{([^\\}]*)\\}").unwrap();
         writeln!(
             f,
@@ -218,6 +229,38 @@ fn file_handlers(f: &mut Vec<u8>) -> Result<()> {
     Ok(())
 }
 
+fn file_handler_importer_parameters(f: &mut Vec<u8>, file_handler: &EbiFileHandler) -> Result<()> {
+    Ok({
+        let importer_parameters =
+            ebi_importer_parameters::file_handler_2_importer_parameters(file_handler);
+        writeln!(
+            f,
+            "<div>On importing .{} files, the following optional importer parameters may be given, where X is the rank of the input in the command:<br><table>",
+            file_handler.file_extension
+        )?;
+        if !importer_parameters.is_empty() {
+            for parameter in importer_parameters {
+                writeln!(
+                    f,
+                    "<tr><td><span class=\"texttt\">--inputX_{}</span></td><td>{}<br>{}",
+                    parameter.name(),
+                    parameter.explanation().escape_html(),
+                    ebi_importer_parameters::explanation_with_values(parameter).escape_html()
+                )?;
+                if ebi_importer_parameters::has_accepted_values(parameter) {
+                    writeln!(
+                        f,
+                        "<br>Accepted values: {}.",
+                        ebi_importer_parameters::explanation_with_values(parameter).escape_html()
+                    )?;
+                }
+                writeln!(f, "</td></tr>")?;
+            }
+        }
+        writeln!(f, "</table></div>")?;
+    })
+}
+
 fn commands(f: &mut Vec<u8>) -> Result<()> {
     writeln!(f, "<div class=\"commands\">")?;
     for path in EBI_COMMANDS.get_command_paths() {
@@ -225,7 +268,7 @@ fn commands(f: &mut Vec<u8>) -> Result<()> {
             name_long,
             explanation_short,
             explanation_long,
-            latex_link: _ll,
+            latex_link,
             cli_command,
             exact_arithmetic,
             input_types: input_typess,
@@ -260,26 +303,44 @@ fn commands(f: &mut Vec<u8>) -> Result<()> {
             }
 
             //explanation
-            writeln!(
-                f,
-                "<div>{}</div>",
-                if let Some(l) = explanation_long {
-                    l
-                } else {
-                    explanation_short
+            {
+                writeln!(
+                    f,
+                    "<div>{}",
+                    if let Some(l) = explanation_long {
+                        l
+                    } else {
+                        explanation_short
+                    }
+                )?;
+                //latex link
+                if latex_link.is_some() {
+                    writeln!(
+                        f,
+                        " More information is available in the <a href=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true\">PDF manual</a>."
+                    )?;
                 }
-            )?;
+                writeln!(f, "</div>")?;
+            }
 
             //parameters
             writeln!(f, "<div>Parameters:<br><table>")?;
-
             command_standard_parameters(f, input_typess, input_names, input_helps)?;
             command_custom_parameters(f, cli_command)?;
             command_output_type(f, output_type)?;
             command_output(f, output_type)?;
             command_exact_arithmetic(f, *exact_arithmetic)?;
-
             writeln!(f, "</table></div>")?;
+
+            //pm4py
+            if path.last().unwrap().is_in_python() {
+                writeln!(
+                    f,
+                    "<div>This command is available in the {} Python package using the function <span class=\"texttt\">{}</span>.</div>",
+                    PYTHON_PACKAGE,
+                    pm4py_function_name(&path).escape_html()
+                )?;
+            }
 
             writeln!(f, "</div>")?;
         }
@@ -309,6 +370,14 @@ fn command_standard_parameters(
             "<br>Accepted values:<ul><li>{}</li></ul>",
             EbiInputType::get_possible_inputs_with_html(input_types).join("</li><li>")
         )?;
+
+        //importer parameters
+        if !ebi_importer_parameters::merge_importer_parameters(input_types).is_empty() {
+            writeln!(
+                f,
+                "For some of these files, importer parameters are available.<br>"
+            )?;
+        }
 
         //mandatoryness
         if let Some(default) = ebi_input::default(input_types) {

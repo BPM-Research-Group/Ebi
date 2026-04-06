@@ -1,8 +1,10 @@
 # Ebi - a process mining tool
 
-Ebi is a stochastic process mining software suite, maintained by the BPM group of RWTH University, Aachen, Germany. 
+Ebi is a process mining software suite, maintained by the [BPM group](https://bpm.rwth-aachen.de) of RWTH Aachen University, Germany. 
 It contains several algorithms and techniques that perform analyses on event logs and process models.
 Ebi can be used as a command-line utility, as a Python package, as a Rust crate, or in ProM. 
+
+Ebi provides process mining and stochastic process mining algorithms, and supports exact arithmetic for most of these algorithms.
 
 More information on its use can be found in its [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
 
@@ -14,8 +16,9 @@ More information on its use can be found in its [PDF manual](https://git.rwth-aa
     Installation is not necessary, and Ebi does not require internet access.
 1. For an overview of the commands, refer to the [commands page](https://leemans.ch/ebi/commands.php) or the [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
 
-Ebi runs on Mac OS X, however, due to Apple's restrictions, only by self-compilation.
-Please see below.
+Ebi runs on Mac OS X and many other platforms by self-compilation; please see below.
+
+A good way to get started is to try `ebi info` followed by a file name, which will parse the file and print some information about it.
 
 ## Use Ebi from Python
 
@@ -42,9 +45,10 @@ Ebi can be used as a Python package, which integrates with [PM4Py](https://pypi.
         )
         print(result)
 
-The names of the Ebi functions can be found in the [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
+The names of the Ebi functions can be found on the [commands page](https://leemans.ch/ebi/commands.php) or in the [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
 
-Please note that for fractional numbers, Ebi returns an array consisting of 1) a 4-decimal approximation, 2) the full numerator, and 3) the full denominator.
+Some PM4Py objects, such as event logs, are read directly by Ebi, but most are passed as strings.
+If Ebi returns an exact fraction, it is returned as an array consisting of 1) a floating-point approximation, 2) the full numerator, and 3) the full denominator.
 
 ## Use Ebi from Rust
 
@@ -97,6 +101,7 @@ Ebi is hosted on [Github](https://github.com/BPM-Research-Group/Ebi), and we wel
 1. Install Visual Studio Code
 1. In Visual Studio Code, install the extension [rust-analyzer](https://code.visualstudio.com/docs/languages/rust)
 1. With a browser, go to the project on [Github](https://github.com/BPM-Research-Group/Ebi), choose "Clone", "Visual Studio Code (SSH)", and clone it in Visual Studio Code.
-1. To run Ebi, use the terminal of Visual Studio Code to give the command "cargo run --" instead of "Ebi". Everything else is equivalent to the commands mentioned in the manual.
+1. To run Ebi, use the terminal of Visual Studio Code to give the command "cargo run --" instead of "ebi". Everything else is equivalent to the commands mentioned in the manual.
 1. To compile Ebi, give the command "cargo build --release". The binary is then placed in the project folder, in the "build/release" sub-folder.
 
+Information on the architecture of Ebi, including its sub-crates, can be found in the [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).

@@ -7,6 +7,10 @@ body {
 .content {
     padding-left: 20px;
     padding-right: 20px;
+    padding-bottom: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 1000px;
 }
 td {
     vertical-align: top;
@@ -19,6 +23,9 @@ a:hover {
 }
 table tr:not(:first-child) td {
     padding-top: 20px;
+}
+table {
+    margin-bottom: 10px;
 }
 .selectable {
     display: none;

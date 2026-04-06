@@ -606,7 +606,7 @@ pub const CONFORMANCE_CSSC_SAMPLE: EbiCommand = EbiCommand::Command {
 };
 
 pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
-    name_short: "sma",
+    name_short: "ma",
     name_long: Some("markovian"),
     explanation_short: "Compute the conformance between two stochastic languages using a stochastic Markovian abstraction.",
     explanation_long: Some(

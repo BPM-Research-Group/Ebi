@@ -1,5 +1,8 @@
 use crate::{
-    ebi_framework::{ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInputType},
+    ebi_framework::{
+        ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+        ebi_input::EbiInputType,
+    },
     text::Joiner,
 };
 use clap::{Arg, ArgAction, ArgMatches, Command, builder::ValueParser, value_parser};
@@ -54,6 +57,19 @@ pub fn merge_importer_parameters(
                 }
             }
             _ => {}
+        }
+    }
+    result
+}
+
+pub fn file_handler_2_importer_parameters(
+    file_handler: &EbiFileHandler,
+) -> BTreeSet<&'static ImporterParameter> {
+    let mut result = BTreeSet::new();
+    for importer in file_handler.object_importers {
+        //found an importer for this trait; copy its parameters
+        for parameter in importer.parameters() {
+            result.insert(parameter);
         }
     }
     result
