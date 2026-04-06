@@ -233,12 +233,12 @@ fn file_handler_importer_parameters(f: &mut Vec<u8>, file_handler: &EbiFileHandl
     Ok({
         let importer_parameters =
             ebi_importer_parameters::file_handler_2_importer_parameters(file_handler);
-        writeln!(
+        if !importer_parameters.is_empty() {
+            writeln!(
             f,
             "<div>On importing .{} files, the following optional importer parameters may be given, where X is the rank of the input in the command:<br><table>",
             file_handler.file_extension
         )?;
-        if !importer_parameters.is_empty() {
             for parameter in importer_parameters {
                 writeln!(
                     f,
