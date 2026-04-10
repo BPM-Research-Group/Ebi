@@ -33,6 +33,8 @@ pub trait Semantics:
         state: &<Self as Semantics>::SemState,
     ) -> bool;
 
+    /// Returns the activity of the given transition in the state. Returns None if the transition is silent.
+    /// May return None or panic if the transition does not exist.
     fn get_transition_activity(
         &self,
         transition: TransitionIndex,

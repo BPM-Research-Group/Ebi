@@ -13,8 +13,7 @@ impl Semantics for FiniteStochasticPartiallyOrderedLanguage {
         if self.number_of_traces() > 0 {
             Some(FspolangMarking {
                 trace: None,
-                states: bitvec![],
-                edges: bitvec![],
+                node_2_executed: bitvec![],
             })
         } else {
             None
@@ -26,23 +25,19 @@ impl Semantics for FiniteStochasticPartiallyOrderedLanguage {
         state: &mut <Self as Semantics>::SemState,
         transition: TransitionIndex,
     ) -> Result<()> {
-        if let Some(trace) = state.trace {
-            let trace = &self.traces[trace];
-            for output in &trace.edge_2_outputs[transition] {
-                state.states.set(*output, true);
-            }
-            state.edges.set(transition, true);
+        //transition = node
+        if state.trace.is_some() {
+            state.node_2_executed.set(transition, true);
         } else {
             state.trace = Some(transition);
-            state.states = bitvec!(0; self.traces[transition].number_of_states());
-            state.edges = bitvec!(0; self.traces[transition].number_of_edges());
+            state.node_2_executed = bitvec!(0; self.traces[transition].number_of_nodes());
         }
         Ok(())
     }
 
     fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool {
         if let Some(_) = state.trace {
-            state.edges.all()
+            state.node_2_executed.all()
         } else {
             true
         }
@@ -62,7 +57,7 @@ impl Semantics for FiniteStochasticPartiallyOrderedLanguage {
         state: &<Self as Semantics>::SemState,
     ) -> Option<Activity> {
         if let Some(trace) = state.trace {
-            self.traces[trace].edge_2_activity[transition]
+            Some(self.traces[trace].node_2_activity[transition])
         } else {
             None
         }
@@ -75,14 +70,14 @@ impl Semantics for FiniteStochasticPartiallyOrderedLanguage {
         if let Some(trace) = state.trace {
             let trace = &self.traces[trace];
             let mut result = vec![];
-            'outer: for edge in 0..trace.number_of_edges() {
-                if !state.edges[edge] {
-                    for input in &trace.edge_2_inputs[edge] {
-                        if !state.states[*input] {
+            'outer: for node in 0..trace.number_of_nodes() {
+                if !state.node_2_executed[node] {
+                    for predecessor in &trace.node_2_predecessors[node] {
+                        if !state.node_2_executed[*predecessor] {
                             continue 'outer;
                         }
                     }
-                    result.push(edge);
+                    result.push(node);
                 }
             }
             result
@@ -103,17 +98,12 @@ impl Semantics for FiniteStochasticPartiallyOrderedLanguage {
 #[derive(Clone, Eq, PartialEq, Hash, Debug)]
 pub struct FspolangMarking {
     trace: Option<usize>,
-    states: BitVec,
-    edges: BitVec,
+    node_2_executed: BitVec,
 }
 
 impl Display for FspolangMarking {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "trace: {:?}, states: {:?}, edges: {:?}",
-            self.trace, self.states, self.edges
-        )
+        write!(f, "trace: {:?}, nodes: {:?}", self.trace, self.node_2_executed)
     }
 }
 
