@@ -36,7 +36,7 @@ impl PartiallyOrderedTraceDistance for Vec<Activity> {
                 result.push(((trace_index + 1, state.clone()), 1));
             }
 
-            //model moves and silent moves
+            //model moves
             for event in state.enabled_events(other) {
                 let new_state = state.execute_event(event);
                 //model move
@@ -48,11 +48,14 @@ impl PartiallyOrderedTraceDistance for Vec<Activity> {
                 }
 
                 //synchronous move
-                if other.event_2_activity[event] == self[*trace_index] {
-                    result.push(((trace_index + 1, new_state), 0));
+                if let Some(po_activity) = other.event_2_activity.get(event) {
+                    if let Some(activity) = self.get(*trace_index)
+                        && po_activity == activity
+                    {
+                        result.push(((trace_index + 1, new_state), 0));
+                    }
                 }
             }
-
             result
         };
 
@@ -171,14 +174,9 @@ struct PartiallyOrderedTraceMarking {
 
 impl PartiallyOrderedTraceMarking {
     pub fn from_trace(po_trace: &PartiallyOrderedTrace) -> Self {
-        let mut result = Self {
+        let result = Self {
             event_2_executed: bitvec!(0; po_trace.number_of_events()),
         };
-
-        po_trace.start_events().for_each(|event| {
-            result.event_2_executed.set(event, true);
-        });
-
         result
     }
 
@@ -229,10 +227,17 @@ mod tests {
             .parse::<FiniteStochasticPartiallyOrderedLanguage>()
             .unwrap();
 
-        let po_trace = &spolang.traces[0];
+        let po_trace = &spolang.traces[4];
+        println!("{:?}", po_trace);
 
-        let ac0 = spolang.activity_key().get_activity_by_id(0);
-        let ac1 = spolang.activity_key().get_activity_by_id(1);
+        let ac0 = spolang
+            .activity_key()
+            .process_activity_attempt("Register claim\n(2min)")
+            .unwrap();
+        let ac1 = spolang
+            .activity_key()
+            .process_activity_attempt("Check easy claim\n(5 min)")
+            .unwrap();
 
         let trace = vec![ac0, ac1];
         assert_eq!(trace.partially_ordered_trace_distance(po_trace), 0);
