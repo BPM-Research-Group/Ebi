@@ -282,10 +282,6 @@ pub fn sample_indices_uniform(number_of_indices: usize, result: &mut Vec<usize>)
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_objects::FiniteStochasticLanguage;
-
     use crate::{
         ebi_framework::trait_importers::ToStochasticSemanticsTrait,
         ebi_traits::{
@@ -293,6 +289,8 @@ mod tests {
             ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
         },
     };
+    use ebi_objects::FiniteStochasticLanguage;
+    use std::fs;
 
     use super::Sampler;
 

@@ -37,8 +37,8 @@ impl PartiallyOrderedTraceDistance for Vec<Activity> {
             }
 
             //model moves and silent moves
-            for node in state.enabled_nodes(other) {
-                let new_state = state.execute_node(node);
+            for event in state.enabled_events(other) {
+                let new_state = state.execute_event(event);
                 //model move
                 result.push(((*trace_index, new_state.clone()), 1));
 
@@ -48,7 +48,7 @@ impl PartiallyOrderedTraceDistance for Vec<Activity> {
                 }
 
                 //synchronous move
-                if other.node_2_activity[node] == self[*trace_index] {
+                if other.event_2_activity[event] == self[*trace_index] {
                     result.push(((trace_index + 1, new_state), 0));
                 }
             }
@@ -61,7 +61,7 @@ impl PartiallyOrderedTraceDistance for Vec<Activity> {
 
         //function that returns whether we are in a final synchronous product state
         let success = |(trace_index, state): &(usize, PartiallyOrderedTraceMarking)| {
-            trace_index == &self.len() && state.node_2_executed.all()
+            trace_index == &self.len() && state.event_2_executed.all()
         };
 
         astar(&start, successors, heuristic, success).unwrap().1
@@ -71,9 +71,9 @@ impl PartiallyOrderedTraceDistance for Vec<Activity> {
         &self,
         other: &PartiallyOrderedTrace,
     ) -> Fraction {
-        if !self.is_empty() || other.number_of_nodes() != 0 {
+        if !self.is_empty() || other.number_of_events() != 0 {
             let distance = self.partially_ordered_trace_distance(other);
-            Fraction::from((distance, self.len().max(other.number_of_nodes())))
+            Fraction::from((distance, self.len().max(other.number_of_events())))
         } else {
             Fraction::zero()
         }
@@ -96,11 +96,11 @@ impl PartiallyOrderedTraceDistance for PartiallyOrderedTrace {
 
             //self move
             let mut successors_self = vec![];
-            for node in marking_self.enabled_nodes(self) {
+            for event in marking_self.enabled_events(self) {
                 //execute transition
-                let new_marking_self = marking_self.execute_node(node);
+                let new_marking_self = marking_self.execute_event(event);
                 //labelled
-                successors_self.push((new_marking_self.clone(), self.node_2_activity[node]));
+                successors_self.push((new_marking_self.clone(), self.event_2_activity[event]));
 
                 //self move
                 result.push(((new_marking_self, marking_other.clone()), 1));
@@ -108,10 +108,10 @@ impl PartiallyOrderedTraceDistance for PartiallyOrderedTrace {
 
             //other move
             let mut successors_other = vec![];
-            for node in marking_other.enabled_nodes(other) {
-                let new_marking_other = marking_other.execute_node(node);
+            for event in marking_other.enabled_events(other) {
+                let new_marking_other = marking_other.execute_event(event);
                 //other move
-                successors_other.push((new_marking_other.clone(), other.node_2_activity[node]));
+                successors_other.push((new_marking_other.clone(), other.event_2_activity[event]));
                 result.push(((marking_self.clone(), new_marking_other), 1));
             }
 
@@ -141,7 +141,7 @@ impl PartiallyOrderedTraceDistance for PartiallyOrderedTrace {
             PartiallyOrderedTraceMarking,
             PartiallyOrderedTraceMarking,
         )| {
-            marking_self.node_2_executed.all() && marking_other.node_2_executed.all()
+            marking_self.event_2_executed.all() && marking_other.event_2_executed.all()
         };
 
         astar(&start, successors, heuristic, success).unwrap().1
@@ -151,12 +151,12 @@ impl PartiallyOrderedTraceDistance for PartiallyOrderedTrace {
         &self,
         other: &PartiallyOrderedTrace,
     ) -> Fraction {
-        if self.number_of_nodes() > 0 || other.number_of_nodes() > 0 {
+        if self.number_of_events() > 0 || other.number_of_events() > 0 {
             let distance = self.partially_ordered_trace_distance(other);
 
             Fraction::from((
                 distance,
-                self.number_of_nodes().max(other.number_of_nodes()),
+                self.number_of_events().max(other.number_of_events()),
             ))
         } else {
             Fraction::zero()
@@ -166,33 +166,33 @@ impl PartiallyOrderedTraceDistance for PartiallyOrderedTrace {
 
 #[derive(Clone, Eq, PartialEq, Hash)]
 struct PartiallyOrderedTraceMarking {
-    node_2_executed: BitVec,
+    event_2_executed: BitVec,
 }
 
 impl PartiallyOrderedTraceMarking {
     pub fn from_trace(po_trace: &PartiallyOrderedTrace) -> Self {
         let mut result = Self {
-            node_2_executed: bitvec!(0; po_trace.number_of_nodes()),
+            event_2_executed: bitvec!(0; po_trace.number_of_events()),
         };
 
-        po_trace.start_nodes().for_each(|node| {
-            result.node_2_executed.set(node, true);
+        po_trace.start_events().for_each(|event| {
+            result.event_2_executed.set(event, true);
         });
 
         result
     }
 
-    pub fn enabled_nodes(&self, po_trace: &PartiallyOrderedTrace) -> impl Iterator<Item = usize> {
-        self.node_2_executed.iter_zeros().filter(|node| {
-            po_trace.node_2_predecessors[*node]
+    pub fn enabled_events(&self, po_trace: &PartiallyOrderedTrace) -> impl Iterator<Item = usize> {
+        self.event_2_executed.iter_zeros().filter(|event| {
+            po_trace.event_2_predecessors[*event]
                 .iter()
-                .all(|input| self.node_2_executed[*input])
+                .all(|input| self.event_2_executed[*input])
         })
     }
 
-    pub fn execute_node(&self, node: usize) -> Self {
+    pub fn execute_event(&self, event: usize) -> Self {
         let mut result = self.clone();
-        result.node_2_executed.set(node, true);
+        result.event_2_executed.set(event, true);
         result
     }
 }
@@ -207,8 +207,8 @@ impl Display for PartiallyOrderedTraceMarking {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "partially ordered trace marking; nodes {:?}",
-            self.node_2_executed.iter_ones().collect::<Vec<_>>()
+            "partially ordered trace marking; events {:?}",
+            self.event_2_executed.iter_ones().collect::<Vec<_>>()
         )
     }
 }
@@ -263,15 +263,15 @@ mod tests {
         for spotrace in spolang.traces {
             println!(
                 "trace length {:?}, distance {}",
-                spotrace.number_of_nodes(),
+                spotrace.number_of_events(),
                 slangtrace.partially_ordered_trace_distance(&spotrace)
             );
 
             assert_eq!(
-                spotrace.number_of_nodes(),
+                spotrace.number_of_events(),
                 slangtrace.partially_ordered_trace_distance(&spotrace)
             );
-            if spotrace.number_of_nodes() == 0 {
+            if spotrace.number_of_events() == 0 {
                 assert_eq!(
                     slangtrace.normalised_partially_ordered_trace_distance(&spotrace),
                     Fraction::zero()

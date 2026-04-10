@@ -28,7 +28,7 @@ extension-module = ["pyo3/extension-module"]
 
 [dependencies]
 ebi_optimisation = "0.3.7"
-ebi_objects = "0.3.175"
+ebi_objects = "0.3.178"
 ebi_derive = "0.2.10"
 bitvec = "1.0.1"
 clap = { version = "4.6.0", features = ["derive", "cargo", "string"] }
@@ -50,7 +50,7 @@ Inflector = "0.11.4"
 strum = "0.28.0"
 strum_macros = "0.28.0"
 indicatif = "0.18.4"
-indexmap = "2.13.1"
+indexmap = "2.14.0"
 pathfinding="4.15.0"
 fnv = "1.0.7"
 itertools = "0.14.0"

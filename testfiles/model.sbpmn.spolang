@@ -1,69 +1,268 @@
 finite stochastic partially ordered language
 # number of traces
-1
+10
 # trace 0
 #	probability
-1
-#	number of edges
-7
-#	edge 0
-silent
-#		number of input states
-1
-0
-#		number of output states
-1
-1
-#	edge 1
-multiline label
+1/10
+#	number of events
+3
+#	event 0
+$multiline
 Register claim
 (2min)
 multiline$
-#		number of input states
-1
-1
-#		number of output states
-1
-2
-#	edge 2
-silent
-#		number of input states
-1
-2
-#		number of output states
-1
-3
-#	edge 3
-multiline label
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
 Check easy claim
 (5 min)
 multiline$
-#		number of input states
+#		number of predecessors
 1
+#		predecessors
+0
+#	event 2
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+1
+# trace 1
+#	probability
+1/10
+#	number of events
 3
-#		number of output states
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
 1
-4
-#	edge 4
-silent
-#		number of input states
+#		predecessors
+0
+#	event 2
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
 1
-4
-#		number of output states
+#		predecessors
 1
-5
-#	edge 5
-silent
-#		number of input states
+# trace 2
+#	probability
+1/10
+#	number of events
+3
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
 1
-5
-#		number of output states
+#		predecessors
+0
+#	event 2
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
 1
-6
-#	edge 6
-silent
-#		number of input states
+#		predecessors
 1
-6
-#		number of output states
+# trace 3
+#	probability
+1/10
+#	number of events
+3
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+#	event 2
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+1
+# trace 4
+#	probability
+1/10
+#	number of events
+2
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+# trace 5
+#	probability
+1/10
+#	number of events
+2
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+# trace 6
+#	probability
+1/10
+#	number of events
+2
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+# trace 7
+#	probability
+1/10
+#	number of events
+2
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+# trace 8
+#	probability
+1/10
+#	number of events
+3
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+#	event 2
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+1
+# trace 9
+#	probability
+1/10
+#	number of events
+2
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
 0
