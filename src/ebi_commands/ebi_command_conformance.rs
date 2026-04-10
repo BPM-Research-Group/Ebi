@@ -530,7 +530,7 @@ pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
                 Let $L$ be a finite stochastic language and let $M$ be a queriable stochastic langauge.
                 Then, the \emph{chi-squared stochastic conformance ($\text{cssc}$) of $L$ and $M$} is defined as follows: 
                 \begin{align*}
-                    \text{cssc}(L, L') ={}& 1 - \frac{1}{2} \sum_{\sigma \in L \cup M} \frac{(L(\sigma)-M(\sigma))^2}{L(\sigma)+M(\sigma)}
+                    \text{cssc}(L, M) ={}& 1 - \frac{1}{2} \sum_{\sigma \in L \cup M} \frac{(L(\sigma)-M(\sigma))^2}{L(\sigma)+M(\sigma)}
                 \end{align*}       
             \end{definition}",
     ),
