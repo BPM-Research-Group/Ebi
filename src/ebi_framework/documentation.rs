@@ -235,10 +235,10 @@ fn file_handler_importer_parameters(f: &mut Vec<u8>, file_handler: &EbiFileHandl
             ebi_importer_parameters::file_handler_2_importer_parameters(file_handler);
         if !importer_parameters.is_empty() {
             writeln!(
-            f,
-            "<div>On importing .{} files, the following optional importer parameters may be given, where X is the rank of the input in the command:<br><table>",
-            file_handler.file_extension
-        )?;
+                f,
+                "<div>On importing .{} files, the following optional importer parameters may be given, where X is the rank of the input in the command:<br><table>",
+                file_handler.file_extension
+            )?;
             for parameter in importer_parameters {
                 writeln!(
                     f,
@@ -256,8 +256,8 @@ fn file_handler_importer_parameters(f: &mut Vec<u8>, file_handler: &EbiFileHandl
                 }
                 writeln!(f, "</td></tr>")?;
             }
+            writeln!(f, "</table></div>")?;
         }
-        writeln!(f, "</table></div>")?;
     })
 }
 
