@@ -4,14 +4,13 @@ use ebi_objects::{
     anyhow::{anyhow, Result},
     ebi_arithmetic::{f, Fraction, One, Signed, Zero},
     traits::trace_iterators::IntoRefTraceProbabilityIterator,
-    Activity,
-    EventLog,
     FiniteStochasticLanguage,
-    HasActivityKey,
-    StochasticDeterministicFiniteAutomaton,
-    TranslateActivityKey,
+    StochasticDeterministicFiniteAutomaton,  
 };
-
+ use crate::ebi_traits::{
+        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+    };
+use crate::follower_semantics::FollowerSemantics;
 use crate::math::log_div::LogDiv;
 use ebi_objects::ebi_arithmetic::fraction::fraction_enum::FractionEnum;
 
@@ -47,41 +46,19 @@ fn resolve_lambda_checked(lambda: Option<&Fraction>) -> Result<Fraction> {
     Ok(resolved)
 }
 
-fn max_state_index(sdfa: &StochasticDeterministicFiniteAutomaton) -> usize {
-    let mut max_state = sdfa.get_initial_state().unwrap_or(0);
-
-    for &source in sdfa.get_sources().iter() {
-        if source > max_state {
-            max_state = source;
-        }
-    }
-
-    for &target in sdfa.get_targets().iter() {
-        if target > max_state {
-            max_state = target;
-        }
-    }
-
-    max_state
-}
-
-fn state_count(sdfa: &StochasticDeterministicFiniteAutomaton) -> usize {
-    max_state_index(sdfa) + 1
-}
-
 /// Check whether the SDFA is a valid stochastic model.
 ///
 /// Rules:
-/// 1. It has an initial state.
+/// 1. It can have no initial state.
 /// 2. For each state, outgoing probabilities plus termination probability sum to 1.
 /// 3. Each transition probability is strictly positive.
 /// 4. At least one state has a non-zero termination probability.
 pub fn is_valid_sdfa(sdfa: &StochasticDeterministicFiniteAutomaton) -> Result<()> {
     if sdfa.get_initial_state().is_none() {
-        return Err(anyhow!("sdfa has no initial state"));
+        return Ok(());
     }
 
-    let state_count = state_count(sdfa);
+    let state_count = sdfa.number_of_states();
 
     for state in 0..state_count {
         let mut total_probability = Fraction::zero();
@@ -130,17 +107,16 @@ fn entropy_term(p: &Fraction) -> LogDiv {
         LogDiv::zero()
     } else {
         let term = LogDiv::n_log_n(p).unwrap();
-        LogDiv::zero() - term
+        - term
     }
 }
 
 /// Entropy of the event log with lambda.
 /// If lambda = 0, this becomes the normal entropy.
-pub fn entropy_eventlog_with_lambda(event_log: EventLog, lambda: &Fraction) -> Result<LogDiv> {
+pub fn entropy_eventlog_with_lambda(fsl: FiniteStochasticLanguage, lambda: &Fraction) -> Result<LogDiv> {
     check_lambda(lambda)?;
 
     if lambda.is_zero() {
-        let fsl = FiniteStochasticLanguage::from(event_log);
         let mut entropy = LogDiv::zero();
 
         for (_, probability) in fsl.iter_traces_probabilities() {
@@ -149,57 +125,27 @@ pub fn entropy_eventlog_with_lambda(event_log: EventLog, lambda: &Fraction) -> R
 
         return Ok(entropy);
     }
-
-    let fsl = FiniteStochasticLanguage::from(event_log);
-    let one_minus_lambda = Fraction::one() - lambda.clone();
+    let one_minus_lambda = &Fraction::one() - lambda;
     let mut entropy = LogDiv::zero();
 
     for (_, probability) in fsl.iter_traces_probabilities() {
-        entropy += entropy_term(&(probability.clone() * one_minus_lambda.clone()));
-        entropy += entropy_term(&(probability.clone() * lambda.clone()));
+        entropy += entropy_term(&(probability * &one_minus_lambda));
+        entropy += entropy_term(&(probability * lambda));
     }
 
     Ok(entropy)
 }
 
 /// A wrapper for normal entropy (lambda = 0).
-pub fn entropy_eventlog(event_log: EventLog) -> LogDiv {
-    entropy_eventlog_with_lambda(event_log, &Fraction::zero())
-        .expect("lambda=0 must be valid")
+pub fn entropy_eventlog(fsl: FiniteStochasticLanguage) -> Result<LogDiv> {
+    entropy_eventlog_with_lambda(fsl, &Fraction::zero())
+        
 }
 
-/// Probability of a trace in the SDFA.
-/// Multiply all transition probabilities and the final termination probability.
-/// If a transition is missing, the probability is 0.
-fn prob_of_trace_in_sdfa(
-    sdfa: &StochasticDeterministicFiniteAutomaton,
-    trace: &Vec<Activity>,
-) -> Fraction {
-    let mut state = match sdfa.get_initial_state() {
-        Some(initial_state) => initial_state,
-        None => return Fraction::zero(),
-    };
-
-    let mut probability = Fraction::one();
-
-    for activity in trace {
-        let activity_id = sdfa.activity_key().get_id_from_activity(activity);
-        let (found, index) = sdfa.binary_search(state, activity_id);
-
-        if !found {
-            return Fraction::zero();
-        }
-
-        probability *= sdfa.get_probabilities()[index].clone();
-        state = sdfa.get_targets()[index];
-    }
-
-    probability * sdfa.get_termination_probability(state).clone()
-}
-
-/// Return the smaller of two `LogDiv` values.
 fn log_div_min(left: &LogDiv, right: &LogDiv) -> LogDiv {
-    if left.approximate() < right.approximate() {
+    debug_assert!(left.partial_cmp(right).is_some(), "incomparable LogDiv values");
+
+    if left <= right {
         left.clone()
     } else {
         right.clone()
@@ -210,24 +156,16 @@ fn log_div_min(left: &LogDiv, right: &LogDiv) -> LogDiv {
 /// Only traces that exist in both the event log and the model are counted.
 /// For each trace, use min(-pL log pL, -pM log pM).
 pub fn gain_numerator_lambda(
-    event_log: EventLog,
-    sdfa: &mut StochasticDeterministicFiniteAutomaton,
+    fsl: FiniteStochasticLanguage,
+    sdfa: StochasticDeterministicFiniteAutomaton,
     lambda: &Fraction,
 ) -> Result<LogDiv> {
     check_lambda(lambda)?;
-
-    let mut fsl = FiniteStochasticLanguage::from(event_log);
-
-    {
-        let activity_key = sdfa.activity_key_mut();
-        fsl.translate_using_activity_key(activity_key);
-    }
-
-    let one_minus_lambda = Fraction::one() - lambda.clone();
+    let one_minus_lambda = &Fraction::one() - lambda;
     let mut numerator = LogDiv::zero();
 
     for (trace, log_probability) in fsl.iter_traces_probabilities() {
-        let model_probability = prob_of_trace_in_sdfa(sdfa, trace);
+        let model_probability = sdfa.get_probability(&FollowerSemantics::Trace(trace))?;
 
         if model_probability.is_zero() {
             continue;
@@ -239,13 +177,14 @@ pub fn gain_numerator_lambda(
             numerator += log_div_min(&log_entropy, &model_entropy);
         } else {
             let log_main_entropy =
-                entropy_term(&(log_probability.clone() * one_minus_lambda.clone()));
+                entropy_term(&(log_probability * &one_minus_lambda));
             let model_main_entropy =
-                entropy_term(&(model_probability.clone() * one_minus_lambda.clone()));
+                entropy_term(&(&model_probability * &one_minus_lambda));
             numerator += log_div_min(&log_main_entropy, &model_main_entropy);
 
-            let log_tail_entropy = entropy_term(&(log_probability.clone() * lambda.clone()));
-            let model_tail_entropy = entropy_term(&(model_probability.clone() * lambda.clone()));
+            let log_tail_entropy = entropy_term(&(log_probability * lambda));
+            let model_tail_entropy = entropy_term(&(&model_probability * lambda));
+
             numerator += log_div_min(&log_tail_entropy, &model_tail_entropy);
         }
     }
@@ -255,11 +194,10 @@ pub fn gain_numerator_lambda(
 
 /// Wrapper for the normal numerator (lambda = 0).
 pub fn gain_numerator(
-    event_log: EventLog,
-    sdfa: &mut StochasticDeterministicFiniteAutomaton,
-) -> LogDiv {
-    gain_numerator_lambda(event_log, sdfa, &Fraction::zero())
-        .expect("lambda=0 must be valid")
+    fsl: FiniteStochasticLanguage,
+    sdfa: StochasticDeterministicFiniteAutomaton,
+) -> Result<LogDiv> {
+    gain_numerator_lambda(fsl, sdfa, &Fraction::zero())
 }
 
 /// Compute c_s by fixed-point iteration.
@@ -269,10 +207,10 @@ pub fn c_s_iterative(
     epsilon: Fraction,
     max_iterations: usize,
 ) -> Result<Vec<Fraction>> {
-    let state_count = state_count(sdfa);
-    let initial_state = sdfa
-        .get_initial_state()
-        .ok_or_else(|| anyhow!("sdfa has no initial state"))?;
+    let state_count = sdfa.number_of_states();
+    let Some(initial_state) = sdfa.get_initial_state() else {
+        return Ok(vec![Fraction::zero(); state_count]);
+    };
 
     let mut state_visits = vec![Fraction::zero(); state_count];
     let mut next_state_visits = vec![Fraction::zero(); state_count];
@@ -287,7 +225,7 @@ pub fn c_s_iterative(
             let probability = &sdfa.get_probabilities()[index];
 
             if !probability.is_zero() {
-                next_state_visits[target] += state_visits[source].clone() * probability.clone();
+                next_state_visits[target] += &state_visits[source] * probability;
             }
         }
 
@@ -332,7 +270,7 @@ pub fn entropy_sdfa_with_lambda(
     is_valid_sdfa(sdfa)?;
 
     if lambda.is_zero() {
-        let state_count = state_count(sdfa);
+        let state_count = sdfa.number_of_states();
         let state_visits = c_s(sdfa)?;
 
         let mut termination_entropy = LogDiv::zero();
@@ -343,7 +281,7 @@ pub fn entropy_sdfa_with_lambda(
             }
 
             let mut entropy = entropy_term(termination_probability);
-            entropy *= state_visits[state].clone();
+            entropy *= &state_visits[state];
             termination_entropy += entropy;
         }
 
@@ -355,14 +293,14 @@ pub fn entropy_sdfa_with_lambda(
             }
 
             let mut entropy = entropy_term(probability);
-            entropy *= state_visits[source].clone();
+            entropy *= &state_visits[source];
             transition_entropy += entropy;
         }
 
         return Ok(transition_entropy + termination_entropy);
     }
 
-    let state_count = state_count(sdfa);
+    let state_count = sdfa.number_of_states();
     let state_visits = c_s(sdfa)?;
     let one_minus_lambda = Fraction::one() - lambda.clone();
 
@@ -374,7 +312,7 @@ pub fn entropy_sdfa_with_lambda(
         }
 
         let mut entropy = entropy_term(probability);
-        entropy *= state_visits[source].clone();
+        entropy *= &state_visits[source];
         transition_entropy += entropy;
     }
 
@@ -387,17 +325,17 @@ pub fn entropy_sdfa_with_lambda(
             continue;
         }
 
-        let main_probability = termination_probability.clone() * one_minus_lambda.clone();
+        let main_probability = termination_probability * &one_minus_lambda;
         if !main_probability.is_zero() {
             let mut entropy = entropy_term(&main_probability);
-            entropy *= state_visits[state].clone();
+            entropy *= &state_visits[state];
             termination_entropy += entropy;
         }
 
         let tail_probability = termination_probability.clone() * lambda.clone();
         if !tail_probability.is_zero() {
             let mut entropy = entropy_term(&tail_probability);
-            entropy *= state_visits[state].clone();
+            entropy *= &state_visits[state];
             lambda_step_entropy += entropy;
         }
     }
@@ -424,33 +362,30 @@ fn ratio(num: LogDiv, denom: LogDiv) -> Result<FractionEnum> {
 
 /// Precision(L, M, λ) = Numerator(L, M, λ) / H(M, λ)
 pub fn potential_gain_precision(
-    event_log: EventLog,
-    sdfa: &StochasticDeterministicFiniteAutomaton,
+    fsl: FiniteStochasticLanguage,
+    sdfa: StochasticDeterministicFiniteAutomaton,
     lambda: Option<&Fraction>,
 ) -> Result<FractionEnum> {
     let resolved_lambda = resolve_lambda_checked(lambda)?;
-    is_valid_sdfa(sdfa)?;
+    is_valid_sdfa(&sdfa)?;
 
-    let mut sdfa_cloned = sdfa.clone();
-    let numerator = gain_numerator_lambda(event_log, &mut sdfa_cloned, &resolved_lambda)?;
-    let denominator = entropy_sdfa_with_lambda(sdfa, &resolved_lambda)?;
+    let denominator = entropy_sdfa_with_lambda(&sdfa, &resolved_lambda)?;
+    let numerator = gain_numerator_lambda(fsl, sdfa, &resolved_lambda)?;
 
     ratio(numerator, denominator)
 }
 
 /// Recall(L, M, λ) = Numerator(L, M, λ) / H(L, λ)
 pub fn potential_gain_recall(
-    event_log: EventLog,
-    sdfa: &StochasticDeterministicFiniteAutomaton,
+    fsl: FiniteStochasticLanguage,
+    sdfa: StochasticDeterministicFiniteAutomaton,
     lambda: Option<&Fraction>,
 ) -> Result<FractionEnum> {
     let resolved_lambda = resolve_lambda_checked(lambda)?;
-    is_valid_sdfa(sdfa)?;
+    is_valid_sdfa(&sdfa)?;
 
-    let mut sdfa_cloned = sdfa.clone();
-    let numerator =
-        gain_numerator_lambda(event_log.clone(), &mut sdfa_cloned, &resolved_lambda)?;
-    let denominator = entropy_eventlog_with_lambda(event_log, &resolved_lambda)?;
+    let numerator = gain_numerator_lambda(fsl.clone(), sdfa, &resolved_lambda)?;
+    let denominator = entropy_eventlog_with_lambda(fsl, &resolved_lambda)?;
 
     ratio(numerator, denominator)
 }
@@ -459,7 +394,7 @@ pub fn potential_gain_recall(
 mod tests {
     use super::*;
     use ebi_objects::anyhow::Result;
-
+    use ebi_objects::EventLog;
     mod sdfa_fig_c {
         use super::*;
         use ebi_objects::anyhow::Result;
@@ -481,82 +416,14 @@ mod tests {
         }
     }
 
-    fn xes_fig_a() -> &'static str {
-        r#"<?xml version="1.0" encoding="UTF-8" ?>
-    <log xes.version="1.0" xes.features="nested-attributes"
-        xmlns="http://www.xes-standard.org/">
-
-    <!-- ε : 1 time -->
-    <trace>
-        <string key="concept:name" value="t_eps_1"/>
-    </trace>
-
-    <!-- (a) : 2 times -->
-    <trace>
-        <string key="concept:name" value="t_a_1"/>
-        <event><string key="concept:name" value="a"/></event>
-    </trace>
-    <trace>
-        <string key="concept:name" value="t_a_2"/>
-        <event><string key="concept:name" value="a"/></event>
-    </trace>
-
-    <!-- (a,a) : 4 times -->
-    <trace>
-        <string key="concept:name" value="t_aa_1"/>
-        <event><string key="concept:name" value="a"/></event>
-        <event><string key="concept:name" value="a"/></event>
-    </trace>
-    <trace>
-        <string key="concept:name" value="t_aa_2"/>
-        <event><string key="concept:name" value="a"/></event>
-        <event><string key="concept:name" value="a"/></event>
-    </trace>
-    <trace>
-        <string key="concept:name" value="t_aa_3"/>
-        <event><string key="concept:name" value="a"/></event>
-        <event><string key="concept:name" value="a"/></event>
-    </trace>
-    <trace>
-        <string key="concept:name" value="t_aa_4"/>
-        <event><string key="concept:name" value="a"/></event>
-        <event><string key="concept:name" value="a"/></event>
-    </trace>
-
-    <!-- (a,a,a) : 1 time -->
-    <trace>
-        <string key="concept:name" value="t_aaa_1"/>
-        <event><string key="concept:name" value="a"/></event>
-        <event><string key="concept:name" value="a"/></event>
-        <event><string key="concept:name" value="a"/></event>
-    </trace>
-
-    <!-- (a,a,a,a) : 2 times -->
-    <trace>
-        <string key="concept:name" value="t_aaaa_1"/>
-        <event><string key="concept:name" value="a"/></event>
-        <event><string key="concept:name" value="a"/></event>
-        <event><string key="concept:name" value="a"/></event>
-        <event><string key="concept:name" value="a"/></event>
-    </trace>
-    <trace>
-        <string key="concept:name" value="t_aaaa_2"/>
-        <event><string key="concept:name" value="a"/></event>
-        <event><string key="concept:name" value="a"/></event>
-        <event><string key="concept:name" value="a"/></event>
-        <event><string key="concept:name" value="a"/></event>
-    </trace>
-
-    </log>"#
-    }
-
     #[test]
     fn test_entropy_eventlog() -> Result<()> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
 
-        let log: EventLog = xes_fig_a().parse()?;
-        let entropy = entropy_eventlog(log.clone());
-
+        let xes_fig_a = include_str!("../../testfiles/fig_a.xes");
+        let log: EventLog = xes_fig_a.parse()?;
+        let fsl = FiniteStochasticLanguage::from(log);
+        let entropy = entropy_eventlog(fsl)?;
         println!("entropy ≈ {:.12}", entropy.approximate());
 
         Ok(())
@@ -585,11 +452,13 @@ mod tests {
     fn test_gain_numerator() -> Result<()> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
 
-        let log: EventLog = xes_fig_a().parse()?;
-        let mut sdfa = sdfa_fig_c::build_fig_c_loop()?;
+        let xes_fig_a = include_str!("../../testfiles/fig_a.xes");
+        let log: EventLog = xes_fig_a.parse()?;
+        let fsl = FiniteStochasticLanguage::from(log);
+        let sdfa = sdfa_fig_c::build_fig_c_loop()?;
         let lambda = Fraction::zero();
 
-        let numerator = gain_numerator_lambda(log.clone(), &mut sdfa, &lambda)?;
+        let numerator = gain_numerator_lambda(fsl, sdfa, &lambda)?;
         println!("Gain Numerator ≈ {:.12}", numerator.approximate());
 
         Ok(())
@@ -598,20 +467,42 @@ mod tests {
     #[test]
     fn test_gain() -> Result<()> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-
-        let log: EventLog = xes_fig_a().parse()?;
+        let xes_fig_a = include_str!("../../testfiles/fig_a.xes");
+        let log: EventLog = xes_fig_a.parse()?;
+        let fsl = FiniteStochasticLanguage::from(log);
         let sdfa = sdfa_fig_c::build_fig_c_loop()?;
 
         let lambda: Fraction = f!(1i64, 1_000_000i64);
 
-        let precision: FractionEnum =
-            potential_gain_precision(log.clone(), &sdfa, Some(&lambda))?;
-        let recall: FractionEnum =
-            potential_gain_recall(log.clone(), &sdfa, Some(&lambda))?;
+        let precision: FractionEnum = potential_gain_precision(fsl.clone(), sdfa.clone(), Some(&lambda))?;
+        let recall: FractionEnum =potential_gain_recall(fsl.clone(), sdfa.clone() , Some(&lambda))?;
 
         println!("precision(L_e, S_e) ≈ {}", precision);
         println!("recall   (L_e, S_e) ≈ {}", recall);
 
         Ok(())
     }
+
+        #[test]
+    fn test_entropy_sdfa_without_initial_state() -> Result<()> {
+        use ebi_objects::ebi_arithmetic::Zero;
+        ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
+
+        let mut sdfa = sdfa_fig_c::build_fig_c_loop()?;
+        sdfa.set_initial_state(None);
+
+        assert!(sdfa.get_initial_state().is_none());
+
+        let state_visits = c_s(&sdfa)?;
+        for value in &state_visits {
+            assert!(value.is_zero());
+        }
+
+        let entropy = entropy_sdfa(&sdfa)?;
+        assert!(entropy.is_zero());
+
+        Ok(())
+    }
+
 }
+

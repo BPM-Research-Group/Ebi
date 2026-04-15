@@ -193,6 +193,27 @@ impl PartialEq for LogDivExact {
 
 impl Eq for LogDivExact {}
 
+impl PartialOrd for LogDivExact {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        match (self, other) {
+            (LogDivExact((l0, l1)), LogDivExact((r0, r1))) => {
+                if self == other {
+                    return Some(Ordering::Equal);
+                }
+
+                if l1 == r1 {
+                    return l0.partial_cmp(r0);
+                }
+
+                let left = LogDivExact::power_f_u(l0, r1);
+                let right = LogDivExact::power_f_u(r0, l1);
+
+                left.partial_cmp(&right)
+            }
+        }
+    }
+}
+
 impl TryFrom<Fraction> for LogDivExact {
     type Error = Error;
 

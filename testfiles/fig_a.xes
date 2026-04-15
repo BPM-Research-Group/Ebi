@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0" xes.features="nested-attributes"
+    xmlns="http://www.xes-standard.org/">
+
+    <!-- ε : 1 time -->
+    <trace>
+        <string key="concept:name" value="t_eps_1"/>
+    </trace>
+
+    <!-- (a) : 2 times -->
+    <trace>
+        <string key="concept:name" value="t_a_1"/>
+        <event><string key="concept:name" value="a"/></event>
+    </trace>
+    <trace>
+        <string key="concept:name" value="t_a_2"/>
+        <event><string key="concept:name" value="a"/></event>
+    </trace>
+
+    <!-- (a,a) : 4 times -->
+    <trace>
+        <string key="concept:name" value="t_aa_1"/>
+        <event><string key="concept:name" value="a"/></event>
+        <event><string key="concept:name" value="a"/></event>
+    </trace>
+    <trace>
+        <string key="concept:name" value="t_aa_2"/>
+        <event><string key="concept:name" value="a"/></event>
+        <event><string key="concept:name" value="a"/></event>
+    </trace>
+    <trace>
+        <string key="concept:name" value="t_aa_3"/>
+        <event><string key="concept:name" value="a"/></event>
+        <event><string key="concept:name" value="a"/></event>
+    </trace>
+    <trace>
+        <string key="concept:name" value="t_aa_4"/>
+        <event><string key="concept:name" value="a"/></event>
+        <event><string key="concept:name" value="a"/></event>
+    </trace>
+
+    <!-- (a,a,a) : 1 time -->
+    <trace>
+        <string key="concept:name" value="t_aaa_1"/>
+        <event><string key="concept:name" value="a"/></event>
+        <event><string key="concept:name" value="a"/></event>
+        <event><string key="concept:name" value="a"/></event>
+    </trace>
+
+    <!-- (a,a,a,a) : 2 times -->
+    <trace>
+        <string key="concept:name" value="t_aaaa_1"/>
+        <event><string key="concept:name" value="a"/></event>
+        <event><string key="concept:name" value="a"/></event>
+        <event><string key="concept:name" value="a"/></event>
+        <event><string key="concept:name" value="a"/></event>
+    </trace>
+    <trace>
+        <string key="concept:name" value="t_aaaa_2"/>
+        <event><string key="concept:name" value="a"/></event>
+        <event><string key="concept:name" value="a"/></event>
+        <event><string key="concept:name" value="a"/></event>
+        <event><string key="concept:name" value="a"/></event>
+    </trace>
+
+</log>
