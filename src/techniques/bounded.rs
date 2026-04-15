@@ -10,7 +10,7 @@ use ebi_objects::{
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::Result,
     ebi_objects::{
-        event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking,
+        event_log_csv::EventLogCsv, event_log_event_attributes::EventLogEventAttributes, event_log_ocel::EventLogOcel, process_tree::TreeMarking
     },
 };
 use std::collections::{HashMap, hash_map::Entry};
@@ -162,6 +162,7 @@ usize!(StochasticDirectlyFollowsModel);
 usize!(FiniteLanguage);
 usize!(EventLog);
 usize!(EventLogCsv);
+usize!(EventLogEventAttributes);
 usize!(EventLogOcel);
 usize!(EventLogPython);
 usize!(EventLogTraceAttributes);

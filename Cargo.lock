@@ -764,9 +764,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_activity_key"
-version = "0.0.1"
+version = "0.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "070fcc38f3aa2c2763b4f0fdd09d4b44ee744d09af3c785381a41cb4997eaf77"
+checksum = "41eab2d4244b7796f898c473fa432cdd7741b18fb23f95663bd32eda50ae12b9"
 dependencies = [
  "intmap",
  "uuid",
@@ -788,9 +788,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_bpmn"
-version = "0.0.45"
+version = "0.0.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cd99d9330ee1fdf50a8c51fc63d30a91e649d7030e184cdda0c19c11651a8271"
+checksum = "922862ad1b66e86a1bb243136e3d73bde20af79193c6e16dc0d2317c106384a0"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -818,9 +818,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
-version = "0.3.178"
+version = "0.3.180"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f19b95e8520e95f95777f9f8b1fdf5e0218d3e20cb3400002e2877bb0462b0d7"
+checksum = "7ab5233657eff204a64414e5092945faa11475ffc814b13a28699535b82cf3a9"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -836,6 +836,7 @@ dependencies = [
  "itertools",
  "layout-rs",
  "log",
+ "pastey",
  "process_mining",
  "quick-xml 0.39.2",
  "rayon",
@@ -2933,9 +2934,9 @@ checksum = "60a357793950651c4ed0f3f52338f53b2f809f32d83a07f72909fa13e4c6c1e3"
 
 [[package]]
 name = "rayon"
-version = "1.11.0"
+version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "368f01d005bf8fd9b1206fb6fa653e6c4a81ceb1466406b81792d87c5677a58f"
+checksum = "fb39b166781f92d482534ef4b4b1b2568f42613b53e5b6c160e24cfbfa30926d"
 dependencies = [
  "either",
  "rayon-core",

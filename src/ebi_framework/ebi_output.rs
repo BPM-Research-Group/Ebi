@@ -41,19 +41,7 @@ use ebi_objects::{
     anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{Exporter, Fraction},
     ebi_objects::{
-        compressed_event_log::CompressedEventLog,
-        compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-        deterministic_finite_automaton::DeterministicFiniteAutomaton,
-        directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel,
-        event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, executions::Executions,
-        finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage,
-        labelled_petri_net::LabelledPetriNet, language_of_alignments::LanguageOfAlignments,
-        process_tree::ProcessTree, scalable_vector_graphics::ScalableVectorGraphics,
-        stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
-        stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
-        stochastic_labelled_petri_net::StochasticLabelledPetriNet,
-        stochastic_language_of_alignments::StochasticLanguageOfAlignments,
-        stochastic_process_tree::StochasticProcessTree,
+        compressed_event_log::CompressedEventLog, compressed_event_log_event_attributes::CompressedEventLogEventAttributes, compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes, deterministic_finite_automaton::DeterministicFiniteAutomaton, directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel, event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, executions::Executions, finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage, labelled_petri_net::LabelledPetriNet, language_of_alignments::LanguageOfAlignments, process_tree::ProcessTree, scalable_vector_graphics::ScalableVectorGraphics, stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton, stochastic_directly_follows_model::StochasticDirectlyFollowsModel, stochastic_labelled_petri_net::StochasticLabelledPetriNet, stochastic_language_of_alignments::StochasticLanguageOfAlignments, stochastic_process_tree::StochasticProcessTree
     },
 };
 use std::{
@@ -246,6 +234,14 @@ impl EbiOutputType {
                 EbiExporter::Object(
                     &EbiObjectExporter::EventLog(
                         CompressedEventLogTraceAttributes::export_from_object,
+                    ),
+                    &EBI_COMPRESSED_EVENT_LOG,
+                )
+            }
+            EbiOutputType::ObjectType(EbiObjectType::EventLogEventAttributes) => {
+                EbiExporter::Object(
+                    &EbiObjectExporter::EventLogEventAttributes(
+                        CompressedEventLogEventAttributes::export_from_object,
                     ),
                     &EBI_COMPRESSED_EVENT_LOG,
                 )
@@ -485,6 +481,7 @@ pub enum EbiObjectExporter {
     BusinessProcessModelAndNotation(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLog(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogCsv(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
+    EventLogEventAttributes(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogOcel(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogTraceAttributes(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogXes(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
