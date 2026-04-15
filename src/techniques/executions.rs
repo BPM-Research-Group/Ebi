@@ -9,8 +9,8 @@ use crate::{
 };
 use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
-    EventLogXes, Executions, HasActivityKey, IntoTraceIterator, NumberOfTraces,
-    anyhow::{Context, Error, Ok, Result},
+    ActivityKey, EventLogXes, Executions, HasActivityKey, IntoTraceIterator, NumberOfTraces,
+    anyhow::{Context, Error, Ok, Result, anyhow},
     ebi_objects::{
         executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
     },
@@ -48,6 +48,7 @@ where
         log::info!("Compute alignments");
         let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
+        let resource_key = Arc::new(Mutex::new(ActivityKey::new()));
 
         self.translate_using_activity_key(log.activity_key_mut());
 
@@ -64,7 +65,7 @@ where
                     Result::Ok((aligned_trace, _)) => {
                         //process the moves of this trace
                         let c = C::new(trace_index, aligned_trace);
-                        match c.process_alignment(self, &log) {
+                        match c.process_alignment(self, &log, &resource_key) {
                             Result::Ok(c) => Some(c),
                             Err(err) => {
                                 let error = Arc::clone(&error);
@@ -95,7 +96,12 @@ where
             }
         }
 
-        Ok(result.into())
+        Ok((
+            log.activity_key().clone(),
+            Arc::try_unwrap(resource_key).unwrap().into_inner().unwrap(),
+            result,
+        )
+            .into())
     }
 }
 
@@ -112,14 +118,19 @@ impl C {
         }
     }
 
-    fn process_alignment<T, FS>(&self, semantics: &T, log: &EventLogXes) -> Result<Vec<Execution>>
+    fn process_alignment<T, FS>(
+        &self,
+        semantics: &T,
+        log: &EventLogXes,
+        resource_key: &Arc<Mutex<ActivityKey>>,
+    ) -> Result<Vec<Execution>>
     where
         T: Semantics<SemState = FS> + Send + Sync + ?Sized,
         FS: Display + Debug + Clone + Hash + Eq,
     {
         let mut state = semantics
             .get_initial_state()
-            .context("Got an unexpected emtpy state.")?;
+            .context("Got an unexpected empty state.")?;
         let mut executions = vec![];
 
         for move_index in 0..self.moves.len() {
@@ -130,16 +141,16 @@ impl C {
                 Move::ModelMove(_, transition) => {
                     semantics.execute_transition(&mut state, transition)?;
                 }
-                Move::SynchronousMove(_, transition) => {
+                Move::SynchronousMove(activity, transition) => {
                     let enabling_move_index = self.get_enabling_move(transition, semantics);
 
                     executions.push(Execution {
-                        transition: transition,
-                        enabled_transitions_at_enablement: self
+                        activity: Some(activity),
+                        enabled_transitions: self
                             .get_enabled_transitions(enabling_move_index, semantics)?,
                         time_of_enablement: self.get_time(enabling_move_index, log),
                         time_of_execution: self.get_time(Some(move_index), log),
-                        features_at_enablement: None,
+                        resource,
                     });
 
                     semantics.execute_transition(&mut state, transition)?;
@@ -148,12 +159,12 @@ impl C {
                     let enabling_move_index = self.get_enabling_move(transition, semantics);
 
                     executions.push(Execution {
-                        transition: transition,
-                        enabled_transitions_at_enablement: self
+                        activity: None,
+                        enabled_transitions: self
                             .get_enabled_transitions(enabling_move_index, semantics)?,
                         time_of_enablement: self.get_time(enabling_move_index, log),
                         time_of_execution: None,
-                        features_at_enablement: None,
+                        resource,
                     });
 
                     semantics.execute_transition(&mut state, transition)?;
@@ -208,7 +219,7 @@ impl C {
         &self,
         move_index: Option<usize>,
         semantics: &T,
-    ) -> Result<Option<Vec<TransitionIndex>>>
+    ) -> Result<Vec<TransitionIndex>>
     where
         T: Semantics<SemState = FS> + Send + Sync + ?Sized,
         FS: Display + Debug + Clone + Hash + Eq,
@@ -226,9 +237,9 @@ impl C {
                     };
                 }
             }
-            Ok(Some(semantics.get_enabled_transitions(&state)))
+            Ok(semantics.get_enabled_transitions(&state))
         } else {
-            Ok(None)
+            Err(anyhow!("No initial state."))
         }
     }
 

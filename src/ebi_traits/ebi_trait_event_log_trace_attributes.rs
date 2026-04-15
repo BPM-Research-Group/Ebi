@@ -16,8 +16,6 @@ use intmap::IntMap;
 use process_mining::core::event_data::case_centric::AttributeValue;
 use std::collections::HashMap;
 
-pub const ATTRIBUTE_TIME: &str = "time:timestamp";
-
 pub trait EbiTraitEventLogTraceAttributes:
     EbiTraitEventLog
     + IntoAttributeIterator

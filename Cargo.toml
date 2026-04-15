@@ -40,7 +40,7 @@ fraction = { version = "0.15.3", features = ["with-approx"] }
 serde_json = "1.0.149"
 priority-queue = "2.6.0"
 process_mining = { version = "0.5.4", features = ["graphviz-export"] }
-rand = "0.10.0"
+rand = "0.10.1"
 rand_chacha = "0.10.0"
 chrono = "0.4.44"
 flate2 = "1.1.5"
