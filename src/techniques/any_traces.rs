@@ -4,9 +4,17 @@ use crate::{
     techniques::livelock::IsPartOfLivelock,
 };
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage, FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet, NumberOfTraces, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, anyhow::Result, ebi_arithmetic::ebi_number::Zero, ebi_objects::{
-        event_log_csv::EventLogCsv, event_log_event_attributes::EventLogEventAttributes, event_log_ocel::EventLogOcel, process_tree::TreeMarking
-    }
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
+    EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
+    FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet, NumberOfTraces, ProcessTree,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    anyhow::Result,
+    ebi_arithmetic::ebi_number::Zero,
+    ebi_objects::{
+        event_log_csv::EventLogCsv, event_log_event_attributes::EventLogEventAttributes,
+        event_log_ocel::EventLogOcel, process_tree::TreeMarking,
+    },
 };
 
 pub trait AnyTraces {
@@ -38,7 +46,10 @@ impl AnyTraces for EventLogOcel {
     type LivState = usize;
 
     fn any_traces(&self) -> Result<bool> {
-        Ok(!Self::get_relevant_objects(&self.rust4pm_log.objects, &self.object_type).is_empty())
+        Ok(
+            !Self::get_relevant_objects(&self.rust4pm_log.objects, &self.case_object_type)
+                .is_empty(),
+        )
     }
 }
 

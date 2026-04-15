@@ -24,6 +24,7 @@ use crate::{
 use ebi_objects::{
     EbiObject, EventLog, EventLogTraceAttributes, EventLogXes, Exportable, Importable,
     anyhow::{Result, anyhow},
+    ebi_objects::event_log_event_attributes::EventLogEventAttributes,
 };
 
 pub const EBI_EVENT_LOG_XES: EbiFileHandler = EbiFileHandler {
@@ -81,6 +82,10 @@ pub const EBI_EVENT_LOG_XES: EbiFileHandler = EbiFileHandler {
     ],
     object_importers: &[
         EbiObjectImporter::EventLog(EventLog::import_as_object, EventLog::IMPORTER_PARAMETERS),
+        EbiObjectImporter::EventLogEventAttributes(
+            EventLogEventAttributes::import_as_object,
+            EventLogEventAttributes::IMPORTER_PARAMETERS,
+        ),
         EbiObjectImporter::EventLogTraceAttributes(
             EventLogTraceAttributes::import_as_object,
             EventLogTraceAttributes::IMPORTER_PARAMETERS,
@@ -149,7 +154,20 @@ impl FromEbiTraitObject for EventLogTraceAttributes {
         match object {
             EbiInput::Object(EbiObject::EventLogTraceAttributes(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as an event log",
+                "Cannot read {} {} as an event log.",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
+    }
+}
+
+impl FromEbiTraitObject for EventLogEventAttributes {
+    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::EventLogEventAttributes(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "Cannot read {} {} as an event log.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

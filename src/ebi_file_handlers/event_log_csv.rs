@@ -3,8 +3,9 @@ use crate::ebi_framework::{
     ebi_input::{EbiObjectImporter, EbiObjectImporterFallible, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     object_importers::{
-        ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogObject,
-        ImportAsFiniteLanguageObject, ImportAsFiniteStochasticLanguageObject,
+        ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogEventAttributesObject,
+        ImportAsEventLogObject, ImportAsFiniteLanguageObject,
+        ImportAsFiniteStochasticLanguageObject,
         ImportAsStochasticDeterministicFiniteAutomatonObject,
         ImportAsStochasticNondeterministicFiniteAutomatonObject, TryToEventLogXesObject,
     },
@@ -73,6 +74,10 @@ pub const EBI_EVENT_LOG_CSV: EbiFileHandler = EbiFileHandler {
             EventLogCsv::import_as_event_log_object,
             EventLogCsv::IMPORTER_PARAMETERS,
         ),
+        EbiObjectImporter::EventLogEventAttributes(
+            EventLogCsv::import_as_event_log_event_attributes_object,
+            EventLogCsv::IMPORTER_PARAMETERS_EVENT_ATTRIBUTES,
+        ),
         EbiObjectImporter::EventLogCsv(
             EventLogCsv::import_as_object,
             EventLogCsv::IMPORTER_PARAMETERS,
@@ -98,12 +103,10 @@ pub const EBI_EVENT_LOG_CSV: EbiFileHandler = EbiFileHandler {
             EventLogCsv::IMPORTER_PARAMETERS,
         ),
     ],
-    object_importers_fallible: &[
-        EbiObjectImporterFallible::EventLogXes(
-            EventLogCsv::try_import_as_event_log_xes_object,
-            EventLogCsv::IMPORTER_PARAMETERS,
-        ),
-    ],
+    object_importers_fallible: &[EbiObjectImporterFallible::EventLogXes(
+        EventLogCsv::try_import_as_event_log_xes_object,
+        EventLogCsv::IMPORTER_PARAMETERS,
+    )],
     object_exporters: &[EbiObjectExporter::EventLogCsv(
         EventLogCsv::export_from_object,
     )],

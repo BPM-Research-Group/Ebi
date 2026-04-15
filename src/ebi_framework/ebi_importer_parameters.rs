@@ -215,13 +215,16 @@ pub fn extract_parameter_values(
             match parameter {
                 ImporterParameter::Flag { name, .. } => {
                     if let Some(cli_matches) = cli_matches {
-                        ImporterParameterValue::Boolean(
-                            *cli_matches
-                                .get_one::<bool>(&name_to_id(name, input_index))
-                                .unwrap_or(&false),
+                        (
+                            ImporterParameterValue::Boolean(
+                                *cli_matches
+                                    .get_one::<bool>(&name_to_id(name, input_index))
+                                    .unwrap_or(&false),
+                            ),
+                            true,
                         )
                     } else {
-                        ImporterParameterValue::Boolean(false)
+                        (ImporterParameterValue::Boolean(false), true)
                     }
                 }
                 ImporterParameter::String {
@@ -236,21 +239,27 @@ pub fn extract_parameter_values(
                         {
                             if let Some(allowed_values) = allowed_values {
                                 if allowed_values.contains(&value.as_str()) {
-                                    ImporterParameterValue::String(value.to_string())
+                                    (ImporterParameterValue::String(value.to_string()), true)
                                 } else {
                                     return Err(anyhow!(
-                                        "value should be one of {:?}",
+                                        "Value should be one of {:?}.",
                                         allowed_values
                                     ));
                                 }
                             } else {
-                                ImporterParameterValue::String(value.to_string())
+                                (ImporterParameterValue::String(value.to_string()), true)
                             }
                         } else {
-                            ImporterParameterValue::String(default_value.to_string())
+                            (
+                                ImporterParameterValue::String(default_value.to_string()),
+                                true,
+                            )
                         }
                     } else {
-                        ImporterParameterValue::String(default_value.to_string())
+                        (
+                            ImporterParameterValue::String(default_value.to_string()),
+                            true,
+                        )
                     }
                 }
                 ImporterParameter::Usize {
@@ -273,30 +282,30 @@ pub fn extract_parameter_values(
                                             max
                                         ));
                                     } else {
-                                        ImporterParameterValue::Usize(*value)
+                                        (ImporterParameterValue::Usize(*value), true)
                                     }
                                 }
                                 (Some(min), None) => {
                                     if value < min {
                                         return Err(anyhow!("Value must be below {}.", min));
                                     } else {
-                                        ImporterParameterValue::Usize(*value)
+                                        (ImporterParameterValue::Usize(*value), true)
                                     }
                                 }
                                 (None, Some(max)) => {
                                     if value > max {
                                         return Err(anyhow!("Value must be above {}.", max));
                                     } else {
-                                        ImporterParameterValue::Usize(*value)
+                                        (ImporterParameterValue::Usize(*value), true)
                                     }
                                 }
-                                (None, None) => ImporterParameterValue::Usize(*value),
+                                (None, None) => (ImporterParameterValue::Usize(*value), true),
                             }
                         } else {
-                            ImporterParameterValue::Usize(*default_value)
+                            (ImporterParameterValue::Usize(*default_value), true)
                         }
                     } else {
-                        ImporterParameterValue::Usize(*default_value)
+                        (ImporterParameterValue::Usize(*default_value), true)
                     }
                 }
                 ImporterParameter::Fraction {
@@ -320,30 +329,36 @@ pub fn extract_parameter_values(
                                             max
                                         ));
                                     } else {
-                                        ImporterParameterValue::Fraction(value)
+                                        (ImporterParameterValue::Fraction(value), true)
                                     }
                                 }
                                 (Some(min), None) => {
                                     if min > &value {
                                         return Err(anyhow!("Value must be below {}.", min));
                                     } else {
-                                        ImporterParameterValue::Fraction(value)
+                                        (ImporterParameterValue::Fraction(value), true)
                                     }
                                 }
                                 (None, Some(max)) => {
                                     if max > &value {
                                         return Err(anyhow!("Value must be above {}.", max));
                                     } else {
-                                        ImporterParameterValue::Fraction(value)
+                                        (ImporterParameterValue::Fraction(value), true)
                                     }
                                 }
-                                (None, None) => ImporterParameterValue::Fraction(value),
+                                (None, None) => (ImporterParameterValue::Fraction(value), true),
                             }
                         } else {
-                            ImporterParameterValue::Fraction(default_value.to_fraction())
+                            (
+                                ImporterParameterValue::Fraction(default_value.to_fraction()),
+                                true,
+                            )
                         }
                     } else {
-                        ImporterParameterValue::Fraction(default_value.to_fraction())
+                        (
+                            ImporterParameterValue::Fraction(default_value.to_fraction()),
+                            true,
+                        )
                     }
                 }
             },

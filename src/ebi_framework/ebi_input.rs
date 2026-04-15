@@ -601,7 +601,7 @@ impl EbiTraitImporter {
     pub fn default_parameter_values(&self) -> ImporterParameterValues {
         let mut result = ImporterParameterValues::new();
         for parameter in self.parameters() {
-            result.insert(*parameter, parameter.default());
+            result.insert(*parameter, (parameter.default(), false));
         }
         result
     }
@@ -671,15 +671,19 @@ pub enum EbiObjectImporter {
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
     ),
-    EventLogTraceAttributes(
-        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
-        &'static [ImporterParameter],
-    ),
     EventLogCsv(
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
     ),
+    EventLogEventAttributes(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
     EventLogOcel(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    EventLogTraceAttributes(
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
     ),
@@ -765,6 +769,9 @@ impl EbiObjectImporter {
             }
             EbiObjectImporter::EventLog(_, _) => EbiObjectType::EventLog,
             EbiObjectImporter::EventLogCsv(_, _) => EbiObjectType::EventLogCsv,
+            EbiObjectImporter::EventLogEventAttributes(_, _) => {
+                EbiObjectType::EventLogEventAttributes
+            }
             EbiObjectImporter::EventLogOcel(_, _) => EbiObjectType::EventLogOcel,
             EbiObjectImporter::EventLogTraceAttributes(_, _) => {
                 EbiObjectType::EventLogTraceAttributes
@@ -813,6 +820,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::BusinessProcessModelAndNotation(_, parameters) => parameters,
             EbiObjectImporter::EventLog(_, parameters) => parameters,
             EbiObjectImporter::EventLogCsv(_, parameters) => parameters,
+            EbiObjectImporter::EventLogEventAttributes(_, parameters) => parameters,
             EbiObjectImporter::EventLogOcel(_, parameters) => parameters,
             EbiObjectImporter::EventLogTraceAttributes(_, parameters) => parameters,
             EbiObjectImporter::EventLogXes(_, parameters) => parameters,
@@ -845,7 +853,7 @@ impl EbiObjectImporter {
     pub fn default_parameter_values(&self) -> ImporterParameterValues {
         let mut result = ImporterParameterValues::new();
         for parameter in self.parameters() {
-            result.insert(*parameter, parameter.default());
+            result.insert(*parameter, (parameter.default(), false));
         }
         result
     }
@@ -857,6 +865,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::BusinessProcessModelAndNotation(importer, _) => *importer,
             EbiObjectImporter::EventLog(importer, _) => *importer,
             EbiObjectImporter::EventLogCsv(importer, _) => *importer,
+            EbiObjectImporter::EventLogEventAttributes(importer, _) => *importer,
             EbiObjectImporter::EventLogOcel(importer, _) => *importer,
             EbiObjectImporter::EventLogTraceAttributes(importer, _) => *importer,
             EbiObjectImporter::EventLogXes(importer, _) => *importer,
@@ -1075,7 +1084,7 @@ impl EbiObjectImporterFallible {
     pub fn default_parameter_values(&self) -> ImporterParameterValues {
         let mut result = ImporterParameterValues::new();
         for parameter in self.parameters() {
-            result.insert(*parameter, parameter.default());
+            result.insert(*parameter, (parameter.default(), false));
         }
         result
     }

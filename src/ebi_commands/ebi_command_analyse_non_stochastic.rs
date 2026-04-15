@@ -14,7 +14,7 @@ use crate::{
         infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic,
     }, tests::test_ebi_command,
 };
-use ebi_objects::{anyhow::anyhow, EbiObject, EbiObjectType, EventLogXes};
+use ebi_objects::{EbiObject, EbiObjectType, anyhow::anyhow, ebi_objects::event_log_event_attributes::EventLogEventAttributes};
 use std::io::Write;
 
 pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
@@ -203,13 +203,13 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Comman
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
-        &[&EbiInputType::Object(EbiObjectType::EventLogXes)],
+        &[&EbiInputType::Object(EbiObjectType::EventLogEventAttributes)],
         &[&EbiInputType::Trait(EbiTrait::Semantics)],
     ],
     input_names: &["LOG", "MODEL"],
     input_helps: &["The event log.", "The model."],
     execute: |mut objects, _| {
-        let mut log = objects.remove(0).to_type::<EventLogXes>()?;
+        let mut log = objects.remove(0).to_type::<EventLogEventAttributes>()?;
         let mut model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
 
         let result = model.find_executions(&mut log)?;

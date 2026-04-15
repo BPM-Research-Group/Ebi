@@ -1,15 +1,16 @@
-use ebi_objects::{Exportable, Importable, ebi_objects::event_log_ocel::EventLogOcel};
+use ebi_objects::{
+    Exportable, Importable,
+    ebi_objects::{
+        event_log_event_attributes::EventLogEventAttributes, event_log_ocel::EventLogOcel,
+    },
+};
 
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     object_importers::{
-        ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogObject,
-        ImportAsEventLogTraceAttributesObject, ImportAsFiniteLanguageObject,
-        ImportAsFiniteStochasticLanguageObject,
-        ImportAsStochasticDeterministicFiniteAutomatonObject,
-        ImportAsStochasticNondeterministicFiniteAutomatonObject,
+        ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogEventAttributesObject, ImportAsEventLogObject, ImportAsEventLogTraceAttributesObject, ImportAsFiniteLanguageObject, ImportAsFiniteStochasticLanguageObject, ImportAsStochasticDeterministicFiniteAutomatonObject, ImportAsStochasticNondeterministicFiniteAutomatonObject
     },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait,
@@ -79,14 +80,22 @@ pub const EBI_EVENT_LOG_OCEL: EbiFileHandler = EbiFileHandler {
             EventLogOcel::import_as_event_log_object,
             EventLogOcel::IMPORTER_PARAMETERS,
         ),
+        EbiObjectImporter::EventLogEventAttributes(
+            EventLogOcel::import_as_event_log_event_attributes_object,
+            EventLogOcel::IMPORTER_PARAMETERS_EVENT_ATTRIBUTES,
+        ),
         EbiObjectImporter::EventLogTraceAttributes(
             EventLogOcel::import_as_event_log_trace_attributes_object,
             EventLogOcel::IMPORTER_PARAMETERS,
         ),
-        // EbiObjectImporter::EventLogOcel(
-        //     EventLogOcel::import_as_object,
-        //     EventLogOcel::IMPORTER_PARAMETERS,
-        // ),
+        EbiObjectImporter::EventLogEventAttributes(
+            EventLogOcel::import_as_object,
+            EventLogEventAttributes::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::EventLogOcel(
+            EventLogOcel::import_as_object,
+            EventLogOcel::IMPORTER_PARAMETERS,
+        ),
         EbiObjectImporter::FiniteLanguage(
             EventLogOcel::import_as_finite_language_object,
             EventLogOcel::IMPORTER_PARAMETERS,

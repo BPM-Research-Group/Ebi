@@ -28,10 +28,10 @@ extension-module = ["pyo3/extension-module"]
 
 [dependencies]
 ebi_optimisation = "0.3.7"
-ebi_objects = "0.3.180"
+ebi_objects = { path = "../Ebi_objects", version = "0.3.181" }
 ebi_derive = "0.2.10"
 bitvec = "1.0.1"
-clap = { version = "4.6.0", features = ["derive", "cargo", "string"] }
+clap = { version = "4.6.1", features = ["derive", "cargo", "string"] }
 clap-verbosity-flag = "3.0.3"
 log = { version = "0.4.28", features = ["release_max_level_debug"] }
 env_logger = "0.11.10"

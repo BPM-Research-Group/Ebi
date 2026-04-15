@@ -52,6 +52,9 @@ where
     T: Display,
 {
     fn join_with(&self, sep: &str, last_sep: &str) -> String {
+        if self.len() == 0 {
+            return String::new()
+        }
         if self.len() == 1 {
             return self[0].to_string();
         }
