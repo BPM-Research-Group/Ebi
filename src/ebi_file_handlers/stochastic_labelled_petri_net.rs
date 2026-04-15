@@ -108,8 +108,6 @@ mod tests {
 
     use ebi_objects::StochasticLabelledPetriNet;
 
-    use crate::semantics::semantics::Semantics;
-
     #[test]
     fn empty_slpn() {
         let fin = fs::read_to_string("testfiles/empty_net.slpn").unwrap();

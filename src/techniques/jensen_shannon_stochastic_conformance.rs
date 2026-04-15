@@ -37,7 +37,6 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
         let mut log1_prob_intersection_sum = Fraction::zero();
         let mut log2_prob_intersection_sum = Fraction::zero();
 
-
         for (trace1, probability1) in self.iter_traces_probabilities() {
             for (trace2, probability2) in event_log2.iter_traces_probabilities() {
                 if trace1 == &translator.translate_trace(trace2) {

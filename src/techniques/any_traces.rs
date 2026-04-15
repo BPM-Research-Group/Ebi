@@ -11,7 +11,9 @@ use ebi_objects::{
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     ebi_arithmetic::ebi_number::Zero,
-    ebi_objects::{event_log_csv::EventLogCsv, process_tree::TreeMarking},
+    ebi_objects::{
+        event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking,
+    },
 };
 
 pub trait AnyTraces {
@@ -36,6 +38,14 @@ impl AnyTraces for StochasticProcessTree {
 
     fn any_traces(&self) -> Result<bool> {
         Ok(self.get_initial_state().is_none()) //an empty tree has no traces, otherwise a tree has traces
+    }
+}
+
+impl AnyTraces for EventLogOcel {
+    type LivState = usize;
+
+    fn any_traces(&self) -> Result<bool> {
+        Ok(!Self::get_relevant_objects(&self.rust4pm_log.objects, &self.object_type).is_empty())
     }
 }
 

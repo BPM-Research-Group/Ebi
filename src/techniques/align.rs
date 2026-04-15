@@ -160,7 +160,7 @@ where
         let aligned_traces = log
             .par_iter_traces_probabilities()
             .filter_map(|(trace, probability)| {
-                let translator = Arc::clone(&translator);
+                let translator: Arc<ActivityKeyTranslator> = Arc::clone(&translator);
                 let self2 = Arc::from(&self);
 
                 let trace_translated = translator.translate_trace(&trace);
@@ -223,7 +223,7 @@ where
     T: Semantics<SemState = State> + AlignmentHeuristics<AliState = State> + ?Sized,
     State: Displayable,
 {
-    // log::debug!("activity key {:?}", semantics.get_activity_key());
+    log::debug!("activity key {:?}", semantics.activity_key());
     // log::debug!("align trace {:?}", trace);
 
     let cache = semantics.initialise_alignment_heuristic_cache();
@@ -239,7 +239,7 @@ where
                 //we can do a log move
                 let new_trace_index = trace_index + 1;
                 let new_state = state.clone();
-                // log::debug!("\tlog move {} to {} {}", trace[*trace_index], new_trace_index, new_state);
+                log::debug!("\tlog move {} to {} {}", trace[*trace_index], new_trace_index, new_state);
                 result.push(((new_trace_index, new_state), 10000));
             }
 
@@ -251,23 +251,23 @@ where
                 if let Some(activity) = semantics.get_transition_activity(transition) {
                     //non-silent model move
                     result.push(((*trace_index, new_state.clone()), 10000));
-                    // log::debug!("\tmodel move t{} {} to {} {}", transition, activity, trace_index, new_state);
+                    log::debug!("\tmodel move t{} {} to {} {}", transition, activity, trace_index, new_state);
 
                     //which may also be a synchronous move
                     if trace_index < &trace.len() && activity == trace[*trace_index] {
                         //synchronous move
                         let new_trace_index = trace_index + 1;
-                        // log::debug!("\tsynchronous move t{} {} to {} {}", transition, activity, new_trace_index, new_state);
+                        log::debug!("\tsynchronous move t{} {} to {} {}", transition, activity, new_trace_index, new_state);
                         result.push(((new_trace_index, new_state), 0));
                     }
                 } else {
                     //silent move
-                    // log::debug!("\tsilent move t{} to {} {}", transition, trace_index, new_state);
+                    log::debug!("\tsilent move t{} to {} {}", transition, trace_index, new_state);
                     result.push(((*trace_index, new_state), 1));
                 }
             }
 
-            // log::debug!("successors of {} {}: {:?}", trace_index, state, result);
+            log::debug!("successors of {} {}: {:?}", trace_index, state, result);
             result
         };
 

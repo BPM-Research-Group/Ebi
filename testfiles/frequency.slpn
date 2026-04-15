@@ -2,47 +2,71 @@ stochastic labelled Petri net
 # number of places
 4
 # initial marking
-1
 0
-0
+4
+2
 1
 # number of transitions
 4
 # transition 0
-label b
+label e
 # weight
-0.5069910276965125
+0.0010000007148029803
 # number of input places
-1
+4
 0
+0
+1
+1
 # number of output places
-1
-1
+8
+0
+0
+0
+0
+0
+0
+0
+2
 # transition 1
 label c
 # weight
-4.562838296980167
+0.00899915854583903
 # number of input places
+4
+0
 1
-1
+2
+2
 # number of output places
 0
 # transition 2
 label d
 # weight
-1.5209691543750348
+0.002999962033497754
+# number of input places
+5
+1
+1
+1
+1
+2
+# number of output places
+5
+0
+0
+0
+1
+1
+# transition 3
+label b
+# weight
+0.000999999284245006
 # number of input places
 1
 3
 # number of output places
-1
-2
-# transition 3
-label e
-# weight
-0.5069896528137836
-# number of input places
-1
-2
-# number of output places
+3
 0
+1
+2

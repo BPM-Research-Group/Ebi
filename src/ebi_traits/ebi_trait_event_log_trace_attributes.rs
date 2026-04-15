@@ -7,7 +7,7 @@ use crate::{
 };
 use anyhow::{Result, anyhow};
 use ebi_objects::{
-    Activity, Attribute, EventLogTraceAttributes, Importable, IntoAttributeIterator,
+    Activity, Attribute, EventLogOcel, EventLogTraceAttributes, Importable, IntoAttributeIterator,
     IntoAttributeTraceIterator, TraceAttributes, attribute_key::has_attribute_key::HasAttributeKey,
     ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
 };
@@ -112,5 +112,11 @@ where
 impl ToEventLogTraceAttributesTrait for CompressedEventLogTraceAttributes {
     fn to_event_log_trace_attributes_trait(self) -> Box<dyn EbiTraitEventLogTraceAttributes> {
         Box::new(self.log)
+    }
+}
+
+impl ToEventLogTraceAttributesTrait for EventLogOcel {
+    fn to_event_log_trace_attributes_trait(self) -> Box<dyn EbiTraitEventLogTraceAttributes> {
+        Box::new(EventLogTraceAttributes::from(self))
     }
 }

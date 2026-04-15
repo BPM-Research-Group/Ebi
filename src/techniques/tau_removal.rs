@@ -567,7 +567,7 @@ mod tests {
     // 9. size 1 / no tau-edge
     #[test]
     fn tau_removal_trivial_source_state() {
-        // 0 has only visible edges, 1 has tau-edges
+        // 0 has only visible edges, 1 has tau-edge
         let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
         snfa.add_state();
 

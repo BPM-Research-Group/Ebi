@@ -31,6 +31,12 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
     input_helps: &["Any file that can be visualised textually."],
     execute: |mut inputs, _| {
         let result = match inputs.remove(0) {
+            EbiInput::Object(EbiObject::BusinessProcessModelAndNotation(bpmn), _) => {
+                bpmn.to_string()
+            }
+            EbiInput::Object(EbiObject::StochasticBusinessProcessModelAndNotation(bpmn), _) => {
+                bpmn.to_string()
+            }
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => slpn.to_string(),
             EbiInput::Object(EbiObject::LabelledPetriNet(lpn), _) => lpn.to_string(),
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(lang), _) => lang.to_string(),
@@ -42,6 +48,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             }
             EbiInput::Object(EbiObject::EventLog(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::EventLogCsv(log), _) => log.to_string(),
+            EbiInput::Object(EbiObject::EventLogOcel(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::EventLogPython(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::EventLogTraceAttributes(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::EventLogXes(log), _) => log.to_string(),
@@ -76,7 +83,7 @@ pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command {
     explanation_long: None,
     latex_link: None,
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[&[&EbiInputType::Trait(EbiTrait::Graphable)]],
     input_names: &["FILE"],
     input_helps: &["Any file that can be visualised as a graph."],

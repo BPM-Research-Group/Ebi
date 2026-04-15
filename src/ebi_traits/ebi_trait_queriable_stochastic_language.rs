@@ -14,7 +14,7 @@ use ebi_objects::{
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-        event_log_csv::EventLogCsv,
+        event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel,
     },
 };
 use std::sync::{Arc, Mutex};
@@ -128,8 +128,7 @@ macro_rules! queriable_via_slang {
             fn to_queriable_stochastic_language_trait(
                 self,
             ) -> Box<dyn EbiTraitQueriableStochasticLanguage> {
-                let lpn: FiniteStochasticLanguage = self.into();
-                Box::new(lpn)
+                Box::new(FiniteStochasticLanguage::from(self))
             }
         }
     };
@@ -143,6 +142,7 @@ queriable_via_slang!(CompressedEventLog);
 queriable_via_slang!(CompressedEventLogTraceAttributes);
 queriable_via_slang!(EventLogXes);
 queriable_via_slang!(EventLogCsv);
+queriable_via_slang!(EventLogOcel);
 queriable_via_slang!(EventLogPython);
 
 #[cfg(test)]

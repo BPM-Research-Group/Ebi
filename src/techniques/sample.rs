@@ -11,7 +11,7 @@ use ebi_objects::{
     FiniteStochasticLanguage,
     ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One, Zero},
 };
-use rand::Rng;
+use rand::RngExt;
 use std::collections::{HashMap, hash_map::Entry};
 
 pub trait Sampler {

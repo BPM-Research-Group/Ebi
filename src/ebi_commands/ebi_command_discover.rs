@@ -20,9 +20,13 @@ use crate::{
             OccurrencesStochasticMinerLPN, OccurrencesStochasticMinerTree,
         },
         spn_miner::SPNMiner,
+        spn_miner_cross_fold::SPNMinerCrossFold,
+        unit_earth_movers_stochastic_miner::UEMSCStochasticMinerLPN,
         uniform_stochastic_miner::{UniformStochasticMinerLPN, UniformStochasticMinerTree},
     },
 };
+
+pub const DEFAULT_NUMBER_OF_PLACES: usize = 10;
 
 pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
     name_short: "disc",
@@ -33,8 +37,10 @@ pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
         &EBI_DISCOVER_ALIGNMENTS,
         &EBI_DISCOVER_DIRECTLY_FOLLOWS,
         &EBI_DISCOVER_OCCURRENCE,
-        &EBI_DISCOVER_UNIFORM,
         &EBI_DISCOVER_SPN,
+        &EBI_DISCOVER_UEMSC,
+        &EBI_DISCOVER_UNIFORM,
+        &EBI_DISCOVER_SPN_CROSS_FOLD,
     ],
 };
 
@@ -62,6 +68,7 @@ pub const EBI_DISCOVER_ALIGNMENTS: EbiCommand = EbiCommand::Command {
             .remove(0)
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let lpn = inputs.remove(0).to_type::<LabelledPetriNet>()?;
+        println!("lpn: {:?}", lpn);
         Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(
             lpn.mine_stochastic_alignment(language)?,
         )))
@@ -176,7 +183,63 @@ pub const EBI_DISCOVER_OCCURRENCE_PTREE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticProcessTree),
 };
 
+pub const EBI_DISCOVER_UEMSC: EbiCommand = EbiCommand::Command {
+    name_short: "opt2_uemsc",
+    name_long: Some("optimization2_uemsc"),
+    explanation_short: "Given an event log and an LPN, construct a stochastic labeled Petri net directly from the log.",
+    explanation_long: None,
+    latex_link: Some("~\\cite{DBLP:conf/caise/LeemansLMP24}"),
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)],
+    ],
+    input_names: &["FILE_1", "FILE_2"],
+    input_helps: &[
+        "A finite stochastic language (log) to get the occurrences from.",
+        "A labelled Petri net with the control flow.",
+    ],
+    execute: |mut inputs, _| {
+        let language = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let lpn = inputs.remove(0).to_type::<LabelledPetriNet>()?;
+        Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(
+            lpn.mine_uemsc_stochastic_lpn(language),
+        )))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
+};
+
 pub const EBI_DISCOVER_SPN: EbiCommand = EbiCommand::Command {
+    name_short: "opt1_uemsc",
+    name_long: Some("optimization1_uemsc"),
+    explanation_short: "Given an event log and a target place number, construct a stochastic Petri net directly from the log.",
+    explanation_long: Some(
+        "",
+    ),
+    latex_link: Some("~\\cite{DBLP:conf/caise/LeemansLMP24}"),
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],         
+                    &[&EbiInputType::Usize(
+                    Some(1),
+                    None,
+                    Some(DEFAULT_NUMBER_OF_PLACES),
+                )],],
+    input_names: &[ "FILE", "PLACE_NUM" ],
+    input_helps: &[ "An event log.", "The target number of places."],
+    execute: |mut objects, _| {
+        let log = objects.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let place_num = objects.remove(0).to_type::<usize>()?;
+        let spn = log.mine_stochastic_petri_net(*place_num);
+        return Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(spn?)));
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
+};
+
+pub const EBI_DISCOVER_SPN_CROSS_FOLD: EbiCommand = EbiCommand::Command {
     name_short: "spn",
     name_long: Some("stochastic-petri-net"),
     explanation_short: "Construct a stochastic Petri net directly from the log.",
@@ -186,13 +249,16 @@ pub const EBI_DISCOVER_SPN: EbiCommand = EbiCommand::Command {
     latex_link: Some("~\\cite{DBLP:conf/caise/LeemansLMP24}"),
     cli_command: None,
     exact_arithmetic: false,
-    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)]],
-    input_names: &[ "FILE" ],
-    input_helps: &[ "An event log."],
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)]],
+    input_names: &[ "TRAIN_LOG", "TEST_LOG" ],
+    input_helps: &[ "An event log for stochastic process discovery.", "An event log for testing."],
     execute: |mut objects, _| {
-        let log = objects.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-        let spn = log.mine_stochastic_petri_net();
-        return Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(spn?)));
+        let train_log = objects.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let test_log = objects.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let spn = train_log.mine_spn(test_log)?;
+        return Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(spn)));
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
 };

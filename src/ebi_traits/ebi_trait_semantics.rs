@@ -19,7 +19,7 @@ use ebi_objects::{
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
-        event_log_csv::EventLogCsv, process_tree::TreeMarking,
+        event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking,
     },
 };
 
@@ -80,7 +80,7 @@ impl FromEbiTraitObject for EbiTraitSemantics {
     }
 }
 
-macro_rules! via_log {
+macro_rules! via_lang {
     ($t:ident) => {
         impl ToSemanticsTrait for $t {
             fn to_semantics_trait(self) -> EbiTraitSemantics {
@@ -89,13 +89,14 @@ macro_rules! via_log {
         }
     };
 }
-via_log!(CompressedEventLog);
-via_log!(CompressedEventLogTraceAttributes);
-via_log!(EventLog);
-via_log!(EventLogTraceAttributes);
-via_log!(EventLogXes);
-via_log!(EventLogCsv);
-via_log!(EventLogPython);
+via_lang!(CompressedEventLog);
+via_lang!(CompressedEventLogTraceAttributes);
+via_lang!(EventLog);
+via_lang!(EventLogTraceAttributes);
+via_lang!(EventLogXes);
+via_lang!(EventLogCsv);
+via_lang!(EventLogOcel);
+via_lang!(EventLogPython);
 
 impl ToSemanticsTrait for DeterministicFiniteAutomaton {
     fn to_semantics_trait(self) -> EbiTraitSemantics {

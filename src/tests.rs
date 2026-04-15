@@ -235,7 +235,7 @@ pub mod tests {
         semantics::semantics::Semantics,
     };
     use ebi_objects::{
-        DeterministicFiniteAutomaton, EventLog, FiniteLanguage, Importable, Infoable,
+        ActivityKey, DeterministicFiniteAutomaton, EventLog, FiniteLanguage, Importable, Infoable,
         NumberOfTraces, PetriNetMarkupLanguage, ProcessTreeMarkupLanguage,
         StochasticDeterministicFiniteAutomaton,
     };
@@ -357,5 +357,15 @@ pub mod tests {
         log.retain_traces(Box::new(|_| false));
 
         assert_eq!(log.number_of_traces(), 0);
+    }
+
+    #[test]
+    #[should_panic]
+    fn test_activities_test() {
+        let mut ak1 = ActivityKey::new();
+        let ak2 = ActivityKey::new();
+
+        let a = ak1.process_activity("a");
+        ak2.get_activity_label(&a);
     }
 }

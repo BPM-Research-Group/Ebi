@@ -70,7 +70,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
             \end{definition}",
     ),
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
@@ -274,8 +274,6 @@ pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
             *number_of_traces,
         )?);
 
-        println!("lang1: {}", lang1);
-        
         let lang1: Box<dyn EbiTraitFiniteStochasticLanguage> = lang1;
         Ok(EbiOutput::RootLogDiv(
             lang1
@@ -309,7 +307,7 @@ pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
             \end{definition}",
     ),
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
@@ -347,7 +345,7 @@ pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     ),
     latex_link: Some("see \\cref{def:emsc}"),
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         SAMPLED_OBJECT_INPUTS,
         SAMPLED_OBJECT_INPUTS,
@@ -399,7 +397,7 @@ pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
             \end{definition}",
     ),
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
@@ -433,7 +431,7 @@ pub const CONFORMANCE_HSC_SAMPLE: EbiCommand = EbiCommand::Command {
     ),
     latex_link: Some("see \\cref{def:hsc}"),
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         SAMPLED_OBJECT_INPUTS,
         SAMPLED_OBJECT_INPUTS,
@@ -487,7 +485,7 @@ pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
             \end{definition}",
     ),
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
@@ -521,7 +519,7 @@ pub const CONFORMANCE_CSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     ),
     latex_link: Some("see \\cref{def:cssc}"),
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         SAMPLED_OBJECT_INPUTS,
         SAMPLED_OBJECT_INPUTS,
@@ -603,6 +601,7 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
                 slang.abstract_markovian(*order)
             }
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
+                
                 slpn.abstract_markovian(*order)
             }
             _ => unreachable!(),
@@ -615,6 +614,7 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
                 slang.abstract_markovian(*order)
             }
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
+                println!("get slpn: {:?}", slpn);
                 slpn.abstract_markovian(*order)
             }
             _ => unreachable!(),

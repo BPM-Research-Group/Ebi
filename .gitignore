@@ -3,6 +3,8 @@
 /.vscode
 /builds
 /python-runtime
+/testfiles
+/results_whole
 
 *.swp
 

@@ -167,7 +167,7 @@ The computation may run forever if the model is unbounded.
 Computation is more efficient for an object with a finite stochastic language."),
     cli_command: None, 
     latex_link: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[ 
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), &EbiInputType::Trait(EbiTrait::StochasticDeterministicSemantics)], 
         &[ &EbiInputType::Usize(Some(1), None, None)] 

@@ -7,7 +7,7 @@ use ebi_objects::{
     Attribute, DataType,
     ebi_arithmetic::{Fraction, Signed, Zero},
 };
-use rand::Rng;
+use rand::RngExt;
 use rayon::prelude::*;
 
 pub trait Associations {

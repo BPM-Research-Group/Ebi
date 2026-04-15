@@ -148,18 +148,22 @@ mod tests {
         assert_eq!(log.number_of_traces(), 1);
 
         let mut log = Box::new(fin.parse::<EventLog>().unwrap());
+        let a = log.activity_key_mut().process_activity("a");
         log.remove_traces_event_activity(EventSelector::Any, a);
         assert_eq!(log.number_of_traces(), 1);
 
         let mut log = Box::new(fin.parse::<EventLog>().unwrap());
+        let a = log.activity_key_mut().process_activity("a");
         log.remove_traces_event_activity(EventSelector::End, a);
         assert_eq!(log.number_of_traces(), 1);
 
         let mut log = Box::new(fin.parse::<EventLog>().unwrap());
+        let a = log.activity_key_mut().process_activity("a");
         log.remove_traces_event_activity(EventSelector::Start, a);
         assert_eq!(log.number_of_traces(), 1);
 
         let mut log = Box::new(fin.parse::<EventLog>().unwrap());
+        let a = log.activity_key_mut().process_activity("a");
         log.remove_traces_event_activity(EventSelector::None, a);
         assert_eq!(log.number_of_traces(), 1);
     }

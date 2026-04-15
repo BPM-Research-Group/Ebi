@@ -36,6 +36,7 @@ pub mod ebi_file_handlers {
     pub mod directly_follows_graph;
     pub mod directly_follows_model;
     pub mod event_log_csv;
+    pub mod event_log_ocel;
     pub mod event_log_python;
     pub mod event_log_xes;
     pub mod executions;
@@ -209,11 +210,15 @@ pub mod techniques {
     pub mod sample;
     pub mod sample_folds;
     pub mod spn_miner;
+    pub mod slpn_miner_cross_product;
+    pub mod spn_miner_cross_fold;
     pub mod stochastic_markovian_abstraction;
     pub mod stochastic_markovian_abstraction_conformance;
+    pub mod symbolic_reachability_graph;
     pub mod tau_removal;
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;
+    pub mod unit_earth_movers_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
 }
 pub mod follower_semantics;
