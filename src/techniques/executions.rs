@@ -1,17 +1,17 @@
 use crate::{
     ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
-    ebi_traits::ebi_trait_semantics::EbiTraitSemantics,
+    ebi_traits::{
+        ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
+        ebi_trait_semantics::EbiTraitSemantics,
+    },
     semantics::semantics::Semantics,
     techniques::align::Align,
 };
 use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
-    Activity, ActivityKey, Executions, HasActivityKey, IntoRefTraceIterator, NumberOfTraces,
-    anyhow::{Context, Error, Ok, Result, anyhow},
-    ebi_objects::{
-        event_log_event_attributes::EventLogEventAttributes, executions::Execution,
-        labelled_petri_net::TransitionIndex, language_of_alignments::Move,
-    },
+    Activity, ActivityKey, Executions,
+    anyhow::{Context, Error, Ok, Result},
+    ebi_objects::{executions::Execution, language_of_alignments::Move},
 };
 use rayon::iter::{IndexedParallelIterator, ParallelIterator};
 use std::{
@@ -21,11 +21,17 @@ use std::{
 };
 
 pub trait FindExecutions {
-    fn find_executions(&mut self, log: &mut EventLogEventAttributes) -> Result<Executions>;
+    fn find_executions(
+        &mut self,
+        log: &mut Box<dyn EbiTraitEventLogEventAttributes>,
+    ) -> Result<Executions>;
 }
 
 impl FindExecutions for EbiTraitSemantics {
-    fn find_executions(&mut self, log: &mut EventLogEventAttributes) -> Result<Executions> {
+    fn find_executions(
+        &mut self,
+        log: &mut Box<dyn EbiTraitEventLogEventAttributes>,
+    ) -> Result<Executions> {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.find_executions(log),
             EbiTraitSemantics::Marking(sem) => sem.find_executions(log),
@@ -41,7 +47,10 @@ where
     T: Semantics<SemState = State, AliState = State> + Send + Sync + ?Sized,
     State: Displayable,
 {
-    fn find_executions(&mut self, log: &mut EventLogEventAttributes) -> Result<Executions> {
+    fn find_executions(
+        &mut self,
+        log: &mut Box<dyn EbiTraitEventLogEventAttributes>,
+    ) -> Result<Executions> {
         log::info!("Compute alignments");
         let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
@@ -118,7 +127,7 @@ impl C {
     fn alignment_to_executions<T, FS>(
         &self,
         semantics: &T,
-        log: &EventLogEventAttributes,
+        log: &Box<dyn EbiTraitEventLogEventAttributes>,
         resource_key: &Arc<Mutex<ActivityKey>>,
     ) -> Result<Vec<Execution>>
     where
@@ -127,7 +136,7 @@ impl C {
     {
         let mut state = semantics
             .get_initial_state()
-            .context("Got an unexpected empty state.")?;
+            .context("The model does not have an initial state.")?;
         let mut executions = vec![];
 
         for move_index in 0..self.moves.len() {
@@ -135,16 +144,33 @@ impl C {
                 Move::LogMove(_) => {
                     //logmoves are not linked to transitions and have no executions
                 }
-                Move::ModelMove(_, transition) => {
+                Move::ModelMove(activity, transition) => {
+                    let enabling_move_index = self.get_enabling_move(transition, semantics);
+                    let mut enabled_transitions = semantics.get_enabled_transitions(&state);
+                    enabled_transitions.retain(|t| *t != transition);
+                    enabled_transitions.insert(0, transition);
+
+                    executions.push(Execution {
+                        activity: Some(activity),
+                        also_in_log: false,
+                        enabled_transitions,
+                        time_of_enablement: self.get_time(enabling_move_index, log).cloned(),
+                        time_of_execution: None,
+                        resource: None,
+                    });
+
                     semantics.execute_transition(&mut state, transition)?;
                 }
                 Move::SynchronousMove(activity, transition) => {
                     let enabling_move_index = self.get_enabling_move(transition, semantics);
+                    let mut enabled_transitions = semantics.get_enabled_transitions(&state);
+                    enabled_transitions.retain(|t| *t != transition);
+                    enabled_transitions.insert(0, transition);
 
                     executions.push(Execution {
                         activity: Some(activity),
-                        enabled_transitions: self
-                            .get_enabled_transitions(enabling_move_index, semantics)?,
+                        also_in_log: true,
+                        enabled_transitions,
                         time_of_enablement: self.get_time(enabling_move_index, log).cloned(),
                         time_of_execution: self.get_time(Some(move_index), log).cloned(),
                         resource: self.get_resource(Some(move_index), log, resource_key),
@@ -154,11 +180,14 @@ impl C {
                 }
                 Move::SilentMove(transition) => {
                     let enabling_move_index = self.get_enabling_move(transition, semantics);
+                    let mut enabled_transitions = semantics.get_enabled_transitions(&state);
+                    enabled_transitions.retain(|t| *t != transition);
+                    enabled_transitions.insert(0, transition);
 
                     executions.push(Execution {
                         activity: None,
-                        enabled_transitions: self
-                            .get_enabled_transitions(enabling_move_index, semantics)?,
+                        also_in_log: false,
+                        enabled_transitions,
                         time_of_enablement: self.get_time(enabling_move_index, log).cloned(),
                         time_of_execution: None,
                         resource: None,
@@ -175,20 +204,20 @@ impl C {
     fn get_time<'a>(
         &self,
         move_index: Option<usize>,
-        log: &'a EventLogEventAttributes,
+        log: &'a Box<dyn EbiTraitEventLogEventAttributes>,
     ) -> Option<&'a DateTime<FixedOffset>> {
         let event_index = self.get_event_index(move_index?);
-        log.get_time(self.trace_index, event_index)
+        log.get_event_time(self.trace_index, event_index)
     }
 
     fn get_resource<'a>(
         &self,
         move_index: Option<usize>,
-        log: &'a EventLogEventAttributes,
+        log: &'a Box<dyn EbiTraitEventLogEventAttributes>,
         resource_key: &Arc<Mutex<ActivityKey>>,
     ) -> Option<Activity> {
         let event_index = self.get_event_index(move_index?);
-        let resource_string = log.get_resource(self.trace_index, event_index)?;
+        let resource_string = log.get_event_resource(self.trace_index, event_index)?;
 
         Some(
             resource_key
@@ -197,34 +226,6 @@ impl C {
                 .unwrap()
                 .process_activity(resource_string),
         )
-    }
-
-    fn get_enabled_transitions<T, FS>(
-        &self,
-        move_index: Option<usize>,
-        semantics: &T,
-    ) -> Result<Vec<TransitionIndex>>
-    where
-        T: Semantics<SemState = FS> + Send + Sync + ?Sized,
-        FS: Display + Debug + Clone + Hash + Eq,
-    {
-        if let Some(mut state) = semantics.get_initial_state() {
-            if let Some(mi) = move_index {
-                for movee in self.moves.iter().take(mi) {
-                    match movee {
-                        Move::ModelMove(_, transition)
-                        | Move::SynchronousMove(_, transition)
-                        | Move::SilentMove(transition) => {
-                            semantics.execute_transition(&mut state, *transition)?
-                        }
-                        _ => (),
-                    };
-                }
-            }
-            Ok(semantics.get_enabled_transitions(&state))
-        } else {
-            Err(anyhow!("No initial state."))
-        }
     }
 
     fn get_event_index(&self, move_index: usize) -> usize {
@@ -291,7 +292,10 @@ mod tests {
         ebi_objects::event_log_event_attributes::EventLogEventAttributes,
     };
 
-    use crate::techniques::executions::FindExecutions;
+    use crate::{
+        ebi_traits::ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
+        techniques::executions::FindExecutions,
+    };
 
     #[test]
     fn executions() {
@@ -305,7 +309,8 @@ mod tests {
 
         let out = fs::read_to_string("testfiles/a-b.exs").unwrap();
 
-        let x = model.find_executions(&mut Box::new(log)).unwrap();
+        let mut log2: Box<dyn EbiTraitEventLogEventAttributes> = Box::new(log);
+        let x = model.find_executions(&mut log2).unwrap();
 
         assert_eq!(out, x.to_string() + "\n");
     }
@@ -320,6 +325,7 @@ mod tests {
             .parse::<StochasticNondeterministicFiniteAutomaton>()
             .unwrap();
 
-        model.find_executions(&mut Box::new(log)).unwrap();
+        let mut log2: Box<dyn EbiTraitEventLogEventAttributes> = Box::new(log);
+        model.find_executions(&mut log2).unwrap();
     }
 }

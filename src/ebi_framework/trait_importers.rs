@@ -2,6 +2,7 @@ use crate::{
     ebi_framework::ebi_trait_object::EbiTraitObject,
     ebi_traits::{
         ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
         ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
@@ -89,6 +90,7 @@ import_as_trait_dyn!(Graphable, graphable);
 import_as_trait_dyn!(FiniteLanguage, finite_language);
 import_as_trait_dyn!(FiniteStochasticLanguage, finite_stochastic_language);
 import_as_trait_dyn!(EventLog, event_log);
+import_as_trait_dyn!(EventLogEventAttributes, event_log_event_attributes);
 import_as_trait_dyn!(EventLogTraceAttributes, event_log_trace_attributes);
 import_as_trait!(Semantics, semantics);
 import_as_trait!(StochasticSemantics, stochastic_semantics);

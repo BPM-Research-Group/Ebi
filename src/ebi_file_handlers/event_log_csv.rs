@@ -10,11 +10,11 @@ use crate::ebi_framework::{
         ImportAsStochasticNondeterministicFiniteAutomatonObject, TryToEventLogXesObject,
     },
     trait_importers::{
-        ImportAsActivitiesTrait, ImportAsEventLogTrait, ImportAsFiniteLanguageTrait,
-        ImportAsFiniteStochasticLanguageTrait, ImportAsIterableLanguageTrait,
-        ImportAsIterableStochasticLanguageTrait, ImportAsQueriableStochasticLanguageTrait,
-        ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait,
-        ImportAsStochasticSemanticsTrait,
+        ImportAsActivitiesTrait, ImportAsEventLogEventAttributesTrait, ImportAsEventLogTrait,
+        ImportAsFiniteLanguageTrait, ImportAsFiniteStochasticLanguageTrait,
+        ImportAsIterableLanguageTrait, ImportAsIterableStochasticLanguageTrait,
+        ImportAsQueriableStochasticLanguageTrait, ImportAsSemanticsTrait,
+        ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait,
     },
     validate::Validate,
 };
@@ -54,6 +54,10 @@ pub const EBI_EVENT_LOG_CSV: EbiFileHandler = EbiFileHandler {
         ),
         EbiTraitImporter::EventLog(
             EventLogCsv::import_as_event_log_trait,
+            EventLogCsv::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::EventLogEventAttributes(
+            EventLogCsv::import_as_event_log_event_attributes_trait,
             EventLogCsv::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticSemantics(

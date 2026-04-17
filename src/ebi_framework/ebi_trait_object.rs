@@ -1,23 +1,13 @@
 use crate::{
     ebi_framework::ebi_trait::EbiTrait,
     ebi_traits::{
-        ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
-        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
-        ebi_trait_finite_language::EbiTraitFiniteLanguage,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-        ebi_trait_graphable::EbiTraitGraphable,
-        ebi_trait_iterable_language::EbiTraitIterableLanguage,
-        ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage,
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-        ebi_trait_semantics::EbiTraitSemantics,
-        ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics,
-        ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics,
-        ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
+        ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog, ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes, ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_graphable::EbiTraitGraphable, ebi_trait_iterable_language::EbiTraitIterableLanguage, ebi_trait_iterable_stochastic_language::EbiTraitIterableStochasticLanguage, ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage, ebi_trait_semantics::EbiTraitSemantics, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics, ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics, ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics
     },
 };
 
 pub enum EbiTraitObject {
     EventLog(Box<dyn EbiTraitEventLog>),
+    EventLogEventAttributes(Box<dyn EbiTraitEventLogEventAttributes>),
     EventLogTraceAttributes(Box<dyn EbiTraitEventLogTraceAttributes>),
     IterableLanguage(Box<dyn EbiTraitIterableLanguage>),
     FiniteLanguage(Box<dyn EbiTraitFiniteLanguage>),
@@ -36,6 +26,7 @@ impl EbiTraitObject {
     pub fn get_trait(&self) -> EbiTrait {
         match self {
             EbiTraitObject::EventLog(_) => EbiTrait::EventLog,
+            EbiTraitObject::EventLogEventAttributes(_) => EbiTrait::EventLogEventAttributes,
             EbiTraitObject::EventLogTraceAttributes(_) => EbiTrait::EventLogTraceAttributes,
             EbiTraitObject::IterableLanguage(_) => EbiTrait::IterableLanguage,
             EbiTraitObject::FiniteLanguage(_) => EbiTrait::FiniteLanguage,

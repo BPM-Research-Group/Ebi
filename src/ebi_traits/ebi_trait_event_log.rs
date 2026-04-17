@@ -7,9 +7,42 @@ use ebi_objects::{
     EventLogTraceAttributes, EventLogXes, HasActivityKey, Importable, IntoRefTraceIterator,
     NumberOfTraces,
     anyhow::{Result, anyhow},
-    ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
+    ebi_objects::{
+        compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
+        event_log_event_attributes::EventLogEventAttributes,
+    },
 };
 use std::collections::HashMap;
+
+#[macro_export]
+macro_rules! trait_definition_logs {
+    () => {
+        "\\begin{tabularx}{\\linewidth}{XXccc}
+            \\toprule
+            \\rotatebox{90}{File type} & \\rotatebox{90}{use} & \\rotatebox{90}{activities} & \\rotatebox{90}{trace attributes} & \\rotatebox{90}{event attributes}\\\\
+            \\midrule
+            \\hyperref[trait:event log]{event log} & traces of activities & yes & no & no \\\\
+            \\hyperref[trait:event log with event attributes]{event log with event attributes} & traces of events that have event attributes, time and resource have specific support of importer parameters & yes & no & yes\\\\
+            \\hyperref[trait:event log with trace attributes]{event log with trace attributes} & traces that have attributes of events & yes & yes & no\\\\
+            \\midrule
+            EventLogXes & access to full XES\\\\
+            EventLogCsv & access to all attributes, including trace identifier (trait \\hyperref[trait:event log with event attributes]{event log with event attributes} does not have trace identifiers)\\\\
+            EventLogOcel & access to full OCEL\\\\
+            EventLogPython & only accessible from PM4Py\\\\
+            \\bottomrule
+        \\end{tabularx}
+        As a developer, consider that a trait may avoid an in-memory conversion. Use objects if this conversion is acceptable, or when the object needs to be updated."
+    };
+}
+
+pub const TRAIT_DEFINITION_LATEX: &str = concat!(
+    "The trait ``event log'' allows for iteration over an event log that contains traces of activities.
+            \\\\
+            Definition: let $\\Sigma$ be an alphabet of activities.
+            Then, a \\emph{trace} $\\sigma \\in \\Sigma^*$ is a finite sequence of activities, and 
+            an \\emph{event log} $L \\in (\\Sigma^*)^*$ is a sequence of traces.",
+    trait_definition_logs!()
+);
 
 pub trait EbiTraitEventLog: HasActivityKey + IntoRefTraceIterator + NumberOfTraces {
     /// Remove traces for which the function returns false.
@@ -58,6 +91,12 @@ impl EbiTraitEventLog for EventLog {
 }
 
 impl EbiTraitEventLog for EventLogTraceAttributes {
+    fn retain_traces<'a>(&'a mut self, mut f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>) {
+        self.retain_traces_mut(&mut f);
+    }
+}
+
+impl EbiTraitEventLog for EventLogEventAttributes {
     fn retain_traces<'a>(&'a mut self, mut f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>) {
         self.retain_traces_mut(&mut f);
     }

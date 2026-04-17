@@ -12,6 +12,7 @@ use crate::{
     },
     ebi_traits::{
         ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
         ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
@@ -514,6 +515,13 @@ pub enum EbiTraitImporter {
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<Box<dyn EbiTraitEventLog>>,
         &'static [ImporterParameter],
     ),
+    EventLogEventAttributes(
+        fn(
+            &mut dyn BufRead,
+            &ImporterParameterValues,
+        ) -> Result<Box<dyn EbiTraitEventLogEventAttributes>>,
+        &'static [ImporterParameter],
+    ),
     EventLogTraceAttributes(
         fn(
             &mut dyn BufRead,
@@ -566,6 +574,7 @@ impl EbiTraitImporter {
                 EbiTrait::IterableStochasticLanguage
             }
             EbiTraitImporter::EventLog(_, _) => EbiTrait::EventLog,
+            EbiTraitImporter::EventLogEventAttributes(_, _) => EbiTrait::EventLogEventAttributes,
             EbiTraitImporter::EventLogTraceAttributes(_, _) => EbiTrait::EventLogTraceAttributes,
             EbiTraitImporter::Semantics(_, _) => EbiTrait::Semantics,
             EbiTraitImporter::StochasticSemantics(_, _) => EbiTrait::StochasticSemantics,
@@ -588,6 +597,7 @@ impl EbiTraitImporter {
             | EbiTraitImporter::IterableLanguage(_, importer_parameters)
             | EbiTraitImporter::IterableStochasticLanguage(_, importer_parameters)
             | EbiTraitImporter::EventLog(_, importer_parameters)
+            | EbiTraitImporter::EventLogEventAttributes(_, importer_parameters)
             | EbiTraitImporter::EventLogTraceAttributes(_, importer_parameters)
             | EbiTraitImporter::Semantics(_, importer_parameters)
             | EbiTraitImporter::StochasticSemantics(_, importer_parameters)
@@ -629,6 +639,9 @@ impl EbiTraitImporter {
             }
             EbiTraitImporter::EventLog(f, _) => {
                 EbiTraitObject::EventLog((f)(reader, parameter_values)?)
+            }
+            EbiTraitImporter::EventLogEventAttributes(f, _) => {
+                EbiTraitObject::EventLogEventAttributes((f)(reader, parameter_values)?)
             }
             EbiTraitImporter::EventLogTraceAttributes(f, _) => {
                 EbiTraitObject::EventLogTraceAttributes((f)(reader, parameter_values)?)

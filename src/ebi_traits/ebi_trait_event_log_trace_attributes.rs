@@ -3,11 +3,11 @@ use crate::{
         ebi_input::EbiInput, ebi_trait::FromEbiTraitObject, ebi_trait_object::EbiTraitObject,
         trait_importers::ToEventLogTraceAttributesTrait,
     },
-    ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
+    ebi_traits::ebi_trait_event_log::EbiTraitEventLog, trait_definition_logs,
 };
 use ebi_objects::{
-    Activity, Attribute, EventLogOcel, EventLogTraceAttributes, Importable, IntoAttributeIterator,
-    IntoAttributeTraceIterator, TraceAttributes,
+    Activity, Attribute, EventLogOcel, EventLogTraceAttributes, EventLogXes, Importable,
+    IntoAttributeIterator, IntoAttributeTraceIterator, TraceAttributes,
     anyhow::{Result, anyhow},
     attribute_key::has_attribute_key::HasAttributeKey,
     ebi_objects::compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
@@ -15,6 +15,13 @@ use ebi_objects::{
 use intmap::IntMap;
 use process_mining::core::event_data::case_centric::AttributeValue;
 use std::collections::HashMap;
+
+pub const TRAIT_DEFINITION_LATEX: &str = concat!("The trait ``event log with trace attributes'' provides an iterator over traces, where each trace may have trace attributes attached.
+                \\\\
+                Definition: let $\\Sigma$ be an alphabet of activities.
+                Let $A \\colon \\text{attribute} \\mapsto \\text{value}$ be an attribute-value mapping, and let $\\mathcal{A}$ be the set of all attribute-value mappings.
+                A \\emph{trace with attributes} $\\sigma^{A} \\in \\Sigma^* \\times \\mathcal{A}$ is a finite sequence of activities, where the sequence is annotated with attributes.
+                An \\emph{event log with trace attributes} $L^A \\in (\\Sigma^* \\times \\mathcal{A})^*$ is a sequence of traces with attributes.", trait_definition_logs!());
 
 pub trait EbiTraitEventLogTraceAttributes:
     EbiTraitEventLog
@@ -115,6 +122,12 @@ impl ToEventLogTraceAttributesTrait for CompressedEventLogTraceAttributes {
 }
 
 impl ToEventLogTraceAttributesTrait for EventLogOcel {
+    fn to_event_log_trace_attributes_trait(self) -> Box<dyn EbiTraitEventLogTraceAttributes> {
+        Box::new(EventLogTraceAttributes::from(self))
+    }
+}
+
+impl ToEventLogTraceAttributesTrait for EventLogXes {
     fn to_event_log_trace_attributes_trait(self) -> Box<dyn EbiTraitEventLogTraceAttributes> {
         Box::new(EventLogTraceAttributes::from(self))
     }

@@ -11,7 +11,8 @@ use crate::{
             ImportAsStochasticNondeterministicFiniteAutomatonObject,
         },
         trait_importers::{
-            ImportAsActivitiesTrait, ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait,
+            ImportAsActivitiesTrait, ImportAsEventLogEventAttributesTrait,
+            ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait,
             ImportAsFiniteLanguageTrait, ImportAsFiniteStochasticLanguageTrait,
             ImportAsIterableLanguageTrait, ImportAsIterableStochasticLanguageTrait,
             ImportAsQueriableStochasticLanguageTrait, ImportAsSemanticsTrait,
@@ -36,48 +37,52 @@ pub const EBI_EVENT_LOG_XES: EbiFileHandler = EbiFileHandler {
     validator: Some(EventLog::validate),
     trait_importers: &[
         EbiTraitImporter::Activities(
-            EventLog::import_as_activities_trait,
-            EventLog::IMPORTER_PARAMETERS,
+            EventLogXes::import_as_activities_trait,
+            EventLogXes::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::IterableLanguage(
-            EventLog::import_as_iterable_language_trait,
-            EventLog::IMPORTER_PARAMETERS,
+            EventLogXes::import_as_iterable_language_trait,
+            EventLogXes::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::FiniteLanguage(
-            EventLog::import_as_finite_language_trait,
-            EventLog::IMPORTER_PARAMETERS,
+            EventLogXes::import_as_finite_language_trait,
+            EventLogXes::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::FiniteStochasticLanguage(
-            EventLog::import_as_finite_stochastic_language_trait,
-            EventLog::IMPORTER_PARAMETERS,
+            EventLogXes::import_as_finite_stochastic_language_trait,
+            EventLogXes::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::QueriableStochasticLanguage(
-            EventLog::import_as_queriable_stochastic_language_trait,
-            EventLog::IMPORTER_PARAMETERS,
+            EventLogXes::import_as_queriable_stochastic_language_trait,
+            EventLogXes::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::IterableStochasticLanguage(
-            EventLog::import_as_iterable_stochastic_language_trait,
-            EventLog::IMPORTER_PARAMETERS,
+            EventLogXes::import_as_iterable_stochastic_language_trait,
+            EventLogXes::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::EventLog(
-            EventLog::import_as_event_log_trait,
-            EventLog::IMPORTER_PARAMETERS,
+            EventLogXes::import_as_event_log_trait,
+            EventLogXes::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::EventLogEventAttributes(
+            EventLogXes::import_as_event_log_event_attributes_trait,
+            EventLogXes::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::EventLogTraceAttributes(
-            EventLogTraceAttributes::import_as_event_log_trace_attributes_trait,
-            EventLogTraceAttributes::IMPORTER_PARAMETERS,
+            EventLogXes::import_as_event_log_trace_attributes_trait,
+            EventLogXes::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticSemantics(
-            EventLog::import_as_stochastic_semantics_trait,
-            EventLog::IMPORTER_PARAMETERS,
+            EventLogXes::import_as_stochastic_semantics_trait,
+            EventLogXes::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticDeterministicSemantics(
-            EventLog::import_as_stochastic_deterministic_semantics_trait,
-            EventLog::IMPORTER_PARAMETERS,
+            EventLogXes::import_as_stochastic_deterministic_semantics_trait,
+            EventLogXes::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::Semantics(
-            EventLog::import_as_semantics_trait,
-            EventLog::IMPORTER_PARAMETERS,
+            EventLogXes::import_as_semantics_trait,
+            EventLogXes::IMPORTER_PARAMETERS,
         ),
     ],
     object_importers: &[

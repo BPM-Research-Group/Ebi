@@ -6,11 +6,7 @@ use crate::ebi_framework::{
         ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogEventAttributesObject, ImportAsEventLogObject, ImportAsEventLogXesObject, ImportAsFiniteLanguageObject, ImportAsFiniteStochasticLanguageObject, ImportAsStochasticDeterministicFiniteAutomatonObject, ImportAsStochasticNondeterministicFiniteAutomatonObject
     },
     trait_importers::{
-        ImportAsActivitiesTrait, ImportAsEventLogTrait, ImportAsFiniteLanguageTrait,
-        ImportAsFiniteStochasticLanguageTrait, ImportAsIterableLanguageTrait,
-        ImportAsIterableStochasticLanguageTrait, ImportAsQueriableStochasticLanguageTrait,
-        ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait,
-        ImportAsStochasticSemanticsTrait,
+        ImportAsActivitiesTrait, ImportAsEventLogEventAttributesTrait, ImportAsEventLogTrait, ImportAsFiniteLanguageTrait, ImportAsFiniteStochasticLanguageTrait, ImportAsIterableLanguageTrait, ImportAsIterableStochasticLanguageTrait, ImportAsQueriableStochasticLanguageTrait, ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait
     },
 };
 use ebi_objects::{EventLogPython, Exportable, Importable};
@@ -49,6 +45,10 @@ pub const EBI_EVENT_LOG_PYTHON: EbiFileHandler = EbiFileHandler {
         ),
         EbiTraitImporter::EventLog(
             EventLogPython::import_as_event_log_trait,
+            EventLogPython::IMPORTER_PARAMETERS,
+        ),
+        EbiTraitImporter::EventLogEventAttributes(
+            EventLogPython::import_as_event_log_event_attributes_trait,
             EventLogPython::IMPORTER_PARAMETERS,
         ),
         EbiTraitImporter::StochasticSemantics(

@@ -8,6 +8,7 @@ use crate::{
         labelled_petri_net_semantics::LPNMarking,
     },
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    trait_definition_finalisation,
 };
 use ebi_objects::{
     ActivityKey, DirectlyFollowsGraph, EventLog, EventLogPython, EventLogTraceAttributes,
@@ -21,6 +22,11 @@ use ebi_objects::{
         event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, process_tree::TreeMarking,
     },
 };
+
+pub const TRAIT_DEFINITION_LATEX: &str = concat!(
+    "The trait ``stochastic semantics`` allows for traversal of the state space, with probabilities.",
+    trait_definition_finalisation!()
+);
 
 pub enum EbiTraitStochasticSemantics {
     Usize(Box<dyn StochasticSemantics<StoSemState = usize, SemState = usize, AliState = usize>>),
