@@ -17,21 +17,35 @@ use std::collections::HashMap;
 #[macro_export]
 macro_rules! trait_definition_logs {
     () => {
-        "\\begin{tabularx}{\\linewidth}{XXccc}
+        " Comparison between log traits and objects: \\begin{tabularx}{\\linewidth}{XXccc}
             \\toprule
             \\rotatebox{90}{File type} & \\rotatebox{90}{use} & \\rotatebox{90}{activities} & \\rotatebox{90}{trace attributes} & \\rotatebox{90}{event attributes}\\\\
             \\midrule
+            Traits:\\\\
             \\hyperref[trait:event log]{event log} & traces of activities & yes & no & no \\\\
             \\hyperref[trait:event log with event attributes]{event log with event attributes} & traces of events that have event attributes, time and resource have specific support of importer parameters & yes & no & yes\\\\
             \\hyperref[trait:event log with trace attributes]{event log with trace attributes} & traces that have attributes of events & yes & yes & no\\\\
             \\midrule
-            EventLogXes & access to full XES\\\\
-            EventLogCsv & access to all attributes, including trace identifier (trait \\hyperref[trait:event log with event attributes]{event log with event attributes} does not have trace identifiers)\\\\
-            EventLogOcel & access to full OCEL\\\\
-            EventLogPython & only accessible from PM4Py\\\\
+            Abstract objects:\\\\
+            EventLog object & traces of activities; one-time conversion & yes & no & no \\\\
+            EventLogEventAttributes object & traces of events that have event attributes, time and resource have specific support of importer parameters; one-time conversion & yes & yes & no \\\\
+            EventLogTraceAttributes object & traces that have attributes of events; one-time conversion \\\\
+            \\midrule
+            Objects:\\\\
+            EventLogXes object & full XES & yes & yes & yes \\\\
+            EventLogCsv object & full CSV & yes & only trace ID & yes \\\\
+            EventLogOcel object & OCEL & yes & yes & yes \\\\
+            EventLogPython object & only accessible from PM4Py & yes & no & yes \\\\
             \\bottomrule
         \\end{tabularx}
-        As a developer, consider that a trait may avoid an in-memory conversion. Use objects if this conversion is acceptable, or when the object needs to be updated."
+        As a developer, please note that 
+        \\begin{itemize}
+            \\item An abstract object is a specialised data structure; thus memory consumption is lower than for an object. 
+            However, there is an initial conversion performed (e.g., strings may be deduplicated).
+            \\item An object requires no conversion as it extracts necessary information when requested.
+            However, this extraction may be expensive (especially for Ocel).
+            \\item A trait may either convert beforehand or extract on the fly.
+        \\end{itemize}~"
     };
 }
 

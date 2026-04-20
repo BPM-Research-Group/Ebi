@@ -218,6 +218,7 @@ pub mod techniques {
     pub mod probability_queries;
     pub mod process_variety;
     pub mod random_stochastic_miner;
+    pub mod resource_utilisation;
     pub mod sample;
     pub mod sample_folds;
     pub mod stochastic_markovian_abstraction;

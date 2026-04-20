@@ -5,7 +5,7 @@ use crate::{
         ebi_trait_semantics::EbiTraitSemantics,
     },
     semantics::semantics::Semantics,
-    techniques::align::Align,
+    techniques::{align::Align, resource_utilisation::ResourceModel},
 };
 use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
@@ -13,8 +13,10 @@ use ebi_objects::{
     anyhow::{Context, Error, Ok, Result},
     ebi_objects::{executions::Execution, language_of_alignments::Move},
 };
+use intmap::IntMap;
 use rayon::iter::{IndexedParallelIterator, ParallelIterator};
 use std::{
+    collections::VecDeque,
     fmt::{Debug, Display},
     hash::Hash,
     sync::{Arc, Mutex},
@@ -58,7 +60,7 @@ where
 
         self.translate_using_activity_key(log.activity_key_mut());
 
-        let result = log
+        let trace_executions = log
             .par_iter_traces()
             .enumerate()
             .filter_map(|(trace_index, trace)| {
@@ -88,7 +90,6 @@ where
                     }
                 }
             })
-            .flatten()
             .collect::<Vec<_>>();
 
         progress_bar.finish_and_clear();
@@ -102,13 +103,56 @@ where
             }
         }
 
-        Ok((
+        //merge sort the executions
+        let execution_list = ExecutionsSorter::merge_sort(trace_executions);
+
+        //create the result object
+        let mut executions = (
             log.activity_key().clone(),
             Arc::try_unwrap(resource_key).unwrap().into_inner().unwrap(),
-            result,
+            execution_list,
         )
-            .into())
+            .into();
+
+        //mine a research model
+        let resource_model = ResourceModel::from_executions(&executions);
+
+        //compute the resource utilisation
+        set_resource_utilisation(self, resource_model, &mut executions)?;
+
+        Ok(executions)
     }
+}
+
+fn set_resource_utilisation<T, State>(
+    semantics: &T,
+    resource_model: ResourceModel,
+    executions: &mut Executions,
+) -> Result<()>
+where
+    T: Semantics<SemState = State, AliState = State> + Send + Sync + ?Sized,
+    State: Displayable,
+{
+    let mut resource_state = resource_model.initial_resource_state();
+    let mut trace_2_marking = IntMap::new();
+
+    for execution in executions.executions.iter_mut() {
+        //get marking
+        let mut marking = trace_2_marking
+            .entry(execution.trace)
+            .or_insert_with(|| semantics.get_initial_state().unwrap());
+
+        semantics.execute_transition(&mut marking, execution.fired_transition)?;
+
+        if let Some(resource) = execution.resource {
+            execution.resource_utilisation =
+                resource_state.resource_utilisation(&resource_model, resource, execution.fired_transition);
+        }
+
+        resource_state.execute_transition(&resource_model, execution.resource);
+    }
+
+    Ok(())
 }
 
 struct C {
@@ -129,7 +173,7 @@ impl C {
         semantics: &T,
         log: &Box<dyn EbiTraitEventLogEventAttributes>,
         resource_key: &Arc<Mutex<ActivityKey>>,
-    ) -> Result<Vec<Execution>>
+    ) -> Result<VecDeque<Execution>>
     where
         T: Semantics<SemState = FS> + Send + Sync + ?Sized,
         FS: Display + Debug + Clone + Hash + Eq,
@@ -137,7 +181,7 @@ impl C {
         let mut state = semantics
             .get_initial_state()
             .context("The model does not have an initial state.")?;
-        let mut executions = vec![];
+        let mut executions = VecDeque::with_capacity(self.moves.len());
 
         for move_index in 0..self.moves.len() {
             match self.moves[move_index] {
@@ -146,51 +190,57 @@ impl C {
                 }
                 Move::ModelMove(activity, transition) => {
                     let enabling_move_index = self.get_enabling_move(transition, semantics);
-                    let mut enabled_transitions = semantics.get_enabled_transitions(&state);
-                    enabled_transitions.retain(|t| *t != transition);
-                    enabled_transitions.insert(0, transition);
+                    let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
+                    other_enabled_transitions.retain(|t| *t != transition);
 
-                    executions.push(Execution {
+                    executions.push_back(Execution {
+                        trace: self.trace_index,
                         activity: Some(activity),
                         also_in_log: false,
-                        enabled_transitions,
+                        fired_transition: transition,
+                        other_enabled_transitions,
                         time_of_enablement: self.get_time(enabling_move_index, log).cloned(),
                         time_of_execution: None,
                         resource: None,
+                        resource_utilisation: None,
                     });
 
                     semantics.execute_transition(&mut state, transition)?;
                 }
                 Move::SynchronousMove(activity, transition) => {
                     let enabling_move_index = self.get_enabling_move(transition, semantics);
-                    let mut enabled_transitions = semantics.get_enabled_transitions(&state);
-                    enabled_transitions.retain(|t| *t != transition);
-                    enabled_transitions.insert(0, transition);
+                    let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
+                    other_enabled_transitions.retain(|t| *t != transition);
 
-                    executions.push(Execution {
+                    executions.push_back(Execution {
+                        trace: self.trace_index,
                         activity: Some(activity),
                         also_in_log: true,
-                        enabled_transitions,
+                        fired_transition: transition,
+                        other_enabled_transitions,
                         time_of_enablement: self.get_time(enabling_move_index, log).cloned(),
                         time_of_execution: self.get_time(Some(move_index), log).cloned(),
                         resource: self.get_resource(Some(move_index), log, resource_key),
+                        resource_utilisation: None,
                     });
 
                     semantics.execute_transition(&mut state, transition)?;
                 }
                 Move::SilentMove(transition) => {
                     let enabling_move_index = self.get_enabling_move(transition, semantics);
-                    let mut enabled_transitions = semantics.get_enabled_transitions(&state);
-                    enabled_transitions.retain(|t| *t != transition);
-                    enabled_transitions.insert(0, transition);
+                    let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
+                    other_enabled_transitions.retain(|t| *t != transition);
 
-                    executions.push(Execution {
+                    executions.push_back(Execution {
+                        trace: self.trace_index,
                         activity: None,
                         also_in_log: false,
-                        enabled_transitions,
+                        fired_transition: transition,
+                        other_enabled_transitions,
                         time_of_enablement: self.get_time(enabling_move_index, log).cloned(),
                         time_of_execution: None,
                         resource: None,
+                        resource_utilisation: None,
                     });
 
                     semantics.execute_transition(&mut state, transition)?;
@@ -283,6 +333,76 @@ impl C {
     }
 }
 
+struct ExecutionsSorter {}
+
+impl ExecutionsSorter {
+    fn merge_sort(mut traces: Vec<VecDeque<Execution>>) -> Vec<Execution> {
+        let number_of_executions = traces.iter().map(|t| t.len()).sum();
+        let mut result = Vec::with_capacity(number_of_executions);
+
+        //initialise first-timestamps
+        let mut first_timestamps = (0..traces.len())
+            .map(|trace_index| Self::get_first_timestamp(&traces[trace_index]).cloned())
+            .collect::<Vec<_>>();
+
+        loop {
+            if let Some((trace_index, _)) = first_timestamps
+                .iter()
+                .enumerate()
+                .filter_map(|(trace_index, first)| {
+                    if let Some(first) = first {
+                        Some((trace_index, first))
+                    } else {
+                        None
+                    }
+                })
+                .min_by(|a, b| a.cmp(b))
+            {
+                //process the trace with the lowest timestamp
+
+                //first, add all executions that do not have a timestamp
+                while let Some(execution) = traces[trace_index].pop_front() {
+                    let has_timestamp = execution.time_of_execution.is_none();
+                    result.push(execution);
+
+                    if has_timestamp {
+                        break;
+                    }
+                }
+
+                //second, add the execution that has a timestamp (if it exists)
+                if let Some(execution) = traces[trace_index].pop_front() {
+                    result.push(execution);
+                }
+
+                first_timestamps[trace_index] =
+                    Self::get_first_timestamp(&traces[trace_index]).cloned();
+
+                //check whether the trace still has timestamps
+                if first_timestamps[trace_index].is_none() {
+                    //This trace does not have timestamps anymore; finish it first to avoid postponing it until the end of the log.
+                    let mut swap = VecDeque::new();
+                    std::mem::swap(&mut swap, &mut traces[trace_index]);
+                    result.extend(swap.into_iter());
+                }
+            } else {
+                //no more timestamps, just append the result
+                result.extend(traces.into_iter().flatten());
+                return result;
+            }
+        }
+    }
+
+    fn get_first_timestamp(trace: &VecDeque<Execution>) -> Option<&DateTime<FixedOffset>> {
+        for execution in trace {
+            if execution.time_of_execution.is_some() {
+                return execution.time_of_execution.as_ref();
+            }
+        }
+        None
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use std::fs;
@@ -312,7 +432,7 @@ mod tests {
         let mut log2: Box<dyn EbiTraitEventLogEventAttributes> = Box::new(log);
         let x = model.find_executions(&mut log2).unwrap();
 
-        assert_eq!(out, x.to_string() + "\n");
+        assert_eq!(out, x.to_string());
     }
 
     #[test]
