@@ -1,3 +1,5 @@
+#[cfg(feature = "javascript")]
+use crate::javascript::javascript_generator_rust::generate_javascript_rust;
 #[cfg(feature = "java")]
 use crate::prom::prom_plugin_generator::print_java_plugins;
 use crate::{
@@ -39,6 +41,8 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
         &EBI_ITSELF_HTML,
         #[cfg(feature = "java")]
         &EBI_ITSELF_JAVA,
+        #[cfg(feature = "javascript")]
+        &EBI_ITSELF_JAVASCRIPT,
         &EBI_ITSELF_LOGO,
         &EBI_ITSELF_MANUAL,
         #[cfg(feature = "python")]
@@ -165,6 +169,22 @@ pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command {
     input_names: &[],
     input_helps: &[],
     execute: |_, _| Ok(print_java_plugins()?),
+    output_type: &EbiOutputType::String,
+};
+
+#[cfg(feature = "javascript")]
+pub const EBI_ITSELF_JAVASCRIPT: EbiCommand = EbiCommand::Command {
+    name_short: "js",
+    name_long: Some("javascript"),
+    explanation_short: "Print the rust code bindings for javascript.",
+    explanation_long: None,
+    cli_command: None,
+    latex_link: None,
+    exact_arithmetic: false,
+    input_types: &[],
+    input_names: &[],
+    input_helps: &[],
+    execute: |_, _| Ok(generate_javascript_rust()?),
     output_type: &EbiOutputType::String,
 };
 

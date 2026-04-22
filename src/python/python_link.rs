@@ -1,14 +1,9 @@
 use crate::{
-    ebi_framework::{
-        ebi_command::EbiCommand,
-        ebi_input::{EbiInput, EbiInputType},
-        ebi_output::EbiOutput,
-    },
-    prom::prom_link::attempt_parse,
+    ebi_framework::ebi_input::{EbiInput, EbiInputType, attempt_parse},
     python::python_import::PYTHON_IMPORTERS,
     text::Joiner,
 };
-use ebi_objects::anyhow::{Result, anyhow};
+use ebi_objects::anyhow::Result;
 use polars::prelude::*;
 use pyo3::{exceptions::PyValueError, prelude::*, types::PyAny};
 use std::io::Cursor;
@@ -30,35 +25,6 @@ fn _extract_dataframe(ipc_bytes: &[u8]) -> Result<DataFrame, PolarsError> {
     let cursor = Cursor::new(ipc_bytes);
     // Use the IPC reader to deserialize the data into a DataFrame.
     polars::io::ipc::IpcReader::new(cursor).finish()
-}
-
-// ========= EbiCommand execution if inputs are given ==========
-
-impl EbiCommand {
-    /// Executes the command using the provided inputs without reading from CLI.
-    /// Returns the resulting object.
-    pub fn execute_with_inputs(&self, inputs: Vec<EbiInput>) -> Result<EbiOutput> {
-        match self {
-            EbiCommand::Command {
-                execute,
-                output_type,
-                ..
-            } => {
-                // Call the command’s execute closure directly.
-                // Passing None for ArgMatches since we don’t need any CLI options.
-                let result = (execute)(inputs, None)?;
-                if &&result.get_type() != output_type {
-                    return Err(anyhow!(
-                        "Output type {} does not match the declared output of {}.",
-                        result.get_type(),
-                        output_type
-                    ));
-                }
-                Ok(result)
-            }
-            _ => Err(anyhow!("Not a command variant.")),
-        }
-    }
 }
 
 // helper: try import via PM4Py importer, else if it's a str, treat as file path

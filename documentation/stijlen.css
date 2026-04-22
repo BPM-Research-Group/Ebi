@@ -117,6 +117,16 @@ div.selectable {
     margin-bottom: 30px;
 }
 
+.online-command {
+    border: 1px solid #014848;
+    border-radius: 10px;
+}
+.online-command .error {
+    display: none;
+}
+.online-command .output {
+    display: none;
+}
 
 @media screen and (max-width: 600px) {
     .menu0 a:not(:first-child) {

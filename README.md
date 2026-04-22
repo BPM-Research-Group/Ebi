@@ -8,6 +8,12 @@ Ebi provides process mining and stochastic process mining algorithms, and suppor
 
 More information on its use can be found in its [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
 
+## Use Ebi from a browser
+
+Most commands of Ebi can be used directly from the browser on the [commands page](https://leemans.ch/ebi/commands.php).
+
+This will run fully on your computer, is limited to 4GB of RAM, and does not upload files.
+
 ## Use Ebi from the command line
 
 1. Download Ebi for [Windows](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/Ebi-x86_64-windows.exe?ref_type=heads&inline=false) or for [Linux](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/Ebi-x86_64-linux?ref_type=heads&inline=false).

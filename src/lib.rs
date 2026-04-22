@@ -79,6 +79,15 @@ pub mod ebi_traits {
     pub mod ebi_trait_stochastic_partially_ordered_semantics;
     pub mod ebi_trait_stochastic_semantics;
 }
+pub mod javascript {
+    #[cfg(feature = "javascript")]
+    pub mod javascript_autogen;
+    pub mod javascript_generator_html;
+    #[cfg(feature = "javascript")]
+    pub mod javascript_generator_rust;
+    #[cfg(feature = "javascript")]
+    pub mod javascript_link;
+}
 pub mod math {
     pub mod average;
 

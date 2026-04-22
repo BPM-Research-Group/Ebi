@@ -6,6 +6,7 @@ use crate::{
         ebi_input::{self, EbiInputType},
         ebi_output::{EbiExporter, EbiOutput, EbiOutputType},
     },
+    javascript::javascript_generator_html::{javascript_html_form, javascript_html_header},
     multiple_reader::MultipleReader,
     python::python::{PYTHON_PACKAGE, pm4py_function_name},
     text::HTMLEscaper,
@@ -24,7 +25,7 @@ use std::{
 pub const COMMANDS_PAGE: &'static str = "https://leemans.ch/ebi/commands.php";
 pub const FILE_HANDLERS_PAGE: &'static str = "https://leemans.ch/ebi/file_handlers.php";
 
-pub fn page_start(f: &mut Vec<u8>) -> Result<()> {
+pub fn page_start(f: &mut Vec<u8>, scripts: &str) -> Result<()> {
     // #016764, #005958, #014848, #00312F, #001E1E
     writeln!(
         f,
@@ -34,7 +35,7 @@ pub fn page_start(f: &mut Vec<u8>) -> Result<()> {
             <title>Ebi - a stochastic process mining tool</title>
             <link rel=\"shortcut icon\" href=\"https://bpm.rwth-aachen.de/favicon.png\">
             <style>
-                {}
+                {styles}
             </style>
             <script>
                 function myFunction0() {{
@@ -45,10 +46,12 @@ pub fn page_start(f: &mut Vec<u8>) -> Result<()> {
                         x.className = \"menu0\";
                     }}
                 }}
+
+                {scripts}
             </script>
         </head>
         <body>",
-        fs::read_to_string("documentation/stijlen.css").unwrap()
+        styles = fs::read_to_string("documentation/stijlen.css").unwrap(),
     )?;
     Ok(())
 }
@@ -64,7 +67,7 @@ fn page_end(f: &mut Vec<u8>) -> Result<()> {
 
 pub fn documentation_filehandlers() -> Result<EbiOutput> {
     let mut f = vec![];
-    page_start(&mut f)?;
+    page_start(&mut f, "")?;
     menu_0(&mut f)?;
     file_handlers(&mut f)?;
     page_end(&mut f)?;
@@ -73,7 +76,7 @@ pub fn documentation_filehandlers() -> Result<EbiOutput> {
 
 pub fn documentation_commands() -> Result<EbiOutput> {
     let mut f = vec![];
-    page_start(&mut f)?;
+    page_start(&mut f, &javascript_html_header())?;
     menu_0(&mut f)?;
     commands(&mut f)?;
     page_end(&mut f)?;
@@ -276,7 +279,7 @@ fn commands(f: &mut Vec<u8>) -> Result<()> {
             input_helps,
             output_type,
             ..
-        } = path[path.len() - 1]
+        } = path.last().unwrap()
             && input_typess.len() > 0
         {
             writeln!(
@@ -323,14 +326,27 @@ fn commands(f: &mut Vec<u8>) -> Result<()> {
                 writeln!(f, "</div>")?;
             }
 
+            //run online
+            if path.last().unwrap().is_in_javascript() {
+                writeln!(f, "<h2>Run</h2>")?;
+                writeln!(
+                    f,
+                    "This command can be run in the browser. 
+                    All files remain on your computer, and are not uploaded. 
+                    There is a limit of 4GB of RAM.
+                    <p>"
+                )?;
+                javascript_html_form(f, &path)?;
+            }
+
             //parameters
-            writeln!(f, "<div>Parameters:<br><table>")?;
+            writeln!(f, "<h2>Parameters</h2><table>")?;
             command_standard_parameters(f, input_typess, input_names, input_helps)?;
             command_custom_parameters(f, cli_command)?;
             command_output_type(f, output_type)?;
             command_output(f, output_type)?;
             command_exact_arithmetic(f, *exact_arithmetic)?;
-            writeln!(f, "</table></div>")?;
+            writeln!(f, "</table>")?;
 
             //pm4py
             if path.last().unwrap().is_in_python() {
@@ -593,7 +609,7 @@ fn command_exact_arithmetic(f: &mut Vec<u8>, exact_arithmetic: bool) -> Result<(
 
 pub fn documentation_home() -> Result<EbiOutput> {
     let mut f = vec![];
-    page_start(&mut f)?;
+    page_start(&mut f, "")?;
     menu_0(&mut f)?;
     writeln!(
         f,

@@ -1309,6 +1309,152 @@ pub fn read_as_any_object(
     ))
 }
 
+/// Attempt to parse an input as any of the given input types. Returns the last error if unsuccessful.
+pub fn attempt_parse(input_types: &[&'static EbiInputType], value: String) -> Result<EbiInput> {
+    //an input may be of several types; go through each of them
+    let mut error = None;
+    let mut reader = MultipleReader::String(value);
+    for input_type in input_types.iter() {
+        //try to parse the input as this type
+        match input_type {
+            EbiInputType::Trait(etrait) => {
+                //try to parse a trait
+                match read_as_trait(etrait, &mut reader, None, 0)
+                    .with_context(|| format!("Parsing as the trait `{}`.", etrait))
+                {
+                    Ok((object, file_handler)) => return Ok(EbiInput::Trait(object, file_handler)),
+                    Err(e) => error = Some(e),
+                }
+            }
+            EbiInputType::Object(etype) => {
+                //try to parse a specific object
+                match read_as_object(etype, &mut reader, None, 0)
+                    .with_context(|| format!("Parsing as the object type `{}`.", etype))
+                {
+                    Ok((object, file_handler)) => {
+                        return Ok(EbiInput::Object(object, file_handler));
+                    }
+                    Err(e) => error = Some(e),
+                }
+            }
+            EbiInputType::AnyObject => {
+                match read_as_any_object(&mut reader, None, 0)
+                    .context("Parsing as any object.")
+                {
+                    Ok((object, file_handler)) => {
+                        return Ok(EbiInput::Object(object, file_handler));
+                    }
+                    Err(e) => error = Some(e),
+                }
+            }
+            EbiInputType::FileHandler => {
+                if let MultipleReader::String(string) = &reader {
+                    if let Ok(value) = string.parse::<EbiFileHandler>() {
+                        return Ok(EbiInput::FileHandler(value));
+                    }
+                };
+            }
+            EbiInputType::String(None, _) => {
+                if let MultipleReader::String(string) = &reader {
+                    return Ok(EbiInput::String(string.clone(), &input_type));
+                } else {
+                    unreachable!()
+                }
+            }
+            EbiInputType::String(Some(allowed_values), _) => {
+                if let MultipleReader::String(string) = &reader {
+                    if allowed_values.contains(&string.as_str()) {
+                        return Ok(EbiInput::String(string.clone(), &input_type));
+                    } else {
+                        error = Some(anyhow!("value should be one of {:?}", allowed_values));
+                    }
+                } else {
+                    unreachable!()
+                }
+            }
+            EbiInputType::Usize(min, max, _) => {
+                if let MultipleReader::String(string) = &reader {
+                    if let Ok(value) = string.parse::<usize>() {
+                        match (min, max) {
+                            (None, None) => {
+                                return Ok(EbiInput::Usize(value.clone(), &input_type));
+                            }
+                            (None, Some(max)) => {
+                                if max < &value {
+                                    error = Some(anyhow!("value should be at most {}", max));
+                                } else {
+                                    return Ok(EbiInput::Usize(value.clone(), &input_type));
+                                }
+                            }
+                            (Some(min), None) => {
+                                if min > &value {
+                                    error = Some(anyhow!("value should be at least {}", min));
+                                } else {
+                                    return Ok(EbiInput::Usize(value.clone(), &input_type));
+                                }
+                            }
+                            (Some(min), Some(max)) => {
+                                if min > &value || max < &value {
+                                    error = Some(anyhow!(
+                                        "value should be between {} and {}",
+                                        min,
+                                        max
+                                    ));
+                                } else {
+                                    return Ok(EbiInput::Usize(value.clone(), &input_type));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            EbiInputType::Fraction(min, max, _) => {
+                if let MultipleReader::String(string) = &reader {
+                    if let Ok(value) = &string.parse::<FractionNotParsedYet>() {
+                        let value: Fraction = value.try_into()?;
+
+                        match (min, max) {
+                            (None, None) => {
+                                return Ok(EbiInput::Fraction(value.clone(), &input_type));
+                            }
+                            (None, Some(max)) => {
+                                if max < &value {
+                                    error = Some(anyhow!("value should be at most {}", max));
+                                } else {
+                                    return Ok(EbiInput::Fraction(value.clone(), &input_type));
+                                }
+                            }
+                            (Some(min), None) => {
+                                if min > &value {
+                                    error = Some(anyhow!("value should be at least {}", min));
+                                } else {
+                                    return Ok(EbiInput::Fraction(value.clone(), &input_type));
+                                }
+                            }
+                            (Some(min), Some(max)) => {
+                                if min > &value || max < &value {
+                                    error = Some(anyhow!(
+                                        "value should be between {} and {}",
+                                        min,
+                                        max
+                                    ));
+                                } else {
+                                    return Ok(EbiInput::Fraction(value.clone(), &input_type));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    match error {
+        Some(e) => Err(e),
+        None => Err(anyhow!("Argument was not given.")),
+    }
+}
+
 pub fn validate_object_of(
     reader: &mut MultipleReader,
     file_handler: &EbiFileHandler,

@@ -16,7 +16,7 @@ name = "ebi"
 crate-type = ["cdylib", "lib"]
 
 [features]
-default = [ ]
+default = [ "javascript" ]
 eexactarithmetic = []
 exactarithmetic = [ "eexactarithmetic", "ebi_objects/exactarithmetic", "ebi_optimisation/exactarithmetic" ]
 approximatearithmetic = [ "eapproximatearithmetic", "ebi_objects/approximatearithmetic", "ebi_optimisation/approximatearithmetic" ]
@@ -24,6 +24,7 @@ eapproximatearithmetic = []
 testactivities = [ "ebi_objects/testactivities" ]
 python = [ "java", "dep:pyo3", "dep:polars", "dep:num-traits", "dep:syn", "dep:num-bigint" ]
 java = [ "dep:jni" ]
+javascript = [ "dep:wasm-bindgen", "dep:syn" ]
 extension-module = ["pyo3/extension-module"]
 
 [dependencies]
@@ -56,7 +57,7 @@ itertools = "0.14.0"
 serde = "1.0.228"
 logging_timer = "1.1.1"
 svg2pdf = "0.13.0"
-uuid = "1.23.0"
+uuid = "1.23.1"
 cfg-if = "1.0.4"
 ntest = "0.9.3"
 regex = "1.12.3"
@@ -64,13 +65,14 @@ quick-xml = {version="0.39.2", features=["serialize"]}
 pastey = "0.2.0"
 intmap = "3.1.3"
 rustc-hash = "2.1.2"
-const_format = "0.2.35"
+const_format = "0.2.36"
 pyo3 = { version = "0.27.1", features = ["abi3-py37", "generate-import-lib", "num-bigint"], optional = true }
 polars = { version = "0.32", features = ["ipc", "timezones"], optional = true }
 num-traits = { version = "0.2", optional = true }
 syn = { version = "2.0.117", features = [ "parsing", "full" ], optional = true }
 jni = { version = "0.21.1", optional = true }
 num-bigint = { version = "0.4.6", optional = true }
+wasm-bindgen = { version = "0.2.118", optional = true }
 
 [profile.release]
 debug = false
@@ -82,3 +84,14 @@ codegen-units = 8
 
 [dev-dependencies]
 ebi = { path = ".", default-features = false, features = ["testactivities"] }
+
+# trick from https://users.rust-lang.org/t/getrandom-version-conflict-error-building-a-wasm/132355
+[target.wasm32-unknown-unknown.dependencies]
+uuid = { version = "1.23.1", features = ["js"] }
+getrandom_v2 = { version = "0.2", features = ["js"], package = "getrandom" }
+getrandom    = { version = "0.3", features = ["wasm_js"] }
+getrandom_v3 = { version = "0.4.2", features = ["wasm_js"], package = "getrandom" }
+
+# fix from https://github.com/leptos-rs/leptos/issues/4004?issue=leptos-rs%7Ccargo-leptos%7C441
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ['-Oz','--enable-bulk-memory','--all-features']
