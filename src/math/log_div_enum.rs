@@ -17,12 +17,11 @@ use ebi_objects::{
         },
     },
 };
-use fraction::Sign;
 use std::{
     fmt::Display,
     io::Write,
     mem,
-    ops::{Add, AddAssign, DivAssign, MulAssign, Neg, Sub, SubAssign},
+    ops::{Add, AddAssign, DivAssign, Mul, MulAssign, Neg, Sub, SubAssign},
 };
 
 #[derive(Clone)]
@@ -713,5 +712,51 @@ mod tests {
         let mut zero = LogDivEnum::zero();
         zero /= 2;
         assert_eq!(zero, LogDivEnum::zero());
+    }
+}
+
+#[derive(Eq, PartialEq, Copy, Clone, Debug)]
+pub enum Sign {
+    Plus,
+    Minus,
+}
+
+impl Sign {
+    pub fn is_negative(&self) -> bool {
+        match self {
+            Sign::Plus => false,
+            Sign::Minus => true,
+        }
+    }
+
+    pub fn is_positive(&self) -> bool {
+        match self {
+            Sign::Plus => true,
+            Sign::Minus => false,
+        }
+    }
+}
+
+impl Neg for Sign {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        match self {
+            Sign::Plus => Sign::Minus,
+            Sign::Minus => Sign::Plus,
+        }
+    }
+}
+
+impl Mul for Sign {
+    type Output = Self;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        match (self, rhs) {
+            (Sign::Plus, Sign::Plus) => Sign::Plus,
+            (Sign::Plus, Sign::Minus) => Sign::Minus,
+            (Sign::Minus, Sign::Plus) => Sign::Minus,
+            (Sign::Minus, Sign::Minus) => Sign::Plus,
+        }
     }
 }

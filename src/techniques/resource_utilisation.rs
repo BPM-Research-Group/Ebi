@@ -68,6 +68,10 @@ impl ResourceMarking {
         resource_model: &ResourceModel,
         resource: Option<Activity>,
     ) {
+        if let Some(resource) = resource {
+            //we know that the resource became unoccupied with the execution of this transition
+            self.0[resource.id] = None;
+        }
     }
 
     pub fn resource_utilisation(

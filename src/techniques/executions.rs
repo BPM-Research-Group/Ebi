@@ -11,7 +11,9 @@ use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
     Activity, ActivityKey, Executions,
     anyhow::{Context, Error, Ok, Result},
-    ebi_objects::{executions::Execution, language_of_alignments::Move},
+    ebi_objects::{
+        executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
+    },
 };
 use intmap::IntMap;
 use rayon::iter::{IndexedParallelIterator, ParallelIterator};
@@ -145,8 +147,11 @@ where
         semantics.execute_transition(&mut marking, execution.fired_transition)?;
 
         if let Some(resource) = execution.resource {
-            execution.resource_utilisation =
-                resource_state.resource_utilisation(&resource_model, resource, execution.fired_transition);
+            execution.resource_utilisation = resource_state.resource_utilisation(
+                &resource_model,
+                resource,
+                execution.fired_transition,
+            );
         }
 
         resource_state.execute_transition(&resource_model, execution.resource);
@@ -189,17 +194,18 @@ impl C {
                     //logmoves are not linked to transitions and have no executions
                 }
                 Move::ModelMove(activity, transition) => {
-                    let enabling_move_index = self.get_enabling_move(transition, semantics);
+                    let move_index_of_enablement = self.get_enabling_move(transition, semantics);
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
 
                     executions.push_back(Execution {
                         trace: self.trace_index,
+                        move_index,
                         activity: Some(activity),
                         also_in_log: false,
                         fired_transition: transition,
                         other_enabled_transitions,
-                        time_of_enablement: self.get_time(enabling_move_index, log).cloned(),
+                        move_index_of_enablement,
                         time_of_execution: None,
                         resource: None,
                         resource_utilisation: None,
@@ -208,17 +214,18 @@ impl C {
                     semantics.execute_transition(&mut state, transition)?;
                 }
                 Move::SynchronousMove(activity, transition) => {
-                    let enabling_move_index = self.get_enabling_move(transition, semantics);
+                    let move_index_of_enablement = self.get_enabling_move(transition, semantics);
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
 
                     executions.push_back(Execution {
                         trace: self.trace_index,
+                        move_index,
                         activity: Some(activity),
                         also_in_log: true,
                         fired_transition: transition,
                         other_enabled_transitions,
-                        time_of_enablement: self.get_time(enabling_move_index, log).cloned(),
+                        move_index_of_enablement,
                         time_of_execution: self.get_time(Some(move_index), log).cloned(),
                         resource: self.get_resource(Some(move_index), log, resource_key),
                         resource_utilisation: None,
@@ -227,17 +234,18 @@ impl C {
                     semantics.execute_transition(&mut state, transition)?;
                 }
                 Move::SilentMove(transition) => {
-                    let enabling_move_index = self.get_enabling_move(transition, semantics);
+                    let move_index_of_enablement = self.get_enabling_move(transition, semantics);
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
 
                     executions.push_back(Execution {
                         trace: self.trace_index,
+                        move_index,
                         activity: None,
                         also_in_log: false,
                         fired_transition: transition,
                         other_enabled_transitions,
-                        time_of_enablement: self.get_time(enabling_move_index, log).cloned(),
+                        move_index_of_enablement,
                         time_of_execution: None,
                         resource: None,
                         resource_utilisation: None,
@@ -291,44 +299,103 @@ impl C {
     }
 
     /**
-     * Get the last non-silent move that enabled the move at the given index
+     * Get the last move that enabled the move at the given index.
      */
     fn get_enabling_move<T, FS>(&self, move_index: usize, semantics: &T) -> Option<usize>
     where
         T: Semantics<SemState = FS> + Send + Sync + ?Sized,
         FS: Display + Debug + Clone + Hash + Eq,
     {
-        let transition = self.moves.get(move_index)?.get_transition()?;
+        let transition_that_may_get_enabled = self.moves.get(move_index)?.get_transition()?;
 
         //first, figure out when this move's transition was last enabled
-        let mut last_enabled_before_move = None;
-        {
-            let mut state = semantics.get_initial_state()?;
+        let (mut result, mut state) =
+            MoveEnabled::start(semantics, transition_that_may_get_enabled)?;
+        if move_index > 0 {
             for (move_index2, move2) in self.moves.iter().take(move_index).enumerate() {
                 if let Some(transition2) = move2.get_transition() {
-                    if semantics
-                        .get_enabled_transitions(&state)
-                        .contains(&transition)
-                    {
-                        if last_enabled_before_move.is_none() {
-                            //transition is now enabled and was not before
-                            last_enabled_before_move = Some(move_index2);
-                        } else {
-                            //transition was already enabled and is still enabled
-                        }
-                    } else {
-                        //transition is not enabled
-                        last_enabled_before_move = None;
-                    }
-                    let _ = semantics.execute_transition(&mut state, transition2);
+                    //sync, model or silent move
+                    result.execute_transition(
+                        semantics,
+                        &mut state,
+                        transition_that_may_get_enabled,
+                        transition2,
+                        move_index2,
+                    );
+                } else {
+                    //skip log move
                 }
             }
         }
+        result.finalise()
+    }
+}
 
-        if let Some(Move::SilentMove(_)) = self.moves.get(last_enabled_before_move?) {
-            self.get_enabling_move(last_enabled_before_move?, semantics)
+#[derive(Debug, Copy, Clone)]
+enum MoveEnabled {
+    FromStartOfTrace,
+    AsResultOfMove(usize),
+    NotEnabled,
+}
+
+impl MoveEnabled {
+    fn start<T, FS>(
+        semantics: &T,
+        transition_that_may_get_enabled: TransitionIndex,
+    ) -> Option<(Self, FS)>
+    where
+        T: Semantics<SemState = FS> + Send + Sync + ?Sized,
+        FS: Display + Debug + Clone + Hash + Eq,
+    {
+        let state = semantics
+            .get_initial_state()
+            .expect("there is no initial state");
+
+        if semantics
+            .get_enabled_transitions(&state)
+            .contains(&transition_that_may_get_enabled)
+        {
+            Some((Self::FromStartOfTrace, state))
         } else {
-            last_enabled_before_move
+            Some((Self::NotEnabled, state))
+        }
+    }
+
+    fn execute_transition<T, FS>(
+        &mut self,
+        semantics: &T,
+        state: &mut FS,
+        transition_that_may_get_enabled: TransitionIndex,
+        transition: TransitionIndex,
+        move_index: usize,
+    ) where
+        T: Semantics<SemState = FS> + Send + Sync + ?Sized,
+        FS: Display + Debug + Clone + Hash + Eq,
+    {
+        semantics
+            .execute_transition(state, transition)
+            .expect("transition was not enabled and nevertheless fired");
+
+        let now_enabled = semantics
+            .get_enabled_transitions(&state)
+            .contains(&transition_that_may_get_enabled);
+        *self = match (now_enabled, &self) {
+            (true, MoveEnabled::FromStartOfTrace) => MoveEnabled::FromStartOfTrace,
+            (true, MoveEnabled::AsResultOfMove(x)) => MoveEnabled::AsResultOfMove(*x),
+            (true, MoveEnabled::NotEnabled) => MoveEnabled::AsResultOfMove(move_index),
+            (false, MoveEnabled::FromStartOfTrace) => MoveEnabled::NotEnabled,
+            (false, MoveEnabled::AsResultOfMove(_)) => MoveEnabled::NotEnabled,
+            (false, MoveEnabled::NotEnabled) => MoveEnabled::NotEnabled,
+        };
+    }
+
+    fn finalise(self) -> Option<usize> {
+        match self {
+            MoveEnabled::FromStartOfTrace => None,
+            MoveEnabled::AsResultOfMove(move_index) => Some(move_index),
+            MoveEnabled::NotEnabled => {
+                panic!("transition was not enabled and it nevertheless fired")
+            }
         }
     }
 }

@@ -1,9 +1,9 @@
+use crate::math::log_div_enum::Sign;
 use ebi_objects::{
     Infoable,
     anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, OneMinus, Signed, Sqrt, Zero},
 };
-use fraction::Sign;
 use std::{
     fmt::{Debug, Display},
     io::Write,
