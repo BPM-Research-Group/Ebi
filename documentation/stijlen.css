@@ -123,6 +123,7 @@ div.selectable {
 }
 .online-command .error {
     display: none;
+    color: rgb(231, 80, 80);
 }
 .online-command .output {
     display: none;

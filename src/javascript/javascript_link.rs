@@ -3,7 +3,8 @@ use crate::ebi_framework::{
     ebi_input::{EbiInput, attempt_parse},
     ebi_output::{self, EbiOutputType},
 };
-use ebi_objects::anyhow::{Context, Result, anyhow};
+use ebi_objects::anyhow::{Context, Error, Result, anyhow};
+use itertools::Itertools;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -55,18 +56,32 @@ pub(crate) fn execute_javascript_command(
         .with_context(|| anyhow!("Reading {} inputs.", number_of_inputs))
     {
         Ok(t) => t,
-        Err(e) => return ebi_error(&e.to_string(), command_name),
+        Err(e) => return ebi_error(&print_error(e), command_name),
     };
 
     // Execute the command.
-    let result = match command.execute_with_inputs(inputs) {
+    let result = match command
+        .execute_with_inputs(inputs)
+        .with_context(|| anyhow!("Executing command {}", command.long_name()))
+    {
         Ok(result) => result,
-        Err(e) => return ebi_error(&e.to_string(), command_name),
+        Err(e) => return ebi_error(&print_error(e), command_name),
     };
 
     let exporter = EbiCommand::select_exporter(output_type, None, None).unwrap();
     match ebi_output::export_to_string(result, exporter) {
         Ok(string) => return ebi_output(&string, command_name),
-        Err(e) => return ebi_error(&e.to_string(), command_name),
+        Err(e) => return ebi_error(&print_error(e), command_name),
     }
+}
+
+pub fn print_error(e: Error) -> String {
+    format!(
+        "Error: {e}<br>Caused by:<br>{}",
+        e.chain()
+            .enumerate()
+            .skip(1)
+            .map(|(i, cause)| format!("{i}: {cause}"))
+            .join("<br>")
+    )
 }

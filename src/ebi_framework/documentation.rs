@@ -25,7 +25,7 @@ use std::{
 pub const COMMANDS_PAGE: &'static str = "https://leemans.ch/ebi/commands.php";
 pub const FILE_HANDLERS_PAGE: &'static str = "https://leemans.ch/ebi/file_handlers.php";
 
-pub fn page_start(f: &mut Vec<u8>, scripts: &str) -> Result<()> {
+pub fn page_start(f: &mut Vec<u8>, headers: &str) -> Result<()> {
     // #016764, #005958, #014848, #00312F, #001E1E
     writeln!(
         f,
@@ -46,9 +46,8 @@ pub fn page_start(f: &mut Vec<u8>, scripts: &str) -> Result<()> {
                         x.className = \"menu0\";
                     }}
                 }}
-
-                {scripts}
             </script>
+            {headers}
         </head>
         <body>",
         styles = fs::read_to_string("documentation/stijlen.css").unwrap(),
