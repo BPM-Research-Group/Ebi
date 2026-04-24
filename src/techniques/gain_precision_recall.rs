@@ -12,7 +12,6 @@ use ebi_objects::{
     };
 use crate::follower_semantics::FollowerSemantics;
 use crate::math::log_div::LogDiv;
-use ebi_objects::ebi_arithmetic::fraction::fraction_enum::FractionEnum;
 
 
 /// Default lambda = 1e-6.
@@ -349,7 +348,7 @@ pub fn entropy_sdfa(sdfa: &StochasticDeterministicFiniteAutomaton) -> Result<Log
 }
 
 /// ratio = numerator / denominator
-fn ratio(num: LogDiv, denom: LogDiv) -> Result<FractionEnum> {
+fn ratio(num: LogDiv, denom: LogDiv) -> Result<Fraction> {
     let numerator = num.approximate();
     let denominator = denom.approximate();
 
@@ -365,7 +364,7 @@ pub fn potential_gain_precision(
     fsl: FiniteStochasticLanguage,
     sdfa: StochasticDeterministicFiniteAutomaton,
     lambda: Option<&Fraction>,
-) -> Result<FractionEnum> {
+) -> Result<Fraction> {
     let resolved_lambda = resolve_lambda_checked(lambda)?;
     is_valid_sdfa(&sdfa)?;
 
@@ -380,7 +379,7 @@ pub fn potential_gain_recall(
     fsl: FiniteStochasticLanguage,
     sdfa: StochasticDeterministicFiniteAutomaton,
     lambda: Option<&Fraction>,
-) -> Result<FractionEnum> {
+) -> Result<Fraction> {
     let resolved_lambda = resolve_lambda_checked(lambda)?;
     is_valid_sdfa(&sdfa)?;
 
@@ -474,8 +473,8 @@ mod tests {
 
         let lambda: Fraction = f!(1i64, 1_000_000i64);
 
-        let precision: FractionEnum = potential_gain_precision(fsl.clone(), sdfa.clone(), Some(&lambda))?;
-        let recall: FractionEnum =potential_gain_recall(fsl.clone(), sdfa.clone() , Some(&lambda))?;
+        let precision = potential_gain_precision(fsl.clone(), sdfa.clone(), Some(&lambda))?;
+        let recall = potential_gain_recall(fsl.clone(), sdfa.clone() , Some(&lambda))?;
 
         println!("precision(L_e, S_e) ≈ {}", precision);
         println!("recall   (L_e, S_e) ≈ {}", recall);
