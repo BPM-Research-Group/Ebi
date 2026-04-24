@@ -17,7 +17,6 @@ use ebi_objects::{
         },
     },
 };
-use fraction::Sign;
 use std::{
     cmp::Ordering,
     fmt::Display,
@@ -25,6 +24,8 @@ use std::{
     mem,
     ops::{Add, AddAssign, DivAssign, MulAssign, Neg, Sub, SubAssign},
 };
+
+use crate::math::sign::Sign;
 
 #[derive(Clone)]
 pub struct LogDivExact((Rational, Natural));

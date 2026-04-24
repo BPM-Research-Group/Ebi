@@ -1,4 +1,3 @@
-use crate::math::log_div_enum::Sign;
 use ebi_objects::{
     Infoable,
     anyhow::{Result, anyhow},
@@ -9,6 +8,8 @@ use std::{
     io::Write,
     ops::{Div, Mul, Neg},
 };
+
+use crate::math::sign::Sign;
 
 #[derive(Clone)]
 pub struct ContainsRoot {

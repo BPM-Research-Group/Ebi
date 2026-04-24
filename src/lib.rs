@@ -91,20 +91,6 @@ pub mod javascript {
 pub mod math {
     pub mod average;
 
-    pub mod log_div;
-    #[cfg(any(
-        all(
-            not(feature = "eexactarithmetic"),
-            not(feature = "eapproximatearithmetic")
-        ),
-        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic")
-    ))]
-    pub mod log_div_enum;
-    #[cfg(all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")))]
-    pub mod log_div_exact;
-    #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
-    pub mod log_div_f64;
-
     pub mod fixed_denominator_fraction;
     #[cfg(any(
         all(
@@ -118,6 +104,20 @@ pub mod math {
     pub mod fixed_denominator_fraction_exact;
     #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
     pub mod fixed_denominator_fraction_f64;
+    pub mod log_div;
+    #[cfg(any(
+        all(
+            not(feature = "eexactarithmetic"),
+            not(feature = "eapproximatearithmetic")
+        ),
+        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic")
+    ))]
+    pub mod log_div_enum;
+    #[cfg(all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")))]
+    pub mod log_div_exact;
+    #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
+    pub mod log_div_f64;
+    pub mod sign;
 
     pub mod correlation;
     pub mod distances;
