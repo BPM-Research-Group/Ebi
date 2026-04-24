@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<log>
+  <object-types>
+    <object-type name="Invoice">
+      <attributes/>
+    </object-type>
+    <object-type name="Payment">
+      <attributes/>
+    </object-type>
+  </object-types>
+  <event-types>
+    <event-type name="Create Purchase Requisition">
+      <attributes/>
+    </event-type>
+    <event-type name="Approve Purchase Requisition">
+      <attributes/>
+    </event-type>
+  </event-types>
+  <objects>
+    <object id="I1" type="Invoice">
+      <attributes/>
+      <objects/>
+    </object>
+    <object id="P1" type="Payment">
+      <attributes/>
+      <objects/>
+    </object>
+  </objects>
+  <events>
+    <event id="e1" type="Create Purchase Requisition" time="2022-01-09T15:00:00Z">
+      <attributes/>
+      <objects>
+        <relationship object-id="I1" qualifier="Regular placement of PR"/>
+        <relationship object-id="P1" qualifier="Regular placement of PR"/>
+      </objects>
+    </event>
+    <event id="e2" type="Approve Purchase Requisition" time="2022-01-09T16:30:00Z">
+      <attributes/>
+      <objects>
+        <relationship object-id="I1" qualifier="Regular approval of PR"/>
+      </objects>
+    </event>
+  </events>
+</log>

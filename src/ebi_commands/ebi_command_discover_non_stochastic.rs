@@ -11,7 +11,7 @@ use crate::{
     techniques::{
         flower_miner::{FlowerMinerDFA, FlowerMinerTree},
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
-    },
+    }, tests::test_ebi_command,
 };
 
 pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
@@ -24,6 +24,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
         &EBI_DISCOVER_NON_STOCHASTIC_PREFIX,
     ],
 };
+test_ebi_command!(EBI_DISCOVER_NON_STOCHASTIC);
 
 pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER: EbiCommand = EbiCommand::Group {
     name_short: "flw",
@@ -131,7 +132,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA: EbiCommand = EbiCommand::Command
 };
 
 pub const EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE: EbiCommand = EbiCommand::Command {
-    name_short: "tree",
+    name_short: "ptree",
     name_long: Some("process-tree"),
     explanation_short: "Discover a process tree that is a prefix tree of the log.",
     explanation_long: None,

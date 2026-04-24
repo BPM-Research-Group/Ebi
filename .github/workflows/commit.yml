@@ -43,12 +43,14 @@ jobs:
         rm README.md
         rm Cargo.toml
         rm -rf manual/*
+        rm -rf documentation/*
         rm .gitlab-ci.yml
         cp -R -a ../src/. src/
         cp -R -a ../testfiles/. testfiles/
         cp ../README.md README.md
         cp ../Cargo.toml Cargo.toml
         cp -R -a ../manual/. manual/
+        cp -R -a ../documentation/. documentation/
         cp ../.gitlab-ci.yml .gitlab-ci.yml
         git add --all
         git commit -a -m "github CI"

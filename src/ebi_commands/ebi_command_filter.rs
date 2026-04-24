@@ -5,7 +5,7 @@ use crate::{
         ebi_input::EbiInputType,
         ebi_output::{EbiOutput, EbiOutputType},
     },
-    techniques::filter::{EventSelector, Filter, Operator},
+    techniques::filter::{EventSelector, Filter, Operator}, tests::test_ebi_command,
 };
 use ebi_objects::{EbiObject, EbiObjectType, EventLog, EventLogXes, HasActivityKey};
 use strum::VariantNames;
@@ -17,6 +17,7 @@ pub const EBI_FILTER: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[&EBI_FILTER_TRACES],
 };
+test_ebi_command!(EBI_FILTER);
 
 pub const EBI_FILTER_TRACES: EbiCommand = EbiCommand::Group {
     name_short: "tr",

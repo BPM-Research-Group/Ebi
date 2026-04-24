@@ -1,0 +1,268 @@
+finite stochastic partially ordered language
+# number of traces
+10
+# trace 0
+#	probability
+1/10
+#	number of events
+3
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+#	event 2
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+1
+# trace 1
+#	probability
+1/10
+#	number of events
+3
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+#	event 2
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+1
+# trace 2
+#	probability
+1/10
+#	number of events
+3
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+#	event 2
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+1
+# trace 3
+#	probability
+1/10
+#	number of events
+3
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+#	event 2
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+1
+# trace 4
+#	probability
+1/10
+#	number of events
+2
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+# trace 5
+#	probability
+1/10
+#	number of events
+2
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+# trace 6
+#	probability
+1/10
+#	number of events
+2
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+# trace 7
+#	probability
+1/10
+#	number of events
+2
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+# trace 8
+#	probability
+1/10
+#	number of events
+3
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check easy claim
+(5 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0
+#	event 2
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+1
+# trace 9
+#	probability
+1/10
+#	number of events
+2
+#	event 0
+$multiline
+Register claim
+(2min)
+multiline$
+#		number of predecessors
+0
+#		predecessors
+#	event 1
+$multiline
+Check difficult claim
+(10 min)
+multiline$
+#		number of predecessors
+1
+#		predecessors
+0

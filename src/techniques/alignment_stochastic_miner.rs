@@ -5,6 +5,7 @@ use ebi_objects::{
     StochasticLabelledPetriNet,
     anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{Fraction, Zero},
+    ebi_bpmn::Token,
     ebi_objects::language_of_alignments::Move,
 };
 
@@ -49,21 +50,25 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
                     .get(index)
                     .ok_or_else(|| anyhow!("should not happen"))?
                 {
+                    // println!("move {:?}", movee);
                     match movee {
                         Move::LogMove(_) => {}
                         Move::ModelMove(_, transition_index)
                         | Move::SynchronousMove(_, transition_index)
                         | Move::SilentMove(transition_index) => {
-                            for sequence_flow_index in self
-                                .transition_2_marked_sequence_flows(*transition_index, &marking)
-                                .ok_or_else(|| anyhow!("this should not happen"))?
+                            for token in
+                                self.transition_2_produced_tokens(*transition_index, &marking)?
                             {
-                                let sequence_flow = self
-                                    .global_index_2_sequence_flow_mut(sequence_flow_index)
-                                    .ok_or_else(|| anyhow!("sequence flow not found"))?;
+                                // println!("\ttoken {:?}", token);
+                                if let Token::SequenceFlow(sequence_flow_index) = token {
+                                    let sequence_flow = self
+                                        .global_index_2_sequence_flow_mut(sequence_flow_index)
+                                        .ok_or_else(|| anyhow!("sequence flow not found"))?;
 
-                                *sequence_flow.weight.get_or_insert_with(|| Fraction::zero()) +=
-                                    probability;
+                                    *sequence_flow
+                                        .weight
+                                        .get_or_insert_with(|| Fraction::zero()) += probability;
+                                }
                             }
 
                             self.execute_transition(&mut marking, *transition_index)?;
@@ -116,7 +121,10 @@ impl AlignmentMiner for LabelledPetriNet {
 mod tests {
     use std::fs;
 
-    use ebi_objects::{FiniteStochasticLanguage, LabelledPetriNet};
+    use ebi_objects::{
+        BusinessProcessModelAndNotation, FiniteStochasticLanguage, HasActivityKey,
+        LabelledPetriNet, TranslateActivityKey, ebi_bpmn::Token,
+    };
 
     use crate::techniques::alignment_stochastic_miner::AlignmentMiner;
 
@@ -133,5 +141,42 @@ mod tests {
         let fout = fs::read_to_string("testfiles/aa-ab-ba_ali.slpn").unwrap();
 
         assert_eq!(fout, slpn.to_string())
+    }
+
+    #[test]
+    fn bpmn_alignment_estimator() {
+        let fin2 = fs::read_to_string("testfiles/aa.slang").unwrap();
+        let mut lang = Box::new(fin2.parse::<FiniteStochasticLanguage>().unwrap());
+
+        let fin1 = fs::read_to_string("testfiles/flower.bpmn").unwrap();
+        let mut bpmn = fin1.parse::<BusinessProcessModelAndNotation>().unwrap();
+        bpmn.translate_using_activity_key(lang.activity_key_mut());
+
+        {
+            let mut marking = bpmn.get_initial_marking().unwrap().unwrap();
+
+            println!("marking: {}", marking);
+
+            assert!(!bpmn.is_final_marking(&marking).unwrap());
+            assert_eq!(bpmn.get_enabled_transitions(&marking).unwrap(), vec![0]);
+            assert_eq!(
+                bpmn.transition_2_produced_tokens(0, &marking).unwrap(),
+                vec![Token::SequenceFlow((7, ()))]
+            );
+            bpmn.execute_transition(&mut marking, 0).unwrap();
+
+            println!("marking: {}", marking);
+
+            assert!(!bpmn.is_final_marking(&marking).unwrap());
+            assert_eq!(bpmn.get_enabled_transitions(&marking).unwrap(), vec![2]);
+            assert_eq!(
+                bpmn.transition_2_produced_tokens(2, &marking).unwrap(),
+                vec![Token::SequenceFlow((9, ()))]
+            );
+            bpmn.execute_transition(&mut marking, 2).unwrap();
+        }
+
+        let _sbpmn = bpmn.mine_stochastic_alignment(lang).unwrap();
+        // dbg!(sbpmn);
     }
 }

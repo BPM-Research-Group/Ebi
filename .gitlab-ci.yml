@@ -24,9 +24,16 @@ buildlatex:
     - mv manual/manual.pdf build/nightly/manual.pdf
     - git add build/nightly/manual.pdf
 
-    #compile html
-    - cargo run itself html -o build/nightly/commands.html
+    #compile documentation
+    - cargo run itself documentation home -o documentation/index.html
+    - cargo run itself documentation commands -o documentation/commands.html
+    - cargo run itself documentation file-handlers -o documentation/file_handlers.html
+    - mv documentation/index.html build/nightly/index.html
+    - mv documentation/commands.html build/nightly/commands.html
+    - mv documentation/file_handlers.html build/nightly/file_handlers.html
+    - git add build/nightly/index.html
     - git add build/nightly/commands.html
+    - git add build/nightly/file_handlers.html
 
     #compile linux 64 bit
     - cargo build --target x86_64-unknown-linux-gnu --release
@@ -82,6 +89,7 @@ buildlatex:
     - cargo run --features java itself java -o Ebi/src/org/processmining/ebi/plugins/EbiPlugins.java
     - cd Ebi
     - git add src/org/processmining/ebi/plugins/EbiPlugins.java
+    - git add README.md
     - git commit -m "update Ebi plugins"
     - git push -f https://ci_token:$PROM_GIT_TOKEN@github.com/promworkbench/Ebi HEAD:main
     - cd ..

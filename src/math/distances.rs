@@ -145,6 +145,9 @@ impl TriangularDistanceMatrix {
     }
 
     fn get_number_of_distances(len: usize) -> usize {
+        if len == 0 {
+            return 0;
+        }
         (len * (len - 1)) / 2
     }
 

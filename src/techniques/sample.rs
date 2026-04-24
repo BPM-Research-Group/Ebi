@@ -1,21 +1,33 @@
 use crate::{
-    ebi_framework::displayable::Displayable,
+    ebi_framework::{displayable::Displayable, ebi_command::EbiCommand},
     ebi_traits::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics,
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
+    stochastic_partially_ordered_semantics::stochastic_partially_ordered_semantics::StochasticPartiallyOrderedSemantics,
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
 use ebi_objects::{
-    FiniteStochasticLanguage,
+    FiniteStochasticLanguage, FiniteStochasticPartiallyOrderedLanguage, HasActivityKey,
+    StochasticBusinessProcessModelAndNotation,
     anyhow::{Result, anyhow},
-    ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One, Zero},
+    ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One, Recip, Zero, f},
+    ebi_bpmn::{BPMNMarking, partially_ordered_run::PartiallyOrderedRun},
 };
 use rand::RngExt;
+use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::collections::{HashMap, hash_map::Entry};
 
 pub trait Sampler {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage>;
+}
+
+pub trait PartiallyOrderedSampler {
+    fn sample_partially_ordered(
+        &self,
+        number_of_traces: usize,
+    ) -> Result<FiniteStochasticPartiallyOrderedLanguage>;
 }
 
 pub trait Resampler {
@@ -55,6 +67,36 @@ impl Sampler for dyn EbiTraitFiniteStochasticLanguage {
         }
 
         Ok((self.activity_key().clone(), result).into())
+    }
+}
+
+impl PartiallyOrderedSampler for StochasticBusinessProcessModelAndNotation {
+    fn sample_partially_ordered(
+        &self,
+        number_of_traces: usize,
+    ) -> Result<FiniteStochasticPartiallyOrderedLanguage> {
+        let probabilities = vec![f!(number_of_traces).recip(); number_of_traces];
+
+        let progress_bar = EbiCommand::get_progress_bar_ticks(number_of_traces);
+
+        // Create thread pool with custom configuration
+        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
+
+        let mut traces = Vec::with_capacity(number_of_traces);
+        pool.install(|| {
+            traces = (0..number_of_traces)
+                .into_par_iter()
+                .map(|_| {
+                    let run = PartiallyOrderedRun::new_random(self).unwrap().into();
+                    progress_bar.inc(1);
+                    run
+                })
+                .collect();
+        });
+
+        progress_bar.finish_and_clear();
+
+        Ok((self.activity_key().clone(), traces, probabilities).into())
     }
 }
 
@@ -151,6 +193,82 @@ impl Resampler for dyn EbiTraitFiniteStochasticLanguage {
     }
 }
 
+impl Sampler for EbiTraitStochasticPartiallyOrderedSemantics {
+    fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage> {
+        match self {
+            EbiTraitStochasticPartiallyOrderedSemantics::BPMNMarking(bpmn) => {
+                bpmn.sample(number_of_traces)
+            }
+        }
+    }
+}
+
+impl Sampler
+    for dyn StochasticPartiallyOrderedSemantics<
+            StoPOSemState = BPMNMarking,
+            SemState = BPMNMarking,
+            AliState = BPMNMarking,
+        >
+{
+    fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage> {
+        if let Some(initial_state) = self.get_initial_state() {
+            let mut result = HashMap::new();
+
+            for _ in 0..number_of_traces {
+                let mut current_state = initial_state.clone();
+                let mut trace = vec![];
+
+                let mut outgoing_probabilities = vec![];
+
+                while !self.is_final_state(&current_state) {
+                    let enabled_transitions = self.get_enabled_transitions(&current_state);
+
+                    outgoing_probabilities.clear();
+                    for transition in &enabled_transitions {
+                        outgoing_probabilities.push(
+                            self.get_transition_probabilistic_penalty(&current_state, *transition)
+                                .ok_or_else(|| anyhow!("transition not found"))?,
+                        );
+                    }
+
+                    // get firing transition
+                    let i = Fraction::choose_randomly(&outgoing_probabilities)?;
+                    let chosen_transition = enabled_transitions[i];
+
+                    let activity = self.get_transition_activity(chosen_transition, &current_state);
+
+                    // execute transition
+                    self.execute_transition(&mut current_state, chosen_transition)?;
+
+                    match activity {
+                        Some(activity) => trace.push(activity),
+                        None => {}
+                    }
+                }
+
+                match result.entry(trace) {
+                    Entry::Occupied(mut e) => *e.get_mut() += 1,
+                    Entry::Vacant(e) => {
+                        e.insert(Fraction::one());
+                    }
+                };
+            }
+
+            if result.is_empty() {
+                return Err(anyhow!(
+                    "Analysis resulted in an empty language; there are no traces in the model."
+                ));
+            }
+
+            // log::debug!("Sampled {:?} traces", result);
+
+            Ok((self.activity_key().clone(), result).into())
+        } else {
+            return Err(anyhow!("Language contains no traces, so cannot sample."));
+        }
+    }
+}
+
 /**
  * Fills the given vector with uniformly random numbers in the range 0..number_of_indices
  */
@@ -164,10 +282,6 @@ pub fn sample_indices_uniform(number_of_indices: usize, result: &mut Vec<usize>)
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_objects::FiniteStochasticLanguage;
-
     use crate::{
         ebi_framework::trait_importers::ToStochasticSemanticsTrait,
         ebi_traits::{
@@ -175,6 +289,8 @@ mod tests {
             ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
         },
     };
+    use ebi_objects::FiniteStochasticLanguage;
+    use std::fs;
 
     use super::Sampler;
 

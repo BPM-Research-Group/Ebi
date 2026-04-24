@@ -4,7 +4,10 @@ use crate::ebi_framework::{
     ebi_output::EbiObjectExporter,
     ebi_trait::FromEbiTraitObject,
     object_importers::ImportAsBusinessProcessModelAndNotationObject,
-    trait_importers::{ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait},
+    trait_importers::{
+        ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait,
+        ImportAsStochasticPartiallyOrderedSemanticsTrait,
+    },
     validate::Validate,
 };
 use ebi_objects::{
@@ -33,6 +36,10 @@ pub const EBI_STOCHASTIC_BUSINESS_PROCESS_MODEL_AND_NOTATION: EbiFileHandler = E
             StochasticBusinessProcessModelAndNotation::import_as_semantics_trait,
             StochasticBusinessProcessModelAndNotation::IMPORTER_PARAMETERS,
         ),
+        EbiTraitImporter::StochasticPartiallyOrderedSemantics(
+            StochasticBusinessProcessModelAndNotation::import_as_stochastic_partially_ordered_semantics_trait,
+            StochasticBusinessProcessModelAndNotation::IMPORTER_PARAMETERS
+        )
     ],
     object_importers: &[
         EbiObjectImporter::StochasticBusinessProcessModelAndNotation(

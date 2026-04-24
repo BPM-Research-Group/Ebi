@@ -11,6 +11,7 @@ use crate::{
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
         ebi_trait_semantics::EbiTraitSemantics,
         ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics,
+        ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics,
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
 };
@@ -94,4 +95,8 @@ import_as_trait!(StochasticSemantics, stochastic_semantics);
 import_as_trait!(
     StochasticDeterministicSemantics,
     stochastic_deterministic_semantics
+);
+import_as_trait!(
+    StochasticPartiallyOrderedSemantics,
+    stochastic_partially_ordered_semantics
 );

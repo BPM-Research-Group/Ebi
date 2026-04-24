@@ -226,7 +226,7 @@ fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
 
         //latex link
         if let Some(link) = latex_link {
-            writeln!(f, "More information: {}.\\\\", link)?;
+            writeln!(f, "More information: {}~\\\\", link)?;
         }
         
         //output

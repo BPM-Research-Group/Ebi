@@ -7,14 +7,16 @@ use crate::{
     },
     semantics::{
         finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
+        finite_stochastic_partially_ordered_language_semantics::FspolangMarking,
         labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
     },
 };
 use ebi_objects::{
     Activity, ActivityKeyTranslator, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
-    DirectlyFollowsGraph, DirectlyFollowsModel, LabelledPetriNet, LanguageOfAlignments,
-    ProcessTree, StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
+    DirectlyFollowsGraph, DirectlyFollowsModel, FiniteStochasticPartiallyOrderedLanguage,
+    LabelledPetriNet, LanguageOfAlignments, ProcessTree, StochasticBusinessProcessModelAndNotation,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::{Context, Error, Result, anyhow},
     ebi_bpmn::BPMNMarking,
@@ -57,6 +59,7 @@ impl Align for EbiTraitSemantics {
             EbiTraitSemantics::Marking(sem) => sem.align_language(log),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_language(log),
             EbiTraitSemantics::BPMNMarking(sem) => sem.align_language(log),
+            EbiTraitSemantics::FspolangMarking(sem) => sem.align_language(log),
         }
     }
 
@@ -69,6 +72,7 @@ impl Align for EbiTraitSemantics {
             EbiTraitSemantics::Marking(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::BPMNMarking(sem) => sem.align_stochastic_language(log),
+            EbiTraitSemantics::FspolangMarking(sem) => sem.align_stochastic_language(log),
         }
     }
 
@@ -78,6 +82,7 @@ impl Align for EbiTraitSemantics {
             EbiTraitSemantics::Marking(sem) => sem.align_trace(trace),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_trace(trace),
             EbiTraitSemantics::BPMNMarking(sem) => sem.align_trace(trace),
+            EbiTraitSemantics::FspolangMarking(sem) => sem.align_trace(trace),
         }
     }
 }
@@ -237,41 +242,41 @@ where
         let successors = |(trace_index, state): &(usize, State)| {
             let mut result = vec![];
 
-            // log::debug!("successors of log {} model {}", trace_index, state);
+            // println!("compute successors of ({} -- {})", trace_index, state);
 
             if trace_index < &trace.len() {
                 //we can do a log move
                 let new_trace_index = trace_index + 1;
                 let new_state = state.clone();
-                // log::debug!("\tlog move {} to {} {}", trace[*trace_index], new_trace_index, new_state);
+                // println!("\tlog move {} to ({} -- {})", trace[*trace_index], new_trace_index, new_state);
                 result.push(((new_trace_index, new_state), 10000));
             }
+
+            // println!("\t\tenabled {:?}", semantics.get_enabled_transitions(&state));
 
             //walk through the enabled transitions in the model
             for transition in semantics.get_enabled_transitions(&state) {
                 let mut new_state = state.clone();
-                let _ = semantics.execute_transition(&mut new_state, transition);
+                let _ = semantics.execute_transition(&mut new_state, transition).unwrap();
 
                 if let Some(activity) = semantics.get_transition_activity(transition, state) {
                     //non-silent model move
                     result.push(((*trace_index, new_state.clone()), 10000));
-                    // log::debug!("\tmodel move t{} {} to {} {}", transition, activity, trace_index, new_state);
+                    // println!("\tmodel move on activity {} to ({} -- {})", activity, trace_index, new_state);
 
                     //which may also be a synchronous move
                     if trace_index < &trace.len() && activity == trace[*trace_index] {
-                        //synchronous move
+                        //synchronous movelog
                         let new_trace_index = trace_index + 1;
-                        // log::debug!("\tsynchronous move t{} {} to {} {}", transition, activity, new_trace_index, new_state);
+                        // println!("\tsynchronous move t{} {} to {} {}", transition, activity, new_trace_index, new_state);
                         result.push(((new_trace_index, new_state), 0));
                     }
                 } else {
                     //silent move
-                    // log::debug!("\tsilent move t{} to {} {}", transition, trace_index, new_state);
+                    // println!("\tsilent move to ({} -- {})", trace_index, new_state);
                     result.push(((*trace_index, new_state), 1));
                 }
             }
-
-            // log::debug!("successors of {} {}: {:?}", trace_index, state, result);
             result
         };
 
@@ -288,7 +293,7 @@ where
         //function that returns whether we are in a final synchronous product state
         let success = |(trace_index, state): &(usize, State)| {
             let result = trace_index == &trace.len() && semantics.is_final_state(&state);
-            // log::debug!("state {} {} is final: {}", trace_index, state, result);
+            // println!("state {} {} is final: {}", trace_index, state, result);
             result
         };
 
@@ -313,7 +318,6 @@ where
     T: Semantics<SemState = State> + ?Sized,
     State: Display + Debug + Clone + Hash + Eq,
 {
-    // log::debug!("transform alignment {:?}", states);
     let mut alignment = vec![];
 
     let mut it = states.into_iter();
@@ -321,25 +325,27 @@ where
     let (mut previous_trace_index, mut previous_state) = it.next().unwrap();
 
     for (trace_index, state) in it {
-        // log::debug!("transform {} from {} to {}", trace_index, previous_state, state);
+        // println!(
+        //     "transform:
+        //     previous_trace_index {}
+        //     trace_index          {}
+        //     previous_state       {:?}
+        //     state                {:?}",
+        //     previous_trace_index, trace_index, previous_state, state
+        // );
         if trace_index != previous_trace_index {
             //we did a move on the log
             let activity = trace[previous_trace_index];
 
-            if previous_state == state {
-                //we did not move on the model => log move
-                alignment.push(Move::LogMove(activity));
-            } else {
-                //we moved on the model => synchronous move
-                let transition =
-                    find_transition_with_label(semantics, &previous_state, &state, activity)
-                        .with_context(|| {
-                            format!(
-                                "Map synchronous move from {} {} to {} {} with label {}",
-                                previous_trace_index, previous_state, trace_index, state, activity
-                            )
-                        })?;
+            //we are in the same model state, check whether we did a self-loop
+            if let Ok(transition) =
+                find_transition_with_label(semantics, &previous_state, &state, activity)
+            {
+                //we could have moved on the model => synchronous move (this assumes that a synchronous move is cheaper than a log move)
                 alignment.push(Move::SynchronousMove(activity, transition));
+            } else {
+                //we could not have moved on the model => log move
+                alignment.push(Move::LogMove(activity));
             }
         } else {
             //we did not do a move on the log
@@ -535,6 +541,24 @@ impl AlignmentHeuristics for FiniteStochasticLanguageSemantics {
     }
 }
 
+impl AlignmentHeuristics for FiniteStochasticPartiallyOrderedLanguage {
+    type AliState = FspolangMarking;
+
+    fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
+        vec![]
+    }
+
+    fn underestimate_cost_to_final_synchronous_state(
+        &self,
+        _trace: &Vec<Activity>,
+        _trace_index: &usize,
+        _state: &Self::AliState,
+        _cache: &Vec<Vec<usize>>,
+    ) -> usize {
+        0
+    }
+}
+
 impl AlignmentHeuristics for LabelledPetriNet {
     type AliState = LPNMarking;
 
@@ -628,12 +652,17 @@ mod tests {
     use std::fs;
 
     use ebi_objects::{
-        DeterministicFiniteAutomaton, FiniteLanguage, FiniteStochasticLanguage, HasActivityKey,
-        StochasticDeterministicFiniteAutomaton, TranslateActivityKey,
+        BusinessProcessModelAndNotation, DeterministicFiniteAutomaton, FiniteLanguage,
+        FiniteStochasticLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton,
+        TranslateActivityKey,
+        ebi_arithmetic::{Fraction, One},
         ebi_objects::language_of_alignments::Move,
     };
 
-    use crate::{ebi_framework::trait_importers::ToSemanticsTrait, techniques::align::Align};
+    use crate::{
+        ebi_framework::trait_importers::ToSemanticsTrait,
+        techniques::{align::Align, fitness::Fitness},
+    };
 
     #[test]
     fn align_sdfa_trace() {
@@ -797,5 +826,19 @@ mod tests {
             Move::LogMove(b),
         ]; //other options may be valid, please check semantically when this fails
         assert_eq!(*alignment.get(0).unwrap(), correct_1);
+    }
+
+    #[test]
+    fn align_flower() {
+        let fin2 = fs::read_to_string("testfiles/aa.slang").unwrap();
+        let mut lang = Box::new(fin2.parse::<FiniteStochasticLanguage>().unwrap());
+
+        let fin1 = fs::read_to_string("testfiles/flower.bpmn").unwrap();
+        let mut bpmn = fin1.parse::<BusinessProcessModelAndNotation>().unwrap();
+        bpmn.translate_using_activity_key(lang.activity_key_mut());
+
+        let alignment = bpmn.align_stochastic_language(lang).unwrap();
+        println!("{}", alignment);
+        assert_eq!(alignment.trace_fitness(), Fraction::one());
     }
 }

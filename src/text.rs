@@ -1,5 +1,8 @@
-use regex::Regex;
+use const_format::concatcp;
+use regex::{Captures, Regex};
 use std::fmt::Display;
+
+use crate::ebi_framework::documentation::FILE_HANDLERS_PAGE;
 
 pub trait Rank {
     fn rank(&self) -> String;
@@ -36,6 +39,12 @@ pub trait LatexEscaper {
 pub trait JavaEscaper {
     fn escape_java_string(&self) -> String;
     fn escape_java_code(&self) -> String;
+}
+
+pub trait HTMLEscaper {
+    fn escape_html(&self) -> String;
+    fn latex_to_html_string(&self) -> String;
+    fn md_to_html_string(&self) -> String;
 }
 
 impl<T> Joiner for &[T]
@@ -97,6 +106,105 @@ where
             .replace(' ', "_")
             .replace("-", "_")
             .replace(".", "_")
+    }
+}
+
+impl<T> HTMLEscaper for T
+where
+    T: AsRef<str>,
+{
+    fn escape_html(&self) -> String {
+        self.as_ref().replace('<', "&lt;").replace(">", "&gt;")
+    }
+
+    fn latex_to_html_string(&self) -> String {
+        let regex_tabularx = Regex::new(
+            "(?s)\\\\begin\\{tabularx\\}\\{[^\\}]*\\}\\{[^\\}]*\\}(.*)\\\\end\\{tabularx\\}",
+        )
+        .unwrap();
+        let base = regex_tabularx.replace_all(self.as_ref(), |caps: &Captures| {
+            let x = caps[1].to_string();
+            let x = x
+                .replace("&", "</td><td>")
+                .replace("\\\\", "</td></tr><tr><td>")
+                .replace("\\toprule", "")
+                .replace("\\midrule", "")
+                .replace("\\bottomrule", "");
+            format!("<table><tr><td>{}</td></tr></table>", x)
+        });
+
+        let base = &base
+            .replace("\\\\", "<br>")
+            .replace("\\_", "_")
+            .replace("\\$", "$")
+            .replace("\\#", "#")
+            .replace("$\\leq$", "&lt;");
+
+        let regex_cite = Regex::new("~\\\\cite\\{[^\\}]*\\}").unwrap();
+        let base = regex_cite.replace_all(base, "");
+
+        let regex_texttt = Regex::new("\\\\texttt\\{([^\\}]*)\\}").unwrap();
+        let base = regex_texttt.replace_all(&base, "<span class=\"texttt\">${1}</span>");
+
+        let regex_center = Regex::new("(?s)\\\\begin\\{center\\}(.*)\\\\end\\{center\\}").unwrap();
+        let base = regex_center.replace_all(&base, "<br>${1}<br>");
+
+        let regex_rotate = Regex::new("(?s)\\\\rotatebox\\{([0-9]+)\\}\\{([^\\}]*)\\}").unwrap();
+        let base = regex_rotate.replace_all(&base, "${2}");
+
+        let regex_link =
+            Regex::new("\\\\hyperref\\[filehandler:[^\\]]*\\]\\{([^(]*)\\(\\.([^)]*)\\)\\}")
+                .unwrap();
+        let base = regex_link.replace_all(
+            &base,
+            concatcp!("${1} (<a href=\"", FILE_HANDLERS_PAGE, "#${2}\">.${2}</a>)"),
+        );
+
+        let regex_itemize =
+            Regex::new("(?s)\\\\begin\\{itemize\\}(.*)\\\\end\\{itemize\\}").unwrap();
+        let base = regex_itemize.replace_all(&base, |caps: &Captures| {
+            let x = caps[1].to_string();
+            let x = x.replace("\\item", "<li>");
+            format!("<ul>{}</ul>", x)
+        });
+
+        base.to_string()
+    }
+
+    fn md_to_html_string(&self) -> String {
+        let base = self.as_ref();
+
+        let regex_enumerate =
+            Regex::new("(?m)(?s)(((^1\\.[^\\n]*\\n)+(\\n|(    |\\t)[^\\n]*\\n)*)+)").unwrap();
+        let base = regex_enumerate.replace_all(&base, |caps: &Captures| {
+            let regex_item = Regex::new("(?m)^1\\.").unwrap();
+            let x = caps[1].to_string();
+            let x = regex_item.replace_all(&x, "<li>\n");
+
+            let regex_code = Regex::new("(?m)((^(?:        |\\t\\t)([^\\n]*\\n))+)").unwrap();
+            let x = regex_code.replace_all(&x, |caps: &Captures| {
+                let regex_space = Regex::new("(?:        |\\t\\t)(([^\\n]*\\n))").unwrap();
+                format!(
+                    "<pre>{}</pre>",
+                    regex_space.replace_all(&caps[1], "<code>${1}</code>")
+                )
+            });
+            format!("<ol>{}</ol>\n", x)
+        });
+
+        let regex_h1 = Regex::new("(?m)\\n*^# (.*)$\\n+").unwrap();
+        let base = regex_h1.replace_all(&base, "\n<h1>${1}</h1>\n");
+
+        let regex_h2 = Regex::new("(?m)\\n*^## (.*)$\\n+").unwrap();
+        let base = regex_h2.replace_all(&base, "\n<h2>${1}</h2>\n");
+
+        let regex_link = Regex::new("\\[([^\\]]*)\\]\\(([^\\)]*)\\)").unwrap();
+        let base = regex_link.replace_all(&base, "<a href=\"${2}\">${1}</a>");
+
+        let regex_newline = Regex::new("(?m)\\n\\n+").unwrap();
+        let base = regex_newline.replace_all(&base, "<p>\n");
+
+        base.to_string()
     }
 }
 

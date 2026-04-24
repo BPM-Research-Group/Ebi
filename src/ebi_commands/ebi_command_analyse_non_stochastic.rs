@@ -1,6 +1,6 @@
 use crate::{
     ebi_framework::{
-        ebi_command::EbiCommand,
+        ebi_command::{EbiCommand},
         ebi_input::{EbiInput, EbiInputType},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
@@ -12,7 +12,7 @@ use crate::{
     techniques::{
         any_traces::AnyTraces, bounded::Bounded, executions::FindExecutions,
         infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic,
-    },
+    }, tests::test_ebi_command,
 };
 use ebi_objects::{anyhow::anyhow, EbiObject, EbiObjectType, EventLogXes};
 use std::io::Write;
@@ -32,6 +32,8 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
         &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
     ],
 };
+
+test_ebi_command!(EBI_ANALYSE_NON_STOCHASTIC);
 
 pub const EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES: EbiCommand = EbiCommand::Command {
     name_short: "act",
@@ -107,6 +109,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::EventLogXes(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::FiniteLanguage(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => object.bounded()?,
+            EbiInput::Object(EbiObject::FiniteStochasticPartiallyOrderedLanguage(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(object), _) => {
                 object.bounded()?
@@ -272,6 +275,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
             EbiInput::Object(EbiObject::EventLogXes(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::FiniteLanguage(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::FiniteStochasticLanguage(object), _) => {
+                object.any_traces()?
+            }
+            EbiInput::Object(EbiObject::FiniteStochasticPartiallyOrderedLanguage(object), _) => {
                 object.any_traces()?
             }
             EbiInput::Object(EbiObject::DirectlyFollowsModel(object), _) => object.any_traces()?,

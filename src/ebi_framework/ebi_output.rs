@@ -12,6 +12,7 @@ use crate::{
         event_log_ocel::EBI_EVENT_LOG_OCEL, event_log_python::EBI_EVENT_LOG_PYTHON,
         executions::EBI_EXECUTIONS, finite_language::EBI_FINITE_LANGUAGE,
         finite_stochastic_language::EBI_FINITE_STOCHASTIC_LANGUAGE,
+        finite_stochastic_partially_ordered_language::EBI_FINITE_STOCHASTIC_PARTIALLY_ORDERED_LANGUAGE,
         labelled_petri_net::EBI_LABELLED_PETRI_NET,
         language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS,
         portable_document_format::EBI_PORTABLE_DOCUMENT_FORMAT,
@@ -34,8 +35,9 @@ use crate::{
 };
 use ebi_objects::{
     BusinessProcessModelAndNotation, CompressedEventLogXes, EbiObject, EbiObjectType,
-    EventLogPython, Exportable, PortableDocumentFormat, PortableNetworkGraphics,
-    StochasticBusinessProcessModelAndNotation, StochasticNondeterministicFiniteAutomaton,
+    EventLogPython, Exportable, FiniteStochasticPartiallyOrderedLanguage, PortableDocumentFormat,
+    PortableNetworkGraphics, StochasticBusinessProcessModelAndNotation,
+    StochasticNondeterministicFiniteAutomaton,
     anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{Exporter, Fraction},
     ebi_objects::{
@@ -268,6 +270,14 @@ impl EbiOutputType {
                     &EBI_FINITE_STOCHASTIC_LANGUAGE,
                 )
             }
+            EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticPartiallyOrderedLanguage) => {
+                EbiExporter::Object(
+                    &&EbiObjectExporter::FiniteStochasticPartiallyOrderedLanguage(
+                        FiniteStochasticPartiallyOrderedLanguage::export_from_object,
+                    ),
+                    &EBI_FINITE_STOCHASTIC_PARTIALLY_ORDERED_LANGUAGE,
+                )
+            }
             EbiOutputType::ObjectType(EbiObjectType::LabelledPetriNet) => EbiExporter::Object(
                 &EbiObjectExporter::LabelledPetriNet(LabelledPetriNet::export_from_object),
                 &EBI_LABELLED_PETRI_NET,
@@ -356,7 +366,7 @@ impl Display for EbiOutputType {
     }
 }
 
-#[derive(Debug, Clone, Hash)]
+#[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum EbiExporter {
     Object(&'static EbiObjectExporter, &'static EbiFileHandler),
     String,
@@ -470,7 +480,7 @@ impl Display for EbiExporter {
     }
 }
 
-#[derive(Hash, IntoStaticStr)]
+#[derive(Hash, IntoStaticStr, Eq)]
 pub enum EbiObjectExporter {
     BusinessProcessModelAndNotation(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLog(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
@@ -483,6 +493,9 @@ pub enum EbiObjectExporter {
     StochasticDirectlyFollowsModel(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     FiniteLanguage(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     FiniteStochasticLanguage(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
+    FiniteStochasticPartiallyOrderedLanguage(
+        fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>,
+    ),
     LabelledPetriNet(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     StochasticBusinessProcessModelAndNotation(
         fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>,
@@ -528,6 +541,9 @@ impl EbiObjectExporter {
             EbiObjectExporter::FiniteLanguage(_) => EbiObjectType::FiniteLanguage,
             EbiObjectExporter::FiniteStochasticLanguage(_) => {
                 EbiObjectType::FiniteStochasticLanguage
+            }
+            EbiObjectExporter::FiniteStochasticPartiallyOrderedLanguage(_) => {
+                EbiObjectType::FiniteStochasticPartiallyOrderedLanguage
             }
             EbiObjectExporter::LabelledPetriNet(_) => EbiObjectType::LabelledPetriNet,
             EbiObjectExporter::StochasticDeterministicFiniteAutomaton(_) => {
@@ -577,6 +593,9 @@ impl EbiObjectExporter {
                 }
                 EbiObjectExporter::FiniteLanguage(exporter) => (exporter)(object, f),
                 EbiObjectExporter::FiniteStochasticLanguage(exporter) => (exporter)(object, f),
+                EbiObjectExporter::FiniteStochasticPartiallyOrderedLanguage(exporter) => {
+                    (exporter)(object, f)
+                }
                 EbiObjectExporter::LabelledPetriNet(exporter) => (exporter)(object, f),
                 EbiObjectExporter::StochasticDeterministicFiniteAutomaton(exporter) => {
                     (exporter)(object, f)
@@ -615,6 +634,24 @@ impl Debug for EbiObjectExporter {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let right: &'static str = self.into();
         write!(f, "{}", right)
+    }
+}
+
+impl PartialEq for EbiObjectExporter {
+    fn eq(&self, other: &Self) -> bool {
+        self.get_type() == other.get_type()
+    }
+}
+
+impl PartialOrd for EbiObjectExporter {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.get_type().partial_cmp(&other.get_type())
+    }
+}
+
+impl Ord for EbiObjectExporter {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.get_type().cmp(&other.get_type())
     }
 }
 

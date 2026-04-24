@@ -7,7 +7,7 @@ use crate::{
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
+    ebi_traits::ebi_trait_graphable::EbiTraitGraphable, tests::test_ebi_command,
 };
 
 pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
@@ -17,6 +17,7 @@ pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[&EBI_VISUALISE_GRAPH, &EBI_VISUALISE_TEXT],
 };
+test_ebi_command!(EBI_VISUALISE);
 
 pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
     name_short: "txt",
@@ -53,6 +54,9 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::EventLogTraceAttributes(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::EventLogXes(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::FiniteLanguage(language), _) => language.to_string(),
+            EbiInput::Object(EbiObject::FiniteStochasticPartiallyOrderedLanguage(language), _) => {
+                language.to_string()
+            }
             EbiInput::Object(EbiObject::DirectlyFollowsModel(d), _) => d.to_string(),
             EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(d), _) => d.to_string(),
             EbiInput::Object(EbiObject::LanguageOfAlignments(a), _) => a.to_string(),

@@ -56,9 +56,8 @@ impl Semantics for StochasticLabelledPetriNet {
     }
 
     fn get_initial_state(&self) -> Option<LPNMarking> {
-        //an SLPN supports the empty language, but only by livelocks
         let mut result = LPNMarking {
-            marking: self.initial_marking.clone(),
+            marking: self.initial_marking.as_ref()?.clone(),
             enabled_transitions: bitvec![0; self.get_number_of_transitions()],
             number_of_enabled_transitions: 0,
         };

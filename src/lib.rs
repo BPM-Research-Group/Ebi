@@ -1,5 +1,6 @@
 pub mod ebi_framework {
     pub mod displayable;
+    pub mod documentation;
     pub mod ebi_command;
     pub mod ebi_file_handler;
     pub mod ebi_importer_parameters;
@@ -43,6 +44,7 @@ pub mod ebi_file_handlers {
     pub mod executions;
     pub mod finite_language;
     pub mod finite_stochastic_language;
+    pub mod finite_stochastic_partially_ordered_language;
     pub mod labelled_petri_net;
     pub mod language_of_alignments;
     pub mod lola_net;
@@ -143,6 +145,7 @@ pub mod semantics {
     pub mod business_process_model_and_notation_semantics;
     pub mod directly_follows_graph_semantics;
     pub mod finite_stochastic_language_semantics;
+    pub mod finite_stochastic_partially_ordered_language_semantics;
     pub mod labelled_petri_net_semantics;
     pub mod process_tree_semantics;
     pub mod semantics;
@@ -208,10 +211,13 @@ pub mod techniques {
     pub mod medoid_non_stochastic;
     pub mod non_decreasing_livelock;
     pub mod occurrences_stochastic_miner;
+    pub mod partially_ordered_earth_movers_stochastic_conformance;
+    pub mod partially_ordered_trace_distance;
     pub mod permutation_test;
     pub mod prefix_tree_miner;
     pub mod probability_queries;
     pub mod process_variety;
+    pub mod random_stochastic_miner;
     pub mod sample;
     pub mod sample_folds;
     pub mod stochastic_markovian_abstraction;

@@ -5,6 +5,7 @@ use super::{
 };
 use crate::{
     ebi_framework::{
+        documentation::FILE_HANDLERS_PAGE,
         ebi_file_handler::{EbiFileHandler, get_file_handlers, get_file_handlers_fallible},
         ebi_importer_parameters,
         ebi_trait_object::EbiTraitObject,
@@ -20,6 +21,7 @@ use crate::{
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
         ebi_trait_semantics::EbiTraitSemantics,
         ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics,
+        ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics,
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
     ebi_validate,
@@ -236,7 +238,87 @@ impl EbiInputType {
                     ));
                 }
                 EbiInputType::String(Some(allowed_values), _) => {
-                    result.insert(format!("either one of `{}`", allowed_values.join("`, `")));
+                    result.insert(format!(
+                        "either one of `{}`",
+                        allowed_values.join_with("`, `", "` or `")
+                    ));
+                }
+                EbiInputType::String(None, _) => {
+                    result.insert("text".to_string());
+                }
+                EbiInputType::Usize(Some(min), Some(max), _) => {
+                    result.insert(format!("integer between {} and {}", min, max));
+                }
+                EbiInputType::Usize(None, Some(max), _) => {
+                    result.insert(format!("integer below {}", max));
+                }
+                EbiInputType::Usize(Some(min), _, _) => {
+                    result.insert(format!("integer above {}", min));
+                }
+                EbiInputType::Usize(_, _, _) => {
+                    result.insert("integer".to_string());
+                }
+                EbiInputType::FileHandler => {
+                    let extensions: Vec<String> = EBI_FILE_HANDLERS
+                        .iter()
+                        .filter_map(|file_type| {
+                            if file_type.validator.is_some() {
+                                Some(file_type.file_extension.to_string())
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
+                    result.insert(
+                        "the file extension of any file type supported by Ebi (".to_owned()
+                            + extensions.join_with(", ", " or ").as_str()
+                            + ")",
+                    );
+                }
+                EbiInputType::Fraction(Some(min), Some(max), _) => {
+                    result.insert(format!("fraction between {} and {}", min, max));
+                }
+                EbiInputType::Fraction(None, Some(max), _) => {
+                    result.insert(format!("fraction below {}", max));
+                }
+                EbiInputType::Fraction(Some(min), _, _) => {
+                    result.insert(format!("fraction above {}", min));
+                }
+                EbiInputType::Fraction(_, _, _) => {
+                    result.insert("fraction".to_string());
+                }
+            };
+        }
+
+        result.into_iter().collect::<Vec<_>>()
+    }
+
+    pub fn get_possible_inputs_with_html(input_types: &[&EbiInputType]) -> Vec<String> {
+        let mut result = BTreeSet::new();
+
+        for input_type in input_types {
+            match input_type {
+                EbiInputType::Trait(t) => {
+                    result.extend(Self::show_file_handlers_html(t.get_file_handlers()));
+                }
+                EbiInputType::Object(o) => {
+                    result.extend(Self::show_file_handlers_html(get_file_handlers(o)));
+                    result.extend(
+                        Self::show_file_handlers_html(get_file_handlers_fallible(o))
+                            .into_iter()
+                            .map(|mut s| {
+                                s += "<span title=\"This file type is converted on import, and this conversion may fail.\">*</span>";
+                                s
+                            }),
+                    );
+                }
+                EbiInputType::AnyObject => {
+                    result.extend(Self::show_file_handlers_html(
+                        EBI_FILE_HANDLERS.iter().collect(),
+                    ));
+                }
+                EbiInputType::String(Some(allowed_values), _) => {
+                    result.extend(allowed_values.iter().map(|x| format!("`{}`", x)));
                 }
                 EbiInputType::String(None, _) => {
                     result.insert("text".to_string());
@@ -310,6 +392,21 @@ impl EbiInputType {
                 format!(
                     "\\hyperref[filehandler:{}]{{{}}}",
                     file_handler.name, file_handler
+                )
+            })
+            .collect::<Vec<_>>()
+    }
+
+    pub fn show_file_handlers_html(file_handlers: Vec<&'static EbiFileHandler>) -> Vec<String> {
+        file_handlers
+            .iter()
+            .map(|file_handler| {
+                format!(
+                    "{} (<a href=\"{}#{}\">.{}</a>)",
+                    file_handler.name,
+                    FILE_HANDLERS_PAGE,
+                    file_handler.file_extension,
+                    file_handler.file_extension
                 )
             })
             .collect::<Vec<_>>()
@@ -432,6 +529,13 @@ pub enum EbiTraitImporter {
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiTraitStochasticSemantics>,
         &'static [ImporterParameter],
     ),
+    StochasticPartiallyOrderedSemantics(
+        fn(
+            &mut dyn BufRead,
+            &ImporterParameterValues,
+        ) -> Result<EbiTraitStochasticPartiallyOrderedSemantics>,
+        &'static [ImporterParameter],
+    ),
     StochasticDeterministicSemantics(
         fn(
             &mut dyn BufRead,
@@ -465,6 +569,9 @@ impl EbiTraitImporter {
             EbiTraitImporter::EventLogTraceAttributes(_, _) => EbiTrait::EventLogTraceAttributes,
             EbiTraitImporter::Semantics(_, _) => EbiTrait::Semantics,
             EbiTraitImporter::StochasticSemantics(_, _) => EbiTrait::StochasticSemantics,
+            EbiTraitImporter::StochasticPartiallyOrderedSemantics(_, _) => {
+                EbiTrait::StochasticPartiallyOrderedSemantics
+            }
             EbiTraitImporter::StochasticDeterministicSemantics(_, _) => {
                 EbiTrait::StochasticDeterministicSemantics
             }
@@ -484,6 +591,7 @@ impl EbiTraitImporter {
             | EbiTraitImporter::EventLogTraceAttributes(_, importer_parameters)
             | EbiTraitImporter::Semantics(_, importer_parameters)
             | EbiTraitImporter::StochasticSemantics(_, importer_parameters)
+            | EbiTraitImporter::StochasticPartiallyOrderedSemantics(_, importer_parameters)
             | EbiTraitImporter::StochasticDeterministicSemantics(_, importer_parameters)
             | EbiTraitImporter::Graphable(_, importer_parameters)
             | EbiTraitImporter::Activities(_, importer_parameters) => importer_parameters,
@@ -530,6 +638,9 @@ impl EbiTraitImporter {
             }
             EbiTraitImporter::StochasticSemantics(f, _) => {
                 EbiTraitObject::StochasticSemantics((f)(reader, parameter_values)?)
+            }
+            EbiTraitImporter::StochasticPartiallyOrderedSemantics(f, _) => {
+                EbiTraitObject::StochasticPartiallyOrderedSemantics((f)(reader, parameter_values)?)
             }
             EbiTraitImporter::StochasticDeterministicSemantics(f, _) => {
                 EbiTraitObject::StochasticDeterministicSemantics((f)(reader, parameter_values)?)
@@ -600,6 +711,10 @@ pub enum EbiObjectImporter {
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
     ),
+    FiniteStochasticPartiallyOrderedLanguage(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
     LabelledPetriNet(
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
@@ -664,6 +779,9 @@ impl EbiObjectImporter {
             EbiObjectImporter::FiniteStochasticLanguage(_, _) => {
                 EbiObjectType::FiniteStochasticLanguage
             }
+            EbiObjectImporter::FiniteStochasticPartiallyOrderedLanguage(_, _) => {
+                EbiObjectType::FiniteStochasticPartiallyOrderedLanguage
+            }
             EbiObjectImporter::LabelledPetriNet(_, _) => EbiObjectType::LabelledPetriNet,
             EbiObjectImporter::StochasticBusinessProcessModelAndNotation(_, _) => {
                 EbiObjectType::StochasticBusinessProcessModelAndNotation
@@ -706,6 +824,9 @@ impl EbiObjectImporter {
             EbiObjectImporter::StochasticDirectlyFollowsModel(_, parameters) => parameters,
             EbiObjectImporter::FiniteLanguage(_, parameters) => parameters,
             EbiObjectImporter::FiniteStochasticLanguage(_, parameters) => parameters,
+            EbiObjectImporter::FiniteStochasticPartiallyOrderedLanguage(_, parameters) => {
+                parameters
+            }
             EbiObjectImporter::LabelledPetriNet(_, parameters) => parameters,
             EbiObjectImporter::StochasticDeterministicFiniteAutomaton(_, parameters) => parameters,
             EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(_, parameters) => {
@@ -744,6 +865,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::StochasticDirectlyFollowsModel(importer, _) => *importer,
             EbiObjectImporter::FiniteLanguage(importer, _) => *importer,
             EbiObjectImporter::FiniteStochasticLanguage(importer, _) => *importer,
+            EbiObjectImporter::FiniteStochasticPartiallyOrderedLanguage(importer, _) => *importer,
             EbiObjectImporter::LabelledPetriNet(importer, _) => *importer,
             EbiObjectImporter::StochasticBusinessProcessModelAndNotation(importer, _) => *importer,
             EbiObjectImporter::StochasticDeterministicFiniteAutomaton(importer, _) => *importer,
@@ -773,6 +895,7 @@ impl Debug for EbiObjectImporter {
     }
 }
 
+#[derive(Debug)]
 pub enum FallibleImporterError {
     ImporterError(Error),
     ConversionError(Error),

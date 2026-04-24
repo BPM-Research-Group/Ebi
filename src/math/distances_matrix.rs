@@ -1,4 +1,3 @@
-use ebi_objects::ebi_arithmetic::Fraction;
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),
@@ -8,7 +7,10 @@ use ebi_objects::ebi_arithmetic::Fraction;
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use ebi_objects::ebi_arithmetic::malachite::Natural;
-use rayon::iter::ParallelIterator;
+use ebi_objects::{
+    FiniteStochasticPartiallyOrderedLanguage,
+    ebi_arithmetic::Fraction,
+};
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),
@@ -17,7 +19,8 @@ use rayon::iter::ParallelIterator;
     all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
-use rayon::iter::{IntoParallelIterator, IntoParallelRefIterator};
+use rayon::iter::IntoParallelIterator;
+use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 #[cfg(any(
     all(
@@ -33,6 +36,7 @@ use crate::{
     ebi_framework::ebi_command::EbiCommand,
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     math::{distances::WeightedDistances, levenshtein},
+    techniques::partially_ordered_trace_distance::PartiallyOrderedTraceDistance,
 };
 
 /**
@@ -83,6 +87,112 @@ impl WeightedDistanceMatrix {
                             let result = levenshtein::normalised(trace_a, trace_b);
                             progress_bar.inc(1);
                             result
+                        })
+                        .collect();
+                    row
+                })
+                .collect();
+        });
+
+        progress_bar.finish_and_clear();
+
+        Self {
+            weights_a,
+            weights_b,
+            distances,
+        }
+    }
+
+    pub fn from_partially_ordered_languages(
+        lang_a: &FiniteStochasticPartiallyOrderedLanguage,
+        lang_b: &FiniteStochasticPartiallyOrderedLanguage,
+    ) -> Self {
+        log::info!("Compute partially ordered - partially ordered distances.");
+
+        // Pre-allocate the entire matrix
+        let mut distances = Vec::with_capacity(lang_a.number_of_traces());
+
+        // Create thread pool with custom configuration
+        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
+
+        // Create weights vectors
+        let weights_a = lang_a.probabilities.clone();
+        let weights_b = lang_b.probabilities.clone();
+
+        let progress_bar = EbiCommand::get_progress_bar_ticks(
+            (lang_a.number_of_traces() * lang_b.number_of_traces())
+                .try_into()
+                .unwrap(),
+        );
+
+        // Compute in chunks for better cache utilisation
+        pool.install(|| {
+            distances = lang_a
+                .traces
+                .par_iter()
+                .map(|trace_a| {
+                    let row: Vec<Fraction> = lang_b
+                        .traces
+                        .par_iter()
+                        .map(|trace_b| {
+                            let distance =
+                                trace_a.normalised_partially_ordered_trace_distance(trace_b);
+                            progress_bar.inc(1);
+                            distance
+                        })
+                        .collect();
+                    row
+                })
+                .collect();
+        });
+
+        progress_bar.finish_and_clear();
+
+        Self {
+            weights_a,
+            weights_b,
+            distances,
+        }
+    }
+
+    pub fn from_total_and_partially_ordered_languages<L>(
+        lang_a: &mut L,
+        lang_b: &FiniteStochasticPartiallyOrderedLanguage,
+    ) -> Self
+    where
+        L: EbiTraitFiniteStochasticLanguage + ?Sized,
+    {
+        log::info!("Compute distances");
+
+        // Pre-allocate the entire matrix
+        let mut distances = Vec::with_capacity(lang_a.number_of_traces());
+
+        // Create thread pool with custom configuration
+        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
+
+        // Create weights vectors
+        let weights_a = lang_a.iter_probabilities().cloned().collect();
+        let weights_b = lang_b.probabilities.clone();
+
+        let progress_bar = EbiCommand::get_progress_bar_ticks(
+            (lang_a.number_of_traces() * lang_b.number_of_traces())
+                .try_into()
+                .unwrap(),
+        );
+
+        // Compute in chunks for better cache utilisation
+        pool.install(|| {
+            distances = lang_a
+                .par_iter_traces()
+                .map(|trace_a| {
+                    let row: Vec<Fraction> = lang_b
+                        .traces
+                        .par_iter()
+                        .map(|trace_b| {
+                            let distance =
+                                trace_a.normalised_partially_ordered_trace_distance(trace_b);
+                            progress_bar.inc(1);
+                            distance
                         })
                         .collect();
                     row

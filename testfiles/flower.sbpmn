@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" exporter="Ebi-bpmn" xmlns:sbpmn="https://www.ebitools.org/sbpmn/20260305">
+	<process id="process_1" isExecutable="true">
+		<startEvent id="startevent_2">
+			<outgoing>sequenceflow_6</outgoing>
+		</startEvent>
+		<endEvent id="startevent_3">
+			<incoming>sequenceflow_7</incoming>
+		</endEvent>
+		<exclusiveGateway id="exclusivegateway_4">
+			<incoming>sequenceflow_6</incoming>
+			<incoming>sequenceflow_11</incoming>
+			<outgoing>sequenceflow_8</outgoing>
+		</exclusiveGateway>
+		<exclusiveGateway id="exclusivegateway_5">
+			<incoming>sequenceflow_8</incoming>
+			<outgoing>sequenceflow_7</outgoing>
+			<outgoing>sequenceflow_10</outgoing>
+		</exclusiveGateway>
+		<task id="task_9" name="a">
+			<incoming>sequenceflow_10</incoming>
+			<outgoing>sequenceflow_11</outgoing>
+		</task>
+		<sequenceFlow id="sequenceflow_6" sourceRef="startevent_2" targetRef="exclusivegateway_4">
+			<sbpmn:weight constant="1"/>
+		</sequenceFlow>
+		<sequenceFlow id="sequenceflow_7" sourceRef="exclusivegateway_5" targetRef="startevent_3">
+			<sbpmn:weight constant="1"/>
+		</sequenceFlow>
+		<sequenceFlow id="sequenceflow_8" sourceRef="exclusivegateway_4" targetRef="exclusivegateway_5">
+			<sbpmn:weight constant="1"/>
+		</sequenceFlow>
+		<sequenceFlow id="sequenceflow_10" sourceRef="exclusivegateway_5" targetRef="task_9">
+			<sbpmn:weight constant="1"/>
+		</sequenceFlow>
+		<sequenceFlow id="sequenceflow_11" sourceRef="task_9" targetRef="exclusivegateway_4">
+			<sbpmn:weight constant="1"/>
+		</sequenceFlow>
+	</process>
+</definitions>

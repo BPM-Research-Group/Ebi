@@ -29,19 +29,19 @@ where
         let distances = TriangularDistanceMatrix::new(self);
 
         if number_of_traces.is_one() {
-            let trace_number = medoid_single(self, &distances);
-            if trace_number.is_none() {
+            if let Some(trace_number) = medoid_single(self, &distances) {
+                result.insert(
+                    self.iter_traces()
+                        .nth(trace_number)
+                        .unwrap()
+                        .to_owned(),
+                );
+                return Ok((activity_key, result).into());
+            } else {
                 return Err(anyhow!(
                     "1 trace was requested, but the stochastic language contains none."
                 ));
             }
-            result.insert(
-                self.iter_traces()
-                    .nth(trace_number.unwrap())
-                    .unwrap()
-                    .to_owned(),
-            );
-            return Ok((activity_key, result).into());
         }
 
         if self.number_of_traces() < number_of_traces {
@@ -128,6 +128,10 @@ where
     T: EbiTraitFiniteLanguage + ?Sized,
 {
     let sum_distance = sum_distances(log, distances);
+
+    if distances.len() == 0 {
+        return None;
+    }
 
     //report the minimum value
     let mut min_pos = 0;
