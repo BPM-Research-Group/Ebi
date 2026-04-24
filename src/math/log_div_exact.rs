@@ -178,6 +178,14 @@ impl One for LogDivExact {
     }
 }
 
+impl Neg for LogDivExact {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        LogDivExact::zero() - self
+    }
+}
+
 impl PartialEq for LogDivExact {
     fn eq(&self, other: &Self) -> bool {
         match (self, other) {
