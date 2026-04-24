@@ -11,7 +11,7 @@ use wasm_bindgen::prelude::*;
 extern "C" {
     pub fn ebi_error(s: &str, command_name: &str);
 
-    pub fn ebi_output(s: &str, command_name: &str);
+    pub fn ebi_output(s: &str, command_name: &str, file_extension: &str);
 
     pub fn ebi_log(s: &str, command_name: &str);
 }
@@ -51,9 +51,8 @@ pub(crate) fn execute_javascript_command(
     string_inputs: Vec<String>,
     command_name: &str,
 ) {
-    let number_of_inputs = string_inputs.len();
     let (inputs, output_type) = match read_inputs(string_inputs, command)
-        .with_context(|| anyhow!("Reading {} inputs.", number_of_inputs))
+        .with_context(|| anyhow!("Reading inputs."))
     {
         Ok(t) => t,
         Err(e) => return ebi_error(&print_error(e), command_name),
@@ -69,8 +68,8 @@ pub(crate) fn execute_javascript_command(
     };
 
     let exporter = EbiCommand::select_exporter(output_type, None, None).unwrap();
-    match ebi_output::export_to_string(result, exporter) {
-        Ok(string) => return ebi_output(&string, command_name),
+    match ebi_output::export_to_string(result, &exporter) {
+        Ok(string) => return ebi_output(&string, command_name, exporter.get_extension()),
         Err(e) => return ebi_error(&print_error(e), command_name),
     }
 }

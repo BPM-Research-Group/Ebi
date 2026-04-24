@@ -679,13 +679,13 @@ pub fn export_object(to_file: &PathBuf, object: EbiOutput, exporter: EbiExporter
         .with_context(|| format!("writing result to file {:?}", to_file));
 }
 
-pub fn export_to_string(object: EbiOutput, exporter: EbiExporter) -> Result<String> {
+pub fn export_to_string(object: EbiOutput, exporter: &EbiExporter) -> Result<String> {
     let mut f = vec![];
     exporter.export_from_object(object, &mut f)?;
     Ok(String::from_utf8(f)?)
 }
 
-pub fn export_to_bytes(object: EbiOutput, exporter: EbiExporter) -> Result<Vec<u8>> {
+pub fn export_to_bytes(object: EbiOutput, exporter: &EbiExporter) -> Result<Vec<u8>> {
     let mut f = vec![];
     exporter.export_from_object(object, &mut f)?;
     Ok(f)
@@ -824,8 +824,8 @@ mod tests {
                 println!("\toutput   {}", output);
                 println!("\texporter {}", exporter);
 
-                let _ = export_to_bytes(output.clone(), exporter.clone());
-                let _ = export_to_string(output.clone(), exporter.clone());
+                let _ = export_to_bytes(output.clone(), &exporter);
+                let _ = export_to_string(output.clone(), &exporter);
 
                 // let mut f = vec![];
                 // _ = exporter.export_from_object(output.clone(), &mut f);

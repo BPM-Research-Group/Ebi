@@ -408,10 +408,10 @@ impl EbiCommand {
                     log::info!("Writing result as {} {}", exporter.get_article(), exporter);
                     if exporter.is_binary() {
                         let mut out = std::io::stdout();
-                        out.write_all(&ebi_output::export_to_bytes(result, exporter)?)?;
+                        out.write_all(&ebi_output::export_to_bytes(result, &exporter)?)?;
                         out.flush()?;
                     } else {
-                        println!("{}", ebi_output::export_to_string(result, exporter)?);
+                        println!("{}", ebi_output::export_to_string(result, &exporter)?);
                     }
                 }
 

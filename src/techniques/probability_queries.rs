@@ -998,8 +998,6 @@ mod tests {
         let xes = fin.parse::<EventLogXes>().unwrap();
         let slang = FiniteStochasticLanguage::from(xes);
         let boxx: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang);
-        let slang2 = boxx.analyse_probability_coverage(&f!((4, 5))).unwrap();
-
-        // xes.ana
+        boxx.analyse_probability_coverage(&f!((4, 5))).unwrap();
     }
 }

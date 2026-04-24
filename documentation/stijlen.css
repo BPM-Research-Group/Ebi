@@ -128,6 +128,9 @@ div.selectable {
 .online-command .output {
     display: none;
 }
+.online-command pre {
+    padding: 10px;
+}
 
 @media screen and (max-width: 600px) {
     .menu0 a:not(:first-child) {
