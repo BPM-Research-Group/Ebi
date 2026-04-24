@@ -459,7 +459,7 @@ mod tests {
         let mut log2: Box<dyn EbiTraitEventLogEventAttributes> = Box::new(log);
         let x = model.find_executions(&mut log2).unwrap();
 
-        assert_eq!(out, x.to_string());
+        assert_eq!(out, x.to_string() + "\n");
     }
 
     #[test]
