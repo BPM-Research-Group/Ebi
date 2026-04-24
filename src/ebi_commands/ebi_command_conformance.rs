@@ -29,7 +29,7 @@ use crate::{
 };
 use ebi_objects::{
     EbiObject, EbiObjectType,
-    anyhow::{Context, anyhow},
+    anyhow::{Context, anyhow},ebi_arithmetic::Fraction
 };
 use strum::VariantNames;
 
