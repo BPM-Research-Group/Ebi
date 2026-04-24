@@ -822,8 +822,8 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
-version = "0.3.181"
-source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#6b2e3f8ca78344d714e05f30807dc78effba60cc"
+version = "0.3.182"
+source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#8fc87162590f09fdb07fbe0d0d6c2c5077a276ec"
 dependencies = [
  "anyhow",
  "bitvec",
