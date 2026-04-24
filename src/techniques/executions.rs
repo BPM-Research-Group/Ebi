@@ -5,7 +5,7 @@ use crate::{
         ebi_trait_semantics::EbiTraitSemantics,
     },
     semantics::semantics::Semantics,
-    techniques::{align::Align, resource_utilisation::ResourceModel},
+    techniques::{align::Align, resource_utilisation::set_resource_utilisations},
 };
 use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
@@ -15,7 +15,6 @@ use ebi_objects::{
         executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
     },
 };
-use intmap::IntMap;
 use rayon::iter::{IndexedParallelIterator, ParallelIterator};
 use std::{
     collections::VecDeque,
@@ -116,48 +115,11 @@ where
         )
             .into();
 
-        //mine a research model
-        let resource_model = ResourceModel::from_executions(&executions);
-
-        //compute the resource utilisation
-        set_resource_utilisation(self, resource_model, &mut executions)?;
+        //set resource utilisations
+        set_resource_utilisations(&mut executions)?;
 
         Ok(executions)
     }
-}
-
-fn set_resource_utilisation<T, State>(
-    semantics: &T,
-    resource_model: ResourceModel,
-    executions: &mut Executions,
-) -> Result<()>
-where
-    T: Semantics<SemState = State, AliState = State> + Send + Sync + ?Sized,
-    State: Displayable,
-{
-    let mut resource_state = resource_model.initial_resource_state();
-    let mut trace_2_marking = IntMap::new();
-
-    for execution in executions.executions.iter_mut() {
-        //get marking
-        let mut marking = trace_2_marking
-            .entry(execution.trace)
-            .or_insert_with(|| semantics.get_initial_state().unwrap());
-
-        semantics.execute_transition(&mut marking, execution.fired_transition)?;
-
-        if let Some(resource) = execution.resource {
-            execution.resource_utilisation = resource_state.resource_utilisation(
-                &resource_model,
-                resource,
-                execution.fired_transition,
-            );
-        }
-
-        resource_state.execute_transition(&resource_model, execution.resource);
-    }
-
-    Ok(())
 }
 
 struct C {
@@ -194,7 +156,7 @@ impl C {
                     //logmoves are not linked to transitions and have no executions
                 }
                 Move::ModelMove(activity, transition) => {
-                    let move_index_of_enablement = self.get_enabling_move(transition, semantics);
+                    let move_index_of_enablement = self.get_enabling_move(move_index, semantics);
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
 
@@ -214,7 +176,7 @@ impl C {
                     semantics.execute_transition(&mut state, transition)?;
                 }
                 Move::SynchronousMove(activity, transition) => {
-                    let move_index_of_enablement = self.get_enabling_move(transition, semantics);
+                    let move_index_of_enablement = self.get_enabling_move(move_index, semantics);
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
 
@@ -234,7 +196,7 @@ impl C {
                     semantics.execute_transition(&mut state, transition)?;
                 }
                 Move::SilentMove(transition) => {
-                    let move_index_of_enablement = self.get_enabling_move(transition, semantics);
+                    let move_index_of_enablement = self.get_enabling_move(move_index, semantics);
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
 
@@ -306,25 +268,23 @@ impl C {
         T: Semantics<SemState = FS> + Send + Sync + ?Sized,
         FS: Display + Debug + Clone + Hash + Eq,
     {
-        let transition_that_may_get_enabled = self.moves.get(move_index)?.get_transition()?;
+        let transition_that_may_get_enabled = self.moves[move_index].get_transition().unwrap();
 
         //first, figure out when this move's transition was last enabled
         let (mut result, mut state) =
             MoveEnabled::start(semantics, transition_that_may_get_enabled)?;
-        if move_index > 0 {
-            for (move_index2, move2) in self.moves.iter().take(move_index).enumerate() {
-                if let Some(transition2) = move2.get_transition() {
-                    //sync, model or silent move
-                    result.execute_transition(
-                        semantics,
-                        &mut state,
-                        transition_that_may_get_enabled,
-                        transition2,
-                        move_index2,
-                    );
-                } else {
-                    //skip log move
-                }
+        for (move_index2, move2) in self.moves.iter().take(move_index).enumerate() {
+            if let Some(transition2) = move2.get_transition() {
+                //sync, model or silent move
+                result.execute_transition(
+                    semantics,
+                    &mut state,
+                    transition_that_may_get_enabled,
+                    transition2,
+                    move_index2,
+                );
+            } else {
+                //skip log move
             }
         }
         result.finalise()

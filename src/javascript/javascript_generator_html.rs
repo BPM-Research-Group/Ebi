@@ -143,7 +143,6 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
     if let EbiCommand::Command {
         input_types: input_typess,
         input_names,
-        input_helps,
         ..
     } = path.last().unwrap()
         && path.last().unwrap().is_in_javascript()
@@ -152,9 +151,9 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
         writeln!(f, "<div class=\"online-command\">")?;
         writeln!(f, "<table>")?;
 
-        for (input_i, (input_name, (input_types, input_help))) in input_names
+        for (input_i, (input_name, input_types)) in input_names
             .iter()
-            .zip(input_typess.iter().zip(input_helps.iter()))
+            .zip(input_typess.iter())
             .enumerate()
         {
             writeln!(f, "<tr><td>&lt;{input_name}&gt;</td><td>")?;
