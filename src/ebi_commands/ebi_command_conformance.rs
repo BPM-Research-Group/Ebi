@@ -29,7 +29,7 @@ use crate::{
 };
 use ebi_objects::{
     EbiObject, EbiObjectType,
-    anyhow::{Context, anyhow},ebi_arithmetic::Fraction
+    anyhow::{Context, anyhow},ebi_arithmetic::{Fraction, f}, ebi_objects::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton
 };
 use strum::VariantNames;
 
