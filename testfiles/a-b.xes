@@ -16,6 +16,8 @@
     <event>
       <string key="concept:name" value="a"/>
       <string key="other_attribute" value="z"/>
+      <date key="time:timestamp" value="2017-05-09T00:00:00.000+01:00"/>
+      <string key="org:resource" value="John"/>
     </event>
   </trace>
   <trace>
@@ -24,6 +26,8 @@
     <event>
       <string key="concept:name" value="b"/>
       <string key="other_attribute" value="y"/>
+      <date key="time:timestamp" value="2017-05-09T00:00:00.000+01:00"/>
+      <string key="org:resource" value="Doe"/>
     </event>
   </trace>
 </log>

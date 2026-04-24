@@ -80,6 +80,11 @@ buildlatex:
     - printf "</packages>\n" >> build/prom-rust/packages.xml
     - git add build/prom-rust/packages.xml
 
+    #generate javascript
+    - wasm-pack build --features javascript
+    - mv pkg build/javascript
+    - git add build/javascript
+
     #push to git
     - git commit -m "Automatically triggered compilation [skip ci]"
     - git push -f https://ci_token:$ACCESS_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main

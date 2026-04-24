@@ -1,25 +1,20 @@
-use ebi_objects::{Exportable, Importable, ebi_objects::event_log_ocel::EventLogOcel};
-
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
     ebi_input::{EbiObjectImporter, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
     object_importers::{
-        ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogObject,
-        ImportAsEventLogTraceAttributesObject, ImportAsFiniteLanguageObject,
-        ImportAsFiniteStochasticLanguageObject,
+        ImportAsDeterministicFiniteAutomatonObject, ImportAsEventLogEventAttributesObject,
+        ImportAsEventLogObject, ImportAsEventLogTraceAttributesObject,
+        ImportAsFiniteLanguageObject, ImportAsFiniteStochasticLanguageObject,
         ImportAsStochasticDeterministicFiniteAutomatonObject,
         ImportAsStochasticNondeterministicFiniteAutomatonObject,
     },
     trait_importers::{
-        ImportAsActivitiesTrait, ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait,
-        ImportAsFiniteLanguageTrait, ImportAsFiniteStochasticLanguageTrait,
-        ImportAsIterableLanguageTrait, ImportAsIterableStochasticLanguageTrait,
-        ImportAsQueriableStochasticLanguageTrait, ImportAsSemanticsTrait,
-        ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait,
+        ImportAsActivitiesTrait, ImportAsEventLogEventAttributesTrait, ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait, ImportAsFiniteLanguageTrait, ImportAsFiniteStochasticLanguageTrait, ImportAsIterableLanguageTrait, ImportAsIterableStochasticLanguageTrait, ImportAsQueriableStochasticLanguageTrait, ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait
     },
     validate::Validate,
 };
+use ebi_objects::{Exportable, Importable, ebi_objects::event_log_ocel::EventLogOcel};
 
 pub const EBI_EVENT_LOG_OCEL: EbiFileHandler = EbiFileHandler {
     name: "object-centric event log",
@@ -57,6 +52,10 @@ pub const EBI_EVENT_LOG_OCEL: EbiFileHandler = EbiFileHandler {
             EventLogOcel::import_as_event_log_trait,
             EventLogOcel::IMPORTER_PARAMETERS,
         ),
+        EbiTraitImporter::EventLogEventAttributes(
+            EventLogOcel::import_as_event_log_event_attributes_trait,
+            EventLogOcel::IMPORTER_PARAMETERS,
+        ),
         EbiTraitImporter::EventLogTraceAttributes(
             EventLogOcel::import_as_event_log_trace_attributes_trait,
             EventLogOcel::IMPORTER_PARAMETERS,
@@ -79,14 +78,18 @@ pub const EBI_EVENT_LOG_OCEL: EbiFileHandler = EbiFileHandler {
             EventLogOcel::import_as_event_log_object,
             EventLogOcel::IMPORTER_PARAMETERS,
         ),
+        EbiObjectImporter::EventLogEventAttributes(
+            EventLogOcel::import_as_event_log_event_attributes_object,
+            EventLogOcel::IMPORTER_PARAMETERS_EVENT_ATTRIBUTES,
+        ),
         EbiObjectImporter::EventLogTraceAttributes(
             EventLogOcel::import_as_event_log_trace_attributes_object,
             EventLogOcel::IMPORTER_PARAMETERS,
         ),
-        // EbiObjectImporter::EventLogOcel(
-        //     EventLogOcel::import_as_object,
-        //     EventLogOcel::IMPORTER_PARAMETERS,
-        // ),
+        EbiObjectImporter::EventLogOcel(
+            EventLogOcel::import_as_object,
+            EventLogOcel::IMPORTER_PARAMETERS,
+        ),
         EbiObjectImporter::FiniteLanguage(
             EventLogOcel::import_as_finite_language_object,
             EventLogOcel::IMPORTER_PARAMETERS,

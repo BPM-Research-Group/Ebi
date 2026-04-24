@@ -1,13 +1,6 @@
 use crate::ebi_framework::ebi_input::FallibleImporterError;
 use ebi_objects::{
-    BusinessProcessModelAndNotation, DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject,
-    EventLog, EventLogCsv, EventLogOcel, EventLogTraceAttributes, EventLogXes, FiniteLanguage,
-    FiniteStochasticLanguage, LabelledPetriNet, LanguageOfAlignments, ProcessTree,
-    StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    anyhow::{Error, Result},
-    traits::importable::{Importable, ImporterParameterValues},
+    BusinessProcessModelAndNotation, DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject, EventLog, EventLogCsv, EventLogOcel, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, LanguageOfAlignments, ProcessTree, StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, anyhow::{Error, Result}, ebi_objects::event_log_event_attributes::EventLogEventAttributes, traits::importable::{Importable, ImporterParameterValues}
 };
 use pastey::paste;
 use std::io::BufRead;
@@ -75,6 +68,7 @@ import_as_object!(
     stochastic_business_process_model_and_notation
 );
 import_as_object!(EventLog, event_log);
+import_as_object!(EventLogEventAttributes, event_log_event_attributes);
 import_as_object!(EventLogTraceAttributes, event_log_trace_attributes);
 import_as_object!(EventLogXes, event_log_xes);
 import_as_object!(EventLogCsv, event_log_csv);

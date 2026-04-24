@@ -27,7 +27,29 @@ use ebi_objects::{
     },
 };
 
-///
+#[macro_export]
+macro_rules! trait_definition_finalisation {
+    () => {
+        "Each deadlock is a final state, and each final state is a deadlock. It is not necessary that a final state is always reachable, and thus you may end up in a livelock.
+        \\begin{tabularx}{\\linewidth}{XXccc}
+            \\toprule
+            \\rotatebox{90}{File type} & \\rotatebox{90}{use} & \\rotatebox{90}{stochastic} & \\rotatebox{90}{deterministic} & \\rotatebox{90}{silent transitions}\\\\
+            \\midrule
+            \\hyperref[trait:semantics]{semantics} & state space traversal & no & no & yes\\\\
+            \\hyperref[trait:stochastic semantics]{stochastic semantics} & stochastic state space traversal & yes & no & yes\\\\
+            \\hyperref[trait:stochastic deterministic semantics]{stochastic deterministic semantics} & stochastic state space traversal, where in each state, each label is enabled at most once & yes & yes & no\\\\
+            \\hyperref[trait:stochastic partially ordered semantics]{trait:stochastic partially ordered semantics} & state space traversal, with partially ordered stochastics & yes & no & yes\\\\
+            \\bottomrule
+        \\end{tabularx}
+        As a developer, using a trait may avoid a conversion. Use objects if this conversion is acceptable, or when the object needs to be updated."
+    };
+}
+
+pub const TRAIT_DEFINITION_LATEX: &str = concat!(
+    "The trait ``semantics'' allows a state space can be traversed.",
+    trait_definition_finalisation!()
+);
+
 /// This is a wrapper enum in order to be able to implement algorithms that are agnostic of the marking/state type, amongst other things.
 /// This enum does not allow access to the underlying Semantics trait methods.
 /// For these methods, such as 'get_initial_state' and 'get_enabled_transitions', please access the struct directly.

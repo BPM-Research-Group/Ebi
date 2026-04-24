@@ -65,6 +65,7 @@ pub mod ebi_file_handlers {
 pub mod ebi_traits {
     pub mod ebi_trait_activities;
     pub mod ebi_trait_event_log;
+    pub mod ebi_trait_event_log_event_attributes;
     pub mod ebi_trait_event_log_trace_attributes;
     pub mod ebi_trait_finite_language;
     pub mod ebi_trait_finite_stochastic_language;
@@ -78,22 +79,17 @@ pub mod ebi_traits {
     pub mod ebi_trait_stochastic_partially_ordered_semantics;
     pub mod ebi_trait_stochastic_semantics;
 }
+pub mod javascript {
+    #[cfg(feature = "javascript")]
+    pub mod javascript_autogen;
+    pub mod javascript_generator_html;
+    #[cfg(feature = "javascript")]
+    pub mod javascript_generator_rust;
+    #[cfg(feature = "javascript")]
+    pub mod javascript_link;
+}
 pub mod math {
     pub mod average;
-
-    pub mod log_div;
-    #[cfg(any(
-        all(
-            not(feature = "eexactarithmetic"),
-            not(feature = "eapproximatearithmetic")
-        ),
-        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic")
-    ))]
-    pub mod log_div_enum;
-    #[cfg(all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")))]
-    pub mod log_div_exact;
-    #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
-    pub mod log_div_f64;
 
     pub mod fixed_denominator_fraction;
     #[cfg(any(
@@ -108,6 +104,20 @@ pub mod math {
     pub mod fixed_denominator_fraction_exact;
     #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
     pub mod fixed_denominator_fraction_f64;
+    pub mod log_div;
+    #[cfg(any(
+        all(
+            not(feature = "eexactarithmetic"),
+            not(feature = "eapproximatearithmetic")
+        ),
+        all(feature = "eexactarithmetic", feature = "eapproximatearithmetic")
+    ))]
+    pub mod log_div_enum;
+    #[cfg(all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")))]
+    pub mod log_div_exact;
+    #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
+    pub mod log_div_f64;
+    pub mod sign;
 
     pub mod correlation;
     pub mod distances;
@@ -217,6 +227,7 @@ pub mod techniques {
     pub mod probability_queries;
     pub mod process_variety;
     pub mod random_stochastic_miner;
+    pub mod resource_utilisation;
     pub mod sample;
     pub mod sample_folds;
     pub mod stochastic_markovian_abstraction;

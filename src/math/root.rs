@@ -3,12 +3,13 @@ use ebi_objects::{
     anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, OneMinus, Signed, Sqrt, Zero},
 };
-use fraction::Sign;
 use std::{
     fmt::{Debug, Display},
     io::Write,
     ops::{Div, Mul, Neg},
 };
+
+use crate::math::sign::Sign;
 
 #[derive(Clone)]
 pub struct ContainsRoot {

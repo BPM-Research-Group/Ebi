@@ -7,7 +7,10 @@ use ebi_objects::{
     anyhow::{Result, anyhow},
 };
 
-pub trait EbiTraitActivities: HasActivityKey {}
+pub const TRAIT_DEFINITION_LATEX: &str = "The trait ``activities'' provides access to activities.";
+
+pub trait EbiTraitActivities: HasActivityKey {
+}
 
 impl<X> EbiTraitActivities for X where X: HasActivityKey {} //blanket implementation
 

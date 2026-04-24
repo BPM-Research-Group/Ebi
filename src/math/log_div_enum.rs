@@ -17,13 +17,14 @@ use ebi_objects::{
         },
     },
 };
-use fraction::Sign;
 use std::{
     fmt::Display,
     io::Write,
     mem,
     ops::{Add, AddAssign, DivAssign, MulAssign, Neg, Sub, SubAssign},
 };
+
+use crate::math::sign::Sign;
 
 #[derive(Clone)]
 pub enum LogDivEnum {

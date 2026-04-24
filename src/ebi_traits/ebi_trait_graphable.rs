@@ -9,6 +9,9 @@ use ebi_objects::{
 };
 use layout::backends::svg::SVGWriter;
 
+pub const TRAIT_DEFINITION_LATEX: &str =
+    "The trait ``graphable'' allows to create a graph representation.";
+
 pub trait EbiTraitGraphable: Graphable {}
 
 impl<X> EbiTraitGraphable for X where X: Graphable {} //blanket implementation

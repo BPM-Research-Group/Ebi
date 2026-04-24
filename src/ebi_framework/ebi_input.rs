@@ -12,6 +12,7 @@ use crate::{
     },
     ebi_traits::{
         ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
         ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
@@ -514,6 +515,13 @@ pub enum EbiTraitImporter {
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<Box<dyn EbiTraitEventLog>>,
         &'static [ImporterParameter],
     ),
+    EventLogEventAttributes(
+        fn(
+            &mut dyn BufRead,
+            &ImporterParameterValues,
+        ) -> Result<Box<dyn EbiTraitEventLogEventAttributes>>,
+        &'static [ImporterParameter],
+    ),
     EventLogTraceAttributes(
         fn(
             &mut dyn BufRead,
@@ -566,6 +574,7 @@ impl EbiTraitImporter {
                 EbiTrait::IterableStochasticLanguage
             }
             EbiTraitImporter::EventLog(_, _) => EbiTrait::EventLog,
+            EbiTraitImporter::EventLogEventAttributes(_, _) => EbiTrait::EventLogEventAttributes,
             EbiTraitImporter::EventLogTraceAttributes(_, _) => EbiTrait::EventLogTraceAttributes,
             EbiTraitImporter::Semantics(_, _) => EbiTrait::Semantics,
             EbiTraitImporter::StochasticSemantics(_, _) => EbiTrait::StochasticSemantics,
@@ -588,6 +597,7 @@ impl EbiTraitImporter {
             | EbiTraitImporter::IterableLanguage(_, importer_parameters)
             | EbiTraitImporter::IterableStochasticLanguage(_, importer_parameters)
             | EbiTraitImporter::EventLog(_, importer_parameters)
+            | EbiTraitImporter::EventLogEventAttributes(_, importer_parameters)
             | EbiTraitImporter::EventLogTraceAttributes(_, importer_parameters)
             | EbiTraitImporter::Semantics(_, importer_parameters)
             | EbiTraitImporter::StochasticSemantics(_, importer_parameters)
@@ -601,7 +611,7 @@ impl EbiTraitImporter {
     pub fn default_parameter_values(&self) -> ImporterParameterValues {
         let mut result = ImporterParameterValues::new();
         for parameter in self.parameters() {
-            result.insert(*parameter, parameter.default());
+            result.insert(*parameter, (parameter.default(), false));
         }
         result
     }
@@ -629,6 +639,9 @@ impl EbiTraitImporter {
             }
             EbiTraitImporter::EventLog(f, _) => {
                 EbiTraitObject::EventLog((f)(reader, parameter_values)?)
+            }
+            EbiTraitImporter::EventLogEventAttributes(f, _) => {
+                EbiTraitObject::EventLogEventAttributes((f)(reader, parameter_values)?)
             }
             EbiTraitImporter::EventLogTraceAttributes(f, _) => {
                 EbiTraitObject::EventLogTraceAttributes((f)(reader, parameter_values)?)
@@ -671,15 +684,19 @@ pub enum EbiObjectImporter {
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
     ),
-    EventLogTraceAttributes(
-        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
-        &'static [ImporterParameter],
-    ),
     EventLogCsv(
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
     ),
+    EventLogEventAttributes(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
     EventLogOcel(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
+    EventLogTraceAttributes(
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
     ),
@@ -765,6 +782,9 @@ impl EbiObjectImporter {
             }
             EbiObjectImporter::EventLog(_, _) => EbiObjectType::EventLog,
             EbiObjectImporter::EventLogCsv(_, _) => EbiObjectType::EventLogCsv,
+            EbiObjectImporter::EventLogEventAttributes(_, _) => {
+                EbiObjectType::EventLogEventAttributes
+            }
             EbiObjectImporter::EventLogOcel(_, _) => EbiObjectType::EventLogOcel,
             EbiObjectImporter::EventLogTraceAttributes(_, _) => {
                 EbiObjectType::EventLogTraceAttributes
@@ -813,6 +833,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::BusinessProcessModelAndNotation(_, parameters) => parameters,
             EbiObjectImporter::EventLog(_, parameters) => parameters,
             EbiObjectImporter::EventLogCsv(_, parameters) => parameters,
+            EbiObjectImporter::EventLogEventAttributes(_, parameters) => parameters,
             EbiObjectImporter::EventLogOcel(_, parameters) => parameters,
             EbiObjectImporter::EventLogTraceAttributes(_, parameters) => parameters,
             EbiObjectImporter::EventLogXes(_, parameters) => parameters,
@@ -845,7 +866,7 @@ impl EbiObjectImporter {
     pub fn default_parameter_values(&self) -> ImporterParameterValues {
         let mut result = ImporterParameterValues::new();
         for parameter in self.parameters() {
-            result.insert(*parameter, parameter.default());
+            result.insert(*parameter, (parameter.default(), false));
         }
         result
     }
@@ -857,6 +878,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::BusinessProcessModelAndNotation(importer, _) => *importer,
             EbiObjectImporter::EventLog(importer, _) => *importer,
             EbiObjectImporter::EventLogCsv(importer, _) => *importer,
+            EbiObjectImporter::EventLogEventAttributes(importer, _) => *importer,
             EbiObjectImporter::EventLogOcel(importer, _) => *importer,
             EbiObjectImporter::EventLogTraceAttributes(importer, _) => *importer,
             EbiObjectImporter::EventLogXes(importer, _) => *importer,
@@ -1075,7 +1097,7 @@ impl EbiObjectImporterFallible {
     pub fn default_parameter_values(&self) -> ImporterParameterValues {
         let mut result = ImporterParameterValues::new();
         for parameter in self.parameters() {
-            result.insert(*parameter, parameter.default());
+            result.insert(*parameter, (parameter.default(), false));
         }
         result
     }
@@ -1285,6 +1307,152 @@ pub fn read_as_any_object(
     Err(anyhow!(
         "File could not be recognised. If you know the file type, try validating it with `Ebi validate [file type]'."
     ))
+}
+
+/// Attempt to parse an input as any of the given input types. Returns the last error if unsuccessful.
+pub fn attempt_parse(input_types: &[&'static EbiInputType], value: String) -> Result<EbiInput> {
+    //an input may be of several types; go through each of them
+    let mut error = None;
+    let mut reader = MultipleReader::String(value);
+    for input_type in input_types.iter() {
+        //try to parse the input as this type
+        match input_type {
+            EbiInputType::Trait(etrait) => {
+                //try to parse a trait
+                match read_as_trait(etrait, &mut reader, None, 0)
+                    .with_context(|| format!("Parsing as the trait `{}`.", etrait))
+                {
+                    Ok((object, file_handler)) => return Ok(EbiInput::Trait(object, file_handler)),
+                    Err(e) => error = Some(e),
+                }
+            }
+            EbiInputType::Object(etype) => {
+                //try to parse a specific object
+                match read_as_object(etype, &mut reader, None, 0)
+                    .with_context(|| format!("Parsing as the object type `{}`.", etype))
+                {
+                    Ok((object, file_handler)) => {
+                        return Ok(EbiInput::Object(object, file_handler));
+                    }
+                    Err(e) => error = Some(e),
+                }
+            }
+            EbiInputType::AnyObject => {
+                match read_as_any_object(&mut reader, None, 0)
+                    .context("Parsing as any object.")
+                {
+                    Ok((object, file_handler)) => {
+                        return Ok(EbiInput::Object(object, file_handler));
+                    }
+                    Err(e) => error = Some(e),
+                }
+            }
+            EbiInputType::FileHandler => {
+                if let MultipleReader::String(string) = &reader {
+                    if let Ok(value) = string.parse::<EbiFileHandler>() {
+                        return Ok(EbiInput::FileHandler(value));
+                    }
+                };
+            }
+            EbiInputType::String(None, _) => {
+                if let MultipleReader::String(string) = &reader {
+                    return Ok(EbiInput::String(string.clone(), &input_type));
+                } else {
+                    unreachable!()
+                }
+            }
+            EbiInputType::String(Some(allowed_values), _) => {
+                if let MultipleReader::String(string) = &reader {
+                    if allowed_values.contains(&string.as_str()) {
+                        return Ok(EbiInput::String(string.clone(), &input_type));
+                    } else {
+                        error = Some(anyhow!("value should be one of {:?}", allowed_values));
+                    }
+                } else {
+                    unreachable!()
+                }
+            }
+            EbiInputType::Usize(min, max, _) => {
+                if let MultipleReader::String(string) = &reader {
+                    if let Ok(value) = string.parse::<usize>() {
+                        match (min, max) {
+                            (None, None) => {
+                                return Ok(EbiInput::Usize(value.clone(), &input_type));
+                            }
+                            (None, Some(max)) => {
+                                if max < &value {
+                                    error = Some(anyhow!("value should be at most {}", max));
+                                } else {
+                                    return Ok(EbiInput::Usize(value.clone(), &input_type));
+                                }
+                            }
+                            (Some(min), None) => {
+                                if min > &value {
+                                    error = Some(anyhow!("value should be at least {}", min));
+                                } else {
+                                    return Ok(EbiInput::Usize(value.clone(), &input_type));
+                                }
+                            }
+                            (Some(min), Some(max)) => {
+                                if min > &value || max < &value {
+                                    error = Some(anyhow!(
+                                        "value should be between {} and {}",
+                                        min,
+                                        max
+                                    ));
+                                } else {
+                                    return Ok(EbiInput::Usize(value.clone(), &input_type));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            EbiInputType::Fraction(min, max, _) => {
+                if let MultipleReader::String(string) = &reader {
+                    if let Ok(value) = &string.parse::<FractionNotParsedYet>() {
+                        let value: Fraction = value.try_into()?;
+
+                        match (min, max) {
+                            (None, None) => {
+                                return Ok(EbiInput::Fraction(value.clone(), &input_type));
+                            }
+                            (None, Some(max)) => {
+                                if max < &value {
+                                    error = Some(anyhow!("value should be at most {}", max));
+                                } else {
+                                    return Ok(EbiInput::Fraction(value.clone(), &input_type));
+                                }
+                            }
+                            (Some(min), None) => {
+                                if min > &value {
+                                    error = Some(anyhow!("value should be at least {}", min));
+                                } else {
+                                    return Ok(EbiInput::Fraction(value.clone(), &input_type));
+                                }
+                            }
+                            (Some(min), Some(max)) => {
+                                if min > &value || max < &value {
+                                    error = Some(anyhow!(
+                                        "value should be between {} and {}",
+                                        min,
+                                        max
+                                    ));
+                                } else {
+                                    return Ok(EbiInput::Fraction(value.clone(), &input_type));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    match error {
+        Some(e) => Err(e),
+        None => Err(anyhow!("Argument was not given.")),
+    }
 }
 
 pub fn validate_object_of(
