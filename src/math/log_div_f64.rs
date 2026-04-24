@@ -105,6 +105,14 @@ impl One for LogDivF64 {
     }
 }
 
+impl Neg for LogDivF64 {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        LogDivF64::zero() - self
+    }
+}
+
 impl From<FractionF64> for LogDivF64 {
     fn from(value: FractionF64) -> Self {
         Self(value)
