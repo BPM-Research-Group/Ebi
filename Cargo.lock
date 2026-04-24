@@ -793,6 +793,8 @@ dependencies = [
 [[package]]
 name = "ebi_bpmn"
 version = "0.0.46"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "922862ad1b66e86a1bb243136e3d73bde20af79193c6e16dc0d2317c106384a0"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -821,6 +823,7 @@ dependencies = [
 [[package]]
 name = "ebi_objects"
 version = "0.3.181"
+source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#6b2e3f8ca78344d714e05f30807dc78effba60cc"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -1815,9 +1818,9 @@ dependencies = [
 
 [[package]]
 name = "macros_process_mining"
-version = "0.5.4"
+version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b9b58529f508910e55b5506ff0bf850643d084eaab86db6276cfe02377105d9b"
+checksum = "4864fe2ea22ec122ecee124e243bdb75e89733b04f2d3004ea32e78e3f56bcf6"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2168,9 +2171,9 @@ dependencies = [
 
 [[package]]
 name = "pastey"
-version = "0.2.1"
+version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b867cad97c0791bbd3aaa6472142568c6c9e8f71937e98379f584cfb0cf35bec"
+checksum = "c5a797f0e07bdf071d15742978fc3128ec6c22891c31a3a931513263904c982a"
 
 [[package]]
 name = "pathfinding"
@@ -2672,9 +2675,9 @@ dependencies = [
 
 [[package]]
 name = "process_mining"
-version = "0.5.4"
+version = "0.5.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a5c2127f9b6af93af7ae468e229e8805c66b8326dbc683dee24c5e761fa1b5e"
+checksum = "64c5f48d81738ff65d3ac392ba3741c943764e3c3a34f8f85f3836b851737eb8"
 dependencies = [
  "chrono",
  "csv",
