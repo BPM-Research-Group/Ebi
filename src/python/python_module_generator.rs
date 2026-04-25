@@ -1,13 +1,11 @@
 use crate::{
     ebi_framework::{
-        ebi_command::{EBI_COMMANDS, EbiCommand},
+        ebi_command::{EBI_COMMANDS, EbiCommand, search_command_in_source_files},
         ebi_output::EbiOutput,
     },
     python::python::pm4py_function_name,
 };
-use ebi_objects::anyhow::{Result, anyhow};
-use std::{fs, path::PathBuf};
-use syn::Item;
+use ebi_objects::anyhow::Result;
 
 pub fn generate_pm4py_module() -> Result<EbiOutput> {
     let imports = format!(
