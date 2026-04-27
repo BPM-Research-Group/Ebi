@@ -16,6 +16,7 @@ use crate::{
         chi_square_stochastic_conformance::ChiSquareStochasticConformance,
         earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
         entropic_relevance::EntropicRelvance,
+        gain_precision_recall::{potential_gain_precision, potential_gain_recall},
         hellinger_stochastic_conformance::HellingerStochasticConformance,
         jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
         partially_ordered_earth_movers_stochastic_conformance::PartiallyOrderedEarthMoversStochasticConformance,
@@ -28,7 +29,7 @@ use crate::{
 };
 use ebi_objects::{
     EbiObject, EbiObjectType,
-    anyhow::{Context, anyhow},
+    anyhow::{Context, anyhow},ebi_arithmetic::{Fraction, f}, ebi_objects::stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton
 };
 use strum::VariantNames;
 
@@ -43,6 +44,8 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
         &CONFORMANCE_EMSC,
         &CONFORMANCE_EMSC_SAMPLE,
         &CONFORMANCE_ER,
+        &CONFORMANCE_GAIN_PRECISION,
+        &CONFORMANCE_GAIN_FITNESS,
         &CONFORMANCE_HSC,
         &CONFORMANCE_HSC_SAMPLE,
         &CONFORMANCE_JSSC,
@@ -671,6 +674,88 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
         let result = abstraction1.markovian_conformance(abstraction2, *measure)?;
 
         Ok(EbiOutput::Fraction(result))
+    },
+    output_type: &EbiOutputType::Fraction,
+};
+
+pub const CONFORMANCE_GAIN_PRECISION: EbiCommand = EbiCommand::Command {
+    name_short: "gain_precision",
+    name_long: Some("gain-based-precision"),
+    explanation_short: "Compute gain-based precision.",
+    explanation_long: Some(
+        "Compute gain-based precision for a finite stochastic language and an SDFA. \
+         The smoothing parameter lambda has a default value of 1e-6.",
+    ),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Object(
+            EbiObjectType::StochasticDeterministicFiniteAutomaton,
+        )],
+    ],
+    input_names: &["LANG_FILE", "SDFA_FILE"],
+    input_helps: &[
+        "A finite stochastic language to compare.",
+        "A stochastic deterministic finite automaton (SDFA) to compare.",
+    ],
+    execute: |mut inputs, _| {
+        let fsl = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let fsl = fsl.to_finite_stochastic_language();
+        let sdfa = *inputs
+            .remove(0)
+            .to_type::<StochasticDeterministicFiniteAutomaton>()?;
+
+        let lambda: Fraction = f!(1i64, 1_000_000i64);
+
+        let precision = potential_gain_precision(fsl, sdfa, Some(&lambda))
+            .context("cannot compute gain precision")?;
+
+        Ok(EbiOutput::Fraction(precision))
+    },
+    output_type: &EbiOutputType::Fraction,
+};
+
+pub const CONFORMANCE_GAIN_FITNESS: EbiCommand = EbiCommand::Command {
+    name_short: "gain_fitness",
+    name_long: Some("gain-based-fitness"),
+    explanation_short: "Compute gain-based fitness.",
+    explanation_long: Some(
+        "Compute gain-based fitness for a finite stochastic language and an SDFA. \
+         The smoothing parameter lambda has a default value of 1e-6.",
+    ),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Object(
+            EbiObjectType::StochasticDeterministicFiniteAutomaton,
+        )],
+    ],
+    input_names: &["LANG_FILE", "SDFA_FILE"],
+    input_helps: &[
+        "A finite stochastic language to compare.",
+        "A stochastic deterministic finite automaton (SDFA) to compare.",
+    ],
+    execute: |mut inputs, _| {
+        let fsl = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let fsl = fsl.to_finite_stochastic_language();
+        let sdfa = *inputs
+            .remove(0)
+            .to_type::<StochasticDeterministicFiniteAutomaton>()?;
+
+        let lambda: Fraction = f!(1i64, 1_000_000i64);
+
+        let fitness = potential_gain_recall(fsl, sdfa, Some(&lambda))
+        .context("cannot compute gain fitness")?;
+
+        Ok(EbiOutput::Fraction(fitness))
     },
     output_type: &EbiOutputType::Fraction,
 };
