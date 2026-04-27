@@ -634,8 +634,8 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
     ],
     input_names: &["FILE_1", "FILE_2", "K_ORDER", "MEASURE"],
     input_helps: &[
-        "A finite stochastic language or a stochastic labelled Petri net (log) to compare. An SLPN must be livelock-free and bounded.",
-        "A finite stochastic language or a stochastic labelled Petri net (model) to compare. An SLPN must be livelock-free and bounded.",
+        "A finite stochastic language or a stochastic labelled Petri net (log) to compare. A model must be livelock-free and bounded.",
+        "A finite stochastic language or a stochastic labelled Petri net (model) to compare. A model must be livelock-free and bounded.",
         "The order of the Markovian abstraction (length of subtraces).",
         "The stochastic conformance measure to be applied to the abstractions.",
     ],

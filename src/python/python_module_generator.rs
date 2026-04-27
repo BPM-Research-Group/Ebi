@@ -1,13 +1,11 @@
 use crate::{
     ebi_framework::{
-        ebi_command::{EBI_COMMANDS, EbiCommand},
+        ebi_command::{EBI_COMMANDS, EbiCommand, search_command_in_source_files},
         ebi_output::EbiOutput,
     },
     python::python::pm4py_function_name,
 };
-use ebi_objects::anyhow::{Result, anyhow};
-use std::{fs, path::PathBuf};
-use syn::Item;
+use ebi_objects::anyhow::Result;
 
 pub fn generate_pm4py_module() -> Result<EbiOutput> {
     let imports = format!(
@@ -123,148 +121,4 @@ fn {fname}(py: Python<'_>, {args}) -> PyResult<Py<PyAny>> {{
     ));
 
     Ok((fn_name, body))
-}
-
-fn search_command_in_source_files(path: &Vec<&EbiCommand>) -> Result<String> {
-    //start the search from the EBI_COMMANDS const
-    let mut path = path.clone();
-    path.remove(0);
-    let (mut last_file, mut command_declaration) = root_command()?;
-
-    //walk over the path of commands to find the file and const name that belongs to the lowest/actual command
-    for child_command in path {
-        (last_file, command_declaration) = search_child(&command_declaration, child_command)?;
-    }
-
-    let mut file_name = last_file.file_name().unwrap().to_str().unwrap().to_owned();
-    file_name.pop();
-    file_name.pop();
-    file_name.pop();
-    Ok(format!(
-        "crate::ebi_commands::{}::{}",
-        file_name, command_declaration.ident
-    ))
-}
-
-fn root_command() -> Result<(PathBuf, syn::ItemConst)> {
-    let file = "src/ebi_framework/ebi_command.rs";
-    let contents = fs::read_to_string(file)?;
-    let syn_file = syn::parse_file(&contents)?;
-    for item in &syn_file.items {
-        if let Item::Const(const_item) = item {
-            if let syn::Type::Path(x) = &*const_item.ty {
-                if let Some(j) = x.path.get_ident() {
-                    if j.to_string() == "EbiCommand"
-                        && const_item.ident.to_string() == "EBI_COMMANDS"
-                    {
-                        return Ok((PathBuf::from(file), const_item.clone()));
-                    }
-                }
-            }
-        }
-    }
-    return Err(anyhow!("source file not found"));
-}
-
-fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
-    if let syn::Expr::Struct(x) = &*const_item.expr {
-        for field in &x.fields {
-            if let syn::Member::Named(field_name) = &field.member {
-                if field_name.to_string() == "children" {
-                    if let syn::Expr::Reference(refe) = &field.expr {
-                        if let syn::Expr::Array(arr) = &*refe.expr {
-                            let mut result = vec![];
-                            for child in &arr.elems {
-                                if let syn::Expr::Reference(child_ref) = child {
-                                    if let syn::Expr::Path(command_name) = &*child_ref.expr {
-                                        result.push(
-                                            command_name
-                                                .path
-                                                .segments
-                                                .last()
-                                                .unwrap()
-                                                .ident
-                                                .to_string(),
-                                        );
-                                    } else {
-                                        return Err(anyhow!("unexpected child found"));
-                                    }
-                                } else {
-                                    return Err(anyhow!("unexpected child found"));
-                                }
-                            }
-                            return Ok(result);
-                        } else {
-                            return Err(anyhow!("unexpected child found"));
-                        }
-                    } else {
-                        return Err(anyhow!("unexpected child found"));
-                    }
-                }
-            }
-        }
-    }
-    Err(anyhow!("cannot extract children"))
-}
-
-fn search_child(
-    parent_declaration: &syn::ItemConst,
-    child_command: &EbiCommand,
-) -> Result<(PathBuf, syn::ItemConst)> {
-    let children_const_names = extract_children_names(parent_declaration)?;
-
-    let child_short_name = child_command.short_name();
-
-    let paths = fs::read_dir("src/ebi_commands")?;
-    for entry in paths {
-        let entry = entry?;
-        let meta = entry.metadata()?;
-
-        if meta.is_file() {
-            let contents = fs::read_to_string(entry.path())?;
-            let file = syn::parse_file(&contents)?;
-            for item in &file.items {
-                if let Item::Const(const_item) = item {
-                    if children_const_names.contains(&const_item.ident.to_string()) {
-                        if let syn::Type::Path(x) = &*const_item.ty {
-                            if let Some(j) = x.path.get_ident() {
-                                if j.to_string() == "EbiCommand" {
-                                    //find the short name
-                                    if let syn::Expr::Struct(x) = &*const_item.expr {
-                                        for field in &x.fields {
-                                            if let syn::Member::Named(field_name) = &field.member {
-                                                if field_name.to_string() == "name_short" {
-                                                    if let syn::Expr::Lit(lit) = &field.expr {
-                                                        if let syn::Lit::Str(str) = &lit.lit {
-                                                            if str.value() == child_short_name {
-                                                                // println!(
-                                                                //     "\tfound EbiCommand {} with short name {}",
-                                                                //     const_item.ident,
-                                                                //     child_short_name
-                                                                // );
-                                                                return Ok((
-                                                                    entry.path(),
-                                                                    const_item.clone(),
-                                                                ));
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            } else {
-                                                return Err(anyhow!("unexpected field"));
-                                            }
-                                        }
-                                    } else {
-                                        return Err(anyhow!("unexpected expr"));
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return Err(anyhow!("todo file not found {}", child_command));
 }

@@ -1,5 +1,5 @@
 use ebi_objects::{
-    Executions, Exportable, Importable, ebi_objects::executions::FORMAT_SPECIFICATION,
+    Executions, Exportable, Importable,
 };
 
 use crate::ebi_framework::{
@@ -12,7 +12,7 @@ pub const EBI_EXECUTIONS: EbiFileHandler = EbiFileHandler {
     article: "",
     file_extension: "exs",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: &Executions::FILE_FORMAT_SPECIFICATION_LATEX,
     validator: Some(Executions::validate),
     trait_importers: &[],
     object_importers: &[EbiObjectImporter::Executions(

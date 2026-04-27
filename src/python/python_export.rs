@@ -43,7 +43,7 @@ impl ExportableToPM4Py for EbiOutput {
 
                 let output_string = if exporter.is_binary() {
                     let bytes =
-                        ebi_output::export_to_bytes(self.clone(), exporter).map_err(|e| {
+                        ebi_output::export_to_bytes(self.clone(), &exporter).map_err(|e| {
                             pyo3::exceptions::PyException::new_err(format!("Export error: {}", e))
                         })?;
                     String::from_utf8(bytes).map_err(|e| {
@@ -53,7 +53,7 @@ impl ExportableToPM4Py for EbiOutput {
                         ))
                     })?
                 } else {
-                    ebi_output::export_to_string(self.clone(), exporter).map_err(|e| {
+                    ebi_output::export_to_string(self.clone(), &exporter).map_err(|e| {
                         pyo3::exceptions::PyException::new_err(format!("Export error: {}", e))
                     })?
                 };

@@ -7,7 +7,8 @@ use crate::{
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
-    ebi_traits::ebi_trait_graphable::EbiTraitGraphable, tests::test_ebi_command,
+    ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
+    tests::test_ebi_command,
 };
 
 pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
@@ -49,6 +50,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             }
             EbiInput::Object(EbiObject::EventLog(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::EventLogCsv(log), _) => log.to_string(),
+            EbiInput::Object(EbiObject::EventLogEventAttributes(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::EventLogOcel(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::EventLogPython(log), _) => log.to_string(),
             EbiInput::Object(EbiObject::EventLogTraceAttributes(log), _) => log.to_string(),

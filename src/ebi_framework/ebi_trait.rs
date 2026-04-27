@@ -1,3 +1,10 @@
+use crate::ebi_traits::{
+    ebi_trait_activities, ebi_trait_event_log, ebi_trait_event_log_event_attributes,
+    ebi_trait_event_log_trace_attributes, ebi_trait_graphable, ebi_trait_semantics,
+    ebi_trait_stochastic_deterministic_semantics, ebi_trait_stochastic_partially_ordered_semantics,
+    ebi_trait_stochastic_semantics,
+};
+
 use super::{
     ebi_command::{EBI_COMMANDS, EbiCommand},
     ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
@@ -18,6 +25,7 @@ pub enum EbiTrait {
     Activities,
     #[default]
     EventLog,
+    EventLogEventAttributes,
     EventLogTraceAttributes,
     FiniteLanguage,
     FiniteStochasticLanguage,
@@ -53,6 +61,7 @@ impl EbiTrait {
     pub fn get_article(&self) -> &str {
         match self {
             EbiTrait::EventLog => "an",
+            EbiTrait::EventLogEventAttributes => "an",
             EbiTrait::EventLogTraceAttributes => "an",
             EbiTrait::IterableLanguage => "an",
             EbiTrait::FiniteLanguage => "a",
@@ -87,21 +96,9 @@ impl EbiTrait {
 
     pub fn get_explanation(&self) -> &str {
         match self {
-            EbiTrait::EventLog => "Iterating over an event log will yield traces.
-            For full access to an underlying XES log, use the EventLogXes object (not trait).
-            \\\\
-            Definition: let $\\Sigma$ be an alphabet of activities.
-            Then, a \\emph{trace} $\\sigma \\in \\Sigma^*$ is a finite sequence of activities, and 
-            an \\emph{event log} $L \\in (\\Sigma^*)^*$ is a sequence of traces.",
-            EbiTrait::EventLogTraceAttributes => {
-                "An ``event log with trace attributes'' provides an iterator over traces, where each trace may have trace attributes attached.
-                For full access to an underlying XES log, use the EventLogXes object (not trait).
-                \\\\
-                Definition: let $\\Sigma$ be an alphabet of activities.
-                Let $A \\colon \\text{attribute} \\mapsto \\text{value}$ be an attribute-value mapping, and let $\\mathcal{A}$ be the set of all attribute-value mappings.
-                A \\emph{trace with attributes} $\\sigma^{A} \\in \\Sigma^* \\times \\mathcal{A}$ is a finite sequence of activities, where the sequence is annotated with attributes.
-                An \\emph{event log with trace attributes} $L^A \\in (\\Sigma^* \\times \\mathcal{A})^*$ is a sequence of traces with attributes."
-            }
+            EbiTrait::EventLog => ebi_trait_event_log::TRAIT_DEFINITION_LATEX,
+            EbiTrait::EventLogEventAttributes => ebi_trait_event_log_event_attributes::TRAIT_DEFINITION_LATEX,
+            EbiTrait::EventLogTraceAttributes => ebi_trait_event_log_trace_attributes::TRAIT_DEFINITION_LATEX,
             EbiTrait::FiniteLanguage => "Iterating over a finite language will yield each trace variant once.
             \\\\
             Definition: let $\\Sigma$ be an alphabet of activities.
@@ -123,20 +120,12 @@ impl EbiTrait {
             EbiTrait::QueriableStochasticLanguage => {
                 "A queriable stochastic language can be given a trace, and it will return the probability of the trace."
             }
-            EbiTrait::Semantics => {
-                "An object in which the state space can be traversed. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
-            }
-            EbiTrait::StochasticPartiallyOrderedSemantics => {
-                "An object in which the state space can be traversed, with probabilities; multiple options may be available at the same time. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
-            }
-            EbiTrait::StochasticDeterministicSemantics => {
-                "An object in which the state space can be traversed deterministically, that is, in each state every activity appears at most once and silent steps are not present. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
-            }
-            EbiTrait::StochasticSemantics => {
-                "An object in which the state space can be traversed, with probabilities. Each deadlock is a final state, and each final state is a deadlock. Does not need to terminate, and may end up in livelocks."
-            }
-            EbiTrait::Graphable => "The trait ``graphable'' allows to create a graph representation.",
-            EbiTrait::Activities => "The trait ``activities'' provides access to activities.",
+            EbiTrait::Semantics => ebi_trait_semantics::TRAIT_DEFINITION_LATEX,
+            EbiTrait::StochasticPartiallyOrderedSemantics => ebi_trait_stochastic_partially_ordered_semantics::TRAIT_DEFINITION_LATEX,
+            EbiTrait::StochasticDeterministicSemantics => ebi_trait_stochastic_deterministic_semantics::TRAIT_DEFINITION_LATEX,
+            EbiTrait::StochasticSemantics => ebi_trait_stochastic_semantics::TRAIT_DEFINITION_LATEX,
+            EbiTrait::Graphable => ebi_trait_graphable::TRAIT_DEFINITION_LATEX,
+            EbiTrait::Activities => ebi_trait_activities::TRAIT_DEFINITION_LATEX,
         }
     }
 }
@@ -164,6 +153,7 @@ impl Display for EbiTrait {
             "{}",
             match self {
                 EbiTrait::EventLog => "event log",
+                EbiTrait::EventLogEventAttributes => "event log with event attributes",
                 EbiTrait::EventLogTraceAttributes => "event log with trace attributes",
                 EbiTrait::IterableLanguage => "iterable language",
                 EbiTrait::FiniteLanguage => "finite language",

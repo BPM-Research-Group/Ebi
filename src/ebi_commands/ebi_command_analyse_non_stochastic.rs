@@ -1,20 +1,19 @@
 use crate::{
     ebi_framework::{
-        ebi_command::{EbiCommand},
+        ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
     },
     ebi_traits::{
-        ebi_trait_activities::EbiTraitActivities,
-        ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics,
+        ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics
     },
     techniques::{
         any_traces::AnyTraces, bounded::Bounded, executions::FindExecutions,
         infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic,
     }, tests::test_ebi_command,
 };
-use ebi_objects::{anyhow::anyhow, EbiObject, EbiObjectType, EventLogXes};
+use ebi_objects::{EbiObject, EbiObjectType, anyhow::anyhow};
 use std::io::Write;
 
 pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
@@ -103,6 +102,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
             }
             EbiInput::Object(EbiObject::EventLog(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::EventLogCsv(object), _) => object.bounded()?,
+            EbiInput::Object(EbiObject::EventLogEventAttributes(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::EventLogOcel(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::EventLogPython(object), _) => object.bounded()?,
             EbiInput::Object(EbiObject::EventLogTraceAttributes(object), _) => object.bounded()?,
@@ -202,13 +202,13 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Comman
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
-        &[&EbiInputType::Object(EbiObjectType::EventLogXes)],
+        &[&EbiInputType::Trait(EbiTrait::EventLogEventAttributes)],
         &[&EbiInputType::Trait(EbiTrait::Semantics)],
     ],
     input_names: &["LOG", "MODEL"],
     input_helps: &["The event log.", "The model."],
     execute: |mut objects, _| {
-        let mut log = objects.remove(0).to_type::<EventLogXes>()?;
+        let mut log: Box<dyn EbiTraitEventLogEventAttributes> = objects.remove(0).to_type::<dyn EbiTraitEventLogEventAttributes>()?;
         let mut model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
 
         let result = model.find_executions(&mut log)?;
@@ -269,6 +269,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
             }
             EbiInput::Object(EbiObject::EventLog(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::EventLogCsv(object), _) => object.any_traces()?,
+            EbiInput::Object(EbiObject::EventLogEventAttributes(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::EventLogOcel(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::EventLogPython(object), _) => object.any_traces()?,
             EbiInput::Object(EbiObject::EventLogTraceAttributes(object), _) => object.any_traces()?,

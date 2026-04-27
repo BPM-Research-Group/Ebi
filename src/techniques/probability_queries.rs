@@ -188,8 +188,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
 
         //insert the first trace
         let mut result = vec![self.iter_traces_probabilities().next().unwrap()];
-
-        let mut sum = Fraction::zero();
+        let mut sum = result[0].1.clone();
 
         for (trace, probability) in self.iter_traces_probabilities().skip(1) {
             if &sum < coverage || probability > result[0].1 {
@@ -572,9 +571,9 @@ mod tests {
         },
     };
     use ebi_objects::{
-        FiniteStochasticLanguage, HasActivityKey, NumberOfTraces,
+        EventLogXes, FiniteStochasticLanguage, HasActivityKey, NumberOfTraces,
         StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
-        ebi_arithmetic::{Fraction, One, Zero},
+        ebi_arithmetic::{Fraction, One, Zero, f},
     };
     use std::fs;
 
@@ -991,5 +990,14 @@ mod tests {
         // let slang = Box::new(slpn).analyse_most_likely_traces(&1).unwrap();
         let fout = fs::read_to_string("testfiles/ba.slang").unwrap();
         assert_eq!(fout, slang.to_string())
+    }
+
+    #[test]
+    fn convert_converage() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let xes = fin.parse::<EventLogXes>().unwrap();
+        let slang = FiniteStochasticLanguage::from(xes);
+        let boxx: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang);
+        boxx.analyse_probability_coverage(&f!((4, 5))).unwrap();
     }
 }

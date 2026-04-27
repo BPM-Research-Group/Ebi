@@ -8,6 +8,7 @@ use crate::{
         deterministic_semantics_for_stochastic_semantics::PMarking,
         infinitely_many_traces::InfinitelyManyTraces,
     },
+    trait_definition_finalisation,
 };
 use ebi_objects::{
     Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogOcel, EventLogPython,
@@ -21,6 +22,11 @@ use ebi_objects::{
         event_log_csv::EventLogCsv, process_tree::TreeMarking,
     },
 };
+
+pub const TRAIT_DEFINITION_LATEX: &str = concat!(
+    "The trait ``stochastic deterministic semantics'' allows for state space traversal in a deterministic fashion, that is, in each state every activity appears at most once and silent steps are not present.",
+    trait_definition_finalisation!()
+);
 
 pub enum EbiTraitStochasticDeterministicSemantics {
     Usize(Box<dyn StochasticDeterministicSemantics<DetState = usize, LivState = usize>>),

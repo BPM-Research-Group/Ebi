@@ -94,6 +94,7 @@ pub fn manual() -> Result<EbiOutput> {
     writeln!(f, "\\long\\def\\ebitraitlist{{")?;
     for etrait in EbiTrait::iter() {
         writeln!(f, "\\subsection{{{}}}", etrait.to_string().to_sentence_case())?;
+        writeln!(f, "\\label{{trait:{}}}", etrait.to_string())?;
         writeln!(f, "{}", etrait.get_explanation())?;
 
         writeln!(f, "\\\\File types that can be imported as {} {}: {}.", 

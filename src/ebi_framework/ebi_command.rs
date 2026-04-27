@@ -19,8 +19,8 @@ use crate::{
 };
 use clap::{Arg, ArgAction, ArgMatches, Command, value_parser};
 use ebi_objects::{
-    anyhow::{Context, Result, anyhow},
     EbiObjectType,
+    anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{Fraction, exact::set_exact_globally, parsing::FractionNotParsedYet},
 };
 use indicatif::{ProgressBar, ProgressStyle};
@@ -84,7 +84,7 @@ pub enum EbiCommand {
 
         /// Latex code to be inserted in the manual.
         latex_link: Option<&'static str>,
-        
+
         /// Provides access to adapt the cli command. If this is not set to None, the command will be unavailable in other environments than the CLI.
         cli_command: Option<fn(command: Command) -> Command>,
 
@@ -92,7 +92,7 @@ pub enum EbiCommand {
         exact_arithmetic: bool,
 
         /// for each fixed-position input parameter, the ebi traits that are accepted. If accept_source_file is true, that is the first parameter
-        input_types: &'static [&'static [&'static EbiInputType]], 
+        input_types: &'static [&'static [&'static EbiInputType]],
         input_names: &'static [&'static str],
         input_helps: &'static [&'static str],
 
@@ -408,10 +408,10 @@ impl EbiCommand {
                     log::info!("Writing result as {} {}", exporter.get_article(), exporter);
                     if exporter.is_binary() {
                         let mut out = std::io::stdout();
-                        out.write_all(&ebi_output::export_to_bytes(result, exporter)?)?;
+                        out.write_all(&ebi_output::export_to_bytes(result, &exporter)?)?;
                         out.flush()?;
                     } else {
-                        println!("{}", ebi_output::export_to_string(result, exporter)?);
+                        println!("{}", ebi_output::export_to_string(result, &exporter)?);
                     }
                 }
 
@@ -686,6 +686,31 @@ impl EbiCommand {
         }
     }
 
+    /// Executes the command using the provided inputs without reading from CLI.
+    /// Returns the resulting object.
+    pub fn execute_with_inputs(&self, inputs: Vec<EbiInput>) -> Result<EbiOutput> {
+        match self {
+            EbiCommand::Command {
+                execute,
+                output_type,
+                ..
+            } => {
+                // Call the command’s execute closure directly.
+                // Passing None for ArgMatches since we don’t need any CLI options.
+                let result = (execute)(inputs, None)?;
+                if &&result.get_type() != output_type {
+                    return Err(anyhow!(
+                        "Output type {} does not match the declared output of {}.",
+                        result.get_type(),
+                        output_type
+                    ));
+                }
+                Ok(result)
+            }
+            _ => Err(anyhow!("Not a command variant.")),
+        }
+    }
+
     pub fn is_in_java(&self) -> bool {
         if let EbiCommand::Command {
             cli_command,
@@ -717,8 +742,26 @@ impl EbiCommand {
     }
 
     pub fn is_in_python(&self) -> bool {
-        if let EbiCommand::Command { cli_command, .. } = &self {
-            return cli_command.is_none();
+        if let EbiCommand::Command {
+            cli_command,
+            input_types,
+            ..
+        } = &self
+        {
+            return cli_command.is_none() && !input_types.is_empty();
+        } else {
+            false
+        }
+    }
+
+    pub fn is_in_javascript(&self) -> bool {
+        if let EbiCommand::Command {
+            cli_command,
+            input_types,
+            ..
+        } = &self
+        {
+            return cli_command.is_none() && !input_types.is_empty();
         } else {
             false
         }
@@ -866,6 +909,154 @@ pub fn get_applicable_commands(object_type: &EbiObjectType) -> BTreeSet<Vec<&'st
     result
 }
 
+#[cfg(any(feature = "javascript", feature = "python"))]
+pub(crate) fn search_command_in_source_files(path: &Vec<&EbiCommand>) -> Result<String> {
+    //start the search from the EBI_COMMANDS const
+    let mut path = path.clone();
+    path.remove(0);
+    let (mut last_file, mut command_declaration) = root_command()?;
+
+    //walk over the path of commands to find the file and const name that belongs to the lowest/actual command
+    for child_command in path {
+        (last_file, command_declaration) = search_child(&command_declaration, child_command)?;
+    }
+
+    let mut file_name = last_file.file_name().unwrap().to_str().unwrap().to_owned();
+    file_name.pop();
+    file_name.pop();
+    file_name.pop();
+    Ok(format!(
+        "crate::ebi_commands::{}::{}",
+        file_name, command_declaration.ident
+    ))
+}
+
+#[cfg(any(feature = "javascript", feature = "python"))]
+fn root_command() -> Result<(PathBuf, syn::ItemConst)> {
+    let file = "src/ebi_framework/ebi_command.rs";
+    let contents = std::fs::read_to_string(file)?;
+    let syn_file = syn::parse_file(&contents)?;
+    for item in &syn_file.items {
+        if let syn::Item::Const(const_item) = item {
+            if let syn::Type::Path(x) = &*const_item.ty {
+                if let Some(j) = x.path.get_ident() {
+                    if j.to_string() == "EbiCommand"
+                        && const_item.ident.to_string() == "EBI_COMMANDS"
+                    {
+                        return Ok((PathBuf::from(file), const_item.clone()));
+                    }
+                }
+            }
+        }
+    }
+    return Err(anyhow!("source file not found"));
+}
+
+#[cfg(any(feature = "javascript", feature = "python"))]
+fn search_child(
+    parent_declaration: &syn::ItemConst,
+    child_command: &EbiCommand,
+) -> Result<(PathBuf, syn::ItemConst)> {
+    let children_const_names = extract_children_names(parent_declaration)?;
+
+    let child_short_name = child_command.short_name();
+
+    let paths = std::fs::read_dir("src/ebi_commands")?;
+    for entry in paths {
+        let entry = entry?;
+        let meta = entry.metadata()?;
+
+        if meta.is_file() {
+            let contents = std::fs::read_to_string(entry.path())?;
+            let file = syn::parse_file(&contents)?;
+            for item in &file.items {
+                if let syn::Item::Const(const_item) = item {
+                    if children_const_names.contains(&const_item.ident.to_string()) {
+                        if let syn::Type::Path(x) = &*const_item.ty {
+                            if let Some(j) = x.path.get_ident() {
+                                if j.to_string() == "EbiCommand" {
+                                    //find the short name
+                                    if let syn::Expr::Struct(x) = &*const_item.expr {
+                                        for field in &x.fields {
+                                            if let syn::Member::Named(field_name) = &field.member {
+                                                if field_name.to_string() == "name_short" {
+                                                    if let syn::Expr::Lit(lit) = &field.expr {
+                                                        if let syn::Lit::Str(str) = &lit.lit {
+                                                            if str.value() == child_short_name {
+                                                                // println!(
+                                                                //     "\tfound EbiCommand {} with short name {}",
+                                                                //     const_item.ident,
+                                                                //     child_short_name
+                                                                // );
+                                                                return Ok((
+                                                                    entry.path(),
+                                                                    const_item.clone(),
+                                                                ));
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            } else {
+                                                return Err(anyhow!("unexpected field"));
+                                            }
+                                        }
+                                    } else {
+                                        return Err(anyhow!("unexpected expr"));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return Err(anyhow!("todo file not found {}", child_command));
+}
+
+#[cfg(any(feature = "javascript", feature = "python"))]
+fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
+    if let syn::Expr::Struct(x) = &*const_item.expr {
+        for field in &x.fields {
+            if let syn::Member::Named(field_name) = &field.member {
+                if field_name.to_string() == "children" {
+                    if let syn::Expr::Reference(refe) = &field.expr {
+                        if let syn::Expr::Array(arr) = &*refe.expr {
+                            let mut result = vec![];
+                            for child in &arr.elems {
+                                if let syn::Expr::Reference(child_ref) = child {
+                                    if let syn::Expr::Path(command_name) = &*child_ref.expr {
+                                        result.push(
+                                            command_name
+                                                .path
+                                                .segments
+                                                .last()
+                                                .unwrap()
+                                                .ident
+                                                .to_string(),
+                                        );
+                                    } else {
+                                        return Err(anyhow!("unexpected child found"));
+                                    }
+                                } else {
+                                    return Err(anyhow!("unexpected child found"));
+                                }
+                            }
+                            return Ok(result);
+                        } else {
+                            return Err(anyhow!("unexpected child found"));
+                        }
+                    } else {
+                        return Err(anyhow!("unexpected child found"));
+                    }
+                }
+            }
+        }
+    }
+    Err(anyhow!("cannot extract children"))
+}
+
 #[cfg(test)]
 pub(crate) mod tests {
     use super::{EBI_COMMANDS, EbiCommand};
@@ -880,7 +1071,10 @@ pub(crate) mod tests {
     use ebi_objects::{EbiObject, ebi_arithmetic::Fraction};
     use itertools::Itertools;
     use std::{
-        collections::HashSet, fmt::Debug, fs::{self, File}, path::PathBuf
+        collections::HashSet,
+        fmt::Debug,
+        fs::{self, File},
+        path::PathBuf,
     };
 
     #[test]
@@ -920,15 +1114,23 @@ pub(crate) mod tests {
                 for child in children.iter() {
                     ebi_command_test(child);
                 }
-            },
-            EbiCommand::Command { cli_command, exact_arithmetic, input_types, execute, output_type, .. } => {
+            }
+            EbiCommand::Command {
+                cli_command,
+                exact_arithmetic,
+                input_types,
+                execute,
+                output_type,
+                ..
+            } => {
                 println!("Command: {}", command.long_name());
                 if cli_command.is_none() // only test commands that do not use the cli directly
                         && (*exact_arithmetic // do not test approximate commands in exact mode
                             || cfg!(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic")))
                 {
                     //for each input type, find all input combinations
-                    let inputss = crate::ebi_framework::ebi_command::tests::find_inputs(input_types);
+                    let inputss =
+                        crate::ebi_framework::ebi_command::tests::find_inputs(input_types);
                     if inputss.is_empty() && input_types.len() > 0 {
                         panic!("Could not find input to call command.");
                     }
@@ -938,18 +1140,23 @@ pub(crate) mod tests {
                         eprintln!("\t{:?}", inputs);
 
                         //we do not know whether a command should succeed (giving an error is fine in general), but no command should panic
-                        let output = (execute)(crate::ebi_framework::ebi_command::tests::transform(inputs), None);
-                        
+                        let output = (execute)(
+                            crate::ebi_framework::ebi_command::tests::transform(inputs),
+                            None,
+                        );
+
                         if let Ok(output) = output {
                             //verify that the output is of the correct type
                             assert_eq!(output.get_type(), output_type.to_owned().to_owned());
 
                             //verify that the activities test passes
-                            ebi_objects::ebi_activity_key::TestActivityKey::test_activity_key(&output);
-                        } 
+                            ebi_objects::ebi_activity_key::TestActivityKey::test_activity_key(
+                                &output,
+                            );
+                        }
                     }
                 }
-            },
+            }
         }
     }
 
@@ -1085,7 +1292,11 @@ pub(crate) mod tests {
                         //for now, we skip files with loops and livelocks, as the techniques cannot handle them yet
                         if !file.file_name().into_string().unwrap().contains("livelock")
                             && !file.file_name().into_string().unwrap().contains("infinite")
-                            && !file.file_name().into_string().unwrap().contains("unbounded")
+                            && !file
+                                .file_name()
+                                .into_string()
+                                .unwrap()
+                                .contains("unbounded")
                             && !file.file_name().into_string().unwrap().contains("loop")
                             && !file.file_name().into_string().unwrap().contains("pdc")
                             && !file

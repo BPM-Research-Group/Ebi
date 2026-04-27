@@ -42,6 +42,7 @@ use ebi_objects::{
     ebi_arithmetic::{Exporter, Fraction},
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
+        compressed_event_log_event_attributes::CompressedEventLogEventAttributes,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         deterministic_finite_automaton::DeterministicFiniteAutomaton,
         directly_follows_graph::DirectlyFollowsGraph, directly_follows_model::DirectlyFollowsModel,
@@ -246,6 +247,14 @@ impl EbiOutputType {
                 EbiExporter::Object(
                     &EbiObjectExporter::EventLog(
                         CompressedEventLogTraceAttributes::export_from_object,
+                    ),
+                    &EBI_COMPRESSED_EVENT_LOG,
+                )
+            }
+            EbiOutputType::ObjectType(EbiObjectType::EventLogEventAttributes) => {
+                EbiExporter::Object(
+                    &EbiObjectExporter::EventLogEventAttributes(
+                        CompressedEventLogEventAttributes::export_from_object,
                     ),
                     &EBI_COMPRESSED_EVENT_LOG,
                 )
@@ -485,6 +494,7 @@ pub enum EbiObjectExporter {
     BusinessProcessModelAndNotation(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLog(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogCsv(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
+    EventLogEventAttributes(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogOcel(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogTraceAttributes(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLogXes(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
@@ -527,6 +537,7 @@ impl EbiObjectExporter {
             }
             EbiObjectExporter::EventLog(_) => EbiObjectType::EventLog,
             EbiObjectExporter::EventLogCsv(_) => EbiObjectType::EventLogCsv,
+            EbiObjectExporter::EventLogEventAttributes(_) => EbiObjectType::EventLogEventAttributes,
             EbiObjectExporter::EventLogOcel(_) => EbiObjectType::EventLogOcel,
             EbiObjectExporter::EventLogPython(_) => EbiObjectType::EventLogPython,
             EbiObjectExporter::EventLogTraceAttributes(_) => EbiObjectType::EventLogTraceAttributes,
@@ -580,6 +591,7 @@ impl EbiObjectExporter {
                 }
                 EbiObjectExporter::EventLog(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogCsv(exporter) => (exporter)(object, f),
+                EbiObjectExporter::EventLogEventAttributes(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogOcel(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogPython(exporter) => (exporter)(object, f),
                 EbiObjectExporter::EventLogTraceAttributes(exporter) => (exporter)(object, f),
@@ -667,13 +679,13 @@ pub fn export_object(to_file: &PathBuf, object: EbiOutput, exporter: EbiExporter
         .with_context(|| format!("writing result to file {:?}", to_file));
 }
 
-pub fn export_to_string(object: EbiOutput, exporter: EbiExporter) -> Result<String> {
+pub fn export_to_string(object: EbiOutput, exporter: &EbiExporter) -> Result<String> {
     let mut f = vec![];
     exporter.export_from_object(object, &mut f)?;
     Ok(String::from_utf8(f)?)
 }
 
-pub fn export_to_bytes(object: EbiOutput, exporter: EbiExporter) -> Result<Vec<u8>> {
+pub fn export_to_bytes(object: EbiOutput, exporter: &EbiExporter) -> Result<Vec<u8>> {
     let mut f = vec![];
     exporter.export_from_object(object, &mut f)?;
     Ok(f)
@@ -812,8 +824,8 @@ mod tests {
                 println!("\toutput   {}", output);
                 println!("\texporter {}", exporter);
 
-                let _ = export_to_bytes(output.clone(), exporter.clone());
-                let _ = export_to_string(output.clone(), exporter.clone());
+                let _ = export_to_bytes(output.clone(), &exporter);
+                let _ = export_to_string(output.clone(), &exporter);
 
                 // let mut f = vec![];
                 // _ = exporter.export_from_object(output.clone(), &mut f);
