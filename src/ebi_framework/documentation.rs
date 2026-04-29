@@ -373,7 +373,7 @@ fn command_availability(
     //cli
     writeln!(
         f,
-        "<tr><td>Command-line interface</td><td>all parameters mentioned above are available</td></tr>"
+        "<tr><td>Command-line interface</td><td>available, with all parameters mentioned above</td></tr>"
     )?;
 
     //pm4py

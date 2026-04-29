@@ -154,8 +154,8 @@ pub const EBI_SAMPLE_FOLDS: EbiCommand = EbiCommand::Command {
     input_types: &[
         &[&EbiInputType::Object(EbiObjectType::EventLog)],
         &[&EbiInputType::Usize(Some(1), None, None)],
-        &[&EbiInputType::Usize(None, None, None)],
-        &[&EbiInputType::Usize(None, None, None)],
+        &[&EbiInputType::Usize(Some(0), None, None)],
+        &[&EbiInputType::Usize(Some(0), None, None)],
     ],
     input_names: &["LOG", "NUMBER_OF_FOLDS", "SEED", "RETURN_FOLD"],
     input_helps: &[

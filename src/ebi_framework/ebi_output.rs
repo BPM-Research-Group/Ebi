@@ -146,22 +146,22 @@ impl EbiOutputType {
      * Returns all exporters that can handle this output type
      */
     pub fn get_exporters(&self) -> Vec<EbiExporter> {
+        let mut result = BTreeSet::new();
         match self {
             EbiOutputType::ObjectType(etype) => {
-                let mut result = vec![];
                 for file_handler in EBI_FILE_HANDLERS {
                     for exporter in file_handler.object_exporters {
                         if &exporter.get_type() == etype {
-                            result.push(EbiExporter::Object(exporter, file_handler))
+                            result.insert(EbiExporter::Object(exporter, file_handler));
                         }
                     }
                     for exporter in file_handler.object_exporters_fallible {
                         if &exporter.get_type() == etype {
-                            result.push(EbiExporter::Object(exporter, file_handler))
+                            result.insert(EbiExporter::Object(exporter, file_handler));
                         }
                     }
                 }
-                result
+                result.into_iter().collect()
             }
             EbiOutputType::String => vec![EbiExporter::String],
             EbiOutputType::Usize => vec![EbiExporter::Usize],
