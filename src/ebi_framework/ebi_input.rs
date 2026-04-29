@@ -371,6 +371,43 @@ impl EbiInputType {
         result.into_iter().collect::<Vec<_>>()
     }
 
+    pub fn get_possible_input_extensions(input_types: &[&'static EbiInputType]) -> Vec<String> {
+        let mut result = BTreeSet::new();
+
+        for input_type in input_types {
+            match input_type {
+                EbiInputType::Trait(t) => {
+                    result.extend(
+                        t.get_file_handlers()
+                            .iter()
+                            .map(|fh| fh.file_extension.to_string()),
+                    );
+                }
+                EbiInputType::Object(o) => {
+                    result.extend(
+                        get_file_handlers(o)
+                            .iter()
+                            .map(|fh| fh.file_extension.to_string()),
+                    );
+                    result.extend(
+                        get_file_handlers_fallible(o)
+                            .iter()
+                            .map(|fh| fh.file_extension.to_string()),
+                    );
+                }
+                EbiInputType::AnyObject => {
+                    result.extend(
+                        EBI_FILE_HANDLERS
+                            .iter()
+                            .map(|fh| fh.file_extension.to_string()),
+                    );
+                }
+                _ => {}
+            }
+        }
+        result.into_iter().collect::<Vec<_>>()
+    }
+
     pub fn get_possible_inputs_with_html_short(input_types: &[&EbiInputType]) -> Vec<String> {
         let mut result = BTreeSet::new();
 
@@ -490,15 +527,15 @@ impl EbiInputType {
             .collect::<Vec<_>>()
     }
 
-    pub fn show_file_handlers_html_short(file_handlers: Vec<&'static EbiFileHandler>) -> Vec<String> {
+    pub fn show_file_handlers_html_short(
+        file_handlers: Vec<&'static EbiFileHandler>,
+    ) -> Vec<String> {
         file_handlers
             .iter()
             .map(|file_handler| {
                 format!(
                     "<a href=\"{}#{}\">.{}</a>",
-                    FILE_HANDLERS_PAGE,
-                    file_handler.file_extension,
-                    file_handler.file_extension
+                    FILE_HANDLERS_PAGE, file_handler.file_extension, file_handler.file_extension
                 )
             })
             .collect::<Vec<_>>()
@@ -533,7 +570,11 @@ impl Display for EbiInputType {
             }
             EbiInputType::String(None, _) => write!(f, "text"),
             EbiInputType::Usize(Some(min), Some(max), _) => {
-                write!(f, "integer between {} (inclusive) and {} (inclusive)", min, max)
+                write!(
+                    f,
+                    "integer between {} (inclusive) and {} (inclusive)",
+                    min, max
+                )
             }
             EbiInputType::Usize(None, Some(max), _) => {
                 write!(f, "integer below or equal to {}", max)
@@ -546,7 +587,11 @@ impl Display for EbiInputType {
             }
             EbiInputType::FileHandler => write!(f, "file"),
             EbiInputType::Fraction(Some(min), Some(max), _) => {
-                write!(f, "fraction between {} (inclusive) and {} (inclusive)", min, max)
+                write!(
+                    f,
+                    "fraction between {} (inclusive) and {} (inclusive)",
+                    min, max
+                )
             }
             EbiInputType::Fraction(None, Some(max), _) => {
                 write!(f, "fraction below or equal to {}", max)
@@ -1429,9 +1474,7 @@ pub fn attempt_parse(input_types: &[&'static EbiInputType], value: String) -> Re
                 }
             }
             EbiInputType::AnyObject => {
-                match read_as_any_object(&mut reader, None, 0)
-                    .context("Parsing as any object.")
-                {
+                match read_as_any_object(&mut reader, None, 0).context("Parsing as any object.") {
                     Ok((object, file_handler)) => {
                         return Ok(EbiInput::Object(object, file_handler));
                     }

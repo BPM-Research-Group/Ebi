@@ -190,9 +190,11 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
                             type=\"file\" 
                             id=\"{function_name}_input_{input_i}\" 
                             onchange=\"input_changed_file(event, '{function_name}', {input_i}, {number_of_inputs});\" 
-                            autocomplete=\"off\"/>
+                            autocomplete=\"off\"
+                            accept=\"{accept}\"/>
                         </td><td>{inputs_explanation}",
-                        inputs_explanation = EbiInputType::get_possible_inputs_with_html_short(input_types).join(", ")
+                        inputs_explanation = EbiInputType::get_possible_inputs_with_html_short(input_types).join(", "),
+                        accept = EbiInputType::get_possible_input_extensions(input_types).into_iter().map(|s| format!(".{s}")).join(",")
                     )?;
                 }
                 EbiInputType::FileHandler => {
