@@ -25,37 +25,47 @@ buildlatex:
     - git add build/nightly/manual.pdf
 
     #compile documentation
+    - wasm-pack build -d ./documentation/javascript --target web --features javascript
     - cargo run itself documentation home -o documentation/index.html
     - cargo run itself documentation commands -o documentation/commands.html
     - cargo run itself documentation file-handlers -o documentation/file_handlers.html
-    - mv documentation/index.html build/nightly/index.html
-    - mv documentation/commands.html build/nightly/commands.html
-    - mv documentation/file_handlers.html build/nightly/file_handlers.html
-    - git add build/nightly/index.html
-    - git add build/nightly/commands.html
-    - git add build/nightly/file_handlers.html
+    - mv -f documentation/javascript build/nightly/documentation/javascript
+    - mv -f documentation/index.html build/nightly/documentation/index.html
+    - mv -f documentation/commands.html build/nightly/documentation/commands.html
+    - mv -f documentation/file_handlers.html build/nightly/documentation/file_handlers.html
+    - git add build/nightly/documentation
 
-    #compile linux 64 bit
+    #compile CLI linux 64 bit
     - cargo build --target x86_64-unknown-linux-gnu --release
-    - mv target/x86_64-unknown-linux-gnu/release/ebi build/nightly/Ebi-x86_64-linux
-    - git add build/nightly/Ebi-x86_64-linux
-    - cd target/x86_64-unknown-linux-gnu/release
-    - mkdir -p lib
-    - mv libebi.so lib/ 
-    - zip ../../../build/prom-rust/Rust-6.15.3-lin64.zip lib/libebi.so
-    - cd ../../..
-    - git add build/prom-rust/Rust-6.15.3-lin64.zip
+    - mv -f target/x86_64-unknown-linux-gnu/release/ebi build/nightly/cli/Ebi-x86_64-linux
+    - git add build/nightly/cli/Ebi-x86_64-linux
 
-    #compile windows 64 bit
+    #compile CLI windows 64 bit
     - export PYO3_CROSS_PYTHON_VERSION="3.12"
     - cargo build --target x86_64-pc-windows-gnu --release
-    - mv target/x86_64-pc-windows-gnu/release/ebi.exe build/nightly/Ebi-x86_64-windows.exe
-    - git add build/nightly/Ebi-x86_64-windows.exe
-    - cd target/x86_64-pc-windows-gnu/release
-    - mkdir -p lib
-    - mv ebi.dll lib/ 
-    - zip ../../../build/prom-rust/Rust-6.15.3-win64.zip lib/ebi.dll
-    - cd ../../..
+    - mv -f target/x86_64-pc-windows-gnu/release/ebi.exe build/nightly/cli/Ebi-x86_64-windows.exe
+    - git add build/nightly/cli/Ebi-x86_64-windows.exe
+
+    #compile java linux 64 bit
+    - cargo build --target x86_64-unknown-linux-gnu --release --features java
+    - cp -f target/x86_64-unknown-linux-gnu/release/lib/libebi.so build/nightly/java/libebi.so
+    - git add build/nightly/java/libebi.so
+    
+    - mkdir -p target/x86_64-unknown-linux-gnu/release/lib
+    - mv -f target/x86_64-unknown-linux-gnu/release/lib/libebi.so target/x86_64-unknown-linux-gnu/release/lib/libebi.so
+    - (cd target/x86_64-unknown-linux-gnu/release/lib && zip -r ../Rust-6.15.3-lin64.zip .)
+    - mv target/x86_64-unknown-linux-gnu/release/Rust-6.15.3-lin64.zip build/prom-rust/Rust-6.15.3-lin64.zip
+    - git add build/prom-rust/Rust-6.15.3-lin64.zip
+
+    #compile java windows 64 bit
+    - cargo build --target x86_64-pc-windows-gnu --release --features java
+    - cp -f target/x86_64-pc-windows-gnu/release/lib/libebi.so build/nightly/java/libebi.so
+    - git add build/nightly/java/libebi.so
+    
+    - mkdir -p target/x86_64-pc-windows-gnu/release/lib
+    - mv -f target/x86_64-pc-windows-gnu/release/lib/ebi.dll target/x86_64-pc-windows-gnu/release/lib/ebi.dll
+    - (cd target/x86_64-pc-windows-gnu/release/lib && zip -r ../Rust-6.15.3-win64.zip .)
+    - mv target/x86_64-pc-windows-gnu/release/Rust-6.15.3-win64.zip build/prom-rust/Rust-6.15.3-win64.zip
     - git add build/prom-rust/Rust-6.15.3-win64.zip
 
     #write packages.xml
@@ -80,16 +90,11 @@ buildlatex:
     - printf "</packages>\n" >> build/prom-rust/packages.xml
     - git add build/prom-rust/packages.xml
 
-    #generate javascript
-    - wasm-pack build --features javascript
-    - mv pkg build/javascript
-    - git add build/javascript
-
     #push to git
     - git commit -m "Automatically triggered compilation [skip ci]"
     - git push -f https://ci_token:$ACCESS_TOKEN@git.rwth-aachen.de/rwth-bpm/rustlibrary HEAD:main
 
-    #generate Java code and push to ProM git
+    #generate Java-code-with-plugins and push to ProM git
     - git clone https://github.com/promworkbench/Ebi.git
     - cargo run --features java itself java -o Ebi/src/org/processmining/ebi/plugins/EbiPlugins.java
     - cd Ebi

@@ -2,7 +2,8 @@
 
 Ebi is a process mining software suite, maintained by the [BPM group](https://bpm.rwth-aachen.de) of RWTH Aachen University, Germany. 
 It contains several algorithms and techniques that perform analyses on event logs and process models.
-Ebi can be used as a command-line utility, as a Python package, as a Rust crate, or in ProM. 
+Ebi can be used as a command-line utility, from a browser and in ProM.
+Furthermore, Ebi can be called from Rust, Python, Java and Javascript. 
 
 Ebi provides process mining and stochastic process mining algorithms, and supports exact arithmetic for most of these algorithms.
 
@@ -14,9 +15,9 @@ Most commands of Ebi can be used directly from the browser on the [commands page
 
 This will run fully on your computer, is limited to 4GB of RAM, and does not upload files.
 
-## Use Ebi from the command line
+## Use Ebi as a command line utility
 
-1. Download Ebi for [Windows](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/Ebi-x86_64-windows.exe?ref_type=heads&inline=false) or for [Linux](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/Ebi-x86_64-linux?ref_type=heads&inline=false).
+1. Download Ebi CLI for [Windows](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/cli/Ebi-x86_64-windows.exe?ref_type=heads&inline=false) or for [Linux](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/cli/Ebi-x86_64-linux?ref_type=heads&inline=false).
 1. In Linux, give the file execution permissions.
 1. Open a command prompt and run the executable.
     Installation is not necessary, and Ebi does not require internet access.
@@ -26,7 +27,16 @@ Ebi runs on Mac OS X and many other platforms by self-compilation; please see be
 
 A good way to get started is to try `ebi info` followed by a file name, which will parse the file and print some information about it.
 
-## Use Ebi from Python
+## Use Ebi in ProM
+
+Ebi is also available in the [ProM framework](https://promtools.org) on Windows and Linux.
+In the ProM Package Manager, install Ebi. 
+Then, several Ebi commands can be used like any other ProM plug-in. 
+As Ebi is extremely flexible in its inputs and outputs, please ensure you choose the correct input and output plug-in (there are many). 
+
+The [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true) indicates which commands are available in ProM.
+
+## Call Ebi from Python
 
 Ebi can be used as a Python package, which integrates with [PM4Py](https://pypi.org/project/pm4py/).
 
@@ -56,7 +66,7 @@ The names of the Ebi functions can be found on the [commands page](https://leema
 Some PM4Py objects, such as event logs, are read directly by Ebi, but most are passed as strings.
 If Ebi returns an exact fraction, it is returned as an array consisting of 1) a floating-point approximation, 2) the full numerator, and 3) the full denominator.
 
-## Use Ebi from Rust
+## Call Ebi from Rust
 
 Ebi can be used as a Rust crate, available from [crates.io](https://crates.io/crates/ebi).
 
@@ -87,16 +97,33 @@ Ebi can be used as a Rust crate, available from [crates.io](https://crates.io/cr
             .earth_movers_stochastic_conformance(object2.as_mut())
             .unwrap();
         assert_eq!(emsc, Fraction::one());
-        
 
-## Use Ebi in ProM
+## Call Ebi from Java
 
-Ebi is also available in the [ProM framework](\url{https://promtools.org}) on Windows and Linux.
-In the ProM Package Manager, install Ebi. 
-Then, several Ebi commands can be used like any other ProM plug-in. 
-As Ebi is extremely flexible in its inputs and outputs, please ensure you choose the correct input and output plug-in (there are many). 
+To use Ebi from Java:
+1.  Download the Ebi library for [Windows](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/java/ebi.dll?ref_type=heads&inline=false) or [Linux](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/java/libebi.so?ref_type=heads&inline=false) and put it in a folder that is accessible to the Path of your program.
 
-The [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true) indicates which commands are available in ProM.
+1.  Add the following static declarations:
+
+        static native String call_ebi_internal(String command_name, String output_format, String[] inputs);
+        static {
+            try {
+                System.loadLibrary("ebi");
+                System.out.println("Ebi library loaded");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+1.  Then, Ebi can be called through the native function, for instance:
+
+        String log = Files.readString("log.xes", StandardCharsets.UTF_8);
+        String result = call_ebi_internal("Ebi analyse completeness", ".frac", new String[] {log});
+
+The [commands](https://leemans.ch/ebi/commands.php) page indicates the commands that can be called from Java.
+
+## Call Ebi from Javascript
+
+Ebi is available as an [NPM library](https://www.npmjs.com/package/ebi_pm).
 
 ## Getting started with development
 
@@ -111,3 +138,7 @@ Ebi is hosted on [Github](https://github.com/BPM-Research-Group/Ebi), and we wel
 1. To compile Ebi, give the command "cargo build --release". The binary is then placed in the project folder, in the "build/release" sub-folder.
 
 Information on the architecture of Ebi, including its sub-crates, can be found in the [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
+
+## License
+
+Ebi has a dual MIT and GPL license.

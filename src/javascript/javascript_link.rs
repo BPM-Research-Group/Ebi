@@ -1,3 +1,5 @@
+use std::path::PathBuf;
+
 use crate::ebi_framework::{
     ebi_command::EbiCommand,
     ebi_input::{EbiInput, attempt_parse},
@@ -50,6 +52,7 @@ pub(crate) fn execute_javascript_command(
     command: &EbiCommand,
     string_inputs: Vec<String>,
     command_name: &str,
+    exporter_file_extension: &str,
 ) {
     let (inputs, output_type) = match read_inputs(string_inputs, command)
         .with_context(|| anyhow!("Reading inputs."))
@@ -67,7 +70,10 @@ pub(crate) fn execute_javascript_command(
         Err(e) => return ebi_error(&print_error(e), command_name),
     };
 
-    let exporter = EbiCommand::select_exporter(output_type, None, None).unwrap();
+    let mut p = PathBuf::new();
+    p.set_file_name("file");
+    p.set_extension(exporter_file_extension);
+    let exporter = EbiCommand::select_exporter(output_type, Some(&p), None).unwrap();
     match ebi_output::export_to_string(result, &exporter) {
         Ok(string) => return ebi_output(&string, command_name, exporter.get_extension()),
         Err(e) => return ebi_error(&print_error(e), command_name),

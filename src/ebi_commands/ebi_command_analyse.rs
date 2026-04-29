@@ -235,7 +235,7 @@ If there are more than one such trace, an arbitrary one is returned."),
     exact_arithmetic: true, 
     input_types: &[ 
         &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)], 
-        &[ &EbiInputType::Usize(None, None, Some(1))],
+        &[ &EbiInputType::Usize(Some(1), None, Some(1))],
     ],
     input_names: &[ "FILE", "NUMBER_OF_TRACES"],
     input_helps: &[ "Any object with a finite stochastic language.", "The number of traces that should be extracted."],

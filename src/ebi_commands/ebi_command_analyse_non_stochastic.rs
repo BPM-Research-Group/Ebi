@@ -426,7 +426,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
-        &[&EbiInputType::Usize(None, None, Some(1))],
+        &[&EbiInputType::Usize(Some(1), None, Some(1))],
     ],
     input_names: &["FILE", "NUMBER_OF_TRACES"],
     input_helps: &[

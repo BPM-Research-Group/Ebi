@@ -5,11 +5,11 @@ edition = "2024"
 license = "MIT OR Apache-2.0"
 keywords = ["stochastic-processes", "process-mining", "business-processes"]
 categories = ["command-line-utilities"]
-description = "A stochastic process mining utility"
+description = "A stochastic process mining utility and library"
 homepage = "https://ebitools.org"
 repository = "https://github.com/BPM-Research-Group/Ebi"
 readme = "README.md"
-exclude = ["/testfiles", "/manual", ".github/", ".*"]
+exclude = ["/testfiles", "/manual", ".github/", ".*", "/documentation"]
 
 [lib]
 name = "ebi"

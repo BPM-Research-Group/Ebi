@@ -44,6 +44,11 @@ pub(crate) fn javascript_html_header() -> String {
                 input_changed(event, function_name, input_i, number_of_inputs, value);
             }}
 
+            function input_changed_combobox(event, function_name, input_i, number_of_inputs) {{
+                value = document.getElementById(function_name + \"_input_\" + input_i).value;
+                input_changed(event, function_name, input_i, number_of_inputs, value);
+            }}
+
             function input_changed_file(event, function_name, input_i, number_of_inputs) {{
                 //disable run button
                 document.getElementById(function_name + \"_button_run\").disabled = true;
@@ -60,10 +65,14 @@ pub(crate) fn javascript_html_header() -> String {
             }}
 
             function input_changed(event, function_name, input_i, number_of_inputs, value) {{
+                window[function_name + '_input_' + input_i + '_value'] = value;
+                inputs_complete(function_name, number_of_inputs);
+            }}
+
+            function inputs_complete(function_name, number_of_inputs) {{
                 document.getElementById(function_name + \"_output\").parentElement.style.display = \"none\";
                 document.getElementById(function_name + \"_error\").parentElement.style.display = \"none\";
                 URL.revokeObjectURL(window[function_name + '_output_url']);
-                window[function_name + '_input_' + input_i + '_value'] = value;
                 for (let i = 0; i < number_of_inputs; i++) {{
                     if (typeof window[function_name + '_input_' + i + '_value'] == \"undefined\" || window[function_name + '_input_' + i + '_value'] == \"\") {{
                         //input not defined, disable submission
@@ -73,6 +82,10 @@ pub(crate) fn javascript_html_header() -> String {
                 }}
                 //enable button
                 document.getElementById(function_name + \"_button_run\").disabled = false;
+            }}
+
+            function output_type_changed(event, function_name, number_of_inputs) {{
+                inputs_complete(function_name, number_of_inputs);
             }}
             
             function run_ebi(event, function_name, number_of_inputs) {{
@@ -88,12 +101,14 @@ pub(crate) fn javascript_html_header() -> String {
                     }}
                     inputs.push(window[function_name + '_input_' + i + '_value']);
                 }}
-                window[function_name](inputs);
+                //gather output
+                let output = document.getElementById(function_name + \"_output_type\").value;
+                window[function_name](inputs, output);
             }}
         </script>
         
         <script type=\"module\">
-            import init, {{ {function_list} }} from \"./pkg/ebi.js\"; 
+            import init, {{ {function_list} }} from \"./javascript/ebi.js\"; 
             {lifted_functions}
 
             window.ebi_error = function ebi_error(error, command_name) {{
@@ -143,13 +158,16 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
     if let EbiCommand::Command {
         input_types: input_typess,
         input_names,
+        output_type,
         ..
     } = path.last().unwrap()
         && path.last().unwrap().is_in_javascript()
     {
+        let mut default_init = String::new();
         let function_name = javascript_function_name(path);
         writeln!(f, "<div class=\"online-command\">")?;
         writeln!(f, "<table>")?;
+        let number_of_inputs = input_names.len();
 
         for (input_i, (input_name, input_types)) in input_names
             .iter()
@@ -158,43 +176,55 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
         {
             writeln!(f, "<tr><td>&lt;{input_name}&gt;</td><td>")?;
 
-            match input_types
+            let input_type = input_types
                 .iter()
                 .next()
-                .ok_or_else(|| anyhow!("empty input types"))?
+                .ok_or_else(|| anyhow!("empty input types"))?;
+            match input_type
             {
                 EbiInputType::Trait(_) | EbiInputType::Object(_) | EbiInputType::AnyObject => {
                     //file
                     writeln!(
                         f,
-                        "<input type=\"file\" id=\"{function_name}_input_{input_i}\" onchange=\"input_changed_file(event, '{function_name}', {input_i}, {});\" autocomplete=\"off\"/>",
-                        input_typess.len()
+                        "<input 
+                            type=\"file\" 
+                            id=\"{function_name}_input_{input_i}\" 
+                            onchange=\"input_changed_file(event, '{function_name}', {input_i}, {number_of_inputs});\" 
+                            autocomplete=\"off\"/>
+                        </td><td>{inputs_explanation}",
+                        inputs_explanation = EbiInputType::get_possible_inputs_with_html_short(input_types).join(", ")
                     )?;
                 }
                 EbiInputType::FileHandler => {
                     writeln!(f, "TODO")?;
                 }
-                EbiInputType::String(None, None) => {
+                EbiInputType::String(None, default) => {
                     //free text
                     writeln!(
                         f,
-                        "<input type=\"text\" id=\"{function_name}_input_{input_i}\" oninput=\"input_changed_text(event, '{function_name}', {input_i}, {});\" autocomplete=\"off\"/>",
-                        input_typess.len()
-                    )?;
-                }
-                EbiInputType::String(None, Some(default)) => {
-                    //free text with default
-                    writeln!(
-                        f,
-                        "<input type=\"text\" id=\"{function_name}_input_{input_i}\" oninput=\"input_changed_text(event, '{function_name}', {input_i}, {});\" autocomplete=\"off\" value=\"{default}\"/>",
-                        input_typess.len()
+                        "<input 
+                            type=\"text\" 
+                            id=\"{function_name}_input_{input_i}\" 
+                            oninput=\"input_changed_text(event, '{function_name}', {input_i}, {number_of_inputs});\" 
+                            {}
+                            autocomplete=\"off\"/>",
+                        if let Some(default) = default {
+                            default_init.push_str(&format!("<script type=\"text/javascript\">input_changed_text(event, '{function_name}', {input_i}, {number_of_inputs});</script>"));
+                            format!("value=\"{default}\"")
+                        } else {
+                            String::new()
+                        }
                     )?;
                 }
                 EbiInputType::String(Some(items), default) => {
                     //list of allowed items
                     writeln!(
                         f,
-                        "<select id=\"{function_name}_input_{input_i}\" oninput=\"input_changed_combobox(event, '{function_name}, {input_i}, {}');\">{}</select>",
+                        "<select 
+                            id=\"{function_name}_input_{input_i}\" 
+                            oninput=\"input_changed_combobox(event, '{function_name}', '{input_i}', '{}');\">
+                            {}
+                        </select>",
                         input_typess.len(),
                         items
                             .iter()
@@ -209,47 +239,98 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
                             })
                             .join(""),
                     )?;
+                    default_init.push_str(&format!("<script type=\"text/javascript\">input_changed_combobox(event, '{function_name}', '{input_i}', '{}');</script>", input_typess.len()));
                 }
                 EbiInputType::Usize(min, max, default) => {
                     //free number
+                    let mut has_default = false;
                     writeln!(
                         f,
-                        "<input type=\"number\" id=\"{function_name}_input_{input_i}\" oninput=\"input_changed_number(event, '{function_name}', {input_i}, {});\" autocomplete=\"off\" {} {} {}/>",
-                        input_typess.len(),
-                        if let Some(min) = min {
+                        "<input 
+                            type=\"number\" 
+                            id=\"{function_name}_input_{input_i}\" 
+                            oninput=\"input_changed_number(event, '{function_name}', {input_i}, {number_of_inputs});\" 
+                            autocomplete=\"off\" 
+                            {min} 
+                            {max} 
+                            {default} 
+                            placeholder=\"integer\"/></td><td>{input_type}",
+                        min = if let Some(min) = min {
                             format!("min = \"{min}\"")
                         } else {
                             String::new()
                         },
-                        if let Some(max) = max {
-                            format!("min = \"{max}\"")
+                        max = if let Some(max) = max {
+                            format!("max = \"{max}\"")
                         } else {
                             String::new()
                         },
-                        if let Some(default) = default {
-                            format!("min = \"{default}\"")
+                        default = if let Some(default) = default {
+                            has_default = true;
+                            format!("value = \"{default}\"")
+                        } else if let Some(min) = min {
+                            has_default = true;
+                            format!("value = \"{min}\"")
+                        } else if let Some(max) = max {
+                            has_default = true;
+                            format!("value = \"{max}\"")
                         } else {
                             String::new()
                         },
                     )?;
+                    if has_default {
+                        default_init.push_str(&format!("<script type=\"text/javascript\">input_changed_number(event, '{function_name}', {input_i}, {});</script>", input_typess.len()));
+                    }
                 }
                 EbiInputType::Fraction(_, _, def) => {
+                    let mut has_default = false;
                     writeln!(
                         f,
-                        "<input type=\"text\" id=\"{function_name}_input_{input_i}\" oninput=\"input_changed_fraction(event, '{function_name}', {input_i}, {});\" autocomplete=\"off\" {}>",
+                        "<input 
+                            type=\"text\" 
+                            id=\"{function_name}_input_{input_i}\" 
+                            oninput=\"input_changed_fraction(event, '{function_name}', {input_i}, {});\" 
+                            autocomplete=\"off\" 
+                            {} 
+                            placeholder=\"a/b or float\">
+                        </td><td>float or {input_type}.",
                         input_typess.len(),
                         if let Some(default) = def {
+                            has_default = true;
                             format!("value = \"{}\"", default)
                         } else {
                             String::new()
-                        }
+                        },
                     )?;
+                    if has_default {
+                        default_init.push_str(&format!("<script type=\"text/javascript\">input_changed_fraction(event, '{function_name}', {input_i}, {});</script>", input_typess.len()));
+                    }
                 }
             }
 
             writeln!(f, "</td></tr>")?;
         }
 
+        //output type selector
+        let default_exporter = output_type.get_default_exporter();
+        if output_type.get_exporters().len() > 1 {
+            writeln!(f, "<tr><td>&lt;OUTPUT&gt;</td><td colspan=\"2\"><select id=\"{function_name}_output_type\" onchange=\"output_type_changed(event, '{function_name}', {number_of_inputs})\">{outputs}</select></td></tr>",
+                number_of_inputs = input_names.len(),
+                outputs = output_type.get_exporters().iter().map(|exporter| {
+                    if exporter == &default_exporter {
+                        format!("<option value={} selected=\"selected\">{exporter}</option>", exporter.get_extension())
+                    } else {
+                        format!("<option value={}>{exporter}</option>", exporter.get_extension())
+                    }
+                }).join("")
+            )?;
+        } else {
+            writeln!(f, "<input type=\"hidden\" id=\"{function_name}_output_type\" value=\"{extension}\"/>",
+                extension = output_type.get_default_exporter().get_extension()
+            )?;
+        }
+
+        //submit button
         writeln!(
             f,
             "
@@ -263,6 +344,7 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
         </table>
         <div class=\"error\">Error:<br><pre id=\"{function_name}_error\"></pre></div>
         <div class=\"output\">Result: (<a href=\"\" id=\"{function_name}_download\">download</a>)<br><pre id=\"{function_name}_output\"></pre></div>
+        {default_init}
         </div>",
             input_typess.len()
         )?;

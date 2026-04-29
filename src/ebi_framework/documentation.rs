@@ -6,9 +6,11 @@ use crate::{
         ebi_input::{self, EbiInputType},
         ebi_output::{EbiExporter, EbiOutput, EbiOutputType},
     },
-    javascript::javascript_generator_html::{javascript_html_form, javascript_html_header},
+    javascript::javascript_generator_html::{
+        javascript_function_name, javascript_html_form, javascript_html_header,
+    },
     multiple_reader::MultipleReader,
-    python::python::{PYTHON_PACKAGE, pm4py_function_name},
+    python::python::pm4py_function_name,
     text::HTMLEscaper,
 };
 use clap::Command;
@@ -93,6 +95,10 @@ fn menu_0(f: &mut Vec<u8>) -> Result<()> {
     )?;
     writeln!(f, "<a href=\"https://crates.io/crates/ebi\">crates.io</a>")?;
     writeln!(f, "<a href=\"https://pypi.org/project/ebi-pm/\">PyPI</a>")?;
+    writeln!(
+        f,
+        "<a href=\"https://www.npmjs.com/package/ebi_pm\">NPM</a>"
+    )?;
     writeln!(
         f,
         "<a href=\"javascript:void(0);\" class=\"expand\" onclick=\"myFunction0()\">...</a>"
@@ -327,10 +333,10 @@ fn commands(f: &mut Vec<u8>) -> Result<()> {
 
             //run online
             if path.last().unwrap().is_in_javascript() {
-                writeln!(f, "<h2>Run</h2>")?;
+                writeln!(f, "<h2>Run online</h2>")?;
                 writeln!(
                     f,
-                    "This command can be run in the browser. 
+                    "This command can be run here, in the browser. 
                     All files remain on your computer, and are not uploaded. 
                     There is a limit of 4GB of RAM.
                     <p>"
@@ -347,20 +353,80 @@ fn commands(f: &mut Vec<u8>) -> Result<()> {
             command_exact_arithmetic(f, *exact_arithmetic)?;
             writeln!(f, "</table>")?;
 
-            //pm4py
-            if path.last().unwrap().is_in_python() {
-                writeln!(
-                    f,
-                    "<div>This command is available in the {} Python package using the function <span class=\"texttt\">{}</span>.</div>",
-                    PYTHON_PACKAGE,
-                    pm4py_function_name(&path).escape_html()
-                )?;
-            }
+            //availability
+            command_availability(f, &path, input_names)?;
 
             writeln!(f, "</div>")?;
         }
     }
     writeln!(f, "</div>")?;
+    Ok(())
+}
+
+fn command_availability(
+    f: &mut Vec<u8>,
+    path: &Vec<&EbiCommand>,
+    input_names: &[&str],
+) -> Result<()> {
+    writeln!(f, "<h2>Availability</h2><table>")?;
+
+    //cli
+    writeln!(
+        f,
+        "<tr><td>Command-line interface</td><td>all parameters mentioned above are available</td></tr>"
+    )?;
+
+    //pm4py
+    writeln!(
+        f,
+        "<tr><td>PM4Py/Python/PyPI</td><td>{}</td></tr>",
+        if path.last().unwrap().is_in_python() {
+            format!(
+                "function <span class=\"texttt\">{}</span>({})",
+                pm4py_function_name(&path).escape_html(),
+                input_names
+                    .iter()
+                    .map(|s| format!("&lt;{s}&gt;"))
+                    .join(", ")
+            )
+        } else {
+            "not available".to_string()
+        }
+    )?;
+
+    //javascript
+    writeln!(
+        f,
+        "<tr><td>Javascript/online/NPM</td><td>{}</td></tr>",
+        if path.last().unwrap().is_in_javascript() {
+            format!(
+                "function <span class=\"texttt\">{}</span>({}, output_file_extension)",
+                javascript_function_name(&path).escape_html(),
+                input_names
+                    .iter()
+                    .map(|s| format!("&lt;{s}&gt; as a string"))
+                    .join(", ")
+            )
+        } else {
+            "not available".to_string()
+        }
+    )?;
+
+    //java
+    writeln!(
+        f,
+        "<tr><td>Java</td><td>{}</td></tr>",
+        if path.last().unwrap().is_in_java() {
+            format!(
+                "function <span class=\"texttt\">call_ebi_internal</span>(\"{}\", String output_format, String[] inputs);",
+                EbiCommand::path_to_string(&path)
+            )
+        } else {
+            "not available".to_string()
+        }
+    )?;
+
+    writeln!(f, "</table>")?;
     Ok(())
 }
 

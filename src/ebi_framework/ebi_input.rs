@@ -202,10 +202,10 @@ impl EbiInputType {
                 EbiInputType::Fraction(None, Some(max), _) => {
                     result.insert(format!("fraction below {}", max));
                 }
-                EbiInputType::Fraction(Some(min), _, _) => {
+                EbiInputType::Fraction(Some(min), None, _) => {
                     result.insert(format!("fraction above {}", min));
                 }
-                EbiInputType::Fraction(_, _, _) => {
+                EbiInputType::Fraction(None, None, _) => {
                     result.insert("fraction".to_string());
                 }
             };
@@ -371,6 +371,83 @@ impl EbiInputType {
         result.into_iter().collect::<Vec<_>>()
     }
 
+    pub fn get_possible_inputs_with_html_short(input_types: &[&EbiInputType]) -> Vec<String> {
+        let mut result = BTreeSet::new();
+
+        for input_type in input_types {
+            match input_type {
+                EbiInputType::Trait(t) => {
+                    result.extend(Self::show_file_handlers_html_short(t.get_file_handlers()));
+                }
+                EbiInputType::Object(o) => {
+                    result.extend(Self::show_file_handlers_html_short(get_file_handlers(o)));
+                    result.extend(
+                        Self::show_file_handlers_html_short(get_file_handlers_fallible(o))
+                            .into_iter()
+                            .map(|mut s| {
+                                s += "<span title=\"This file type is converted on import, and this conversion may fail.\">*</span>";
+                                s
+                            }),
+                    );
+                }
+                EbiInputType::AnyObject => {
+                    result.extend(Self::show_file_handlers_html_short(
+                        EBI_FILE_HANDLERS.iter().collect(),
+                    ));
+                }
+                EbiInputType::String(Some(allowed_values), _) => {
+                    result.extend(allowed_values.iter().map(|x| format!("`{}`", x)));
+                }
+                EbiInputType::String(None, _) => {
+                    result.insert("text".to_string());
+                }
+                EbiInputType::Usize(Some(min), Some(max), _) => {
+                    result.insert(format!("integer between {} and {}", min, max));
+                }
+                EbiInputType::Usize(None, Some(max), _) => {
+                    result.insert(format!("integer below {}", max));
+                }
+                EbiInputType::Usize(Some(min), _, _) => {
+                    result.insert(format!("integer above {}", min));
+                }
+                EbiInputType::Usize(_, _, _) => {
+                    result.insert("integer".to_string());
+                }
+                EbiInputType::FileHandler => {
+                    let extensions: Vec<String> = EBI_FILE_HANDLERS
+                        .iter()
+                        .filter_map(|file_type| {
+                            if file_type.validator.is_some() {
+                                Some(file_type.file_extension.to_string())
+                            } else {
+                                None
+                            }
+                        })
+                        .collect();
+                    result.insert(
+                        "the file extension of any file type supported by Ebi (".to_owned()
+                            + extensions.join_with(", ", " or ").as_str()
+                            + ")",
+                    );
+                }
+                EbiInputType::Fraction(Some(min), Some(max), _) => {
+                    result.insert(format!("fraction between {} and {}", min, max));
+                }
+                EbiInputType::Fraction(None, Some(max), _) => {
+                    result.insert(format!("fraction below {}", max));
+                }
+                EbiInputType::Fraction(Some(min), _, _) => {
+                    result.insert(format!("fraction above {}", min));
+                }
+                EbiInputType::Fraction(_, _, _) => {
+                    result.insert("fraction".to_string());
+                }
+            };
+        }
+
+        result.into_iter().collect::<Vec<_>>()
+    }
+
     pub fn possible_inputs_as_strings_with_articles(
         traits: &[&EbiInputType],
         last_connector: &str,
@@ -413,6 +490,20 @@ impl EbiInputType {
             .collect::<Vec<_>>()
     }
 
+    pub fn show_file_handlers_html_short(file_handlers: Vec<&'static EbiFileHandler>) -> Vec<String> {
+        file_handlers
+            .iter()
+            .map(|file_handler| {
+                format!(
+                    "<a href=\"{}#{}\">.{}</a>",
+                    FILE_HANDLERS_PAGE,
+                    file_handler.file_extension,
+                    file_handler.file_extension
+                )
+            })
+            .collect::<Vec<_>>()
+    }
+
     pub fn get_applicable_commands(&self) -> BTreeSet<Vec<&'static EbiCommand>> {
         let mut result = EBI_COMMANDS.get_command_paths();
         result.retain(|path| {
@@ -442,28 +533,28 @@ impl Display for EbiInputType {
             }
             EbiInputType::String(None, _) => write!(f, "text"),
             EbiInputType::Usize(Some(min), Some(max), _) => {
-                write!(f, "integer between {} and {}", min, max)
+                write!(f, "integer between {} (inclusive) and {} (inclusive)", min, max)
             }
             EbiInputType::Usize(None, Some(max), _) => {
-                write!(f, "integer below {}", max)
+                write!(f, "integer below or equal to {}", max)
             }
-            EbiInputType::Usize(Some(min), _, _) => {
-                write!(f, "integer above {}", min)
+            EbiInputType::Usize(Some(min), None, _) => {
+                write!(f, "integer equal to or above {}", min)
             }
-            EbiInputType::Usize(_, _, _) => {
+            EbiInputType::Usize(None, None, _) => {
                 write!(f, "integer")
             }
             EbiInputType::FileHandler => write!(f, "file"),
             EbiInputType::Fraction(Some(min), Some(max), _) => {
-                write!(f, "fraction between {} and {}", min, max)
+                write!(f, "fraction between {} (inclusive) and {} (inclusive)", min, max)
             }
             EbiInputType::Fraction(None, Some(max), _) => {
-                write!(f, "fraction below {}", max)
+                write!(f, "fraction below or equal to {}", max)
             }
-            EbiInputType::Fraction(Some(min), _, _) => {
-                write!(f, "fraction above {}", min)
+            EbiInputType::Fraction(Some(min), None, _) => {
+                write!(f, "fraction equal to or above {}", min)
             }
-            EbiInputType::Fraction(_, _, _) => {
+            EbiInputType::Fraction(None, None, _) => {
                 write!(f, "fraction")
             }
         }

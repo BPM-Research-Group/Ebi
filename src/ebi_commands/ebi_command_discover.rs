@@ -68,7 +68,7 @@ pub const EBI_DISCOVER_ALIGNMENTS_BPMN: EbiCommand = EbiCommand::Command {
             EbiObjectType::BusinessProcessModelAndNotation,
         )],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["SLANG", "BPMN"],
     input_helps: &[
         "A finite stochastic language (log) to get the occurrences from.",
         "A business process model and notation with the control flow.",
@@ -106,7 +106,7 @@ pub const EBI_DISCOVER_ALIGNMENTS_SLPN: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["SLANG", "LPN"],
     input_helps: &[
         "A finite stochastic language (log) to get the occurrences from.",
         "A labelled Petri net with the control flow.",
@@ -142,7 +142,7 @@ pub const EBI_DISCOVER_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
             Some(ConstFraction::one()),
         )],
     ],
-    input_names: &["LANG", "MIN_FITNESS"],
+    input_names: &["SLANG", "MIN_FITNESS"],
     input_helps: &[
         "A finite stochastic language.",
         "The minimum fraction of traces that should fit the resulting model.",
@@ -198,7 +198,7 @@ pub const EBI_DISCOVER_OCCURRENCE_SBPMN: EbiCommand = EbiCommand::Command {
             EbiObjectType::BusinessProcessModelAndNotation,
         )],
     ],
-    input_names: &["LANG", "BPMN"],
+    input_names: &["SLANG", "BPMN"],
     input_helps: &[
         "A finite stochastic language (log) to get the occurrences from.",
         "A business process model and notation model with the control flow.",
@@ -233,7 +233,7 @@ pub const EBI_DISCOVER_OCCURRENCE_SLPN: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["SLANG", "LPN"],
     input_helps: &[
         "A finite stochastic language (log) to get the occurrences from.",
         "A labelled Petri net with the control flow.",
@@ -262,7 +262,7 @@ pub const EBI_DISCOVER_OCCURRENCE_SPTREE: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Object(EbiObjectType::ProcessTree)],
     ],
-    input_names: &["LANG", "TREE"],
+    input_names: &["SLANG", "TREE"],
     input_helps: &[
         "A finite stochastic language (log) to get the occurrences from.",
         "A process tree with the control flow.",
