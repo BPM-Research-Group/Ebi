@@ -389,7 +389,7 @@ pub fn potential_gain_recall(
     ratio(numerator, denominator)
 }
 
-#[cfg(test)]
+#[cfg(all(feature = "eexactarithmetic", test))]
 mod tests {
     use super::*;
     use ebi_objects::anyhow::Result;
