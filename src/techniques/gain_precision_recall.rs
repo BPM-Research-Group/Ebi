@@ -1,57 +1,77 @@
-use std::ops::Neg;
-
-use ebi_objects::{
-    anyhow::{anyhow, Result},
-    ebi_arithmetic::{f, Fraction, One, Signed, Zero},
-    traits::trace_iterators::IntoRefTraceProbabilityIterator,
-    FiniteStochasticLanguage,
-    StochasticDeterministicFiniteAutomaton,  
+use crate::ebi_traits::{
+    ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
 };
- use crate::ebi_traits::{
-        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-    };
 use crate::follower_semantics::FollowerSemantics;
 use crate::math::log_div::LogDiv;
+use ebi_objects::ebi_arithmetic::ConstFraction;
+use ebi_objects::{
+    StochasticDeterministicFiniteAutomaton,
+    anyhow::{Result, anyhow},
+    ebi_arithmetic::{Fraction, One, Signed, Zero, f},
+};
+use std::ops::Neg;
 
+pub const DEFAULT_LAMBDA: ConstFraction = ConstFraction::of(1, 1_000_000);
 
-/// Default lambda = 1e-6.
-pub fn default_lambda() -> Fraction {
-    f!(1i64, 1_000_000i64)
+pub trait PotentialGainRecallPrecision {
+    /// Recall(L, M, λ) = Numerator(L, M, λ) / H(L, λ)
+    fn potential_gain_recall(
+        &self,
+        slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+        lambda: &Fraction,
+    ) -> Result<Fraction>;
+
+    /// Precision(L, M, λ) = Numerator(L, M, λ) / H(M, λ)
+    fn potential_gain_precision(
+        &self,
+        slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+        lambda: &Fraction,
+    ) -> Result<Fraction>;
 }
 
-/// A simple list of lambda values for tests.
-pub fn lambda_sweep_defaults() -> Vec<Fraction> {
-    vec![
-        Fraction::zero(),       // lambda = 0 (original)
-        f!(1i64, 1_000_000i64), // 1e-6 (default)
-        f!(1i64, 10_000i64),    // 1e-4
-        f!(1i64, 100i64),       // 1e-2
-    ]
+impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
+    fn potential_gain_recall(
+        &self,
+        slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+        lambda: &Fraction,
+    ) -> Result<Fraction> {
+        is_valid_sdfa(&self)?;
+
+        let numerator = gain_numerator_lambda(slang, self, lambda)?;
+        let denominator = entropy_eventlog_with_lambda(slang, lambda)?;
+
+        ratio(numerator, denominator)
+    }
+
+    fn potential_gain_precision(
+        &self,
+        slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+        lambda: &Fraction,
+    ) -> Result<Fraction> {
+        is_valid_sdfa(&self)?;
+
+        let numerator = gain_numerator_lambda(&slang, self, lambda)?;
+        let denominator = entropy_sdfa_with_lambda(&self, lambda)?;
+
+        ratio(numerator, denominator)
+    }
 }
 
 /// Check whether lambda is in [0, 1].
 fn check_lambda(lambda: &Fraction) -> Result<()> {
     if lambda.is_negative() || *lambda > Fraction::one() {
-        return Err(anyhow!("lambda must be in [0, 1], got {}", lambda));
+        return Err(anyhow!("Lambda must be in [0, 1], but is {}.", lambda));
     }
     Ok(())
-}
-
-/// Resolve the smoothing parameter.
-/// If `lambda` is `None`, the default value is used.
-fn resolve_lambda_checked(lambda: Option<&Fraction>) -> Result<Fraction> {
-    let resolved = lambda.cloned().unwrap_or_else(default_lambda);
-    check_lambda(&resolved)?;
-    Ok(resolved)
 }
 
 /// Check whether the SDFA is a valid stochastic model.
 ///
 /// Rules:
-/// 1. It can have no initial state.
-/// 2. For each state, outgoing probabilities plus termination probability sum to 1.
-/// 3. Each transition probability is strictly positive.
-/// 4. At least one state has a non-zero termination probability.
+/// 1. For each state, outgoing probabilities plus termination probability sum to 1.
+/// 2. Each transition probability is strictly positive.
+/// 3. At least one state has a non-zero termination probability.
 pub fn is_valid_sdfa(sdfa: &StochasticDeterministicFiniteAutomaton) -> Result<()> {
     if sdfa.get_initial_state().is_none() {
         return Ok(());
@@ -72,9 +92,7 @@ pub fn is_valid_sdfa(sdfa: &StochasticDeterministicFiniteAutomaton) -> Result<()
 
         if !total_probability.is_one() {
             return Err(anyhow!(
-                "invalid probability sum at state {}: total = {} (expected 1)",
-                state,
-                total_probability
+                "Invalid probability sum at state {state}: total = {total_probability} (expected 1)."
             ));
         }
     }
@@ -82,18 +100,15 @@ pub fn is_valid_sdfa(sdfa: &StochasticDeterministicFiniteAutomaton) -> Result<()
     for (index, probability) in sdfa.get_probabilities().iter().enumerate() {
         if probability.is_zero() || probability.is_negative() {
             return Err(anyhow!(
-                "invalid transition probability at index {}: {} (must be > 0)",
-                index,
-                probability
+                "Invalid transition probability at index {index}: {probability} (must be > 0)."
             ));
         }
     }
 
-    let has_terminating_state =
-        (0..state_count).any(|state| !sdfa.get_termination_probability(state).is_zero());
-
-    if !has_terminating_state {
-        return Err(anyhow!("no terminating state found (model may livelock)"));
+    if !(0..state_count).any(|state| !sdfa.get_termination_probability(state).is_zero()) {
+        return Err(anyhow!(
+            "No terminating state found (model can only livelock)."
+        ));
     }
 
     Ok(())
@@ -106,13 +121,16 @@ fn entropy_term(p: &Fraction) -> LogDiv {
         LogDiv::zero()
     } else {
         let term = LogDiv::n_log_n(p).unwrap();
-        - term
+        -term
     }
 }
 
 /// Entropy of the event log with lambda.
 /// If lambda = 0, this becomes the normal entropy.
-pub fn entropy_eventlog_with_lambda(fsl: FiniteStochasticLanguage, lambda: &Fraction) -> Result<LogDiv> {
+fn entropy_eventlog_with_lambda(
+    fsl: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+    lambda: &Fraction,
+) -> Result<LogDiv> {
     check_lambda(lambda)?;
 
     if lambda.is_zero() {
@@ -135,14 +153,11 @@ pub fn entropy_eventlog_with_lambda(fsl: FiniteStochasticLanguage, lambda: &Frac
     Ok(entropy)
 }
 
-/// A wrapper for normal entropy (lambda = 0).
-pub fn entropy_eventlog(fsl: FiniteStochasticLanguage) -> Result<LogDiv> {
-    entropy_eventlog_with_lambda(fsl, &Fraction::zero())
-        
-}
-
 fn log_div_min(left: &LogDiv, right: &LogDiv) -> LogDiv {
-    debug_assert!(left.partial_cmp(right).is_some(), "incomparable LogDiv values");
+    debug_assert!(
+        left.partial_cmp(right).is_some(),
+        "incomparable LogDiv values"
+    );
 
     if left <= right {
         left.clone()
@@ -154,9 +169,9 @@ fn log_div_min(left: &LogDiv, right: &LogDiv) -> LogDiv {
 /// Gain numerator with lambda.
 /// Only traces that exist in both the event log and the model are counted.
 /// For each trace, use min(-pL log pL, -pM log pM).
-pub fn gain_numerator_lambda(
-    fsl: FiniteStochasticLanguage,
-    sdfa: StochasticDeterministicFiniteAutomaton,
+fn gain_numerator_lambda(
+    fsl: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+    sdfa: &StochasticDeterministicFiniteAutomaton,
     lambda: &Fraction,
 ) -> Result<LogDiv> {
     check_lambda(lambda)?;
@@ -175,10 +190,8 @@ pub fn gain_numerator_lambda(
             let model_entropy = entropy_term(&model_probability);
             numerator += log_div_min(&log_entropy, &model_entropy);
         } else {
-            let log_main_entropy =
-                entropy_term(&(log_probability * &one_minus_lambda));
-            let model_main_entropy =
-                entropy_term(&(&model_probability * &one_minus_lambda));
+            let log_main_entropy = entropy_term(&(log_probability * &one_minus_lambda));
+            let model_main_entropy = entropy_term(&(&model_probability * &one_minus_lambda));
             numerator += log_div_min(&log_main_entropy, &model_main_entropy);
 
             let log_tail_entropy = entropy_term(&(log_probability * lambda));
@@ -191,17 +204,9 @@ pub fn gain_numerator_lambda(
     Ok(numerator)
 }
 
-/// Wrapper for the normal numerator (lambda = 0).
-pub fn gain_numerator(
-    fsl: FiniteStochasticLanguage,
-    sdfa: StochasticDeterministicFiniteAutomaton,
-) -> Result<LogDiv> {
-    gain_numerator_lambda(fsl, sdfa, &Fraction::zero())
-}
-
 /// Compute c_s by fixed-point iteration.
 /// c[s] is the expected number of visits to state s.
-pub fn c_s_iterative(
+fn c_s_iterative(
     sdfa: &StochasticDeterministicFiniteAutomaton,
     epsilon: Fraction,
     max_iterations: usize,
@@ -253,7 +258,7 @@ pub fn c_s_iterative(
     Ok(state_visits)
 }
 
-pub fn c_s(sdfa: &StochasticDeterministicFiniteAutomaton) -> Result<Vec<Fraction>> {
+fn c_s(sdfa: &StochasticDeterministicFiniteAutomaton) -> Result<Vec<Fraction>> {
     let epsilon = f!(1i64, 1_000_000_000_000i64);
     let max_iterations = 20_000;
     c_s_iterative(sdfa, epsilon, max_iterations)
@@ -261,7 +266,7 @@ pub fn c_s(sdfa: &StochasticDeterministicFiniteAutomaton) -> Result<Vec<Fraction
 
 /// Entropy of the SDFA with lambda.
 /// Note: this code applies lambda on termination only.
-pub fn entropy_sdfa_with_lambda(
+fn entropy_sdfa_with_lambda(
     sdfa: &StochasticDeterministicFiniteAutomaton,
     lambda: &Fraction,
 ) -> Result<LogDiv> {
@@ -342,11 +347,6 @@ pub fn entropy_sdfa_with_lambda(
     Ok(transition_entropy + termination_entropy + lambda_step_entropy)
 }
 
-/// Wrapper for normal model entropy (lambda = 0).
-pub fn entropy_sdfa(sdfa: &StochasticDeterministicFiniteAutomaton) -> Result<LogDiv> {
-    entropy_sdfa_with_lambda(sdfa, &Fraction::zero())
-}
-
 /// ratio = numerator / denominator
 fn ratio(num: LogDiv, denom: LogDiv) -> Result<Fraction> {
     let numerator = num.approximate();
@@ -359,46 +359,23 @@ fn ratio(num: LogDiv, denom: LogDiv) -> Result<Fraction> {
     Ok(numerator / denominator)
 }
 
-/// Precision(L, M, λ) = Numerator(L, M, λ) / H(M, λ)
-pub fn potential_gain_precision(
-    fsl: FiniteStochasticLanguage,
-    sdfa: StochasticDeterministicFiniteAutomaton,
-    lambda: Option<&Fraction>,
-) -> Result<Fraction> {
-    let resolved_lambda = resolve_lambda_checked(lambda)?;
-    is_valid_sdfa(&sdfa)?;
-
-    let denominator = entropy_sdfa_with_lambda(&sdfa, &resolved_lambda)?;
-    let numerator = gain_numerator_lambda(fsl, sdfa, &resolved_lambda)?;
-
-    ratio(numerator, denominator)
-}
-
-/// Recall(L, M, λ) = Numerator(L, M, λ) / H(L, λ)
-pub fn potential_gain_recall(
-    fsl: FiniteStochasticLanguage,
-    sdfa: StochasticDeterministicFiniteAutomaton,
-    lambda: Option<&Fraction>,
-) -> Result<Fraction> {
-    let resolved_lambda = resolve_lambda_checked(lambda)?;
-    is_valid_sdfa(&sdfa)?;
-
-    let numerator = gain_numerator_lambda(fsl.clone(), sdfa, &resolved_lambda)?;
-    let denominator = entropy_eventlog_with_lambda(fsl, &resolved_lambda)?;
-
-    ratio(numerator, denominator)
-}
-
-#[cfg(all(not(feature = "eexactarithmetic"), test))]
+#[cfg(all(
+    not(feature = "exactarithmetic"),
+    feature = "approximatearithmetic",
+    test
+))]
 mod tests {
     use super::*;
     use ebi_objects::anyhow::Result;
-    use ebi_objects::EventLog;
+    use ebi_objects::ebi_arithmetic::f0;
+    use ebi_objects::{EventLog, FiniteStochasticLanguage};
+    use std::fs;
+
     mod sdfa_fig_c {
         use super::*;
+        use ebi_objects::StochasticDeterministicFiniteAutomaton;
         use ebi_objects::anyhow::Result;
         use ebi_objects::ebi_arithmetic::f;
-        use ebi_objects::StochasticDeterministicFiniteAutomaton;
 
         /// Figure (c): 2-state SDFA with a self-loop.
         pub fn build_fig_c_loop() -> Result<StochasticDeterministicFiniteAutomaton> {
@@ -417,12 +394,11 @@ mod tests {
 
     #[test]
     fn test_entropy_eventlog() -> Result<()> {
-        ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-
-        let xes_fig_a = include_str!("../../testfiles/fig_a.xes");
-        let log: EventLog = xes_fig_a.parse()?;
-        let fsl = FiniteStochasticLanguage::from(log);
-        let entropy = entropy_eventlog(fsl)?;
+        let fin = fs::read_to_string("testfiles/fig_a.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+        let slang: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(FiniteStochasticLanguage::from(log));
+        let entropy = entropy_eventlog_with_lambda(&slang, &f0!())?;
         println!("entropy ≈ {:.12}", entropy.approximate());
 
         Ok(())
@@ -430,8 +406,6 @@ mod tests {
 
     #[test]
     fn test_entropy_sdfa() -> Result<()> {
-        ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-
         let sdfa = sdfa_fig_c::build_fig_c_loop()?;
         let state_visits = c_s(&sdfa)?;
 
@@ -449,15 +423,14 @@ mod tests {
 
     #[test]
     fn test_gain_numerator() -> Result<()> {
-        ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-
-        let xes_fig_a = include_str!("../../testfiles/fig_a.xes");
-        let log: EventLog = xes_fig_a.parse()?;
-        let fsl = FiniteStochasticLanguage::from(log);
+        let fin = fs::read_to_string("testfiles/fig_a.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+        let fsl: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(FiniteStochasticLanguage::from(log));
         let sdfa = sdfa_fig_c::build_fig_c_loop()?;
         let lambda = Fraction::zero();
 
-        let numerator = gain_numerator_lambda(fsl, sdfa, &lambda)?;
+        let numerator = gain_numerator_lambda(&fsl, &sdfa, &lambda)?;
         println!("Gain Numerator ≈ {:.12}", numerator.approximate());
 
         Ok(())
@@ -465,16 +438,16 @@ mod tests {
 
     #[test]
     fn test_gain() -> Result<()> {
-        ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-        let xes_fig_a = include_str!("../../testfiles/fig_a.xes");
-        let log: EventLog = xes_fig_a.parse()?;
-        let fsl = FiniteStochasticLanguage::from(log);
+        let fin = fs::read_to_string("testfiles/fig_a.xes").unwrap();
+        let log = fin.parse::<EventLog>().unwrap();
+        let fsl: Box<dyn EbiTraitFiniteStochasticLanguage> =
+            Box::new(FiniteStochasticLanguage::from(log));
         let sdfa = sdfa_fig_c::build_fig_c_loop()?;
 
         let lambda: Fraction = f!(1i64, 1_000_000i64);
 
-        let precision = potential_gain_precision(fsl.clone(), sdfa.clone(), Some(&lambda))?;
-        let recall = potential_gain_recall(fsl.clone(), sdfa.clone() , Some(&lambda))?;
+        let precision = sdfa.potential_gain_precision(&fsl, &lambda)?;
+        let recall = sdfa.potential_gain_recall(&fsl, &lambda)?;
 
         println!("precision(L_e, S_e) ≈ {}", precision);
         println!("recall   (L_e, S_e) ≈ {}", recall);
@@ -482,10 +455,9 @@ mod tests {
         Ok(())
     }
 
-        #[test]
+    #[test]
     fn test_entropy_sdfa_without_initial_state() -> Result<()> {
         use ebi_objects::ebi_arithmetic::Zero;
-        ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
 
         let mut sdfa = sdfa_fig_c::build_fig_c_loop()?;
         sdfa.set_initial_state(None);
@@ -497,11 +469,9 @@ mod tests {
             assert!(value.is_zero());
         }
 
-        let entropy = entropy_sdfa(&sdfa)?;
+        let entropy = entropy_sdfa_with_lambda(&sdfa, &f0!())?;
         assert!(entropy.is_zero());
 
         Ok(())
     }
-
 }
-
