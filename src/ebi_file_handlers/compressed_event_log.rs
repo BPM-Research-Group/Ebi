@@ -9,11 +9,12 @@ use crate::ebi_framework::{
         ImportAsStochasticNondeterministicFiniteAutomatonObject,
     },
     trait_importers::{
-        ImportAsActivitiesTrait, ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait,
-        ImportAsFiniteLanguageTrait, ImportAsFiniteStochasticLanguageTrait,
-        ImportAsIterableLanguageTrait, ImportAsIterableStochasticLanguageTrait,
-        ImportAsQueriableStochasticLanguageTrait, ImportAsSemanticsTrait,
-        ImportAsStochasticDeterministicSemanticsTrait, ImportAsStochasticSemanticsTrait,
+        ImportAsActivitiesTrait, ImportAsEventLogEventAttributesTrait,
+        ImportAsEventLogTraceAttributesTrait, ImportAsEventLogTrait, ImportAsFiniteLanguageTrait,
+        ImportAsFiniteStochasticLanguageTrait, ImportAsIterableLanguageTrait,
+        ImportAsIterableStochasticLanguageTrait, ImportAsQueriableStochasticLanguageTrait,
+        ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait,
+        ImportAsStochasticSemanticsTrait,
     },
     validate::Validate,
 };
@@ -21,6 +22,7 @@ use ebi_objects::{
     CompressedEventLogXes, Exportable, Importable,
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
+        compressed_event_log_event_attributes::CompressedEventLogEventAttributes,
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
     },
 };
@@ -61,6 +63,10 @@ pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
             CompressedEventLog::import_as_event_log_trait,
             CompressedEventLog::IMPORTER_PARAMETERS,
         ),
+        EbiTraitImporter::EventLogEventAttributes(
+            CompressedEventLogEventAttributes::import_as_event_log_event_attributes_trait,
+            CompressedEventLogEventAttributes::IMPORTER_PARAMETERS,
+        ),
         EbiTraitImporter::EventLogTraceAttributes(
             CompressedEventLogTraceAttributes::import_as_event_log_trace_attributes_trait,
             CompressedEventLogTraceAttributes::IMPORTER_PARAMETERS,
@@ -82,6 +88,10 @@ pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
         EbiObjectImporter::EventLog(
             CompressedEventLog::import_as_object,
             CompressedEventLog::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::EventLogEventAttributes(
+            CompressedEventLogEventAttributes::import_as_object,
+            CompressedEventLogEventAttributes::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::EventLogTraceAttributes(
             CompressedEventLogTraceAttributes::import_as_object,

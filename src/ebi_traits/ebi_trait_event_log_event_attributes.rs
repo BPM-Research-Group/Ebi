@@ -10,7 +10,7 @@ use ebi_objects::{
     Activity, Attribute, EventLogCsv, EventLogOcel, EventLogPython, EventLogXes,
     anyhow::{Result, anyhow},
     attribute_key::has_attribute_key::HasAttributeKey,
-    ebi_objects::event_log_event_attributes::EventLogEventAttributes,
+    ebi_objects::{compressed_event_log_event_attributes::CompressedEventLogEventAttributes, event_log_event_attributes::EventLogEventAttributes},
     traits::{
         event_attribute_iterators::IntoEventAttributeIterator, event_attributes::EventAttributes,
     },
@@ -59,6 +59,12 @@ impl EbiTraitEventLogEventAttributes for EventLogEventAttributes {
         >,
     ) {
         self.retain_traces_event_attributes_mut(&mut f);
+    }
+}
+
+impl ToEventLogEventAttributesTrait for CompressedEventLogEventAttributes {
+    fn to_event_log_event_attributes_trait(self) -> Box<dyn EbiTraitEventLogEventAttributes> {
+        Box::new(self.log)
     }
 }
 
