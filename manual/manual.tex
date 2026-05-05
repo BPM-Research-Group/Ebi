@@ -504,6 +504,19 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
 				Add your new command here, while maintaining the alphabetical order.
 			\end{enumerate}
 
+        \subsection{Code structure}
+            Ebi is divided over several Rust crates:
+            \begin{itemize}
+                \item Ebi is the main crate, and contains the commands, techniques, CLI, and links with other programming languages.
+                Furthermore, in this crate the framework can be found, that is, the enum declarations of commands, file handlers and traits.
+                \item Ebi\_objects contains all code for objects, including input, output and conversions between objects.
+                \item Ebi\_bpmn contains the code for stochastic and non-stochastic BPMN models: parser, exporter and semantics.
+                \item Ebi\_activity\_key contains the code for activity keys, which de-duplicate strings.
+                \item Ebi\_arithmetic contains math-based code, such as fractions.
+                \item Ebi\_optimisation contains optimisers.
+                \item Ebi\_derive contains derivation macros.
+            \end{itemize}
+
         \subsection{Tests}
         \label{sec:tests}
             Ebi automatically tests each command, importer, exporter, graphable and infoable, if a corresponding test file is provided in the \verb=testfiles= folder.

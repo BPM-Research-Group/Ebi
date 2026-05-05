@@ -238,8 +238,6 @@ pub mod techniques {
     pub mod unit_earth_movers_stochastic_conformance;
 }
 pub mod follower_semantics;
-pub mod json;
-pub mod line_reader;
 pub mod multiple_reader;
 pub mod tests;
 pub mod text;
