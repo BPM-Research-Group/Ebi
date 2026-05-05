@@ -8,6 +8,7 @@ use ebi_objects::{
     },
 };
 use std::{
+    cmp::Ordering,
     fmt::Display,
     io::Write,
     ops::{Add, AddAssign, DivAssign, MulAssign, Sub, SubAssign},
@@ -104,6 +105,14 @@ impl One for LogDivF64 {
     }
 }
 
+impl Neg for LogDivF64 {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        LogDivF64::zero() - self
+    }
+}
+
 impl From<FractionF64> for LogDivF64 {
     fn from(value: FractionF64) -> Self {
         Self(value)
@@ -187,6 +196,12 @@ impl DivAssign<FractionF64> for LogDivF64 {
 impl DivAssign<&FractionF64> for LogDivF64 {
     fn div_assign(&mut self, rhs: &FractionF64) {
         self.mul_assign(rhs.recip())
+    }
+}
+
+impl PartialOrd for LogDivF64 {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        self.0.partial_cmp(&other.0)
     }
 }
 

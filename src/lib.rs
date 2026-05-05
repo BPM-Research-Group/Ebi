@@ -212,6 +212,7 @@ pub mod techniques {
     pub mod filter;
     pub mod fitness;
     pub mod flower_miner;
+    pub mod gain_precision_recall;
     pub mod hellinger_stochastic_conformance;
     pub mod infinitely_many_traces;
     pub mod jensen_shannon_stochastic_conformance;
