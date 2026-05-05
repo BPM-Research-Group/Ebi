@@ -11,7 +11,7 @@ use std::{
     cmp::Ordering,
     fmt::Display,
     io::Write,
-    ops::{Add, AddAssign, DivAssign, MulAssign, Sub, SubAssign},
+    ops::{Add, AddAssign, DivAssign, MulAssign, Neg, Sub, SubAssign},
 };
 
 #[derive(Clone, PartialEq, Eq)]
