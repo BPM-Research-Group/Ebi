@@ -4,15 +4,15 @@ use crate::ebi_traits::{
 };
 use crate::follower_semantics::FollowerSemantics;
 use crate::math::log_div::LogDiv;
-use ebi_objects::ebi_arithmetic::ConstFraction;
+use crate::techniques::entropy::{Entropy, number_of_average_visits_per_state};
+use ebi_objects::ebi_arithmetic::{ConstFraction, OneMinus};
 use ebi_objects::{
     StochasticDeterministicFiniteAutomaton,
     anyhow::{Result, anyhow},
-    ebi_arithmetic::{Fraction, One, Signed, Zero, f},
+    ebi_arithmetic::{Fraction, One, Signed, Zero},
 };
-use std::ops::Neg;
 
-pub const DEFAULT_LAMBDA: ConstFraction = ConstFraction::of(1, 1_000_000);
+pub const DEFAULT_LAMBDA_HIGHER_THAN_ZERO: ConstFraction = ConstFraction::of(1, 1_000_000);
 
 pub trait PotentialGainRecallPrecision {
     /// Recall(L, M, λ) = Numerator(L, M, λ) / H(L, λ)
@@ -131,17 +131,10 @@ fn entropy_eventlog_with_lambda(
     fsl: &Box<dyn EbiTraitFiniteStochasticLanguage>,
     lambda: &Fraction,
 ) -> Result<LogDiv> {
-    check_lambda(lambda)?;
-
     if lambda.is_zero() {
-        let mut entropy = LogDiv::zero();
-
-        for (_, probability) in fsl.iter_traces_probabilities() {
-            entropy += entropy_term(probability);
-        }
-
-        return Ok(entropy);
+        return fsl.entropy_approximate();
     }
+    
     let one_minus_lambda = &Fraction::one() - lambda;
     let mut entropy = LogDiv::zero();
 
@@ -204,66 +197,6 @@ fn gain_numerator_lambda(
     Ok(numerator)
 }
 
-/// Compute c_s by fixed-point iteration.
-/// c[s] is the expected number of visits to state s.
-fn c_s_iterative(
-    sdfa: &StochasticDeterministicFiniteAutomaton,
-    epsilon: Fraction,
-    max_iterations: usize,
-) -> Result<Vec<Fraction>> {
-    let state_count = sdfa.number_of_states();
-    let Some(initial_state) = sdfa.get_initial_state() else {
-        return Ok(vec![Fraction::zero(); state_count]);
-    };
-
-    let mut state_visits = vec![Fraction::zero(); state_count];
-    let mut next_state_visits = vec![Fraction::zero(); state_count];
-
-    for _ in 0..max_iterations {
-        for value in &mut next_state_visits {
-            *value = Fraction::zero();
-        }
-
-        for (index, &source) in sdfa.get_sources().iter().enumerate() {
-            let target = sdfa.get_targets()[index];
-            let probability = &sdfa.get_probabilities()[index];
-
-            if !probability.is_zero() {
-                next_state_visits[target] += &state_visits[source] * probability;
-            }
-        }
-
-        next_state_visits[initial_state] += Fraction::one();
-
-        let mut max_diff = Fraction::zero();
-        for state in 0..state_count {
-            let mut diff = &next_state_visits[state] - &state_visits[state];
-
-            if diff.is_negative() {
-                diff = diff.neg();
-            }
-
-            if diff > max_diff {
-                max_diff = diff;
-            }
-        }
-
-        std::mem::swap(&mut state_visits, &mut next_state_visits);
-
-        if max_diff < epsilon {
-            break;
-        }
-    }
-
-    Ok(state_visits)
-}
-
-fn c_s(sdfa: &StochasticDeterministicFiniteAutomaton) -> Result<Vec<Fraction>> {
-    let epsilon = f!(1i64, 1_000_000_000_000i64);
-    let max_iterations = 20_000;
-    c_s_iterative(sdfa, epsilon, max_iterations)
-}
-
 /// Entropy of the SDFA with lambda.
 /// Note: this code applies lambda on termination only.
 fn entropy_sdfa_with_lambda(
@@ -274,39 +207,12 @@ fn entropy_sdfa_with_lambda(
     is_valid_sdfa(sdfa)?;
 
     if lambda.is_zero() {
-        let state_count = sdfa.number_of_states();
-        let state_visits = c_s(sdfa)?;
-
-        let mut termination_entropy = LogDiv::zero();
-        for state in 0..state_count {
-            let termination_probability = sdfa.get_termination_probability(state);
-            if termination_probability.is_zero() {
-                continue;
-            }
-
-            let mut entropy = entropy_term(termination_probability);
-            entropy *= &state_visits[state];
-            termination_entropy += entropy;
-        }
-
-        let mut transition_entropy = LogDiv::zero();
-        for (index, &source) in sdfa.get_sources().iter().enumerate() {
-            let probability = &sdfa.get_probabilities()[index];
-            if probability.is_zero() {
-                continue;
-            }
-
-            let mut entropy = entropy_term(probability);
-            entropy *= &state_visits[source];
-            transition_entropy += entropy;
-        }
-
-        return Ok(transition_entropy + termination_entropy);
+        return sdfa.entropy_approximate();
     }
 
     let state_count = sdfa.number_of_states();
-    let state_visits = c_s(sdfa)?;
-    let one_minus_lambda = Fraction::one() - lambda.clone();
+    let state_visits = number_of_average_visits_per_state(sdfa)?;
+    let one_minus_lambda = lambda.one_minus();
 
     let mut transition_entropy = LogDiv::zero();
     for (index, &source) in sdfa.get_sources().iter().enumerate() {
@@ -367,7 +273,7 @@ fn ratio(num: LogDiv, denom: LogDiv) -> Result<Fraction> {
 mod tests {
     use super::*;
     use ebi_objects::anyhow::Result;
-    use ebi_objects::ebi_arithmetic::f0;
+    use ebi_objects::ebi_arithmetic::{f, f0};
     use ebi_objects::{EventLog, FiniteStochasticLanguage};
     use std::fs;
 
@@ -407,7 +313,7 @@ mod tests {
     #[test]
     fn test_entropy_sdfa() -> Result<()> {
         let sdfa = sdfa_fig_c::build_fig_c_loop()?;
-        let state_visits = c_s(&sdfa)?;
+        let state_visits = number_of_average_visits_per_state(&sdfa)?;
 
         for (state, value) in state_visits.iter().enumerate() {
             println!("state {}: {}", state, value);
@@ -464,7 +370,7 @@ mod tests {
 
         assert!(sdfa.get_initial_state().is_none());
 
-        let state_visits = c_s(&sdfa)?;
+        let state_visits = number_of_average_visits_per_state(&sdfa)?;
         for value in &state_visits {
             assert!(value.is_zero());
         }

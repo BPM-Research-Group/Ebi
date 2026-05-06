@@ -1,5 +1,5 @@
-use ebi_objects::{anyhow::Context,DirectlyFollowsGraph, EbiObject, EbiObjectType, ebi_arithmetic::{ConstFraction, Fraction, Zero}};
-use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, ebi_trait_object::EbiTraitObject}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, techniques::{completeness::Completeness, edge_difference::EdgeDifference, medoid, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}, tests::test_ebi_command};
+use ebi_objects::{DirectlyFollowsGraph, EbiObject, EbiObjectType, anyhow::{Context, anyhow}, ebi_arithmetic::{ConstFraction, Fraction, Zero}};
+use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, ebi_trait_object::EbiTraitObject}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, techniques::{completeness::Completeness, edge_difference::EdgeDifference, entropy::Entropy, medoid, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}, tests::test_ebi_command};
 
 pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
     name_short: "ana",
@@ -11,6 +11,7 @@ pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
         &EBI_ANALYSE_COMPLETENESS,
         &EBI_ANALYSE_COVERAGE,
         &EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE,
+        &EBI_ANALYSE_ENTROPY,
         &EBI_ANALYSE_MEDOID,
         &EBI_ANALYSE_MINPROB,
         &EBI_ANALYSE_MODE,
@@ -126,9 +127,38 @@ pub const EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE: EbiCommand = EbiCommand:
         
         let difference = dfg1.edge_difference(&mut dfg2);
 
-        return Ok(EbiOutput::Fraction(difference));
+        Ok(EbiOutput::Fraction(difference))
     }, 
     output_type: &EbiOutputType::Fraction
+};
+
+pub const EBI_ANALYSE_ENTROPY: EbiCommand = EbiCommand::Command {
+    name_short: "en",
+    name_long: Some("entropy"),
+    explanation_short: "Computes the entropy of the object.",
+    explanation_long: None,
+    latex_link: Some("\\cite{DBLP:journals/is/LeemansP23}"),
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[
+        &[
+            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), 
+            &EbiInputType::Object(EbiObjectType::StochasticDeterministicFiniteAutomaton)
+        ]
+    ],
+    input_names: &["STOCH"],
+    input_helps: &["The object"],
+    execute: |mut objects, _| {
+        let result = match objects.remove(0) {
+            EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => 
+                slang.entropy_approximate()?,
+            EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => 
+                sdfa.entropy_approximate()?,
+            _ => return Err(anyhow!("Input not supported."))
+        };
+        Ok(EbiOutput::LogDiv(result))
+    },
+    output_type: &EbiOutputType::LogDiv,
 };
 
 pub const EBI_ANALYSE_MINPROB: EbiCommand = EbiCommand::Command {

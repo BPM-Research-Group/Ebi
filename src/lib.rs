@@ -206,6 +206,7 @@ pub mod techniques {
     pub mod earth_movers_stochastic_conformance_f64;
     pub mod edge_difference;
     pub mod entropic_relevance;
+    pub mod entropy;
     pub mod escaping_edges_precision;
     pub mod executions;
     pub mod explain_trace;
