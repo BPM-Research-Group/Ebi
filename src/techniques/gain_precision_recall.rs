@@ -4,7 +4,7 @@ use crate::ebi_traits::{
 };
 use crate::follower_semantics::FollowerSemantics;
 use crate::math::log_div::LogDiv;
-use crate::techniques::entropy::{Entropy, number_of_average_visits_per_state};
+use crate::techniques::entropy::{Entropy, number_of_average_visits_per_state_approximate};
 use ebi_objects::ebi_arithmetic::{ConstFraction, OneMinus};
 use ebi_objects::{
     StochasticDeterministicFiniteAutomaton,
@@ -211,7 +211,7 @@ fn entropy_sdfa_with_lambda(
     }
 
     let state_count = sdfa.number_of_states();
-    let state_visits = number_of_average_visits_per_state(sdfa)?;
+    let state_visits = number_of_average_visits_per_state_approximate(sdfa)?;
     let one_minus_lambda = lambda.one_minus();
 
     let mut transition_entropy = LogDiv::zero();
@@ -313,7 +313,7 @@ mod tests {
     #[test]
     fn test_entropy_sdfa() -> Result<()> {
         let sdfa = sdfa_fig_c::build_fig_c_loop()?;
-        let state_visits = number_of_average_visits_per_state(&sdfa)?;
+        let state_visits = number_of_average_visits_per_state_approximate(&sdfa)?;
 
         for (state, value) in state_visits.iter().enumerate() {
             println!("state {}: {}", state, value);
@@ -370,7 +370,7 @@ mod tests {
 
         assert!(sdfa.get_initial_state().is_none());
 
-        let state_visits = number_of_average_visits_per_state(&sdfa)?;
+        let state_visits = number_of_average_visits_per_state_approximate(&sdfa)?;
         for value in &state_visits {
             assert!(value.is_zero());
         }
