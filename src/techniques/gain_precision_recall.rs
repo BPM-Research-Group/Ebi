@@ -212,7 +212,7 @@ fn entropy_sdfa_with_lambda(
 
     let state_count = sdfa.number_of_states();
     let state_visits = number_of_average_visits_per_state_approximate(sdfa)?;
-    let one_minus_lambda = lambda.one_minus();
+    let one_minus_lambda = lambda.clone().one_minus();
 
     let mut transition_entropy = LogDiv::zero();
     for (index, &source) in sdfa.get_sources().iter().enumerate() {

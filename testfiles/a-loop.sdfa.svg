@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg width="132.5" height="167.501" viewBox="0 0 132.5 167.501" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="startarrow" markerWidth="10" markerHeight="7"
+refX="0" refY="3.5" orient="auto">
+<polygon points="10 0, 10 7, 0 3.5" fill="context-stroke" />
+</marker>
+<marker id="endarrow" markerWidth="10" markerHeight="7"
+refX="10" refY="3.5" orient="auto">
+<polygon points="0 0, 10 3.5, 0 7" fill="context-stroke" />
+</marker>
+
+</defs><style>
+.a15 { font-size: 15px; font-family: Times, serif; }
+</style>
+<g >
+
+            <ellipse cx="62.5" cy="97.501" rx="32.5" ry="32.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="62.5" y="82.501" class="a15"><tspan x = "62.5" dy="1.0em">2/3</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="62.5" y="2.5" class="a15"><tspan x = "62.5" dy="1.0em">a, 1/3</tspan></text><g >
+
+            <path id="arrow0" d="M 79.72481072007224 69.94095835167 C 95.62463600013893 44.5009199070577, 87.0599615553877 1.6001747199333085, 112.5 17.5 S 95.62463600013893 44.5009199070577, 79.72481072007224 69.94095835167 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow0" startOffset="50%" text-anchor="middle" class="a15"></textPath></text></svg>

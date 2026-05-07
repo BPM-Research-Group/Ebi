@@ -78,16 +78,13 @@ impl Entropy for StochasticDeterministicFiniteAutomaton {
 pub fn number_of_average_visits_per_state_approximate(
     sdfa: &StochasticDeterministicFiniteAutomaton,
 ) -> Result<Vec<Fraction>> {
-    if is_exact_globally() {
-        return Err(anyhow!(
-            "Number of average visits per state is only available in approximate mode."
-        ));
-    }
     let epsilon = f!(1, 1_000_000_000_000u64);
     let max_iterations = 20_000;
     c_s_iterative(sdfa, &epsilon, max_iterations)
 }
 
+/// Returns how often each state is visited on average on an arbitrary run.
+/// If a state is part of a livelock, returns None for that state (even if it is unreachable).
 pub fn number_of_average_visits_per_state_exact(
     sdfa: &StochasticDeterministicFiniteAutomaton,
 ) -> Result<Vec<Option<Fraction>>> {
@@ -105,7 +102,7 @@ pub fn number_of_average_visits_per_state_exact(
     {
         let mut livelock_cache = sdfa.get_livelock_cache();
         for state in 0..sdfa.number_of_states() {
-            if livelock_cache.is_state_part_of_livelock(&state)? {
+            if !livelock_cache.is_state_part_of_livelock(&state)? {
                 let transient_state = transient_state_2_state.len();
                 transient_state_2_state.push(state);
                 state_2_transient_state[state] = Some(transient_state);
@@ -115,7 +112,8 @@ pub fn number_of_average_visits_per_state_exact(
 
     //verify that the initial state is transient
     if state_2_transient_state[initial_state].is_none() {
-        // the initial state is recurring, so we will visit every reachable state infinitely often.
+        // The initial state is recurring, so we will visit every reachable state infinitely often.
+        // It is up to the caller to figure out whether a state is reachable, should that be of interest.
         return Ok(vec![None; sdfa.number_of_states()]);
     }
 
@@ -125,25 +123,31 @@ pub fn number_of_average_visits_per_state_exact(
     for (source, (target, probability)) in sdfa
         .sources
         .iter()
-        .zip(sdfa.targets.iter().zip(sdfa.probabilities))
+        .zip(sdfa.targets.iter().zip(sdfa.probabilities.iter()))
     {
         if let (Some(source_transient), Some(target_transient)) = (
             state_2_transient_state[*source],
             state_2_transient_state[*target],
         ) {
             //add transition
-            matrix.set(source_transient, target_transient, probability);
+            matrix.set(source_transient, target_transient, probability.clone());
         }
     }
 
+    //compute inverse(I - matrix)
     matrix.identity_minus();
     matrix = matrix
         .invert()
-        .with_context(|| anyhow!("Cannot compute (I - PT)^-1."))?;
+        .with_context(|| anyhow!("Cannot compute inversion of (I - PT)."))?;
 
-    matrix[initial_state, ]
+    //read result
+    // It is up to the caller to figure out whether a recurrent state is reachable, should that be of interest.
+    let mut result = vec![None; sdfa.number_of_states()];
+    for (transient_state, state) in transient_state_2_state.iter().enumerate() {
+        result[*state] = matrix.get(initial_state, transient_state);
+    }
 
-    Ok(())
+    Ok(result)
 }
 
 /// Compute c_s by fixed-point iteration.
@@ -198,4 +202,54 @@ fn c_s_iterative(
     }
 
     Ok(state_visits)
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::techniques::entropy::{c_s_iterative, number_of_average_visits_per_state_exact};
+    use ebi_objects::{
+        StochasticDeterministicFiniteAutomaton,
+        anyhow::Result,
+        ebi_arithmetic::{Fraction, f},
+    };
+    use std::fs;
+
+    fn compute_approx(
+        sdfa: &StochasticDeterministicFiniteAutomaton,
+    ) -> Result<Vec<Option<Fraction>>> {
+        let epsilon = f!(1, 1_000_000_000_000u64);
+        let max_iterations = 20_000;
+        Ok(c_s_iterative(sdfa, &epsilon, max_iterations)?
+            .into_iter()
+            .map(|x| Some(x))
+            .collect())
+    }
+
+    #[test]
+    fn number_of_average_visits_per_state() {
+        let fin = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
+        let sdfa = fin
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
+
+        let approx = compute_approx(&sdfa).unwrap();
+        let exact = number_of_average_visits_per_state_exact(&sdfa).unwrap();
+        assert_eq!(approx, exact);
+        println!("approx {:?}", approx);
+        println!("exact  {:?}", exact);
+    }
+
+    #[test]
+    fn number_of_average_visits_per_state_livelock() {
+        let fin = fs::read_to_string("testfiles/a-livelock.sdfa").unwrap();
+        let sdfa = fin
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
+
+        let approx = compute_approx(&sdfa).unwrap();
+        let exact = number_of_average_visits_per_state_exact(&sdfa).unwrap();
+        // assert_eq!(approx, exact);
+        println!("approx {:?}", approx);
+        println!("exact  {:?}", exact);
+    }
 }
