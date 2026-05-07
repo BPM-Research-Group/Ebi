@@ -127,7 +127,8 @@ Ebi is available as an [NPM library](https://www.npmjs.com/package/ebi_pm).
 
 ## Getting started with development
 
-Ebi is hosted on [Github](https://github.com/BPM-Research-Group/Ebi), and we welcome pull requests there.
+Ebi is hosted on [Github](https://github.com/BPM-Research-Group/Ebi).
+To get started with development, or to compile for Mac OS X:
 
 1. Install [Rustup](https://www.rust-lang.org/tools/install)
 1. Log out and in again
@@ -138,6 +139,10 @@ Ebi is hosted on [Github](https://github.com/BPM-Research-Group/Ebi), and we wel
 1. To compile Ebi, give the command "cargo build --release". The binary is then placed in the project folder, in the "build/release" sub-folder.
 
 Information on the architecture of Ebi, including its sub-crates, can be found in the [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
+
+We welcome pull requests on [Github](https://github.com/BPM-Research-Group/Ebi).
+Before opening a pull request, please ensure that the test batch file test.sh finishes without errors (on Windows, rename it to .bat and remove the first three lines).
+This file may take up to an hour to run, depending on your machine.
 
 ## License
 

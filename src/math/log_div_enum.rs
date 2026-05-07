@@ -18,6 +18,7 @@ use ebi_objects::{
     },
 };
 use std::{
+    cmp::Ordering,
     fmt::Display,
     io::Write,
     mem,
@@ -289,6 +290,47 @@ impl PartialEq for LogDivEnum {
 
 impl Eq for LogDivEnum {}
 
+impl PartialOrd for LogDivEnum {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        match (self, other) {
+            // exact vs exact
+            (Self::Exact((l_ab, l_den)), Self::Exact((r_ab, r_den))) => {
+                if self == other {
+                    return Some(Ordering::Equal);
+                }
+
+                // same logarithm argument: compare denominators inversely
+                if l_ab == r_ab {
+                    return Some(r_den.cmp(l_den));
+                }
+
+                // same denominator: compare logarithm arguments directly
+                if l_den == r_den {
+                    return l_ab.partial_cmp(r_ab);
+                }
+
+                // general case:
+                // compare log(l_ab)/l_den  vs  log(r_ab)/r_den
+                // equivalent to comparing l_ab^r_den vs r_ab^l_den
+                let left = LogDivEnum::power_f_u(l_ab, r_den);
+                let right = LogDivEnum::power_f_u(r_ab, l_den);
+
+                left.partial_cmp(&right)
+            }
+
+            // approx vs approx
+            (Self::Approx(l), Self::Approx(r)) => l.partial_cmp(r),
+
+            // mixed / invalid cases
+            (Self::CannotCombineExactAndApprox, _)
+            | (_, Self::CannotCombineExactAndApprox) => None,
+
+            (Self::Exact(_), Self::Approx(_))
+            | (Self::Approx(_), Self::Exact(_)) => None,
+        }
+    }
+}
+
 impl TryFrom<FractionEnum> for LogDivEnum {
     type Error = Error;
 
@@ -395,6 +437,14 @@ impl SubAssign for LogDivEnum {
                 _ => {}
             }
         }
+    }
+}
+
+impl Neg for LogDivEnum {
+    type Output = Self;
+
+    fn neg(self) -> Self::Output {
+        LogDivEnum::zero() - self
     }
 }
 

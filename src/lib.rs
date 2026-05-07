@@ -206,12 +206,14 @@ pub mod techniques {
     pub mod earth_movers_stochastic_conformance_f64;
     pub mod edge_difference;
     pub mod entropic_relevance;
+    pub mod entropy;
     pub mod escaping_edges_precision;
     pub mod executions;
     pub mod explain_trace;
     pub mod filter;
     pub mod fitness;
     pub mod flower_miner;
+    pub mod gain_precision_recall;
     pub mod hellinger_stochastic_conformance;
     pub mod infinitely_many_traces;
     pub mod jensen_shannon_stochastic_conformance;
