@@ -108,7 +108,7 @@ pub(crate) fn javascript_html_header() -> String {
         </script>
         
         <script type=\"module\">
-            import init, {{ {function_list} }} from \"./javascript/ebi.js\"; 
+            import init, {{ {function_list} }} from \"./javascript/ebi.php\"; 
             {lifted_functions}
 
             window.ebi_error = function ebi_error(error, command_name) {{
