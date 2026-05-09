@@ -34,6 +34,7 @@ impl ExportableToPM4Py for EbiOutput {
             EbiOutput::Object(_)
             | EbiOutput::String(_)
             | EbiOutput::LogDiv(_)
+            | EbiOutput::LogPolynomial(_)
             | EbiOutput::ContainsRoot(_)
             | EbiOutput::RootLogDiv(_) => {
                 let exporter =
