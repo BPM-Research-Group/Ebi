@@ -1,38 +1,32 @@
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    math::log_div::LogDiv, techniques::livelock::IsPartOfLivelock,
+    techniques::livelock::IsPartOfLivelock,
 };
 use ebi_objects::{
     StochasticDeterministicFiniteAutomaton,
     anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{
-        EbiMatrix, Fraction, FractionMatrix, IdentityMinus, Inversion, One, Signed, Zero, f,
-        is_exact_globally,
+        EbiMatrix, Fraction, FractionMatrix, IdentityMinus, Inversion, Log, One, Signed, Zero, f,
     },
 };
+use ebi_optimisation::ebi_arithmetic::log_polynomial::log_polynomial::LogPolynomial;
 use std::ops::Neg;
 
 pub trait Entropy {
     /// Returns the entropy of the struct.
-    /// Given current restrictions, this function is only available in approximate mode. It may return an Err when called in exact mode.
-    /// This is, for now, for two reasons: n_log_n is prohibitively expensive to compute, and the average number of visits per state is computed using an approximation algorithm.
-    fn entropy_approximate(&self) -> Result<LogDiv>;
+    fn entropy(&self) -> Result<LogPolynomial>;
 }
 
 impl<T: ?Sized> Entropy for T
 where
     T: EbiTraitFiniteStochasticLanguage,
 {
-    fn entropy_approximate(&self) -> Result<LogDiv> {
-        if is_exact_globally() {
-            return Err(anyhow!("Entropy is only available in approximate mode."));
-        }
-
-        let mut entropy = LogDiv::zero();
+    fn entropy(&self) -> Result<LogPolynomial> {
+        let mut entropy = LogPolynomial::zero();
 
         for (_, probability) in self.iter_traces_probabilities() {
             if probability.is_positive() {
-                entropy -= LogDiv::n_log_n(probability)?
+                entropy -= probability.n_log_n()?
             }
         }
 
@@ -41,51 +35,43 @@ where
 }
 
 impl Entropy for StochasticDeterministicFiniteAutomaton {
-    fn entropy_approximate(&self) -> Result<LogDiv> {
-        if is_exact_globally() {
-            return Err(anyhow!("Entropy is only available in approximate mode."));
-        }
-
+    fn entropy(&self) -> Result<LogPolynomial> {
         let state_count = self.number_of_states();
-        let state_visits = number_of_average_visits_per_state_approximate(self)?;
+        let state_visits = number_of_average_visits_per_state(self)?;
 
-        let mut termination_entropy = LogDiv::zero();
+        let mut sum = LogPolynomial::zero();
+
+        //termination
         for state in 0..state_count {
-            let termination_probability = self.get_termination_probability(state);
-            if termination_probability.is_positive() {
-                let mut entropy = LogDiv::n_log_n(termination_probability)?;
-                entropy *= &state_visits[state];
-                termination_entropy += entropy;
+            if let Some(average_visits) = &state_visits[state] {
+                let termination_probability = self.get_termination_probability(state);
+                if termination_probability.is_positive() {
+                    let mut entropy = termination_probability.n_log_n()?;
+                    entropy *= average_visits;
+                    sum += entropy;
+                }
             }
         }
 
-        let mut transition_entropy = LogDiv::zero();
+        //transitions
         for (index, &source) in self.get_sources().iter().enumerate() {
-            let probability = &self.get_probabilities()[index];
-            if probability.is_positive() {
-                let mut entropy = LogDiv::n_log_n(probability)?;
-                entropy *= &state_visits[source];
-                transition_entropy += entropy;
+            if let Some(average_visits) = &state_visits[source] {
+                let probability = &self.get_probabilities()[index];
+                if probability.is_positive() {
+                    let mut entropy = probability.n_log_n()?;
+                    entropy *= average_visits;
+                    sum += entropy;
+                }
             }
         }
 
-        return Ok(transition_entropy + termination_entropy);
+        return Ok(-sum);
     }
-}
-
-/// Compute the number of times each state is visited, on average.
-/// This is an approximating algorithm. Do not call in exact mode (will return an Err).
-pub fn number_of_average_visits_per_state_approximate(
-    sdfa: &StochasticDeterministicFiniteAutomaton,
-) -> Result<Vec<Fraction>> {
-    let epsilon = f!(1, 1_000_000_000_000u64);
-    let max_iterations = 20_000;
-    c_s_iterative(sdfa, &epsilon, max_iterations)
 }
 
 /// Returns how often each state is visited on average on an arbitrary run.
 /// If a state is part of a livelock, returns None for that state (even if it is unreachable).
-pub fn number_of_average_visits_per_state_exact(
+pub fn number_of_average_visits_per_state(
     sdfa: &StochasticDeterministicFiniteAutomaton,
 ) -> Result<Vec<Option<Fraction>>> {
     //verify initial marking
@@ -150,6 +136,16 @@ pub fn number_of_average_visits_per_state_exact(
     Ok(result)
 }
 
+/// Compute the number of times each state is visited, on average.
+/// This is an approximating algorithm. A livelock state will get an arbitrary high value.
+pub(crate) fn number_of_average_visits_per_state_approximate(
+    sdfa: &StochasticDeterministicFiniteAutomaton,
+) -> Result<Vec<Fraction>> {
+    let epsilon = f!(1, 1_000_000_000_000u64);
+    let max_iterations = 20_000;
+    c_s_iterative(sdfa, &epsilon, max_iterations)
+}
+
 /// Compute c_s by fixed-point iteration.
 /// c[s] is the expected number of visits to state s.
 fn c_s_iterative(
@@ -206,11 +202,11 @@ fn c_s_iterative(
 
 #[cfg(test)]
 mod tests {
-    use crate::techniques::entropy::{c_s_iterative, number_of_average_visits_per_state_exact};
+    use crate::techniques::entropy::{Entropy, c_s_iterative, number_of_average_visits_per_state};
     use ebi_objects::{
         StochasticDeterministicFiniteAutomaton,
         anyhow::Result,
-        ebi_arithmetic::{Fraction, f},
+        ebi_arithmetic::{Fraction, f, fraction::approximate::Approximate},
     };
     use std::fs;
 
@@ -226,14 +222,14 @@ mod tests {
     }
 
     #[test]
-    fn number_of_average_visits_per_state() {
+    fn number_of_average_visits_per_state_test() {
         let fin = fs::read_to_string("testfiles/aa-ab-ba.sdfa").unwrap();
         let sdfa = fin
             .parse::<StochasticDeterministicFiniteAutomaton>()
             .unwrap();
 
         let approx = compute_approx(&sdfa).unwrap();
-        let exact = number_of_average_visits_per_state_exact(&sdfa).unwrap();
+        let exact = number_of_average_visits_per_state(&sdfa).unwrap();
         assert_eq!(approx, exact);
         println!("approx {:?}", approx);
         println!("exact  {:?}", exact);
@@ -247,9 +243,21 @@ mod tests {
             .unwrap();
 
         let approx = compute_approx(&sdfa).unwrap();
-        let exact = number_of_average_visits_per_state_exact(&sdfa).unwrap();
-        // assert_eq!(approx, exact);
+        let exact = number_of_average_visits_per_state(&sdfa).unwrap();
+        assert_eq!(approx[0], exact[0]);
         println!("approx {:?}", approx);
         println!("exact  {:?}", exact);
+    }
+
+    #[test]
+    fn entropy_livelock() {
+        let fin = fs::read_to_string("testfiles/a-b-livelock.sdfa").unwrap();
+        let sdfa = fin
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
+
+        let entropy = sdfa.entropy().unwrap();
+
+        assert_eq!(entropy.approximate().unwrap(), 1.5);
     }
 }

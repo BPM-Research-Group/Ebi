@@ -29,8 +29,8 @@ use crate::{
     prom::java_object_handler::{
         JAVA_OBJECT_HANDLERS_BOOL, JAVA_OBJECT_HANDLERS_CONTAINSROOT,
         JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV,
-        JAVA_OBJECT_HANDLERS_ROOTLOGDIV, JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE,
-        JavaObjectHandler,
+        JAVA_OBJECT_HANDLERS_LOGPOLYNOMIAL, JAVA_OBJECT_HANDLERS_ROOTLOGDIV,
+        JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE, JavaObjectHandler,
     },
 };
 use ebi_objects::{
@@ -57,6 +57,7 @@ use ebi_objects::{
         stochastic_process_tree::StochasticProcessTree,
     },
 };
+use ebi_optimisation::ebi_arithmetic::log_polynomial::log_polynomial::LogPolynomial;
 use std::{
     collections::BTreeSet,
     fmt::{self, Debug, Display},
@@ -73,6 +74,7 @@ pub enum EbiOutput {
     Usize(usize),
     Fraction(Fraction),
     LogDiv(LogDiv),
+    LogPolynomial(LogPolynomial),
     ContainsRoot(ContainsRoot),
     RootLogDiv(RootLogDiv),
     Bool(bool),
@@ -86,6 +88,7 @@ impl EbiOutput {
             EbiOutput::Usize(_) => EbiOutputType::Usize,
             EbiOutput::Fraction(_) => EbiOutputType::Fraction,
             EbiOutput::LogDiv(_) => EbiOutputType::LogDiv,
+            EbiOutput::LogPolynomial(_) => EbiOutputType::LogPolynomial,
             EbiOutput::ContainsRoot(_) => EbiOutputType::ContainsRoot,
             EbiOutput::RootLogDiv(_) => EbiOutputType::RootLogDiv,
             EbiOutput::Bool(_) => EbiOutputType::Bool,
@@ -102,6 +105,7 @@ impl ebi_objects::ebi_activity_key::has_activity_key::TestActivityKey for EbiOut
             | EbiOutput::Usize(_)
             | EbiOutput::Fraction(_)
             | EbiOutput::LogDiv(_)
+            | EbiOutput::LogPolynomial(_)
             | EbiOutput::ContainsRoot(_)
             | EbiOutput::RootLogDiv(_)
             | EbiOutput::Bool(_) => {}
@@ -116,6 +120,7 @@ pub enum EbiOutputType {
     Usize,
     Fraction,
     LogDiv,
+    LogPolynomial,
     ContainsRoot,
     RootLogDiv,
     Bool,
@@ -167,6 +172,7 @@ impl EbiOutputType {
             EbiOutputType::Usize => vec![EbiExporter::Usize],
             EbiOutputType::Fraction => vec![EbiExporter::Fraction],
             EbiOutputType::LogDiv => vec![EbiExporter::LogDiv],
+            EbiOutputType::LogPolynomial => vec![EbiExporter::LogPolynomial],
             EbiOutputType::ContainsRoot => vec![EbiExporter::ContainsRoot],
             EbiOutputType::RootLogDiv => vec![EbiExporter::RootLogDiv],
             EbiOutputType::Bool => vec![EbiExporter::Bool],
@@ -353,6 +359,7 @@ impl EbiOutputType {
             EbiOutputType::Usize => EbiExporter::Usize,
             EbiOutputType::Fraction => EbiExporter::Fraction,
             EbiOutputType::LogDiv => EbiExporter::LogDiv,
+            EbiOutputType::LogPolynomial => EbiExporter::LogPolynomial,
             EbiOutputType::ContainsRoot => EbiExporter::ContainsRoot,
             EbiOutputType::RootLogDiv => EbiExporter::RootLogDiv,
             EbiOutputType::Bool => EbiExporter::Bool,
@@ -368,6 +375,7 @@ impl Display for EbiOutputType {
             EbiOutputType::Usize => Display::fmt(&"integer", f),
             EbiOutputType::Fraction => Display::fmt(&"fraction", f),
             EbiOutputType::LogDiv => Display::fmt(&"logarithm", f),
+            EbiOutputType::LogPolynomial => Display::fmt(&"logarithm", f),
             EbiOutputType::ContainsRoot => Display::fmt(&"root", f),
             EbiOutputType::RootLogDiv => Display::fmt(&"rootlog", f),
             EbiOutputType::Bool => Display::fmt(&"bool", f),
@@ -382,6 +390,7 @@ pub enum EbiExporter {
     Usize,
     Fraction,
     LogDiv,
+    LogPolynomial,
     ContainsRoot,
     RootLogDiv,
     Bool,
@@ -399,6 +408,8 @@ impl EbiExporter {
             (EbiExporter::Fraction, _) => unreachable!(),
             (EbiExporter::LogDiv, EbiOutput::LogDiv(object)) => object.export(f),
             (EbiExporter::LogDiv, _) => unreachable!(),
+            (EbiExporter::LogPolynomial, EbiOutput::LogPolynomial(object)) => object.export(f),
+            (EbiExporter::LogPolynomial, _) => unreachable!(),
             (EbiExporter::ContainsRoot, EbiOutput::ContainsRoot(object)) => object.export(f),
             (EbiExporter::ContainsRoot, _) => unreachable!(),
             (EbiExporter::RootLogDiv, EbiOutput::RootLogDiv(object)) => object.export(f),
@@ -415,6 +426,7 @@ impl EbiExporter {
             EbiExporter::Usize => "an",
             EbiExporter::Fraction => "a",
             EbiExporter::LogDiv => "a",
+            EbiExporter::LogPolynomial => "a",
             EbiExporter::ContainsRoot => "a",
             EbiExporter::RootLogDiv => "a",
             EbiExporter::Bool => "a",
@@ -428,6 +440,7 @@ impl EbiExporter {
             EbiExporter::Usize => "integer",
             EbiExporter::Fraction => "fraction",
             EbiExporter::LogDiv => "logdiv",
+            EbiExporter::LogPolynomial => "logpolynomial",
             EbiExporter::ContainsRoot => "containsroot",
             EbiExporter::RootLogDiv => "rootlogdiv",
             EbiExporter::Bool => "boolean",
@@ -441,6 +454,7 @@ impl EbiExporter {
             EbiExporter::Usize => JAVA_OBJECT_HANDLERS_USIZE,
             EbiExporter::Fraction => JAVA_OBJECT_HANDLERS_FRACTION,
             EbiExporter::LogDiv => JAVA_OBJECT_HANDLERS_LOGDIV,
+            EbiExporter::LogPolynomial => JAVA_OBJECT_HANDLERS_LOGPOLYNOMIAL,
             EbiExporter::ContainsRoot => JAVA_OBJECT_HANDLERS_CONTAINSROOT,
             EbiExporter::RootLogDiv => JAVA_OBJECT_HANDLERS_ROOTLOGDIV,
             EbiExporter::Bool => JAVA_OBJECT_HANDLERS_BOOL,
@@ -454,6 +468,7 @@ impl EbiExporter {
             EbiExporter::Usize => "int",
             EbiExporter::Fraction => "frac",
             EbiExporter::LogDiv => "logdiv",
+            EbiExporter::LogPolynomial => "logpol",
             EbiExporter::ContainsRoot => "croot",
             EbiExporter::RootLogDiv => "rldiv",
             EbiExporter::Bool => "bool",
@@ -467,6 +482,7 @@ impl EbiExporter {
             EbiExporter::Usize => false,
             EbiExporter::Fraction => false,
             EbiExporter::LogDiv => false,
+            EbiExporter::LogPolynomial => false,
             EbiExporter::ContainsRoot => false,
             EbiExporter::RootLogDiv => false,
             EbiExporter::Bool => false,
@@ -482,6 +498,7 @@ impl Display for EbiExporter {
             EbiExporter::Usize => Display::fmt(&"integer", f),
             EbiExporter::Fraction => Display::fmt(&"fraction", f),
             EbiExporter::LogDiv => Display::fmt(&"logarithm", f),
+            EbiExporter::LogPolynomial => Display::fmt(&"logarithm", f),
             EbiExporter::ContainsRoot => Display::fmt(&"root", f),
             EbiExporter::RootLogDiv => Display::fmt(&"rootlog", f),
             EbiExporter::Bool => Display::fmt(&"boolean", f),

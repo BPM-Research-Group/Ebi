@@ -735,7 +735,7 @@ dependencies = [
  "indexmap 2.14.0",
  "indicatif",
  "intmap",
- "itertools",
+ "itertools 0.14.0",
  "jni",
  "layout-rs",
  "log",
@@ -749,7 +749,7 @@ dependencies = [
  "priority-queue",
  "process_mining",
  "pyo3",
- "quick-xml 0.39.2",
+ "quick-xml 0.39.4",
  "rand 0.10.1",
  "rand_chacha 0.10.0",
  "rayon",
@@ -779,12 +779,14 @@ dependencies = [
 [[package]]
 name = "ebi_arithmetic"
 version = "0.3.11"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a7b76bcfca3042eb8c037a980f919e9a455c6171202730a7f6a835f6ede92d75"
+source = "git+https://github.com/BPM-Research-Group/Ebi_arithmetic.git#d2b85a298a5db9d306ad72ab26d38574ced3bfdd"
 dependencies = [
  "anyhow",
- "itertools",
+ "fnv",
+ "intmap",
+ "itertools 0.14.0",
  "malachite",
+ "prime_factorization",
  "rand 0.9.4",
  "rand_chacha 0.9.0",
  "serial_test",
@@ -793,17 +795,16 @@ dependencies = [
 [[package]]
 name = "ebi_bpmn"
 version = "0.0.46"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "922862ad1b66e86a1bb243136e3d73bde20af79193c6e16dc0d2317c106384a0"
+source = "git+https://github.com/BPM-Research-Group/Ebi_BPMN.git#961328bc2af05b94dbdb9f81631c3a059a1ec9bb"
 dependencies = [
  "anyhow",
  "bitvec",
  "ebi_activity_key",
  "ebi_arithmetic",
  "ebi_derive",
- "itertools",
+ "itertools 0.14.0",
  "layout-rs",
- "quick-xml 0.39.2",
+ "quick-xml 0.39.4",
  "strum",
  "strum_macros 0.28.0",
 ]
@@ -823,25 +824,24 @@ dependencies = [
 [[package]]
 name = "ebi_objects"
 version = "0.3.182"
-source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#8fc87162590f09fdb07fbe0d0d6c2c5077a276ec"
+source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#b0dec181a4bef70d28965f4f3f5d6c29632566a4"
 dependencies = [
  "anyhow",
  "bitvec",
  "chrono",
  "csv",
  "ebi_activity_key",
- "ebi_arithmetic",
  "ebi_bpmn",
  "ebi_derive",
  "flate2",
  "fnv",
  "intmap",
- "itertools",
+ "itertools 0.14.0",
  "layout-rs",
  "log",
  "pastey",
  "process_mining",
- "quick-xml 0.39.2",
+ "quick-xml 0.39.4",
  "rayon",
  "resvg 0.47.0",
  "serde",
@@ -856,8 +856,7 @@ dependencies = [
 [[package]]
 name = "ebi_optimisation"
 version = "0.3.7"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4e71d417c233739ef94384de518e9bef96bc996a7ec5b42c62369e22ea5963bf"
+source = "git+https://github.com/BPM-Research-Group/Ebi_optimisation.git#07575afa1c5b0f973315ad76f98bb92ccf0257bc"
 dependencies = [
  "ebi_arithmetic",
  "indexmap 2.14.0",
@@ -1487,6 +1486,15 @@ checksum = "a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695"
 
 [[package]]
 name = "itertools"
+version = "0.10.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
 version = "0.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "2b192c782037fadd9cfa75548310488aabdbf3d2da73885b31bd0abd03351285"
@@ -1580,9 +1588,9 @@ dependencies = [
 
 [[package]]
 name = "js-sys"
-version = "0.3.97"
+version = "0.3.98"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1840c94c045fbcf8ba2812c95db44499f7c64910a912551aaaa541decebcacf"
+checksum = "67df7112613f8bfd9150013a0314e196f4800d3201ae742489d999db2f979f08"
 dependencies = [
  "cfg-if",
  "futures-util",
@@ -1849,7 +1857,7 @@ checksum = "a8b6f86fdbb1eb9955946be91775239dfcb0acdb1a51bb07d5fc9b8c854f5ccd"
 dependencies = [
  "getrandom 0.2.17",
  "hashbrown 0.16.1",
- "itertools",
+ "itertools 0.14.0",
  "libm",
  "rand 0.9.4",
  "rand_chacha 0.9.0",
@@ -1863,7 +1871,7 @@ version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "47d5021773c1552820b10ce7410817fadc1dfcef907b4f9a29af5346d756fd28"
 dependencies = [
- "itertools",
+ "itertools 0.14.0",
  "malachite-base",
  "malachite-nz",
  "malachite-q",
@@ -1875,7 +1883,7 @@ version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "0197a2f5cfee19d59178e282985c6ca79a9233e26a2adcf40acb693896aa09f6"
 dependencies = [
- "itertools",
+ "itertools 0.14.0",
  "libm",
  "malachite-base",
  "wide",
@@ -1887,7 +1895,7 @@ version = "0.9.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be2add95162aede090c48f0ee51bea7d328847ce3180aa44588111f846cc116b"
 dependencies = [
- "itertools",
+ "itertools 0.14.0",
  "malachite-base",
  "malachite-nz",
 ]
@@ -2055,6 +2063,20 @@ dependencies = [
 ]
 
 [[package]]
+name = "num"
+version = "0.4.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "35bd024e8b2ff75562e5f34e7f4905839deb4b22955ef5e73d2fea1b9813cb23"
+dependencies = [
+ "num-bigint",
+ "num-complex 0.4.6",
+ "num-integer",
+ "num-iter",
+ "num-rational",
+ "num-traits",
+]
+
+[[package]]
 name = "num-bigint"
 version = "0.4.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2095,6 +2117,28 @@ version = "0.1.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7969661fd2958a5cb096e56c8e1ad0444ac2bbcd0061bd28660485a44879858f"
 dependencies = [
+ "num-traits",
+]
+
+[[package]]
+name = "num-iter"
+version = "0.1.45"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1429034a0490724d0075ebb2bc9e875d6503c3cf69e235a8941aa757d83ef5bf"
+dependencies = [
+ "autocfg",
+ "num-integer",
+ "num-traits",
+]
+
+[[package]]
+name = "num-rational"
+version = "0.4.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f83d14da390562dca69fc84082e73e548e1ad308d24accdedd2720017cb37824"
+dependencies = [
+ "num-bigint",
+ "num-integer",
  "num-traits",
 ]
 
@@ -2647,6 +2691,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "prime_factorization"
+version = "1.0.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bb24cb4f70d64221509ab3dca82ad2ec24e1d7f3fa3e7cb9eed4ced578683287"
+dependencies = [
+ "itertools 0.10.5",
+ "num",
+ "rand 0.8.6",
+]
+
+[[package]]
 name = "priority-queue"
 version = "2.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2685,7 +2740,7 @@ dependencies = [
  "csv",
  "flate2",
  "graphviz-rust",
- "itertools",
+ "itertools 0.14.0",
  "macros_process_mining",
  "ordered-float",
  "petgraph",
@@ -2795,9 +2850,9 @@ dependencies = [
 
 [[package]]
 name = "quick-xml"
-version = "0.39.2"
+version = "0.39.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "958f21e8e7ceb5a1aa7fa87fab28e7c75976e0bfe7e23ff069e0a260f894067d"
+checksum = "cdcc8dd4e2f670d309a5f0e83fe36dfdc05af317008fea29144da1a2ac858e5e"
 dependencies = [
  "memchr",
  "serde",
@@ -4033,9 +4088,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen"
-version = "0.2.120"
+version = "0.2.121"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "df52b6d9b87e0c74c9edfa1eb2d9bf85e5d63515474513aa50fa181b3c4f5db1"
+checksum = "49ace1d07c165b0864824eee619580c4689389afa9dc9ed3a4c75040d82e6790"
 dependencies = [
  "cfg-if",
  "once_cell",
@@ -4046,9 +4101,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-macro"
-version = "0.2.120"
+version = "0.2.121"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "78b1041f495fb322e64aca85f5756b2172e35cd459376e67f2a6c9dffcedb103"
+checksum = "8e68e6f4afd367a562002c05637acb8578ff2dea1943df76afb9e83d177c8578"
 dependencies = [
  "quote",
  "wasm-bindgen-macro-support",
@@ -4056,9 +4111,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-macro-support"
-version = "0.2.120"
+version = "0.2.121"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9dcd0ff20416988a18ac686d4d4d0f6aae9ebf08a389ff5d29012b05af2a1b41"
+checksum = "d95a9ec35c64b2a7cb35d3fead40c4238d0940c86d107136999567a4703259f2"
 dependencies = [
  "bumpalo",
  "proc-macro2",
@@ -4069,9 +4124,9 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-shared"
-version = "0.2.120"
+version = "0.2.121"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "49757b3c82ebf16c57d69365a142940b384176c24df52a087fb748e2085359ea"
+checksum = "c4e0100b01e9f0d03189a92b96772a1fb998639d981193d7dbab487302513441"
 dependencies = [
  "unicode-ident",
 ]

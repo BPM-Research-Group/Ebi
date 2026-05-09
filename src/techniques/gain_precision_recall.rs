@@ -132,9 +132,9 @@ fn entropy_eventlog_with_lambda(
     lambda: &Fraction,
 ) -> Result<LogDiv> {
     if lambda.is_zero() {
-        return fsl.entropy_approximate();
+        return fsl.entropy()?.try_into();
     }
-    
+
     let one_minus_lambda = &Fraction::one() - lambda;
     let mut entropy = LogDiv::zero();
 
@@ -207,7 +207,7 @@ fn entropy_sdfa_with_lambda(
     is_valid_sdfa(sdfa)?;
 
     if lambda.is_zero() {
-        return sdfa.entropy_approximate();
+        return sdfa.entropy()?.try_into();
     }
 
     let state_count = sdfa.number_of_states();

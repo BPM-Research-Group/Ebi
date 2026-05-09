@@ -139,7 +139,7 @@ pub const EBI_ANALYSE_ENTROPY: EbiCommand = EbiCommand::Command {
     explanation_long: None,
     latex_link: Some("\\cite{DBLP:journals/is/LeemansP23}"),
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         &[
             &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), 
@@ -151,14 +151,14 @@ pub const EBI_ANALYSE_ENTROPY: EbiCommand = EbiCommand::Command {
     execute: |mut objects, _| {
         let result = match objects.remove(0) {
             EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => 
-                slang.entropy_approximate()?,
+                slang.entropy()?,
             EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => 
-                sdfa.entropy_approximate()?,
+                sdfa.entropy()?,
             _ => return Err(anyhow!("Input not supported."))
         };
-        Ok(EbiOutput::LogDiv(result))
+        Ok(EbiOutput::LogPolynomial(result))
     },
-    output_type: &EbiOutputType::LogDiv,
+    output_type: &EbiOutputType::LogPolynomial,
 };
 
 pub const EBI_ANALYSE_MINPROB: EbiCommand = EbiCommand::Command {

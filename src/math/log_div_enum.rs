@@ -17,6 +17,9 @@ use ebi_objects::{
         },
     },
 };
+use ebi_optimisation::ebi_arithmetic::{
+    fraction::approximate::Approximate, log_polynomial::log_polynomial_enum::LogPolynomialEnum,
+};
 use std::{
     cmp::Ordering,
     fmt::Display,
@@ -322,11 +325,9 @@ impl PartialOrd for LogDivEnum {
             (Self::Approx(l), Self::Approx(r)) => l.partial_cmp(r),
 
             // mixed / invalid cases
-            (Self::CannotCombineExactAndApprox, _)
-            | (_, Self::CannotCombineExactAndApprox) => None,
+            (Self::CannotCombineExactAndApprox, _) | (_, Self::CannotCombineExactAndApprox) => None,
 
-            (Self::Exact(_), Self::Approx(_))
-            | (Self::Approx(_), Self::Exact(_)) => None,
+            (Self::Exact(_), Self::Approx(_)) | (Self::Approx(_), Self::Exact(_)) => None,
         }
     }
 }
@@ -567,6 +568,22 @@ impl std::fmt::Debug for LogDivEnum {
             LogDivEnum::Approx(fr) => write!(f, "logdiv approx {}", fr),
             LogDivEnum::CannotCombineExactAndApprox => {
                 write!(f, "cannot combine exact and approximate arithmetic")
+            }
+        }
+    }
+}
+
+impl TryFrom<LogPolynomialEnum> for LogDivEnum {
+    type Error = Error;
+
+    fn try_from(value: LogPolynomialEnum) -> Result<Self> {
+        match value {
+            LogPolynomialEnum::Approx(f) => Ok(LogDivEnum::Approx(f.approximate()?.into())),
+            LogPolynomialEnum::Exact(_) => Err(anyhow!(
+                "Cannot transform an exact log polynomial into an exact log div."
+            )),
+            LogPolynomialEnum::CannotCombineExactAndApprox => {
+                Err(anyhow!("Cannot combine exact and approximate arithmetic."))
             }
         }
     }
