@@ -72,6 +72,7 @@ Sander J.J. Leemans, Tian Li, Leonhard Mühlmeyer, Philipp Moch, Adam Burke}
 
 \DeclareMathOperator{\logdiv}{logdiv}
 \DeclareMathOperator{\Logdiv}{Logdiv}
+\DeclareMathOperator{\logpol}{logpol}
 \newcommand\xsnakearrow[1]{\overset{#1}{\rightsquigarrow}}
 \DeclareMathOperator{\multisetminus}{\mathbin{{\setminus}\mspace{-7mu}{-}}}
 \DeclareMathOperator{\entrel}{\smash{\text{ER}}}
@@ -582,6 +583,43 @@ mod tests {
             \end{align*}
     
             Thus, we can represent all of these square root operations with the square root of a fractional number.
+
+        \subsection{LogPolynomial}
+            Logarithms can often not be expressed in $\mathbb{Q}$.
+            For instance, $\log_2(3) \notin \mathbb{Q}$ is not a rational number.
+            To perform computations in an exact manner, a log polynomial is a list of terms 
+            $\logpol((r_0, n_0) \ldots (q_m, n_m))$ with $q_i \in \mathbb{Q}, q_i \neq 0$ and $n_i \in \mathbb{P}$ (prime numbers), and each $n_i$ is unique.
+            The value of such a log polynomial is:
+            $$\logpol((q_0, n_0) \ldots (q_m, n_m)) = \sum_i q_i \log_2 n_i$$
+
+            The value zero is:
+            $$ 0 = \logpol()$$
+
+            The value of any fraction $r \in \mathbb{Q}$ is:
+            $$ q = \logpol((q, 2))$$
+
+            A basic operation, but also an expensive operation, is to take the logarithm of a natural number $n \in N, n > 0$.
+            This step requires the prime factorisation of $n$, which may be infeasible for very large n\footnote{However, this is in most cases preferred over a LogDiv, which has to compute large powers during most operations, while LogPolynomial only computes the prime factorisation while taking the logarithm.}.
+            $$ \log_2(n) = \logpol((q_1, p_1) \ldots (q_m, p_m)) \text{ with } n = p_1^{q_1} * \ldots * p_m^{q_m}$$
+            
+            To take the logarithm of a fraction $q \in Q$, we simply use the rule that $\log_2(\frac{a}{b}) = \log_2(a) - \log_2(b)$.
+
+            Summing and subtraction of log polynomials is cheap as one simply sums or subtracts the $q_i$s of corresponding terms.
+            Multiplication and division of a log polynomial with a fraction distributes over the $q_i$s.
+
+            Multiplication and division of log polynomials with one another is not supported.
+
+            To approximate a log polynomial, the individual terms are approximated and summed.
+
+            A log polynomial can be collapsed to a single term $(q, n)$:
+            \begin{align*}
+                \logpol((\frac{a}{b}, c), (\frac{d}{e}, f)) =& \frac{a \log_2(c)}{b} + \frac{d \log_2(e)}{f}\\
+                & \frac{fa \log_2(c)}{bf} + \frac{bd \log_2(e)}{bf}\\
+                & \frac{\log_2(c^{fa}) + \log_2(e^{bd})}{bf}\\
+                & \frac{\log_2(c^{fa} + e^{bd})}{bf}\\
+                & \frac{1}{bf} \log_2(c^{fa} + e^{bd})
+            \end{align*}
+            Experience has shown that such a single term quickly gets uncomprehensibly and unfeasibly large.
 
         \subsection{Logdiv}
             Logarithms can often not be expressed in $\mathbb{Q}$.

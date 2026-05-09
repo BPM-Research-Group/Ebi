@@ -30,6 +30,7 @@ use std::{
 
 use crate::math::sign::Sign;
 
+//#[deprecated(since="0.3.12", note="Please use `LogPolynomial` from the crate `ebi_arithmetic` instead")]
 #[derive(Clone)]
 pub enum LogDivEnum {
     Exact((Rational, Natural)), //fraction cannot be negative, but zero is ok
@@ -208,6 +209,22 @@ impl MaybeExact for LogDivEnum {
             LogDivEnum::CannotCombineExactAndApprox => {
                 Err(anyhow!("cannot combine exact and approximate arithmetic"))
             }
+        }
+    }
+
+    fn try_to_exact(exact: <Self as MaybeExact>::Exact) -> Result<Self> {
+        if is_exact_globally() {
+            Ok(Self::Exact(exact))
+        } else {
+            Err(anyhow!("cannot put float in a fraction"))
+        }
+    }
+
+    fn try_to_approx(approx: Self::Approximate) -> Result<Self> {
+        if !is_exact_globally() {
+            Ok(Self::Approx(approx))
+        } else {
+            Err(anyhow!("cannot put fraction in a float"))
         }
     }
 }

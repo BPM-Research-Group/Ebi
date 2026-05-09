@@ -128,6 +128,14 @@ impl MaybeExact for LogDivExact {
     fn exact(self) -> Result<Self::Exact> {
         Ok(self.0)
     }
+
+    fn try_to_exact(exact: Self::Exact) -> Result<Self> {
+        Ok(LogDivExact((exact.0, exact.1)))
+    }
+
+    fn try_to_approx(_: Self::Approximate) -> Result<Self> {
+        Err(anyhow!("cannot put float in a fraction"))
+    }
 }
 
 impl Zero for LogDivExact {

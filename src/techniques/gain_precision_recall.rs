@@ -1,15 +1,20 @@
-use crate::ebi_traits::{
-    ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+use crate::{
+    ebi_traits::{
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+    },
+    follower_semantics::FollowerSemantics,
+    techniques::entropy::{Entropy, number_of_average_visits_per_state_approximate},
 };
-use crate::follower_semantics::FollowerSemantics;
-use crate::math::log_div::LogDiv;
-use crate::techniques::entropy::{Entropy, number_of_average_visits_per_state_approximate};
-use ebi_objects::ebi_arithmetic::{ConstFraction, OneMinus};
 use ebi_objects::{
     StochasticDeterministicFiniteAutomaton,
     anyhow::{Result, anyhow},
-    ebi_arithmetic::{Fraction, One, Signed, Zero},
+    ebi_arithmetic::{
+        ConstFraction, Fraction, Log, MaybeExact, One, OneMinus, Signed, Zero,
+        fraction::approximate::Approximate,
+        is_exact_globally,
+        log_polynomial::{log_polynomial::LogPolynomial, log_polynomial_f64::LogPolynomialF64},
+    },
 };
 
 pub const DEFAULT_LAMBDA_HIGHER_THAN_ZERO: ConstFraction = ConstFraction::of(1, 1_000_000);
@@ -20,14 +25,14 @@ pub trait PotentialGainRecallPrecision {
         &self,
         slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
         lambda: &Fraction,
-    ) -> Result<Fraction>;
+    ) -> Result<LogPolynomial>;
 
     /// Precision(L, M, λ) = Numerator(L, M, λ) / H(M, λ)
     fn potential_gain_precision(
         &self,
         slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
         lambda: &Fraction,
-    ) -> Result<Fraction>;
+    ) -> Result<LogPolynomial>;
 }
 
 impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
@@ -35,7 +40,12 @@ impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
         &self,
         slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
         lambda: &Fraction,
-    ) -> Result<Fraction> {
+    ) -> Result<LogPolynomial> {
+        if is_exact_globally() {
+            return Err(anyhow!(
+                "This method is only available in approximate mode."
+            ));
+        }
         is_valid_sdfa(&self)?;
 
         let numerator = gain_numerator_lambda(slang, self, lambda)?;
@@ -48,7 +58,12 @@ impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
         &self,
         slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
         lambda: &Fraction,
-    ) -> Result<Fraction> {
+    ) -> Result<LogPolynomial> {
+        if is_exact_globally() {
+            return Err(anyhow!(
+                "This method is only available in approximate mode."
+            ));
+        }
         is_valid_sdfa(&self)?;
 
         let numerator = gain_numerator_lambda(&slang, self, lambda)?;
@@ -116,12 +131,12 @@ pub fn is_valid_sdfa(sdfa: &StochasticDeterministicFiniteAutomaton) -> Result<()
 
 /// Entropy helper: h(p) = -p * log(p).
 /// If p = 0, return 0.
-fn entropy_term(p: &Fraction) -> LogDiv {
+fn entropy_term(p: &Fraction) -> Result<LogPolynomial> {
     if p.is_zero() {
-        LogDiv::zero()
+        Ok(LogPolynomial::zero())
     } else {
-        let term = LogDiv::n_log_n(p).unwrap();
-        -term
+        let term = p.n_log_n()?;
+        Ok(-term)
     }
 }
 
@@ -130,33 +145,26 @@ fn entropy_term(p: &Fraction) -> LogDiv {
 fn entropy_eventlog_with_lambda(
     fsl: &Box<dyn EbiTraitFiniteStochasticLanguage>,
     lambda: &Fraction,
-) -> Result<LogDiv> {
+) -> Result<LogPolynomial> {
     if lambda.is_zero() {
-        return fsl.entropy()?.try_into();
+        return fsl.entropy();
     }
 
     let one_minus_lambda = &Fraction::one() - lambda;
-    let mut entropy = LogDiv::zero();
+    let mut entropy = LogPolynomial::zero();
 
     for (_, probability) in fsl.iter_traces_probabilities() {
-        entropy += entropy_term(&(probability * &one_minus_lambda));
-        entropy += entropy_term(&(probability * lambda));
+        entropy += entropy_term(&(probability * &one_minus_lambda))?;
+        entropy += entropy_term(&(probability * lambda))?;
     }
 
     Ok(entropy)
 }
 
-fn log_div_min(left: &LogDiv, right: &LogDiv) -> LogDiv {
-    debug_assert!(
-        left.partial_cmp(right).is_some(),
-        "incomparable LogDiv values"
-    );
-
-    if left <= right {
-        left.clone()
-    } else {
-        right.clone()
-    }
+fn log_div_min(left: LogPolynomial, right: LogPolynomial) -> Result<LogPolynomial> {
+    LogPolynomial::try_to_approx(LogPolynomialF64::from(
+        left.approximate()?.min(right.approximate()?),
+    ))
 }
 
 /// Gain numerator with lambda.
@@ -166,10 +174,10 @@ fn gain_numerator_lambda(
     fsl: &Box<dyn EbiTraitFiniteStochasticLanguage>,
     sdfa: &StochasticDeterministicFiniteAutomaton,
     lambda: &Fraction,
-) -> Result<LogDiv> {
+) -> Result<LogPolynomial> {
     check_lambda(lambda)?;
     let one_minus_lambda = &Fraction::one() - lambda;
-    let mut numerator = LogDiv::zero();
+    let mut numerator = LogPolynomial::zero();
 
     for (trace, log_probability) in fsl.iter_traces_probabilities() {
         let model_probability = sdfa.get_probability(&FollowerSemantics::Trace(trace))?;
@@ -179,18 +187,18 @@ fn gain_numerator_lambda(
         }
 
         if lambda.is_zero() {
-            let log_entropy = entropy_term(log_probability);
-            let model_entropy = entropy_term(&model_probability);
-            numerator += log_div_min(&log_entropy, &model_entropy);
+            let log_entropy = entropy_term(log_probability)?;
+            let model_entropy = entropy_term(&model_probability)?;
+            numerator += log_div_min(log_entropy, model_entropy)?;
         } else {
-            let log_main_entropy = entropy_term(&(log_probability * &one_minus_lambda));
-            let model_main_entropy = entropy_term(&(&model_probability * &one_minus_lambda));
-            numerator += log_div_min(&log_main_entropy, &model_main_entropy);
+            let log_main_entropy = entropy_term(&(log_probability * &one_minus_lambda))?;
+            let model_main_entropy = entropy_term(&(&model_probability * &one_minus_lambda))?;
+            numerator += log_div_min(log_main_entropy, model_main_entropy)?;
 
-            let log_tail_entropy = entropy_term(&(log_probability * lambda));
-            let model_tail_entropy = entropy_term(&(&model_probability * lambda));
+            let log_tail_entropy = entropy_term(&(log_probability * lambda))?;
+            let model_tail_entropy = entropy_term(&(&model_probability * lambda))?;
 
-            numerator += log_div_min(&log_tail_entropy, &model_tail_entropy);
+            numerator += log_div_min(log_tail_entropy, model_tail_entropy)?;
         }
     }
 
@@ -202,32 +210,32 @@ fn gain_numerator_lambda(
 fn entropy_sdfa_with_lambda(
     sdfa: &StochasticDeterministicFiniteAutomaton,
     lambda: &Fraction,
-) -> Result<LogDiv> {
+) -> Result<LogPolynomial> {
     check_lambda(lambda)?;
     is_valid_sdfa(sdfa)?;
 
     if lambda.is_zero() {
-        return sdfa.entropy()?.try_into();
+        return sdfa.entropy();
     }
 
     let state_count = sdfa.number_of_states();
     let state_visits = number_of_average_visits_per_state_approximate(sdfa)?;
     let one_minus_lambda = lambda.clone().one_minus();
 
-    let mut transition_entropy = LogDiv::zero();
+    let mut transition_entropy = LogPolynomial::zero();
     for (index, &source) in sdfa.get_sources().iter().enumerate() {
         let probability = &sdfa.get_probabilities()[index];
         if probability.is_zero() {
             continue;
         }
 
-        let mut entropy = entropy_term(probability);
+        let mut entropy = entropy_term(probability)?;
         entropy *= &state_visits[source];
         transition_entropy += entropy;
     }
 
-    let mut termination_entropy = LogDiv::zero();
-    let mut lambda_step_entropy = LogDiv::zero();
+    let mut termination_entropy = LogPolynomial::zero();
+    let mut lambda_step_entropy = LogPolynomial::zero();
 
     for state in 0..state_count {
         let termination_probability = sdfa.get_termination_probability(state);
@@ -237,32 +245,35 @@ fn entropy_sdfa_with_lambda(
 
         let main_probability = termination_probability * &one_minus_lambda;
         if !main_probability.is_zero() {
-            let mut entropy = entropy_term(&main_probability);
+            let mut entropy = entropy_term(&main_probability)?;
             entropy *= &state_visits[state];
             termination_entropy += entropy;
         }
 
         let tail_probability = termination_probability.clone() * lambda.clone();
         if !tail_probability.is_zero() {
-            let mut entropy = entropy_term(&tail_probability);
+            let mut entropy = entropy_term(&tail_probability)?;
             entropy *= &state_visits[state];
             lambda_step_entropy += entropy;
         }
     }
 
-    Ok(transition_entropy + termination_entropy + lambda_step_entropy)
+    let mut result = transition_entropy;
+    result += termination_entropy;
+    result += lambda_step_entropy;
+    Ok(result)
 }
 
 /// ratio = numerator / denominator
-fn ratio(num: LogDiv, denom: LogDiv) -> Result<Fraction> {
-    let numerator = num.approximate();
-    let denominator = denom.approximate();
+fn ratio(num: LogPolynomial, denom: LogPolynomial) -> Result<LogPolynomial> {
+    let numerator = num.approximate()?;
+    let denominator = denom.approximate()?;
 
     if denominator.is_zero() {
         return Err(anyhow!("denominator is zero"));
     }
 
-    Ok(numerator / denominator)
+    LogPolynomial::try_to_approx(LogPolynomialF64::from(numerator / denominator))
 }
 
 #[cfg(all(
@@ -305,7 +316,7 @@ mod tests {
         let slang: Box<dyn EbiTraitFiniteStochasticLanguage> =
             Box::new(FiniteStochasticLanguage::from(log));
         let entropy = entropy_eventlog_with_lambda(&slang, &f0!())?;
-        println!("entropy ≈ {:.12}", entropy.approximate());
+        println!("entropy ≈ {:.12}", entropy.approximate().unwrap());
 
         Ok(())
     }
@@ -322,7 +333,7 @@ mod tests {
         let lambda = f!(1i64, 1_000_000i64);
         let entropy = entropy_sdfa_with_lambda(&sdfa, &lambda)?;
 
-        println!("SDFA entropy = {:.12}", entropy.approximate());
+        println!("SDFA entropy = {:.12}", entropy.approximate().unwrap());
 
         Ok(())
     }
@@ -337,7 +348,7 @@ mod tests {
         let lambda = Fraction::zero();
 
         let numerator = gain_numerator_lambda(&fsl, &sdfa, &lambda)?;
-        println!("Gain Numerator ≈ {:.12}", numerator.approximate());
+        println!("Gain Numerator ≈ {:.12}", numerator.approximate().unwrap());
 
         Ok(())
     }
