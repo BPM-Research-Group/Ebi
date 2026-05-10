@@ -136,8 +136,8 @@ pub const EBI_ANALYSE_ENTROPY: EbiCommand = EbiCommand::Command {
     name_short: "en",
     name_long: Some("entropy"),
     explanation_short: "Computes the entropy of the object.",
-    explanation_long: Some("Computes the entropy $H$ of the object. That is, the average number of bits that is required to encode a randomly drawn trace, given the object.
-    For a finite stochastic language $L$ the entropy is:
+    explanation_long: Some("Computes the entropy $H$ of the object. That is, the average number of bits that is required to encode a randomly drawn trace, given the object."),
+    latex_link: Some("For a finite stochastic language $L$ the entropy is:
     $$ H = - \\sum_{t \\in L} L(t) \\log_2 L(t) $$
     For a stochastic deterministic finite automaton $(S, \\Sigma, \\delta, p, s_0)$ with 
     $S$ a set of states, 
@@ -148,8 +148,7 @@ pub const EBI_ANALYSE_ENTROPY: EbiCommand = EbiCommand::Command {
     First of all, for each state $s$ a factor $c_s$ is computed that indicates the average number of times the state is visited, or 0 if $s$ is part of a livelock.
     Then, the entropy is:
     $$ H = -\\sum_{\\delta(s, a)} c_s p(s, a) \\log_2 p(s, a) - \\sum_{s \\in \\Sigma} c_s \\lambda_s \\log_2 \\lambda_s $$
-    with the convention that $0 \\log_2 0 = 0$, and $\\lambda_s = 1 - \\sum_{\\delta(s, a)} p(s, a)$."),
-    latex_link: Some("\\cite{DBLP:journals/is/LeemansP23}"),
+    with the convention that $0 \\log_2 0 = 0$, and $\\lambda_s = 1 - \\sum_{\\delta(s, a)} p(s, a)$~\\cite{DBLP:journals/is/LeemansP23}."),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
