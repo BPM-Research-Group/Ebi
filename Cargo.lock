@@ -856,7 +856,7 @@ dependencies = [
 [[package]]
 name = "ebi_optimisation"
 version = "0.3.7"
-source = "git+https://github.com/BPM-Research-Group/Ebi_optimisation.git#07575afa1c5b0f973315ad76f98bb92ccf0257bc"
+source = "git+https://github.com/BPM-Research-Group/Ebi_optimisation.git#3c2fe927eb5dbc5cbddbde623e50bea6ccf2ae9e"
 dependencies = [
  "ebi_arithmetic",
  "indexmap 2.14.0",
