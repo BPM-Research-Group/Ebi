@@ -7,7 +7,7 @@ use ebi_optimisation::anyhow::Result;
 use itertools::Itertools;
 use std::io::Write;
 
-pub const EBIJS: &str = "ebi.js";
+pub const EBIJS: &str = "ebi.php";
 
 pub fn javascript_function_name(path: &Vec<&EbiCommand>) -> String {
     let raw_name = EbiCommand::path_to_string(path);
