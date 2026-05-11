@@ -226,7 +226,7 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
                             onchange=\"input_changed_file(event, '{function_name}', {input_i}, {number_of_inputs});\" 
                             autocomplete=\"off\"
                             accept=\"{accept}\"/>
-                        </td><td>{inputs_explanation}<br>NB: binary file types, such as .xes.gz, are not yet supported online, but they are supported in the <a href=\"https://ebitools.org\">CLI version</a> of Ebi.",
+                        </td><td>{inputs_explanation}",
                         inputs_explanation = EbiInputType::get_possible_inputs_with_html_short(input_types).join(", "),
                         accept = EbiInputType::get_possible_input_extensions(input_types).into_iter().map(|s| format!(".{s}")).join(",")
                     )?;
