@@ -7,6 +7,8 @@ use ebi_optimisation::anyhow::Result;
 use itertools::Itertools;
 use std::io::Write;
 
+pub const EBIJS: &str = "ebi.js";
+
 pub fn javascript_function_name(path: &Vec<&EbiCommand>) -> String {
     let raw_name = EbiCommand::path_to_string(path);
     raw_name
@@ -56,12 +58,23 @@ pub(crate) fn javascript_html_header() -> String {
 
                 //read file asynchronously
                 file = document.getElementById(function_name + \"_input_\" + input_i).files[0];
+                
                 var fr = new FileReader();
-                fr.onload = function(e) {{
-                    console.log(\"file loaded\");
-                    input_changed(event, function_name, input_i, number_of_inputs, e.target.result)
-                }};
-                fr.readAsText(file);
+                if (file.type.endsWith(\"gzip\")) {{
+                    console.log(\"start loading binary file of type \" + file.type);
+                    fr.readAsArrayBuffer(file);
+                }} else {{
+                    fr.onload = function(e) {{
+                        console.log(\"file loaded\");
+                        let loaded_input = new window.JavascriptInput(null, null);
+                        loaded_input.textual = e.target.result;
+                        loaded_input.binary = null;
+                        console.log(\"loaded input \" + loaded_input);
+                        input_changed(event, function_name, input_i, number_of_inputs, loaded_input)
+                    }};
+                    console.log(\"start loading text file of type \" + file.type);
+                    fr.readAsText(file);
+                }}
             }}
 
             function input_changed(event, function_name, input_i, number_of_inputs, value) {{
@@ -108,8 +121,9 @@ pub(crate) fn javascript_html_header() -> String {
         </script>
         
         <script type=\"module\">
-            import init, {{ {function_list} }} from \"./javascript/ebi.php\"; 
+            import init, {{ {function_list}, JavascriptInput }} from \"./javascript/{EBIJS}\"; 
             {lifted_functions}
+            window.JavascriptInput = JavascriptInput;
 
             window.ebi_error = function ebi_error(error, command_name) {{
                 console.log(\"Error: \" + error);
@@ -315,10 +329,11 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
 
         //output type selector
         let default_exporter = output_type.get_default_exporter();
-        if output_type.get_exporters().len() > 1 {
+        let exporters = output_type.get_exporters().into_iter().filter(|exporter| !exporter.is_binary()).collect::<Vec<_>>();
+        if exporters.len() > 1 {
             writeln!(f, "<tr><td>&lt;OUTPUT&gt;</td><td colspan=\"2\"><select id=\"{function_name}_output_type\" onchange=\"output_type_changed(event, '{function_name}', {number_of_inputs})\">{outputs}</select></td></tr>",
                 number_of_inputs = input_names.len(),
-                outputs = output_type.get_exporters().iter().map(|exporter| {
+                outputs = exporters.iter().map(|exporter| {
                     if exporter == &default_exporter {
                         format!("<option value={} selected=\"selected\">{exporter}</option>", exporter.get_extension())
                     } else {

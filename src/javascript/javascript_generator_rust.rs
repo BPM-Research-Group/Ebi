@@ -13,7 +13,7 @@ pub fn generate_javascript_rust() -> Result<EbiOutput> {
         "// This file has been automatically generated. Manual changes will be overridden.
 
 use crate::{{
-    ebi_framework::ebi_command::EbiCommand, javascript::javascript_link::execute_javascript_command,
+    ebi_framework::ebi_command::EbiCommand, javascript::javascript_link::{{execute_javascript_command, JavascriptInput}}
 }};
 use wasm_bindgen::prelude::*;"
     );
@@ -44,11 +44,11 @@ pub fn ebi_command_to_javascript_function(path: &Vec<&EbiCommand>) -> Result<Str
     //function
     let result = format!(
         "#[wasm_bindgen]
-pub fn {fun_nam}(string_inputs: Vec<String>, exporter_file_extension: &str) {{
+pub fn {fun_nam}(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {{
     ebi_objects::ebi_arithmetic::exact::set_exact_globally({exa_ari});
     let command: &&EbiCommand = 
         &&{lib_nam};
-    execute_javascript_command(command, string_inputs, \"{fun_nam}\", exporter_file_extension);
+    execute_javascript_command(command, javascript_inputs, \"{fun_nam}\", exporter_file_extension);
 }}",
         fun_nam = function_name,
         exa_ari = exact_arithmetic.to_string(),
