@@ -39,7 +39,7 @@ pub fn analyse_directly_follows_edge_difference(javascript_inputs: Vec<Javascrip
 
 #[wasm_bindgen]
 pub fn analyse_entropy(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
     let command: &&EbiCommand = 
         &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ENTROPY;
     execute_javascript_command(command, javascript_inputs, "analyse_entropy", exporter_file_extension);
@@ -191,7 +191,7 @@ pub fn conformance_earth_movers_sample(javascript_inputs: Vec<JavascriptInput>, 
 
 #[wasm_bindgen]
 pub fn conformance_entropic_relevance(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
     let command: &&EbiCommand = 
         &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_ER;
     execute_javascript_command(command, javascript_inputs, "conformance_entropic_relevance", exporter_file_extension);

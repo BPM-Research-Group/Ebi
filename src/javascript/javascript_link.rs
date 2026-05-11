@@ -29,6 +29,34 @@ pub struct JavascriptInput {
     pub binary: Option<Uint8Array>,
 }
 
+#[wasm_bindgen]
+impl JavascriptInput {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Self {
+        Self {
+            textual: None,
+            binary: None,
+        }
+    }
+
+    pub fn set_textual(&mut self, string: String) {
+        self.textual = Some(string);
+        self.binary = None;
+    }
+
+    pub fn set_binary(&mut self, binary: Uint8Array) {
+        self.textual = None;
+        self.binary = Some(binary);
+    }
+
+    pub fn clone(&self) -> Self {
+        Self {
+            textual: self.textual.clone(),
+            binary: self.binary.clone(),
+        }
+    }
+}
+
 pub fn read_inputs(
     javascript_inputs: Vec<JavascriptInput>,
     command: &EbiCommand,
