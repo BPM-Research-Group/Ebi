@@ -1446,10 +1446,9 @@ pub fn read_as_any_object(
 }
 
 /// Attempt to parse an input as any of the given input types. Returns the last error if unsuccessful.
-pub fn attempt_parse(input_types: &[&'static EbiInputType], value: String) -> Result<EbiInput> {
+pub fn attempt_parse(input_types: &[&'static EbiInputType], mut reader: MultipleReader) -> Result<EbiInput> {
     //an input may be of several types; go through each of them
     let mut error = None;
-    let mut reader = MultipleReader::String(value);
     for input_type in input_types.iter() {
         //try to parse the input as this type
         match input_type {

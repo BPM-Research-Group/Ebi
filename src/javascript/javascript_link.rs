@@ -1,12 +1,16 @@
 use std::path::PathBuf;
 
-use crate::ebi_framework::{
-    ebi_command::EbiCommand,
-    ebi_input::{EbiInput, attempt_parse},
-    ebi_output::{self, EbiOutputType},
+use crate::{
+    ebi_framework::{
+        ebi_command::EbiCommand,
+        ebi_input::{EbiInput, attempt_parse},
+        ebi_output::{self, EbiOutputType},
+    },
+    multiple_reader::MultipleReader,
 };
 use ebi_objects::anyhow::{Context, Error, Result, anyhow};
 use itertools::Itertools;
+use js_sys::Uint8Array;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -18,8 +22,43 @@ extern "C" {
     pub fn ebi_log(s: &str, command_name: &str);
 }
 
+#[wasm_bindgen(getter_with_clone)]
+pub struct JavascriptInput {
+    // an enum would be better, but that's seemingly not supported yet by wasm.
+    pub textual: Option<String>,
+    pub binary: Option<Uint8Array>,
+}
+
+#[wasm_bindgen]
+impl JavascriptInput {
+    #[wasm_bindgen(constructor)]
+    pub fn new() -> Self {
+        Self {
+            textual: None,
+            binary: None,
+        }
+    }
+
+    pub fn set_textual(&mut self, string: String) {
+        self.textual = Some(string);
+        self.binary = None;
+    }
+
+    pub fn set_binary(&mut self, binary: Uint8Array) {
+        self.textual = None;
+        self.binary = Some(binary);
+    }
+
+    pub fn clone(&self) -> Self {
+        Self {
+            textual: self.textual.clone(),
+            binary: self.binary.clone(),
+        }
+    }
+}
+
 pub fn read_inputs(
-    string_inputs: Vec<String>,
+    javascript_inputs: Vec<JavascriptInput>,
     command: &EbiCommand,
 ) -> Result<(Vec<EbiInput>, &EbiOutputType)> {
     if let EbiCommand::Command {
@@ -31,14 +70,22 @@ pub fn read_inputs(
     {
         //read the inputs
         let mut inputs = vec![];
-        for ((input_types, input_name), string_input) in input_typess
+        for ((input_types, input_name), javascript_input) in input_typess
             .iter()
             .zip(input_names.iter())
-            .zip(string_inputs.into_iter())
+            .zip(javascript_inputs.into_iter())
         {
             //read input
+            let reader = match (javascript_input.textual, javascript_input.binary) {
+                (Some(string_input), None) => MultipleReader::String(string_input),
+                (None, Some(array)) => MultipleReader::Bytes(array.to_vec()),
+                _ => {
+                    return Err(anyhow!("No or both textual and binary inputs given."));
+                }
+            };
+
             inputs.push(
-                attempt_parse(input_types, string_input)
+                attempt_parse(input_types, reader)
                     .with_context(|| format!("Reading parameter {}.", input_name))?,
             );
         }
@@ -50,16 +97,15 @@ pub fn read_inputs(
 
 pub(crate) fn execute_javascript_command(
     command: &EbiCommand,
-    string_inputs: Vec<String>,
+    javascript_inputs: Vec<JavascriptInput>,
     command_name: &str,
     exporter_file_extension: &str,
 ) {
-    let (inputs, output_type) = match read_inputs(string_inputs, command)
-        .with_context(|| anyhow!("Reading inputs."))
-    {
-        Ok(t) => t,
-        Err(e) => return ebi_error(&print_error(e), command_name),
-    };
+    let (inputs, output_type) =
+        match read_inputs(javascript_inputs, command).with_context(|| anyhow!("Reading inputs.")) {
+            Ok(t) => t,
+            Err(e) => return ebi_error(&print_error(e), command_name),
+        };
 
     // Execute the command.
     let result = match command

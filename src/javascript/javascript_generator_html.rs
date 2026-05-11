@@ -7,6 +7,8 @@ use ebi_optimisation::anyhow::Result;
 use itertools::Itertools;
 use std::io::Write;
 
+pub const EBIJS: &str = "ebi.php";
+
 pub fn javascript_function_name(path: &Vec<&EbiCommand>) -> String {
     let raw_name = EbiCommand::path_to_string(path);
     raw_name
@@ -20,13 +22,17 @@ pub fn javascript_function_name(path: &Vec<&EbiCommand>) -> String {
 
 pub(crate) fn javascript_html_header() -> String {
     format!("
-            <script type=\"text/javascript\">
+        <script type=\"text/javascript\">
+            window.default_inits = new Array();
+
             function input_changed_fraction(event, function_name, input_i, number_of_inputs) {{
                 value = document.getElementById(function_name + \"_input_\" + input_i).value;
                 if (value == \"\") {{
                     input_changed(event, function_name, input_i, number_of_inputs, undefined);
                 }} else {{
-                    input_changed(event, function_name, input_i, number_of_inputs, value);
+                    let loaded_input = new window.JavascriptInput();
+                    loaded_input.set_textual(value);
+                    input_changed(event, function_name, input_i, number_of_inputs, loaded_input);
                 }}
             }}
 
@@ -35,18 +41,24 @@ pub(crate) fn javascript_html_header() -> String {
                 if (value == \"\") {{
                     input_changed(event, function_name, input_i, number_of_inputs, undefined);
                 }} else {{
-                    input_changed(event, function_name, input_i, number_of_inputs, value);
+                    let loaded_input = new window.JavascriptInput();
+                    loaded_input.set_textual(value);
+                    input_changed(event, function_name, input_i, number_of_inputs, loaded_input);
                 }}
             }}
 
             function input_changed_text(event, function_name, input_i, number_of_inputs) {{
                 value = document.getElementById(function_name + \"_input_\" + input_i).value;
-                input_changed(event, function_name, input_i, number_of_inputs, value);
+                let loaded_input = new window.JavascriptInput();
+                loaded_input.set_textual(value);
+                input_changed(event, function_name, input_i, number_of_inputs, loaded_input);
             }}
 
             function input_changed_combobox(event, function_name, input_i, number_of_inputs) {{
                 value = document.getElementById(function_name + \"_input_\" + input_i).value;
-                input_changed(event, function_name, input_i, number_of_inputs, value);
+                let loaded_input = new window.JavascriptInput();
+                loaded_input.set_textual(value);
+                input_changed(event, function_name, input_i, number_of_inputs, loaded_input);
             }}
 
             function input_changed_file(event, function_name, input_i, number_of_inputs) {{
@@ -56,12 +68,26 @@ pub(crate) fn javascript_html_header() -> String {
 
                 //read file asynchronously
                 file = document.getElementById(function_name + \"_input_\" + input_i).files[0];
+                
                 var fr = new FileReader();
-                fr.onload = function(e) {{
-                    console.log(\"file loaded\");
-                    input_changed(event, function_name, input_i, number_of_inputs, e.target.result)
-                }};
-                fr.readAsText(file);
+                if (file.type.endsWith(\"gzip\")) {{
+                    fr.onload = function(e) {{
+                        console.log(\"binary file loaded\");
+                        let loaded_input = new window.JavascriptInput();
+                        let value = e.target.result;
+                        loaded_input.set_binary(new Uint8Array(value));
+                        input_changed(event, function_name, input_i, number_of_inputs, loaded_input)
+                    }};
+                    fr.readAsArrayBuffer(file);
+                }} else {{
+                    fr.onload = function(e) {{
+                        console.log(\"textual file loaded\");
+                        let loaded_input = new window.JavascriptInput();
+                        loaded_input.set_textual(e.target.result);
+                        input_changed(event, function_name, input_i, number_of_inputs, loaded_input)
+                    }};
+                    fr.readAsText(file);
+                }}
             }}
 
             function input_changed(event, function_name, input_i, number_of_inputs, value) {{
@@ -99,7 +125,7 @@ pub(crate) fn javascript_html_header() -> String {
                         document.getElementById(function_name + \"_button_run\").disabled = true;
                         return;
                     }}
-                    inputs.push(window[function_name + '_input_' + i + '_value']);
+                    inputs.push(window[function_name + '_input_' + i + '_value'].clone());
                 }}
                 //gather output
                 let output = document.getElementById(function_name + \"_output_type\").value;
@@ -108,8 +134,9 @@ pub(crate) fn javascript_html_header() -> String {
         </script>
         
         <script type=\"module\">
-            import init, {{ {function_list} }} from \"./javascript/ebi.php\"; 
+            import init, {{ {function_list}, JavascriptInput }} from \"./javascript/{EBIJS}\"; 
             {lifted_functions}
+            window.JavascriptInput = JavascriptInput;
 
             window.ebi_error = function ebi_error(error, command_name) {{
                 console.log(\"Error: \" + error);
@@ -132,7 +159,14 @@ pub(crate) fn javascript_html_header() -> String {
                 console.log(message);
             }};
 
-            init();
+            async function run() {{
+                await init();
+                for (const func of window.default_inits) {{
+                    func();
+                }}
+            }};
+            run();
+
         </script>", 
         function_list = EBI_COMMANDS.get_command_paths()
             .iter()
@@ -192,7 +226,7 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
                             onchange=\"input_changed_file(event, '{function_name}', {input_i}, {number_of_inputs});\" 
                             autocomplete=\"off\"
                             accept=\"{accept}\"/>
-                        </td><td>{inputs_explanation}<br>NB: binary file types, such as .xes.gz, are not yet supported online, but they are supported in the <a href=\"https://ebitools.org\">CLI version</a> of Ebi.",
+                        </td><td>{inputs_explanation}",
                         inputs_explanation = EbiInputType::get_possible_inputs_with_html_short(input_types).join(", "),
                         accept = EbiInputType::get_possible_input_extensions(input_types).into_iter().map(|s| format!(".{s}")).join(",")
                     )?;
@@ -211,7 +245,12 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
                             {}
                             autocomplete=\"off\"/>",
                         if let Some(default) = default {
-                            default_init.push_str(&format!("<script type=\"text/javascript\">input_changed_text(event, '{function_name}', {input_i}, {number_of_inputs});</script>"));
+                            default_init.push_str(&format!("
+                                <script type=\"text/javascript\">
+                                    window.default_inits.push(function() {{
+                                        input_changed_text(event, '{function_name}', {input_i}, {number_of_inputs});
+                                    }});
+                                </script>"));
                             format!("value=\"{default}\"")
                         } else {
                             String::new()
@@ -241,7 +280,12 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
                             })
                             .join(""),
                     )?;
-                    default_init.push_str(&format!("<script type=\"text/javascript\">input_changed_combobox(event, '{function_name}', '{input_i}', '{}');</script>", input_typess.len()));
+                    default_init.push_str(&format!("
+                        <script type=\"text/javascript\">
+                            window.default_inits.push(function() {{
+                                input_changed_combobox(event, '{function_name}', '{input_i}', '{number_of_inputs}');
+                            }});
+                        </script>"));
                 }
                 EbiInputType::Usize(min, max, default) => {
                     //free number
@@ -281,7 +325,12 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
                         },
                     )?;
                     if has_default {
-                        default_init.push_str(&format!("<script type=\"text/javascript\">input_changed_number(event, '{function_name}', {input_i}, {});</script>", input_typess.len()));
+                        default_init.push_str(&format!("
+                            <script type =\"text/javascript\">
+                                window.default_inits.push(function() {{
+                                    input_changed_number(event, '{function_name}', {input_i}, {number_of_inputs});
+                                }});
+                            </script>"));
                     }
                 }
                 EbiInputType::Fraction(_, _, def) => {
@@ -305,7 +354,12 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
                         },
                     )?;
                     if has_default {
-                        default_init.push_str(&format!("<script type=\"text/javascript\">input_changed_fraction(event, '{function_name}', {input_i}, {});</script>", input_typess.len()));
+                        default_init.push_str(&format!("
+                            <script type=\"text/javascript\">
+                                window.default_inits.push(function() {{
+                                    input_changed_fraction(event, '{function_name}', {input_i}, {number_of_inputs});
+                                }});
+                            </script>"));
                     }
                 }
             }
@@ -315,10 +369,11 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
 
         //output type selector
         let default_exporter = output_type.get_default_exporter();
-        if output_type.get_exporters().len() > 1 {
+        let exporters = output_type.get_exporters().into_iter().filter(|exporter| !exporter.is_binary()).collect::<Vec<_>>();
+        if exporters.len() > 1 {
             writeln!(f, "<tr><td>&lt;OUTPUT&gt;</td><td colspan=\"2\"><select id=\"{function_name}_output_type\" onchange=\"output_type_changed(event, '{function_name}', {number_of_inputs})\">{outputs}</select></td></tr>",
                 number_of_inputs = input_names.len(),
-                outputs = output_type.get_exporters().iter().map(|exporter| {
+                outputs = exporters.iter().map(|exporter| {
                     if exporter == &default_exporter {
                         format!("<option value={} selected=\"selected\">{exporter}</option>", exporter.get_extension())
                     } else {
@@ -337,7 +392,7 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
             f,
             "
             <tr><td></td><td>
-                <button id=\"{function_name}_button_run\" onclick=\"run_ebi(event, '{function_name}', {});\" 
+                <button id=\"{function_name}_button_run\" onclick=\"run_ebi(event, '{function_name}', {number_of_inputs});\" 
                     disabled
                     autocomplete = \"off\">
                     Run command
@@ -347,9 +402,7 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
         <div class=\"error\">Error:<br><pre id=\"{function_name}_error\"></pre></div>
         <div class=\"output\">Result: (<a href=\"\" id=\"{function_name}_download\">download</a>)<br><pre id=\"{function_name}_output\"></pre></div>
         {default_init}
-        </div>",
-            input_typess.len()
-        )?;
+        </div>")?;
     }
     Ok(())
 }

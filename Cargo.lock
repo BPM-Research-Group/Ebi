@@ -737,6 +737,7 @@ dependencies = [
  "intmap",
  "itertools 0.14.0",
  "jni",
+ "js-sys",
  "layout-rs",
  "log",
  "logging_timer",

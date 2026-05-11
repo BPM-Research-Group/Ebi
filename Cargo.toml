@@ -24,7 +24,7 @@ eapproximatearithmetic = []
 testactivities = [ "ebi_objects/testactivities" ]
 python = [ "java", "dep:pyo3", "dep:polars", "dep:num-traits", "dep:syn", "dep:num-bigint" ]
 java = [ "dep:jni" ]
-javascript = [ "dep:wasm-bindgen", "dep:syn" ]
+javascript = [ "dep:wasm-bindgen", "dep:syn", "dep:js-sys" ]
 extension-module = ["pyo3/extension-module"]
 
 [dependencies]
@@ -73,6 +73,7 @@ syn = { version = "2.0.117", features = [ "parsing", "full" ], optional = true }
 jni = { version = "0.21.1", optional = true }
 num-bigint = { version = "0.4.6", optional = true }
 wasm-bindgen = { version = "0.2.121", optional = true }
+js-sys = { version = "0.3.98", optional = true }
 
 [profile.release]
 debug = false
