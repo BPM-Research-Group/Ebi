@@ -1,4 +1,4 @@
-use ebi_objects::{DirectlyFollowsGraph, EbiObject, EbiObjectType, anyhow::{Context, anyhow}, ebi_arithmetic::{ConstFraction, Fraction, Zero}};
+use ebi_objects::{DirectlyFollowsGraph, EbiObject, EbiObjectType, anyhow::Context, ebi_arithmetic::{ConstFraction, Fraction, Zero}};
 use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, ebi_trait_object::EbiTraitObject}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, techniques::{completeness::Completeness, edge_difference::EdgeDifference, entropy::Entropy, medoid, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}, tests::test_ebi_command};
 
 pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
@@ -136,10 +136,21 @@ pub const EBI_ANALYSE_ENTROPY: EbiCommand = EbiCommand::Command {
     name_short: "en",
     name_long: Some("entropy"),
     explanation_short: "Computes the entropy of the object.",
-    explanation_long: None,
-    latex_link: Some("\\cite{DBLP:journals/is/LeemansP23}"),
+    explanation_long: Some("Computes the entropy $H$ of the object. That is, the average number of bits that is required to encode a randomly drawn trace, given the object."),
+    latex_link: Some("For a finite stochastic language $L$ the entropy is:
+    $$ H = - \\sum_{t \\in L} L(t) \\log_2 L(t) $$
+    For a stochastic deterministic finite automaton $(S, \\Sigma, \\delta, p, s_0)$ with 
+    $S$ a set of states, 
+    $\\Sigma$ an alphabet of activities, 
+    $\\delta \\colon S \\times \\Sigma \\rightarrow S$ a transition function,
+    $p \\colon S \\times \\Sigma \\rightarrow [0, 1]$ a transition probability function, and 
+    $s_0 \\in S$ the initial state, the computation is more involved.
+    First of all, for each state $s$ a factor $c_s$ is computed that indicates the average number of times the state is visited, or 0 if $s$ is part of a livelock.
+    Then, the entropy is:
+    $$ H = -\\sum_{\\delta(s, a)} c_s p(s, a) \\log_2 p(s, a) - \\sum_{s \\in \\Sigma} c_s \\lambda_s \\log_2 \\lambda_s $$
+    with the convention that $0 \\log_2 0 = 0$, and $\\lambda_s = 1 - \\sum_{\\delta(s, a)} p(s, a)$~\\cite{DBLP:journals/is/LeemansP23}."),
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         &[
             &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage), 
@@ -151,14 +162,14 @@ pub const EBI_ANALYSE_ENTROPY: EbiCommand = EbiCommand::Command {
     execute: |mut objects, _| {
         let result = match objects.remove(0) {
             EbiInput::Trait(EbiTraitObject::FiniteStochasticLanguage(slang), _) => 
-                slang.entropy_approximate()?,
+                slang.entropy()?,
             EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => 
-                sdfa.entropy_approximate()?,
-            _ => return Err(anyhow!("Input not supported."))
+                sdfa.entropy()?,
+            _ => unreachable!()
         };
-        Ok(EbiOutput::LogDiv(result))
+        Ok(EbiOutput::LogPolynomial(result))
     },
-    output_type: &EbiOutputType::LogDiv,
+    output_type: &EbiOutputType::LogPolynomial,
 };
 
 pub const EBI_ANALYSE_MINPROB: EbiCommand = EbiCommand::Command {

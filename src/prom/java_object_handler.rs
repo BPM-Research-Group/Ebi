@@ -161,6 +161,7 @@ pub const JAVA_OBJECT_HANDLERS_LOGDIV: &[JavaObjectHandler] = &[JavaObjectHandle
     translator_java_to_ebi: None,
     input_gui: None,
 }];
+pub const JAVA_OBJECT_HANDLERS_LOGPOLYNOMIAL: &[JavaObjectHandler] = &[];
 pub const JAVA_OBJECT_HANDLERS_CONTAINSROOT: &[JavaObjectHandler] = &[JavaObjectHandler {
     name: "containsroot_html",
     java_class: "org.processmining.framework.util.HTMLToString",

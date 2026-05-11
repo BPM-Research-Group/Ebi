@@ -7,6 +7,12 @@ use ebi_objects::{
         malachite::{Natural, base::num::arithmetic::traits::Pow, rational::Rational},
     },
 };
+use ebi_optimisation::{
+    anyhow::Error,
+    ebi_arithmetic::{
+        fraction::approximate::Approximate, log_polynomial::log_polynomial_f64::LogPolynomialF64,
+    },
+};
 use std::{
     cmp::Ordering,
     fmt::Display,
@@ -221,6 +227,14 @@ impl Display for LogDivF64 {
 impl std::fmt::Debug for LogDivF64 {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "logdiv approx {}", self.0)
+    }
+}
+
+impl TryFrom<LogPolynomialF64> for LogDivF64 {
+    type Error = Error;
+
+    fn try_from(value: LogPolynomialF64) -> Result<Self> {
+        Ok(LogDivF64(value.approximate()?.into()))
     }
 }
 

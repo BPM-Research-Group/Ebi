@@ -176,7 +176,7 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
             \end{definition}",
     ),
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
@@ -193,11 +193,11 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
         let model = inputs
             .remove(0)
             .to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
-        Ok(EbiOutput::LogDiv(
+        Ok(EbiOutput::LogPolynomial(
             log.entropic_relevance(model).context("cannot compute ER")?,
         ))
     },
-    output_type: &EbiOutputType::LogDiv,
+    output_type: &EbiOutputType::LogPolynomial,
 };
 
 pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
@@ -721,9 +721,9 @@ pub const CONFORMANCE_GAIN_PRECISION: EbiCommand = EbiCommand::Command {
             .potential_gain_precision(&slang, &lambda)
             .context("Cannot compute gain precision.")?;
 
-        Ok(EbiOutput::Fraction(precision))
+        Ok(EbiOutput::LogPolynomial(precision))
     },
-    output_type: &EbiOutputType::Fraction,
+    output_type: &EbiOutputType::LogPolynomial,
 };
 
 pub const CONFORMANCE_GAIN_RECALL: EbiCommand = EbiCommand::Command {
@@ -766,9 +766,9 @@ pub const CONFORMANCE_GAIN_RECALL: EbiCommand = EbiCommand::Command {
             .potential_gain_recall(&slang, &lambda)
             .context("Cannot compute gain recall.")?;
 
-        Ok(EbiOutput::Fraction(recall))
+        Ok(EbiOutput::LogPolynomial(recall))
     },
-    output_type: &EbiOutputType::Fraction,
+    output_type: &EbiOutputType::LogPolynomial,
 };
 
 #[cfg(test)]

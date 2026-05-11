@@ -4,12 +4,13 @@ use crate::{
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
     follower_semantics::FollowerSemantics,
-    math::log_div::LogDiv,
 };
 use ebi_objects::{
     Activity, ActivityKeyTranslator,
     anyhow::{Context, Result},
-    ebi_arithmetic::{Fraction, One, Signed, Zero},
+    ebi_arithmetic::{
+        Fraction, Log, One, Signed, Zero, log_polynomial::log_polynomial::LogPolynomial,
+    },
 };
 use std::collections::HashSet;
 
@@ -17,16 +18,16 @@ pub trait EntropicRelvance {
     fn entropic_relevance(
         &self,
         model: Box<dyn EbiTraitQueriableStochasticLanguage>,
-    ) -> Result<LogDiv>;
+    ) -> Result<LogPolynomial>;
 }
 
 impl EntropicRelvance for dyn EbiTraitFiniteStochasticLanguage {
     fn entropic_relevance(
         &self,
         mut model: Box<dyn EbiTraitQueriableStochasticLanguage>,
-    ) -> Result<LogDiv> {
+    ) -> Result<LogPolynomial> {
         let mut rho = Fraction::zero(); // the overall probability that a trace in the event log E is possible in the stochastic language of model A
-        let mut sum = LogDiv::zero();
+        let mut sum = LogPolynomial::zero();
 
         let number_of_activities_in_log = {
             let mut activities = HashSet::new();
@@ -52,13 +53,15 @@ impl EntropicRelvance for dyn EbiTraitFiniteStochasticLanguage {
             }
 
             if !model_probability.is_zero() {
-                sum -= LogDiv::log2(model_probability)?;
+                sum -= model_probability.log()?;
             } else {
                 sum += bits(trace, number_of_activities_in_log)?;
             }
         }
 
-        return Ok(sum_j - h(&rho)?);
+        let mut result = sum_j;
+        result -= h(&rho)?;
+        return Ok(result);
     }
 }
 
@@ -68,8 +71,8 @@ impl dyn EbiTraitFiniteStochasticLanguage {
         model: &mut Box<dyn EbiTraitQueriableStochasticLanguage>,
         number_of_activities_in_log: usize,
         translator: &ActivityKeyTranslator,
-    ) -> Result<LogDiv> {
-        let mut sum_j = LogDiv::zero();
+    ) -> Result<LogPolynomial> {
+        let mut sum_j = LogPolynomial::zero();
 
         for (trace, probability_log) in self.iter_traces_probabilities() {
             let translated_trace = translator.translate_trace(&trace);
@@ -78,7 +81,7 @@ impl dyn EbiTraitFiniteStochasticLanguage {
             if probability_model.is_zero() {
                 //trace not in model
                 let l = 1 + number_of_activities_in_log;
-                let mut log_div = LogDiv::log2(l.into())?;
+                let mut log_div = l.log()?;
 
                 log_div *= trace.len() + 1;
 
@@ -91,7 +94,7 @@ impl dyn EbiTraitFiniteStochasticLanguage {
                 //log(pm^a) / b
                 // = a log(pm) / b
                 // = a/b log(pm)
-                let mut logdiv = LogDiv::log2(probability_model)?;
+                let mut logdiv = probability_model.log()?;
                 logdiv *= probability_log;
 
                 // let log_of = LogDiv::power_f_u(&probability_model, &a_log);
@@ -104,23 +107,24 @@ impl dyn EbiTraitFiniteStochasticLanguage {
     }
 }
 
-fn bits(trace: &Vec<Activity>, number_of_activities_in_log: usize) -> Result<LogDiv> {
-    let mut result = LogDiv::log2(Fraction::from(number_of_activities_in_log + 1))?;
+fn bits(trace: &Vec<Activity>, number_of_activities_in_log: usize) -> Result<LogPolynomial> {
+    let mut result = (number_of_activities_in_log + 1).log()?;
     result *= trace.len() + 1;
     Ok(result)
 }
 
-fn h(x: &Fraction) -> Result<LogDiv> {
+fn h(x: &Fraction) -> Result<LogPolynomial> {
     if x.is_zero() || x.is_one() {
-        return Ok(LogDiv::zero());
+        return Ok(LogPolynomial::zero());
     }
 
-    let xlogx = LogDiv::n_log_n(x)?;
+    let xlogx = x.n_log_n()?;
     let mut n = Fraction::one();
     n -= x;
-    let nlogn = LogDiv::n_log_n(&n)?;
+    let nlogn = n.n_log_n()?;
 
-    let result = xlogx + nlogn;
+    let mut result = xlogx;
+    result += nlogn;
     return Ok(result);
 }
 

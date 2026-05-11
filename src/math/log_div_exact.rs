@@ -17,6 +17,7 @@ use ebi_objects::{
         },
     },
 };
+use ebi_optimisation::ebi_arithmetic::log_polynomial::log_polynomial_exact::LogPolynomialExact;
 use std::{
     cmp::Ordering,
     fmt::Display,
@@ -126,6 +127,14 @@ impl MaybeExact for LogDivExact {
 
     fn exact(self) -> Result<Self::Exact> {
         Ok(self.0)
+    }
+
+    fn try_to_exact(exact: Self::Exact) -> Result<Self> {
+        Ok(LogDivExact((exact.0, exact.1)))
+    }
+
+    fn try_to_approx(_: Self::Approximate) -> Result<Self> {
+        Err(anyhow!("cannot put float in a fraction"))
     }
 }
 
@@ -567,6 +576,16 @@ impl Display for FractionRaw {
             "{:.4}",
             FractionExact::from(Rational::from_naturals(self.a.clone(), self.b.clone()))
         )
+    }
+}
+
+impl TryFrom<LogPolynomialExact> for LogDivExact {
+    type Error = Error;
+
+    fn try_from(_value: LogPolynomialExact) -> Result<Self> {
+        Err(anyhow!(
+            "Cannot transform an exact log polynomial into an exact log div."
+        ))
     }
 }
 
