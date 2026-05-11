@@ -1,7 +1,5 @@
 use crate::{
-    ebi_framework::ebi_input::{EbiInput, EbiInputType, attempt_parse},
-    python::python_import::PYTHON_IMPORTERS,
-    text::Joiner,
+    ebi_framework::ebi_input::{EbiInput, EbiInputType, attempt_parse}, multiple_reader::MultipleReader, python::python_import::PYTHON_IMPORTERS, text::Joiner
 };
 use ebi_objects::anyhow::Result;
 use polars::prelude::*;
@@ -41,7 +39,7 @@ pub fn import_or_load(
         inp
     } else if let Ok(content) = py_obj.extract::<String>() {
         // parse the content string
-        attempt_parse(input_types, content).map_err(|e| {
+        attempt_parse(input_types, MultipleReader::String(content)).map_err(|e| {
             PyValueError::new_err(format!("Failed to parse argument {}, which was given as a string literal. Last attempted parsing gave the error {}. Expected {}.", index, e, EbiInputType::get_possible_inputs(input_types).join_with(", ", " or ")))
         })?
     } else {

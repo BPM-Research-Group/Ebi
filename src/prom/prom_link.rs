@@ -1,8 +1,8 @@
-use crate::ebi_framework::{
+use crate::{ebi_framework::{
     ebi_command::{EBI_COMMANDS, EbiCommand},
     ebi_input::attempt_parse,
     ebi_output::{self},
-};
+}, multiple_reader::MultipleReader};
 use ebi_objects::anyhow::{Context, Result, anyhow};
 use jni::{
     JNIEnv,
@@ -97,7 +97,7 @@ pub fn handle_prom_request(
             .zip(string_inputs.into_iter())
         {
             //read input
-            let input = attempt_parse(input_types, string_input)
+            let input = attempt_parse(input_types, MultipleReader::String(string_input))
                 .with_context(|| format!("Reading parameter {}.", input_name))?;
             inputs.push(input);
         }
