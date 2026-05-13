@@ -264,6 +264,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "bs58"
+version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bf88ba1141d185c399bee5288d850d63b8369520c1eafc32a0430b5b6c287bf4"
+dependencies = [
+ "tinyvec",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -795,8 +804,8 @@ dependencies = [
 
 [[package]]
 name = "ebi_bpmn"
-version = "0.0.46"
-source = "git+https://github.com/BPM-Research-Group/Ebi_BPMN.git#961328bc2af05b94dbdb9f81631c3a059a1ec9bb"
+version = "0.0.47"
+source = "git+https://github.com/BPM-Research-Group/Ebi_BPMN.git#dd74737e535828fc9687fb4d73e908a34bd1667b"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -824,8 +833,8 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
-version = "0.3.182"
-source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#b0dec181a4bef70d28965f4f3f5d6c29632566a4"
+version = "0.3.184"
+source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#6271574cb1c5c1e92bde7c8b8e57002932423842"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -1647,12 +1656,13 @@ dependencies = [
 
 [[package]]
 name = "kurbo"
-version = "0.13.0"
+version = "0.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7564e90fe3c0d5771e1f0bc95322b21baaeaa0d9213fa6a0b61c99f8b17b3bfb"
+checksum = "4b60dfc32f652b926df6192e55525b16d186c69d47876c3ead4da5cc9f8450e2"
 dependencies = [
  "arrayvec",
  "euclid",
+ "polycool",
  "smallvec",
 ]
 
@@ -2652,6 +2662,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "polycool"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "50596ddc09eb5ad5f75cacd40209568e66df71baf86e1499a0e99c4cff12a5a6"
+dependencies = [
+ "arrayvec",
+]
+
+[[package]]
 name = "portable-atomic"
 version = "1.13.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3338,11 +3357,12 @@ dependencies = [
 
 [[package]]
 name = "serde_with"
-version = "3.19.0"
+version = "3.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f05839ce67618e14a09b286535c0d9c94e85ef25469b0e13cb4f844e5593eb19"
+checksum = "e72c1c2cb7b223fafb600a619537a871c2818583d619401b785e7c0b746ccde2"
 dependencies = [
  "base64",
+ "bs58",
  "chrono",
  "hex",
  "indexmap 1.9.3",
@@ -3357,9 +3377,9 @@ dependencies = [
 
 [[package]]
 name = "serde_with_macros"
-version = "3.19.0"
+version = "3.20.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cf2ebbe86054f9b45bc3881e865683ccfaccce97b9b4cb53f3039d67f355a334"
+checksum = "b90c488738ecb4fb0262f41f43bc40efc5868d9fb744319ddf5f5317f417bfac"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -3629,7 +3649,7 @@ version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "695b5790b3131dafa99b3bbfd25a216edb3d216dad9ca208d4657bfb8f2abc3d"
 dependencies = [
- "kurbo 0.13.0",
+ "kurbo 0.13.1",
  "siphasher",
 ]
 
@@ -4012,7 +4032,7 @@ dependencies = [
  "flate2",
  "fontdb",
  "imagesize 0.14.0",
- "kurbo 0.13.0",
+ "kurbo 0.13.1",
  "log",
  "pico-args",
  "roxmltree 0.21.1",

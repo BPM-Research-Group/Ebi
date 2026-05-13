@@ -48,7 +48,7 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS: EbiCommand = EbiCommand::Co
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::Semantics)],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["SLANG", "MODEL"],
     input_helps: &["The finite stochastic language.", "The model."],
     execute: |mut objects, _| {
         let log = objects

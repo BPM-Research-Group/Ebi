@@ -1,0 +1,20 @@
+stochastic process tree
+loop
+2
+	interleaved
+	2
+		sequence
+		2
+			activity a
+			1
+			activity b
+			2
+		loop
+		2
+			activity c
+			3
+			activity d
+			4
+	activity e
+	5
+6
