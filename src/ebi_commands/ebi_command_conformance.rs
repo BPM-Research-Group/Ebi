@@ -85,7 +85,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["SLANG", "MODEL"],
     input_helps: &[
         "A finite stochastic language (log) to compare.",
         "A queriable stochastic language (model) to compare.",
@@ -181,7 +181,7 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["SLANG", "MODEL"],
     input_helps: &[
         "A finite stochastic language (log) to compare.",
         "A queriable stochastic language (model) to compare.",
@@ -226,7 +226,7 @@ pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
             &EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage),
         ],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["SLANG", "MODEL"],
     input_helps: &[
         "A finite stochastic language to compare.",
         "A queriable stochastic language to compare.",
@@ -330,7 +330,7 @@ pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
             &EbiInputType::Object(EbiObjectType::FiniteStochasticPartiallyOrderedLanguage),
         ],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["SLANG", "SLANG"],
     input_helps: &[
         "A finite stochastic language to compare (may be partially ordered).",
         "A finite stochastic language to compare (may be partially ordered).",
@@ -458,7 +458,7 @@ pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["SLANG", "MODEL"],
     input_helps: &[
         "A finite stochastic language (log) to compare.",
         "A queriable stochastic language (model) to compare.",
@@ -546,7 +546,7 @@ pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["SLANG", "MODEL"],
     input_helps: &[
         "A finite stochastic language (log) to compare.",
         "A queriable stochastic language (model) to compare.",
@@ -623,14 +623,14 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true,
     input_types: &[
         &[
+            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
             &EbiInputType::Object(EbiObjectType::StochasticNondeterministicFiniteAutomaton),
             &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
-            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
         ],
         &[
+            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
             &EbiInputType::Object(EbiObjectType::StochasticNondeterministicFiniteAutomaton),
             &EbiInputType::Object(EbiObjectType::StochasticLabelledPetriNet),
-            &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage),
         ],
         &[&EbiInputType::Usize(Some(1), None, None)],
         &[&EbiInputTypeEnum!(DistanceMeasure)],
@@ -702,7 +702,7 @@ pub const CONFORMANCE_GAIN_PRECISION: EbiCommand = EbiCommand::Command {
             Some(ConstFraction::zero()),
         )],
     ],
-    input_names: &["SLANG", "SDFA", "LAMBDA"],
+    input_names: &["SLANG", "MODEL", "LAMBDA"],
     input_helps: &[
         "A finite stochastic language to compare.",
         "A stochastic deterministic finite automaton (SDFA) to compare.",
@@ -747,7 +747,7 @@ pub const CONFORMANCE_GAIN_RECALL: EbiCommand = EbiCommand::Command {
             Some(ConstFraction::zero()),
         )],
     ],
-    input_names: &["SLANG", "SDFA", "LAMBDA"],
+    input_names: &["SLANG", "MODEL", "LAMBDA"],
     input_helps: &[
         "A finite stochastic language to compare.",
         "A stochastic deterministic finite automaton (SDFA) to compare.",
