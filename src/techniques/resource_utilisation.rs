@@ -16,7 +16,12 @@ pub fn set_resource_utilisations(executions: &mut Executions) -> Result<()> {
 
     //initialise resource marking and result of resource utilisations
     let mut resource_marking = resource_model.empty_resource_marking();
-    let mut execution_2_resource_utilisation = vec![None; executions.executions.len()];
+    let mut execution_2_resource_utilisation_fired = vec![None; executions.executions.len()];
+    let mut execution_2_resource_utilisation_enabled = executions
+        .executions
+        .iter()
+        .map(|execution| vec![None; execution.other_enabled_transitions.len()])
+        .collect::<Vec<_>>();
     {
         for (execution_i, started_by) in execution_2_started_by.iter().enumerate() {
             if let Some(resource) = executions.executions[execution_i].resource
@@ -24,8 +29,16 @@ pub fn set_resource_utilisations(executions: &mut Executions) -> Result<()> {
             {
                 //set resource utilisation
                 let execution = &executions.executions[execution_i];
-                execution_2_resource_utilisation[execution_i] = resource_model
+                execution_2_resource_utilisation_fired[execution_i] = resource_model
                     .resource_utilisation(&resource_marking, execution.fired_transition);
+                for (j, other_enabled_transition) in executions.executions[execution_i]
+                    .other_enabled_transitions
+                    .iter()
+                    .enumerate()
+                {
+                    execution_2_resource_utilisation_enabled[execution_i][j] = resource_model
+                        .resource_utilisation(&resource_marking, *other_enabled_transition);
+                }
 
                 //set resource marking
                 resource_marking.occupy(resource)?;
@@ -45,8 +58,18 @@ pub fn set_resource_utilisations(executions: &mut Executions) -> Result<()> {
             for later_execution_i in &execution_2_starting[execution_i] {
                 let later_execution = &executions.executions[*later_execution_i];
                 if later_execution.resource.is_some() {
-                    execution_2_resource_utilisation[*later_execution_i] = resource_model
+                    execution_2_resource_utilisation_fired[*later_execution_i] = resource_model
                         .resource_utilisation(&resource_marking, later_execution.fired_transition);
+
+                    for (j, other_enabled_transition) in executions.executions[*later_execution_i]
+                        .other_enabled_transitions
+                        .iter()
+                        .enumerate()
+                    {
+                        execution_2_resource_utilisation_enabled[*later_execution_i][j] =
+                            resource_model
+                                .resource_utilisation(&resource_marking, *other_enabled_transition);
+                    }
                 }
             }
 
@@ -63,8 +86,15 @@ pub fn set_resource_utilisations(executions: &mut Executions) -> Result<()> {
     executions
         .executions
         .iter_mut()
-        .zip(execution_2_resource_utilisation)
-        .for_each(|(execution, utilisation)| execution.resource_utilisation = utilisation);
+        .zip(
+            execution_2_resource_utilisation_fired
+                .into_iter()
+                .zip(execution_2_resource_utilisation_enabled),
+        )
+        .for_each(|(execution, (utilisation_fired, utilisation_enabled))| {
+            execution.resource_utilisation_fired_transition = utilisation_fired;
+            execution.resource_utilisation_other_enabled_transitions = utilisation_enabled;
+        });
 
     Ok(())
 }
@@ -147,11 +177,11 @@ impl ResourceModel {
         let number_of_resources = executions.resource_key.get_number_of_activities();
         let mut transition_2_resources = vec![];
         for execution in executions.executions.iter() {
+            //ensure length
+            while transition_2_resources.len() <= execution.fired_transition {
+                transition_2_resources.push(bitvec![0; number_of_resources]);
+            }
             if let Some(resource) = execution.resource {
-                //ensure length
-                while transition_2_resources.len() <= execution.fired_transition {
-                    transition_2_resources.push(bitvec![0; number_of_resources]);
-                }
                 transition_2_resources[execution.fired_transition].set(resource.id, true);
             }
         }
@@ -171,7 +201,13 @@ impl ResourceModel {
         resource_marking: &ResourceMarking,
         transition: usize,
     ) -> Option<Fraction> {
+        if self.transition_2_resources.len() <= transition {
+            return None;
+        }
         let can_execute = self.transition_2_resources[transition].count_ones();
+        if can_execute == 0 {
+            return None;
+        }
         let occupied = self.transition_2_resources[transition]
             .iter_ones()
             .filter(|res| resource_marking.0[*res])

@@ -1,0 +1,7 @@
+process tree
+loop
+# number of children
+3
+	tau
+	activity b
+	activity a

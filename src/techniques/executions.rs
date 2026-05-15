@@ -160,6 +160,7 @@ impl C {
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
 
+                    let l = other_enabled_transitions.len();
                     executions.push_back(Execution {
                         trace: self.trace_index,
                         move_index,
@@ -170,7 +171,8 @@ impl C {
                         move_index_of_enablement,
                         time_of_execution: None,
                         resource: None,
-                        resource_utilisation: None,
+                        resource_utilisation_fired_transition: None,
+                        resource_utilisation_other_enabled_transitions: vec![None; l],
                     });
 
                     semantics.execute_transition(&mut state, transition)?;
@@ -180,6 +182,7 @@ impl C {
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
 
+                    let l = other_enabled_transitions.len();
                     executions.push_back(Execution {
                         trace: self.trace_index,
                         move_index,
@@ -190,7 +193,8 @@ impl C {
                         move_index_of_enablement,
                         time_of_execution: self.get_time(Some(move_index), log).cloned(),
                         resource: self.get_resource(Some(move_index), log, resource_key),
-                        resource_utilisation: None,
+                        resource_utilisation_fired_transition: None,
+                        resource_utilisation_other_enabled_transitions: vec![None; l]
                     });
 
                     semantics.execute_transition(&mut state, transition)?;
@@ -200,6 +204,7 @@ impl C {
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
 
+                    let l = other_enabled_transitions.len();
                     executions.push_back(Execution {
                         trace: self.trace_index,
                         move_index,
@@ -210,7 +215,8 @@ impl C {
                         move_index_of_enablement,
                         time_of_execution: None,
                         resource: None,
-                        resource_utilisation: None,
+                        resource_utilisation_fired_transition: None,
+                        resource_utilisation_other_enabled_transitions: vec![None; l]
                     });
 
                     semantics.execute_transition(&mut state, transition)?;

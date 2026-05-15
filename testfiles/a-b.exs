@@ -10,8 +10,12 @@
         1,
         2
       ],
+      "other_enabled_transitions_resource_utilisation": [
+        "0",
+        null
+      ],
       "resource": "John",
-      "resource_utilisation": "0",
+      "resource_utilisation_fired_transition": "0",
       "time_of_execution": "2017-05-09 00:00:00 +01:00",
       "trace": 0
     },
@@ -22,8 +26,9 @@
       "move_index": 1,
       "move_index_of_enablement": 0,
       "other_enabled_transitions": [],
+      "other_enabled_transitions_resource_utilisation": [],
       "resource": null,
-      "resource_utilisation": null,
+      "resource_utilisation_fired_transition": null,
       "time_of_execution": null,
       "trace": 0
     },
@@ -37,8 +42,12 @@
         0,
         2
       ],
+      "other_enabled_transitions_resource_utilisation": [
+        "1",
+        null
+      ],
       "resource": "Doe",
-      "resource_utilisation": "0",
+      "resource_utilisation_fired_transition": "0",
       "time_of_execution": "2017-05-09 00:00:00 +01:00",
       "trace": 1
     },
@@ -49,8 +58,9 @@
       "move_index": 1,
       "move_index_of_enablement": 0,
       "other_enabled_transitions": [],
+      "other_enabled_transitions_resource_utilisation": [],
       "resource": null,
-      "resource_utilisation": null,
+      "resource_utilisation_fired_transition": null,
       "time_of_execution": null,
       "trace": 1
     }
