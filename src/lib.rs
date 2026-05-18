@@ -225,6 +225,7 @@ pub mod techniques {
     pub mod partially_ordered_earth_movers_stochastic_conformance;
     pub mod partially_ordered_trace_distance;
     pub mod permutation_test;
+    pub mod permutation_test_ml;
     pub mod prefix_tree_miner;
     pub mod probability_queries;
     pub mod process_variety;
