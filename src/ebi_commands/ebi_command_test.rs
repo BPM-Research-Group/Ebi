@@ -269,23 +269,49 @@ pub const EBI_PERMUTATION_TEST_ML: EbiCommand = EbiCommand::Command {
             None,
             Some(DEFAULT_NUMBER_OF_SAMPLES),
         )],
+        &[&EbiInputType::Fraction(
+            Some(ConstFraction::zero()),
+            Some(ConstFraction::one()),
+            Some(DEFAULT_P_VALUE),
+        )],
     ],
-    input_names: &["LOG", "MODEL", "SAMPLES"],
+    input_names: &["LOG", "MODEL", "SAMPLES", "P-VALUE"],
     input_helps: &[
         "The event log.",
         "The stochastic model to sample from.",
         "The number of samples/permutations to execute.",
+        "The threshold p-value",
     ],
     execute: |mut inputs, _| {
         let mut log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         let mut model = inputs.remove(0).to_type::<EbiTraitStochasticSemantics>()?;
         let number_of_samples = inputs.remove(0).to_type::<usize>()?;
+        let p_value_threshold = inputs.remove(0).to_type::<Fraction>()?;
 
-        let p_value = log
-            .permutation_test_ml(&mut model, *number_of_samples)
+        let (value, sustained) = log
+            .permutation_test_ml(&mut model, *number_of_samples, &p_value_threshold)
             .context("Run model-log permutation test.")?;
 
-        Ok(EbiOutput::Fraction(p_value))
+        let mut f = vec![];
+        writeln!(f, "p-value \t {}", value)?;
+        writeln!(
+            f,
+            "Null-hypothesis: the log and model follow identical processes."
+        )?;
+
+        if sustained {
+            writeln!(
+                f,
+                "The data does not provide enough evidence to make a claim on this hypothesis.\nDo not reject the null-hypothesis."
+            )?;
+        } else {
+            writeln!(
+                f,
+                "The data provides enough evidence to conclude that the log and model are derived from different processes.\nReject the null-hypothesis.",
+            )?;
+        };
+
+        Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
     },
-    output_type: &EbiOutputType::Fraction,
+    output_type: &EbiOutputType::String,
 };
