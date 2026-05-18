@@ -15,10 +15,7 @@ use ebi_objects::{
     TranslateActivityKey,
 };
 use rand::seq::index;
-use std::{
-    collections::{HashMap, HashSet},
-    sync::Arc,
-};
+use std::collections::{HashMap, HashSet};
 
 pub trait PermutationTestMl {
     fn permutation_test_ml(
@@ -52,8 +49,6 @@ impl PermutationTestMl for dyn EbiTraitEventLog {
 
         model.translate_using_activity_key(log_language.activity_key_mut());
 
-        let log_language = Arc::new(log_language);
-        let log_traces = Arc::new(log_traces);
         let mut errors = 0;
 
         log::info!("Perform the model-log permutation test");
@@ -61,10 +56,7 @@ impl PermutationTestMl for dyn EbiTraitEventLog {
 
         let mut e = 0;
         for _ in 0..number_of_samples {
-            let log_language = Arc::clone(&log_language);
-            let log_traces = Arc::clone(&log_traces);
-
-            let result = iteration(&log_language, &log_traces, model, number_of_traces)
+            let result = iteration(&mut log_language, &log_traces, model, number_of_traces)
                 .with_context(|| "Compute one model-log permutation test iteration.");
 
             progress_bar.inc(1);
@@ -92,7 +84,7 @@ impl PermutationTestMl for dyn EbiTraitEventLog {
 }
 
 fn iteration(
-    log_language: &FiniteStochasticLanguage,
+    log_language: &mut FiniteStochasticLanguage,
     log_traces: &[Vec<Activity>],
     model: &EbiTraitStochasticSemantics,
     number_of_traces: usize,
@@ -101,14 +93,15 @@ fn iteration(
         .sample(number_of_traces)
         .context("Sample traces from stochastic semantics.")?;
 
-    let base_distance = earth_movers_distance(&mut sample_language, &mut log_language.clone())
+    let base_distance = earth_movers_distance(&mut sample_language, log_language)
         .context("Compute base model-log distance.")?;
 
-    let mut pool = log_traces.to_vec();
-    pool.extend(expand_language(&sample_language, number_of_traces)?);
-
-    let (mut permuted_a, mut permuted_b) =
-        split_traces(&log_language.activity_key().clone(), pool, number_of_traces);
+    let (mut permuted_a, mut permuted_b) = split_traces(
+        log_language.activity_key(),
+        log_traces,
+        &sample_language,
+        number_of_traces,
+    )?;
 
     let permuted_distance = earth_movers_distance(&mut permuted_a, &mut permuted_b)
         .context("Compute permuted distance.")?;
@@ -127,30 +120,65 @@ fn earth_movers_distance(
 
 fn split_traces(
     activity_key: &ebi_objects::ActivityKey,
-    traces: Vec<Vec<Activity>>,
+    log_traces: &[Vec<Activity>],
+    sample_language: &FiniteStochasticLanguage,
     half_size: usize,
-) -> (FiniteStochasticLanguage, FiniteStochasticLanguage) {
+) -> Result<(FiniteStochasticLanguage, FiniteStochasticLanguage)> {
     let mut rng = rand::rng();
-    let selected = index::sample(&mut rng, traces.len(), half_size)
+    let selected = index::sample(&mut rng, half_size * 2, half_size)
         .into_vec()
         .into_iter()
         .collect::<HashSet<_>>();
 
-    let mut traces_a = Vec::with_capacity(half_size);
-    let mut traces_b = Vec::with_capacity(half_size);
+    let mut traces_a = HashMap::new();
+    let mut traces_b = HashMap::new();
+    let trace_weight = Fraction::from((1, half_size));
 
-    for (index, trace) in traces.into_iter().enumerate() {
-        if selected.contains(&index) {
-            traces_a.push(trace);
+    let mut pool_index = 0;
+    for trace in log_traces {
+        if selected.contains(&pool_index) {
+            add_trace(&mut traces_a, trace, &trace_weight);
         } else {
-            traces_b.push(trace);
+            add_trace(&mut traces_b, trace, &trace_weight);
+        }
+        pool_index += 1;
+    }
+
+    for (trace, probability) in sample_language.iter_traces_probabilities() {
+        let cardinality = probability_to_cardinality(probability, half_size)?;
+        for _ in 0..cardinality {
+            if selected.contains(&pool_index) {
+                add_trace(&mut traces_a, trace, &trace_weight);
+            } else {
+                add_trace(&mut traces_b, trace, &trace_weight);
+            }
+            pool_index += 1;
         }
     }
 
-    (
-        language_from_traces(activity_key.clone(), &traces_a),
-        language_from_traces(activity_key.clone(), &traces_b),
-    )
+    if pool_index != half_size * 2 {
+        return Err(anyhow!(
+            "Permutation pool contained {} traces instead of {}.",
+            pool_index,
+            half_size * 2
+        ));
+    }
+
+    Ok((
+        FiniteStochasticLanguage::new_raw(traces_a, activity_key.clone()),
+        FiniteStochasticLanguage::new_raw(traces_b, activity_key.clone()),
+    ))
+}
+
+fn add_trace(
+    traces: &mut HashMap<Vec<Activity>, Fraction>,
+    trace: &Vec<Activity>,
+    trace_weight: &Fraction,
+) {
+    traces
+        .entry(trace.clone())
+        .and_modify(|probability| *probability += trace_weight)
+        .or_insert_with(|| trace_weight.clone());
 }
 
 fn language_from_traces(
@@ -168,30 +196,6 @@ fn language_from_traces(
     }
 
     FiniteStochasticLanguage::new_raw(result, activity_key)
-}
-
-fn expand_language(
-    language: &FiniteStochasticLanguage,
-    number_of_traces: usize,
-) -> Result<Vec<Vec<Activity>>> {
-    let mut result = Vec::with_capacity(number_of_traces);
-
-    for (trace, probability) in language.iter_traces_probabilities() {
-        let cardinality = probability_to_cardinality(probability, number_of_traces)?;
-        for _ in 0..cardinality {
-            result.push(trace.clone());
-        }
-    }
-
-    if result.len() != number_of_traces {
-        return Err(anyhow!(
-            "Sample expansion produced {} traces instead of {}.",
-            result.len(),
-            number_of_traces
-        ));
-    }
-
-    Ok(result)
 }
 
 fn probability_to_cardinality(probability: &Fraction, number_of_traces: usize) -> Result<usize> {
