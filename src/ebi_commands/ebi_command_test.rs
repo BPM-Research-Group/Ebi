@@ -35,7 +35,6 @@ pub const EBI_TEST: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[
         &EBI_BOOTSTRAP_TEST,
-        &EBI_PERMUTATION_TEST,
         &EBI_PERMUTATION_TEST_ML,
         &EBI_TEST_LOG_ATTRIBUTE,
     ],
