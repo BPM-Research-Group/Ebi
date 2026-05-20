@@ -1,4 +1,3 @@
-use ebi_objects::{anyhow::Context, EbiObject, EbiObjectType, HasActivityKey};
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
@@ -11,8 +10,11 @@ use crate::{
     techniques::{
         flower_miner::{FlowerMinerDFA, FlowerMinerTree},
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
-    }, tests::test_ebi_command,
+        trace_model_miner::TraceModelMinerTree,
+    },
+    tests::test_ebi_command,
 };
+use ebi_objects::{EbiObject, EbiObjectType, HasActivityKey, anyhow::Context};
 
 pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     name_short: "dins",
@@ -22,6 +24,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     children: &[
         &EBI_DISCOVER_NON_STOCHASTIC_FLOWER,
         &EBI_DISCOVER_NON_STOCHASTIC_PREFIX,
+        &EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL,
     ],
 };
 test_ebi_command!(EBI_DISCOVER_NON_STOCHASTIC);
@@ -146,6 +149,26 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE: EbiCommand = EbiCommand::Comman
         let lpn = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
         Ok(EbiOutput::Object(EbiObject::ProcessTree(
             lpn.mine_prefix_tree_tree(),
+        )))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::ProcessTree),
+};
+
+pub const EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL: EbiCommand = EbiCommand::Command {
+    name_short: "tm",
+    name_long: Some("trace-model"),
+    explanation_short: "Discover a model that is a choice between all traces of the model.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteLanguage)]],
+    input_names: &["LANG"],
+    input_helps: &["A finite language."],
+    execute: |mut inputs, _| {
+        let lpn = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+        Ok(EbiOutput::Object(EbiObject::ProcessTree(
+            lpn.mine_trace_model_tree(),
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::ProcessTree),
