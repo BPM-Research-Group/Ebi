@@ -186,6 +186,7 @@ pub mod techniques {
     pub mod association;
     pub mod bootstrap_test;
     pub mod bounded;
+    pub mod are_timestamps_ordered;
     pub mod chi_square_stochastic_conformance;
     pub mod completeness;
     pub mod deterministic_semantics_for_stochastic_semantics;

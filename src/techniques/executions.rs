@@ -5,7 +5,10 @@ use crate::{
         ebi_trait_semantics::EbiTraitSemantics,
     },
     semantics::semantics::Semantics,
-    techniques::{align::Align, resource_utilisation::set_resource_utilisations},
+    techniques::{
+        align::Align, are_timestamps_ordered::AreTimestampsOrdered,
+        resource_utilisation::set_resource_utilisations,
+    },
 };
 use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
@@ -107,6 +110,10 @@ where
         //merge sort the executions
         let execution_list = ExecutionsSorter::merge_sort(trace_executions);
 
+        if !(execution_list.are_timestamps_ordered()?) {
+            unreachable!()
+        }
+
         //create the result object
         let mut executions = (
             log.activity_key().clone(),
@@ -194,7 +201,7 @@ impl C {
                         time_of_execution: self.get_time(Some(move_index), log).cloned(),
                         resource: self.get_resource(Some(move_index), log, resource_key),
                         resource_utilisation_fired_transition: None,
-                        resource_utilisation_other_enabled_transitions: vec![None; l]
+                        resource_utilisation_other_enabled_transitions: vec![None; l],
                     });
 
                     semantics.execute_transition(&mut state, transition)?;
@@ -216,7 +223,7 @@ impl C {
                         time_of_execution: None,
                         resource: None,
                         resource_utilisation_fired_transition: None,
-                        resource_utilisation_other_enabled_transitions: vec![None; l]
+                        resource_utilisation_other_enabled_transitions: vec![None; l],
                     });
 
                     semantics.execute_transition(&mut state, transition)?;
@@ -382,20 +389,23 @@ impl ExecutionsSorter {
             if let Some((trace_index, _)) = first_timestamps
                 .iter()
                 .enumerate()
-                .filter_map(|(trace_index, first)| {
-                    if let Some(first) = first {
+                .filter_map(|(trace_index, first_timestamp)| {
+                    if let Some(first) = first_timestamp {
                         Some((trace_index, first))
                     } else {
                         None
                     }
                 })
-                .min_by(|a, b| a.cmp(b))
+                .min_by(|a, b| {
+                    let c = a.1.cmp(&b.1);
+                    if !c.is_eq() { c } else { a.0.cmp(&b.0) }
+                })
             {
                 //process the trace with the lowest timestamp
 
-                //first, add all executions that do not have a timestamp
+                //first, add all executions up to and including the first one that has a timestamp
                 while let Some(execution) = traces[trace_index].pop_front() {
-                    let has_timestamp = execution.time_of_execution.is_none();
+                    let has_timestamp = execution.time_of_execution.is_some();
                     result.push(execution);
 
                     if has_timestamp {
@@ -403,11 +413,7 @@ impl ExecutionsSorter {
                     }
                 }
 
-                //second, add the execution that has a timestamp (if it exists)
-                if let Some(execution) = traces[trace_index].pop_front() {
-                    result.push(execution);
-                }
-
+                //update the first timestamp
                 first_timestamps[trace_index] =
                     Self::get_first_timestamp(&traces[trace_index]).cloned();
 
