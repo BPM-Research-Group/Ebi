@@ -20,7 +20,7 @@ impl Semantics for DirectlyFollowsGraph {
         if !self.has_empty_traces() && !self.start_activities.iter().any(|(_, w)| w.is_positive()) {
             None
         } else {
-            Some(self.activity_key.get_number_of_activities())
+            Some(self.activity_key.next_index)
         }
     }
 
@@ -31,7 +31,7 @@ impl Semantics for DirectlyFollowsGraph {
     ) -> Result<()> {
         if transition == self.sources.len() {
             //end
-            *state = self.activity_key.get_number_of_activities() + 1
+            *state = self.activity_key.next_index + 1
         } else if transition < self.sources.len() {
             //edge
             *state = self
@@ -45,7 +45,7 @@ impl Semantics for DirectlyFollowsGraph {
     }
 
     fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool {
-        state > &self.activity_key.get_number_of_activities()
+        state > &self.activity_key.next_index
     }
 
     fn is_transition_silent(
@@ -79,14 +79,14 @@ impl Semantics for DirectlyFollowsGraph {
         &self,
         state: &<Self as Semantics>::SemState,
     ) -> Vec<TransitionIndex> {
-        if state == &self.activity_key.get_number_of_activities() {
+        if state == &self.activity_key.next_index {
             //we are in the initial state
             let mut result = self
                 .start_activities
                 .iter()
                 .filter_map(|(a, w)| {
                     if w.is_positive() {
-                        Some(self.activity_key.get_id_from_activity(a))
+                        Some(self.sources.len() + 1 + self.activity_key.get_id_from_activity(a))
                     } else {
                         None
                     }
@@ -98,7 +98,7 @@ impl Semantics for DirectlyFollowsGraph {
             }
 
             result
-        } else if state > &self.activity_key.get_number_of_activities() {
+        } else if state > &self.activity_key.next_index {
             //we are in the final state
             vec![]
         } else {
@@ -126,5 +126,46 @@ impl Semantics for DirectlyFollowsGraph {
 
     fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState) -> usize {
         self.sources.len() + 1 + self.sources.len()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::semantics::semantics::Semantics;
+    use ebi_objects::{DirectlyFollowsGraph, HasActivityKey};
+    use std::fs;
+
+    #[cfg(test)]
+    macro_rules! assert_execute_expect {
+        ($tree:ident, $state:ident, $t:expr, $e:expr) => {
+            println!("execute {} {}", ::std::stringify!($t), $t);
+            assert!($tree.get_enabled_transitions(&$state).contains(&$t));
+            $tree.execute_transition(&mut $state, $t).unwrap();
+            println!("state {}\n", $state);
+            assert_eq!($tree.get_enabled_transitions(&$state), $e);
+        };
+    }
+
+    #[test]
+    fn dfg_semantics() {
+        let fin = fs::read_to_string("testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap();
+        let mut dfg = fin.parse::<DirectlyFollowsGraph>().unwrap();
+
+        let a_submitted = dfg.activity_key_mut().process_activity("A_SUBMITTED");
+        let a_partlysubmitted = dfg.activity_key_mut().process_activity("A_PARTLYSUBMITTED");
+
+        let mut state = dfg.get_initial_state().unwrap();
+        println!("{}\n", state);
+        assert_eq!(dfg.get_enabled_transitions(&state), [25]);
+        assert_eq!(
+            dfg.get_transition_activity(25, &state).unwrap(),
+            a_submitted
+        );
+
+        assert_execute_expect!(dfg, state, 25, [14]);
+        assert_eq!(
+            dfg.get_transition_activity(14, &state).unwrap(),
+            a_partlysubmitted
+        );
     }
 }

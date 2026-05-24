@@ -373,6 +373,14 @@ impl EbiCommand {
                     log::info!("Reading {}", input_name);
                     let input = Self::attempt_parse(input_types, cli_matches, &cli_id, i)
                         .with_context(|| format!("Reading parameter {}.", input_name))?;
+                    log::debug!(
+                        "Read {input_name} as {} ({})",
+                        input.get_type(),
+                        input
+                            .importing_file_handler()
+                            .map(|x| format!("event handler: {}", x.name))
+                            .unwrap_or_else(|| "no file handler".to_string())
+                    );
                     inputs.push(input);
                 }
 

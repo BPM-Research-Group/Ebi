@@ -5,10 +5,7 @@ use crate::{
         ebi_trait_semantics::EbiTraitSemantics,
     },
     semantics::semantics::Semantics,
-    techniques::{
-        align::Align, are_timestamps_ordered::AreTimestampsOrdered,
-        resource_utilisation::set_resource_utilisations,
-    },
+    techniques::{align::Align, resource_utilisation::set_resource_utilisations},
 };
 use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
@@ -76,6 +73,7 @@ where
                 match alignment {
                     Result::Ok((aligned_trace, _)) => {
                         //process the moves of this trace
+                        // println!("{:?}", aligned_trace);
                         let c = C::new(trace_index, aligned_trace);
                         match c.alignment_to_executions(self, &log, &resource_key) {
                             Result::Ok(c) => Some(c),
@@ -98,6 +96,8 @@ where
 
         progress_bar.finish_and_clear();
 
+        // println!("{}", self.activity_key());
+
         //see whether an error was reported
         if let Result::Ok(mutex) = Arc::try_unwrap(error) {
             if let Result::Ok(err) = mutex.into_inner() {
@@ -109,10 +109,6 @@ where
 
         //merge sort the executions
         let execution_list = ExecutionsSorter::merge_sort(trace_executions);
-
-        if !(execution_list.are_timestamps_ordered()?) {
-            unreachable!()
-        }
 
         //create the result object
         let mut executions = (
@@ -379,6 +375,8 @@ impl ExecutionsSorter {
     fn merge_sort(mut traces: Vec<VecDeque<Execution>>) -> Vec<Execution> {
         let number_of_executions = traces.iter().map(|t| t.len()).sum();
         let mut result = Vec::with_capacity(number_of_executions);
+
+        log::info!("Sorting executions");
 
         //initialise first-timestamps
         let mut first_timestamps = (0..traces.len())
