@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
@@ -11,6 +9,7 @@ use crate::{
 use ebi_objects::anyhow::{Context, Error, Result, anyhow};
 use itertools::Itertools;
 use js_sys::Uint8Array;
+use std::path::PathBuf;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -80,7 +79,9 @@ pub fn read_inputs(
                 (Some(string_input), None) => MultipleReader::String(string_input),
                 (None, Some(array)) => MultipleReader::Bytes(array.to_vec()),
                 _ => {
-                    return Err(anyhow!("No inputs or both textual and binary inputs given."));
+                    return Err(anyhow!(
+                        "No inputs or both textual and binary inputs given."
+                    ));
                 }
             };
 
