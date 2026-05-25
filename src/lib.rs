@@ -205,6 +205,7 @@ pub mod techniques {
     #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
     pub mod earth_movers_stochastic_conformance_f64;
     pub mod edge_difference;
+    pub mod edge_difference_no_freq;
     pub mod entropic_relevance;
     pub mod entropy;
     pub mod escaping_edges_precision;
@@ -215,6 +216,7 @@ pub mod techniques {
     pub mod flower_miner;
     pub mod gain_precision_recall;
     pub mod hellinger_stochastic_conformance;
+    pub mod inductive_miner;
     pub mod infinitely_many_traces;
     pub mod jensen_shannon_stochastic_conformance;
     pub mod livelock;
