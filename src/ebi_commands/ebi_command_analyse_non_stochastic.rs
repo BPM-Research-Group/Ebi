@@ -402,7 +402,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
             EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(object), _) => {
                 object.infinitely_many_traces()?
             }
-            _ => unreachable!(),
+            _ => return Err(anyhow!("Unsupported object {:?} provided.", model.get_type())),
         };
         if result {
             log::debug!("The language of the model has infinitely many traces.");
@@ -463,7 +463,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED: EbiCommand = EbiCommand
         let result = match objects.remove(0) {
             EbiInput::Trait(EbiTraitObject::EventLogEventAttributes(log), _) => log.are_timestamps_ordered(),
             EbiInput::Object(EbiObject::Executions(exs), _) => exs.are_timestamps_ordered(),
-            _ => unreachable!()
+            o => return Err(anyhow!("Unsupported object {:?} provided.", o.get_type()))
         };
         Ok(EbiOutput::Bool(result?))
     }, 

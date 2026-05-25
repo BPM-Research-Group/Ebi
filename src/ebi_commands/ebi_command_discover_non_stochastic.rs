@@ -14,7 +14,10 @@ use crate::{
     },
     tests::test_ebi_command,
 };
-use ebi_objects::{EbiObject, EbiObjectType, HasActivityKey, anyhow::Context};
+use ebi_objects::{
+    EbiObject, EbiObjectType, HasActivityKey,
+    anyhow::{Context, anyhow},
+};
 
 pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     name_short: "dins",
@@ -67,7 +70,12 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA: EbiCommand = EbiCommand::Comma
                     lang.mine_flower_dfa()
                         .with_context(|| format!("cannot compute flower model"))?
                 }
-                _ => unreachable!(),
+                object => {
+                    return Err(anyhow!(
+                        "Unsupported object {:?} provided.",
+                        object.get_type()
+                    ));
+                }
             },
         )))
     },
@@ -96,7 +104,12 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE: EbiCommand = EbiCommand::Comm
                     let lang: Box<dyn HasActivityKey> = lang;
                     lang.mine_flower_tree()
                 }
-                _ => unreachable!(),
+                object => {
+                    return Err(anyhow!(
+                        "Unsupported object {:?} provided.",
+                        object.get_type()
+                    ));
+                }
             },
         )))
     },

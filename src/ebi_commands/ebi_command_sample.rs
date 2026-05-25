@@ -10,7 +10,8 @@ use crate::{
     techniques::{
         sample::{PartiallyOrderedSampler, Sampler},
         sample_folds::FoldsSampler,
-    }, tests::test_ebi_command,
+    },
+    tests::test_ebi_command,
 };
 use ebi_objects::{
     EbiObject, EbiObjectType, EventLog, FiniteStochasticLanguage,
@@ -39,7 +40,12 @@ pub fn get_sampled_object(
                 .sample(number_of_traces)
                 .context("Sample semantics.")
         }
-        _ => unreachable!(),
+        _ => {
+            return Err(anyhow!(
+                "Unsupported object {:?} provided.",
+                object.get_type()
+            ));
+        }
     }
 }
 
@@ -55,7 +61,12 @@ pub fn get_sampled_object_if_necessary(
                 .context("Sample semantics.")?;
             Box::new(slang)
         }
-        _ => unreachable!(),
+        _ => {
+            return Err(anyhow!(
+                "Unsupported object {:?} provided.",
+                object.get_type()
+            ));
+        }
     })
 }
 

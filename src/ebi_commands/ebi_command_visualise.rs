@@ -1,4 +1,6 @@
-use ebi_objects::{EbiObject, EbiObjectType, ebi_objects::scalable_vector_graphics::ToSVG};
+use ebi_objects::{
+    EbiObject, EbiObjectType, anyhow::anyhow, ebi_objects::scalable_vector_graphics::ToSVG,
+};
 
 use crate::{
     ebi_framework::{
@@ -32,7 +34,8 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
     input_names: &["FILE"],
     input_helps: &["Any file that can be visualised textually."],
     execute: |mut inputs, _| {
-        let result = match inputs.remove(0) {
+        let object = inputs.remove(0);
+        let result = match object {
             EbiInput::Object(EbiObject::BusinessProcessModelAndNotation(bpmn), _) => {
                 bpmn.to_string()
             }
@@ -71,11 +74,36 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::ScalableVectorGraphics(s), _) => s.to_string(),
             EbiInput::Object(EbiObject::PortableDocumentFormat(s), _) => s.to_string(),
             EbiInput::Object(EbiObject::PortableNetworkGraphics(s), _) => s.to_string(),
-            EbiInput::FileHandler(_) => unreachable!(),
-            EbiInput::Trait(_, _) => unreachable!(),
-            EbiInput::String(_, _) => unreachable!(),
-            EbiInput::Usize(_, _) => unreachable!(),
-            EbiInput::Fraction(_, _) => unreachable!(),
+            EbiInput::FileHandler(_) => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    object.get_type()
+                ));
+            }
+            EbiInput::Trait(_, _) => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    object.get_type()
+                ));
+            }
+            EbiInput::String(_, _) => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    object.get_type()
+                ));
+            }
+            EbiInput::Usize(_, _) => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    object.get_type()
+                ));
+            }
+            EbiInput::Fraction(_, _) => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    object.get_type()
+                ));
+            }
         };
         Ok(EbiOutput::String(result))
     },

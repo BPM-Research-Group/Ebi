@@ -1217,7 +1217,7 @@ pub(crate) mod tests {
                     let mut reader = MultipleReader::from_file(File::open(file).unwrap());
                     match ebi_input::read_as_trait(&etrait, &mut reader, None, 0) {
                         Ok((object, file_handler)) => EbiInput::Trait(object, file_handler),
-                        Err(_) => unreachable!(),
+                        Err(_) => panic!(),
                     }
                 }
                 TestInput::Object(o, fh, _) => EbiInput::Object(o, fh),

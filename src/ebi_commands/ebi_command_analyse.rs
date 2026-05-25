@@ -1,4 +1,4 @@
-use ebi_objects::{DirectlyFollowsGraph, EbiObject, EbiObjectType, anyhow::Context, ebi_arithmetic::{ConstFraction, Fraction, Zero}};
+use ebi_objects::{DirectlyFollowsGraph, EbiObject, EbiObjectType, anyhow::{Context, anyhow}, ebi_arithmetic::{ConstFraction, Fraction, Zero}};
 use crate::{ebi_framework::{ebi_command::EbiCommand, ebi_input::{EbiInput, EbiInputType}, ebi_output::{EbiOutput, EbiOutputType}, ebi_trait::EbiTrait, ebi_trait_object::EbiTraitObject}, ebi_traits::{ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage, ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics}, techniques::{completeness::Completeness, edge_difference::EdgeDifference, entropy::Entropy, medoid, probability_queries::ProbabilityQueries, process_variety::ProcessVariety}, tests::test_ebi_command};
 
 pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
@@ -44,7 +44,7 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
             EbiInput::Trait(EbiTraitObject::StochasticDeterministicSemantics(semantics), _) => {
                 semantics.analyse_minimum_probability(&Fraction::zero()).with_context(|| "could not analyse language")?
             },
-            _ => unreachable!()
+            _ => return Err(anyhow!("Unsupported object {:?} provided.", object.get_type()))
         };
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     }, 
@@ -100,7 +100,7 @@ The computation may not terminate if the model has non-decreasing livelocks, or 
             EbiInput::Trait(EbiTraitObject::StochasticDeterministicSemantics(semantics), _) => {
                 semantics.analyse_probability_coverage(&coverage).context("Analysing language.")?
             },
-            _ => unreachable!()
+            _ => return Err(anyhow!("Unsupported object {:?} provided.", model.get_type()))
         };
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     }, 
@@ -165,7 +165,7 @@ pub const EBI_ANALYSE_ENTROPY: EbiCommand = EbiCommand::Command {
                 slang.entropy()?,
             EbiInput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(sdfa), _) => 
                 sdfa.entropy()?,
-            _ => unreachable!()
+            object => return Err(anyhow!("Unsupported object {:?} provided.", object.get_type()))
         };
         Ok(EbiOutput::LogPolynomial(result))
     },
@@ -225,7 +225,7 @@ Computation is more efficient for an object with a finite stochastic language.")
             EbiInput::Trait(EbiTraitObject::StochasticDeterministicSemantics(semantics), _) => {
                 semantics.analyse_most_likely_traces(&number_of_traces).context("Analysing language.")?
             },
-            _ => unreachable!()
+            _ => return Err(anyhow!("Unsupported object {:?} provided.", object.get_type()))
         };
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     }, 
@@ -258,7 +258,7 @@ Computation is more efficient for a model with a finite stochastic language."),
             EbiInput::Trait(EbiTraitObject::StochasticDeterministicSemantics(semantics), _) => {
                 semantics.analyse_most_likely_traces(&number_of_traces).context("Analysing language.")?
             },
-            _ => unreachable!()
+            object => return Err(anyhow!("Unsupported object {:?} provided.", object.get_type()))
         };
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     }, 

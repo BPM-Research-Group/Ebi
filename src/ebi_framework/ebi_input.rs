@@ -1505,7 +1505,9 @@ pub fn attempt_parse(
                 if let MultipleReader::String(string) = &reader {
                     return Ok(EbiInput::String(string.clone(), &input_type));
                 } else {
-                    unreachable!()
+                    return Err(anyhow!(
+                        "Cannot get a string from a non-string multireader."
+                    ));
                 }
             }
             EbiInputType::String(Some(allowed_values), _) => {
@@ -1516,7 +1518,9 @@ pub fn attempt_parse(
                         error = Some(anyhow!("value should be one of {:?}", allowed_values));
                     }
                 } else {
-                    unreachable!()
+                    return Err(anyhow!(
+                        "Cannot get a string from a non-string multireader."
+                    ));
                 }
             }
             EbiInputType::Usize(min, max, _) => {

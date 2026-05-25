@@ -181,7 +181,7 @@ macro_rules! default_stochastic_deterministic_semantics {
                                     marking, probability
                                 );
                                 q_state.termination_probability += probability;
-                                unreachable!("This is a bug. A state was encountered that should not be assigned a non-zero probability.");
+                                panic!("This is a bug. A state was encountered that should not be assigned a non-zero probability.");
                             }
                             MarkovMarking::AfterExecutingActivity(marking, activity) => {
                                 match q_state.activity_2_probability.entry(activity) {

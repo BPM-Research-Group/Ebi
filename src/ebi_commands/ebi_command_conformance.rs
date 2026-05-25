@@ -659,7 +659,12 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
                 slpn.abstract_markovian(*order)
             }
-            _ => unreachable!(),
+            _ => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    lang1.get_type()
+                ));
+            }
         }?;
         let abstraction2 = match &mut lang2 {
             EbiInput::Object(EbiObject::StochasticNondeterministicFiniteAutomaton(snfa), _) => {
@@ -671,7 +676,12 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
                 slpn.abstract_markovian(*order)
             }
-            _ => unreachable!(),
+            _ => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    lang2.get_type()
+                ));
+            }
         }?;
 
         let result = abstraction1.markovian_conformance(abstraction2, *measure)?;
