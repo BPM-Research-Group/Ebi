@@ -80,7 +80,7 @@ pub fn read_inputs(
                 (Some(string_input), None) => MultipleReader::String(string_input),
                 (None, Some(array)) => MultipleReader::Bytes(array.to_vec()),
                 _ => {
-                    return Err(anyhow!("No or both textual and binary inputs given."));
+                    return Err(anyhow!("No inputs or both textual and binary inputs given."));
                 }
             };
 
