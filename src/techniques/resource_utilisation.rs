@@ -8,6 +8,7 @@ use itertools::Itertools;
 use std::fmt::Display;
 
 pub fn set_resource_utilisations(executions: &mut Executions) -> Result<()> {
+    log::info!("Computing resource utilisations");
     //discover a resource model
     let resource_model = ResourceModel::from_executions(&executions);
 

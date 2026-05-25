@@ -12,6 +12,7 @@ use std::fmt::Display;
 pub trait EbiTraitFiniteLanguage:
     Display + EbiTraitIterableLanguage + NumberOfTraces + Send + Sync
 {
+    fn to_finite_language(&self) -> FiniteLanguage;
 }
 
 impl FromEbiTraitObject for dyn EbiTraitFiniteLanguage {
@@ -27,9 +28,17 @@ impl FromEbiTraitObject for dyn EbiTraitFiniteLanguage {
     }
 }
 
-impl EbiTraitFiniteLanguage for FiniteLanguage {}
+impl EbiTraitFiniteLanguage for FiniteLanguage {
+    fn to_finite_language(&self) -> FiniteLanguage {
+        self.clone()
+    }
+}
 
-impl EbiTraitFiniteLanguage for FiniteStochasticLanguage {}
+impl EbiTraitFiniteLanguage for FiniteStochasticLanguage {
+    fn to_finite_language(&self) -> FiniteLanguage {
+        self.clone().into()
+    }
+}
 
 impl<T> ToFiniteLanguageTrait for T
 where

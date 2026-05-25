@@ -192,8 +192,7 @@ impl ToSemanticsTrait for StochasticDirectlyFollowsModel {
 
 impl ToSemanticsTrait for DirectlyFollowsGraph {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        let dfm: DirectlyFollowsModel = self.into();
-        EbiTraitSemantics::Usize(Box::new(dfm))
+        EbiTraitSemantics::Usize(Box::new(self))
     }
 }
 

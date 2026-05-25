@@ -1,4 +1,3 @@
-use ebi_objects::{anyhow::Context, EbiObject, EbiObjectType, HasActivityKey};
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
@@ -11,8 +10,14 @@ use crate::{
     techniques::{
         flower_miner::{FlowerMinerDFA, FlowerMinerTree},
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
+        trace_model_miner::TraceModelMinerTree,
         inductive_miner::InductiveMinerTree,
-    }, tests::test_ebi_command,
+    },
+    tests::test_ebi_command,
+};
+use ebi_objects::{
+    EbiObject, EbiObjectType, HasActivityKey,
+    anyhow::{Context, anyhow},
 };
 
 pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
@@ -23,6 +28,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     children: &[
         &EBI_DISCOVER_NON_STOCHASTIC_FLOWER,
         &EBI_DISCOVER_NON_STOCHASTIC_PREFIX,
+        &EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL,
         &EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER,
     ],
 };
@@ -66,7 +72,12 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA: EbiCommand = EbiCommand::Comma
                     lang.mine_flower_dfa()
                         .with_context(|| format!("cannot compute flower model"))?
                 }
-                _ => unreachable!(),
+                object => {
+                    return Err(anyhow!(
+                        "Unsupported object {:?} provided.",
+                        object.get_type()
+                    ));
+                }
             },
         )))
     },
@@ -95,7 +106,12 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE: EbiCommand = EbiCommand::Comm
                     let lang: Box<dyn HasActivityKey> = lang;
                     lang.mine_flower_tree()
                 }
-                _ => unreachable!(),
+                object => {
+                    return Err(anyhow!(
+                        "Unsupported object {:?} provided.",
+                        object.get_type()
+                    ));
+                }
             },
         )))
     },
@@ -153,6 +169,26 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE: EbiCommand = EbiCommand::Comman
     output_type: &EbiOutputType::ObjectType(EbiObjectType::ProcessTree),
 };
 
+pub const EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL: EbiCommand = EbiCommand::Command {
+    name_short: "tm",
+    name_long: Some("trace-model"),
+    explanation_short: "Discover a model that is a choice between all traces of the model.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteLanguage)]],
+    input_names: &["LANG"],
+    input_helps: &["A finite language."],
+    execute: |mut inputs, _| {
+        let lpn = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+        Ok(EbiOutput::Object(EbiObject::ProcessTree(
+            lpn.mine_trace_model_tree(),
+        )))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::ProcessTree),
+};
+
 pub const EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER: EbiCommand = EbiCommand::Command {
     name_short: "ind",
     name_long: Some("inductive-mined-ptree"),
@@ -172,3 +208,4 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER: EbiCommand = EbiCommand::
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::ProcessTree),
 };
+

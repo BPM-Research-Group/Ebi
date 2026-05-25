@@ -69,6 +69,17 @@ impl EbiInput {
             EbiInput::Fraction(_, input_type) => (*input_type).clone(),
         }
     }
+
+    pub fn importing_file_handler(&self) -> Option<&'static EbiFileHandler> {
+        match self {
+            EbiInput::Trait(_, ebi_file_handler) => Some(ebi_file_handler),
+            EbiInput::Object(_, ebi_file_handler) => Some(ebi_file_handler),
+            EbiInput::String(_, _) => None,
+            EbiInput::Usize(_, _) => None,
+            EbiInput::FileHandler(_) => None,
+            EbiInput::Fraction(_, _) => None,
+        }
+    }
 }
 
 #[macro_export]
@@ -1446,7 +1457,10 @@ pub fn read_as_any_object(
 }
 
 /// Attempt to parse an input as any of the given input types. Returns the last error if unsuccessful.
-pub fn attempt_parse(input_types: &[&'static EbiInputType], mut reader: MultipleReader) -> Result<EbiInput> {
+pub fn attempt_parse(
+    input_types: &[&'static EbiInputType],
+    mut reader: MultipleReader,
+) -> Result<EbiInput> {
     //an input may be of several types; go through each of them
     let mut error = None;
     for input_type in input_types.iter() {
@@ -1491,7 +1505,9 @@ pub fn attempt_parse(input_types: &[&'static EbiInputType], mut reader: Multiple
                 if let MultipleReader::String(string) = &reader {
                     return Ok(EbiInput::String(string.clone(), &input_type));
                 } else {
-                    unreachable!()
+                    return Err(anyhow!(
+                        "Cannot get a string from a non-string multireader."
+                    ));
                 }
             }
             EbiInputType::String(Some(allowed_values), _) => {
@@ -1502,7 +1518,9 @@ pub fn attempt_parse(input_types: &[&'static EbiInputType], mut reader: Multiple
                         error = Some(anyhow!("value should be one of {:?}", allowed_values));
                     }
                 } else {
-                    unreachable!()
+                    return Err(anyhow!(
+                        "Cannot get a string from a non-string multireader."
+                    ));
                 }
             }
             EbiInputType::Usize(min, max, _) => {

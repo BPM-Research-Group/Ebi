@@ -4,12 +4,13 @@ use crate::{
         ebi_input::{EbiInput, EbiInputType},
         ebi_output::{EbiOutput, EbiOutputType},
     },
-    techniques::stochastic_markovian_abstraction::build_embedded_snfa, tests::test_ebi_command,
+    techniques::stochastic_markovian_abstraction::build_embedded_snfa,
+    tests::test_ebi_command,
 };
 use ebi_objects::{
     BusinessProcessModelAndNotation, EbiObject, EbiObjectType, EventLog, FiniteLanguage,
     FiniteStochasticLanguage, LabelledPetriNet, StochasticDeterministicFiniteAutomaton,
-    StochasticLabelledPetriNet,
+    StochasticLabelledPetriNet, anyhow::anyhow,
 };
 
 pub const EBI_CONVERT: EbiCommand = EbiCommand::Group {
@@ -204,7 +205,12 @@ pub const EBI_CONVERT_SNFA: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::StochasticLabelledPetriNet(slpn), _) => {
                 build_embedded_snfa(&slpn)?
             }
-            _ => unreachable!(),
+            object => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    object.get_type()
+                ));
+            }
         };
         Ok(EbiOutput::Object(
             EbiObject::StochasticNondeterministicFiniteAutomaton(snfa),

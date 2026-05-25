@@ -401,21 +401,40 @@ impl EbiExporter {
         match (self, output) {
             (EbiExporter::Object(exporter, _), object) => exporter.export(object, f),
             (EbiExporter::String, EbiOutput::String(object)) => object.export(f),
-            (EbiExporter::String, _) => unreachable!(),
+            (EbiExporter::String, _) => {
+                return Err(anyhow!("Cannot export {} as string", self.get_name()));
+            }
             (EbiExporter::Usize, EbiOutput::Usize(object)) => object.export(f),
-            (EbiExporter::Usize, _) => unreachable!(),
+            (EbiExporter::Usize, _) => {
+                return Err(anyhow!("Cannot export {} as number", self.get_name()));
+            }
             (EbiExporter::Fraction, EbiOutput::Fraction(object)) => object.export(f),
-            (EbiExporter::Fraction, _) => unreachable!(),
+            (EbiExporter::Fraction, _) => {
+                return Err(anyhow!("Cannot export {} as fraction", self.get_name()));
+            }
             (EbiExporter::LogDiv, EbiOutput::LogDiv(object)) => object.export(f),
-            (EbiExporter::LogDiv, _) => unreachable!(),
+            (EbiExporter::LogDiv, _) => {
+                return Err(anyhow!("Cannot export {} as logdiv", self.get_name()));
+            }
             (EbiExporter::LogPolynomial, EbiOutput::LogPolynomial(object)) => object.export(f),
-            (EbiExporter::LogPolynomial, _) => unreachable!(),
+            (EbiExporter::LogPolynomial, _) => {
+                return Err(anyhow!(
+                    "Cannot export {} as log polynomial",
+                    self.get_name()
+                ));
+            }
             (EbiExporter::ContainsRoot, EbiOutput::ContainsRoot(object)) => object.export(f),
-            (EbiExporter::ContainsRoot, _) => unreachable!(),
+            (EbiExporter::ContainsRoot, _) => {
+                return Err(anyhow!("Cannot export {} as containsroot", self.get_name()));
+            }
             (EbiExporter::RootLogDiv, EbiOutput::RootLogDiv(object)) => object.export(f),
-            (EbiExporter::RootLogDiv, _) => unreachable!(),
+            (EbiExporter::RootLogDiv, _) => {
+                return Err(anyhow!("Cannot export {} as rootlogdiv", self.get_name()));
+            }
             (EbiExporter::Bool, EbiOutput::Bool(object)) => object.export(f),
-            (EbiExporter::Bool, _) => unreachable!(),
+            (EbiExporter::Bool, _) => {
+                return Err(anyhow!("Cannot export {} as bool", self.get_name()));
+            }
         }
     }
 
@@ -852,44 +871,62 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_string() {
         let mut f = vec![];
-        let _ = EbiExporter::String.export_from_object(EbiOutput::Usize(10), &mut f);
+        assert!(
+            EbiExporter::String
+                .export_from_object(EbiOutput::Usize(10), &mut f)
+                .is_err()
+        );
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_usize() {
         let mut f = vec![];
-        let _ = EbiExporter::Usize.export_from_object(EbiOutput::String("a".to_string()), &mut f);
+        assert!(
+            EbiExporter::Usize
+                .export_from_object(EbiOutput::String("a".to_string()), &mut f)
+                .is_err()
+        );
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_fraction() {
         let mut f = vec![];
-        let _ = EbiExporter::Fraction.export_from_object(EbiOutput::Usize(10), &mut f);
+        assert!(
+            EbiExporter::Fraction
+                .export_from_object(EbiOutput::Usize(10), &mut f)
+                .is_err()
+        );
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_logdiv() {
         let mut f = vec![];
-        let _ = EbiExporter::LogDiv.export_from_object(EbiOutput::Usize(10), &mut f);
+        assert!(
+            EbiExporter::LogDiv
+                .export_from_object(EbiOutput::Usize(10), &mut f)
+                .is_err()
+        );
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_containsroot() {
         let mut f = vec![];
-        let _ = EbiExporter::ContainsRoot.export_from_object(EbiOutput::Usize(10), &mut f);
+        assert!(
+            EbiExporter::ContainsRoot
+                .export_from_object(EbiOutput::Usize(10), &mut f)
+                .is_err()
+        );
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_rootlogdiv() {
         let mut f = vec![];
-        let _ = EbiExporter::RootLogDiv.export_from_object(EbiOutput::Usize(10), &mut f);
+        assert!(
+            EbiExporter::RootLogDiv
+                .export_from_object(EbiOutput::Usize(10), &mut f)
+                .is_err()
+        );
     }
 }

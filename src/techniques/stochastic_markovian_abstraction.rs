@@ -623,7 +623,7 @@ fn solve_sparse_linear_system_optimized(
                     }
                     p += 1;
                 }
-                (None, None) => unreachable!(),
+                (None, None) => panic!(),
             }
         }
         out.shrink_to_fit();

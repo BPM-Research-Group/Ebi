@@ -186,6 +186,7 @@ pub mod techniques {
     pub mod association;
     pub mod bootstrap_test;
     pub mod bounded;
+    pub mod are_timestamps_ordered;
     pub mod chi_square_stochastic_conformance;
     pub mod completeness;
     pub mod deterministic_semantics_for_stochastic_semantics;
@@ -237,6 +238,7 @@ pub mod techniques {
     pub mod stochastic_markovian_abstraction;
     pub mod stochastic_markovian_abstraction_conformance;
     pub mod tau_removal;
+    pub mod trace_model_miner;
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;

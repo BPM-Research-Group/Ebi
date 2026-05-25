@@ -3,14 +3,13 @@ use crate::{
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
         ebi_output::{EbiOutput, EbiOutputType},
-        ebi_trait::EbiTrait,
+        ebi_trait::EbiTrait, ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::{
         ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics
     },
     techniques::{
-        any_traces::AnyTraces, bounded::Bounded, executions::FindExecutions,
-        infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic,
+        any_traces::AnyTraces, are_timestamps_ordered::AreTimestampsOrdered, bounded::Bounded, executions::FindExecutions, infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic
     }, tests::test_ebi_command,
 };
 use ebi_objects::{EbiObject, EbiObjectType, anyhow::anyhow};
@@ -29,6 +28,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
         &EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES,
         &EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES,
         &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
+        &EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED,
     ],
 };
 
@@ -402,7 +402,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
             EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(object), _) => {
                 object.infinitely_many_traces()?
             }
-            _ => unreachable!(),
+            _ => return Err(anyhow!("Unsupported object {:?} provided.", model.get_type())),
         };
         if result {
             log::debug!("The language of the model has infinitely many traces.");
@@ -441,4 +441,31 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_MEDOID: EbiCommand = EbiCommand::Command {
         return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage),
+};
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED: EbiCommand = EbiCommand::Command {
+    name_short: "to",
+    name_long: Some("timestamps-ordered"),
+    explanation_short: "Check whether all timestamps are in a correct order.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[
+            &EbiInputType::Trait(EbiTrait::EventLogEventAttributes), 
+            &EbiInputType::Object(EbiObjectType::Executions)
+        ]
+    ],
+    input_names: &["LOG"],
+    input_helps: &["The event log"],
+    execute: |mut objects, _| {
+        let result = match objects.remove(0) {
+            EbiInput::Trait(EbiTraitObject::EventLogEventAttributes(log), _) => log.are_timestamps_ordered(),
+            EbiInput::Object(EbiObject::Executions(exs), _) => exs.are_timestamps_ordered(),
+            o => return Err(anyhow!("Unsupported object {:?} provided.", o.get_type()))
+        };
+        Ok(EbiOutput::Bool(result?))
+    }, 
+    output_type: &EbiOutputType::Bool,
 };
