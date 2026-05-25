@@ -871,44 +871,62 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_string() {
         let mut f = vec![];
-        let _ = EbiExporter::String.export_from_object(EbiOutput::Usize(10), &mut f);
+        assert!(
+            EbiExporter::String
+                .export_from_object(EbiOutput::Usize(10), &mut f)
+                .is_err()
+        );
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_usize() {
         let mut f = vec![];
-        let _ = EbiExporter::Usize.export_from_object(EbiOutput::String("a".to_string()), &mut f);
+        assert!(
+            EbiExporter::Usize
+                .export_from_object(EbiOutput::String("a".to_string()), &mut f)
+                .is_err()
+        );
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_fraction() {
         let mut f = vec![];
-        let _ = EbiExporter::Fraction.export_from_object(EbiOutput::Usize(10), &mut f);
+        assert!(
+            EbiExporter::Fraction
+                .export_from_object(EbiOutput::Usize(10), &mut f)
+                .is_err()
+        );
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_logdiv() {
         let mut f = vec![];
-        let _ = EbiExporter::LogDiv.export_from_object(EbiOutput::Usize(10), &mut f);
+        assert!(
+            EbiExporter::LogDiv
+                .export_from_object(EbiOutput::Usize(10), &mut f)
+                .is_err()
+        );
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_containsroot() {
         let mut f = vec![];
-        let _ = EbiExporter::ContainsRoot.export_from_object(EbiOutput::Usize(10), &mut f);
+        assert!(
+            EbiExporter::ContainsRoot
+                .export_from_object(EbiOutput::Usize(10), &mut f)
+                .is_err()
+        );
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_rootlogdiv() {
         let mut f = vec![];
-        let _ = EbiExporter::RootLogDiv.export_from_object(EbiOutput::Usize(10), &mut f);
+        assert!(
+            EbiExporter::RootLogDiv
+                .export_from_object(EbiOutput::Usize(10), &mut f)
+                .is_err()
+        );
     }
 }

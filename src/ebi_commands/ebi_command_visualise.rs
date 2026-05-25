@@ -135,11 +135,6 @@ pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command {
 #[cfg(test)]
 mod tests {
 
-    use ebi_objects::{
-        FiniteLanguage,
-        ebi_arithmetic::{Fraction, One},
-    };
-
     use crate::{
         ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT,
         ebi_file_handlers::stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
@@ -150,6 +145,10 @@ mod tests {
             },
             ebi_trait_object::EbiTraitObject,
         },
+    };
+    use ebi_objects::{
+        FiniteLanguage,
+        ebi_arithmetic::{Fraction, One},
     };
 
     #[test]
@@ -164,43 +163,38 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_filehandler() {
         let object = EbiInput::FileHandler(EBI_STOCHASTIC_LABELLED_PETRI_NET);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
-            let _ = (execute)(vec![object], None);
+            assert!((execute)(vec![object], None).is_err());
         }
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_string() {
         let object = EbiInput::String("abc".to_string(), &TEST_INPUT_TYPE_STRING);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
-            let _ = (execute)(vec![object], None);
+            assert!((execute)(vec![object], None).is_err());
         }
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_usize() {
         let object = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
-            let _ = (execute)(vec![object], None);
+            assert!((execute)(vec![object], None).is_err());
         }
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_fraction() {
         let object = EbiInput::Fraction(Fraction::one(), &TEST_INPUT_TYPE_FRACTION);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
-            let _ = (execute)(vec![object], None);
+            assert!((execute)(vec![object], None).is_err());
         }
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_trait() {
         let net = "finite language\n0";
         let lang = net.parse::<FiniteLanguage>().unwrap();
@@ -209,7 +203,7 @@ mod tests {
             &EBI_STOCHASTIC_LABELLED_PETRI_NET,
         );
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
-            let _ = (execute)(vec![object], None);
+            assert!((execute)(vec![object], None).is_err());
         }
     }
 }
