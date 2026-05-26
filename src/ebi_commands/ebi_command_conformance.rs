@@ -42,25 +42,25 @@ pub const EBI_CONFORMANCE: EbiCommand = EbiCommand::Group {
     explanation_short: "Check the conformance of two stochastic languages.",
     explanation_long: None,
     children: &[
-        &CONFORMANCE_CSSC,
-        &CONFORMANCE_CSSC_SAMPLE,
-        &CONFORMANCE_EMSC,
-        &CONFORMANCE_EMSC_SAMPLE,
-        &CONFORMANCE_ER,
-        &CONFORMANCE_GAIN_PRECISION,
-        &CONFORMANCE_GAIN_RECALL,
-        &CONFORMANCE_HSC,
-        &CONFORMANCE_HSC_SAMPLE,
-        &CONFORMANCE_JSSC,
-        &CONFORMANCE_JSSC_SAMPLE,
-        &CONFORMANCE_MARKOVIAN,
-        &CONFORMANCE_UEMSC,
-        &CONFORMANCE_UEMSC_SAMPLE,
+        &EBI_CONFORMANCE_CHI_SQUARED,
+        &EBI_CONFORMANCE_CHI_SQUARED_SAMPLE,
+        &EBI_CONFORMANCE_EARTH_MOVERS,
+        &EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE,
+        &EBI_CONFORMANCE_ENTROPIC_RELEVANCE,
+        &EBI_CONFORMANCE_GAIN_PRECISION,
+        &EBI_CONFORMANCE_GAIN_RECALL,
+        &EBI_CONFORMANCE_HELLINGER,
+        &EBI_CONFORMANCE_HELLINGER_SAMPLE,
+        &EBI_CONFORMANCE_JSSC,
+        &EBI_CONFORMANCE_JSSC_SAMPLE,
+        &EBI_CONFORMANCE_MARKOVIAN,
+        &EBI_CONFORMANCE_UEMSC,
+        &EBI_CONFORMANCE_UEMSC_SAMPLE,
     ],
 };
 test_ebi_command!(EBI_CONFORMANCE);
 
-pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
     name_short: "uemsc",
     name_long: Some("unit-earth-movers"),
     explanation_short: "Compute unit-earth movers' stochastic conformance.",
@@ -106,7 +106,7 @@ pub const CONFORMANCE_UEMSC: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
-pub const CONFORMANCE_UEMSC_SAMPLE: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_UEMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "uemsc-sample",
     name_long: Some("unit-earth-movers-sample"),
     explanation_short: "Compute unit-earth movers' stochastic conformance, which is 1 - the total variation distance, if both inputs need to be sampled.",
@@ -151,7 +151,7 @@ pub const CONFORMANCE_UEMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
-pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_ENTROPIC_RELEVANCE: EbiCommand = EbiCommand::Command {
     name_short: "er",
     name_long: Some("entropic-relevance"),
     explanation_short: "Compute entropic relevance (uniform).",
@@ -200,7 +200,7 @@ pub const CONFORMANCE_ER: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::LogPolynomial,
 };
 
-pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
     name_short: "jssc",
     name_long: Some("jensen-shannon"),
     explanation_short: "Compute Jensen-Shannon stochastic conformance, which is 1 - the Jensen-Shannon distance.",
@@ -249,7 +249,7 @@ pub const CONFORMANCE_JSSC: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::RootLogDiv,
 };
 
-pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "jssc-sample",
     name_long: Some("jensen-shannon-sample"),
     explanation_short: "Compute Jensen-Shannon stochastic conformance, which is 1 - the Jensen-Shannon distance, if both inputs need to be sampled.",
@@ -294,7 +294,7 @@ pub const CONFORMANCE_JSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::RootLogDiv,
 };
 
-pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_EARTH_MOVERS: EbiCommand = EbiCommand::Command {
     name_short: "emsc",
     name_long: Some("earth-movers"),
     explanation_short: "Compute Earth mover's stochastic conformance.",
@@ -392,7 +392,7 @@ pub const CONFORMANCE_EMSC: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
-pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "emsc-sample",
     name_long: Some("earth-movers-sample"),
     explanation_short: "Compute Earth mover's stochastic conformance, which is 1 - the Wasserstein distance, where one or both of the inputs needs to be sampled.",
@@ -433,7 +433,7 @@ pub const CONFORMANCE_EMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
-pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_HELLINGER: EbiCommand = EbiCommand::Command {
     name_short: "hsc",
     name_long: Some("hellinger"),
     explanation_short: "Compute Hellinger stochastic conformance.",
@@ -478,7 +478,7 @@ pub const CONFORMANCE_HSC: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
-pub const CONFORMANCE_HSC_SAMPLE: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_HELLINGER_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "hsc-sample",
     name_long: Some("hellinger-sample"),
     explanation_short: "Compute Hellinger stochastic conformance, which is 1 - the Hellinger distance, if both inputs need to be sampled.",
@@ -523,7 +523,7 @@ pub const CONFORMANCE_HSC_SAMPLE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
-pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_CHI_SQUARED: EbiCommand = EbiCommand::Command {
     name_short: "cssc",
     name_long: Some("chi-squared"),
     explanation_short: "Compute Chi-Square stochastic conformance.",
@@ -566,7 +566,7 @@ pub const CONFORMANCE_CSSC: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
-pub const CONFORMANCE_CSSC_SAMPLE: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_CHI_SQUARED_SAMPLE: EbiCommand = EbiCommand::Command {
     name_short: "cssc-sample",
     name_long: Some("chi-squared-sample"),
     explanation_short: "Compute chi-squared stochastic conformance, if both inputs need to be sampled.",
@@ -611,7 +611,7 @@ pub const CONFORMANCE_CSSC_SAMPLE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
-pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
     name_short: "ma",
     name_long: Some("markovian"),
     explanation_short: "Compute the conformance between two stochastic languages using a stochastic Markovian abstraction.",
@@ -691,7 +691,7 @@ pub const CONFORMANCE_MARKOVIAN: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::Fraction,
 };
 
-pub const CONFORMANCE_GAIN_PRECISION: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_GAIN_PRECISION: EbiCommand = EbiCommand::Command {
     name_short: "gp",
     name_long: Some("gain-precision"),
     explanation_short: "Compute gain-based precision.",
@@ -736,7 +736,7 @@ pub const CONFORMANCE_GAIN_PRECISION: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::LogPolynomial,
 };
 
-pub const CONFORMANCE_GAIN_RECALL: EbiCommand = EbiCommand::Command {
+pub const EBI_CONFORMANCE_GAIN_RECALL: EbiCommand = EbiCommand::Command {
     name_short: "gr",
     name_long: Some("gain-recall"),
     explanation_short: "Compute gain-based recall.",

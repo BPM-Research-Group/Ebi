@@ -79,7 +79,7 @@ fn generate_javascript_rust_tests(command: &EbiCommand, path: &Vec<&EbiCommand>)
 
         let mut result = String::new();
         //apply the command to all input combinations
-        for (input_i, inputs) in inputss.into_iter().take(2).enumerate() {
+        for (input_i, inputs) in inputss.into_iter().take(3).enumerate() {
             result += &format!(
                 "\t#[test]
 \t{fallible}pub fn {function_name}_test_{input_i}() {{

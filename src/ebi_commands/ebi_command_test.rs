@@ -26,7 +26,7 @@ pub const EBI_TEST: EbiCommand = EbiCommand::Group {
     name_long: Some("test"),
     explanation_short: "Test a hypothesis.",
     explanation_long: None,
-    children: &[&EBI_BOOTSTRAP_TEST, &EBI_TEST_LOG_ATTRIBUTE],
+    children: &[&EBI_TEST_BOOTSTRAP, &EBI_TEST_LOG_ATTRIBUTE],
 };
 test_ebi_command!(EBI_TEST);
 
@@ -108,7 +108,7 @@ pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
-pub const EBI_BOOTSTRAP_TEST: EbiCommand = EbiCommand::Command {
+pub const EBI_TEST_BOOTSTRAP: EbiCommand = EbiCommand::Command {
     name_short: "btst",
     name_long: Some("bootstrap-test"),
     explanation_short: "Test the hypothesis that the logs are derived from identical processes.",
