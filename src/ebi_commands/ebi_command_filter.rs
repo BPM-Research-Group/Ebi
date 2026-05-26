@@ -5,8 +5,7 @@ use crate::{
         ebi_input::EbiInputType,
         ebi_output::{EbiOutput, EbiOutputType},
     },
-    techniques::filter::{EventSelector, Filter, Operator},
-    tests::test_ebi_command,
+    techniques::filter::{EventSelector, Filter, Operator}, tests::test_ebi_command::test_ebi_command,
 };
 use ebi_objects::{EbiObject, EbiObjectType, EventLogXes, HasActivityKey};
 use strum::VariantNames;

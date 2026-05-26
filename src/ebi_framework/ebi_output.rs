@@ -740,7 +740,7 @@ mod tests {
             root::{ContainsRoot, Root},
             root_log_div::RootLogDiv,
         },
-        tests::get_all_test_files_for_file,
+        tests::tests::get_all_test_files_for_file,
     };
     use ebi_objects::ebi_arithmetic::{Fraction, One, Zero};
     use rayon::iter::{IntoParallelIterator, ParallelIterator};
@@ -786,7 +786,7 @@ mod tests {
 
     #[test]
     fn all_fallible_exporters() {
-        for (object, importer, _, f) in crate::tests::get_all_test_files() {
+        for (object, importer, _, f) in crate::tests::tests::get_all_test_files() {
             if let EbiInput::Object(object, file_handler) = object {
                 for file_handler2 in EBI_FILE_HANDLERS {
                     for exporter in file_handler2.object_exporters_fallible {
@@ -834,7 +834,7 @@ mod tests {
         ];
 
         //gather output objects from the test files
-        for (input, _, _, file) in crate::tests::get_all_test_files() {
+        for (input, _, _, file) in crate::tests::tests::get_all_test_files() {
             if let EbiInput::Object(object, _) = input {
                 outputs.push((EbiOutput::Object(object), file));
             }

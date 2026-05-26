@@ -7,8 +7,7 @@ use crate::{
         ebi_command::EbiCommand,
         ebi_input::{EbiInput, EbiInputType},
         ebi_output::{EbiOutput, EbiOutputType},
-    },
-    tests::test_ebi_command,
+    }, tests::test_ebi_command::test_ebi_command,
 };
 
 #[macro_export]

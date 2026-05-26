@@ -7,7 +7,7 @@ use crate::{
     },
     ebi_info,
     ebi_traits::ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
-    techniques::association::Associations, tests::test_ebi_command,
+    techniques::association::Associations, tests::test_ebi_command::test_ebi_command,
 };
 use ebi_objects::anyhow::{Context, anyhow};
 use std::io::Write;

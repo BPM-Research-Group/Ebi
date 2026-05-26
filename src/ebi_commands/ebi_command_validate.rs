@@ -5,7 +5,7 @@ use crate::{
         ebi_input::{self, EbiInputType},
         ebi_output::{EbiOutput, EbiOutputType},
     },
-    ebi_info, tests::test_ebi_command,
+    ebi_info, tests::test_ebi_command::test_ebi_command,
 };
 use clap::{Arg, ArgAction, value_parser};
 use ebi_objects::anyhow::{Context, Ok, anyhow};

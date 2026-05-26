@@ -4,8 +4,7 @@ use crate::{
         ebi_input::{EbiInput, EbiInputType},
         ebi_output::{EbiOutput, EbiOutputType},
     },
-    techniques::stochastic_markovian_abstraction::build_embedded_snfa,
-    tests::test_ebi_command,
+    techniques::stochastic_markovian_abstraction::build_embedded_snfa, tests::test_ebi_command::test_ebi_command,
 };
 use ebi_objects::{
     BusinessProcessModelAndNotation, EbiObject, EbiObjectType, EventLog, FiniteLanguage,

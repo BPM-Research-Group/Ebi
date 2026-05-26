@@ -12,7 +12,8 @@ use crate::{
     },
     techniques::{
         align::Align, escaping_edges_precision::EscapingEdgesPrecision, fitness::Fitness,
-    }, tests::test_ebi_command,
+    },
+    tests::test_ebi_command::test_ebi_command,
 };
 use ebi_objects::{EbiObject, EbiObjectType, StochasticLanguageOfAlignments, anyhow::Context};
 

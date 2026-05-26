@@ -12,7 +12,7 @@ use crate::{
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
         trace_model_miner::TraceModelMinerTree,
     },
-    tests::test_ebi_command,
+    tests::test_ebi_command::test_ebi_command,
 };
 use ebi_objects::{
     EbiObject, EbiObjectType, HasActivityKey,

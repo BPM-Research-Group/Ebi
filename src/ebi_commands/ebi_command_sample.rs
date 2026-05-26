@@ -10,8 +10,7 @@ use crate::{
     techniques::{
         sample::{PartiallyOrderedSampler, Sampler},
         sample_folds::FoldsSampler,
-    },
-    tests::test_ebi_command,
+    }, tests::test_ebi_command::test_ebi_command,
 };
 use ebi_objects::{
     EbiObject, EbiObjectType, EventLog, FiniteStochasticLanguage,

@@ -10,7 +10,7 @@ use crate::{
     },
     techniques::{
         any_traces::AnyTraces, are_timestamps_ordered::AreTimestampsOrdered, bounded::Bounded, executions::FindExecutions, infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic
-    }, tests::test_ebi_command,
+    }, tests::test_ebi_command::test_ebi_command,
 };
 use ebi_objects::{EbiObject, EbiObjectType, anyhow::anyhow};
 use std::io::Write;

@@ -14,9 +14,12 @@ use crate::{
     techniques::{
         bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
         permutation_test::PermutationTest,
-    }, tests::test_ebi_command,
+    }, tests::test_ebi_command::test_ebi_command,
 };
-use ebi_objects::{anyhow::{Context, anyhow}, ebi_arithmetic::{ConstFraction, Fraction}};
+use ebi_objects::{
+    anyhow::{Context, anyhow},
+    ebi_arithmetic::{ConstFraction, Fraction},
+};
 use std::io::Write;
 
 pub const DEFAULT_P_VALUE: ConstFraction = ConstFraction::of(1, 20);

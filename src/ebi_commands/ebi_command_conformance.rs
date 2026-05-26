@@ -25,8 +25,7 @@ use crate::{
             DistanceMeasure, StochasticMarkovianConformance,
         },
         unit_earth_movers_stochastic_conformance::UnitEarthMoversStochasticConformance,
-    },
-    tests::test_ebi_command,
+    }, tests::test_ebi_command::test_ebi_command,
 };
 use ebi_objects::{
     EbiObject, EbiObjectType,

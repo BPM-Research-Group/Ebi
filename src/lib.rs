@@ -183,10 +183,10 @@ pub mod techniques {
     pub mod align;
     pub mod alignment_stochastic_miner;
     pub mod any_traces;
+    pub mod are_timestamps_ordered;
     pub mod association;
     pub mod bootstrap_test;
     pub mod bounded;
-    pub mod are_timestamps_ordered;
     pub mod chi_square_stochastic_conformance;
     pub mod completeness;
     pub mod deterministic_semantics_for_stochastic_semantics;
@@ -241,9 +241,18 @@ pub mod techniques {
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
 }
+pub mod tests {
+    #[cfg(any(test, feature = "test_generation"))]
+    pub mod fallible_test;
+    #[cfg(any(test, feature = "test_generation"))]
+    pub mod fallible_test_list;
+    pub mod test_ebi_command;
+    #[cfg(any(test, feature = "test_generation"))]
+    pub mod test_input;
+    pub mod tests;
+}
 pub mod follower_semantics;
 pub mod multiple_reader;
-pub mod tests;
 pub mod text;
 
 pub use ebi_objects;

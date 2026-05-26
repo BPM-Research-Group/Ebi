@@ -10,7 +10,7 @@ use crate::{
         ebi_trait::EbiTrait,
     },
     ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
-    tests::test_ebi_command,
+    tests::test_ebi_command::test_ebi_command,
 };
 
 pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
@@ -153,7 +153,7 @@ mod tests {
 
     #[test]
     fn visualise_as_text() {
-        for (object, _, _, _) in crate::tests::get_all_test_files() {
+        for (object, _, _, _) in crate::tests::tests::get_all_test_files() {
             if let EbiInput::Object(_, _) = object {
                 if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
                     let _ = (execute)(vec![object], None);

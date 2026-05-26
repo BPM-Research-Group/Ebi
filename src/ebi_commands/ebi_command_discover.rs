@@ -19,7 +19,8 @@ use crate::{
             UniformStochasticBusinessProcessModelAndNotation, UniformStochasticMinerLPN,
             UniformStochasticMinerTree,
         },
-    }, tests::test_ebi_command,
+    },
+    tests::test_ebi_command::test_ebi_command,
 };
 use ebi_objects::{
     BusinessProcessModelAndNotation, EbiObject, EbiObjectType, LabelledPetriNet, ProcessTree,

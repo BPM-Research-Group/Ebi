@@ -6,6 +6,6 @@ cargo test --verbose
 cargo test --verbose --features exactarithmetic,approximatearithmetic
 cargo test --verbose --features exactarithmetic
 cargo test --verbose --features approximatearithmetic
-cargo test --features javascript
+cargo test --verbose --features javascript
 
 echo "Ebi was successfully tested"

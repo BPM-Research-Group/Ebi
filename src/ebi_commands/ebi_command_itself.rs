@@ -8,8 +8,7 @@ use crate::{
         ebi_command::EbiCommand,
         ebi_output::{EbiOutput, EbiOutputType},
         manual::{graph, html, manual},
-    },
-    tests::test_ebi_command,
+    }, tests::test_ebi_command::test_ebi_command,
 };
 use ebi_objects::{EbiObject, EbiObjectType, ebi_objects::scalable_vector_graphics::ToSVGMut};
 

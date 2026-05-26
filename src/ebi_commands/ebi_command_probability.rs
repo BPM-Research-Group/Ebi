@@ -11,7 +11,7 @@ use crate::{
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
     follower_semantics::FollowerSemantics,
-    techniques::explain_trace::ExplainTrace, tests::test_ebi_command,
+    techniques::explain_trace::ExplainTrace, tests::test_ebi_command::test_ebi_command,
 };
 use clap::{Arg, ArgAction, value_parser};
 use ebi_objects::{
