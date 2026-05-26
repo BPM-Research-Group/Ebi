@@ -5,9 +5,10 @@ use crate::{
         ebi_input::EbiInputType,
         ebi_output::{EbiOutput, EbiOutputType},
     },
-    techniques::filter::{EventSelector, Filter, Operator}, tests::test_ebi_command,
+    techniques::filter::{EventSelector, Filter, Operator},
+    tests::test_ebi_command,
 };
-use ebi_objects::{EbiObject, EbiObjectType, EventLog, EventLogXes, HasActivityKey};
+use ebi_objects::{EbiObject, EbiObjectType, EventLogXes, HasActivityKey};
 use strum::VariantNames;
 
 pub const EBI_FILTER: EbiCommand = EbiCommand::Group {
@@ -70,11 +71,11 @@ pub const EBI_FILTER_TRACES_EMPTY: EbiCommand = EbiCommand::Command {
     input_names: &["event log"],
     input_helps: &["the log"],
     execute: |mut inputs, _| {
-        let mut log = inputs.remove(0).to_type::<EventLog>()?;
+        let mut log = inputs.remove(0).to_type::<EventLogXes>()?;
 
         log.remove_traces_empty();
 
-        Ok(EbiOutput::Object(EbiObject::EventLog(*log)))
+        Ok(EbiOutput::Object(EbiObject::EventLogXes(*log)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::EventLogXes),
 };
@@ -107,15 +108,15 @@ pub const EBI_FILTER_TRACES_EVENT_ACTIVITY: EbiCommand = EbiCommand::Command {
         "the activity the filter targets",
     ],
     execute: |mut inputs, _| {
-        let mut log = inputs.remove(0).to_type::<EventLog>()?;
-        let activity_label = *inputs.remove(0).to_type::<String>()?;
+        let mut log = inputs.remove(0).to_type::<EventLogXes>()?;
         let event_selector = inputs.remove(0).to_type::<EventSelector>()?;
+        let activity_label = *inputs.remove(0).to_type::<String>()?;
 
         let activity = log.activity_key_mut().process_activity(&activity_label);
 
         log.remove_traces_event_activity(*event_selector, activity);
 
-        Ok(EbiOutput::Object(EbiObject::EventLog(*log)))
+        Ok(EbiOutput::Object(EbiObject::EventLogXes(*log)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::EventLogXes),
 };

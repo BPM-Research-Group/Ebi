@@ -12,6 +12,7 @@ use js_sys::Uint8Array;
 use std::path::PathBuf;
 use wasm_bindgen::prelude::*;
 
+#[cfg(not(test))]
 #[wasm_bindgen]
 extern "C" {
     pub fn ebi_error(s: &str, command_name: &str);
@@ -20,6 +21,20 @@ extern "C" {
 
     pub fn ebi_log(s: &str, command_name: &str);
 }
+
+#[cfg(test)]
+pub fn ebi_error(s: &str, command_name: &str) {
+    use std::backtrace::Backtrace;
+
+    println!("Custom backtrace: {}", Backtrace::force_capture());
+    panic!("{command_name}: {s}");
+}
+
+#[cfg(test)]
+pub fn ebi_output(_s: &str, _command_name: &str, _file_extension: &str) {}
+
+#[cfg(test)]
+pub fn ebi_log(_s: &str, _command_name: &str) {}
 
 #[wasm_bindgen(getter_with_clone)]
 pub struct JavascriptInput {
@@ -52,6 +67,15 @@ impl JavascriptInput {
         Self {
             textual: self.textual.clone(),
             binary: self.binary.clone(),
+        }
+    }
+}
+
+impl From<String> for JavascriptInput {
+    fn from(value: String) -> Self {
+        Self {
+            textual: Some(value),
+            binary: None,
         }
     }
 }

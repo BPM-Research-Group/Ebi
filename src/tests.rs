@@ -49,6 +49,63 @@
 
 //     Fraction::set_exact_globally(true);
 // }
+
+#[cfg(any(test, feature = "javascript"))]
+pub(crate) mod fallible_test {
+    use crate::{
+        ebi_commands::{
+            ebi_command_conformance::{CONFORMANCE_GAIN_PRECISION, CONFORMANCE_GAIN_RECALL}, ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION, ebi_command_test::EBI_TEST_LOG_ATTRIBUTE
+        },
+        ebi_framework::ebi_command::{EbiCommand, TestInput},
+    };
+
+    pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'static str])] = &[
+        (
+            &CONFORMANCE_GAIN_PRECISION,
+            &[
+                "trait finite stochastic language ./testfiles/a-b.csv",
+                "object stochastic deterministic finite automaton ./testfiles/empty.sdfa",
+                "fraction 0",
+            ],
+        ),
+        (
+            &CONFORMANCE_GAIN_RECALL,
+            &[
+                "trait finite stochastic language ./testfiles/a-b.csv",
+                "object stochastic deterministic finite automaton ./testfiles/empty.sdfa",
+                "fraction 0",
+            ],
+        ),
+        (
+            &EBI_TEST_LOG_ATTRIBUTE,
+            &[
+                "trait event log with trace attributes ./testfiles/a-b-double.xes",
+                "string some string",
+                "usize 10",
+                "fraction 0.05",
+            ],
+        ),
+        (
+            &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+            &[
+                "object stochastic language of alignments ./testfiles/aa-ab-ba.sali",
+                "trait semantics ./testfiles/flower.bpmn"
+            ]
+        )
+    ];
+
+    pub(crate) fn is_fallible(path: &Vec<&EbiCommand>, inputs: &Vec<TestInput>) -> bool {
+        //transform to strings
+        let string_inputs = inputs
+            .iter()
+            .map(|input| input.to_unique_string())
+            .collect::<Vec<_>>();
+        let ref_string_inputs = string_inputs.iter().map(|s| s.as_str()).collect::<Vec<_>>();
+
+        FALLIBLE_TESTS.contains(&(path.last().unwrap(), &ref_string_inputs))
+    }
+}
+
 #[cfg(test)]
 use crate::{
     ebi_framework::{

@@ -13,13 +13,13 @@ use crate::{
         ebi_command_probability, ebi_command_sample, ebi_command_test, ebi_command_validate,
         ebi_command_visualise,
     },
-    ebi_framework::{ebi_importer_parameters, ebi_output},
+    ebi_framework::{ebi_importer_parameters, ebi_output, ebi_trait::EbiTrait},
     prom::java_object_handler::get_possible_inputs_with_java,
     text::Joiner,
 };
 use clap::{Arg, ArgAction, ArgMatches, Command, value_parser};
 use ebi_objects::{
-    EbiObjectType,
+    EbiObject, EbiObjectType,
     anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{Fraction, exact::set_exact_globally, parsing::FractionNotParsedYet},
 };
@@ -243,7 +243,7 @@ impl EbiCommand {
                     )
                 }
 
-                //importer flags
+                //importer parameters
                 for (input_index, inputs) in input_types.iter().enumerate() {
                     let merged_importer_parameters =
                         ebi_importer_parameters::merge_importer_parameters(inputs);
@@ -378,7 +378,7 @@ impl EbiCommand {
                         input.get_type(),
                         input
                             .importing_file_handler()
-                            .map(|x| format!("event handler: {}", x.name))
+                            .map(|x| format!("file handler: {}", x.name))
                             .unwrap_or_else(|| "no file handler".to_string())
                     );
                     inputs.push(input);
@@ -1068,22 +1068,8 @@ fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::{EBI_COMMANDS, EbiCommand};
-    use crate::{
-        ebi_framework::{
-            ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
-            ebi_input::{self, EbiInput, EbiInputType},
-            ebi_trait::EbiTrait,
-        },
-        multiple_reader::MultipleReader,
-    };
-    use ebi_objects::{EbiObject, ebi_arithmetic::Fraction};
-    use itertools::Itertools;
-    use std::{
-        collections::HashSet,
-        fmt::Debug,
-        fs::{self, File},
-        path::PathBuf,
-    };
+    use crate::ebi_framework::{ebi_command::TestInput, ebi_input::EbiInput};
+    use std::collections::HashSet;
 
     #[test]
     fn build_cli() {
@@ -1138,7 +1124,7 @@ pub(crate) mod tests {
                 {
                     //for each input type, find all input combinations
                     let inputss =
-                        crate::ebi_framework::ebi_command::tests::find_inputs(input_types);
+                        crate::ebi_framework::ebi_command::test_inputs::find_inputs(input_types);
                     if inputss.is_empty() && input_types.len() > 0 {
                         panic!("Could not find input to call command.");
                     }
@@ -1168,6 +1154,95 @@ pub(crate) mod tests {
         }
     }
 
+    pub(crate) fn transform(inputs: Vec<TestInput>) -> Vec<EbiInput> {
+        inputs
+            .into_iter()
+            .map(|x| x.to_ebi_input())
+            .collect::<Vec<_>>()
+    }
+}
+
+#[derive(Clone)]
+#[allow(unused)]
+pub(crate) enum TestInput {
+    Trait(EbiTrait, PathBuf), //a trait cannot be cloned, thus we must parse it every time in the cartesian product
+    Object(EbiObject, &'static EbiFileHandler, PathBuf),
+    String(String, &'static EbiInputType),
+    Usize(usize, &'static EbiInputType),
+    FileHandler(EbiFileHandler),
+    Fraction(Fraction, &'static EbiInputType),
+}
+
+#[cfg(any(test, feature = "javascript"))]
+impl TestInput {
+    #[cfg(test)]
+    fn to_ebi_input(self) -> EbiInput {
+        match self {
+            TestInput::Trait(etrait, file) => {
+                use crate::multiple_reader::MultipleReader;
+                use std::fs::File;
+
+                let mut reader = MultipleReader::from_file(File::open(file).unwrap());
+                match ebi_input::read_as_trait(&etrait, &mut reader, None, 0) {
+                    Ok((object, file_handler)) => EbiInput::Trait(object, file_handler),
+                    Err(_) => panic!(),
+                }
+            }
+            TestInput::Object(o, fh, _) => EbiInput::Object(o, fh),
+            TestInput::String(s, input_type) => EbiInput::String(s, input_type),
+            TestInput::Usize(u, input_type) => EbiInput::Usize(u, input_type),
+            TestInput::FileHandler(fh) => EbiInput::FileHandler(fh),
+            TestInput::Fraction(f, input_type) => EbiInput::Fraction(f, input_type),
+        }
+    }
+
+    pub fn to_unique_string(&self) -> String {
+        match self {
+            TestInput::Trait(ebi_trait, path_buf) => {
+                format!("trait {} {}", ebi_trait, path_buf.to_str().unwrap())
+            }
+            TestInput::Object(ebi_object, _, path_buf) => {
+                format!(
+                    "object {} {}",
+                    ebi_object.get_type(),
+                    path_buf.to_str().unwrap()
+                )
+            }
+            TestInput::String(s, _) => format!("string {s}"),
+            TestInput::Usize(u, _) => format!("usize {u}"),
+            TestInput::FileHandler(ebi_file_handler) => format!("file handler {ebi_file_handler}"),
+            TestInput::Fraction(f, _) => format!("fraction {f}"),
+        }
+    }
+}
+
+impl Debug for TestInput {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Trait(arg0, arg1) => f.debug_tuple("Trait").field(arg0).field(arg1).finish(),
+            Self::Object(_, _, arg2) => f.debug_tuple("Object").field(arg2).finish(),
+            Self::String(arg0, _) => f.debug_tuple("String").field(arg0).finish(),
+            Self::Usize(arg0, _) => f.debug_tuple("Usize").field(arg0).finish(),
+            Self::FileHandler(arg0) => f.debug_tuple("FileHandler").field(&arg0.name).finish(),
+            Self::Fraction(arg0, _) => f.debug_tuple("Fraction").field(arg0).finish(),
+        }
+    }
+}
+
+#[cfg(any(test, feature = "javascript"))]
+pub(crate) mod test_inputs {
+    use crate::{
+        ebi_framework::{
+            ebi_command::TestInput,
+            ebi_file_handler::EBI_FILE_HANDLERS,
+            ebi_input::{self, EbiInputType},
+        },
+        multiple_reader::MultipleReader,
+    };
+    use ebi_objects::ebi_arithmetic::Fraction;
+    use itertools::Itertools;
+    use std::fs::{self, File};
+
     pub(crate) fn find_inputs(input_typess: &[&[&'static EbiInputType]]) -> Vec<Vec<TestInput>> {
         let mut it = input_typess.iter();
         let mut result = if let Some(input_types) = it.next() {
@@ -1191,55 +1266,6 @@ pub(crate) mod tests {
         }
         println!("\tinput combinations {}", result.len());
         return result;
-    }
-
-    pub(crate) fn transform(inputs: Vec<TestInput>) -> Vec<EbiInput> {
-        inputs
-            .into_iter()
-            .map(|x| x.to_ebi_input())
-            .collect::<Vec<_>>()
-    }
-
-    #[derive(Clone)]
-    pub(crate) enum TestInput {
-        Trait(EbiTrait, PathBuf), //a trait cannot be cloned, thus we must parse it every time in the cartesian product
-        Object(EbiObject, &'static EbiFileHandler, PathBuf),
-        String(String, &'static EbiInputType),
-        Usize(usize, &'static EbiInputType),
-        FileHandler(EbiFileHandler),
-        Fraction(Fraction, &'static EbiInputType),
-    }
-
-    impl TestInput {
-        fn to_ebi_input(self) -> EbiInput {
-            match self {
-                TestInput::Trait(etrait, file) => {
-                    let mut reader = MultipleReader::from_file(File::open(file).unwrap());
-                    match ebi_input::read_as_trait(&etrait, &mut reader, None, 0) {
-                        Ok((object, file_handler)) => EbiInput::Trait(object, file_handler),
-                        Err(_) => panic!(),
-                    }
-                }
-                TestInput::Object(o, fh, _) => EbiInput::Object(o, fh),
-                TestInput::String(s, input_type) => EbiInput::String(s, input_type),
-                TestInput::Usize(u, input_type) => EbiInput::Usize(u, input_type),
-                TestInput::FileHandler(fh) => EbiInput::FileHandler(fh),
-                TestInput::Fraction(f, input_type) => EbiInput::Fraction(f, input_type),
-            }
-        }
-    }
-
-    impl Debug for TestInput {
-        fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-            match self {
-                Self::Trait(arg0, arg1) => f.debug_tuple("Trait").field(arg0).field(arg1).finish(),
-                Self::Object(_, _, arg2) => f.debug_tuple("Object").field(arg2).finish(),
-                Self::String(arg0, _) => f.debug_tuple("String").field(arg0).finish(),
-                Self::Usize(arg0, _) => f.debug_tuple("Usize").field(arg0).finish(),
-                Self::FileHandler(arg0) => f.debug_tuple("FileHandler").field(&arg0.name).finish(),
-                Self::Fraction(arg0, _) => f.debug_tuple("Fraction").field(arg0).finish(),
-            }
-        }
     }
 
     fn find_inputs_for_position(input_types: &[&'static EbiInputType]) -> Vec<TestInput> {

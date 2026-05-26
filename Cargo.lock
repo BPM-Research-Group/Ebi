@@ -788,8 +788,8 @@ dependencies = [
 
 [[package]]
 name = "ebi_arithmetic"
-version = "0.3.11"
-source = "git+https://github.com/BPM-Research-Group/Ebi_arithmetic.git#e97fe7f0f503168f36feef5b41c8d94b1443bd46"
+version = "0.3.12"
+source = "git+https://github.com/BPM-Research-Group/Ebi_arithmetic.git#250f59c82bb36133425a543432f42f1d23758461"
 dependencies = [
  "anyhow",
  "fnv",
