@@ -249,7 +249,12 @@ pub mod tests {
     pub mod test_ebi_command;
     #[cfg(any(test, feature = "test_generation"))]
     pub mod test_input;
+    #[cfg(any(test, feature = "test_generation"))]
     pub mod tests;
+    #[cfg(test)]
+    pub mod tests_autogen;
+    #[cfg(feature = "test_generation")]
+    pub mod tests_generator;
 }
 pub mod follower_semantics;
 pub mod multiple_reader;

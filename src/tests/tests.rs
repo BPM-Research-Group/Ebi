@@ -50,7 +50,15 @@
 //     Fraction::set_exact_globally(true);
 // }
 
-#[cfg(any(test, feature = "javascript"))]
+use crate::{
+    ebi_framework::{
+        ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+        ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
+    },
+    multiple_reader::MultipleReader,
+};
+use std::fs::{self, DirEntry, File};
+
 pub(crate) mod fallible_test {
     use crate::{
         ebi_framework::ebi_command::EbiCommand,
@@ -69,18 +77,6 @@ pub(crate) mod fallible_test {
     }
 }
 
-#[cfg(test)]
-use crate::{
-    ebi_framework::{
-        ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
-        ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
-    },
-    multiple_reader::MultipleReader,
-};
-#[cfg(test)]
-use std::fs::{self, DirEntry, File};
-
-#[cfg(test)]
 pub fn get_all_test_files() -> Vec<(
     EbiInput,
     Option<EbiObjectImporter>,
@@ -96,7 +92,6 @@ pub fn get_all_test_files() -> Vec<(
     result
 }
 
-#[cfg(test)]
 pub fn get_all_test_files_for_file(
     file: DirEntry,
 ) -> Vec<(
@@ -193,7 +188,6 @@ pub fn get_all_test_files_for_file(
     result
 }
 
-#[cfg(test)]
 pub fn should_file_be_tested(
     file: &DirEntry,
     importer: &EbiObjectImporter,
@@ -226,7 +220,6 @@ pub mod tests {
         },
         multiple_reader::MultipleReader,
         semantics::semantics::Semantics,
-        tests::fallible_test_list::FALLIBLE_TESTS,
     };
     use ebi_objects::{
         ActivityKey, DeterministicFiniteAutomaton, EventLog, FiniteLanguage, Importable, Infoable,

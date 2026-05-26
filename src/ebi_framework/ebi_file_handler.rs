@@ -186,6 +186,21 @@ impl FromStr for EbiFileHandler {
     }
 }
 
+impl FromStr for &'static EbiFileHandler {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        for file_handler in EBI_FILE_HANDLERS {
+            if file_handler.validator.is_some()
+                && (file_handler.name == s || file_handler.file_extension == s)
+            {
+                return Ok(file_handler);
+            }
+        }
+        return Err(anyhow!("{} is not an Ebi file handler.", s));
+    }
+}
+
 impl FromEbiTraitObject for EbiFileHandler {
     fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
         match object {

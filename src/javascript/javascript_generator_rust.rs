@@ -72,7 +72,7 @@ fn generate_javascript_rust_tests(command: &EbiCommand, path: &Vec<&EbiCommand>)
         && *exact_arithmetic
     {
         //for each input type, find all input combinations
-        let inputss = crate::ebi_framework::ebi_command::test_inputs::find_inputs(input_types);
+        let inputss = crate::tests::test_input::TestInput::find_inputs(input_types);
         if inputss.is_empty() && input_types.len() > 0 {
             panic!("Could not find input to call command.");
         }

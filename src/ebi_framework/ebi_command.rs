@@ -917,7 +917,7 @@ pub fn get_applicable_commands(object_type: &EbiObjectType) -> BTreeSet<Vec<&'st
     result
 }
 
-#[cfg(any(feature = "javascript", feature = "python"))]
+#[cfg(any(feature = "javascript", feature = "python", feature = "test_generation"))]
 pub(crate) fn search_command_in_source_files(path: &Vec<&EbiCommand>) -> Result<String> {
     //start the search from the EBI_COMMANDS const
     let mut path = path.clone();
@@ -939,7 +939,7 @@ pub(crate) fn search_command_in_source_files(path: &Vec<&EbiCommand>) -> Result<
     ))
 }
 
-#[cfg(any(feature = "javascript", feature = "python"))]
+#[cfg(any(feature = "javascript", feature = "python", feature = "test_generation"))]
 fn root_command() -> Result<(PathBuf, syn::ItemConst)> {
     let file = "src/ebi_framework/ebi_command.rs";
     let contents = std::fs::read_to_string(file)?;
@@ -960,7 +960,7 @@ fn root_command() -> Result<(PathBuf, syn::ItemConst)> {
     return Err(anyhow!("source file not found"));
 }
 
-#[cfg(any(feature = "javascript", feature = "python"))]
+#[cfg(any(feature = "javascript", feature = "python", feature = "test_generation"))]
 fn search_child(
     parent_declaration: &syn::ItemConst,
     child_command: &EbiCommand,
@@ -1023,7 +1023,7 @@ fn search_child(
     return Err(anyhow!("todo file not found {}", child_command));
 }
 
-#[cfg(any(feature = "javascript", feature = "python"))]
+#[cfg(any(feature = "javascript", feature = "python", feature = "test_generation"))]
 fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
     if let syn::Expr::Struct(x) = &*const_item.expr {
         for field in &x.fields {

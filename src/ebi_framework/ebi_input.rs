@@ -43,7 +43,7 @@ use std::{
     io::BufRead,
     path::PathBuf,
 };
-use strum_macros::{EnumIter, IntoStaticStr};
+use strum_macros::{EnumIs, EnumIter, IntoStaticStr};
 
 pub enum EbiInput {
     Trait(EbiTraitObject, &'static EbiFileHandler),
@@ -89,7 +89,7 @@ macro_rules! EbiInputTypeEnum {
     };
 }
 
-#[derive(PartialEq, Eq, EnumIter, Clone, Debug)]
+#[derive(PartialEq, Eq, EnumIter, Clone, Debug, EnumIs)]
 pub enum EbiInputType {
     Trait(EbiTrait),
     Object(EbiObjectType),
@@ -97,7 +97,7 @@ pub enum EbiInputType {
     FileHandler,
 
     ///Fields: allowed values, default value.
-    /// If the allowed values are limited, consider using an enum with a #[derive(EbiInputEnum)] and &[&EbiInputTypeEnum!(type)] as input type.
+    /// If the allowed values are limited, consider using an enum annotated with #[derive(EbiInputEnum)], and &[&EbiInputTypeEnum!(type)] as input type.
     String(Option<&'static [&'static str]>, Option<&'static str>),
 
     ///Fields: minimum, maximum, default value.
@@ -1363,51 +1363,15 @@ pub fn read_as_object(
 ) -> Result<(EbiObject, &'static EbiFileHandler)> {
     let mut conversion_error = None;
     for file_handler in EBI_FILE_HANDLERS {
-        for importer in file_handler.object_importers {
-            if &importer.get_type() == etype {
-                //attempt to import
-                match ebi_importer_parameters::extract_parameter_values(
-                    cli_matches,
-                    importer.parameters(),
-                    input_index,
-                ) {
-                    Ok(importer_parameter_values) => {
-                        if let Ok(object) = (importer.get_importer())(
-                            reader.get().context("Could not obtain reader.")?.as_mut(),
-                            &importer_parameter_values,
-                        ) {
-                            //object parsed; return it
-                            return Ok((object, file_handler));
-                        }
-                    }
-                    Err(_) => {}
-                }
-            }
-        }
-        //try as fallible importer
-        for importer in file_handler.object_importers_fallible {
-            if &importer.get_type() == etype {
-                //attempt to import
-                match ebi_importer_parameters::extract_parameter_values(
-                    cli_matches,
-                    importer.parameters(),
-                    input_index,
-                ) {
-                    Ok(importer_parameter_values) => {
-                        match (importer.get_importer())(
-                            reader.get().context("Could not obtain reader.")?.as_mut(),
-                            &importer_parameter_values,
-                        ) {
-                            Ok(object) => return Ok((object, file_handler)), //object parsed; return it
-                            Err(FallibleImporterError::ConversionError(e)) => {
-                                conversion_error = Some((e, file_handler));
-                            }
-                            Err(FallibleImporterError::ImporterError(_)) => {}
-                        }
-                    }
-                    Err(_) => {}
-                }
-            }
+        if let Ok(object) = read_as_object_with_file_handler(
+            etype,
+            reader,
+            cli_matches,
+            input_index,
+            &mut conversion_error,
+            file_handler,
+        ) {
+            return Ok((object, file_handler));
         }
     }
 
@@ -1423,6 +1387,62 @@ pub fn read_as_object(
             "File could not be recognised. If you know the file format, try validating it with `Ebi validate [file type]'."
         ))
     }
+}
+
+pub fn read_as_object_with_file_handler(
+    etype: &EbiObjectType,
+    reader: &mut MultipleReader,
+    cli_matches: Option<&ArgMatches>,
+    input_index: usize,
+    conversion_error: &mut Option<(Error, &EbiFileHandler)>,
+    file_handler: &'static EbiFileHandler,
+) -> Result<EbiObject> {
+    for importer in file_handler.object_importers {
+        if &importer.get_type() == etype {
+            //attempt to import
+            match ebi_importer_parameters::extract_parameter_values(
+                cli_matches,
+                importer.parameters(),
+                input_index,
+            ) {
+                Ok(importer_parameter_values) => {
+                    if let Ok(object) = (importer.get_importer())(
+                        reader.get().context("Could not obtain reader.")?.as_mut(),
+                        &importer_parameter_values,
+                    ) {
+                        //object parsed; return it
+                        return Ok(object);
+                    }
+                }
+                Err(_) => {}
+            }
+        }
+    }
+    for importer in file_handler.object_importers_fallible {
+        if &importer.get_type() == etype {
+            //attempt to import
+            match ebi_importer_parameters::extract_parameter_values(
+                cli_matches,
+                importer.parameters(),
+                input_index,
+            ) {
+                Ok(importer_parameter_values) => {
+                    match (importer.get_importer())(
+                        reader.get().context("Could not obtain reader.")?.as_mut(),
+                        &importer_parameter_values,
+                    ) {
+                        Ok(object) => return Ok(object), //object parsed; return it
+                        Err(FallibleImporterError::ConversionError(e)) => {
+                            *conversion_error = Some((e, file_handler));
+                        }
+                        Err(FallibleImporterError::ImporterError(_)) => {}
+                    }
+                }
+                Err(_) => {}
+            }
+        }
+    }
+    Err(anyhow!("not parsed"))
 }
 
 pub fn read_as_any_object(

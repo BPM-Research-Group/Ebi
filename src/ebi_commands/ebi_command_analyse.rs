@@ -232,6 +232,30 @@ Computation is more efficient for an object with a finite stochastic language.")
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
 };
 
+pub const EBI_ANALYSE_MEDOID: EbiCommand = EbiCommand::Command { 
+    name_short: "med", 
+    name_long: Some("medoid"),
+    explanation_short: "Find the traces with the least distance to the other traces.", 
+    explanation_long: Some("Find the traces with the lowest average normalised Levenshtein distance to the other traces.
+If there are more than one such trace, an arbitrary one is returned."), 
+    latex_link: None, 
+    cli_command: None, 
+    exact_arithmetic: true, 
+    input_types: &[ 
+        &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)], 
+        &[ &EbiInputType::Usize(Some(1), None, Some(1))],
+    ],
+    input_names: &[ "FILE", "NUMBER_OF_TRACES"],
+    input_helps: &[ "Any object with a finite stochastic language.", "The number of traces that should be extracted."],
+    execute: |mut objects, _| {
+        let language = objects.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let number_of_traces = objects.remove(0).to_type::<usize>()?;
+        let result = medoid::medoid(language.as_ref(), &number_of_traces)?;
+        return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
+    }, 
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
+};
+
 pub const EBI_ANALYSE_MODE: EbiCommand = EbiCommand::Command { 
     name_short: "mode", 
     name_long: None,
@@ -263,30 +287,6 @@ Computation is more efficient for a model with a finite stochastic language."),
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     }, 
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)
-};
-
-pub const EBI_ANALYSE_MEDOID: EbiCommand = EbiCommand::Command { 
-    name_short: "med", 
-    name_long: Some("medoid"),
-    explanation_short: "Find the traces with the least distance to the other traces.", 
-    explanation_long: Some("Find the traces with the lowest average normalised Levenshtein distance to the other traces.
-If there are more than one such trace, an arbitrary one is returned."), 
-    latex_link: None, 
-    cli_command: None, 
-    exact_arithmetic: true, 
-    input_types: &[ 
-        &[ &EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)], 
-        &[ &EbiInputType::Usize(Some(1), None, Some(1))],
-    ],
-    input_names: &[ "FILE", "NUMBER_OF_TRACES"],
-    input_helps: &[ "Any object with a finite stochastic language.", "The number of traces that should be extracted."],
-    execute: |mut objects, _| {
-        let language = objects.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-        let number_of_traces = objects.remove(0).to_type::<usize>()?;
-        let result = medoid::medoid(language.as_ref(), &number_of_traces)?;
-        return Ok(EbiOutput::Object(EbiObject::FiniteLanguage(result)));
-    }, 
-    output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage)
 };
 
 pub const EBI_ANALYSE_VARIETY: EbiCommand = EbiCommand::Command {

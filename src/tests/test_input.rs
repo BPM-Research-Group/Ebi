@@ -1,12 +1,3 @@
-use std::{
-    fmt::Debug,
-    fs::{self, File},
-    path::PathBuf,
-};
-
-use ebi_objects::{EbiObject, ebi_arithmetic::Fraction};
-use itertools::Itertools;
-
 #[cfg(test)]
 use crate::ebi_framework::ebi_input::EbiInput;
 use crate::{
@@ -17,7 +8,15 @@ use crate::{
     },
     multiple_reader::MultipleReader,
 };
+use ebi_objects::{EbiObject, ebi_arithmetic::Fraction};
+use itertools::Itertools;
+use std::{
+    fmt::Debug,
+    fs::{self, File},
+    path::PathBuf,
+};
 
+#[allow(unused)]
 #[derive(Clone)]
 pub(crate) enum TestInput {
     Trait(EbiTrait, PathBuf), //a trait cannot be cloned, thus we must parse it every time in the cartesian product
@@ -29,10 +28,14 @@ pub(crate) enum TestInput {
 }
 
 impl TestInput {
+    #[cfg(test)]
     pub(crate) fn to_ebi_input(self) -> EbiInput {
         match self {
             TestInput::Trait(etrait, file) => {
-                use crate::{ebi_framework::ebi_input, multiple_reader::MultipleReader};
+                use crate::{
+                    ebi_framework::ebi_input::{self, EbiInput},
+                    multiple_reader::MultipleReader,
+                };
                 use std::fs::File;
 
                 let mut reader = MultipleReader::from_file(File::open(file).unwrap());
@@ -49,40 +52,109 @@ impl TestInput {
         }
     }
 
+    // #[cfg(test)]
+    // pub(crate) fn get_input_type(&self) -> Option<&'static EbiInputType> {
+    //     match self {
+    //         TestInput::Trait(_, _) => None,
+    //         TestInput::Object(_, _, _) => None,
+    //         TestInput::String(_, ebi_input_type) => Some(ebi_input_type),
+    //         TestInput::Usize(_, ebi_input_type) => Some(ebi_input_type),
+    //         TestInput::FileHandler(_) => None,
+    //         TestInput::Fraction(_, ebi_input_type) => Some(ebi_input_type),
+    //     }
+    // }
+
     pub fn to_unique_string(&self) -> String {
         match self {
             TestInput::Trait(ebi_trait, path_buf) => {
-                format!("trait {} {}", ebi_trait, path_buf.to_str().unwrap())
+                format!("trait {}#{}", ebi_trait, path_buf.to_str().unwrap())
             }
             TestInput::Object(ebi_object, _, path_buf) => {
                 format!(
-                    "object {} {}",
+                    "object {}#{}",
                     ebi_object.get_type(),
                     path_buf.to_str().unwrap()
                 )
             }
             TestInput::String(s, _) => format!("string {s}"),
             TestInput::Usize(u, _) => format!("usize {u}"),
-            TestInput::FileHandler(ebi_file_handler) => format!("file handler {ebi_file_handler}"),
+            TestInput::FileHandler(ebi_file_handler) => format!("filehandler {ebi_file_handler}"),
             TestInput::Fraction(f, _) => format!("fraction {f}"),
         }
     }
-}
 
-impl Debug for TestInput {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Self::Trait(arg0, arg1) => f.debug_tuple("Trait").field(arg0).field(arg1).finish(),
-            Self::Object(_, _, arg2) => f.debug_tuple("Object").field(arg2).finish(),
-            Self::String(arg0, _) => f.debug_tuple("String").field(arg0).finish(),
-            Self::Usize(arg0, _) => f.debug_tuple("Usize").field(arg0).finish(),
-            Self::FileHandler(arg0) => f.debug_tuple("FileHandler").field(&arg0.name).finish(),
-            Self::Fraction(arg0, _) => f.debug_tuple("Fraction").field(arg0).finish(),
-        }
-    }
-}
+    // pub fn from_unique_string(string: &str, input_types: &[&'static EbiInputType]) -> Result<Self> {
+    //     let (variant, value) = string
+    //         .split_once(' ')
+    //         .ok_or_else(|| anyhow!("not a valid testinput {}", string))?;
+    //     match variant {
+    //         "trait" => {
+    //             let (trait_name, path) = value
+    //                 .split_once('#')
+    //                 .ok_or_else(|| anyhow!("not a valid testinput {}", string))?;
+    //             let path_buf = path.parse::<PathBuf>()?;
+    //             let ebi_trait = trait_name.parse::<EbiTrait>()?;
+    //             Ok(Self::Trait(ebi_trait, path_buf))
+    //         }
+    //         "object" => {
+    //             let (_object_name, path) = value
+    //                 .split_once('#')
+    //                 .ok_or_else(|| anyhow!("not a valid testinput {}", string))?;
+    //             let path_buf = path.parse::<PathBuf>()?;
+    //             let reader = MultipleReader::File(File::open(path)?);
+    //             if let Ok(EbiInput::Object(ebi_object, file_handler)) =
+    //                 attempt_parse(input_types, reader)
+    //             {
+    //                 Ok(Self::Object(ebi_object, file_handler, path_buf))
+    //             } else {
+    //                 Err(anyhow!("not a valid testinput {}", string))
+    //             }
+    //         }
+    //         "string" => {
+    //             for input_type in input_types {
+    //                 if let EbiInputType::String(allowed_values, _) = input_type {
+    //                     if let Some(allowed_values) = allowed_values
+    //                         && allowed_values.contains(&value)
+    //                     {
+    //                         return Ok(TestInput::String(value.to_string(), input_type));
+    //                     } else if allowed_values.is_none() {
+    //                         return Ok(TestInput::String(value.to_string(), input_type));
+    //                     }
+    //                 }
+    //             }
+    //             Err(anyhow!("not a valid testinput {}", string))
+    //         }
+    //         "usize" => {
+    //             let reader = MultipleReader::String(value.to_string());
+    //             if let Ok(EbiInput::Usize(val, file_handler)) = attempt_parse(input_types, reader) {
+    //                 Ok(Self::Usize(val, file_handler))
+    //             } else {
+    //                 Err(anyhow!("not a valid testinput {}", string))
+    //             }
+    //         }
+    //         "filehandler" => {
+    //             let reader = MultipleReader::String(value.to_string());
+    //             if let Ok(EbiInput::FileHandler(file_handler)) = attempt_parse(input_types, reader)
+    //             {
+    //                 Ok(Self::FileHandler(file_handler))
+    //             } else {
+    //                 Err(anyhow!("not a valid testinput {}", string))
+    //             }
+    //         }
+    //         "fraction" => {
+    //             let reader = MultipleReader::String(value.to_string());
+    //             if let Ok(EbiInput::Fraction(val, file_handler)) =
+    //                 attempt_parse(input_types, reader)
+    //             {
+    //                 Ok(Self::Fraction(val, file_handler))
+    //             } else {
+    //                 Err(anyhow!("not a valid testinput {}", string))
+    //             }
+    //         }
+    //         _ => Err(anyhow!("not a valid testinput {}", string)),
+    //     }
+    // }
 
-impl TestInput {
     pub(crate) fn find_inputs(input_typess: &[&[&'static EbiInputType]]) -> Vec<Vec<TestInput>> {
         let mut it = input_typess.iter();
         let mut result = if let Some(input_types) = it.next() {
@@ -104,7 +176,6 @@ impl TestInput {
                 })
                 .collect();
         }
-        println!("\tinput combinations {}", result.len());
         return result;
     }
 
@@ -227,5 +298,18 @@ impl TestInput {
         }
 
         result
+    }
+}
+
+impl Debug for TestInput {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Trait(arg0, arg1) => f.debug_tuple("Trait").field(arg0).field(arg1).finish(),
+            Self::Object(_, _, arg2) => f.debug_tuple("Object").field(arg2).finish(),
+            Self::String(arg0, _) => f.debug_tuple("String").field(arg0).finish(),
+            Self::Usize(arg0, _) => f.debug_tuple("Usize").field(arg0).finish(),
+            Self::FileHandler(arg0) => f.debug_tuple("FileHandler").field(&arg0.name).finish(),
+            Self::Fraction(arg0, _) => f.debug_tuple("Fraction").field(arg0).finish(),
+        }
     }
 }

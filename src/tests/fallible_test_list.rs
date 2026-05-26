@@ -23,34 +23,38 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
     (
         &EBI_ANALYSE_MEDOID,
         &[
-            "trait finite stochastic language ./testfiles/empty.xes",
+            "trait finite stochastic language#./testfiles/empty.xes",
             "usize 1",
         ],
     ),
     (
         &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
-        &["trait finite language ./testfiles/empty.xes", "usize 1"],
+        &["trait finite language#./testfiles/empty.xes", "usize 1"],
     ),
     (
         &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
-        &["trait finite language ./testfiles/empty.xes", "usize 1"],
+        &["trait finite language#./testfiles/empty.xes", "usize 1"],
     ),
     (
         &EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED,
-        &["trait event log with event attributes ./testfiles/empty.xes"],
+        &["trait event log with event attributes#./testfiles/empty.xes"],
     ),
     (
         &EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED,
-        &["trait event log with event attributes ./testfiles/simple_log_markovian_abstraction.xes"],
+        &["trait event log with event attributes#./testfiles/simple_log_markovian_abstraction.xes"],
     ),
     (
         &EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED,
-        &["trait event log with event attributes ./testfiles/a-b-double.xes"],
+        &["trait event log with event attributes#./testfiles/a-b-double.xes"],
+    ),
+    (
+        &EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED,
+        &["trait event log with event attributes#./testfiles/a-b.csv"],
     ),
     (
         &EBI_ASSOCIATION_ATTRIBUTE,
         &[
-            "trait event log with trace attributes ./testfiles/empty.xes",
+            "trait event log with trace attributes#./testfiles/empty.xes",
             "string some string",
             "usize 10",
         ],
@@ -58,7 +62,7 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
     (
         &EBI_ASSOCIATION_ATTRIBUTE,
         &[
-            "trait event log with trace attributes ./testfiles/simple_log_markovian_abstraction.xes",
+            "trait event log with trace attributes#./testfiles/oc-log.ocel",
             "string some string",
             "usize 10",
         ],
@@ -66,7 +70,15 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
     (
         &EBI_ASSOCIATION_ATTRIBUTE,
         &[
-            "trait event log with trace attributes ./testfiles/a-b-double.xes",
+            "trait event log with trace attributes#./testfiles/simple_log_markovian_abstraction.xes",
+            "string some string",
+            "usize 10",
+        ],
+    ),
+    (
+        &EBI_ASSOCIATION_ATTRIBUTE,
+        &[
+            "trait event log with trace attributes#./testfiles/a-b-double.xes",
             "string some string",
             "usize 10",
         ],
@@ -74,83 +86,83 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
     (
         &EBI_ASSOCIATION_ATTRIBUTES,
         &[
-            "trait event log with trace attributes ./testfiles/a-b-double.xes",
+            "trait event log with trace attributes#./testfiles/a-b-double.xes",
             "usize 10",
         ],
     ),
     (
         &EBI_CONFORMANCE_GAIN_PRECISION,
         &[
-            "trait finite stochastic language ./testfiles/a-b.csv",
-            "object stochastic deterministic finite automaton ./testfiles/empty.sdfa",
+            "trait finite stochastic language#./testfiles/a-b.csv",
+            "object stochastic deterministic finite automaton#./testfiles/empty.sdfa",
             "fraction 0",
         ],
     ),
     (
         &EBI_CONFORMANCE_GAIN_RECALL,
         &[
-            "trait finite stochastic language ./testfiles/a-b.csv",
-            "object stochastic deterministic finite automaton ./testfiles/empty.sdfa",
+            "trait finite stochastic language#./testfiles/a-b.csv",
+            "object stochastic deterministic finite automaton#./testfiles/empty.sdfa",
             "fraction 0",
         ],
     ),
     (
         &EBI_CONFORMANCE_CHI_SQUARED_SAMPLE,
         &[
-            "trait finite stochastic language ./testfiles/ba-aa-ab.slang",
-            "trait finite stochastic language ./testfiles/empty.xes",
+            "trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+            "trait finite stochastic language#./testfiles/empty.xes",
             "usize 1",
         ],
     ),
     (
         &EBI_CONFORMANCE_EARTH_MOVERS,
         &[
-            "trait finite stochastic language ./testfiles/ba-aa-ab.slang",
-            "trait finite stochastic language ./testfiles/empty.xes",
+            "trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+            "trait finite stochastic language#./testfiles/empty.xes",
         ],
     ),
     (
         &EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE,
         &[
-            "trait finite stochastic language ./testfiles/ba-aa-ab.slang",
-            "trait finite stochastic language ./testfiles/empty.xes",
+            "trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+            "trait finite stochastic language#./testfiles/empty.xes",
             "usize 1",
         ],
     ),
     (
         &EBI_CONFORMANCE_HELLINGER_SAMPLE,
         &[
-            "trait finite stochastic language ./testfiles/ba-aa-ab.slang",
-            "trait finite stochastic language ./testfiles/empty.xes",
+            "trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+            "trait finite stochastic language#./testfiles/empty.xes",
             "usize 1",
         ],
     ),
     (
         &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
         &[
-            "object stochastic language of alignments ./testfiles/aa-ab-ba.sali",
-            "trait semantics ./testfiles/flower.bpmn",
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/flower.bpmn",
         ],
     ),
     (
         &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
         &[
-            "object stochastic language of alignments ./testfiles/aa-ab-ba.sali",
-            "trait semantics ./testfiles/seq(a-xor(b-c)).sptree",
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/seq(a-xor(b-c)).sptree",
         ],
     ),
     (
         &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
         &[
-            "object stochastic language of alignments ./testfiles/aa-ab-ba.sali",
-            "trait semantics ./testfiles/ba-aa-ab.slang",
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/ba-aa-ab.slang",
         ],
     ),
     (
         &EBI_TEST_BOOTSTRAP,
         &[
-            "trait finite stochastic language ./testfiles/ba-aa-ab.slang",
-            "trait finite stochastic language ./testfiles/empty.xes",
+            "trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+            "trait finite stochastic language#./testfiles/empty.xes",
             "usize 10",
             "fraction 0.05",
         ],
@@ -158,7 +170,7 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
     (
         &EBI_TEST_LOG_ATTRIBUTE,
         &[
-            "trait event log with trace attributes ./testfiles/a-b-double.xes",
+            "trait event log with trace attributes#./testfiles/a-b-double.xes",
             "string some string",
             "usize 10",
             "fraction 0.05",
@@ -167,7 +179,7 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
     (
         &EBI_TEST_LOG_ATTRIBUTE,
         &[
-            "trait event log with trace attributes ./testfiles/simple_log_markovian_abstraction.xes",
+            "trait event log with trace attributes#./testfiles/simple_log_markovian_abstraction.xes",
             "string some string",
             "usize 10",
             "fraction 0.05",
@@ -176,7 +188,7 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
     (
         &EBI_TEST_LOG_ATTRIBUTE,
         &[
-            "trait event log with trace attributes ./testfiles/empty.xes",
+            "trait event log with trace attributes#./testfiles/empty.xes",
             "string some string",
             "usize 10",
             "fraction 0.05",
@@ -185,7 +197,7 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
     (
         &EBI_SAMPLE_TRACES,
         &[
-            "trait finite stochastic language ./testfiles/empty.xes",
+            "trait finite stochastic language#./testfiles/empty.xes",
             "usize 1",
         ],
     ),

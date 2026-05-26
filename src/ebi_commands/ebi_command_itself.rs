@@ -8,7 +8,8 @@ use crate::{
         ebi_command::EbiCommand,
         ebi_output::{EbiOutput, EbiOutputType},
         manual::{graph, html, manual},
-    }, tests::test_ebi_command::test_ebi_command,
+    },
+    tests::test_ebi_command::test_ebi_command,
 };
 use ebi_objects::{EbiObject, EbiObjectType, ebi_objects::scalable_vector_graphics::ToSVGMut};
 
@@ -46,6 +47,8 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
         &EBI_ITSELF_MANUAL,
         #[cfg(feature = "python")]
         &EBI_ITSELF_PYTHON,
+        #[cfg(feature = "test_generation")]
+        &EBI_ITSELF_TESTS,
     ],
 };
 test_ebi_command!(EBI_ITSELF);
@@ -215,5 +218,25 @@ pub const EBI_ITSELF_PYTHON: EbiCommand = EbiCommand::Command {
     input_names: &[],
     input_helps: &[],
     execute: |_, _| Ok(crate::python::python_module_generator::generate_pm4py_module()?),
+    output_type: &EbiOutputType::String,
+};
+
+#[cfg(feature = "test_generation")]
+pub const EBI_ITSELF_TESTS: EbiCommand = EbiCommand::Command {
+    name_short: "tests",
+    name_long: None,
+    explanation_short: "Generate blanket tests for commands.",
+    explanation_long: None,
+    cli_command: None,
+    latex_link: None,
+    exact_arithmetic: false,
+    input_types: &[],
+    input_names: &[],
+    input_helps: &[],
+    execute: |_, _| {
+        Ok(EbiOutput::String(
+            crate::tests::tests_generator::generate_tests()?,
+        ))
+    },
     output_type: &EbiOutputType::String,
 };
