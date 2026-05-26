@@ -64,7 +64,13 @@ pub fn {fun_nam}(javascript_inputs: Vec<JavascriptInput>, exporter_file_extensio
 }
 
 fn generate_javascript_rust_tests(command: &EbiCommand, path: &Vec<&EbiCommand>) -> Result<String> {
-    if let EbiCommand::Command { input_types, .. } = command {
+    if let EbiCommand::Command {
+        input_types,
+        exact_arithmetic,
+        ..
+    } = command
+        && *exact_arithmetic
+    {
         //for each input type, find all input combinations
         let inputss = crate::ebi_framework::ebi_command::test_inputs::find_inputs(input_types);
         if inputss.is_empty() && input_types.len() > 0 {
@@ -73,10 +79,10 @@ fn generate_javascript_rust_tests(command: &EbiCommand, path: &Vec<&EbiCommand>)
 
         let mut result = String::new();
         //apply the command to all input combinations
-        if let Some(inputs) = inputss.into_iter().next() {
+        for (input_i, inputs) in inputss.into_iter().take(2).enumerate() {
             result += &format!(
                 "\t#[test]
-\t{fallible}pub fn {function_name}_test() {{
+\t{fallible}pub fn {function_name}_test_{input_i}() {{
         let inputs = {inputs_string};
         crate::javascript::javascript_autogen::{function_name}(inputs, \".xes\");
     }}\n\n",
@@ -92,7 +98,7 @@ fn generate_javascript_rust_tests(command: &EbiCommand, path: &Vec<&EbiCommand>)
 
         Ok(result)
     } else {
-        Err(anyhow!("Not a command."))
+        Ok(String::new())
     }
 }
 

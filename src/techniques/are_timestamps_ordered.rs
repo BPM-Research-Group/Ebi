@@ -40,7 +40,7 @@ impl AreTimestampsOrdered for dyn EbiTraitEventLogEventAttributes {
     fn are_timestamps_ordered(&self) -> Result<bool> {
         for trace in self
             .iter_time_and_events()
-            .ok_or_else(|| anyhow!("Time attribute not given."))?
+            .ok_or_else(|| anyhow!("Log does not have a time attribute."))?
         {
             let mut last_timestamp = None;
             for (_, timestamp) in trace {

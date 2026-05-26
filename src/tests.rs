@@ -54,7 +54,11 @@
 pub(crate) mod fallible_test {
     use crate::{
         ebi_commands::{
-            ebi_command_conformance::{CONFORMANCE_GAIN_PRECISION, CONFORMANCE_GAIN_RECALL}, ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION, ebi_command_test::EBI_TEST_LOG_ATTRIBUTE
+            ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED,
+            ebi_command_association::ASSOCIATION_ATTRIBUTE,
+            ebi_command_conformance::{CONFORMANCE_GAIN_PRECISION, CONFORMANCE_GAIN_RECALL},
+            ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+            ebi_command_test::EBI_TEST_LOG_ATTRIBUTE,
         },
         ebi_framework::ebi_command::{EbiCommand, TestInput},
     };
@@ -86,12 +90,70 @@ pub(crate) mod fallible_test {
             ],
         ),
         (
+            &EBI_TEST_LOG_ATTRIBUTE,
+            &[
+                "trait event log with trace attributes ./testfiles/simple_log_markovian_abstraction.xes",
+                "string some string",
+                "usize 10",
+                "fraction 0.05",
+            ],
+        ),
+        (
             &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
             &[
                 "object stochastic language of alignments ./testfiles/aa-ab-ba.sali",
-                "trait semantics ./testfiles/flower.bpmn"
-            ]
-        )
+                "trait semantics ./testfiles/flower.bpmn",
+            ],
+        ),
+        (
+            &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+            &[
+                "object stochastic language of alignments ./testfiles/aa-ab-ba.sali",
+                "trait semantics ./testfiles/seq(a-xor(b-c)).sptree",
+            ],
+        ),
+        (
+            &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+            &[
+                "object stochastic language of alignments ./testfiles/aa-ab-ba.sali",
+                "trait semantics ./testfiles/ba-aa-ab.slang",
+            ],
+        ),
+        (
+            &ASSOCIATION_ATTRIBUTE,
+            &[
+                "trait event log with trace attributes ./testfiles/empty.xes",
+                "string some string",
+                "usize 10",
+            ],
+        ),
+        (
+            &ASSOCIATION_ATTRIBUTE,
+            &[
+                "trait event log with trace attributes ./testfiles/simple_log_markovian_abstraction.xes",
+                "string some string",
+                "usize 10",
+            ],
+        ),
+        (
+            &EBI_TEST_LOG_ATTRIBUTE,
+            &[
+                "trait event log with trace attributes ./testfiles/empty.xes",
+                "string some string",
+                "usize 10",
+                "fraction 0.05",
+            ],
+        ),
+        (
+            &EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED,
+            &["trait event log with event attributes ./testfiles/empty.xes"],
+        ),
+        (
+            &EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED,
+            &[
+                "trait event log with event attributes ./testfiles/simple_log_markovian_abstraction.xes",
+            ],
+        ),
     ];
 
     pub(crate) fn is_fallible(path: &Vec<&EbiCommand>, inputs: &Vec<TestInput>) -> bool {
