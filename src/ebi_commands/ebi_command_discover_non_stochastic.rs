@@ -12,6 +12,7 @@ use crate::{
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
         trace_model_miner::TraceModelMinerTree,
         inductive_miner::InductiveMinerTree,
+        edge_difference_no_freq::EdgeDifferenceNoFrequencies,
     },
 };
 use ebi_objects::{
