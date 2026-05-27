@@ -51,6 +51,12 @@ impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
         let numerator = gain_numerator_lambda(slang, self, lambda)?;
         let denominator = entropy_eventlog_with_lambda(slang, lambda)?;
 
+        if denominator.is_zero() {
+            return Err(anyhow!(
+                "Entropy is zero. Consider setting lambda to a small positive value to add a bit of uncertainty to the languages."
+            ));
+        }
+
         ratio(numerator, denominator)
     }
 
@@ -68,6 +74,12 @@ impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
 
         let numerator = gain_numerator_lambda(&slang, self, lambda)?;
         let denominator = entropy_sdfa_with_lambda(&self, lambda)?;
+
+        if denominator.is_zero() {
+            return Err(anyhow!(
+                "Entropy is zero. Consider setting lambda to a small positive value to add a bit of uncertainty to the languages."
+            ));
+        }
 
         ratio(numerator, denominator)
     }

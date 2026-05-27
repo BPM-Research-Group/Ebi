@@ -146,7 +146,7 @@ impl FromEbiTraitObject for EventLog {
         match object {
             EbiInput::Object(EbiObject::EventLog(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as an event log",
+                "Cannot read {} {} as an event log.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

@@ -83,7 +83,7 @@ pub mod javascript {
     #[cfg(feature = "javascript")]
     pub mod javascript_autogen;
     pub mod javascript_generator_html;
-    #[cfg(feature = "javascript")]
+    #[cfg(all(feature = "javascript", feature = "test_generation"))]
     pub mod javascript_generator_rust;
     #[cfg(feature = "javascript")]
     pub mod javascript_link;
@@ -186,7 +186,6 @@ pub mod techniques {
     pub mod association;
     pub mod bootstrap_test;
     pub mod bounded;
-    pub mod are_timestamps_ordered;
     pub mod chi_square_stochastic_conformance;
     pub mod completeness;
     pub mod deterministic_semantics_for_stochastic_semantics;
@@ -232,20 +231,35 @@ pub mod techniques {
     pub mod probability_queries;
     pub mod process_variety;
     pub mod random_stochastic_miner;
+    pub mod reachability;
     pub mod resource_utilisation;
     pub mod sample;
     pub mod sample_folds;
     pub mod stochastic_markovian_abstraction;
     pub mod stochastic_markovian_abstraction_conformance;
     pub mod tau_removal;
+    pub mod timestamps_ordered;
     pub mod trace_model_miner;
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
 }
+pub mod tests {
+    #[cfg(feature = "test_generation")]
+    pub mod fallible_test;
+    #[cfg(feature = "test_generation")]
+    pub mod fallible_test_list;
+    #[cfg(feature = "test_generation")]
+    pub mod test_input;
+    #[cfg(any(test, feature = "test_generation"))]
+    pub mod tests;
+    #[cfg(test)]
+    pub mod tests_autogen;
+    #[cfg(feature = "test_generation")]
+    pub mod tests_generator;
+}
 pub mod follower_semantics;
 pub mod multiple_reader;
-pub mod tests;
 pub mod text;
 
 pub use ebi_objects;

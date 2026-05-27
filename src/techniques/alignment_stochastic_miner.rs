@@ -25,6 +25,11 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
         mut self,
         language: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<Self::T> {
+        if self.get_initial_marking()?.is_none() {
+            //empty language stays empty
+            return Ok(StochasticBusinessProcessModelAndNotation { bpmn: self });
+        }
+
         //reset the weights
         {
             let ids = self
@@ -89,6 +94,10 @@ impl AlignmentMiner for LabelledPetriNet {
         mut self,
         language: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<StochasticLabelledPetriNet> {
+        if self.initial_marking.is_none() {
+            return Ok(StochasticLabelledPetriNet::new_empty_language());
+        }
+
         let mut probabilities: Vec<Fraction> =
             vec![Fraction::zero(); self.get_number_of_transitions()];
 

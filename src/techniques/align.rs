@@ -96,6 +96,10 @@ where
         &mut self,
         log: Box<dyn EbiTraitFiniteLanguage>,
     ) -> Result<LanguageOfAlignments> {
+        if self.get_initial_state().is_none() {
+            return Err(anyhow!("Model has the empty language, and can therefore not be aligned."));
+        }
+        
         let mut activity_key = self.activity_key().clone();
         let translator = Arc::new(ActivityKeyTranslator::new(
             log.activity_key(),
@@ -154,6 +158,10 @@ where
         &mut self,
         log: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<StochasticLanguageOfAlignments> {
+        if self.get_initial_state().is_none() {
+            return Err(anyhow!("Model has the empty language, and can therefore not be aligned."));
+        }
+
         let mut activity_key = self.activity_key().clone();
         let translator = Arc::new(ActivityKeyTranslator::new(
             log.activity_key(),

@@ -450,7 +450,7 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
     fn analyse_minimum_probability(&self, at_least: &Fraction) -> Result<FiniteStochasticLanguage> {
         if !at_least.is_positive() && self.infinitely_many_traces()? {
             return Err(anyhow!(
-                "all traces were requested but as the model has infinitely many traces, this is impossible"
+                "All traces were requested, but as the model has infinitely many traces, this is impossible."
             ));
         }
 

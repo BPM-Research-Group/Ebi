@@ -63,7 +63,10 @@ pub struct EbiFileHandler {
     pub name: &'static str,
     pub article: &'static str, //a or an
     pub file_extension: &'static str,
+    
+    /// Indicates whether the file format is binary.
     pub is_binary: bool,
+    
     pub format_specification: &'static str,
     pub validator: Option<fn(&mut dyn BufRead) -> Result<()>>,
 
@@ -180,6 +183,21 @@ impl FromStr for EbiFileHandler {
                 && (file_handler.name == s || file_handler.file_extension == s)
             {
                 return Ok(file_handler.clone());
+            }
+        }
+        return Err(anyhow!("{} is not an Ebi file handler.", s));
+    }
+}
+
+impl FromStr for &'static EbiFileHandler {
+    type Err = Error;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        for file_handler in EBI_FILE_HANDLERS {
+            if file_handler.validator.is_some()
+                && (file_handler.name == s || file_handler.file_extension == s)
+            {
+                return Ok(file_handler);
             }
         }
         return Err(anyhow!("{} is not an Ebi file handler.", s));

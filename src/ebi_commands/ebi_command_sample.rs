@@ -11,7 +11,6 @@ use crate::{
         sample::{PartiallyOrderedSampler, Sampler},
         sample_folds::FoldsSampler,
     },
-    tests::test_ebi_command,
 };
 use ebi_objects::{
     EbiObject, EbiObjectType, EventLog, FiniteStochasticLanguage,
@@ -81,7 +80,6 @@ pub const EBI_SAMPLE: EbiCommand = EbiCommand::Group {
         &EBI_SAMPLE_TRACES,
     ],
 };
-test_ebi_command!(EBI_SAMPLE);
 
 pub const EBI_SAMPLE_TRACES: EbiCommand = EbiCommand::Command {
     name_short: "tra",

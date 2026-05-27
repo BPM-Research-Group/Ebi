@@ -13,7 +13,6 @@ use crate::{
         trace_model_miner::TraceModelMinerTree,
         inductive_miner::InductiveMinerTree,
     },
-    tests::test_ebi_command,
 };
 use ebi_objects::{
     EbiObject, EbiObjectType, HasActivityKey,
@@ -32,7 +31,6 @@ pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
         &EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER,
     ],
 };
-test_ebi_command!(EBI_DISCOVER_NON_STOCHASTIC);
 
 pub const EBI_DISCOVER_NON_STOCHASTIC_FLOWER: EbiCommand = EbiCommand::Group {
     name_short: "flw",

@@ -25,7 +25,7 @@ pub fn correlation(pairs: &[(Fraction, Fraction)]) -> Result<Root> {
     let den_y = Root::of(&(&n * &sum_y_squared) - &(&sum_y * &sum_y))?;
 
     if den_x.is_zero() || den_y.is_zero() {
-        return Err(anyhow!("the standard deviation is zero"));
+        return Err(anyhow!("The standard deviation is zero."));
     }
 
     let result = num / (den_x * den_y);

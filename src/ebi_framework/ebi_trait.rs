@@ -1,14 +1,13 @@
+use super::{
+    ebi_command::{EBI_COMMANDS, EbiCommand},
+    ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+    ebi_input::{EbiInput, EbiInputType},
+};
 use crate::ebi_traits::{
     ebi_trait_activities, ebi_trait_event_log, ebi_trait_event_log_event_attributes,
     ebi_trait_event_log_trace_attributes, ebi_trait_graphable, ebi_trait_semantics,
     ebi_trait_stochastic_deterministic_semantics, ebi_trait_stochastic_partially_ordered_semantics,
     ebi_trait_stochastic_semantics,
-};
-
-use super::{
-    ebi_command::{EBI_COMMANDS, EbiCommand},
-    ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
-    ebi_input::{EbiInput, EbiInputType},
 };
 use ebi_objects::{
     anyhow::{Result, anyhow},
@@ -16,26 +15,40 @@ use ebi_objects::{
 };
 use std::{
     collections::{BTreeSet, HashSet},
-    fmt::{Debug, Display},
+    fmt::Debug,
 };
-use strum_macros::EnumIter;
+use strum_macros::{Display, EnumIter, EnumString};
 
-#[derive(Clone, Copy, PartialEq, Eq, EnumIter, Hash, Default)]
+#[derive(Clone, Copy, PartialEq, Eq, EnumIter, Hash, Default, EnumString, Display)]
 pub enum EbiTrait {
+    #[strum(serialize = "activities")]
     Activities,
     #[default]
+    #[strum(serialize = "event log")]
     EventLog,
+    #[strum(serialize = "event log with event attributes")]
     EventLogEventAttributes,
+    #[strum(serialize = "event log with trace attributes")]
     EventLogTraceAttributes,
+    #[strum(serialize = "finite language")]
     FiniteLanguage,
+    #[strum(serialize = "finite stochastic language")]
     FiniteStochasticLanguage,
+    #[strum(serialize = "graphable")]
     Graphable,
+    #[strum(serialize = "iterable language")]
     IterableLanguage,
+    #[strum(serialize = "iterable stochastic language")]
     IterableStochasticLanguage,
+    #[strum(serialize = "queriable stochastic language")]
     QueriableStochasticLanguage,
+    #[strum(serialize = "semantics")]
     Semantics,
+    #[strum(serialize = "stochastic deterministic semantics")]
     StochasticDeterministicSemantics,
+    #[strum(serialize = "stochastic partially ordered semantics")]
     StochasticPartiallyOrderedSemantics,
+    #[strum(serialize = "stochastic semantics")]
     StochasticSemantics,
 }
 
@@ -143,32 +156,6 @@ impl PartialOrd for EbiTrait {
         self.to_string()
             .to_lowercase()
             .partial_cmp(&other.to_string().to_lowercase())
-    }
-}
-
-impl Display for EbiTrait {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "{}",
-            match self {
-                EbiTrait::EventLog => "event log",
-                EbiTrait::EventLogEventAttributes => "event log with event attributes",
-                EbiTrait::EventLogTraceAttributes => "event log with trace attributes",
-                EbiTrait::IterableLanguage => "iterable language",
-                EbiTrait::FiniteLanguage => "finite language",
-                EbiTrait::FiniteStochasticLanguage => "finite stochastic language",
-                EbiTrait::IterableStochasticLanguage => "iterable stochastic language",
-                EbiTrait::QueriableStochasticLanguage => "queriable stochastic language",
-                EbiTrait::StochasticDeterministicSemantics => "stochastic deterministic semantics",
-                EbiTrait::StochasticPartiallyOrderedSemantics =>
-                    "stochastic partially ordered semantics",
-                EbiTrait::StochasticSemantics => "stochastic semantics",
-                EbiTrait::Semantics => "semantics",
-                EbiTrait::Graphable => "graphable",
-                EbiTrait::Activities => "activities",
-            }
-        )
     }
 }
 

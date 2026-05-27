@@ -1,7 +1,7 @@
 use crate::{
     ebi_framework::displayable::Displayable,
     semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
-    techniques::livelock::IsPartOfLivelock,
+    techniques::{livelock::IsPartOfLivelock, reachability::IsReachable},
 };
 use ebi_objects::{
     DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
@@ -9,13 +9,10 @@ use ebi_objects::{
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::Result,
-    ebi_objects::{
-        process_tree::TreeMarking,
-        process_tree::{Node, Operator},
-    },
+    ebi_objects::process_tree::{Node, Operator, TreeMarking},
 };
 use std::{
-    collections::{HashMap, hash_map::Entry},
+    collections::{HashMap, VecDeque, hash_map::Entry},
     fmt::Display,
 };
 
@@ -210,30 +207,129 @@ impl Display for CycleGraph {
     }
 }
 
+macro_rules! dfa_2 {
+    ($t:ty) => {
+        impl InfinitelyManyTraces for $t {
+            type LivState = usize;
+
+            fn infinitely_many_traces(&self) -> Result<bool> {
+                if self.get_initial_state().is_none() {
+                    //no initial state -> no traces -> not infinitely many traces
+                    return Ok(false);
+                };
+
+                // Step 1: apply Kahn's algorithm to find states that are part of a cycle.
+                let mut part_of_cycle = vec![false; self.number_of_states()];
+                {
+                    let v = self.number_of_states();
+
+                    let mut queue = vec![];
+                    let mut visited = 0;
+
+                    //compute in-degrees
+                    let mut in_degree = vec![0; v];
+                    for target in &self.targets {
+                        in_degree[*target] += 1;
+                    }
+
+                    //initialise queue with nodes with in-degree of 0
+                    for state in 0..v {
+                        if in_degree[state] == 0 {
+                            queue.push(state);
+                            part_of_cycle[state] = false;
+                        }
+                    }
+
+                    while let Some(state_u) = queue.pop() {
+                        visited += 1;
+
+                        //reduce the in-degree of neighbours
+                        let (_, mut transition) = self.binary_search(state_u, 0);
+                        while transition < self.sources.len() && self.sources[transition] == state_u
+                        {
+                            //found a neighbour
+                            let neighbour = self.targets[transition];
+                            in_degree[neighbour] -= 1;
+                            if in_degree[neighbour] == 0 {
+                                queue.push(neighbour);
+                                part_of_cycle[neighbour] = false;
+                            }
+
+                            transition += 1;
+                        }
+                    }
+
+                    if visited == v {
+                        //no states on cycles detected -> not infinitely many traces
+                        return Ok(false);
+                    }
+                }
+
+                //Step 2: remove states that are part of livelocks
+                {
+                    let mut livelock_cache = self.get_livelock_cache();
+                    for state in 0..self.number_of_states() {
+                        if part_of_cycle[state]
+                            && livelock_cache.is_state_part_of_livelock(&state)?
+                        {
+                            part_of_cycle[state] = false;
+                        }
+                    }
+                }
+
+                //intermediate check: if no states are left, there are not infinitely many traces
+                if part_of_cycle.iter().all(|x| !x) {
+                    return Ok(false);
+                }
+
+                //Step 3: remove states that are not reachable
+                {
+                    let mut reachability_cache = self.get_reachability_cache();
+                    for state in 0..self.number_of_states() {
+                        if part_of_cycle[state] && !reachability_cache.is_state_reachable(&state)? {
+                            part_of_cycle[state] = false;
+                        }
+                    }
+                }
+
+                Ok(part_of_cycle.iter().any(|x| *x))
+            }
+        }
+    };
+}
+
 macro_rules! dfa {
     ($t:ident) => {
         impl InfinitelyManyTraces for $t {
             type LivState = usize;
 
             fn infinitely_many_traces(&self) -> Result<bool> {
-                //in a DFA-like model, we must find a loop that has an activity on it and that has a state that is not in a livelock.
-                let mut queue = vec![];
+                //in a DFA-like model, we must find a loop on which all states are not in a livelock.
+
+                let mut queue = VecDeque::new();
                 let mut distance_from_initial = vec![usize::MAX; self.number_of_states() + 2];
                 if let Some(initial_state) = self.get_initial_state() {
-                    queue.push(initial_state);
+                    queue.push_front(initial_state);
                     distance_from_initial[initial_state] = 0;
                 } else {
                     //a DFA without initial state has no traces.
                     return Ok(false);
                 }
 
+                let mut livelock_cache = self.get_livelock_cache();
+
                 // log::debug!("queue {:?}", queue);
                 // log::debug!("distances {:?}", distance_from_initial);
 
-                while let Some(state) = queue.pop() {
+                while let Some(state) = queue.pop_front() {
                     let state_distance = distance_from_initial[state];
 
-                    // log::debug!("state {}, distance from initial {}", state, state_distance);
+                    log::debug!("state {}, distance from initial {}", state, state_distance);
+                    log::debug!(
+                        "state {}, enabled transitions {:?}",
+                        state,
+                        self.get_enabled_transitions(&state)
+                    );
 
                     for transition in self.get_enabled_transitions(&state) {
                         let mut child_state = state;
@@ -243,18 +339,18 @@ macro_rules! dfa {
                         if state_distance + 1 > child_distance {
                             //loopback edge detected
 
-                            //in a DFA, every transition is labelled, so the loop causes infinitely many paths.
-                            // log::debug!("loop detected with node {}", child_state);
+                            //The transition must be labelled, so the loop causes infinitely many paths.
+                            log::debug!("loop detected with node {}", child_state);
 
                             //however, there must be a path to a final state for these paths to be traces.
-                            if !self.is_state_part_of_livelock(&state)? {
+                            if !livelock_cache.is_state_part_of_livelock(&state)? {
                                 log::debug!("witness of infinite traces: state {}", state);
                                 return Ok(true);
                             }
                         } else if child_distance == usize::MAX {
                             //child hit for the first time
                             distance_from_initial[child_state] = state_distance + 1;
-                            queue.push(child_state);
+                            queue.push_front(child_state);
                         }
                     }
                 }
@@ -276,8 +372,8 @@ macro_rules! lang {
     };
 }
 
-dfa!(DeterministicFiniteAutomaton);
-dfa!(StochasticDeterministicFiniteAutomaton);
+dfa_2!(StochasticDeterministicFiniteAutomaton);
+dfa_2!(DeterministicFiniteAutomaton);
 dfa!(StochasticNondeterministicFiniteAutomaton);
 dfa!(DirectlyFollowsModel);
 dfa!(StochasticDirectlyFollowsModel);
@@ -290,14 +386,12 @@ lang!(FiniteStochasticLanguage);
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
+    use crate::techniques::infinitely_many_traces::InfinitelyManyTraces;
     use ebi_objects::{
         DeterministicFiniteAutomaton, LabelledPetriNet, ProcessTree,
         StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
     };
-
-    use crate::techniques::infinitely_many_traces::InfinitelyManyTraces;
+    use std::fs;
 
     #[test]
     fn infinitely_many_traces_lpn() {
@@ -339,5 +433,26 @@ mod tests {
         let lpn = fin.parse::<ProcessTree>().unwrap();
 
         assert!(lpn.infinitely_many_traces().unwrap());
+    }
+
+    #[test]
+    fn infinitely_many_traces_sdfa_2() {
+        let fin =
+            fs::read_to_string("./testfiles/acb-abc-ad-aded-adeded-adededed.slang.sdfa").unwrap();
+        let sdfa = fin
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
+
+        assert!(!sdfa.infinitely_many_traces().unwrap());
+    }
+
+    #[test]
+    fn disconnected_and_livelock() {
+        let fin = fs::read_to_string("./testfiles/disconnected_and_livelock.sdfa").unwrap();
+        let sdfa = fin
+            .parse::<StochasticDeterministicFiniteAutomaton>()
+            .unwrap();
+
+        assert!(!sdfa.infinitely_many_traces().unwrap());
     }
 }

@@ -5,7 +5,6 @@ use crate::{
         ebi_output::{EbiOutput, EbiOutputType},
     },
     techniques::stochastic_markovian_abstraction::build_embedded_snfa,
-    tests::test_ebi_command,
 };
 use ebi_objects::{
     BusinessProcessModelAndNotation, EbiObject, EbiObjectType, EventLog, FiniteLanguage,
@@ -29,7 +28,6 @@ pub const EBI_CONVERT: EbiCommand = EbiCommand::Group {
         &EBI_CONVERT_SNFA,
     ],
 };
-test_ebi_command!(EBI_CONVERT);
 
 pub const EBI_CONVERT_BPMN: EbiCommand = EbiCommand::Command {
     name_short: "bpmn",
