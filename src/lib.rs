@@ -242,12 +242,11 @@ pub mod techniques {
     pub mod unit_earth_movers_stochastic_conformance;
 }
 pub mod tests {
-    #[cfg(any(test, feature = "test_generation"))]
+    #[cfg(feature = "test_generation")]
     pub mod fallible_test;
-    #[cfg(any(test, feature = "test_generation"))]
+    #[cfg(feature = "test_generation")]
     pub mod fallible_test_list;
-    pub mod test_ebi_command;
-    #[cfg(any(test, feature = "test_generation"))]
+    #[cfg(feature = "test_generation")]
     pub mod test_input;
     #[cfg(any(test, feature = "test_generation"))]
     pub mod tests;

@@ -9,4 +9,4 @@ cargo test --verbose --features exactarithmetic
 cargo test --verbose --features approximatearithmetic
 cargo test --verbose --features javascript
 
-echo "Ebi was successfully tested"
+echo "Ebi passed the tests."

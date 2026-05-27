@@ -1,16 +1,13 @@
+use crate::ebi_framework::{
+    documentation::{documentation_commands, documentation_filehandlers, documentation_home},
+    ebi_command::EbiCommand,
+    ebi_output::{EbiOutput, EbiOutputType},
+    manual::{graph, html, manual},
+};
 #[cfg(feature = "javascript")]
 use crate::javascript::javascript_generator_rust::generate_javascript_rust;
 #[cfg(feature = "java")]
 use crate::prom::prom_plugin_generator::print_java_plugins;
-use crate::{
-    ebi_framework::{
-        documentation::{documentation_commands, documentation_filehandlers, documentation_home},
-        ebi_command::EbiCommand,
-        ebi_output::{EbiOutput, EbiOutputType},
-        manual::{graph, html, manual},
-    },
-    tests::test_ebi_command::test_ebi_command,
-};
 use ebi_objects::{EbiObject, EbiObjectType, ebi_objects::scalable_vector_graphics::ToSVGMut};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
@@ -51,7 +48,6 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
         &EBI_ITSELF_TESTS,
     ],
 };
-test_ebi_command!(EBI_ITSELF);
 
 pub const EBI_ITSELF_DOCUMENTATION: EbiCommand = EbiCommand::Group {
     name_short: "docs",

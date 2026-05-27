@@ -917,7 +917,11 @@ pub fn get_applicable_commands(object_type: &EbiObjectType) -> BTreeSet<Vec<&'st
     result
 }
 
-#[cfg(any(feature = "javascript", feature = "python", feature = "test_generation"))]
+#[cfg(any(
+    feature = "javascript",
+    feature = "python",
+    feature = "test_generation"
+))]
 pub(crate) fn search_command_in_source_files(path: &Vec<&EbiCommand>) -> Result<String> {
     //start the search from the EBI_COMMANDS const
     let mut path = path.clone();
@@ -939,7 +943,11 @@ pub(crate) fn search_command_in_source_files(path: &Vec<&EbiCommand>) -> Result<
     ))
 }
 
-#[cfg(any(feature = "javascript", feature = "python", feature = "test_generation"))]
+#[cfg(any(
+    feature = "javascript",
+    feature = "python",
+    feature = "test_generation"
+))]
 fn root_command() -> Result<(PathBuf, syn::ItemConst)> {
     let file = "src/ebi_framework/ebi_command.rs";
     let contents = std::fs::read_to_string(file)?;
@@ -960,7 +968,11 @@ fn root_command() -> Result<(PathBuf, syn::ItemConst)> {
     return Err(anyhow!("source file not found"));
 }
 
-#[cfg(any(feature = "javascript", feature = "python", feature = "test_generation"))]
+#[cfg(any(
+    feature = "javascript",
+    feature = "python",
+    feature = "test_generation"
+))]
 fn search_child(
     parent_declaration: &syn::ItemConst,
     child_command: &EbiCommand,
@@ -1023,7 +1035,11 @@ fn search_child(
     return Err(anyhow!("todo file not found {}", child_command));
 }
 
-#[cfg(any(feature = "javascript", feature = "python", feature = "test_generation"))]
+#[cfg(any(
+    feature = "javascript",
+    feature = "python",
+    feature = "test_generation"
+))]
 fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
     if let syn::Expr::Struct(x) = &*const_item.expr {
         for field in &x.fields {
@@ -1068,7 +1084,6 @@ fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
 #[cfg(test)]
 pub(crate) mod tests {
     use super::{EBI_COMMANDS, EbiCommand};
-    use crate::{ebi_framework::ebi_input::EbiInput, tests::test_input::TestInput};
     use std::collections::HashSet;
 
     #[test]
@@ -1099,64 +1114,5 @@ pub(crate) mod tests {
             let mut hash = HashSet::new();
             hash.insert(command.last().unwrap());
         }
-    }
-
-    pub(crate) fn ebi_command_test(command: &EbiCommand) {
-        match command {
-            EbiCommand::Group { children, .. } => {
-                println!("Group: {}", command.long_name());
-                for child in children.iter() {
-                    ebi_command_test(child);
-                }
-            }
-            EbiCommand::Command {
-                cli_command,
-                exact_arithmetic,
-                input_types,
-                execute,
-                output_type,
-                ..
-            } => {
-                println!("Command: {}", command.long_name());
-                if cli_command.is_none() // only test commands that do not use the cli directly
-                        && (*exact_arithmetic // do not test approximate commands in exact mode
-                            || cfg!(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic")))
-                {
-                    //for each input type, find all input combinations
-                    let inputss = crate::tests::test_input::TestInput::find_inputs(input_types);
-                    if inputss.is_empty() && input_types.len() > 0 {
-                        panic!("Could not find input to call command.");
-                    }
-
-                    //apply the command to all input combinations
-                    for inputs in inputss {
-                        eprintln!("\t{:?}", inputs);
-
-                        //we do not know whether a command should succeed (giving an error is fine in general), but no command should panic
-                        let output = (execute)(
-                            crate::ebi_framework::ebi_command::tests::transform(inputs),
-                            None,
-                        );
-
-                        if let Ok(output) = output {
-                            //verify that the output is of the correct type
-                            assert_eq!(output.get_type(), output_type.to_owned().to_owned());
-
-                            //verify that the activities test passes
-                            ebi_objects::ebi_activity_key::TestActivityKey::test_activity_key(
-                                &output,
-                            );
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    pub(crate) fn transform(inputs: Vec<TestInput>) -> Vec<EbiInput> {
-        inputs
-            .into_iter()
-            .map(|x| x.to_ebi_input())
-            .collect::<Vec<_>>()
     }
 }

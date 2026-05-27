@@ -7,7 +7,7 @@ use crate::{
     },
     ebi_info,
     ebi_traits::ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
-    techniques::association::Associations, tests::test_ebi_command::test_ebi_command,
+    techniques::association::Associations,
 };
 use ebi_objects::anyhow::{Context, anyhow};
 use std::io::Write;
@@ -21,7 +21,6 @@ pub const EBI_ASSOCIATION: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[&EBI_ASSOCIATION_ATTRIBUTE, &EBI_ASSOCIATION_ATTRIBUTES],
 };
-test_ebi_command!(EBI_ASSOCIATION);
 
 pub const EBI_ASSOCIATION_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     name_short: "att",

@@ -1,11 +1,11 @@
 use crate::{
     ebi_framework::ebi_command::{EBI_COMMANDS, EbiCommand, search_command_in_source_files},
     ebi_objects::anyhow::{Result, anyhow},
-    tests::{test_input::TestInput, tests::fallible_test::is_fallible},
+    tests::{fallible_test::is_fallible, test_input::TestInput},
 };
 use itertools::Itertools;
 
-pub const CONST_NUMBER_OF_TESTS_PER_COMMAND: usize = 1;
+pub const NUMBER_OF_TESTS_PER_COMMAND: usize = 1;
 
 pub(crate) fn generate_tests() -> Result<String> {
     let path = EBI_COMMANDS;
@@ -55,7 +55,6 @@ pub(crate) fn generate_tests_for_command(
         cli_command,
         ..
     } = command
-        && *exact_arithmetic
         && cli_command.is_none()
         && input_types.len() > 0
     {
@@ -72,9 +71,19 @@ pub(crate) fn generate_tests_for_command(
         //apply the command to all input combinations
         for (input_i, inputs) in inputss
             .into_iter()
-            .take(CONST_NUMBER_OF_TESTS_PER_COMMAND)
+            .take(NUMBER_OF_TESTS_PER_COMMAND)
             .enumerate()
         {
+            let exact_code = if !exact_arithmetic {
+                format!(
+                    "if ebi_objects::ebi_arithmetic::is_exact_globally() {{
+\t\t\treturn;
+\t\t}}"
+                )
+            } else {
+                String::new()
+            };
+
             let function_name = EbiCommand::path_to_short_string(path)
                 .replace(" ", "_")
                 .replace("-", "_")
@@ -102,6 +111,7 @@ pub(crate) fn generate_tests_for_command(
             result += &format!(
                 "\t#[test]
 \tpub fn {function_name}_test_{input_i}() {{
+\t\t{exact_code}
 \t\t{inputs_code}
 \t\t{match_code}
 \t}}\n",

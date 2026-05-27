@@ -18,8 +18,9 @@ mod tests{
 	// ==== command all ====
 	#[test]
 	pub fn ebi_ana_all_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -36,8 +37,9 @@ mod tests{
 	// ==== command comp ====
 	#[test]
 	pub fn ebi_ana_comp_test_0() {
-		// trait event log#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait event log#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -54,8 +56,9 @@ mod tests{
 	// ==== command cov ====
 	#[test]
 	pub fn ebi_ana_cov_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// fraction 0
@@ -74,12 +77,13 @@ mod tests{
 	// ==== command dfgedi ====
 	#[test]
 	pub fn ebi_ana_dfgedi_test_0() {
-		// object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
+		
+		// object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
 		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
 		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		// object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
+		// object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
 		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
 		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
 		let inputs = vec![input0, input1];
@@ -96,8 +100,9 @@ mod tests{
 	// ==== command en ====
 	#[test]
 	pub fn ebi_ana_en_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -114,8 +119,9 @@ mod tests{
 	// ==== command med ====
 	#[test]
 	pub fn ebi_ana_med_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// usize 1
@@ -134,6 +140,7 @@ mod tests{
 	// ==== command minprob ====
 	#[test]
 	pub fn ebi_ana_minprob_test_0() {
+		
 		// trait stochastic deterministic semantics#./testfiles/seq(a-xor(b-c)).sptree
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic deterministic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
@@ -154,8 +161,9 @@ mod tests{
 	// ==== command mode ====
 	#[test]
 	pub fn ebi_ana_mode_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -172,8 +180,9 @@ mod tests{
 	// ==== command mostlikely ====
 	#[test]
 	pub fn ebi_ana_mostlikely_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// usize 1
@@ -192,8 +201,9 @@ mod tests{
 	// ==== command var ====
 	#[test]
 	pub fn ebi_ana_var_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -213,8 +223,9 @@ mod tests{
 	// ==== command act ====
 	#[test]
 	pub fn ebi_anans_act_test_0() {
-		// trait activities#./testfiles/flower.bpmn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/flower.bpmn").unwrap());
+		
+		// trait activities#./testfiles/seq(a-xor(b-c)).sptree
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("activities".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -231,8 +242,9 @@ mod tests{
 	// ==== command bnd ====
 	#[test]
 	pub fn ebi_anans_bnd_test_0() {
-		// object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
+		
+		// object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
 		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
 		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
 		let inputs = vec![input0];
@@ -249,8 +261,9 @@ mod tests{
 	// ==== command clus ====
 	#[test]
 	pub fn ebi_anans_clus_test_0() {
-		// trait finite language#./testfiles/aa-ab-ba.lang
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
+		
+		// trait finite language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// usize 1
@@ -269,12 +282,13 @@ mod tests{
 	// ==== command exe ====
 	#[test]
 	pub fn ebi_anans_exe_test_0() {
-		// trait event log with event attributes#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait event log with event attributes#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with event attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		// trait semantics#./testfiles/flower.bpmn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/flower.bpmn").unwrap());
+		// trait semantics#./testfiles/seq(a-xor(b-c)).sptree
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
@@ -291,8 +305,9 @@ mod tests{
 	// ==== command at ====
 	#[test]
 	pub fn ebi_anans_at_test_0() {
-		// object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
+		
+		// object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
 		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
 		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
 		let inputs = vec![input0];
@@ -309,10 +324,11 @@ mod tests{
 	// ==== command inft ====
 	#[test]
 	pub fn ebi_anans_inft_test_0() {
-		// object event log#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
-		let object0 = read_as_object_with_file_handler(&"event log".parse().unwrap(), &mut reader, None, 0, &mut None, "comma-separated values".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "comma-separated values".parse().unwrap());
+		
+		// object event log#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let object0 = read_as_object_with_file_handler(&"event log".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		let inputs = vec![input0];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES {
@@ -327,8 +343,9 @@ mod tests{
 	// ==== command med ====
 	#[test]
 	pub fn ebi_anans_med_test_0() {
-		// trait finite language#./testfiles/aa-ab-ba.lang
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
+		
+		// trait finite language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// usize 1
@@ -347,8 +364,9 @@ mod tests{
 	// ==== command to ====
 	#[test]
 	pub fn ebi_anans_to_test_0() {
-		// trait event log with event attributes#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait event log with event attributes#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with event attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -365,8 +383,9 @@ mod tests{
 	// ==== command att ====
 	#[test]
 	pub fn ebi_asso_att_test_0() {
-		// trait event log with trace attributes#./testfiles/a-b-double.xes
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		
+		// trait event log with trace attributes#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with trace attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// string some string
@@ -384,16 +403,20 @@ mod tests{
 	// ==== command atts ====
 	#[test]
 	pub fn ebi_asso_atts_test_0() {
-		// trait event log with trace attributes#./testfiles/a-b-double.xes
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		
+		// trait event log with trace attributes#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with trace attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// usize 10
 		let input1 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1];
 
-		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_association::EBI_ASSOCIATION_ATTRIBUTES {
-			assert!(((execute)(inputs, None)).is_err())
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_association::EBI_ASSOCIATION_ATTRIBUTES {
+			match (execute)(inputs, None) {
+				Ok(output) => assert_eq!(&output.get_type(), output_type),
+				Err(_) => assert!(false),
+			}
 		}
 	}
 
@@ -404,8 +427,9 @@ mod tests{
 	// ==== command cssc ====
 	#[test]
 	pub fn ebi_conf_cssc_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree
@@ -426,12 +450,13 @@ mod tests{
 	// ==== command cssc-sample ====
 	#[test]
 	pub fn ebi_conf_cssc_sample_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		// usize 1
@@ -450,12 +475,13 @@ mod tests{
 	// ==== command emsc ====
 	#[test]
 	pub fn ebi_conf_emsc_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
@@ -472,12 +498,13 @@ mod tests{
 	// ==== command emsc-sample ====
 	#[test]
 	pub fn ebi_conf_emsc_sample_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		// usize 1
@@ -496,8 +523,9 @@ mod tests{
 	// ==== command er ====
 	#[test]
 	pub fn ebi_conf_er_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree
@@ -515,13 +543,66 @@ mod tests{
 	}
 
 
+	// ==== command gp ====
+	#[test]
+	pub fn ebi_conf_gp_test_0() {
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		// object stochastic deterministic finite automaton#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let object1 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "finite stochastic language".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "finite stochastic language".parse().unwrap());
+		// fraction 0
+		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_PRECISION {
+			match (execute)(inputs, None) {
+				Ok(output) => assert_eq!(&output.get_type(), output_type),
+				Err(_) => assert!(false),
+			}
+		}
+	}
+
+
+	// ==== command gr ====
+	#[test]
+	pub fn ebi_conf_gr_test_0() {
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		// object stochastic deterministic finite automaton#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let object1 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "finite stochastic language".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "finite stochastic language".parse().unwrap());
+		// fraction 0
+		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_RECALL {
+			match (execute)(inputs, None) {
+				Ok(output) => assert_eq!(&output.get_type(), output_type),
+				Err(_) => assert!(false),
+			}
+		}
+	}
 
 
 	// ==== command hsc ====
 	#[test]
 	pub fn ebi_conf_hsc_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree
@@ -542,12 +623,13 @@ mod tests{
 	// ==== command hsc-sample ====
 	#[test]
 	pub fn ebi_conf_hsc_sample_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		// usize 1
@@ -563,17 +645,68 @@ mod tests{
 	}
 
 
+	// ==== command jssc ====
+	#[test]
+	pub fn ebi_conf_jssc_test_0() {
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_JSSC {
+			match (execute)(inputs, None) {
+				Ok(output) => assert_eq!(&output.get_type(), output_type),
+				Err(_) => assert!(false),
+			}
+		}
+	}
+
+
+	// ==== command jssc-sample ====
+	#[test]
+	pub fn ebi_conf_jssc_sample_test_0() {
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		// usize 1
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_JSSC_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => assert_eq!(&output.get_type(), output_type),
+				Err(_) => assert!(false),
+			}
+		}
+	}
 
 
 	// ==== command ma ====
 	#[test]
 	pub fn ebi_conf_ma_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		// usize 1
@@ -594,8 +727,9 @@ mod tests{
 	// ==== command uemsc ====
 	#[test]
 	pub fn ebi_conf_uemsc_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree
@@ -613,6 +747,32 @@ mod tests{
 	}
 
 
+	// ==== command uemsc-sample ====
+	#[test]
+	pub fn ebi_conf_uemsc_sample_test_0() {
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		// usize 1
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_UEMSC_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => assert_eq!(&output.get_type(), output_type),
+				Err(_) => assert!(false),
+			}
+		}
+	}
+
 
 	// ==== group confns ====
 
@@ -620,12 +780,13 @@ mod tests{
 	// ==== command ali ====
 	#[test]
 	pub fn ebi_confns_ali_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		// trait semantics#./testfiles/flower.bpmn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/flower.bpmn").unwrap());
+		// trait semantics#./testfiles/seq(a-xor(b-c)).sptree
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
@@ -642,12 +803,13 @@ mod tests{
 	// ==== command eep ====
 	#[test]
 	pub fn ebi_confns_eep_test_0() {
+		
 		// object stochastic language of alignments#./testfiles/aa-ab-ba.sali
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
 		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
 		let input0 = EbiInput::Object(object0, "stochastic language of alignments".parse().unwrap());
-		// trait semantics#./testfiles/flower.bpmn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/flower.bpmn").unwrap());
+		// trait semantics#./testfiles/seq(a-xor(b-c)).sptree
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
@@ -661,12 +823,13 @@ mod tests{
 	// ==== command setali ====
 	#[test]
 	pub fn ebi_confns_setali_test_0() {
-		// trait finite language#./testfiles/aa-ab-ba.lang
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
+		
+		// trait finite language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		// trait semantics#./testfiles/flower.bpmn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/flower.bpmn").unwrap());
+		// trait semantics#./testfiles/seq(a-xor(b-c)).sptree
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
@@ -683,6 +846,7 @@ mod tests{
 	// ==== command tfit ====
 	#[test]
 	pub fn ebi_confns_tfit_test_0() {
+		
 		// object stochastic language of alignments#./testfiles/aa-ab-ba.sali
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
 		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
@@ -704,10 +868,11 @@ mod tests{
 	// ==== command bpmn ====
 	#[test]
 	pub fn ebi_conv_bpmn_test_0() {
-		// object business process model and notation#./testfiles/flower.bpmn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/flower.bpmn").unwrap());
-		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "business process model and notation".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "business process model and notation".parse().unwrap());
+		
+		// object business process model and notation#./testfiles/seq(a-xor(b-c)).sptree
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic process tree".parse().unwrap());
 		let inputs = vec![input0];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_BPMN {
@@ -722,10 +887,11 @@ mod tests{
 	// ==== command lang ====
 	#[test]
 	pub fn ebi_conv_lang_test_0() {
-		// object finite language#./testfiles/aa-ab-ba.lang
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
-		let object0 = read_as_object_with_file_handler(&"finite language".parse().unwrap(), &mut reader, None, 0, &mut None, "finite language".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "finite language".parse().unwrap());
+		
+		// object finite language#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite language".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		let inputs = vec![input0];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_LANG {
@@ -740,10 +906,11 @@ mod tests{
 	// ==== command log ====
 	#[test]
 	pub fn ebi_conv_log_test_0() {
-		// object event log#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
-		let object0 = read_as_object_with_file_handler(&"event log".parse().unwrap(), &mut reader, None, 0, &mut None, "comma-separated values".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "comma-separated values".parse().unwrap());
+		
+		// object event log#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let object0 = read_as_object_with_file_handler(&"event log".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		let inputs = vec![input0];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_LOG {
@@ -758,6 +925,7 @@ mod tests{
 	// ==== command lpn ====
 	#[test]
 	pub fn ebi_conv_lpn_test_0() {
+		
 		// object labelled Petri net#./testfiles/seq(a-xor(b-c)).sptree
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
@@ -776,10 +944,11 @@ mod tests{
 	// ==== command slang ====
 	#[test]
 	pub fn ebi_conv_slang_test_0() {
-		// object finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
-		let object0 = read_as_object_with_file_handler(&"finite stochastic language".parse().unwrap(), &mut reader, None, 0, &mut None, "comma-separated values".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "comma-separated values".parse().unwrap());
+		
+		// object finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite stochastic language".parse().unwrap(), &mut reader, None, 0, &mut None, "finite stochastic language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite stochastic language".parse().unwrap());
 		let inputs = vec![input0];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SLANG {
@@ -794,10 +963,11 @@ mod tests{
 	// ==== command sdfa ====
 	#[test]
 	pub fn ebi_conv_sdfa_test_0() {
-		// object stochastic deterministic finite automaton#./testfiles/empty.sdfa
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.sdfa").unwrap());
-		let object0 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		
+		// object stochastic deterministic finite automaton#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "finite stochastic language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite stochastic language".parse().unwrap());
 		let inputs = vec![input0];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SDFA {
@@ -812,10 +982,11 @@ mod tests{
 	// ==== command slpn ====
 	#[test]
 	pub fn ebi_conv_slpn_test_0() {
-		// object stochastic labelled Petri net#./testfiles/simple_markovian_abstraction.slpn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_markovian_abstraction.slpn").unwrap());
-		let object0 = read_as_object_with_file_handler(&"stochastic labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic labelled Petri net".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "stochastic labelled Petri net".parse().unwrap());
+		
+		// object stochastic labelled Petri net#./testfiles/bpic12-a.xes.gz-dfg.dfg
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
 		let inputs = vec![input0];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SLPN {
@@ -830,6 +1001,7 @@ mod tests{
 	// ==== command snfa ====
 	#[test]
 	pub fn ebi_conv_snfa_test_0() {
+		
 		// object stochastic non-deterministic finite automaton#./testfiles/seq(a-xor(b-c)).sptree
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let object0 = read_as_object_with_file_handler(&"stochastic non-deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
@@ -854,14 +1026,15 @@ mod tests{
 	// ==== command sbpmn ====
 	#[test]
 	pub fn ebi_disc_ali_sbpmn_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		// object business process model and notation#./testfiles/flower.bpmn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/flower.bpmn").unwrap());
-		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "business process model and notation".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "business process model and notation".parse().unwrap());
+		// object business process model and notation#./testfiles/seq(a-xor(b-c)).sptree
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
+		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic process tree".parse().unwrap());
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS_BPMN {
@@ -876,8 +1049,9 @@ mod tests{
 	// ==== command slpn ====
 	#[test]
 	pub fn ebi_disc_ali_slpn_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// object labelled Petri net#./testfiles/seq(a-xor(b-c)).sptree
@@ -898,8 +1072,9 @@ mod tests{
 	// ==== command dfg ====
 	#[test]
 	pub fn ebi_disc_dfg_test_0() {
-		// trait event log#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait event log#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// fraction 1
@@ -921,14 +1096,15 @@ mod tests{
 	// ==== command sbpmn ====
 	#[test]
 	pub fn ebi_disc_occ_sbpmn_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		// object business process model and notation#./testfiles/flower.bpmn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/flower.bpmn").unwrap());
-		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "business process model and notation".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "business process model and notation".parse().unwrap());
+		// object business process model and notation#./testfiles/seq(a-xor(b-c)).sptree
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
+		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic process tree".parse().unwrap());
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SBPMN {
@@ -943,8 +1119,9 @@ mod tests{
 	// ==== command slpn ====
 	#[test]
 	pub fn ebi_disc_occ_slpn_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// object labelled Petri net#./testfiles/seq(a-xor(b-c)).sptree
@@ -965,8 +1142,9 @@ mod tests{
 	// ==== command sptree ====
 	#[test]
 	pub fn ebi_disc_occ_sptree_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// object process tree#./testfiles/seq(a-xor(b-c)).sptree
@@ -990,10 +1168,11 @@ mod tests{
 	// ==== command sbpmn ====
 	#[test]
 	pub fn ebi_disc_rnd_sbpmn_test_0() {
-		// object business process model and notation#./testfiles/flower.bpmn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/flower.bpmn").unwrap());
-		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "business process model and notation".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "business process model and notation".parse().unwrap());
+		
+		// object business process model and notation#./testfiles/seq(a-xor(b-c)).sptree
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic process tree".parse().unwrap());
 		let inputs = vec![input0];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SBPMN {
@@ -1008,6 +1187,7 @@ mod tests{
 	// ==== command slpn ====
 	#[test]
 	pub fn ebi_disc_rnd_slpn_test_0() {
+		
 		// object labelled Petri net#./testfiles/seq(a-xor(b-c)).sptree
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
@@ -1026,6 +1206,7 @@ mod tests{
 	// ==== command sptree ====
 	#[test]
 	pub fn ebi_disc_rnd_sptree_test_0() {
+		
 		// object process tree#./testfiles/seq(a-xor(b-c)).sptree
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
@@ -1047,10 +1228,11 @@ mod tests{
 	// ==== command sbpmn ====
 	#[test]
 	pub fn ebi_disc_uni_sbpmn_test_0() {
-		// object business process model and notation#./testfiles/flower.bpmn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/flower.bpmn").unwrap());
-		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "business process model and notation".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "business process model and notation".parse().unwrap());
+		
+		// object business process model and notation#./testfiles/seq(a-xor(b-c)).sptree
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic process tree".parse().unwrap());
 		let inputs = vec![input0];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SBPMN {
@@ -1065,6 +1247,7 @@ mod tests{
 	// ==== command slpn ====
 	#[test]
 	pub fn ebi_disc_uni_slpn_test_0() {
+		
 		// object labelled Petri net#./testfiles/seq(a-xor(b-c)).sptree
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
@@ -1083,6 +1266,7 @@ mod tests{
 	// ==== command sptree ====
 	#[test]
 	pub fn ebi_disc_uni_sptree_test_0() {
+		
 		// object process tree#./testfiles/seq(a-xor(b-c)).sptree
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
@@ -1107,8 +1291,9 @@ mod tests{
 	// ==== command dfa ====
 	#[test]
 	pub fn ebi_dins_flw_dfa_test_0() {
-		// trait finite language#./testfiles/aa-ab-ba.lang
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
+		
+		// trait finite language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -1125,8 +1310,9 @@ mod tests{
 	// ==== command ptree ====
 	#[test]
 	pub fn ebi_dins_flw_ptree_test_0() {
-		// trait finite language#./testfiles/aa-ab-ba.lang
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
+		
+		// trait finite language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -1146,8 +1332,9 @@ mod tests{
 	// ==== command dfa ====
 	#[test]
 	pub fn ebi_dins_pfxt_dfa_test_0() {
-		// trait finite language#./testfiles/aa-ab-ba.lang
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
+		
+		// trait finite language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -1164,8 +1351,9 @@ mod tests{
 	// ==== command ptree ====
 	#[test]
 	pub fn ebi_dins_pfxt_ptree_test_0() {
-		// trait finite language#./testfiles/aa-ab-ba.lang
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
+		
+		// trait finite language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -1182,8 +1370,9 @@ mod tests{
 	// ==== command tm ====
 	#[test]
 	pub fn ebi_dins_tm_test_0() {
-		// trait finite language#./testfiles/aa-ab-ba.lang
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
+		
+		// trait finite language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -1206,10 +1395,11 @@ mod tests{
 	// ==== command empty ====
 	#[test]
 	pub fn ebi_fil_tr_empty_test_0() {
-		// object XES event log#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
-		let object0 = read_as_object_with_file_handler(&"XES event log".parse().unwrap(), &mut reader, None, 0, &mut None, "comma-separated values".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "comma-separated values".parse().unwrap());
+		
+		// object XES event log#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let object0 = read_as_object_with_file_handler(&"XES event log".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		let inputs = vec![input0];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY {
@@ -1224,10 +1414,11 @@ mod tests{
 	// ==== command len ====
 	#[test]
 	pub fn ebi_fil_tr_len_test_0() {
-		// object XES event log#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
-		let object0 = read_as_object_with_file_handler(&"XES event log".parse().unwrap(), &mut reader, None, 0, &mut None, "comma-separated values".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "comma-separated values".parse().unwrap());
+		
+		// object XES event log#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let object0 = read_as_object_with_file_handler(&"XES event log".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		// string <
 		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
 		// usize 0
@@ -1249,10 +1440,11 @@ mod tests{
 	// ==== command act ====
 	#[test]
 	pub fn ebi_fil_tr_event_act_test_0() {
-		// object XES event log#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
-		let object0 = read_as_object_with_file_handler(&"XES event log".parse().unwrap(), &mut reader, None, 0, &mut None, "comma-separated values".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "comma-separated values".parse().unwrap());
+		
+		// object XES event log#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let object0 = read_as_object_with_file_handler(&"XES event log".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		// string any
 		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
 		// string some string
@@ -1285,10 +1477,11 @@ mod tests{
 	// ==== command info ====
 	#[test]
 	pub fn ebi_info_test_0() {
-		// object business process model and notation#./testfiles/flower.bpmn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/flower.bpmn").unwrap());
-		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "business process model and notation".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "business process model and notation".parse().unwrap());
+		
+		// object stochastic process tree#./testfiles/seq(a-xor(b-c)).sptree
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic process tree".parse().unwrap());
 		let inputs = vec![input0];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_info::EBI_INFO {
@@ -1306,12 +1499,13 @@ mod tests{
 	// ==== command log ====
 	#[test]
 	pub fn ebi_prob_log_test_0() {
+		
 		// trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		// trait finite language#./testfiles/aa-ab-ba.lang
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
+		// trait finite language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
@@ -1333,10 +1527,11 @@ mod tests{
 	// ==== command folds ====
 	#[test]
 	pub fn ebi_sam_folds_test_0() {
-		// object event log#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
-		let object0 = read_as_object_with_file_handler(&"event log".parse().unwrap(), &mut reader, None, 0, &mut None, "comma-separated values".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "comma-separated values".parse().unwrap());
+		
+		// object event log#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let object0 = read_as_object_with_file_handler(&"event log".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		// usize 1
 		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
 		// usize 0
@@ -1357,8 +1552,9 @@ mod tests{
 	// ==== command potr ====
 	#[test]
 	pub fn ebi_sam_potr_test_0() {
-		// object stochastic business process model and notation#./testfiles/flower.sbpmn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/flower.sbpmn").unwrap());
+		
+		// object stochastic business process model and notation#./testfiles/model.sbpmn
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/model.sbpmn").unwrap());
 		let object0 = read_as_object_with_file_handler(&"stochastic business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic business process model and notation".parse().unwrap()).unwrap();
 		let input0 = EbiInput::Object(object0, "stochastic business process model and notation".parse().unwrap());
 		// usize 1
@@ -1377,8 +1573,9 @@ mod tests{
 	// ==== command tra ====
 	#[test]
 	pub fn ebi_sam_tra_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// usize 1
@@ -1400,12 +1597,13 @@ mod tests{
 	// ==== command btst ====
 	#[test]
 	pub fn ebi_tst_btst_test_0() {
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		// trait finite stochastic language#./testfiles/a-b.csv
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		// usize 10
@@ -1426,8 +1624,9 @@ mod tests{
 	// ==== command lcat ====
 	#[test]
 	pub fn ebi_tst_lcat_test_0() {
-		// trait event log with trace attributes#./testfiles/a-b-double.xes
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		
+		// trait event log with trace attributes#./testfiles/empty.xes
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with trace attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		// string some string
@@ -1451,8 +1650,9 @@ mod tests{
 	// ==== command graph ====
 	#[test]
 	pub fn ebi_vis_graph_test_0() {
-		// trait graphable#./testfiles/flower.bpmn
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/flower.bpmn").unwrap());
+		
+		// trait graphable#./testfiles/seq(a-xor(b-c)).sptree
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("graphable".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -1465,4 +1665,24 @@ mod tests{
 		}
 	}
 
+
+	// ==== command txt ====
+	#[test]
+	pub fn ebi_vis_txt_test_0() {
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		// object stochastic process tree#./testfiles/seq(a-xor(b-c)).sptree
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT {
+			match (execute)(inputs, None) {
+				Ok(output) => assert_eq!(&output.get_type(), output_type),
+				Err(_) => assert!(false),
+			}
+		}
+	}
 }

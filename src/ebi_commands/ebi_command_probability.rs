@@ -11,7 +11,7 @@ use crate::{
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
     follower_semantics::FollowerSemantics,
-    techniques::explain_trace::ExplainTrace, tests::test_ebi_command::test_ebi_command,
+    techniques::explain_trace::ExplainTrace,
 };
 use clap::{Arg, ArgAction, value_parser};
 use ebi_objects::{
@@ -31,7 +31,6 @@ pub const EBI_PROBABILITY: EbiCommand = EbiCommand::Group {
         &EBI_PROBABILITY_EXPLAIN_TRACE,
     ],
 };
-test_ebi_command!(EBI_PROBABILITY);
 
 pub const EBI_PROBABILITY_LOG: EbiCommand = EbiCommand::Command {
     name_short: "log",

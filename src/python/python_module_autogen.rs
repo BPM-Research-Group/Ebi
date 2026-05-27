@@ -97,6 +97,27 @@ fn analyse_directly_follows_edge_difference(py: Python<'_>, arg0: &Bound<'_, PyA
 }
 
 #[pyfunction]
+fn analyse_entropy(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ENTROPY;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
 fn analyse_medoid(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MEDOID;
@@ -361,9 +382,30 @@ fn analyse_non_stochastic_medoid(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: 
 }
 
 #[pyfunction]
+fn analyse_non_stochastic_timestamps_ordered(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
 fn association_all_trace_attributes(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_association::ASSOCIATION_ATTRIBUTES;
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_association::EBI_ASSOCIATION_ATTRIBUTES;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -386,7 +428,7 @@ fn association_all_trace_attributes(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg
 #[pyfunction]
 fn association_trace_attribute(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_association::ASSOCIATION_ATTRIBUTE;
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_association::EBI_ASSOCIATION_ATTRIBUTE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -409,9 +451,9 @@ fn association_trace_attribute(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &B
 }
 
 #[pyfunction]
-fn conformance_chi_square_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+fn conformance_chi_squared(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_CSSC;
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_CHI_SQUARED;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -432,9 +474,34 @@ fn conformance_chi_square_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_
 }
 
 #[pyfunction]
-fn conformance_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+fn conformance_chi_squared_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_EMSC;
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_CHI_SQUARED_SAMPLE;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let input2 = import_or_load(arg2, input_types[2], 2)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
+        let inputs = vec![input0, input1, input2];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn conformance_earth_movers(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_EARTH_MOVERS;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -455,9 +522,9 @@ fn conformance_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &Bound<
 }
 
 #[pyfunction]
-fn conformance_earth_movers_stochastic_conformance_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+fn conformance_earth_movers_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_EMSC_SAMPLE;
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -481,31 +548,8 @@ fn conformance_earth_movers_stochastic_conformance_sample(py: Python<'_>, arg0: 
 
 #[pyfunction]
 fn conformance_entropic_relevance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_ER;
-    let input_types = match **command {
-        EbiCommand::Command { input_types, .. } => input_types,
-        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
-    };
-    let input0 = import_or_load(arg0, input_types[0], 0)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
-        let input1 = import_or_load(arg1, input_types[1], 1)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
-        let inputs = vec![input0, input1];
-
-    // Execute the command.
-    let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
-        .export_to_pm4py(py)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-
-    Ok(result)
-}
-
-#[pyfunction]
-fn conformance_hellinger_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_HSC;
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_ENTROPIC_RELEVANCE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -526,32 +570,9 @@ fn conformance_hellinger_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_,
 }
 
 #[pyfunction]
-fn conformance_jensen_shannon(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+fn conformance_gain_precision(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_JSSC;
-    let input_types = match **command {
-        EbiCommand::Command { input_types, .. } => input_types,
-        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
-    };
-    let input0 = import_or_load(arg0, input_types[0], 0)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
-        let input1 = import_or_load(arg1, input_types[1], 1)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
-        let inputs = vec![input0, input1];
-
-    // Execute the command.
-    let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
-        .export_to_pm4py(py)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-
-    Ok(result)
-}
-
-#[pyfunction]
-fn conformance_jensen_shannon_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_JSSC_SAMPLE;
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_PRECISION;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -574,9 +595,34 @@ fn conformance_jensen_shannon_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, ar
 }
 
 #[pyfunction]
-fn conformance_unit_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+fn conformance_gain_recall(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_RECALL;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let input2 = import_or_load(arg2, input_types[2], 2)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
+        let inputs = vec![input0, input1, input2];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn conformance_hellinger(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::CONFORMANCE_UEMSC;
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_HELLINGER;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -586,6 +632,154 @@ fn conformance_unit_earth_movers_stochastic_conformance(py: Python<'_>, arg0: &B
         let input1 = import_or_load(arg1, input_types[1], 1)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
         let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn conformance_hellinger_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_HELLINGER_SAMPLE;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let input2 = import_or_load(arg2, input_types[2], 2)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
+        let inputs = vec![input0, input1, input2];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn conformance_jensen_shannon(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_JSSC;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn conformance_jensen_shannon_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_JSSC_SAMPLE;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let input2 = import_or_load(arg2, input_types[2], 2)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
+        let inputs = vec![input0, input1, input2];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn conformance_markovian(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>, arg3: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_MARKOVIAN;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let input2 = import_or_load(arg2, input_types[2], 2)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
+        let input3 = import_or_load(arg3, input_types[3], 3)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 3: {}", e)))?;
+        let inputs = vec![input0, input1, input2, input3];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn conformance_unit_earth_movers(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_UEMSC;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn conformance_unit_earth_movers_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_UEMSC_SAMPLE;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let input2 = import_or_load(arg2, input_types[2], 2)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
+        let inputs = vec![input0, input1, input2];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -669,6 +863,27 @@ fn conformance_non_stochastic_set_alignments(py: Python<'_>, arg0: &Bound<'_, Py
 fn conformance_non_stochastic_trace_fitness(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_TRACE_FITNESS;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn convert_business_process_model_and_notation(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_convert::EBI_CONVERT_BPMN;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -771,7 +986,7 @@ fn convert_log(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
 }
 
 #[pyfunction]
-fn convert_stochastic_finite_deterministic_automaton(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+fn convert_stochastic_deterministic_finite_automaton(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SDFA;
     let input_types = match **command {
@@ -813,9 +1028,53 @@ fn convert_stochastic_labelled_petri_net(py: Python<'_>, arg0: &Bound<'_, PyAny>
 }
 
 #[pyfunction]
-fn discover_alignments(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+fn convert_stochastic_nondeterministic_finite_automaton(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS;
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SNFA;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn discover_alignments_stochastic_business_process_model_and_notation(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS_BPMN;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn discover_alignments_stochastic_labelled_petri_nets(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS_SLPN;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -859,9 +1118,9 @@ fn discover_directly_follows_graph(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1
 }
 
 #[pyfunction]
-fn discover_occurrence(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+fn discover_occurrence_stochastic_business_process_model_and_notation(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE;
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SBPMN;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -882,9 +1141,160 @@ fn discover_occurrence(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_,
 }
 
 #[pyfunction]
-fn discover_uniform(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+fn discover_occurrence_stochastic_labelled_petri_net(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM;
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SLPN;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn discover_occurrence_stochastic_process_tree(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SPTREE;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn discover_random_stochastic_business_process_model_and_notation(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SBPMN;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn discover_random_stochastic_labelled_petri_net(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SLPN;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn discover_random_stochastic_process_tree(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SPTREE;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn discover_uniform_stochastic_business_process_model_and_notation(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SBPMN;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn discover_uniform_stochastic_labelled_petri_net(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SLPN;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn discover_uniform_stochastic_process_tree(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SPTREE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -969,6 +1379,27 @@ fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton(py: Python
 fn discover_non_stochastic_prefix_tree_process_tree(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn discover_non_stochastic_trace_model(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -1079,120 +1510,6 @@ fn information(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
 }
 
 #[pyfunction]
-fn itself_graph(py: Python<'_>, ) -> PyResult<Py<PyAny>> {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_itself::EBI_ITSELF_GRAPH;
-    let input_types = match **command {
-        EbiCommand::Command { input_types, .. } => input_types,
-        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
-    };
-    let inputs = vec![];
-
-    // Execute the command.
-    let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
-        .export_to_pm4py(py)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-
-    Ok(result)
-}
-
-#[pyfunction]
-fn itself_html(py: Python<'_>, ) -> PyResult<Py<PyAny>> {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_itself::EBI_ITSELF_HTML;
-    let input_types = match **command {
-        EbiCommand::Command { input_types, .. } => input_types,
-        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
-    };
-    let inputs = vec![];
-
-    // Execute the command.
-    let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
-        .export_to_pm4py(py)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-
-    Ok(result)
-}
-
-#[pyfunction]
-fn itself_java(py: Python<'_>, ) -> PyResult<Py<PyAny>> {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_itself::EBI_ITSELF_JAVA;
-    let input_types = match **command {
-        EbiCommand::Command { input_types, .. } => input_types,
-        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
-    };
-    let inputs = vec![];
-
-    // Execute the command.
-    let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
-        .export_to_pm4py(py)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-
-    Ok(result)
-}
-
-#[pyfunction]
-fn itself_logo(py: Python<'_>, ) -> PyResult<Py<PyAny>> {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_itself::EBI_ITSELF_LOGO;
-    let input_types = match **command {
-        EbiCommand::Command { input_types, .. } => input_types,
-        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
-    };
-    let inputs = vec![];
-
-    // Execute the command.
-    let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
-        .export_to_pm4py(py)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-
-    Ok(result)
-}
-
-#[pyfunction]
-fn itself_manual(py: Python<'_>, ) -> PyResult<Py<PyAny>> {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_itself::EBI_ITSELF_MANUAL;
-    let input_types = match **command {
-        EbiCommand::Command { input_types, .. } => input_types,
-        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
-    };
-    let inputs = vec![];
-
-    // Execute the command.
-    let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
-        .export_to_pm4py(py)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-
-    Ok(result)
-}
-
-#[pyfunction]
-fn itself_python(py: Python<'_>, ) -> PyResult<Py<PyAny>> {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_itself::EBI_ITSELF_PYTHON;
-    let input_types = match **command {
-        EbiCommand::Command { input_types, .. } => input_types,
-        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
-    };
-    let inputs = vec![];
-
-    // Execute the command.
-    let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
-        .export_to_pm4py(py)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-
-    Ok(result)
-}
-
-#[pyfunction]
 fn probability_log(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_LOG;
@@ -1243,6 +1560,29 @@ fn sample_folds(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>
 }
 
 #[pyfunction]
+fn sample_partially_ordered_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_sample::EBI_SAMPLE_PARTIALLY_ORDERED_TRACES;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
 fn sample_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_sample::EBI_SAMPLE_TRACES;
@@ -1268,7 +1608,7 @@ fn sample_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny
 #[pyfunction]
 fn test_bootstrap_test(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>, arg3: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_test::EBI_BOOTSTRAP_TEST;
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -1368,6 +1708,7 @@ pub fn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {    m.add_
     m.add_function(wrap_pyfunction!(analyse_completeness, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_coverage, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_directly_follows_edge_difference, m)?)?;
+    m.add_function(wrap_pyfunction!(analyse_entropy, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_medoid, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_minimum_probability_traces, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_mode, m)?)?;
@@ -1380,46 +1721,59 @@ pub fn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {    m.add_
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_executions, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_infinitely_many_traces, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_medoid, m)?)?;
+    m.add_function(wrap_pyfunction!(analyse_non_stochastic_timestamps_ordered, m)?)?;
     m.add_function(wrap_pyfunction!(association_all_trace_attributes, m)?)?;
     m.add_function(wrap_pyfunction!(association_trace_attribute, m)?)?;
-    m.add_function(wrap_pyfunction!(conformance_chi_square_stochastic_conformance, m)?)?;
-    m.add_function(wrap_pyfunction!(conformance_earth_movers_stochastic_conformance, m)?)?;
-    m.add_function(wrap_pyfunction!(conformance_earth_movers_stochastic_conformance_sample, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_chi_squared, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_chi_squared_sample, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_earth_movers, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_earth_movers_sample, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_entropic_relevance, m)?)?;
-    m.add_function(wrap_pyfunction!(conformance_hellinger_stochastic_conformance, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_gain_precision, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_gain_recall, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_hellinger, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_hellinger_sample, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_jensen_shannon, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_jensen_shannon_sample, m)?)?;
-    m.add_function(wrap_pyfunction!(conformance_unit_earth_movers_stochastic_conformance, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_markovian, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_unit_earth_movers, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_unit_earth_movers_sample, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_non_stochastic_alignments, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_non_stochastic_escaping_edges_precision, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_non_stochastic_set_alignments, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_non_stochastic_trace_fitness, m)?)?;
+    m.add_function(wrap_pyfunction!(convert_business_process_model_and_notation, m)?)?;
     m.add_function(wrap_pyfunction!(convert_finite_language, m)?)?;
     m.add_function(wrap_pyfunction!(convert_finite_stochastic_language, m)?)?;
     m.add_function(wrap_pyfunction!(convert_labelled_petri_net, m)?)?;
     m.add_function(wrap_pyfunction!(convert_log, m)?)?;
-    m.add_function(wrap_pyfunction!(convert_stochastic_finite_deterministic_automaton, m)?)?;
+    m.add_function(wrap_pyfunction!(convert_stochastic_deterministic_finite_automaton, m)?)?;
     m.add_function(wrap_pyfunction!(convert_stochastic_labelled_petri_net, m)?)?;
-    m.add_function(wrap_pyfunction!(discover_alignments, m)?)?;
+    m.add_function(wrap_pyfunction!(convert_stochastic_nondeterministic_finite_automaton, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_alignments_stochastic_business_process_model_and_notation, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_alignments_stochastic_labelled_petri_nets, m)?)?;
     m.add_function(wrap_pyfunction!(discover_directly_follows_graph, m)?)?;
-    m.add_function(wrap_pyfunction!(discover_occurrence, m)?)?;
-    m.add_function(wrap_pyfunction!(discover_uniform, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_occurrence_stochastic_business_process_model_and_notation, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_occurrence_stochastic_labelled_petri_net, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_occurrence_stochastic_process_tree, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_random_stochastic_business_process_model_and_notation, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_random_stochastic_labelled_petri_net, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_random_stochastic_process_tree, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_uniform_stochastic_business_process_model_and_notation, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_uniform_stochastic_labelled_petri_net, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_uniform_stochastic_process_tree, m)?)?;
     m.add_function(wrap_pyfunction!(discover_non_stochastic_flower_deterministic_finite_automaton, m)?)?;
     m.add_function(wrap_pyfunction!(discover_non_stochastic_flower_process_tree, m)?)?;
     m.add_function(wrap_pyfunction!(discover_non_stochastic_prefix_tree_deterministic_finite_automaton, m)?)?;
     m.add_function(wrap_pyfunction!(discover_non_stochastic_prefix_tree_process_tree, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_non_stochastic_trace_model, m)?)?;
     m.add_function(wrap_pyfunction!(filter_traces_empty, m)?)?;
     m.add_function(wrap_pyfunction!(filter_traces_event_activity, m)?)?;
     m.add_function(wrap_pyfunction!(filter_traces_length, m)?)?;
     m.add_function(wrap_pyfunction!(information, m)?)?;
-    m.add_function(wrap_pyfunction!(itself_graph, m)?)?;
-    m.add_function(wrap_pyfunction!(itself_html, m)?)?;
-    m.add_function(wrap_pyfunction!(itself_java, m)?)?;
-    m.add_function(wrap_pyfunction!(itself_logo, m)?)?;
-    m.add_function(wrap_pyfunction!(itself_manual, m)?)?;
-    m.add_function(wrap_pyfunction!(itself_python, m)?)?;
     m.add_function(wrap_pyfunction!(probability_log, m)?)?;
     m.add_function(wrap_pyfunction!(sample_folds, m)?)?;
+    m.add_function(wrap_pyfunction!(sample_partially_ordered_traces, m)?)?;
     m.add_function(wrap_pyfunction!(sample_traces, m)?)?;
     m.add_function(wrap_pyfunction!(test_bootstrap_test, m)?)?;
     m.add_function(wrap_pyfunction!(test_log_categorical_attribute, m)?)?;
@@ -1427,5 +1781,4 @@ pub fn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {    m.add_
     m.add_function(wrap_pyfunction!(visualise_text, m)?)?;
     Ok(())
 }
-
 

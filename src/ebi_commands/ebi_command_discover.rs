@@ -20,7 +20,6 @@ use crate::{
             UniformStochasticMinerTree,
         },
     },
-    tests::test_ebi_command::test_ebi_command,
 };
 use ebi_objects::{
     BusinessProcessModelAndNotation, EbiObject, EbiObjectType, LabelledPetriNet, ProcessTree,
@@ -41,7 +40,6 @@ pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
         &EBI_DISCOVER_UNIFORM,
     ],
 };
-test_ebi_command!(EBI_DISCOVER);
 
 pub const EBI_DISCOVER_ALIGNMENTS: EbiCommand = EbiCommand::Group {
     name_short: "ali",

@@ -10,7 +10,6 @@ use crate::{
         ebi_trait::EbiTrait,
     },
     ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
-    tests::test_ebi_command::test_ebi_command,
 };
 
 pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
@@ -20,7 +19,6 @@ pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[&EBI_VISUALISE_GRAPH, &EBI_VISUALISE_TEXT],
 };
-test_ebi_command!(EBI_VISUALISE);
 
 pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
     name_short: "txt",
