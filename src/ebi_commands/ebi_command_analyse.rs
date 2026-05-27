@@ -13,7 +13,8 @@ use crate::{
     },
     techniques::{
         completeness::Completeness, edge_difference::EdgeDifference, entropy::Entropy, medoid,
-        probability_queries::ProbabilityQueries, process_variety::ProcessVariety,
+        probability_queries::ProbabilityQueries, process_variety::ProcessVariety, 
+        edge_difference_no_freq::EdgeDifferenceNoFrequencies;
     },
 };
 use ebi_objects::{
