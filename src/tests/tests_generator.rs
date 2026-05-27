@@ -5,7 +5,7 @@ use crate::{
 };
 use itertools::Itertools;
 
-pub const NUMBER_OF_TESTS_PER_COMMAND: usize = 1;
+pub const NUMBER_OF_TESTS_PER_COMMAND: usize = 4;
 
 pub(crate) fn generate_tests() -> Result<String> {
     let path = EBI_COMMANDS;
@@ -17,6 +17,7 @@ mod tests{{
 \t\tebi_command::EbiCommand,
 \t\tebi_input::{{self, EbiInput, read_as_object_with_file_handler, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE, TEST_INPUT_TYPE_FRACTION}}
 \t}};
+\tuse ebi_objects::ebi_activity_key::TestActivityKey;
 \tuse crate::multiple_reader::MultipleReader;
 \tuse std::fs::File;
 
@@ -74,6 +75,8 @@ pub(crate) fn generate_tests_for_command(
             .take(NUMBER_OF_TESTS_PER_COMMAND)
             .enumerate()
         {
+            let fallible = is_fallible(path, &inputs);
+
             let exact_code = if !exact_arithmetic {
                 format!(
                     "if ebi_objects::ebi_arithmetic::is_exact_globally() {{
@@ -90,13 +93,32 @@ pub(crate) fn generate_tests_for_command(
                 .to_ascii_lowercase();
             let inputs_code = test_inputs_to_import_code(&inputs);
             let execution_code = search_command_in_source_files(path)?;
+            let (_, execution_code_short) = execution_code.rsplit_once(":").unwrap();
+            let unique_input_strings = test_inputs_to_fallible_list_code(&inputs);
 
-            let match_code = if !is_fallible(path, &inputs) {
+            let fallible_hint = if !fallible {
+                format!("// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+\t\t/* 
+\t\t(
+\t\t\t&{execution_code_short},
+\t\t\t&[
+\t\t\t\t{unique_input_strings}			
+\t\t\t]
+\t\t),
+\t\t*/")
+            } else {
+                format!("// this test has been indicated as to be expected to fail")
+            };
+
+            let match_code = if !fallible {
                 format!(
                     "if let EbiCommand::Command{{execute, output_type, ..}} = {execution_code} {{
 \t\t\tmatch (execute)(inputs, None) {{
-\t\t\t\tOk(output) => assert_eq!(&output.get_type(), output_type),
-\t\t\t\tErr(_) => assert!(false),
+\t\t\t\tOk(output) => {{
+\t\t\t\t\toutput.test_activity_key();
+\t\t\t\t\tassert_eq!(&output.get_type(), output_type);
+\t\t\t\t}}
+\t\t\t\tErr(e) => Err(e).unwrap(),
 \t\t\t}}
 \t\t}}"
                 )
@@ -111,6 +133,7 @@ pub(crate) fn generate_tests_for_command(
             result += &format!(
                 "\t#[test]
 \tpub fn {function_name}_test_{input_i}() {{
+\t\t{fallible_hint}
 \t\t{exact_code}
 \t\t{inputs_code}
 \t\t{match_code}
@@ -129,7 +152,7 @@ fn test_inputs_to_import_code(test_inputs: &Vec<TestInput>) -> String {
     test_inputs
         .into_iter()
         .enumerate()
-        .map(|(input_i, x)| format!("// {input_unique_string}\n\t\t{}", match x {
+        .map(|(input_i, x)| match x {
             TestInput::Trait(ebi_trait, path_buf) => format!(
                 "let mut reader = MultipleReader::from_file(File::open(\"{}\").unwrap());
 \t\tlet (object{input_i}, file_handler{input_i}) = ebi_input::read_as_trait(&(\"{ebi_trait}\".parse().unwrap()), &mut reader, None, 0).unwrap();
@@ -152,9 +175,16 @@ fn test_inputs_to_import_code(test_inputs: &Vec<TestInput>) -> String {
             ),
             TestInput::FileHandler(f) => format!("let input{input_i} = \"{f}\".to_string();"),
             TestInput::Fraction(f, _) => format!("let input{input_i} = EbiInput::Fraction(\"{f}\".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);"),
-        }, input_unique_string = x.to_unique_string()))
+        })
         .collect::<Vec<_>>()
         .join("\n\t\t"),
         (0..test_inputs.len()).map(|i| format!("input{i}")).join(", ")
     )
+}
+
+fn test_inputs_to_fallible_list_code(test_inputs: &Vec<TestInput>) -> String {
+    test_inputs
+        .iter()
+        .map(|test_input| format!("\"{}\"", test_input.to_unique_string()))
+        .join(",\n\t\t\t\t")
 }

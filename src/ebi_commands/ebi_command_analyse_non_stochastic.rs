@@ -9,7 +9,7 @@ use crate::{
         ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics
     },
     techniques::{
-        any_traces::AnyTraces, are_timestamps_ordered::AreTimestampsOrdered, bounded::Bounded, executions::FindExecutions, infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic
+        any_traces::AnyTraces, timestamps_ordered::TimestampsOrdered, bounded::Bounded, executions::FindExecutions, infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic
     }, 
 };
 use ebi_objects::{EbiObject, EbiObjectType, anyhow::anyhow};

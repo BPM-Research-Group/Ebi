@@ -1,7 +1,7 @@
 use crate::{
     ebi_framework::{
         ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
-        ebi_input::{self, EbiInput, EbiInputType},
+        ebi_input::{self, EbiInputType},
         ebi_trait::EbiTrait,
     },
     multiple_reader::MultipleReader,
@@ -26,6 +26,7 @@ pub(crate) enum TestInput {
 }
 
 impl TestInput {
+    #[cfg(feature = "python")]
     pub(crate) fn to_ebi_input(self) -> EbiInput {
         match self {
             TestInput::Trait(etrait, file) => {

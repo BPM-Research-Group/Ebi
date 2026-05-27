@@ -4,7 +4,7 @@ use crate::ebi_framework::{
     ebi_output::{EbiOutput, EbiOutputType},
     manual::{graph, html, manual},
 };
-#[cfg(feature = "javascript")]
+#[cfg(all(feature = "javascript", feature = "test_generation"))]
 use crate::javascript::javascript_generator_rust::generate_javascript_rust;
 #[cfg(feature = "java")]
 use crate::prom::prom_plugin_generator::print_java_plugins;
@@ -38,7 +38,7 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
         &EBI_ITSELF_HTML,
         #[cfg(feature = "java")]
         &EBI_ITSELF_JAVA,
-        #[cfg(feature = "javascript")]
+        #[cfg(all(feature = "javascript", feature = "test_generation"))]
         &EBI_ITSELF_JAVASCRIPT,
         &EBI_ITSELF_LOGO,
         &EBI_ITSELF_MANUAL,
@@ -170,7 +170,7 @@ pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
-#[cfg(feature = "javascript")]
+#[cfg(all(feature = "javascript", feature = "test_generation"))]
 pub const EBI_ITSELF_JAVASCRIPT: EbiCommand = EbiCommand::Command {
     name_short: "js",
     name_long: Some("javascript"),

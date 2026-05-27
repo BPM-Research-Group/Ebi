@@ -5,18 +5,18 @@ use ebi_objects::{
     ebi_objects::executions::Execution,
 };
 
-pub trait AreTimestampsOrdered {
+pub trait TimestampsOrdered {
     /// Checks whether the timestamps are in increasing order.
     fn are_timestamps_ordered(&self) -> Result<bool>;
 }
 
-impl AreTimestampsOrdered for Executions {
+impl TimestampsOrdered for Executions {
     fn are_timestamps_ordered(&self) -> Result<bool> {
         self.executions.are_timestamps_ordered()
     }
 }
 
-impl AreTimestampsOrdered for Vec<Execution> {
+impl TimestampsOrdered for Vec<Execution> {
     fn are_timestamps_ordered(&self) -> Result<bool> {
         let mut last_timestamp = None;
         for execution in self {
@@ -36,7 +36,7 @@ impl AreTimestampsOrdered for Vec<Execution> {
     }
 }
 
-impl AreTimestampsOrdered for dyn EbiTraitEventLogEventAttributes {
+impl TimestampsOrdered for dyn EbiTraitEventLogEventAttributes {
     fn are_timestamps_ordered(&self) -> Result<bool> {
         for trace in self
             .iter_time_and_events()
@@ -58,5 +58,24 @@ impl AreTimestampsOrdered for dyn EbiTraitEventLogEventAttributes {
             }
         }
         Ok(true)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        ebi_framework::trait_importers::ToEventLogEventAttributesTrait,
+        techniques::timestamps_ordered::TimestampsOrdered,
+    };
+    use ebi_objects::ebi_objects::event_log_event_attributes::EventLogEventAttributes;
+    use std::fs::{self};
+
+    #[test]
+    fn equal_order() {
+        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
+        let log = fin.parse::<EventLogEventAttributes>().unwrap();
+        let d = log.to_event_log_event_attributes_trait();
+
+        assert!(d.are_timestamps_ordered().unwrap())
     }
 }

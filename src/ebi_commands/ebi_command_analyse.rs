@@ -41,7 +41,7 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
                 slang.as_ref().to_finite_stochastic_language()
             },
             EbiInput::Trait(EbiTraitObject::StochasticDeterministicSemantics(semantics), _) => {
-                semantics.analyse_minimum_probability(&Fraction::zero()).with_context(|| "could not analyse language")?
+                semantics.analyse_minimum_probability(&Fraction::zero()).with_context(|| "Could not analyse language.")?
             },
             _ => return Err(anyhow!("Unsupported object {:?} provided.", object.get_type()))
         };
@@ -191,7 +191,7 @@ The computation may not terminate if the model is unbounded and this unboundedne
     execute: |mut objects, _| {
         let semantics = objects.remove(0).to_type::<EbiTraitStochasticDeterministicSemantics>()?;
         let at_least = objects.remove(0).to_type::<Fraction>()?;
-        let result = semantics.analyse_minimum_probability(&at_least).context("could not analyse")?;
+        let result = semantics.analyse_minimum_probability(&at_least)?;
         return Ok(EbiOutput::Object(EbiObject::FiniteStochasticLanguage(result)));
     }, 
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage)

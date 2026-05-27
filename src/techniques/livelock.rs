@@ -30,13 +30,13 @@ pub trait IsPartOfLivelock {
 pub trait LiveLockCache {
     type LivState;
 
-    fn is_state_part_of_livelock(&mut self, _: &Self::LivState) -> Result<bool>;
+    fn is_state_part_of_livelock(&mut self, state: &Self::LivState) -> Result<bool>;
 }
 
 impl IsPartOfLivelock for ProcessTree {
     type LivState = TreeMarking;
 
-    fn is_state_part_of_livelock(&self, _: &Self::LivState) -> Result<bool> {
+    fn is_state_part_of_livelock(&self, _state: &Self::LivState) -> Result<bool> {
         Ok(false)
     }
 

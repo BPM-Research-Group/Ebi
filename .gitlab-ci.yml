@@ -25,7 +25,7 @@ buildlatex:
     - git add build/nightly/manual.pdf
 
     #compile documentation
-    - cargo run --features javascript -- itself javascript -o src/javascript/javascript_autogen.rs
+    - cargo run --features "javascript test_generation" -- itself javascript -o src/javascript/javascript_autogen.rs
     - wasm-pack build -d ./documentation/javascript --target web --features javascript
     - cargo run itself documentation home -o documentation/index.html
     - cargo run itself documentation commands -o documentation/commands.html

@@ -63,7 +63,10 @@ pub struct EbiFileHandler {
     pub name: &'static str,
     pub article: &'static str, //a or an
     pub file_extension: &'static str,
+    
+    /// Indicates whether the file format is binary.
     pub is_binary: bool,
+    
     pub format_specification: &'static str,
     pub validator: Option<fn(&mut dyn BufRead) -> Result<()>>,
 

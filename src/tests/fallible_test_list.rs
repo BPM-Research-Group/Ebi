@@ -1,6 +1,6 @@
 use crate::{
     ebi_commands::{
-        ebi_command_analyse::EBI_ANALYSE_MEDOID,
+        ebi_command_analyse::{EBI_ANALYSE_MEDOID, EBI_ANALYSE_MINPROB},
         ebi_command_analyse_non_stochastic::{
             EBI_ANALYSE_NON_STOCHASTIC_CLUSTER, EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
             EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED,
@@ -11,7 +11,11 @@ use crate::{
             EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE, EBI_CONFORMANCE_GAIN_PRECISION,
             EBI_CONFORMANCE_GAIN_RECALL, EBI_CONFORMANCE_HELLINGER_SAMPLE,
         },
-        ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        ebi_command_conformance_non_stochastic::{
+            EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
+            EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+            EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS,
+        },
         ebi_command_sample::EBI_SAMPLE_TRACES,
         ebi_command_test::{EBI_TEST_BOOTSTRAP, EBI_TEST_LOG_ATTRIBUTE},
     },
@@ -25,6 +29,13 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &[
             "trait finite stochastic language#./testfiles/empty.xes",
             "usize 1",
+        ],
+    ),
+    (
+        &EBI_ANALYSE_MINPROB,
+        &[
+            "trait stochastic deterministic semantics#./testfiles/empty.xes",
+            "fraction 0",
         ],
     ),
     (
@@ -50,6 +61,14 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
     (
         &EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED,
         &["trait event log with event attributes#./testfiles/a-b.csv"],
+    ),
+    (
+        &EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED,
+        &["trait event log with event attributes#./testfiles/a-b.xes.gz"],
+    ),
+    (
+        &EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED,
+        &["trait event log with event attributes#./testfiles/fig_a.xes"],
     ),
     (
         &EBI_ASSOCIATION_ATTRIBUTE,
@@ -84,9 +103,32 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         ],
     ),
     (
+        &EBI_ASSOCIATION_ATTRIBUTE,
+        &[
+            "trait event log with trace attributes#./testfiles/a-b.xes.gz",
+            "string some string",
+            "usize 10",
+        ],
+    ),
+    (
+        &EBI_ASSOCIATION_ATTRIBUTE,
+        &[
+            "trait event log with trace attributes#./testfiles/fig_a.xes",
+            "string some string",
+            "usize 10",
+        ],
+    ),
+    (
         &EBI_ASSOCIATION_ATTRIBUTES,
         &[
             "trait event log with trace attributes#./testfiles/a-b-double.xes",
+            "usize 10",
+        ],
+    ),
+    (
+        &EBI_ASSOCIATION_ATTRIBUTES,
+        &[
+            "trait event log with trace attributes#./testfiles/a-b.xes.gz",
             "usize 10",
         ],
     ),
@@ -138,6 +180,20 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         ],
     ),
     (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
+        &[
+            "trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+            "trait semantics#./testfiles/empty.xes",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/empty.xes",
+        ],
+    ),
+    (
         &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
         &[
             "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
@@ -156,6 +212,20 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &[
             "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
             "trait semantics#./testfiles/ba-aa-ab.slang",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/a-b.slang",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS,
+        &[
+            "trait finite language#./testfiles/ba-aa-ab.slang",
+            "trait semantics#./testfiles/empty.xes",
         ],
     ),
     (
@@ -179,6 +249,15 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
     (
         &EBI_TEST_LOG_ATTRIBUTE,
         &[
+            "trait event log with trace attributes#./testfiles/fig_a.xes",
+            "string some string",
+            "usize 10",
+            "fraction 0.05",
+        ],
+    ),
+    (
+        &EBI_TEST_LOG_ATTRIBUTE,
+        &[
             "trait event log with trace attributes#./testfiles/simple_log_markovian_abstraction.xes",
             "string some string",
             "usize 10",
@@ -189,6 +268,15 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &EBI_TEST_LOG_ATTRIBUTE,
         &[
             "trait event log with trace attributes#./testfiles/empty.xes",
+            "string some string",
+            "usize 10",
+            "fraction 0.05",
+        ],
+    ),
+    (
+        &EBI_TEST_LOG_ATTRIBUTE,
+        &[
+            "trait event log with trace attributes#./testfiles/a-b.xes.gz",
             "string some string",
             "usize 10",
             "fraction 0.05",

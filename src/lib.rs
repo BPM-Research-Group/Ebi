@@ -83,7 +83,7 @@ pub mod javascript {
     #[cfg(feature = "javascript")]
     pub mod javascript_autogen;
     pub mod javascript_generator_html;
-    #[cfg(feature = "javascript")]
+    #[cfg(all(feature = "javascript", feature = "test_generation"))]
     pub mod javascript_generator_rust;
     #[cfg(feature = "javascript")]
     pub mod javascript_link;
@@ -183,7 +183,6 @@ pub mod techniques {
     pub mod align;
     pub mod alignment_stochastic_miner;
     pub mod any_traces;
-    pub mod are_timestamps_ordered;
     pub mod association;
     pub mod bootstrap_test;
     pub mod bounded;
@@ -230,12 +229,14 @@ pub mod techniques {
     pub mod probability_queries;
     pub mod process_variety;
     pub mod random_stochastic_miner;
+    pub mod reachability;
     pub mod resource_utilisation;
     pub mod sample;
     pub mod sample_folds;
     pub mod stochastic_markovian_abstraction;
     pub mod stochastic_markovian_abstraction_conformance;
     pub mod tau_removal;
+    pub mod timestamps_ordered;
     pub mod trace_model_miner;
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;

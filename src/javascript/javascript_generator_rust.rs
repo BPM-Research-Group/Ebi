@@ -1,10 +1,9 @@
 use crate::{
     ebi_framework::{
-        ebi_command::{EBI_COMMANDS, EbiCommand, TestInput, search_command_in_source_files},
+        ebi_command::{EBI_COMMANDS, EbiCommand, search_command_in_source_files},
         ebi_output::EbiOutput,
     },
-    javascript::javascript_generator_html::javascript_function_name,
-    tests::fallible_test::is_fallible,
+    javascript::javascript_generator_html::javascript_function_name, tests::{fallible_test::is_fallible, test_input::TestInput},
 };
 use ebi_objects::anyhow::anyhow;
 use ebi_optimisation::anyhow::Result;

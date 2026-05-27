@@ -25,7 +25,7 @@ eapproximatearithmetic = []
 testactivities = [ "ebi_objects/testactivities" ]
 python = [ "java", "dep:pyo3", "dep:polars", "dep:num-traits", "dep:syn", "dep:num-bigint" ]
 java = [ "dep:jni" ]
-javascript = [ "test_generation", "dep:wasm-bindgen", "dep:syn", "dep:js-sys" ]
+javascript = [ "dep:wasm-bindgen", "dep:syn", "dep:js-sys" ]
 extension-module = ["pyo3/extension-module"]
 
 [dependencies]
