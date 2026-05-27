@@ -213,13 +213,13 @@ macro_rules! dfa_2 {
             type LivState = usize;
 
             fn infinitely_many_traces(&self) -> Result<bool> {
-                if self.get_initial_state().is_none() {
+                if self.initial_state.is_none() {
                     //no initial state -> no traces -> not infinitely many traces
                     return Ok(false);
                 };
 
                 // Step 1: apply Kahn's algorithm to find states that are part of a cycle.
-                let mut part_of_cycle = vec![false; self.number_of_states()];
+                let mut part_of_cycle = vec![true; self.number_of_states()];
                 {
                     let v = self.number_of_states();
 
