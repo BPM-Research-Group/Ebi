@@ -5,7 +5,7 @@ use crate::{
 };
 use itertools::Itertools;
 
-pub const NUMBER_OF_TESTS_PER_COMMAND: usize = 4;
+pub const NUMBER_OF_TESTS_PER_COMMAND: usize = 10;
 
 pub(crate) fn generate_tests() -> Result<String> {
     let path = EBI_COMMANDS;

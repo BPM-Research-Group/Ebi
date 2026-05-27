@@ -9,7 +9,25 @@ pub(crate) fn is_fallible(path: &Vec<&EbiCommand>, inputs: &Vec<TestInput>) -> b
         .iter()
         .map(|input| input.to_unique_string())
         .collect::<Vec<_>>();
-    let ref_string_inputs = string_inputs.iter().map(|s| s.as_str()).collect::<Vec<_>>();
+    let needle_command = path.last().unwrap();
 
-    FALLIBLE_TESTS.contains(&(path.last().unwrap(), &ref_string_inputs))
+    'outer: for (command, test_inputs) in FALLIBLE_TESTS {
+        if command != needle_command {
+            continue 'outer;
+        }
+
+        'inner: for (string_input, test_input) in string_inputs.iter().zip(test_inputs.iter()) {
+            if test_input == &"*" {
+                continue 'inner;
+            }
+
+            if test_input != string_input {
+                continue 'outer;
+            }
+        }
+
+        return true;
+    }
+
+    return false;
 }

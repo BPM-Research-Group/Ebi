@@ -207,88 +207,95 @@ impl Display for CycleGraph {
     }
 }
 
-impl InfinitelyManyTraces for StochasticDeterministicFiniteAutomaton {
-    type LivState = usize;
+macro_rules! dfa_2 {
+    ($t:ty) => {
+        impl InfinitelyManyTraces for $t {
+            type LivState = usize;
 
-    fn infinitely_many_traces(&self) -> Result<bool> {
-        if self.get_initial_state().is_none() {
-            //no initial state -> no traces -> not infinitely many traces
-            return Ok(false);
-        };
+            fn infinitely_many_traces(&self) -> Result<bool> {
+                if self.get_initial_state().is_none() {
+                    //no initial state -> no traces -> not infinitely many traces
+                    return Ok(false);
+                };
 
-        // Step 1: apply Kahn's algorithm to find states that are part of a cycle.
-        let mut part_of_cycle = vec![false; self.number_of_states()];
-        {
-            let v = self.number_of_states();
+                // Step 1: apply Kahn's algorithm to find states that are part of a cycle.
+                let mut part_of_cycle = vec![false; self.number_of_states()];
+                {
+                    let v = self.number_of_states();
 
-            let mut queue = vec![];
-            let mut visited = 0;
+                    let mut queue = vec![];
+                    let mut visited = 0;
 
-            //compute in-degrees
-            let mut in_degree = vec![0; v];
-            for target in &self.targets {
-                in_degree[*target] += 1;
-            }
-
-            //initialise queue with nodes with in-degree of 0
-            for state in 0..v {
-                if in_degree[state] == 0 {
-                    queue.push(state);
-                    part_of_cycle[state] = false;
-                }
-            }
-
-            while let Some(state_u) = queue.pop() {
-                visited += 1;
-
-                //reduce the in-degree of neighbours
-                let (_, mut transition) = self.binary_search(state_u, 0);
-                while transition < self.sources.len() && self.sources[transition] == state_u {
-                    //found a neighbour
-                    let neighbour = self.targets[transition];
-                    in_degree[neighbour] -= 1;
-                    if in_degree[neighbour] == 0 {
-                        queue.push(neighbour);
-                        part_of_cycle[neighbour] = false;
+                    //compute in-degrees
+                    let mut in_degree = vec![0; v];
+                    for target in &self.targets {
+                        in_degree[*target] += 1;
                     }
 
-                    transition += 1;
+                    //initialise queue with nodes with in-degree of 0
+                    for state in 0..v {
+                        if in_degree[state] == 0 {
+                            queue.push(state);
+                            part_of_cycle[state] = false;
+                        }
+                    }
+
+                    while let Some(state_u) = queue.pop() {
+                        visited += 1;
+
+                        //reduce the in-degree of neighbours
+                        let (_, mut transition) = self.binary_search(state_u, 0);
+                        while transition < self.sources.len() && self.sources[transition] == state_u
+                        {
+                            //found a neighbour
+                            let neighbour = self.targets[transition];
+                            in_degree[neighbour] -= 1;
+                            if in_degree[neighbour] == 0 {
+                                queue.push(neighbour);
+                                part_of_cycle[neighbour] = false;
+                            }
+
+                            transition += 1;
+                        }
+                    }
+
+                    if visited == v {
+                        //no states on cycles detected -> not infinitely many traces
+                        return Ok(false);
+                    }
                 }
-            }
 
-            if visited == v {
-                //no states on cycles detected -> not infinitely many traces
-                return Ok(false);
-            }
-        }
-
-        //Step 2: remove states that are part of livelocks
-        {
-            let mut livelock_cache = self.get_livelock_cache();
-            for state in 0..self.number_of_states() {
-                if part_of_cycle[state] && livelock_cache.is_state_part_of_livelock(&state)? {
-                    part_of_cycle[state] = false;
+                //Step 2: remove states that are part of livelocks
+                {
+                    let mut livelock_cache = self.get_livelock_cache();
+                    for state in 0..self.number_of_states() {
+                        if part_of_cycle[state]
+                            && livelock_cache.is_state_part_of_livelock(&state)?
+                        {
+                            part_of_cycle[state] = false;
+                        }
+                    }
                 }
-            }
-        }
 
-        //intermediate check: if no states are left, there are not infinitely many traces
-        if part_of_cycle.iter().all(|x| !x) {
-            return Ok(false);
-        }
-
-        //Step 3: remove states that are not reachable
-        {
-            let mut reachability_cache = self.get_reachability_cache();
-            for state in 0..self.number_of_states() {
-                if part_of_cycle[state] && !reachability_cache.is_state_reachable(&state)? {
-                    part_of_cycle[state] = false;
+                //intermediate check: if no states are left, there are not infinitely many traces
+                if part_of_cycle.iter().all(|x| !x) {
+                    return Ok(false);
                 }
+
+                //Step 3: remove states that are not reachable
+                {
+                    let mut reachability_cache = self.get_reachability_cache();
+                    for state in 0..self.number_of_states() {
+                        if part_of_cycle[state] && !reachability_cache.is_state_reachable(&state)? {
+                            part_of_cycle[state] = false;
+                        }
+                    }
+                }
+
+                Ok(part_of_cycle.iter().any(|x| *x))
             }
         }
-
-        Ok(part_of_cycle.iter().any(|x| *x))
-    }
+    };
 }
 
 macro_rules! dfa {
@@ -365,7 +372,8 @@ macro_rules! lang {
     };
 }
 
-dfa!(DeterministicFiniteAutomaton);
+dfa_2!(StochasticDeterministicFiniteAutomaton);
+dfa_2!(DeterministicFiniteAutomaton);
 dfa!(StochasticNondeterministicFiniteAutomaton);
 dfa!(DirectlyFollowsModel);
 dfa!(StochasticDirectlyFollowsModel);

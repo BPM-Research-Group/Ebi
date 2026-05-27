@@ -10,7 +10,7 @@ use crate::{
 use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
     Activity, ActivityKey, Executions,
-    anyhow::{Context, Error, Ok, Result},
+    anyhow::{Context, Error, Ok, Result, anyhow},
     ebi_objects::{
         executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
     },
@@ -54,6 +54,12 @@ where
         &mut self,
         log: &mut Box<dyn EbiTraitEventLogEventAttributes>,
     ) -> Result<Executions> {
+        if self.get_initial_state().is_none() {
+            return Err(anyhow!(
+                "Model has the empty language, and can therefore not be aligned."
+            ));
+        }
+
         log::info!("Compute alignments");
         let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
