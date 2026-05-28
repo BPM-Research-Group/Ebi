@@ -1,7 +1,9 @@
 use crate::semantics::semantics::Semantics;
 use ebi_objects::{
-    Activity, DirectlyFollowsGraph, anyhow::Result, ebi_arithmetic::ebi_number::Signed,
-    ebi_objects::labelled_petri_net::TransitionIndex,
+    Activity, DirectlyFollowsGraph,
+    anyhow::Result,
+    ebi_arithmetic::ebi_number::Signed,
+    ebi_objects::{directly_follows_graph::Node, labelled_petri_net::TransitionIndex},
 };
 
 /**
@@ -34,9 +36,7 @@ impl Semantics for DirectlyFollowsGraph {
             *state = self.activity_key.next_index + 1
         } else if transition < self.sources.len() {
             //edge
-            *state = self
-                .activity_key
-                .get_id_from_activity(self.targets[transition]);
+            *state = self.targets[transition].0;
         } else {
             //start
             *state = transition - (self.sources.len() + 1);
@@ -67,7 +67,7 @@ impl Semantics for DirectlyFollowsGraph {
         } else if transition < self.sources.len() {
             //edge
             let node = transition;
-            Some(self.targets[node])
+            Some(self.node_2_activity[self.targets[node].0])
         } else {
             //start
             let node = transition - (self.sources.len() + 1);
@@ -86,7 +86,7 @@ impl Semantics for DirectlyFollowsGraph {
                 .iter()
                 .filter_map(|(a, w)| {
                     if w.is_positive() {
-                        Some(self.sources.len() + 1 + self.activity_key.get_id_from_activity(a))
+                        Some(self.sources.len() + 1 + a.0)
                     } else {
                         None
                     }
@@ -102,12 +102,12 @@ impl Semantics for DirectlyFollowsGraph {
             //we are in the final state
             vec![]
         } else {
-            let node = self.activity_key.get_activity_by_id(*state);
+            let node = Node::of(*state);
             //we are not in the initial state
             let mut result = vec![];
 
             //add edges
-            let (_, mut i) = self.binary_search(node, self.activity_key.get_activity_by_id(0));
+            let (_, mut i) = self.binary_search(node, Node::zero());
             while i < self.sources.len() && self.sources[i] == node {
                 if self.weights[i].is_positive() {
                     result.push(i);
@@ -116,7 +116,7 @@ impl Semantics for DirectlyFollowsGraph {
             }
 
             //add transition to final state
-            if self.is_end_node(node) {
+            if self.is_end_node(self.node_2_activity[node.0]) {
                 result.push(self.sources.len())
             }
 
@@ -132,7 +132,9 @@ impl Semantics for DirectlyFollowsGraph {
 #[cfg(test)]
 mod tests {
     use crate::semantics::semantics::Semantics;
-    use ebi_objects::{DirectlyFollowsGraph, HasActivityKey};
+    use ebi_objects::{
+        DirectlyFollowsGraph, FiniteStochasticLanguage, HasActivityKey, TranslateActivityKey,
+    };
     use std::fs;
 
     #[cfg(test)]
@@ -150,6 +152,11 @@ mod tests {
     fn dfg_semantics() {
         let fin = fs::read_to_string("testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap();
         let mut dfg = fin.parse::<DirectlyFollowsGraph>().unwrap();
+
+        let fin2 = fs::read_to_string("testfiles/bpic12-a-sample.slang").unwrap();
+        let mut slang = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+
+        // dfg.translate_using_activity_key(slang.activity_key_mut());
 
         let a_submitted = dfg.activity_key_mut().process_activity("A_SUBMITTED");
         let a_partlysubmitted = dfg.activity_key_mut().process_activity("A_PARTLYSUBMITTED");

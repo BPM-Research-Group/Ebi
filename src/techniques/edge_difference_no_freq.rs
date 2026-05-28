@@ -1,6 +1,6 @@
 use ebi_objects::{
     DirectlyFollowsGraph, TranslateActivityKey,
-    ebi_arithmetic::{Fraction, Zero, One},
+    ebi_arithmetic::{Fraction, One, Zero},
 };
 
 /// DFG-difference ignoring frequency, counts differences in empty-trace, start, end, and edge presence.
@@ -14,7 +14,7 @@ impl EdgeDifferenceNoFrequencies for DirectlyFollowsGraph {
         other.translate_using_activity_key(&mut self.activity_key);
 
         let zero = Fraction::zero();
-        let one  = Fraction::one();
+        let one = Fraction::one();
 
         let is_present = |w: &Fraction| !w.is_zero();
 
@@ -26,15 +26,16 @@ impl EdgeDifferenceNoFrequencies for DirectlyFollowsGraph {
         if empty1 != empty2 {
             log::debug!(
                 "empty trace presence differs: first={} second={}",
-                empty1, empty2
+                empty1,
+                empty2
             );
             result += &one;
         }
 
         //start activities
         for activity in self.activity_key.get_activities() {
-            let start1 = self.start_activities.get(activity).unwrap_or(&zero);
-            let start2 = other.start_activities.get(activity).unwrap_or(&zero);
+            let start1 = &self.start_activity_weight(*activity);
+            let start2 = &other.start_activity_weight(*activity);
 
             let p1 = is_present(start1);
             let p2 = is_present(start2);
@@ -43,7 +44,8 @@ impl EdgeDifferenceNoFrequencies for DirectlyFollowsGraph {
                 log::debug!(
                     "start presence different: {} first={} second={}",
                     self.activity_key.get_activity_label(activity),
-                    p1, p2
+                    p1,
+                    p2
                 );
                 result += &one;
             }
@@ -51,8 +53,8 @@ impl EdgeDifferenceNoFrequencies for DirectlyFollowsGraph {
 
         //end activities
         for activity in self.activity_key.get_activities() {
-            let end1 = self.end_activities.get(activity).unwrap_or(&zero);
-            let end2 = other.end_activities.get(activity).unwrap_or(&zero);
+            let end1 = &self.end_activity_weight(*activity);
+            let end2 = &other.end_activity_weight(*activity);
 
             let p1 = is_present(end1);
             let p2 = is_present(end2);
@@ -61,7 +63,8 @@ impl EdgeDifferenceNoFrequencies for DirectlyFollowsGraph {
                 log::debug!(
                     "end presence different: {} first={} second={}",
                     self.activity_key.get_activity_label(activity),
-                    p1, p2
+                    p1,
+                    p2
                 );
                 result += &one;
             }

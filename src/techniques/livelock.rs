@@ -167,16 +167,16 @@ dfm_cache!(
 dfm!(DirectlyFollowsGraph, DirectlyFollowsGraphLiveLockCache);
 
 impl DirectlyFollowsGraphLiveLockCache {
-    pub fn new(dfm: &DirectlyFollowsGraph) -> Self {
-        let mut result = vec![true; dfm.activity_key.get_number_of_activities() + 2];
+    pub fn new(dfg: &DirectlyFollowsGraph) -> Self {
+        let mut result = vec![true; dfg.number_of_states()];
         let mut queue = vec![];
-        result[dfm.activity_key.get_number_of_activities()] = false;
-        dfm.activity_key().get_activities().iter().for_each(|node| {
-            if dfm.is_end_node(**node) {
-                result[dfm.activity_key().get_id_from_activity(*node)] = false;
+        result[dfg.number_of_states() - 2] = false;
+        for (activity, node) in dfg.activity_2_node.iter() {
+            if dfg.is_end_node(activity) {
+                result[node.0] = false;
                 queue.push(*node)
             }
-        });
+        }
 
         // log::debug!("queue {:?}, result {:?}", queue, result);
 
@@ -184,19 +184,19 @@ impl DirectlyFollowsGraphLiveLockCache {
             // log::debug!("queue {:?}, result {:?}, state {}", queue, result, state);
 
             //walk over the edges that go into state (expensive :'( )
-            for (source, target) in dfm.sources.iter().zip(dfm.targets.iter()) {
-                if result[dfm.activity_key.get_id_from_activity(source)] && target == state {
-                    result[dfm.activity_key.get_id_from_activity(source)] = false;
-                    queue.push(source);
+            for (source, target) in dfg.sources.iter().zip(dfg.targets.iter()) {
+                if result[source.0] && *target == state {
+                    result[source.0] = false;
+                    queue.push(*source);
                 }
             }
         }
 
-        if (0..dfm.activity_key().get_number_of_activities())
+        if (0..dfg.activity_key().get_number_of_activities())
             .into_iter()
             .any(|node| !result[node])
         {
-            result[dfm.activity_key.get_number_of_activities() + 1] = false;
+            result[dfg.activity_key.get_number_of_activities() + 1] = false;
         }
 
         Self(result)

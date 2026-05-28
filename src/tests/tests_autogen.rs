@@ -3742,16 +3742,7 @@ mod tests{
 	}
 	#[test]
 	pub fn ebi_anans_clus_test_5() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
-			&[
-				"trait finite language#./testfiles/empty.lang",
-				"usize 1"			
-			]
-		),
-		*/
+		// this test has been indicated as to be expected to fail
 		
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
@@ -3759,14 +3750,8 @@ mod tests{
 		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_CLUSTER {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_CLUSTER {
+			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
 	#[test]
@@ -4014,16 +3999,7 @@ mod tests{
 	}
 	#[test]
 	pub fn ebi_anans_exe_test_4() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
-			&[
-				"trait event log with event attributes#./testfiles/empty.xes",
-				"trait semantics#./testfiles/empty.xes"			
-			]
-		),
-		*/
+		// this test has been indicated as to be expected to fail
 		
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with event attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
@@ -4033,14 +4009,8 @@ mod tests{
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS {
+			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
 	#[test]
@@ -4879,16 +4849,7 @@ mod tests{
 	}
 	#[test]
 	pub fn ebi_anans_med_test_5() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
-			&[
-				"trait finite language#./testfiles/empty.lang",
-				"usize 1"			
-			]
-		),
-		*/
+		// this test has been indicated as to be expected to fail
 		
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
@@ -4896,14 +4857,8 @@ mod tests{
 		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_MEDOID {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_MEDOID {
+			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
 	#[test]
@@ -10507,16 +10462,7 @@ mod tests{
 	}
 	#[test]
 	pub fn ebi_confns_eep_test_5() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
-			&[
-				"object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
-				"trait semantics#./testfiles/acb-abc-ad-aded-adeded-adededed.slang"			
-			]
-		),
-		*/
+		// this test has been indicated as to be expected to fail
 		
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
 		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
@@ -10526,28 +10472,13 @@ mod tests{
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
+			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
 	#[test]
 	pub fn ebi_confns_eep_test_6() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
-			&[
-				"object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
-				"trait semantics#./testfiles/bb.slang"			
-			]
-		),
-		*/
+		// this test has been indicated as to be expected to fail
 		
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
 		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
@@ -10557,28 +10488,13 @@ mod tests{
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
+			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
 	#[test]
 	pub fn ebi_confns_eep_test_7() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
-			&[
-				"object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
-				"trait semantics#./testfiles/a-b_star.dfm"			
-			]
-		),
-		*/
+		// this test has been indicated as to be expected to fail
 		
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
 		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
@@ -10588,28 +10504,13 @@ mod tests{
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
+			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
 	#[test]
 	pub fn ebi_confns_eep_test_8() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
-			&[
-				"object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
-				"trait semantics#./testfiles/bpic12-a.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
+		// this test has been indicated as to be expected to fail
 		
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
 		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
@@ -10619,28 +10520,13 @@ mod tests{
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
+			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
 	#[test]
 	pub fn ebi_confns_eep_test_9() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
-			&[
-				"object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
-				"trait semantics#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
+		// this test has been indicated as to be expected to fail
 		
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
 		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
@@ -10650,14 +10536,8 @@ mod tests{
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
+			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
 

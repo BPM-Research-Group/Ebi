@@ -144,13 +144,14 @@ fn get_edges_to_filter(
     let mut result = HashSet::new();
 
     //start edges
-    for (activity, weight) in dfm.start_activities.iter() {
+    for (node, weight) in dfm.start_activities.iter() {
+        let activity = dfm.node_2_activity[node.0];
         if weight == min {
-            result.insert((None, Some(activity.clone())));
+            result.insert((None, Some(activity)));
         } else if weight < min {
             min = weight;
             result.clear();
-            result.insert((None, Some(activity.clone())));
+            result.insert((None, Some(activity)));
         }
     }
 
@@ -159,6 +160,8 @@ fn get_edges_to_filter(
         .iter()
         .zip(dfm.targets.iter().zip(dfm.weights.iter()))
         .for_each(|(source, (target, weight))| {
+            let source = dfm.node_2_activity[source.0];
+            let target = dfm.node_2_activity[target.0];
             if weight == min {
                 result.insert((Some(source.clone()), Some(target.clone())));
             } else {
@@ -169,7 +172,8 @@ fn get_edges_to_filter(
         });
 
     //end edges
-    for (activity, weight) in dfm.end_activities.iter() {
+    for (node, weight) in dfm.end_activities.iter() {
+        let activity = dfm.node_2_activity[node.0];
         if weight == min {
             result.insert((Some(activity.clone()), None));
         } else if weight < min {

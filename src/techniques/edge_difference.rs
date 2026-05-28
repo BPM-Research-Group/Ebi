@@ -17,8 +17,8 @@ impl EdgeDifference for DirectlyFollowsGraph {
 
         //start activities
         for activity in self.activity_key.get_activities() {
-            let start1 = self.start_activities.get(activity).unwrap_or(&zero);
-            let start2 = other.start_activities.get(activity).unwrap_or(&zero);
+            let start1 = self.start_activity_weight(*activity);
+            let start2 = other.start_activity_weight(*activity);
 
             if start1 != start2 {
                 log::debug!(
@@ -34,8 +34,8 @@ impl EdgeDifference for DirectlyFollowsGraph {
 
         //end activities
         for activity in self.activity_key.get_activities() {
-            let end1 = self.end_activities.get(activity).unwrap_or(&zero);
-            let end2 = other.end_activities.get(activity).unwrap_or(&zero);
+            let end1 = self.end_activity_weight(*activity);
+            let end2 = other.end_activity_weight(*activity);
 
             if end1 != end2 {
                 log::debug!(

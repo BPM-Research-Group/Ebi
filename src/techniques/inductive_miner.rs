@@ -183,7 +183,10 @@ fn inductive_miner(log: &dyn EbiTraitFiniteLanguage) -> ProcessTree {
 
     if let Some(cut) = find_cut(&info) {
         let sublogs = cut.split_log(log);
-        let subtrees = sublogs.iter().map(|s| inductive_miner(s.as_ref())).collect();
+        let subtrees = sublogs
+            .iter()
+            .map(|s| inductive_miner(s.as_ref()))
+            .collect();
         return cut.build_tree(subtrees, log.activity_key().clone());
     }
 
@@ -221,8 +224,8 @@ fn find_cut(info: &LogInfo) -> Option<Cut> {
 
 fn xor_cut(info: &LogInfo) -> Option<Cut> {
     let mut components = Components::new(&info.activities);
-    for (src, tgt) in info.dfg.sources.iter().zip(info.dfg.targets.iter()) {
-        components.merge_components(*src, *tgt);
+    for (src, tgt) in info.dfg.get_sources().zip(info.dfg.get_targets()) {
+        components.merge_components(src, tgt);
     }
     let parts = components.into_components();
     if parts.len() > 1 {
@@ -247,6 +250,8 @@ fn sequence_cut(info: &LogInfo) -> Option<Cut> {
 
     let mut adj: Vec<Vec<usize>> = vec![vec![]; n];
     for (&src, &tgt) in info.dfg.sources.iter().zip(info.dfg.targets.iter()) {
+        let src = info.dfg.node_2_activity[src.0];
+        let tgt = info.dfg.node_2_activity[tgt.0];
         if let (Some(&u), Some(&v)) = (act_to_idx.get(&src), act_to_idx.get(&tgt)) {
             if !adj[u].contains(&v) {
                 adj[u].push(v);
@@ -389,7 +394,7 @@ fn loop_cut(info: &LogInfo) -> Option<Cut> {
         components.merge_components(pivot, a);
     }
 
-    for (&src, &tgt) in info.dfg.sources.iter().zip(&info.dfg.targets) {
+    for (src, tgt) in info.dfg.get_sources().zip(info.dfg.get_targets()) {
         let src_is_start = info.start_activities.contains(&src);
         let src_is_end = info.end_activities.contains(&src);
         let tgt_is_start = info.start_activities.contains(&tgt);
@@ -402,13 +407,12 @@ fn loop_cut(info: &LogInfo) -> Option<Cut> {
 
     let (sub_ends, sub_starts): (HashSet<Activity>, HashSet<Activity>) = info
         .dfg
-        .sources
-        .iter()
-        .zip(&info.dfg.targets)
-        .filter(|&(&src, &tgt)| !components.same_component(src, tgt))
+        .get_sources()
+        .zip(info.dfg.get_targets())
+        .filter(|(src, tgt)| !components.same_component(*src, *tgt))
         .fold(
             (HashSet::new(), HashSet::new()),
-            |(mut ends, mut starts), (&src, &tgt)| {
+            |(mut ends, mut starts), (src, tgt)| {
                 ends.insert(src);
                 starts.insert(tgt);
                 (ends, starts)

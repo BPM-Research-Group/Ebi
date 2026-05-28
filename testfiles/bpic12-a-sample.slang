@@ -1,0 +1,64 @@
+finite stochastic language
+# number of traces
+6
+# trace 0
+# probability
+4/19
+# number of events
+4
+A_SUBMITTED
+A_PARTLYSUBMITTED
+A_PREACCEPTED
+A_DECLINED
+# trace 1
+# probability
+2/19
+# number of events
+4
+A_SUBMITTED
+A_PARTLYSUBMITTED
+A_PREACCEPTED
+A_CANCELLED
+# trace 2
+# probability
+9/19
+# number of events
+3
+A_SUBMITTED
+A_PARTLYSUBMITTED
+A_DECLINED
+# trace 3
+# probability
+1/19
+# number of events
+6
+A_SUBMITTED
+A_PARTLYSUBMITTED
+A_PREACCEPTED
+A_ACCEPTED
+A_FINALIZED
+A_DECLINED
+# trace 4
+# probability
+2/19
+# number of events
+8
+A_SUBMITTED
+A_PARTLYSUBMITTED
+A_PREACCEPTED
+A_ACCEPTED
+A_FINALIZED
+A_APPROVED
+A_REGISTERED
+A_ACTIVATED
+# trace 5
+# probability
+1/19
+# number of events
+6
+A_SUBMITTED
+A_PARTLYSUBMITTED
+A_PREACCEPTED
+A_ACCEPTED
+A_FINALIZED
+A_CANCELLED

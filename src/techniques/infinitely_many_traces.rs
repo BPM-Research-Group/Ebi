@@ -388,8 +388,7 @@ lang!(FiniteStochasticLanguage);
 mod tests {
     use crate::techniques::infinitely_many_traces::InfinitelyManyTraces;
     use ebi_objects::{
-        DeterministicFiniteAutomaton, LabelledPetriNet, ProcessTree,
-        StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
+        DeterministicFiniteAutomaton, DirectlyFollowsGraph, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet
     };
     use std::fs;
 
@@ -454,5 +453,16 @@ mod tests {
             .unwrap();
 
         assert!(!sdfa.infinitely_many_traces().unwrap());
+    }
+
+    #[test]
+    fn infinitely_many_traces_dfa_bpic12() {
+        let fin =
+            fs::read_to_string("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap();
+        let dfg = fin
+            .parse::<DirectlyFollowsGraph>()
+            .unwrap();
+
+        assert!(!dfg.infinitely_many_traces().unwrap());
     }
 }

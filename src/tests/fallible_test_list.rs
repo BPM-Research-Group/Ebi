@@ -194,6 +194,45 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &["*", "trait semantics#./testfiles/empty_2.ptree"],
     ),
     (
+        &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
+        &["trait finite language#./testfiles/empty.lang", "usize 1"],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/bpic12-a.xes.gz-dfg.dfg",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/a-b_star.dfm",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/bb.slang",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
+        ],
+    ),
+    (
         &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
         &["*", "trait semantics#./testfiles/empty.xes"],
     ),
@@ -270,6 +309,14 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
             "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
             "trait semantics#./testfiles/all_operators.sptree",
         ],
+    ),
+    (
+        &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
+        &["*", "trait semantics#./testfiles/empty.xes"],
+    ),
+    (
+        &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
+        &["trait finite language#./testfiles/empty.lang", "*"],
     ),
     (
         &EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS,
