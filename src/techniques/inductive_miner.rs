@@ -1,27 +1,25 @@
-use std::collections::{HashSet, HashMap};
+use std::collections::{HashMap, HashSet};
 
 use ebi_objects::{
-    FiniteLanguage, Activity, ActivityKey, DirectlyFollowsGraph, ProcessTree, IntoRefTraceIterator,
-    ebi_objects::process_tree::{Node, Operator},
+    Activity, ActivityKey, DirectlyFollowsGraph, FiniteLanguage, IntoRefTraceIterator, ProcessTree,
     ebi_arithmetic::{Fraction, One},
+    ebi_objects::process_tree::{Node, Operator},
 };
 
 use crate::ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage;
- 
-
 
 pub trait InductiveMinerTree {
-    fn inductive_mine_tree(&self) -> ProcessTree;
+    fn inductive_miner(&self) -> ProcessTree;
 }
- 
+
 impl InductiveMinerTree for dyn EbiTraitFiniteLanguage {
-    fn inductive_mine_tree(&self) -> ProcessTree {
-        inductive_mine(self)
-    } 
-}  
+    fn inductive_miner(&self) -> ProcessTree {
+        inductive_miner(self)
+    }
+}
 
 pub struct LogInfo {
-    pub dfg: DirectlyFollowsGraph, 
+    pub dfg: DirectlyFollowsGraph,
     pub start_activities: HashSet<Activity>,
     pub end_activities: HashSet<Activity>,
     pub has_empty_traces: bool,
@@ -30,7 +28,7 @@ pub struct LogInfo {
     pub activity_instances: usize,
 }
 
-/// Pre-computed log stats, DFG construction mirrors directly_follows_graph_abstractor. 
+/// Pre-computed log stats, DFG construction mirrors directly_follows_graph_abstractor.
 impl LogInfo {
     pub fn log_calcs(log: &dyn EbiTraitFiniteLanguage) -> Self {
         let mut dfg = DirectlyFollowsGraph::new(log.activity_key().clone());
@@ -57,7 +55,7 @@ impl LogInfo {
                 last_activity = Some(activity);
             }
             match last_activity {
-                Some(a) => { 
+                Some(a) => {
                     dfg.add_end_activity(a, &Fraction::one());
                     end_activities.insert(a);
                 }
@@ -67,7 +65,7 @@ impl LogInfo {
                 }
             }
         }
-        
+
         LogInfo {
             dfg,
             start_activities,
@@ -80,13 +78,11 @@ impl LogInfo {
     }
 }
 
-
 /// Partitioning activities
 struct Components {
     activities: Vec<Activity>,
     groups: Vec<usize>,
 }
-
 
 impl Components {
     fn new(activities: &HashSet<Activity>) -> Self {
@@ -99,12 +95,22 @@ impl Components {
     }
 
     fn merge_components(&mut self, a: Activity, b: Activity) {
-        let g_a = self.activities.iter().position(|&x| x == a).map(|i| self.groups[i]);
-        let g_b = self.activities.iter().position(|&x| x == b).map(|i| self.groups[i]);
+        let g_a = self
+            .activities
+            .iter()
+            .position(|&x| x == a)
+            .map(|i| self.groups[i]);
+        let g_b = self
+            .activities
+            .iter()
+            .position(|&x| x == b)
+            .map(|i| self.groups[i]);
         if let (Some(group_a), Some(group_b)) = (g_a, g_b) {
             if group_a != group_b {
                 for g in self.groups.iter_mut() {
-                    if *g == group_a { *g = group_b; }
+                    if *g == group_a {
+                        *g = group_b;
+                    }
                 }
             }
         }
@@ -123,19 +129,29 @@ impl Components {
     }
 
     fn same_component(&self, a: Activity, b: Activity) -> bool {
-        let ga = self.activities.iter().position(|&x| x == a).map(|i| self.groups[i]);
-        let gb = self.activities.iter().position(|&x| x == b).map(|i| self.groups[i]);
+        let ga = self
+            .activities
+            .iter()
+            .position(|&x| x == a)
+            .map(|i| self.groups[i]);
+        let gb = self
+            .activities
+            .iter()
+            .position(|&x| x == b)
+            .map(|i| self.groups[i]);
 
         ga.is_some() && ga == gb
     }
 }
 
-
 enum Cut {
     ExclusiveChoice(Vec<HashSet<Activity>>),
     Sequence(Vec<HashSet<Activity>>),
     Concurrent(Vec<HashSet<Activity>>),
-    Loop {body: HashSet<Activity>, redos: Vec<HashSet<Activity>>},
+    Loop {
+        body: HashSet<Activity>,
+        redos: Vec<HashSet<Activity>>,
+    },
 }
 
 impl Cut {
@@ -144,37 +160,35 @@ impl Cut {
             Cut::ExclusiveChoice(parts) => xor_split(log, parts),
             Cut::Sequence(parts) => seq_conc_split(log, parts),
             Cut::Concurrent(parts) => seq_conc_split(log, parts),
-            Cut::Loop {body, redos} => loop_split(log, body, redos),
+            Cut::Loop { body, redos } => loop_split(log, body, redos),
         }
     }
-    
+
     fn build_tree(&self, subtrees: Vec<ProcessTree>, activity_key: ActivityKey) -> ProcessTree {
         match self {
             Cut::ExclusiveChoice(_) => build_operator_node(Operator::Xor, subtrees, activity_key),
-            Cut::Sequence(_)        => build_operator_node(Operator::Sequence, subtrees, activity_key),
-            Cut::Concurrent(_)      => build_operator_node(Operator::Concurrent, subtrees, activity_key),
-            Cut::Loop {..}          => build_operator_node(Operator::Loop, subtrees, activity_key),
+            Cut::Sequence(_) => build_operator_node(Operator::Sequence, subtrees, activity_key),
+            Cut::Concurrent(_) => build_operator_node(Operator::Concurrent, subtrees, activity_key),
+            Cut::Loop { .. } => build_operator_node(Operator::Loop, subtrees, activity_key),
         }
     }
 }
 
-
-fn inductive_mine(log: &dyn EbiTraitFiniteLanguage) -> ProcessTree {
+fn inductive_miner(log: &dyn EbiTraitFiniteLanguage) -> ProcessTree {
     let info = LogInfo::log_calcs(log);
-    
+
     if let Some(tree) = base_case(log, &info) {
         return tree;
     }
-    
+
     if let Some(cut) = find_cut(&info) {
         let sublogs = cut.split_log(log);
-        let subtrees = sublogs.iter().map(|s| inductive_mine(s.as_ref())).collect();
+        let subtrees = sublogs.iter().map(|s| inductive_miner(s.as_ref())).collect();
         return cut.build_tree(subtrees, log.activity_key().clone());
     }
-    
+
     fall_throughs(log)
 }
-
 
 fn base_case(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Option<ProcessTree> {
     let activity_key = log.activity_key().clone();
@@ -183,17 +197,20 @@ fn base_case(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Option<Process
         return Some((activity_key, vec![]).into());
     }
     //singleActivity: no empty traces, every trace has exactly one event
-    if info.activities.len() == 1 && !info.has_empty_traces && info.activity_instances == info.total_traces {
+    if info.activities.len() == 1
+        && !info.has_empty_traces
+        && info.activity_instances == info.total_traces
+    {
         let only_activity = *info.activities.iter().next().unwrap();
         return Some((activity_key, vec![Node::Activity(only_activity)]).into());
     }
-    
+
     None
 }
 
 fn find_cut(info: &LogInfo) -> Option<Cut> {
-    if info.has_empty_traces { 
-        return None; 
+    if info.has_empty_traces {
+        return None;
     }
 
     xor_cut(info)
@@ -201,7 +218,6 @@ fn find_cut(info: &LogInfo) -> Option<Cut> {
         .or_else(|| concurrent_cut(info))
         .or_else(|| loop_cut(info))
 }
-
 
 fn xor_cut(info: &LogInfo) -> Option<Cut> {
     let mut components = Components::new(&info.activities);
@@ -216,24 +232,25 @@ fn xor_cut(info: &LogInfo) -> Option<Cut> {
     }
 }
 
-
 fn sequence_cut(info: &LogInfo) -> Option<Cut> {
     let activities: Vec<Activity> = info.activities.iter().cloned().collect();
     let n = activities.len();
     if n == 0 {
-        return None; 
-        }
-        
+        return None;
+    }
+
     let act_to_idx: HashMap<Activity, usize> = activities
         .iter()
         .enumerate()
         .map(|(i, &a)| (a, i))
         .collect();
-    
+
     let mut adj: Vec<Vec<usize>> = vec![vec![]; n];
     for (&src, &tgt) in info.dfg.sources.iter().zip(info.dfg.targets.iter()) {
         if let (Some(&u), Some(&v)) = (act_to_idx.get(&src), act_to_idx.get(&tgt)) {
-            if !adj[u].contains(&v) { adj[u].push(v); }
+            if !adj[u].contains(&v) {
+                adj[u].push(v);
+            }
         }
     }
 
@@ -242,7 +259,9 @@ fn sequence_cut(info: &LogInfo) -> Option<Cut> {
         let mut stack = vec![start];
         while let Some(v) = stack.pop() {
             for &w in &adj[v] {
-                if reachable[start].insert(w) { stack.push(w); }
+                if reachable[start].insert(w) {
+                    stack.push(w);
+                }
             }
         }
     }
@@ -250,7 +269,7 @@ fn sequence_cut(info: &LogInfo) -> Option<Cut> {
     //merge pairwise reachable and pairwise unreachable pairs
     let mut components = Components::new(&info.activities);
     for i in 0..n {
-        for j in (i + 1)..n { 
+        for j in (i + 1)..n {
             let (a, b) = (activities[i], activities[j]);
             let a_to_b = reachable[i].contains(&j);
             let b_to_a = reachable[j].contains(&i);
@@ -259,7 +278,7 @@ fn sequence_cut(info: &LogInfo) -> Option<Cut> {
             }
         }
     }
-    
+
     let mut parts = components.into_components();
     if parts.len() <= 1 {
         return None;
@@ -277,13 +296,12 @@ fn sequence_cut(info: &LogInfo) -> Option<Cut> {
         match (i_to_j, j_to_i) {
             (true, false) => std::cmp::Ordering::Less,
             (false, true) => std::cmp::Ordering::Greater,
-            _             => std::cmp::Ordering::Equal, // but not possible cause pairwise reach/unreachable is merged before
+            _ => std::cmp::Ordering::Equal, // but not possible cause pairwise reach/unreachable is merged before
         }
     });
 
     Some(Cut::Sequence(parts))
 }
-
 
 fn concurrent_cut(info: &LogInfo) -> Option<Cut> {
     if info.activities.len() < 2 {
@@ -292,11 +310,11 @@ fn concurrent_cut(info: &LogInfo) -> Option<Cut> {
     if info.start_activities.is_empty() || info.end_activities.is_empty() {
         return None;
     }
-    
+
     let activities: Vec<Activity> = info.activities.iter().cloned().collect();
     let n = activities.len();
     let mut components = Components::new(&info.activities);
-    
+
     //merge pairs that aren't fully connected in both directions
     for i in 0..n {
         for j in (i + 1)..n {
@@ -310,25 +328,27 @@ fn concurrent_cut(info: &LogInfo) -> Option<Cut> {
             }
         }
     }
-    
+
     let raw = components.build_components();
-    let mut with_start_end: Vec<HashSet<Activity>> = vec![]; 
+    let mut with_start_end: Vec<HashSet<Activity>> = vec![];
     let mut with_start: Vec<HashSet<Activity>> = vec![];
-    let mut with_end: Vec<HashSet<Activity>> = vec![];  
+    let mut with_end: Vec<HashSet<Activity>> = vec![];
     let mut with_nothing: Vec<HashSet<Activity>> = vec![];
-    
+
     for part in raw.into_values() {
         let has_start = part.iter().any(|a| info.start_activities.contains(a));
         let has_end = part.iter().any(|a| info.end_activities.contains(a));
         match (has_start, has_end) {
-            (true,  true)  => with_start_end.push(part),
-            (true,  false) => with_start.push(part),
-            (false, true)  => with_end.push(part), 
+            (true, true) => with_start_end.push(part),
+            (true, false) => with_start.push(part),
+            (false, true) => with_end.push(part),
             (false, false) => with_nothing.push(part),
         }
     }
-    if with_start_end.is_empty() { return None; }
-    
+    if with_start_end.is_empty() {
+        return None;
+    }
+
     let mut result = with_start_end;
     let pairs = with_start.len().min(with_end.len());
     for i in 0..pairs {
@@ -336,9 +356,15 @@ fn concurrent_cut(info: &LogInfo) -> Option<Cut> {
         merged.extend(with_end[i].iter());
         result.push(merged);
     }
-    for part in &with_start[pairs..] { result[0].extend(part.iter()); }
-    for part in &with_end[pairs..]   { result[0].extend(part.iter()); }
-    for part in with_nothing         { result[0].extend(part.iter()); }
+    for part in &with_start[pairs..] {
+        result[0].extend(part.iter());
+    }
+    for part in &with_end[pairs..] {
+        result[0].extend(part.iter());
+    }
+    for part in with_nothing {
+        result[0].extend(part.iter());
+    }
 
     if result.len() > 1 {
         Some(Cut::Concurrent(result))
@@ -347,19 +373,22 @@ fn concurrent_cut(info: &LogInfo) -> Option<Cut> {
     }
 }
 
-
 fn loop_cut(info: &LogInfo) -> Option<Cut> {
-    if info.activities.len() < 2 { return None; }
-    if info.start_activities.is_empty() || info.end_activities.is_empty() { return None; }
-    
+    if info.activities.len() < 2 {
+        return None;
+    }
+    if info.start_activities.is_empty() || info.end_activities.is_empty() {
+        return None;
+    }
+
     let mut components = Components::new(&info.activities);
-    
-    //merge all start + end activities 
+
+    //merge all start + end activities
     let pivot = *info.start_activities.iter().next().unwrap();
     for &a in info.start_activities.iter().chain(&info.end_activities) {
         components.merge_components(pivot, a);
     }
-    
+
     for (&src, &tgt) in info.dfg.sources.iter().zip(&info.dfg.targets) {
         let src_is_start = info.start_activities.contains(&src);
         let src_is_end = info.end_activities.contains(&src);
@@ -370,25 +399,32 @@ fn loop_cut(info: &LogInfo) -> Option<Cut> {
             components.merge_components(src, tgt);
         }
     }
-    
+
     let (sub_ends, sub_starts): (HashSet<Activity>, HashSet<Activity>) = info
         .dfg
         .sources
         .iter()
         .zip(&info.dfg.targets)
         .filter(|&(&src, &tgt)| !components.same_component(src, tgt))
-        .fold((HashSet::new(), HashSet::new()), |(mut ends, mut starts), (&src, &tgt)| {
-            ends.insert(src);
-            starts.insert(tgt);
-            (ends, starts)
-            });
-            
+        .fold(
+            (HashSet::new(), HashSet::new()),
+            |(mut ends, mut starts), (&src, &tgt)| {
+                ends.insert(src);
+                starts.insert(tgt);
+                (ends, starts)
+            },
+        );
+
     // sub-end of redo connects to all start acts
     for &sub_end in &sub_ends {
         if components.same_component(sub_end, pivot) {
             continue;
         }
-        if info.start_activities.iter().any(|&s| info.dfg.edge_weight(sub_end, s).is_none()) {
+        if info
+            .start_activities
+            .iter()
+            .any(|&s| info.dfg.edge_weight(sub_end, s).is_none())
+        {
             components.merge_components(sub_end, pivot);
         }
     }
@@ -397,11 +433,15 @@ fn loop_cut(info: &LogInfo) -> Option<Cut> {
         if components.same_component(sub_start, pivot) {
             continue;
         }
-        if info.end_activities.iter().any(|&e| info.dfg.edge_weight(e, sub_start).is_none()) {
+        if info
+            .end_activities
+            .iter()
+            .any(|&e| info.dfg.edge_weight(e, sub_start).is_none())
+        {
             components.merge_components(sub_start, pivot);
         }
     }
-    
+
     let mut parts = components.into_components();
     if parts.len() <= 1 {
         return None;
@@ -409,10 +449,9 @@ fn loop_cut(info: &LogInfo) -> Option<Cut> {
     let body_idx = parts.iter().position(|p| p.contains(&pivot))?;
     parts.swap(0, body_idx);
     let body = parts.remove(0);
-    
-    Some(Cut::Loop {body, redos: parts})
-}
 
+    Some(Cut::Loop { body, redos: parts })
+}
 
 fn new_sublog(log: &dyn EbiTraitFiniteLanguage) -> FiniteLanguage {
     FiniteLanguage {
@@ -421,9 +460,12 @@ fn new_sublog(log: &dyn EbiTraitFiniteLanguage) -> FiniteLanguage {
     }
 }
 
-fn xor_split(log: &dyn EbiTraitFiniteLanguage, parts: &[HashSet<Activity>]) -> Vec<Box<dyn EbiTraitFiniteLanguage>> {
+fn xor_split(
+    log: &dyn EbiTraitFiniteLanguage,
+    parts: &[HashSet<Activity>],
+) -> Vec<Box<dyn EbiTraitFiniteLanguage>> {
     let mut sublogs: Vec<FiniteLanguage> = parts.iter().map(|_| new_sublog(log)).collect();
-    
+
     'trace: for trace in log.iter_traces() {
         for (i, partition) in parts.iter().enumerate() {
             if trace.iter().any(|a| partition.contains(a)) {
@@ -431,39 +473,54 @@ fn xor_split(log: &dyn EbiTraitFiniteLanguage, parts: &[HashSet<Activity>]) -> V
                 continue 'trace;
             }
         }
-    }   
-    
+    }
+
     sublogs
         .into_iter()
         .map(|s| Box::new(s) as Box<dyn EbiTraitFiniteLanguage>)
         .collect()
 }
 
-fn seq_conc_split(log: &dyn EbiTraitFiniteLanguage, parts: &[HashSet<Activity>]) -> Vec<Box<dyn EbiTraitFiniteLanguage>> {
+fn seq_conc_split(
+    log: &dyn EbiTraitFiniteLanguage,
+    parts: &[HashSet<Activity>],
+) -> Vec<Box<dyn EbiTraitFiniteLanguage>> {
     let mut sublogs: Vec<FiniteLanguage> = parts.iter().map(|_| new_sublog(log)).collect();
-    
+
     for trace in log.iter_traces() {
         for (i, partition) in parts.iter().enumerate() {
-            let subtrace: Vec<Activity> = trace.iter().filter(|&&a| partition.contains(&a)).cloned().collect();
+            let subtrace: Vec<Activity> = trace
+                .iter()
+                .filter(|&&a| partition.contains(&a))
+                .cloned()
+                .collect();
             sublogs[i].push(subtrace);
         }
     }
-    
+
     sublogs
         .into_iter()
         .map(|s| Box::new(s) as Box<dyn EbiTraitFiniteLanguage>)
         .collect()
 }
 
-
-fn loop_split(log: &dyn EbiTraitFiniteLanguage, body: &HashSet<Activity>, redos: &[HashSet<Activity>]) -> Vec<Box<dyn EbiTraitFiniteLanguage>> {
+fn loop_split(
+    log: &dyn EbiTraitFiniteLanguage,
+    body: &HashSet<Activity>,
+    redos: &[HashSet<Activity>],
+) -> Vec<Box<dyn EbiTraitFiniteLanguage>> {
     let mut sublogs: Vec<FiniteLanguage> = (0..redos.len() + 1).map(|_| new_sublog(log)).collect();
 
     let find_part = |a: Activity| -> usize {
-        if body.contains(&a) { return 0; }
-        redos.iter().position(|r| r.contains(&a)).map_or(0, |i| i + 1)
+        if body.contains(&a) {
+            return 0;
+        }
+        redos
+            .iter()
+            .position(|r| r.contains(&a))
+            .map_or(0, |i| i + 1)
     };
-    
+
     for trace in log.iter_traces() {
         let mut current: Vec<Activity> = Vec::new();
         let mut current_part = 0;
@@ -484,8 +541,11 @@ fn loop_split(log: &dyn EbiTraitFiniteLanguage, body: &HashSet<Activity>, redos:
         .collect()
 }
 
-
-fn build_operator_node(operator: Operator, subtrees: Vec<ProcessTree>, activity_key: ActivityKey) -> ProcessTree {
+fn build_operator_node(
+    operator: Operator,
+    subtrees: Vec<ProcessTree>,
+    activity_key: ActivityKey,
+) -> ProcessTree {
     let n = subtrees.len();
     let mut nodes = vec![Node::Operator(operator, n)];
 
@@ -496,7 +556,6 @@ fn build_operator_node(operator: Operator, subtrees: Vec<ProcessTree>, activity_
     (activity_key, nodes).into()
 }
 
-
 fn fall_throughs(log: &dyn EbiTraitFiniteLanguage) -> ProcessTree {
     empty_traces(log)
         .or_else(|| activity_once_per_trace(log))
@@ -505,7 +564,6 @@ fn fall_throughs(log: &dyn EbiTraitFiniteLanguage) -> ProcessTree {
         .or_else(|| tau_loop(log))
         .unwrap_or_else(|| flower_model(log))
 }
-
 
 fn empty_traces(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
     let info = LogInfo::log_calcs(log);
@@ -519,35 +577,43 @@ fn empty_traces(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
             filtered_log.push(trace.to_vec());
         }
     }
-    
+
     let activity_key = log.activity_key().clone();
 
     if LogInfo::log_calcs(&filtered_log).total_traces == 0 {
         return Some((activity_key, vec![Node::Tau]).into());
     }
 
-    let subtree = inductive_mine(&filtered_log);
+    let subtree = inductive_miner(&filtered_log);
     let tau_leaf: ProcessTree = (activity_key.clone(), vec![Node::Tau]).into();
-    Some(build_operator_node(Operator::Xor, vec![tau_leaf, subtree], activity_key))
+    Some(build_operator_node(
+        Operator::Xor,
+        vec![tau_leaf, subtree],
+        activity_key,
+    ))
 }
 
 fn activity_once_per_trace(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
     let info = LogInfo::log_calcs(log);
-    
+
     let a = *info.activities.iter().find(|&&a| {
         log.iter_traces()
-        .all(|trace| trace.iter().filter(|&&x| x == a).count() == 1)
+            .all(|trace| trace.iter().filter(|&&x| x == a).count() == 1)
     })?;
-    
+
     let activity_key = log.activity_key().clone();
     let mut filtered_log = new_sublog(log);
     for trace in log.iter_traces() {
         filtered_log.push(trace.iter().filter(|&&x| x != a).cloned().collect());
     }
-    
-    let subtree = inductive_mine(&filtered_log);
+
+    let subtree = inductive_miner(&filtered_log);
     let a_leaf: ProcessTree = (activity_key.clone(), vec![Node::Activity(a)]).into();
-    Some(build_operator_node(Operator::Concurrent, vec![a_leaf, subtree], activity_key))
+    Some(build_operator_node(
+        Operator::Concurrent,
+        vec![a_leaf, subtree],
+        activity_key,
+    ))
 }
 
 fn activity_concurrent(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
@@ -555,13 +621,13 @@ fn activity_concurrent(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> 
     if info.activities.len() < 3 {
         return None;
     }
-    
+
     for &a in &info.activities {
         let mut filtered_log = new_sublog(log);
         for trace in log.iter_traces() {
             filtered_log.push(trace.iter().filter(|&&x| x != a).cloned().collect());
         }
-        
+
         let mut non_empty = new_sublog(log);
         for trace in filtered_log.iter_traces() {
             if !trace.is_empty() {
@@ -571,9 +637,13 @@ fn activity_concurrent(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> 
 
         if find_cut(&LogInfo::log_calcs(&non_empty)).is_some() {
             let activity_key = log.activity_key().clone();
-            let subtree = inductive_mine(&filtered_log);
+            let subtree = inductive_miner(&filtered_log);
             let a_leaf: ProcessTree = (activity_key.clone(), vec![Node::Activity(a)]).into();
-            return Some(build_operator_node(Operator::Concurrent, vec![a_leaf, subtree], activity_key));
+            return Some(build_operator_node(
+                Operator::Concurrent,
+                vec![a_leaf, subtree],
+                activity_key,
+            ));
         }
     }
 
@@ -588,8 +658,8 @@ fn strict_tau_loop(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
 
     let mut new_log = new_sublog(log);
     let mut any_split = false;
-    
-    for trace in  log.iter_traces() {
+
+    for trace in log.iter_traces() {
         let mut current: Vec<Activity> = Vec::new();
         for &a in trace {
             if let Some(&last) = current.last() {
@@ -606,12 +676,15 @@ fn strict_tau_loop(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
     if !any_split {
         return None;
     }
-    
+
     let activity_key = log.activity_key().clone();
-    let subtree = inductive_mine(&new_log);
+    let subtree = inductive_miner(&new_log);
     let tau_leaf: ProcessTree = (activity_key.clone(), vec![Node::Tau]).into();
-    Some(build_operator_node(Operator::Loop, vec![subtree, tau_leaf], activity_key))
-    
+    Some(build_operator_node(
+        Operator::Loop,
+        vec![subtree, tau_leaf],
+        activity_key,
+    ))
 }
 
 fn tau_loop(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
@@ -619,7 +692,7 @@ fn tau_loop(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
     if info.activities.len() <= 1 {
         return None;
     }
-    
+
     let mut new_log = new_sublog(log);
     let mut any_split = false;
 
@@ -640,9 +713,13 @@ fn tau_loop(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
     }
 
     let activity_key = log.activity_key().clone();
-    let subtree = inductive_mine(&new_log);
+    let subtree = inductive_miner(&new_log);
     let tau_leaf: ProcessTree = (activity_key.clone(), vec![Node::Tau]).into();
-    Some(build_operator_node(Operator::Loop, vec![subtree, tau_leaf], activity_key))
+    Some(build_operator_node(
+        Operator::Loop,
+        vec![subtree, tau_leaf],
+        activity_key,
+    ))
 }
 
 fn flower_model(log: &dyn EbiTraitFiniteLanguage) -> ProcessTree {
@@ -655,8 +732,10 @@ fn flower_model(log: &dyn EbiTraitFiniteLanguage) -> ProcessTree {
         let tau_leaf: ProcessTree = (activity_key.clone(), vec![Node::Tau]).into();
         return build_operator_node(Operator::Loop, vec![a_leaf, tau_leaf], activity_key);
     }
-    
-    let activity_trees: Vec<ProcessTree> = info.activities.iter()
+
+    let activity_trees: Vec<ProcessTree> = info
+        .activities
+        .iter()
         .map(|&a| (activity_key.clone(), vec![Node::Activity(a)]).into())
         .collect();
     let xor_body = build_operator_node(Operator::Xor, activity_trees, activity_key.clone());
