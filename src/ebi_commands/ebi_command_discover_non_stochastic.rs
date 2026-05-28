@@ -189,11 +189,11 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL: EbiCommand = EbiCommand::Comm
 };
 
 pub const EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER: EbiCommand = EbiCommand::Command {
-    name_short: "ind",
-    name_long: Some("inductive-mined-ptree"),
-    explanation_short: "Discover a sound process tree using the Inductive Miner Algo.",
+    name_short: "im",
+    name_long: Some("inductive-miner"),
+    explanation_short: "Discover a process tree using the Inductive Miner algorithm.",
     explanation_long: None,
-    latex_link: None,
+    latex_link: Some("\cite{DBLP:conf/bpm/LeemansFA13}"),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteLanguage)]],
