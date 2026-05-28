@@ -13,7 +13,8 @@ use crate::{
     },
     techniques::{
         completeness::Completeness, edge_difference::EdgeDifference, entropy::Entropy, medoid,
-        probability_queries::ProbabilityQueries, process_variety::ProcessVariety,
+        probability_queries::ProbabilityQueries, process_variety::ProcessVariety, 
+        edge_difference_no_freq::EdgeDifferenceNoFrequencies,
     },
 };
 use ebi_objects::{
@@ -32,6 +33,7 @@ pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
         &EBI_ANALYSE_COMPLETENESS,
         &EBI_ANALYSE_COVERAGE,
         &EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE,
+        &EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES,
         &EBI_ANALYSE_ENTROPY,
         &EBI_ANALYSE_MEDOID,
         &EBI_ANALYSE_MINPROB,
@@ -161,6 +163,31 @@ pub const EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE: EbiCommand = EbiCommand:
     },
     output_type: &EbiOutputType::Fraction,
 };
+
+pub const EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES: EbiCommand = EbiCommand::Command {
+        name_short: "dfgedi-nf",
+        name_long: Some("directly-follows-edge-difference-no-frequencies"),
+        explanation_short: "The number of edges that differ between two directly follows graphs, ignoring frequencies.",
+        explanation_long: None,
+        cli_command: None,
+        latex_link: None,
+        exact_arithmetic: true,
+        input_types: &[
+            &[&EbiInputType::Object(EbiObjectType::DirectlyFollowsGraph)],
+            &[&EbiInputType::Object(EbiObjectType::DirectlyFollowsGraph)],
+        ],
+        input_names: &["DFG_1", "DFG_2"],
+        input_helps: &[ "A directly follows graph.", "A directly follows graph."],
+        execute: |mut objects, _| {
+            let mut dfg1 = objects.remove(0).to_type::<DirectlyFollowsGraph>()?;
+            let mut dfg2 = objects.remove(0).to_type::<DirectlyFollowsGraph>()?;
+
+            let difference = dfg1.edge_difference_no_freq(&mut dfg2);
+
+            Ok(EbiOutput::Fraction(difference))
+        },
+        output_type: &EbiOutputType::Fraction,
+    };
 
 pub const EBI_ANALYSE_ENTROPY: EbiCommand = EbiCommand::Command {
     name_short: "en",

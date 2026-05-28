@@ -11,6 +11,8 @@ use crate::{
         flower_miner::{FlowerMinerDFA, FlowerMinerTree},
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
         trace_model_miner::TraceModelMinerTree,
+        inductive_miner::InductiveMinerTree,
+        edge_difference_no_freq::EdgeDifferenceNoFrequencies,
     },
 };
 use ebi_objects::{
@@ -27,6 +29,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
         &EBI_DISCOVER_NON_STOCHASTIC_FLOWER,
         &EBI_DISCOVER_NON_STOCHASTIC_PREFIX,
         &EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL,
+        &EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER,
     ],
 };
 
@@ -184,3 +187,24 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL: EbiCommand = EbiCommand::Comm
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::ProcessTree),
 };
+
+pub const EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER: EbiCommand = EbiCommand::Command {
+    name_short: "im",
+    name_long: Some("inductive-miner"),
+    explanation_short: "Discover a process tree using the Inductive Miner algorithm.",
+    explanation_long: None,
+    latex_link: Some("\cite{DBLP:conf/bpm/LeemansFA13}"),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteLanguage)]],
+    input_names: &["LANG"],
+    input_helps: &["A finite language."],
+    execute: |mut inputs, _| {
+        let lang = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
+        Ok(EbiOutput::Object(EbiObject::ProcessTree(
+            lang.inductive_mine_tree(),
+        )))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::ProcessTree),
+};
+
