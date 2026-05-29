@@ -8,7 +8,7 @@ use ebi_objects::{
     DirectlyFollowsModel, EventLog, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet,
     ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    anyhow::Result,
+    anyhow::{Result, anyhow},
     ebi_objects::process_tree::{Node, Operator, TreeMarking},
 };
 use std::{
@@ -245,7 +245,9 @@ macro_rules! dfa_2 {
 
                         //reduce the in-degree of neighbours
                         for transition in self.outgoing_transitions(state_u) {
-                            let neighbour = self.targets[transition];
+                            let neighbour = self
+                                .transition_2_target(transition)
+                                .ok_or_else(|| anyhow!("Bug."))?;
                             in_degree[neighbour] -= 1;
                             if in_degree[neighbour] == 0 {
                                 queue.push(neighbour);

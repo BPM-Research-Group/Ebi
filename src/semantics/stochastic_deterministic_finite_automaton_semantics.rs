@@ -69,7 +69,7 @@ macro_rules! semantics_for_automaton {
                 if transition == self.sources.len() {
                     None
                 } else {
-                    Some(self.get_activities()[transition])
+                    Some(self.activities[transition])
                 }
             }
 
