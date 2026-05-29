@@ -4,11 +4,12 @@ use crate::{
     techniques::livelock::IsPartOfLivelock,
 };
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
-    EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
-    FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet, NumberOfTraces, ProcessTree,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
+    EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage,
+    FiniteStochasticLanguage, FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet,
+    NumberOfTraces, ProcessTree, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::Result,
     ebi_arithmetic::ebi_number::Zero,
     ebi_objects::{
@@ -84,9 +85,9 @@ macro_rules! lpn {
 }
 
 macro_rules! dfm {
-    ($t:ident) => {
+    ($t:ident, $s:ident) => {
         impl AnyTraces for $t {
-            type LivState = usize;
+            type LivState = $s;
 
             fn any_traces(&self) -> Result<bool> {
                 if let Some(initial_state) = self.get_initial_state() {
@@ -112,12 +113,12 @@ lang!(EventLogTraceAttributes);
 lang!(EventLogXes);
 lpn!(LabelledPetriNet);
 lpn!(StochasticLabelledPetriNet);
-dfm!(DeterministicFiniteAutomaton);
-dfm!(StochasticDeterministicFiniteAutomaton);
-dfm!(StochasticNondeterministicFiniteAutomaton);
-dfm!(DirectlyFollowsModel);
-dfm!(StochasticDirectlyFollowsModel);
-dfm!(DirectlyFollowsGraph);
+dfm!(DeterministicFiniteAutomaton, usize);
+dfm!(StochasticDeterministicFiniteAutomaton, usize);
+dfm!(StochasticNondeterministicFiniteAutomaton, usize);
+dfm!(DirectlyFollowsModel, usize);
+dfm!(StochasticDirectlyFollowsModel, usize);
+dfm!(DirectlyFollowsGraph, AutomatonState);
 
 #[cfg(test)]
 mod tests {

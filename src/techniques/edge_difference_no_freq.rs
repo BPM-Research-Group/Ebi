@@ -13,7 +13,6 @@ impl EdgeDifferenceNoFrequencies for DirectlyFollowsGraph {
         // Align activity keys between the two graphs
         other.translate_using_activity_key(&mut self.activity_key);
 
-        let zero = Fraction::zero();
         let one = Fraction::one();
 
         let is_present = |w: &Fraction| !w.is_zero();
@@ -75,11 +74,11 @@ impl EdgeDifferenceNoFrequencies for DirectlyFollowsGraph {
 
         for &a in &activities {
             for &b in &activities {
-                let e1 = self.edge_weight(*a, *b).unwrap_or(&zero);
-                let e2 = other.edge_weight(*a, *b).unwrap_or(&zero);
+                let e1 = self.edge_weight_activities(*a, *b);
+                let e2 = other.edge_weight_activities(*a, *b);
 
-                let p1 = is_present(e1);
-                let p2 = is_present(e2);
+                let p1 = is_present(&e1);
+                let p2 = is_present(&e2);
 
                 if p1 != p2 {
                     log::debug!(

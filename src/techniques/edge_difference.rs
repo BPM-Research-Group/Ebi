@@ -1,6 +1,6 @@
 use ebi_objects::{
     DirectlyFollowsGraph, TranslateActivityKey,
-    ebi_arithmetic::{Fraction, Signed, Zero},
+    ebi_arithmetic::{Fraction, Signed},
 };
 
 pub trait EdgeDifference {
@@ -10,7 +10,6 @@ pub trait EdgeDifference {
 impl EdgeDifference for DirectlyFollowsGraph {
     fn edge_difference(&mut self, other: &mut Self) -> Fraction {
         other.translate_using_activity_key(&mut self.activity_key);
-        let zero = Fraction::zero();
 
         //empty traces
         let mut result = (&self.empty_traces_weight - &other.empty_traces_weight).abs();
@@ -56,8 +55,9 @@ impl EdgeDifference for DirectlyFollowsGraph {
             .iter()
             .zip(self.activity_key.get_activities().iter())
         {
-            let e1 = self.edge_weight(**a, **b).unwrap_or(&zero);
-            let e2 = other.edge_weight(**a, **b).unwrap_or(&zero);
+            let e1 = self.edge_weight_activities(**a, **b);
+
+            let e2 = other.edge_weight_activities(**a, **b);
 
             if e1 != e2 {
                 log::debug!(

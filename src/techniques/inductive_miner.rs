@@ -1,12 +1,10 @@
-use std::collections::{HashMap, HashSet};
-
+use crate::ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage;
 use ebi_objects::{
     Activity, ActivityKey, DirectlyFollowsGraph, FiniteLanguage, IntoRefTraceIterator, ProcessTree,
-    ebi_arithmetic::{Fraction, One},
+    ebi_arithmetic::{Fraction, One, Signed},
     ebi_objects::process_tree::{Node, Operator},
 };
-
-use crate::ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage;
+use std::collections::{HashMap, HashSet};
 
 pub trait InductiveMinerTree {
     fn inductive_miner(&self) -> ProcessTree;
@@ -250,8 +248,8 @@ fn sequence_cut(info: &LogInfo) -> Option<Cut> {
 
     let mut adj: Vec<Vec<usize>> = vec![vec![]; n];
     for (&src, &tgt) in info.dfg.sources.iter().zip(info.dfg.targets.iter()) {
-        let src = info.dfg.node_2_activity[src.0];
-        let tgt = info.dfg.node_2_activity[tgt.0];
+        let src = info.dfg.state_2_activity[src];
+        let tgt = info.dfg.state_2_activity[tgt];
         if let (Some(&u), Some(&v)) = (act_to_idx.get(&src), act_to_idx.get(&tgt)) {
             if !adj[u].contains(&v) {
                 adj[u].push(v);
@@ -325,8 +323,8 @@ fn concurrent_cut(info: &LogInfo) -> Option<Cut> {
         for j in (i + 1)..n {
             let (a, b) = (activities[i], activities[j]);
             if !components.same_component(a, b) {
-                let a_to_b = info.dfg.edge_weight(a, b).is_some();
-                let b_to_a = info.dfg.edge_weight(b, a).is_some();
+                let a_to_b = info.dfg.edge_weight_activities(a, b).is_positive();
+                let b_to_a = info.dfg.edge_weight_activities(b, a).is_positive();
                 if !(a_to_b && b_to_a) {
                     components.merge_components(a, b);
                 }
@@ -424,11 +422,11 @@ fn loop_cut(info: &LogInfo) -> Option<Cut> {
         if components.same_component(sub_end, pivot) {
             continue;
         }
-        if info
-            .start_activities
-            .iter()
-            .any(|&s| info.dfg.edge_weight(sub_end, s).is_none())
-        {
+        if info.start_activities.iter().any(|&s| {
+            info.dfg
+                .edge_weight_activities(sub_end, s)
+                .is_not_positive()
+        }) {
             components.merge_components(sub_end, pivot);
         }
     }
@@ -437,11 +435,11 @@ fn loop_cut(info: &LogInfo) -> Option<Cut> {
         if components.same_component(sub_start, pivot) {
             continue;
         }
-        if info
-            .end_activities
-            .iter()
-            .any(|&e| info.dfg.edge_weight(e, sub_start).is_none())
-        {
+        if info.end_activities.iter().any(|&e| {
+            info.dfg
+                .edge_weight_activities(e, sub_start)
+                .is_not_positive()
+        }) {
             components.merge_components(sub_start, pivot);
         }
     }

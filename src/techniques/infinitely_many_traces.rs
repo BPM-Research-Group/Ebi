@@ -4,9 +4,9 @@ use crate::{
     techniques::{livelock::IsPartOfLivelock, reachability::IsReachable},
 };
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
-    FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, ProcessTree,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
+    DirectlyFollowsModel, EventLog, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet,
+    ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::Result,
     ebi_objects::process_tree::{Node, Operator, TreeMarking},
@@ -208,12 +208,12 @@ impl Display for CycleGraph {
 }
 
 macro_rules! dfa_2 {
-    ($t:ty) => {
+    ($t:ty, $s:ty) => {
         impl InfinitelyManyTraces for $t {
-            type LivState = usize;
+            type LivState = $s;
 
             fn infinitely_many_traces(&self) -> Result<bool> {
-                if self.initial_state.is_none() {
+                if self.get_initial_state().is_none() {
                     //no initial state -> no traces -> not infinitely many traces
                     return Ok(false);
                 };
@@ -229,11 +229,11 @@ macro_rules! dfa_2 {
                     //compute in-degrees
                     let mut in_degree = vec![0; v];
                     for target in &self.targets {
-                        in_degree[*target] += 1;
+                        in_degree[target] += 1;
                     }
 
                     //initialise queue with nodes with in-degree of 0
-                    for state in 0..v {
+                    for state in self.states() {
                         if in_degree[state] == 0 {
                             queue.push(state);
                             part_of_cycle[state] = false;
@@ -244,18 +244,13 @@ macro_rules! dfa_2 {
                         visited += 1;
 
                         //reduce the in-degree of neighbours
-                        let (_, mut transition) = self.binary_search(state_u, 0);
-                        while transition < self.sources.len() && self.sources[transition] == state_u
-                        {
-                            //found a neighbour
+                        for transition in self.outgoing_transitions(state_u) {
                             let neighbour = self.targets[transition];
                             in_degree[neighbour] -= 1;
                             if in_degree[neighbour] == 0 {
                                 queue.push(neighbour);
                                 part_of_cycle[neighbour] = false;
                             }
-
-                            transition += 1;
                         }
                     }
 
@@ -268,7 +263,7 @@ macro_rules! dfa_2 {
                 //Step 2: remove states that are part of livelocks
                 {
                     let mut livelock_cache = self.get_livelock_cache();
-                    for state in 0..self.number_of_states() {
+                    for state in self.states() {
                         if part_of_cycle[state]
                             && livelock_cache.is_state_part_of_livelock(&state)?
                         {
@@ -372,12 +367,12 @@ macro_rules! lang {
     };
 }
 
-dfa_2!(StochasticDeterministicFiniteAutomaton);
-dfa_2!(DeterministicFiniteAutomaton);
+dfa!(StochasticDeterministicFiniteAutomaton);
+dfa!(DeterministicFiniteAutomaton);
 dfa!(StochasticNondeterministicFiniteAutomaton);
 dfa!(DirectlyFollowsModel);
 dfa!(StochasticDirectlyFollowsModel);
-dfa!(DirectlyFollowsGraph);
+dfa_2!(DirectlyFollowsGraph, AutomatonState);
 lpn!(LabelledPetriNet);
 lpn!(StochasticLabelledPetriNet);
 lang!(EventLog);
@@ -388,7 +383,8 @@ lang!(FiniteStochasticLanguage);
 mod tests {
     use crate::techniques::infinitely_many_traces::InfinitelyManyTraces;
     use ebi_objects::{
-        DeterministicFiniteAutomaton, DirectlyFollowsGraph, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet
+        DeterministicFiniteAutomaton, DirectlyFollowsGraph, LabelledPetriNet, ProcessTree,
+        StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
     };
     use std::fs;
 
@@ -457,11 +453,8 @@ mod tests {
 
     #[test]
     fn infinitely_many_traces_dfa_bpic12() {
-        let fin =
-            fs::read_to_string("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap();
-        let dfg = fin
-            .parse::<DirectlyFollowsGraph>()
-            .unwrap();
+        let fin = fs::read_to_string("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap();
+        let dfg = fin.parse::<DirectlyFollowsGraph>().unwrap();
 
         assert!(!dfg.infinitely_many_traces().unwrap());
     }

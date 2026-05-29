@@ -1,9 +1,7 @@
 use crate::semantics::semantics::Semantics;
 use ebi_objects::{
-    Activity, DirectlyFollowsGraph,
-    anyhow::Result,
-    ebi_arithmetic::ebi_number::Signed,
-    ebi_objects::{directly_follows_graph::Node, labelled_petri_net::TransitionIndex},
+    Activity, AutomatonState, DirectlyFollowsGraph, anyhow::Result,
+    ebi_arithmetic::ebi_number::Signed, ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
 /**
@@ -13,16 +11,16 @@ use ebi_objects::{
  *
  * Transitions:
  * End activity -> final state = edges[len]
- * initial state -> start activity = edges[len] + 1 ...
+ * initial state -> start activity = edges[len] + 1 + ...
  */
 impl Semantics for DirectlyFollowsGraph {
-    type SemState = usize;
+    type SemState = AutomatonState;
 
     fn get_initial_state(&self) -> Option<<Self as Semantics>::SemState> {
         if !self.has_empty_traces() && !self.start_activities.iter().any(|(_, w)| w.is_positive()) {
             None
         } else {
-            Some(self.activity_key.next_index)
+            Some(AutomatonState::of(self.state_2_activity.len()))
         }
     }
 
@@ -33,19 +31,19 @@ impl Semantics for DirectlyFollowsGraph {
     ) -> Result<()> {
         if transition == self.sources.len() {
             //end
-            *state = self.activity_key.next_index + 1
+            *state = AutomatonState::of(self.activity_key.next_index + 1);
         } else if transition < self.sources.len() {
             //edge
-            *state = self.targets[transition].0;
+            *state = AutomatonState::of(self.targets[transition].0);
         } else {
             //start
-            *state = transition - (self.sources.len() + 1);
+            *state = AutomatonState::of(transition - (self.sources.len() + 1));
         }
         Ok(())
     }
 
     fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool {
-        state > &self.activity_key.next_index
+        state.0 > self.state_2_activity.len()
     }
 
     fn is_transition_silent(
@@ -67,11 +65,11 @@ impl Semantics for DirectlyFollowsGraph {
         } else if transition < self.sources.len() {
             //edge
             let node = transition;
-            Some(self.node_2_activity[self.targets[node].0])
+            Some(self.state_2_activity[self.targets[node].0])
         } else {
             //start
             let node = transition - (self.sources.len() + 1);
-            Some(self.activity_key.get_activity_by_id(node))
+            Some(self.state_2_activity[node])
         }
     }
 
@@ -79,14 +77,14 @@ impl Semantics for DirectlyFollowsGraph {
         &self,
         state: &<Self as Semantics>::SemState,
     ) -> Vec<TransitionIndex> {
-        if state == &self.activity_key.next_index {
+        if state.0 == self.state_2_activity.len() {
             //we are in the initial state
             let mut result = self
                 .start_activities
                 .iter()
-                .filter_map(|(a, w)| {
+                .filter_map(|(node, w)| {
                     if w.is_positive() {
-                        Some(self.sources.len() + 1 + a.0)
+                        Some(self.sources.len() + 1 + node.0)
                     } else {
                         None
                     }
@@ -98,17 +96,16 @@ impl Semantics for DirectlyFollowsGraph {
             }
 
             result
-        } else if state > &self.activity_key.next_index {
+        } else if state.0 > self.state_2_activity.len() {
             //we are in the final state
             vec![]
         } else {
-            let node = Node::of(*state);
             //we are not in the initial state
             let mut result = vec![];
 
             //add edges
-            let (_, mut i) = self.binary_search(node, Node::zero());
-            while i < self.sources.len() && self.sources[i] == node {
+            let (_, mut i) = self.binary_search(*state, AutomatonState::zero());
+            while i < self.sources.len() && &self.sources[i] == state {
                 if self.weights[i].is_positive() {
                     result.push(i);
                 }
@@ -116,7 +113,7 @@ impl Semantics for DirectlyFollowsGraph {
             }
 
             //add transition to final state
-            if self.is_end_node(self.node_2_activity[node.0]) {
+            if self.is_end_node(self.state_2_activity[state]) {
                 result.push(self.sources.len())
             }
 
@@ -132,9 +129,7 @@ impl Semantics for DirectlyFollowsGraph {
 #[cfg(test)]
 mod tests {
     use crate::semantics::semantics::Semantics;
-    use ebi_objects::{
-        DirectlyFollowsGraph, FiniteStochasticLanguage, HasActivityKey, TranslateActivityKey,
-    };
+    use ebi_objects::{DirectlyFollowsGraph, HasActivityKey};
     use std::fs;
 
     #[cfg(test)]
@@ -153,25 +148,29 @@ mod tests {
         let fin = fs::read_to_string("testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap();
         let mut dfg = fin.parse::<DirectlyFollowsGraph>().unwrap();
 
-        let fin2 = fs::read_to_string("testfiles/bpic12-a-sample.slang").unwrap();
-        let mut slang = fin2.parse::<FiniteStochasticLanguage>().unwrap();
+        // let fin2 = fs::read_to_string("testfiles/bpic12-a-sample.slang").unwrap();
+        // let mut slang = fin2.parse::<FiniteStochasticLanguage>().unwrap();
 
         // dfg.translate_using_activity_key(slang.activity_key_mut());
 
         let a_submitted = dfg.activity_key_mut().process_activity("A_SUBMITTED");
         let a_partlysubmitted = dfg.activity_key_mut().process_activity("A_PARTLYSUBMITTED");
 
+        println!("{:?}", dfg.activity_key);
+        println!("node_2_activity  {:?}", dfg.state_2_activity);
+        println!("start activities {:?}", dfg.start_activities);
+
         let mut state = dfg.get_initial_state().unwrap();
-        println!("{}\n", state);
-        assert_eq!(dfg.get_enabled_transitions(&state), [25]);
+        println!("state {}\n", state);
+        assert_eq!(dfg.get_enabled_transitions(&state), [16]);
         assert_eq!(
-            dfg.get_transition_activity(25, &state).unwrap(),
+            dfg.get_transition_activity(16, &state).unwrap(),
             a_submitted
         );
 
-        assert_execute_expect!(dfg, state, 25, [14]);
+        assert_execute_expect!(dfg, state, 16, [0]);
         assert_eq!(
-            dfg.get_transition_activity(14, &state).unwrap(),
+            dfg.get_transition_activity(0, &state).unwrap(),
             a_partlysubmitted
         );
     }

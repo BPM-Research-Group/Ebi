@@ -12,11 +12,11 @@ use crate::{
     },
 };
 use ebi_objects::{
-    Activity, ActivityKeyTranslator, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
-    DirectlyFollowsGraph, DirectlyFollowsModel, FiniteStochasticPartiallyOrderedLanguage,
-    LabelledPetriNet, LanguageOfAlignments, ProcessTree, StochasticBusinessProcessModelAndNotation,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
+    Activity, ActivityKeyTranslator, AutomatonState, BusinessProcessModelAndNotation,
+    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
+    FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet, LanguageOfAlignments, ProcessTree,
+    StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::{Context, Error, Result, anyhow},
     ebi_bpmn::BPMNMarking,
@@ -56,6 +56,7 @@ impl Align for EbiTraitSemantics {
     ) -> Result<LanguageOfAlignments> {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.align_language(log),
+            EbiTraitSemantics::AutomatonState(sem) => sem.align_language(log),
             EbiTraitSemantics::Marking(sem) => sem.align_language(log),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_language(log),
             EbiTraitSemantics::BPMNMarking(sem) => sem.align_language(log),
@@ -69,6 +70,7 @@ impl Align for EbiTraitSemantics {
     ) -> Result<StochasticLanguageOfAlignments> {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.align_stochastic_language(log),
+            EbiTraitSemantics::AutomatonState(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::Marking(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_stochastic_language(log),
             EbiTraitSemantics::BPMNMarking(sem) => sem.align_stochastic_language(log),
@@ -79,6 +81,7 @@ impl Align for EbiTraitSemantics {
     fn align_trace(&self, trace: &Vec<Activity>) -> Result<(Vec<Move>, usize)> {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.align_trace(trace),
+            EbiTraitSemantics::AutomatonState(sem) => sem.align_trace(trace),
             EbiTraitSemantics::Marking(sem) => sem.align_trace(trace),
             EbiTraitSemantics::TreeMarking(sem) => sem.align_trace(trace),
             EbiTraitSemantics::BPMNMarking(sem) => sem.align_trace(trace),
@@ -97,9 +100,11 @@ where
         log: Box<dyn EbiTraitFiniteLanguage>,
     ) -> Result<LanguageOfAlignments> {
         if self.get_initial_state().is_none() {
-            return Err(anyhow!("Model has the empty language, and can therefore not be aligned."));
+            return Err(anyhow!(
+                "Model has the empty language, and can therefore not be aligned."
+            ));
         }
-        
+
         let mut activity_key = self.activity_key().clone();
         let translator = Arc::new(ActivityKeyTranslator::new(
             log.activity_key(),
@@ -159,7 +164,9 @@ where
         log: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<StochasticLanguageOfAlignments> {
         if self.get_initial_state().is_none() {
-            return Err(anyhow!("Model has the empty language, and can therefore not be aligned."));
+            return Err(anyhow!(
+                "Model has the empty language, and can therefore not be aligned."
+            ));
         }
 
         let mut activity_key = self.activity_key().clone();
@@ -265,7 +272,9 @@ where
             //walk through the enabled transitions in the model
             for transition in semantics.get_enabled_transitions(&state) {
                 let mut new_state = state.clone();
-                let _ = semantics.execute_transition(&mut new_state, transition).unwrap();
+                let _ = semantics
+                    .execute_transition(&mut new_state, transition)
+                    .unwrap();
 
                 if let Some(activity) = semantics.get_transition_activity(transition, state) {
                     //non-silent model move
@@ -604,9 +613,9 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
 }
 
 macro_rules! usize {
-    ($t:ident) => {
+    ($t:ident, $s:ident) => {
         impl AlignmentHeuristics for $t {
-            type AliState = usize;
+            type AliState = $s;
 
             fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
                 vec![]
@@ -616,7 +625,7 @@ macro_rules! usize {
                 &self,
                 _: &Vec<Activity>,
                 _: &usize,
-                _: &usize,
+                _: &$s,
                 _: &Vec<Vec<usize>>,
             ) -> usize {
                 0
@@ -647,13 +656,13 @@ macro_rules! treemarking {
     };
 }
 
-usize!(StochasticDeterministicFiniteAutomaton);
-usize!(StochasticNondeterministicFiniteAutomaton);
+usize!(StochasticDeterministicFiniteAutomaton, usize);
+usize!(StochasticNondeterministicFiniteAutomaton, usize);
 treemarking!(ProcessTree);
 treemarking!(StochasticProcessTree);
-usize!(DirectlyFollowsGraph);
-usize!(DirectlyFollowsModel);
-usize!(StochasticDirectlyFollowsModel);
+usize!(DirectlyFollowsGraph, AutomatonState);
+usize!(DirectlyFollowsModel, usize);
+usize!(StochasticDirectlyFollowsModel, usize);
 
 #[cfg(test)]
 mod tests {

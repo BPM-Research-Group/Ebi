@@ -3,10 +3,10 @@ use crate::{
     semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
 };
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, HasActivityKey,
-    LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton,
+    AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
+    DirectlyFollowsModel, HasActivityKey, LabelledPetriNet, ProcessTree,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton,
     anyhow::{Result, anyhow},
     ebi_objects::process_tree::TreeMarking,
 };
@@ -66,9 +66,9 @@ impl LiveLockCache for LiveLockCacheProcessTree {
  * nodes:           terminate
  */
 macro_rules! dfm {
-    ($t:ident, $u:ident) => {
+    ($t:ident, $u:ident, $s:ident) => {
         impl IsPartOfLivelock for $t {
-            type LivState = usize;
+            type LivState = $s;
 
             fn is_state_part_of_livelock(&self, state: &Self::LivState) -> Result<bool> {
                 let mut queue = vec![];
@@ -104,7 +104,7 @@ macro_rules! dfm {
 }
 
 macro_rules! dfm_cache {
-    ($t:ident, $u:ident) => {
+    ($t:ident, $u:ident, $s:ident) => {
         impl $u {
             pub fn new(dfm: &$t) -> Self {
                 let mut result = vec![true; dfm.node_2_activity.len() + 2];
@@ -143,7 +143,7 @@ macro_rules! dfm_cache {
         }
 
         impl LiveLockCache for $u {
-            type LivState = usize;
+            type LivState = $s;
 
             fn is_state_part_of_livelock(&mut self, state: &Self::LivState) -> Result<bool> {
                 self.0
@@ -154,24 +154,38 @@ macro_rules! dfm_cache {
         }
     };
 }
-dfm!(DirectlyFollowsModel, DirectlyFollowsModelLiveLockCache);
+dfm!(
+    DirectlyFollowsModel,
+    DirectlyFollowsModelLiveLockCache,
+    usize
+);
 dfm!(
     StochasticDirectlyFollowsModel,
-    StochasticDirectlyFollowsModelLiveLockCache
+    StochasticDirectlyFollowsModelLiveLockCache,
+    usize
 );
-dfm_cache!(DirectlyFollowsModel, DirectlyFollowsModelLiveLockCache);
+dfm_cache!(
+    DirectlyFollowsModel,
+    DirectlyFollowsModelLiveLockCache,
+    usize
+);
 dfm_cache!(
     StochasticDirectlyFollowsModel,
-    StochasticDirectlyFollowsModelLiveLockCache
+    StochasticDirectlyFollowsModelLiveLockCache,
+    usize
 );
-dfm!(DirectlyFollowsGraph, DirectlyFollowsGraphLiveLockCache);
+dfm!(
+    DirectlyFollowsGraph,
+    DirectlyFollowsGraphLiveLockCache,
+    AutomatonState
+);
 
 impl DirectlyFollowsGraphLiveLockCache {
     pub fn new(dfg: &DirectlyFollowsGraph) -> Self {
         let mut result = vec![true; dfg.number_of_states()];
         let mut queue = vec![];
         result[dfg.number_of_states() - 2] = false;
-        for (activity, node) in dfg.activity_2_node.iter() {
+        for (activity, node) in dfg.activity_2_state.iter() {
             if dfg.is_end_node(activity) {
                 result[node.0] = false;
                 queue.push(*node)
@@ -204,13 +218,13 @@ impl DirectlyFollowsGraphLiveLockCache {
 }
 
 impl LiveLockCache for DirectlyFollowsGraphLiveLockCache {
-    type LivState = usize;
+    type LivState = AutomatonState;
 
     fn is_state_part_of_livelock(&mut self, state: &Self::LivState) -> Result<bool> {
-        self.0
-            .get(*state)
-            .copied()
-            .ok_or_else(|| anyhow!("index out of bounds"))
+        if state.0 > self.0.len() {
+            return Err(anyhow!("State does not exist."));
+        }
+        Ok(self.0[state])
     }
 }
 

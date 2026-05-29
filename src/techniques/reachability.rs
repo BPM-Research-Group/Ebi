@@ -1,6 +1,7 @@
 use crate::{ebi_framework::displayable::Displayable, semantics::semantics::Semantics};
 use ebi_objects::{
-    DeterministicFiniteAutomaton, StochasticDeterministicFiniteAutomaton, anyhow::Result,
+    AutomatonSemantics, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
+    StochasticDeterministicFiniteAutomaton, anyhow::Result,
 };
 use std::collections::VecDeque;
 
@@ -43,17 +44,13 @@ macro_rules! dfa {
                     queue.push_back(initial_state);
                     while let Some(state) = queue.pop_front() {
                         reachable[state] = true;
-
-                        let (_, mut transition) = sdfa.binary_search(state, 0);
-                        while transition < sdfa.sources.len() && sdfa.sources[transition] == state {
+                        for transition in sdfa.get_enabled_transitions(&state) {
                             //found a neighbour
                             let neighbour = sdfa.targets[transition];
                             if !reachable[neighbour] {
                                 queue.push_back(neighbour);
                                 reachable[neighbour] = true;
                             }
-
-                            transition += 1;
                         }
                     }
                 }
@@ -80,3 +77,4 @@ dfa!(
     StochasticDeterministicFiniteAutomaton,
     StochasticDeterministicFiniteAutomatonReachabilityCache
 );
+dfa!(DirectlyFollowsGraph, DirectlyFollowsGraphReachabilityCache);
