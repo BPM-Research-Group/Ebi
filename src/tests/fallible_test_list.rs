@@ -51,7 +51,14 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &EBI_ANALYSE_MINPROB,
         &[
             "trait stochastic deterministic semantics#./testfiles/all_operators.sptree",
-            "*",
+            "fraction 0",
+        ],
+    ),
+    (
+        &EBI_ANALYSE_MINPROB,
+        &[
+            "trait stochastic deterministic semantics#./testfiles/fig_c.sdfa",
+            "fraction 0",
         ],
     ),
     (
@@ -194,6 +201,14 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &["*", "trait semantics#./testfiles/empty_2.ptree"],
     ),
     (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
+        &["*", "trait semantics#./testfiles/empty.lang"],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS,
+        &["*", "trait semantics#./testfiles/empty.lang"],
+    ),
+    (
         &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
         &["trait finite language#./testfiles/empty.lang", "usize 1"],
     ),
@@ -239,6 +254,10 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
     (
         &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
         &["*", "trait semantics#./testfiles/empty_2.ptree"],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &["*", "trait semantics#./testfiles/empty.lang"],
     ),
     (
         &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
@@ -311,8 +330,16 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         ],
     ),
     (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &["*", "trait semantics#./testfiles/empty.lpn"],
+    ),
+    (
         &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
         &["*", "trait semantics#./testfiles/empty.xes"],
+    ),
+    (
+        &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
+        &["*", "trait semantics#./testfiles/empty.lang"],
     ),
     (
         &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,

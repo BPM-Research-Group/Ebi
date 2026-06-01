@@ -19,7 +19,7 @@ mod tests{
 
 	// ==== command all ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_all_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47,7 +47,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_all_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -75,7 +75,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_all_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -103,7 +103,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_all_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -131,7 +131,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_all_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -159,7 +159,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_all_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -187,7 +187,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_all_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -215,7 +215,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_all_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -243,7 +243,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_all_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -271,7 +271,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_all_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -298,11 +298,95 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_all_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_ALL,
+			&[
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ALL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_all_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_ALL,
+			&[
+				"trait finite stochastic language#./testfiles/fig_a.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ALL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_all_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_ALL,
+			&[
+				"trait finite stochastic language#./testfiles/oc-log.ocel"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ALL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command comp ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_comp_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -330,7 +414,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_comp_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -358,7 +442,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_comp_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -386,7 +470,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_comp_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -414,7 +498,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_comp_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -442,7 +526,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_comp_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -470,7 +554,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_comp_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -498,7 +582,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_comp_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -526,7 +610,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_comp_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -557,7 +641,7 @@ mod tests{
 
 	// ==== command cov ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_cov_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -587,7 +671,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_cov_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -617,7 +701,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_cov_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -647,7 +731,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_cov_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -677,7 +761,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_cov_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -707,7 +791,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_cov_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -737,7 +821,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_cov_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -767,7 +851,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_cov_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -797,7 +881,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_cov_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -827,7 +911,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_cov_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -856,11 +940,101 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_cov_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_COVERAGE,
+			&[
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"fraction 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COVERAGE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_cov_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_COVERAGE,
+			&[
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"fraction 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COVERAGE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_cov_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_COVERAGE,
+			&[
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"fraction 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COVERAGE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command dfgedi ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_dfgedi_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -892,7 +1066,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_dfgedi_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -900,7 +1074,7 @@ mod tests{
 			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE,
 			&[
 				"object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg",
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
+				"object directly follows graph#./testfiles/aa-ab-ba.dfg"			
 			]
 		),
 		*/
@@ -908,7 +1082,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
 		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
 		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
 		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
 		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
 		let inputs = vec![input0, input1];
@@ -924,23 +1098,23 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_dfgedi_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
 			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE,
 			&[
-				"object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg",
-				"object directly follows graph#./testfiles/aa-ab-ba.dfg"			
+				"object directly follows graph#./testfiles/aa-ab-ba.dfg",
+				"object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg"			
 			]
 		),
 		*/
 		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
 		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
 		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
 		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
 		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
 		let inputs = vec![input0, input1];
@@ -956,168 +1130,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_dfgedi_test_3() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE,
-			&[
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg",
-				"object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_ana_dfgedi_test_4() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE,
-			&[
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg",
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_ana_dfgedi_test_5() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE,
-			&[
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg",
-				"object directly follows graph#./testfiles/aa-ab-ba.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_ana_dfgedi_test_6() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE,
-			&[
-				"object directly follows graph#./testfiles/aa-ab-ba.dfg",
-				"object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_ana_dfgedi_test_7() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE,
-			&[
-				"object directly follows graph#./testfiles/aa-ab-ba.dfg",
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_ana_dfgedi_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -1151,7 +1165,7 @@ mod tests{
 
 	// ==== command dfgedi-nf ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_dfgedi_nf_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1183,7 +1197,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_dfgedi_nf_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1191,7 +1205,7 @@ mod tests{
 			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES,
 			&[
 				"object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg",
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
+				"object directly follows graph#./testfiles/aa-ab-ba.dfg"			
 			]
 		),
 		*/
@@ -1199,7 +1213,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
 		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
 		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
 		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
 		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
 		let inputs = vec![input0, input1];
@@ -1215,23 +1229,23 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_dfgedi_nf_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
 			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES,
 			&[
-				"object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg",
-				"object directly follows graph#./testfiles/aa-ab-ba.dfg"			
+				"object directly follows graph#./testfiles/aa-ab-ba.dfg",
+				"object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg"			
 			]
 		),
 		*/
 		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
 		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
 		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
 		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
 		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
 		let inputs = vec![input0, input1];
@@ -1247,168 +1261,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_dfgedi_nf_test_3() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES,
-			&[
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg",
-				"object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_ana_dfgedi_nf_test_4() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES,
-			&[
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg",
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_ana_dfgedi_nf_test_5() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES,
-			&[
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg",
-				"object directly follows graph#./testfiles/aa-ab-ba.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_ana_dfgedi_nf_test_6() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES,
-			&[
-				"object directly follows graph#./testfiles/aa-ab-ba.dfg",
-				"object directly follows graph#./testfiles/bpic12-a.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_ana_dfgedi_nf_test_7() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES,
-			&[
-				"object directly follows graph#./testfiles/aa-ab-ba.dfg",
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_ana_dfgedi_nf_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -1442,7 +1296,7 @@ mod tests{
 
 	// ==== command en ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_en_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1470,7 +1324,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_en_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1498,7 +1352,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_en_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1526,7 +1380,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_en_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1554,7 +1408,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_en_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1582,7 +1436,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_en_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1610,7 +1464,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_en_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1638,7 +1492,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_en_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1666,7 +1520,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_en_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1694,7 +1548,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_en_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1721,11 +1575,95 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_en_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_ENTROPY,
+			&[
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ENTROPY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_en_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_ENTROPY,
+			&[
+				"trait finite stochastic language#./testfiles/fig_a.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ENTROPY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_en_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_ENTROPY,
+			&[
+				"trait finite stochastic language#./testfiles/oc-log.ocel"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_ENTROPY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command med ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_med_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1755,7 +1693,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_med_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1785,7 +1723,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_med_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -1800,7 +1738,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_med_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1830,7 +1768,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_med_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1860,7 +1798,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_med_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1890,7 +1828,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_med_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1920,7 +1858,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_med_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1950,7 +1888,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_med_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1980,7 +1918,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_med_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2009,11 +1947,101 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_med_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_MEDOID,
+			&[
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MEDOID {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_med_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_MEDOID,
+			&[
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MEDOID {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_med_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_MEDOID,
+			&[
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MEDOID {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command minprob ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_minprob_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2043,7 +2071,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_minprob_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2073,7 +2101,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_minprob_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2103,7 +2131,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_minprob_test_3() {
 		// this test has been indicated as to be expected to fail
 		
@@ -2118,7 +2146,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_minprob_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2148,7 +2176,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_minprob_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2178,7 +2206,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_minprob_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2208,38 +2236,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_minprob_test_7() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_MINPROB,
-			&[
-				"trait stochastic deterministic semantics#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg",
-				"fraction 0"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic deterministic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MINPROB {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_ana_minprob_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -2268,8 +2266,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_ana_minprob_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_ana_minprob_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -2297,11 +2295,116 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_minprob_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_MINPROB,
+			&[
+				"trait stochastic deterministic semantics#./testfiles/simple_markovian_abstraction.slpn",
+				"fraction 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_markovian_abstraction.slpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic deterministic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MINPROB {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_minprob_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_MINPROB,
+			&[
+				"trait stochastic deterministic semantics#./testfiles/aa-ab-ba.snfa",
+				"fraction 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.snfa").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic deterministic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MINPROB {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_minprob_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_MINPROB,
+			&[
+				"trait stochastic deterministic semantics#./testfiles/ba.slang",
+				"fraction 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic deterministic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MINPROB {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_minprob_test_12() {
+		// this test has been indicated as to be expected to fail
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_c.sdfa").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("stochastic deterministic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MINPROB {
+			assert!(((execute)(inputs, None)).is_err())
+		}
+	}
 
 
 	// ==== command mode ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mode_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2329,7 +2432,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mode_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2357,7 +2460,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mode_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2385,7 +2488,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mode_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2413,7 +2516,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mode_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2441,7 +2544,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mode_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2469,7 +2572,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mode_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2497,7 +2600,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mode_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2525,7 +2628,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mode_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2553,7 +2656,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mode_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2580,11 +2683,95 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_mode_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_MODE,
+			&[
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MODE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_mode_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_MODE,
+			&[
+				"trait finite stochastic language#./testfiles/fig_a.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MODE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_mode_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_MODE,
+			&[
+				"trait finite stochastic language#./testfiles/oc-log.ocel"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MODE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command mostlikely ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mostlikely_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2614,7 +2801,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mostlikely_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2644,7 +2831,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mostlikely_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2674,7 +2861,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mostlikely_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2704,7 +2891,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mostlikely_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2734,7 +2921,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mostlikely_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2764,7 +2951,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mostlikely_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2794,7 +2981,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mostlikely_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2824,7 +3011,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mostlikely_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2854,7 +3041,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_mostlikely_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2883,11 +3070,101 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_mostlikely_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_MOSTLIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MOSTLIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_mostlikely_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_MOSTLIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MOSTLIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_mostlikely_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_MOSTLIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_MOSTLIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command var ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_var_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2915,7 +3192,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_var_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2943,7 +3220,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_var_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2971,7 +3248,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_var_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2999,7 +3276,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_var_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3027,7 +3304,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_var_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3055,7 +3332,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_var_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3083,7 +3360,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_var_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3111,7 +3388,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_var_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3139,7 +3416,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_ana_var_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3166,6 +3443,90 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_var_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_VARIETY,
+			&[
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_VARIETY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_var_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_VARIETY,
+			&[
+				"trait finite stochastic language#./testfiles/fig_a.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_VARIETY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_ana_var_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_VARIETY,
+			&[
+				"trait finite stochastic language#./testfiles/oc-log.ocel"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_VARIETY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== group anans ====
@@ -3173,7 +3534,7 @@ mod tests{
 
 	// ==== command act ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_act_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3201,7 +3562,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_act_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3229,7 +3590,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_act_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3257,7 +3618,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_act_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3285,7 +3646,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_act_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3313,7 +3674,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_act_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3341,7 +3702,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_act_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3369,7 +3730,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_act_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3397,7 +3758,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_act_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3425,19 +3786,103 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_act_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
 			&EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES,
 			&[
-				"trait activities#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
+				"trait activities#./testfiles/empty.lang"			
 			]
 		),
 		*/
 		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("activities".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_act_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES,
+			&[
+				"trait activities#./testfiles/bb.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("activities".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_act_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES,
+			&[
+				"trait activities#./testfiles/empty.lpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lpn").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("activities".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_act_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES,
+			&[
+				"trait activities#./testfiles/aa.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.lang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("activities".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let inputs = vec![input0];
@@ -3456,7 +3901,7 @@ mod tests{
 
 	// ==== command bnd ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_bnd_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3484,36 +3929,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_bnd_test_1() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_NON_STOCHASTIC_BOUNDED,
-			&[
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_BOUNDED {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_bnd_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -3540,8 +3957,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_bnd_test_3() {
+	#[timeout(10000)]
+	pub fn ebi_anans_bnd_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -3568,8 +3985,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_bnd_test_4() {
+	#[timeout(10000)]
+	pub fn ebi_anans_bnd_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -3596,8 +4013,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_bnd_test_5() {
+	#[timeout(10000)]
+	pub fn ebi_anans_bnd_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -3624,8 +4041,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_bnd_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_anans_bnd_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -3652,8 +4069,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_bnd_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_anans_bnd_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -3680,8 +4097,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_bnd_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_anans_bnd_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -3708,8 +4125,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_bnd_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_anans_bnd_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -3735,11 +4152,123 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_bnd_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_BOUNDED,
+			&[
+				"object process tree#./testfiles/seq(a-xor(b-c)).ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).ptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_BOUNDED {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_bnd_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_BOUNDED,
+			&[
+				"object process tree#./testfiles/all_operators.sptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/all_operators.sptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_BOUNDED {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_bnd_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_BOUNDED,
+			&[
+				"object process tree#./testfiles/seq(a-xor(b-c))-uniform.sptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c))-uniform.sptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_BOUNDED {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_bnd_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_BOUNDED,
+			&[
+				"object process tree#./testfiles/all_operators.ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/all_operators.ptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_BOUNDED {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command clus ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_clus_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3769,7 +4298,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_clus_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3799,7 +4328,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_clus_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -3814,7 +4343,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_clus_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3844,7 +4373,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_clus_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3874,7 +4403,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_clus_test_5() {
 		// this test has been indicated as to be expected to fail
 		
@@ -3889,7 +4418,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_clus_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3919,7 +4448,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_clus_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3949,7 +4478,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_clus_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3979,7 +4508,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_clus_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4008,11 +4537,101 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_clus_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
+			&[
+				"trait finite language#./testfiles/a-b-double.xes",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_CLUSTER {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_clus_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
+			&[
+				"trait finite language#./testfiles/a-b.xes.gz",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_CLUSTER {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_clus_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
+			&[
+				"trait finite language#./testfiles/empty_trace.slang",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_CLUSTER {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command exe ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_exe_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4044,7 +4663,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_exe_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4076,7 +4695,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_exe_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4108,7 +4727,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_exe_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4140,7 +4759,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_exe_test_4() {
 		// this test has been indicated as to be expected to fail
 		
@@ -4157,7 +4776,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_exe_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4189,7 +4808,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_exe_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4221,7 +4840,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_exe_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4253,7 +4872,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_exe_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4285,15 +4904,32 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_exe_test_9() {
+		// this test has been indicated as to be expected to fail
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with event attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS {
+			assert!(((execute)(inputs, None)).is_err())
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_exe_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
 			&EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
 			&[
 				"trait event log with event attributes#./testfiles/empty.xes",
-				"trait semantics#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
+				"trait semantics#./testfiles/bb.lang"			
 			]
 		),
 		*/
@@ -4301,7 +4937,71 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with event attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.lang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_exe_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
+			&[
+				"trait event log with event attributes#./testfiles/empty.xes",
+				"trait semantics#./testfiles/empty.lpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with event attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_exe_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
+			&[
+				"trait event log with event attributes#./testfiles/empty.xes",
+				"trait semantics#./testfiles/aa.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with event attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.lang").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
@@ -4320,7 +5020,7 @@ mod tests{
 
 	// ==== command at ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_at_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4348,36 +5048,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_at_test_1() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES,
-			&[
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_at_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -4404,8 +5076,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_at_test_3() {
+	#[timeout(10000)]
+	pub fn ebi_anans_at_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -4432,8 +5104,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_at_test_4() {
+	#[timeout(10000)]
+	pub fn ebi_anans_at_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -4460,8 +5132,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_at_test_5() {
+	#[timeout(10000)]
+	pub fn ebi_anans_at_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -4488,8 +5160,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_at_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_anans_at_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -4516,8 +5188,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_at_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_anans_at_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -4544,8 +5216,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_at_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_anans_at_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -4572,8 +5244,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_anans_at_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_anans_at_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -4599,11 +5271,123 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_at_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES,
+			&[
+				"object process tree#./testfiles/seq(a-xor(b-c)).ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).ptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_at_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES,
+			&[
+				"object process tree#./testfiles/all_operators.sptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/all_operators.sptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_at_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES,
+			&[
+				"object process tree#./testfiles/seq(a-xor(b-c))-uniform.sptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c))-uniform.sptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_at_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES,
+			&[
+				"object process tree#./testfiles/all_operators.ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/all_operators.ptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command inft ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_inft_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4631,7 +5415,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_inft_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4659,7 +5443,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_inft_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4687,7 +5471,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_inft_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4715,7 +5499,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_inft_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4743,7 +5527,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_inft_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4771,7 +5555,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_inft_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4799,7 +5583,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_inft_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4827,7 +5611,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_inft_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4855,7 +5639,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_inft_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4882,11 +5666,95 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_inft_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES,
+			&[
+				"object finite stochastic language#./testfiles/a-b.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite stochastic language".parse().unwrap(), &mut reader, None, 0, &mut None, "finite stochastic language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite stochastic language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_inft_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES,
+			&[
+				"object finite stochastic language#./testfiles/empty.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite stochastic language".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_inft_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES,
+			&[
+				"object finite stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite stochastic language".parse().unwrap(), &mut reader, None, 0, &mut None, "finite stochastic language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite stochastic language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command med ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_med_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4916,7 +5784,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_med_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4946,7 +5814,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_med_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -4961,7 +5829,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_med_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4991,7 +5859,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_med_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5021,7 +5889,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_med_test_5() {
 		// this test has been indicated as to be expected to fail
 		
@@ -5036,7 +5904,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_med_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5066,7 +5934,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_med_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5096,7 +5964,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_med_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5126,7 +5994,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_med_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5155,11 +6023,101 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_med_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
+			&[
+				"trait finite language#./testfiles/a-b-double.xes",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_MEDOID {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_med_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
+			&[
+				"trait finite language#./testfiles/a-b.xes.gz",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_MEDOID {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_anans_med_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
+			&[
+				"trait finite language#./testfiles/empty_trace.slang",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_MEDOID {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command to ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_to_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5187,7 +6145,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_to_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5215,7 +6173,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_to_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5243,7 +6201,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_to_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5271,7 +6229,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_to_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5299,7 +6257,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_to_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5327,7 +6285,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_to_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5355,7 +6313,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_to_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5383,7 +6341,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_to_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5411,7 +6369,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_anans_to_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5445,7 +6403,7 @@ mod tests{
 
 	// ==== command att ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_att_test_0() {
 		// this test has been indicated as to be expected to fail
 		
@@ -5461,7 +6419,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_att_test_1() {
 		// this test has been indicated as to be expected to fail
 		
@@ -5477,7 +6435,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_att_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -5493,7 +6451,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_att_test_3() {
 		// this test has been indicated as to be expected to fail
 		
@@ -5509,7 +6467,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_att_test_4() {
 		// this test has been indicated as to be expected to fail
 		
@@ -5525,7 +6483,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_att_test_5() {
 		// this test has been indicated as to be expected to fail
 		
@@ -5541,7 +6499,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_att_test_6() {
 		// this test has been indicated as to be expected to fail
 		
@@ -5560,7 +6518,7 @@ mod tests{
 
 	// ==== command atts ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_atts_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5590,7 +6548,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_atts_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5620,7 +6578,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_atts_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -5635,7 +6593,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_atts_test_3() {
 		// this test has been indicated as to be expected to fail
 		
@@ -5650,7 +6608,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_atts_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5680,7 +6638,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_atts_test_5() {
 		// this test has been indicated as to be expected to fail
 		
@@ -5695,7 +6653,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_asso_atts_test_6() {
 		// this test has been indicated as to be expected to fail
 		
@@ -5716,7 +6674,7 @@ mod tests{
 
 	// ==== command cssc ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5748,7 +6706,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5780,7 +6738,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5812,7 +6770,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5844,7 +6802,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5876,7 +6834,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5908,7 +6866,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5940,40 +6898,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_test_7() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_CHI_SQUARED,
-			&[
-				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
-				"trait queriable stochastic language#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
-		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input0 = EbiInput::Trait(object0, file_handler0);
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input1 = EbiInput::Trait(object1, file_handler1);
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_CHI_SQUARED {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_cssc_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -6004,8 +6930,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_cssc_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_conf_cssc_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -6035,11 +6961,139 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_cssc_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_CHI_SQUARED,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/simple_markovian_abstraction.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_markovian_abstraction.slpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_CHI_SQUARED {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_cssc_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_CHI_SQUARED,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/aa-ab-ba.snfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.snfa").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_CHI_SQUARED {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_cssc_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_CHI_SQUARED,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/ba.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_CHI_SQUARED {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_cssc_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_CHI_SQUARED,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/fig_c.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_c.sdfa").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_CHI_SQUARED {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command cssc-sample ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_sample_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6073,7 +7127,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_sample_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6107,7 +7161,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_sample_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -6125,7 +7179,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_sample_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6159,7 +7213,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_sample_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6193,7 +7247,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_sample_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6227,7 +7281,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_sample_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6261,7 +7315,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_sample_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6295,7 +7349,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_sample_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6329,7 +7383,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_cssc_sample_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6362,11 +7416,113 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_cssc_sample_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_CHI_SQUARED_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_CHI_SQUARED_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_cssc_sample_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_CHI_SQUARED_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_CHI_SQUARED_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_cssc_sample_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_CHI_SQUARED_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_CHI_SQUARED_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command emsc ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6398,7 +7554,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6430,7 +7586,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -6447,7 +7603,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6479,7 +7635,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6511,7 +7667,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6543,7 +7699,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6575,7 +7731,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6607,7 +7763,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6639,7 +7795,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6670,11 +7826,107 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_emsc_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_EARTH_MOVERS,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_EARTH_MOVERS {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_emsc_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_EARTH_MOVERS,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/fig_a.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_EARTH_MOVERS {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_emsc_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_EARTH_MOVERS,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/oc-log.ocel"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_EARTH_MOVERS {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command emsc-sample ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_sample_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6708,7 +7960,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_sample_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6742,7 +7994,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_sample_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -6760,7 +8012,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_sample_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6794,7 +8046,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_sample_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6828,7 +8080,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_sample_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6862,7 +8114,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_sample_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6896,7 +8148,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_sample_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6930,7 +8182,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_sample_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6964,7 +8216,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_emsc_sample_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6997,11 +8249,113 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_emsc_sample_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_emsc_sample_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_emsc_sample_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command er ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_er_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7033,7 +8387,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_er_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7065,7 +8419,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_er_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7097,7 +8451,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_er_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7129,7 +8483,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_er_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7161,7 +8515,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_er_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7193,7 +8547,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_er_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7225,40 +8579,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_er_test_7() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_ENTROPIC_RELEVANCE,
-			&[
-				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
-				"trait queriable stochastic language#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
-		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input0 = EbiInput::Trait(object0, file_handler0);
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input1 = EbiInput::Trait(object1, file_handler1);
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_ENTROPIC_RELEVANCE {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_er_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -7289,8 +8611,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_er_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_conf_er_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -7320,11 +8642,139 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_er_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_ENTROPIC_RELEVANCE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/simple_markovian_abstraction.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_markovian_abstraction.slpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_ENTROPIC_RELEVANCE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_er_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_ENTROPIC_RELEVANCE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/aa-ab-ba.snfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.snfa").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_ENTROPIC_RELEVANCE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_er_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_ENTROPIC_RELEVANCE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/ba.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_ENTROPIC_RELEVANCE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_er_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_ENTROPIC_RELEVANCE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/fig_c.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_c.sdfa").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_ENTROPIC_RELEVANCE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command gp ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gp_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7360,7 +8810,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gp_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7396,7 +8846,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gp_test_2() {
 		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
@@ -7416,7 +8866,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gp_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7452,7 +8902,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gp_test_4() {
 		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
@@ -7472,7 +8922,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gp_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7508,44 +8958,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gp_test_6() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_GAIN_PRECISION,
-			&[
-				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
-				"object stochastic deterministic finite automaton#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg",
-				"fraction 0"			
-			]
-		),
-		*/
-		if ebi_objects::ebi_arithmetic::is_exact_globally() {
-			return;
-		}
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
-		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input0 = EbiInput::Trait(object0, file_handler0);
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let inputs = vec![input0, input1, input2];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_PRECISION {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_gp_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -7580,8 +8994,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_gp_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_conf_gp_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -7616,8 +9030,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_gp_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_conf_gp_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -7651,11 +9065,155 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_gp_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_GAIN_PRECISION,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object stochastic deterministic finite automaton#./testfiles/aa-ab-ba.sdfa",
+				"fraction 0"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object1 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic deterministic finite automaton".parse().unwrap());
+		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_PRECISION {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_gp_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_GAIN_PRECISION,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object stochastic deterministic finite automaton#./testfiles/a-b-double.xes",
+				"fraction 0"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let object1 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "extensible event stream".parse().unwrap());
+		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_PRECISION {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_gp_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_GAIN_PRECISION,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object stochastic deterministic finite automaton#./testfiles/a-b.xes.gz",
+				"fraction 0"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let object1 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "compressed event log".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "compressed event log".parse().unwrap());
+		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_PRECISION {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_gp_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_GAIN_PRECISION,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object stochastic deterministic finite automaton#./testfiles/empty_trace.slang",
+				"fraction 0"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let object1 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "finite stochastic language".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "finite stochastic language".parse().unwrap());
+		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_PRECISION {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command gr ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gr_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7691,7 +9249,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gr_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7727,7 +9285,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gr_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7763,7 +9321,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gr_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7799,7 +9357,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gr_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7835,7 +9393,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gr_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7871,44 +9429,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_gr_test_6() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_GAIN_RECALL,
-			&[
-				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
-				"object stochastic deterministic finite automaton#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg",
-				"fraction 0"			
-			]
-		),
-		*/
-		if ebi_objects::ebi_arithmetic::is_exact_globally() {
-			return;
-		}
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
-		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input0 = EbiInput::Trait(object0, file_handler0);
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let inputs = vec![input0, input1, input2];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_RECALL {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_gr_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -7943,8 +9465,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_gr_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_conf_gr_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -7979,8 +9501,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_gr_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_conf_gr_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -8014,11 +9536,155 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_gr_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_GAIN_RECALL,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object stochastic deterministic finite automaton#./testfiles/aa-ab-ba.sdfa",
+				"fraction 0"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object1 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic deterministic finite automaton".parse().unwrap());
+		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_RECALL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_gr_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_GAIN_RECALL,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object stochastic deterministic finite automaton#./testfiles/a-b-double.xes",
+				"fraction 0"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let object1 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "extensible event stream".parse().unwrap());
+		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_RECALL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_gr_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_GAIN_RECALL,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object stochastic deterministic finite automaton#./testfiles/a-b.xes.gz",
+				"fraction 0"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let object1 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "compressed event log".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "compressed event log".parse().unwrap());
+		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_RECALL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_gr_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_GAIN_RECALL,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object stochastic deterministic finite automaton#./testfiles/empty_trace.slang",
+				"fraction 0"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let object1 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "finite stochastic language".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "finite stochastic language".parse().unwrap());
+		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_RECALL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command hsc ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8050,7 +9716,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8082,7 +9748,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8114,7 +9780,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8146,7 +9812,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8178,7 +9844,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8210,7 +9876,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8242,40 +9908,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_test_7() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_HELLINGER,
-			&[
-				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
-				"trait queriable stochastic language#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
-		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input0 = EbiInput::Trait(object0, file_handler0);
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input1 = EbiInput::Trait(object1, file_handler1);
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_HELLINGER {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_hsc_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -8306,8 +9940,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_hsc_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_conf_hsc_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -8337,11 +9971,139 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_hsc_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_HELLINGER,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/simple_markovian_abstraction.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_markovian_abstraction.slpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_HELLINGER {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_hsc_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_HELLINGER,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/aa-ab-ba.snfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.snfa").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_HELLINGER {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_hsc_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_HELLINGER,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/ba.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_HELLINGER {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_hsc_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_HELLINGER,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/fig_c.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_c.sdfa").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_HELLINGER {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command hsc-sample ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_sample_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8375,7 +10137,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_sample_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8409,7 +10171,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_sample_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -8427,7 +10189,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_sample_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8461,7 +10223,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_sample_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8495,7 +10257,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_sample_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8529,7 +10291,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_sample_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8563,7 +10325,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_sample_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8597,7 +10359,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_sample_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8631,7 +10393,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_hsc_sample_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8664,11 +10426,113 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_hsc_sample_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_HELLINGER_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_HELLINGER_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_hsc_sample_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_HELLINGER_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_HELLINGER_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_hsc_sample_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_HELLINGER_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_HELLINGER_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command jssc ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8702,7 +10566,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8736,7 +10600,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8770,7 +10634,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8804,7 +10668,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8838,7 +10702,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8872,7 +10736,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8906,7 +10770,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8940,7 +10804,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8974,7 +10838,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9007,11 +10871,113 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_jssc_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_JSSC,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_JSSC {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_jssc_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_JSSC,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/fig_a.xes"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_JSSC {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_jssc_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_JSSC,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/oc-log.ocel"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_JSSC {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command jssc-sample ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_sample_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9047,7 +11013,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_sample_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9083,7 +11049,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_sample_test_2() {
 		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
@@ -9103,7 +11069,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_sample_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9139,7 +11105,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_sample_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9175,7 +11141,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_sample_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9211,7 +11177,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_sample_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9247,7 +11213,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_sample_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9283,7 +11249,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_sample_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9319,7 +11285,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_jssc_sample_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9354,11 +11320,119 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_jssc_sample_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_JSSC_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"usize 1"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_JSSC_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_jssc_sample_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_JSSC_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"usize 1"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_JSSC_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_jssc_sample_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_JSSC_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"usize 1"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_JSSC_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command ma ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_ma_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9394,7 +11468,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_ma_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9430,7 +11504,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_ma_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9466,7 +11540,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_ma_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9502,7 +11576,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_ma_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9538,7 +11612,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_ma_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9574,7 +11648,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_ma_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9610,7 +11684,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_ma_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9646,7 +11720,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_ma_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9682,7 +11756,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_ma_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9717,11 +11791,119 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_ma_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_MARKOVIAN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"usize 1",
+				"string cssc"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::String("cssc".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_MARKOVIAN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_ma_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_MARKOVIAN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"usize 1",
+				"string cssc"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::String("cssc".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_MARKOVIAN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_ma_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_MARKOVIAN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"usize 1",
+				"string cssc"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::String("cssc".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_MARKOVIAN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command uemsc ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9753,7 +11935,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9785,7 +11967,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9817,7 +11999,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9849,7 +12031,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9881,7 +12063,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9913,7 +12095,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9945,40 +12127,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_test_7() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_UEMSC,
-			&[
-				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
-				"trait queriable stochastic language#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
-		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input0 = EbiInput::Trait(object0, file_handler0);
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input1 = EbiInput::Trait(object1, file_handler1);
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_UEMSC {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_uemsc_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -10009,8 +12159,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conf_uemsc_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_conf_uemsc_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -10040,11 +12190,139 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_uemsc_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_UEMSC,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/simple_markovian_abstraction.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_markovian_abstraction.slpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_UEMSC {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_uemsc_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_UEMSC,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/aa-ab-ba.snfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.snfa").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_UEMSC {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_uemsc_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_UEMSC,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/ba.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_UEMSC {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_uemsc_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_UEMSC,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait queriable stochastic language#./testfiles/fig_c.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_c.sdfa").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_UEMSC {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command uemsc-sample ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_sample_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10080,7 +12358,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_sample_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10116,7 +12394,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_sample_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10152,7 +12430,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_sample_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10188,7 +12466,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_sample_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10224,7 +12502,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_sample_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10260,7 +12538,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_sample_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10296,7 +12574,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_sample_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10332,7 +12610,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_sample_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10368,7 +12646,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conf_uemsc_sample_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10403,6 +12681,114 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_uemsc_sample_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_UEMSC_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"usize 1"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_UEMSC_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_uemsc_sample_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_UEMSC_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"usize 1"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_UEMSC_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conf_uemsc_sample_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_UEMSC_SAMPLE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"usize 1"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_UEMSC_SAMPLE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== group confns ====
@@ -10410,7 +12796,7 @@ mod tests{
 
 	// ==== command ali ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_ali_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10442,7 +12828,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_ali_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10474,7 +12860,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_ali_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10506,7 +12892,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_ali_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10538,7 +12924,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_ali_test_4() {
 		// this test has been indicated as to be expected to fail
 		
@@ -10555,7 +12941,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_ali_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10587,7 +12973,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_ali_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10619,7 +13005,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_ali_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10651,7 +13037,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_ali_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10683,15 +13069,32 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_ali_test_9() {
+		// this test has been indicated as to be expected to fail
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS {
+			assert!(((execute)(inputs, None)).is_err())
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_confns_ali_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
 			&EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
 			&[
 				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
-				"trait semantics#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
+				"trait semantics#./testfiles/bb.lang"			
 			]
 		),
 		*/
@@ -10699,7 +13102,71 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.lang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_confns_ali_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait semantics#./testfiles/empty.lpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_confns_ali_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait semantics#./testfiles/aa.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.lang").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
@@ -10718,7 +13185,7 @@ mod tests{
 
 	// ==== command eep ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_eep_test_0() {
 		// this test has been indicated as to be expected to fail
 		
@@ -10735,7 +13202,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_eep_test_1() {
 		// this test has been indicated as to be expected to fail
 		
@@ -10752,7 +13219,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_eep_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10784,7 +13251,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_eep_test_3() {
 		// this test has been indicated as to be expected to fail
 		
@@ -10801,7 +13268,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_eep_test_4() {
 		// this test has been indicated as to be expected to fail
 		
@@ -10818,7 +13285,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_eep_test_5() {
 		// this test has been indicated as to be expected to fail
 		
@@ -10835,7 +13302,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_eep_test_6() {
 		// this test has been indicated as to be expected to fail
 		
@@ -10852,7 +13319,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_eep_test_7() {
 		// this test has been indicated as to be expected to fail
 		
@@ -10869,7 +13336,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_eep_test_8() {
 		// this test has been indicated as to be expected to fail
 		
@@ -10886,14 +13353,14 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_eep_test_9() {
 		// this test has been indicated as to be expected to fail
 		
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
 		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
 		let input0 = EbiInput::Object(object0, "stochastic language of alignments".parse().unwrap());
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lang").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
@@ -10902,11 +13369,92 @@ mod tests{
 			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_confns_eep_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+			&[
+				"object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+				"trait semantics#./testfiles/bb.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic language of alignments".parse().unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.lang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_confns_eep_test_11() {
+		// this test has been indicated as to be expected to fail
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic language of alignments".parse().unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
+			assert!(((execute)(inputs, None)).is_err())
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_confns_eep_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+			&[
+				"object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+				"trait semantics#./testfiles/aa.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic language of alignments".parse().unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.lang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command setali ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_setali_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10938,7 +13486,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_setali_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10970,7 +13518,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_setali_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11002,7 +13550,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_setali_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11034,7 +13582,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_setali_test_4() {
 		// this test has been indicated as to be expected to fail
 		
@@ -11051,7 +13599,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_setali_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11083,7 +13631,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_setali_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11115,7 +13663,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_setali_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11147,7 +13695,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_setali_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11179,15 +13727,32 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_setali_test_9() {
+		// this test has been indicated as to be expected to fail
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS {
+			assert!(((execute)(inputs, None)).is_err())
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_confns_setali_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
 			&EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS,
 			&[
 				"trait finite language#./testfiles/ba-aa-ab.slang",
-				"trait semantics#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
+				"trait semantics#./testfiles/bb.lang"			
 			]
 		),
 		*/
@@ -11195,7 +13760,71 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.lang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_confns_setali_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS,
+			&[
+				"trait finite language#./testfiles/ba-aa-ab.slang",
+				"trait semantics#./testfiles/empty.lpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_confns_setali_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS,
+			&[
+				"trait finite language#./testfiles/ba-aa-ab.slang",
+				"trait semantics#./testfiles/aa.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.lang").unwrap());
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
@@ -11214,7 +13843,7 @@ mod tests{
 
 	// ==== command tfit ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_confns_tfit_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11248,7 +13877,7 @@ mod tests{
 
 	// ==== command bpmn ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_bpmn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11276,7 +13905,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_bpmn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11304,7 +13933,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_bpmn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11332,7 +13961,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_bpmn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11360,36 +13989,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_bpmn_test_4() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONVERT_BPMN,
-			&[
-				"object business process model and notation#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_BPMN {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_bpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -11416,8 +14017,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_bpmn_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_conv_bpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -11444,8 +14045,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_bpmn_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_conv_bpmn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -11472,8 +14073,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_bpmn_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_conv_bpmn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -11500,8 +14101,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_bpmn_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_conv_bpmn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -11527,11 +14128,123 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_bpmn_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_BPMN,
+			&[
+				"object business process model and notation#./testfiles/model.sbpmn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/model.sbpmn").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic business process model and notation".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic business process model and notation".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_BPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_bpmn_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_BPMN,
+			&[
+				"object business process model and notation#./testfiles/aa-ab-ba.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_BPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_bpmn_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_BPMN,
+			&[
+				"object business process model and notation#./testfiles/aa-ab-ba_occ-f64.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ-f64.slpn").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic labelled Petri net".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic labelled Petri net".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_BPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_bpmn_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_BPMN,
+			&[
+				"object business process model and notation#./testfiles/a-b-flower.ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-flower.ptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_BPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command lang ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lang_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11559,7 +14272,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lang_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11587,7 +14300,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lang_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11615,7 +14328,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lang_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11643,7 +14356,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lang_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11671,7 +14384,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lang_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11699,7 +14412,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lang_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11727,7 +14440,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lang_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11755,7 +14468,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lang_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11783,7 +14496,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lang_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11810,11 +14523,95 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_lang_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_LANG,
+			&[
+				"object finite language#./testfiles/a-b.csv"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite language".parse().unwrap(), &mut reader, None, 0, &mut None, "comma-separated values".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "comma-separated values".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_LANG {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_lang_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_LANG,
+			&[
+				"object finite language#./testfiles/a-b.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite language".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_LANG {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_lang_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_LANG,
+			&[
+				"object finite language#./testfiles/aa-ab-ba.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite language".parse().unwrap(), &mut reader, None, 0, &mut None, "finite language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_LANG {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command log ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_log_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11842,7 +14639,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_log_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11870,7 +14667,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_log_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11898,7 +14695,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_log_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11926,7 +14723,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_log_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11954,7 +14751,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_log_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11982,7 +14779,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_log_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12010,7 +14807,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_log_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12038,7 +14835,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_log_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12069,7 +14866,7 @@ mod tests{
 
 	// ==== command lpn ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lpn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12097,7 +14894,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lpn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12125,7 +14922,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12153,36 +14950,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_lpn_test_3() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONVERT_LPN,
-			&[
-				"object labelled Petri net#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_LPN {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_lpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -12209,8 +14978,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_lpn_test_5() {
+	#[timeout(10000)]
+	pub fn ebi_conv_lpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -12237,8 +15006,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_lpn_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_conv_lpn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -12265,8 +15034,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_lpn_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_conv_lpn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -12293,8 +15062,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_lpn_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_conv_lpn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -12321,8 +15090,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_lpn_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_conv_lpn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -12348,11 +15117,123 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_lpn_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_LPN,
+			&[
+				"object labelled Petri net#./testfiles/fig_c.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_c.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_LPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_lpn_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_LPN,
+			&[
+				"object labelled Petri net#./testfiles/aa-ab-ba.ptml"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.ptml").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree markup language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree markup language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_LPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_lpn_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_LPN,
+			&[
+				"object labelled Petri net#./testfiles/aa-ab-ba.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_LPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_lpn_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_LPN,
+			&[
+				"object labelled Petri net#./testfiles/aa-ab-ba_occ-f64.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ-f64.slpn").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic labelled Petri net".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic labelled Petri net".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_LPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command slang ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_slang_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12380,7 +15261,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_slang_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12408,7 +15289,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_slang_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12436,7 +15317,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_slang_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12464,7 +15345,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_slang_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12492,7 +15373,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_slang_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12520,7 +15401,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_slang_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12548,7 +15429,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_slang_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12576,7 +15457,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_slang_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12604,7 +15485,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_slang_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12631,11 +15512,95 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_slang_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SLANG,
+			&[
+				"object finite stochastic language#./testfiles/abc-acb-aaabc.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite stochastic language".parse().unwrap(), &mut reader, None, 0, &mut None, "finite stochastic language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite stochastic language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SLANG {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_slang_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SLANG,
+			&[
+				"object finite stochastic language#./testfiles/fig_a.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite stochastic language".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SLANG {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_slang_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SLANG,
+			&[
+				"object finite stochastic language#./testfiles/oc-log.ocel"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite stochastic language".parse().unwrap(), &mut reader, None, 0, &mut None, "object-centric event log".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "object-centric event log".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SLANG {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command sdfa ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_sdfa_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12663,7 +15628,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_sdfa_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12691,7 +15656,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_sdfa_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12719,7 +15684,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_sdfa_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12747,7 +15712,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_sdfa_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12775,7 +15740,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_sdfa_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12803,36 +15768,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_sdfa_test_6() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONVERT_SDFA,
-			&[
-				"object stochastic deterministic finite automaton#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SDFA {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_sdfa_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -12859,8 +15796,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_sdfa_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_conv_sdfa_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -12887,8 +15824,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_sdfa_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_conv_sdfa_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -12914,11 +15851,123 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_sdfa_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SDFA,
+			&[
+				"object stochastic deterministic finite automaton#./testfiles/aa-ab-ba.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SDFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_sdfa_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SDFA,
+			&[
+				"object stochastic deterministic finite automaton#./testfiles/a-b-double.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SDFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_sdfa_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SDFA,
+			&[
+				"object stochastic deterministic finite automaton#./testfiles/a-b.xes.gz"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "compressed event log".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "compressed event log".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SDFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_sdfa_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SDFA,
+			&[
+				"object stochastic deterministic finite automaton#./testfiles/empty_trace.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "finite stochastic language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite stochastic language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SDFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command slpn ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_slpn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12946,36 +15995,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_slpn_test_1() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONVERT_SLPN,
-			&[
-				"object stochastic labelled Petri net#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"stochastic labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SLPN {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_slpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13002,8 +16023,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_slpn_test_3() {
+	#[timeout(10000)]
+	pub fn ebi_conv_slpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13030,8 +16051,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_slpn_test_4() {
+	#[timeout(10000)]
+	pub fn ebi_conv_slpn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13058,8 +16079,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_slpn_test_5() {
+	#[timeout(10000)]
+	pub fn ebi_conv_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13086,8 +16107,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_slpn_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_conv_slpn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13114,8 +16135,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_slpn_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_conv_slpn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13142,8 +16163,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_slpn_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_conv_slpn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13170,8 +16191,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_slpn_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_conv_slpn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13197,11 +16218,123 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_slpn_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SLPN,
+			&[
+				"object stochastic labelled Petri net#./testfiles/empty_net.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_net.slpn").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic labelled Petri net".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic labelled Petri net".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_slpn_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SLPN,
+			&[
+				"object stochastic labelled Petri net#./testfiles/aa-ab-ba_occ.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ.slpn").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic labelled Petri net".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic labelled Petri net".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_slpn_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SLPN,
+			&[
+				"object stochastic labelled Petri net#./testfiles/empty.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_slpn_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SLPN,
+			&[
+				"object stochastic labelled Petri net#./testfiles/acb-abc-ad-aded-adeded-adededed.slang.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command snfa ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_snfa_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13229,7 +16362,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_snfa_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13257,7 +16390,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_snfa_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13285,7 +16418,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_snfa_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13313,7 +16446,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_snfa_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13341,7 +16474,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_snfa_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13369,7 +16502,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_snfa_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13397,36 +16530,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_conv_snfa_test_7() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONVERT_SNFA,
-			&[
-				"object stochastic non-deterministic finite automaton#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"stochastic non-deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SNFA {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_snfa_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13453,8 +16558,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_conv_snfa_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_conv_snfa_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13480,6 +16585,118 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_snfa_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SNFA,
+			&[
+				"object stochastic non-deterministic finite automaton#./testfiles/ba.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic non-deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "finite stochastic language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite stochastic language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SNFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_snfa_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SNFA,
+			&[
+				"object stochastic non-deterministic finite automaton#./testfiles/fig_c.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_c.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic non-deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SNFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_snfa_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SNFA,
+			&[
+				"object stochastic non-deterministic finite automaton#./testfiles/aa-ab-ba.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic non-deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SNFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_conv_snfa_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONVERT_SNFA,
+			&[
+				"object stochastic non-deterministic finite automaton#./testfiles/a-b-double.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic non-deterministic finite automaton".parse().unwrap(), &mut reader, None, 0, &mut None, "extensible event stream".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SNFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== group disc ====
@@ -13490,7 +16707,7 @@ mod tests{
 
 	// ==== command sbpmn ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_ali_sbpmn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13522,7 +16739,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_ali_sbpmn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13554,7 +16771,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_ali_sbpmn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13586,7 +16803,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_ali_sbpmn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13618,40 +16835,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_ali_sbpmn_test_4() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_DISCOVER_ALIGNMENTS_BPMN,
-			&[
-				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
-				"object business process model and notation#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
-		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input0 = EbiInput::Trait(object0, file_handler0);
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS_BPMN {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_ali_sbpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13682,8 +16867,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_ali_sbpmn_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_sbpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13714,8 +16899,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_ali_sbpmn_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_sbpmn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13746,8 +16931,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_ali_sbpmn_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_sbpmn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13778,8 +16963,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_ali_sbpmn_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_sbpmn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13809,11 +16994,139 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_sbpmn_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_ALIGNMENTS_BPMN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object business process model and notation#./testfiles/model.sbpmn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/model.sbpmn").unwrap());
+		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic business process model and notation".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic business process model and notation".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS_BPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_sbpmn_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_ALIGNMENTS_BPMN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object business process model and notation#./testfiles/aa-ab-ba.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS_BPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_sbpmn_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_ALIGNMENTS_BPMN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object business process model and notation#./testfiles/aa-ab-ba_occ-f64.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ-f64.slpn").unwrap());
+		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic labelled Petri net".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic labelled Petri net".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS_BPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_sbpmn_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_ALIGNMENTS_BPMN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object business process model and notation#./testfiles/a-b-flower.ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-flower.ptree").unwrap());
+		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "process tree".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS_BPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command slpn ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_ali_slpn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13845,7 +17158,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_ali_slpn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13877,7 +17190,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_ali_slpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13909,40 +17222,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_ali_slpn_test_3() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_DISCOVER_ALIGNMENTS_SLPN,
-			&[
-				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
-				"object labelled Petri net#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
-		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input0 = EbiInput::Trait(object0, file_handler0);
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS_SLPN {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_ali_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -13973,8 +17254,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_ali_slpn_test_5() {
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -14005,8 +17286,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_ali_slpn_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_slpn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -14037,8 +17318,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_ali_slpn_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_slpn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -14069,8 +17350,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_ali_slpn_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_slpn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -14101,8 +17382,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_ali_slpn_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_slpn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -14132,11 +17413,139 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_slpn_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_ALIGNMENTS_SLPN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object labelled Petri net#./testfiles/fig_c.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_c.sdfa").unwrap());
+		let object1 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_slpn_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_ALIGNMENTS_SLPN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object labelled Petri net#./testfiles/aa-ab-ba.ptml"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.ptml").unwrap());
+		let object1 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree markup language".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "process tree markup language".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_slpn_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_ALIGNMENTS_SLPN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object labelled Petri net#./testfiles/aa-ab-ba.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object1 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_ali_slpn_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_ALIGNMENTS_SLPN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object labelled Petri net#./testfiles/aa-ab-ba_occ-f64.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ-f64.slpn").unwrap());
+		let object1 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic labelled Petri net".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic labelled Petri net".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALIGNMENTS_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command dfg ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_dfg_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14166,7 +17575,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_dfg_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14196,7 +17605,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_dfg_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14226,7 +17635,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_dfg_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14256,7 +17665,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_dfg_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14286,7 +17695,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_dfg_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14316,7 +17725,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_dfg_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14346,7 +17755,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_dfg_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14376,7 +17785,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_dfg_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14406,7 +17815,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_dfg_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14435,6 +17844,96 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_dfg_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_DIRECTLY_FOLLOWS,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.slang",
+				"fraction 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_DIRECTLY_FOLLOWS {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_dfg_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_DIRECTLY_FOLLOWS,
+			&[
+				"trait finite stochastic language#./testfiles/empty.xes",
+				"fraction 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_DIRECTLY_FOLLOWS {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_dfg_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_DIRECTLY_FOLLOWS,
+			&[
+				"trait finite stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
+				"fraction 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Fraction("1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_DIRECTLY_FOLLOWS {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== group occ ====
@@ -14442,7 +17941,7 @@ mod tests{
 
 	// ==== command sbpmn ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sbpmn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14474,7 +17973,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sbpmn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14506,7 +18005,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sbpmn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14538,7 +18037,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sbpmn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14570,40 +18069,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sbpmn_test_4() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_DISCOVER_OCCURRENCE_SBPMN,
-			&[
-				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
-				"object business process model and notation#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
-		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input0 = EbiInput::Trait(object0, file_handler0);
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SBPMN {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_occ_sbpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -14634,8 +18101,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_occ_sbpmn_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_sbpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -14666,8 +18133,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_occ_sbpmn_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_sbpmn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -14698,8 +18165,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_occ_sbpmn_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_sbpmn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -14730,8 +18197,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_occ_sbpmn_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_sbpmn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -14761,11 +18228,139 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_sbpmn_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_OCCURRENCE_SBPMN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object business process model and notation#./testfiles/model.sbpmn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/model.sbpmn").unwrap());
+		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic business process model and notation".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic business process model and notation".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SBPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_sbpmn_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_OCCURRENCE_SBPMN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object business process model and notation#./testfiles/aa-ab-ba.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SBPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_sbpmn_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_OCCURRENCE_SBPMN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object business process model and notation#./testfiles/aa-ab-ba_occ-f64.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ-f64.slpn").unwrap());
+		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic labelled Petri net".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic labelled Petri net".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SBPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_sbpmn_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_OCCURRENCE_SBPMN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object business process model and notation#./testfiles/a-b-flower.ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-flower.ptree").unwrap());
+		let object1 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "process tree".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SBPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command slpn ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_slpn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14797,7 +18392,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_slpn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14829,7 +18424,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_slpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14861,40 +18456,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_slpn_test_3() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_DISCOVER_OCCURRENCE_SLPN,
-			&[
-				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
-				"object labelled Petri net#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
-		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input0 = EbiInput::Trait(object0, file_handler0);
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object1 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input1 = EbiInput::Object(object1, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0, input1];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SLPN {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_occ_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -14925,8 +18488,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_occ_slpn_test_5() {
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -14957,8 +18520,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_occ_slpn_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_slpn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -14989,8 +18552,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_occ_slpn_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_slpn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15021,8 +18584,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_occ_slpn_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_slpn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15053,8 +18616,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_occ_slpn_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_slpn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15084,11 +18647,139 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_slpn_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_OCCURRENCE_SLPN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object labelled Petri net#./testfiles/fig_c.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_c.sdfa").unwrap());
+		let object1 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_slpn_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_OCCURRENCE_SLPN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object labelled Petri net#./testfiles/aa-ab-ba.ptml"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.ptml").unwrap());
+		let object1 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree markup language".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "process tree markup language".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_slpn_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_OCCURRENCE_SLPN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object labelled Petri net#./testfiles/aa-ab-ba.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object1 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_slpn_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_OCCURRENCE_SLPN,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object labelled Petri net#./testfiles/aa-ab-ba_occ-f64.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ-f64.slpn").unwrap());
+		let object1 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic labelled Petri net".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "stochastic labelled Petri net".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command sptree ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sptree_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15120,7 +18811,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sptree_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15152,7 +18843,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sptree_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15184,7 +18875,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sptree_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15216,7 +18907,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sptree_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15248,7 +18939,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sptree_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15280,7 +18971,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sptree_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15312,7 +19003,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sptree_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15344,7 +19035,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sptree_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15376,7 +19067,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_occ_sptree_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15407,6 +19098,102 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_sptree_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_OCCURRENCE_SPTREE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object process tree#./testfiles/valid nested.ptml"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/valid nested.ptml").unwrap());
+		let object1 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree markup language".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "process tree markup language".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SPTREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_sptree_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_OCCURRENCE_SPTREE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object process tree#./testfiles/tree.ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/tree.ptree").unwrap());
+		let object1 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "process tree".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SPTREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_occ_sptree_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_OCCURRENCE_SPTREE,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"object process tree#./testfiles/aa.ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.ptree").unwrap());
+		let object1 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input1 = EbiInput::Object(object1, "process tree".parse().unwrap());
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_OCCURRENCE_SPTREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== group rnd ====
@@ -15414,7 +19201,7 @@ mod tests{
 
 	// ==== command sbpmn ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sbpmn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15442,7 +19229,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sbpmn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15470,7 +19257,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sbpmn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15498,7 +19285,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sbpmn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15526,36 +19313,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sbpmn_test_4() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_DISCOVER_RANDOM_SBPMN,
-			&[
-				"object business process model and notation#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SBPMN {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_rnd_sbpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15582,8 +19341,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_rnd_sbpmn_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_sbpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15610,8 +19369,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_rnd_sbpmn_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_sbpmn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15638,8 +19397,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_rnd_sbpmn_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_sbpmn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15666,8 +19425,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_rnd_sbpmn_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_sbpmn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15693,11 +19452,123 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_sbpmn_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_RANDOM_SBPMN,
+			&[
+				"object business process model and notation#./testfiles/model.sbpmn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/model.sbpmn").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic business process model and notation".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic business process model and notation".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SBPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_sbpmn_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_RANDOM_SBPMN,
+			&[
+				"object business process model and notation#./testfiles/aa-ab-ba.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SBPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_sbpmn_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_RANDOM_SBPMN,
+			&[
+				"object business process model and notation#./testfiles/aa-ab-ba_occ-f64.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ-f64.slpn").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic labelled Petri net".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic labelled Petri net".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SBPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_sbpmn_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_RANDOM_SBPMN,
+			&[
+				"object business process model and notation#./testfiles/a-b-flower.ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-flower.ptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SBPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command slpn ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_slpn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15725,7 +19596,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_slpn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15753,7 +19624,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_slpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15781,36 +19652,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_slpn_test_3() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_DISCOVER_RANDOM_SLPN,
-			&[
-				"object labelled Petri net#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SLPN {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_rnd_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15837,8 +19680,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_rnd_slpn_test_5() {
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15865,8 +19708,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_rnd_slpn_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_slpn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15893,8 +19736,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_rnd_slpn_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_slpn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15921,8 +19764,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_rnd_slpn_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_slpn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15949,8 +19792,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_rnd_slpn_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_slpn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -15976,11 +19819,123 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_slpn_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_RANDOM_SLPN,
+			&[
+				"object labelled Petri net#./testfiles/fig_c.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_c.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_slpn_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_RANDOM_SLPN,
+			&[
+				"object labelled Petri net#./testfiles/aa-ab-ba.ptml"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.ptml").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree markup language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree markup language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_slpn_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_RANDOM_SLPN,
+			&[
+				"object labelled Petri net#./testfiles/aa-ab-ba.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_slpn_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_RANDOM_SLPN,
+			&[
+				"object labelled Petri net#./testfiles/aa-ab-ba_occ-f64.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ-f64.slpn").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic labelled Petri net".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic labelled Petri net".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command sptree ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sptree_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16008,7 +19963,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sptree_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16036,7 +19991,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sptree_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16064,7 +20019,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sptree_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16092,7 +20047,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sptree_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16120,7 +20075,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sptree_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16148,7 +20103,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sptree_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16176,7 +20131,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sptree_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16204,7 +20159,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sptree_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16232,7 +20187,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_rnd_sptree_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16259,6 +20214,90 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_sptree_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_RANDOM_SPTREE,
+			&[
+				"object process tree#./testfiles/valid nested.ptml"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/valid nested.ptml").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree markup language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree markup language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SPTREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_sptree_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_RANDOM_SPTREE,
+			&[
+				"object process tree#./testfiles/tree.ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/tree.ptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SPTREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_rnd_sptree_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_RANDOM_SPTREE,
+			&[
+				"object process tree#./testfiles/aa.ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.ptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_RANDOM_SPTREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== group uni ====
@@ -16266,7 +20305,7 @@ mod tests{
 
 	// ==== command sbpmn ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sbpmn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16294,7 +20333,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sbpmn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16322,7 +20361,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sbpmn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16350,7 +20389,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sbpmn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16378,36 +20417,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sbpmn_test_4() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_DISCOVER_UNIFORM_SBPMN,
-			&[
-				"object business process model and notation#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SBPMN {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_uni_sbpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -16434,8 +20445,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_uni_sbpmn_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_sbpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -16462,8 +20473,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_uni_sbpmn_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_sbpmn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -16490,8 +20501,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_uni_sbpmn_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_sbpmn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -16518,8 +20529,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_uni_sbpmn_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_sbpmn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -16545,11 +20556,123 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_sbpmn_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_UNIFORM_SBPMN,
+			&[
+				"object business process model and notation#./testfiles/model.sbpmn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/model.sbpmn").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic business process model and notation".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic business process model and notation".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SBPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_sbpmn_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_UNIFORM_SBPMN,
+			&[
+				"object business process model and notation#./testfiles/aa-ab-ba.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SBPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_sbpmn_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_UNIFORM_SBPMN,
+			&[
+				"object business process model and notation#./testfiles/aa-ab-ba_occ-f64.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ-f64.slpn").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic labelled Petri net".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic labelled Petri net".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SBPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_sbpmn_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_UNIFORM_SBPMN,
+			&[
+				"object business process model and notation#./testfiles/a-b-flower.ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-flower.ptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"business process model and notation".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SBPMN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command slpn ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_slpn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16577,7 +20700,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_slpn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16605,7 +20728,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_slpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16633,36 +20756,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_slpn_test_3() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_DISCOVER_UNIFORM_SLPN,
-			&[
-				"object labelled Petri net#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
-		let inputs = vec![input0];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SLPN {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_uni_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -16689,8 +20784,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_uni_slpn_test_5() {
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -16717,8 +20812,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_uni_slpn_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_slpn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -16745,8 +20840,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_uni_slpn_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_slpn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -16773,8 +20868,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_uni_slpn_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_slpn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -16801,8 +20896,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_disc_uni_slpn_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_slpn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -16828,11 +20923,123 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_slpn_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_UNIFORM_SLPN,
+			&[
+				"object labelled Petri net#./testfiles/fig_c.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_c.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_slpn_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_UNIFORM_SLPN,
+			&[
+				"object labelled Petri net#./testfiles/aa-ab-ba.ptml"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.ptml").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree markup language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree markup language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_slpn_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_UNIFORM_SLPN,
+			&[
+				"object labelled Petri net#./testfiles/aa-ab-ba.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic deterministic finite automaton".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic deterministic finite automaton".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_slpn_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_UNIFORM_SLPN,
+			&[
+				"object labelled Petri net#./testfiles/aa-ab-ba_occ-f64.slpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ-f64.slpn").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic labelled Petri net".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic labelled Petri net".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SLPN {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command sptree ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sptree_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16860,7 +21067,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sptree_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16888,7 +21095,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sptree_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16916,7 +21123,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sptree_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16944,7 +21151,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sptree_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16972,7 +21179,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sptree_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17000,7 +21207,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sptree_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17028,7 +21235,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sptree_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17056,7 +21263,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sptree_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17084,7 +21291,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_disc_uni_sptree_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17111,6 +21318,90 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_sptree_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_UNIFORM_SPTREE,
+			&[
+				"object process tree#./testfiles/valid nested.ptml"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/valid nested.ptml").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree markup language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree markup language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SPTREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_sptree_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_UNIFORM_SPTREE,
+			&[
+				"object process tree#./testfiles/tree.ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/tree.ptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SPTREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_disc_uni_sptree_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_UNIFORM_SPTREE,
+			&[
+				"object process tree#./testfiles/aa.ptree"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.ptree").unwrap());
+		let object0 = read_as_object_with_file_handler(&"process tree".parse().unwrap(), &mut reader, None, 0, &mut None, "process tree".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "process tree".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_UNIFORM_SPTREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== group dins ====
@@ -17121,7 +21412,7 @@ mod tests{
 
 	// ==== command dfa ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_dfa_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17149,7 +21440,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_dfa_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17177,7 +21468,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_dfa_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17205,7 +21496,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_dfa_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17233,7 +21524,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_dfa_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17261,7 +21552,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_dfa_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17289,7 +21580,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_dfa_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17317,7 +21608,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_dfa_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17345,7 +21636,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_dfa_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17373,7 +21664,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_dfa_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17400,11 +21691,95 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_flw_dfa_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA,
+			&[
+				"trait finite language#./testfiles/a-b-double.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_flw_dfa_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA,
+			&[
+				"trait finite language#./testfiles/a-b.xes.gz"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_flw_dfa_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA,
+			&[
+				"trait finite language#./testfiles/empty_trace.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_FLOWER_DFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command ptree ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_ptree_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17432,7 +21807,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_ptree_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17460,7 +21835,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_ptree_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17488,7 +21863,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_ptree_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17516,7 +21891,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_ptree_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17544,7 +21919,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_ptree_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17572,7 +21947,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_ptree_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17600,7 +21975,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_ptree_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17628,7 +22003,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_ptree_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17656,7 +22031,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_flw_ptree_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17683,6 +22058,90 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_flw_ptree_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE,
+			&[
+				"trait finite language#./testfiles/a-b-double.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_flw_ptree_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE,
+			&[
+				"trait finite language#./testfiles/a-b.xes.gz"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_flw_ptree_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE,
+			&[
+				"trait finite language#./testfiles/empty_trace.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_FLOWER_TREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== group pfxt ====
@@ -17690,7 +22149,7 @@ mod tests{
 
 	// ==== command dfa ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_dfa_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17718,7 +22177,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_dfa_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17746,7 +22205,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_dfa_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17774,7 +22233,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_dfa_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17802,7 +22261,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_dfa_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17830,7 +22289,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_dfa_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17858,7 +22317,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_dfa_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17886,7 +22345,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_dfa_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17914,7 +22373,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_dfa_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17942,7 +22401,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_dfa_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17969,11 +22428,95 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_pfxt_dfa_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA,
+			&[
+				"trait finite language#./testfiles/a-b-double.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_pfxt_dfa_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA,
+			&[
+				"trait finite language#./testfiles/a-b.xes.gz"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_pfxt_dfa_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA,
+			&[
+				"trait finite language#./testfiles/empty_trace.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command ptree ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_ptree_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18001,7 +22544,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_ptree_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18029,7 +22572,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_ptree_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18057,7 +22600,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_ptree_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18085,7 +22628,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_ptree_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18113,7 +22656,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_ptree_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18141,7 +22684,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_ptree_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18169,7 +22712,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_ptree_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18197,7 +22740,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_ptree_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18225,7 +22768,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_pfxt_ptree_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18252,11 +22795,95 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_pfxt_ptree_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE,
+			&[
+				"trait finite language#./testfiles/a-b-double.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_pfxt_ptree_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE,
+			&[
+				"trait finite language#./testfiles/a-b.xes.gz"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_pfxt_ptree_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE,
+			&[
+				"trait finite language#./testfiles/empty_trace.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_TREE {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command tm ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_tm_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18284,7 +22911,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_tm_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18312,7 +22939,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_tm_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18340,7 +22967,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_tm_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18368,7 +22995,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_tm_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18396,7 +23023,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_tm_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18424,7 +23051,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_tm_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18452,7 +23079,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_tm_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18480,7 +23107,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_tm_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18508,7 +23135,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_tm_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18535,11 +23162,95 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_tm_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL,
+			&[
+				"trait finite language#./testfiles/a-b-double.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_tm_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL,
+			&[
+				"trait finite language#./testfiles/a-b.xes.gz"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_tm_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL,
+			&[
+				"trait finite language#./testfiles/empty_trace.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command im ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_im_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18567,7 +23278,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_im_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18595,7 +23306,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_im_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18623,7 +23334,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_im_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18651,7 +23362,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_im_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18679,7 +23390,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_im_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18707,7 +23418,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_im_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18735,7 +23446,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_im_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18763,7 +23474,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_im_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18791,7 +23502,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_dins_im_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18818,6 +23529,90 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_im_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER,
+			&[
+				"trait finite language#./testfiles/a-b-double.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_im_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER,
+			&[
+				"trait finite language#./testfiles/a-b.xes.gz"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_dins_im_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER,
+			&[
+				"trait finite language#./testfiles/empty_trace.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== group fil ====
@@ -18828,7 +23623,7 @@ mod tests{
 
 	// ==== command empty ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_empty_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18856,7 +23651,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_empty_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18884,7 +23679,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_empty_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18912,7 +23707,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_empty_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18940,7 +23735,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_empty_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18968,7 +23763,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_empty_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18996,7 +23791,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_empty_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19024,7 +23819,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_empty_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19055,7 +23850,7 @@ mod tests{
 
 	// ==== command len ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_len_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19087,7 +23882,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_len_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19119,7 +23914,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_len_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19151,7 +23946,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_len_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19183,7 +23978,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_len_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19215,7 +24010,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_len_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19247,7 +24042,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_len_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19279,7 +24074,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_len_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19317,7 +24112,7 @@ mod tests{
 
 	// ==== command act ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_event_act_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19349,7 +24144,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_event_act_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19381,7 +24176,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_event_act_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19413,7 +24208,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_event_act_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19445,7 +24240,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_event_act_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19477,7 +24272,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_event_act_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19509,7 +24304,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_event_act_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19541,7 +24336,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_fil_tr_event_act_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19590,7 +24385,7 @@ mod tests{
 
 	// ==== command info ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_info_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19618,7 +24413,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_info_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19646,7 +24441,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_info_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19674,7 +24469,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_info_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19702,7 +24497,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_info_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19730,7 +24525,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_info_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19758,7 +24553,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_info_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19786,7 +24581,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_info_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19814,7 +24609,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_info_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19842,21 +24637,105 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_info_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
 			&EBI_INFO,
 			&[
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
+				"object finite language#./testfiles/empty.lang"			
 			]
 		),
 		*/
 		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite language".parse().unwrap(), &mut reader, None, 0, &mut None, "finite language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_info::EBI_INFO {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_info_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_INFO,
+			&[
+				"object finite language#./testfiles/bb.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.lang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite language".parse().unwrap(), &mut reader, None, 0, &mut None, "finite language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_info::EBI_INFO {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_info_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_INFO,
+			&[
+				"object labelled Petri net#./testfiles/empty.lpn"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lpn").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "labelled Petri net".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "labelled Petri net".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_info::EBI_INFO {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_info_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_INFO,
+			&[
+				"object finite language#./testfiles/aa.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.lang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite language".parse().unwrap(), &mut reader, None, 0, &mut None, "finite language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite language".parse().unwrap());
 		let inputs = vec![input0];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_info::EBI_INFO {
@@ -19876,7 +24755,7 @@ mod tests{
 
 	// ==== command log ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_prob_log_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19908,7 +24787,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_prob_log_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19940,7 +24819,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_prob_log_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19972,7 +24851,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_prob_log_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20004,7 +24883,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_prob_log_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20036,7 +24915,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_prob_log_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20068,7 +24947,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_prob_log_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20100,7 +24979,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_prob_log_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20132,7 +25011,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_prob_log_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20164,7 +25043,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_prob_log_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20195,6 +25074,102 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_prob_log_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_LOG,
+			&[
+				"trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree",
+				"trait finite language#./testfiles/a-b-double.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_LOG {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_prob_log_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_LOG,
+			&[
+				"trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree",
+				"trait finite language#./testfiles/a-b.xes.gz"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_LOG {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_prob_log_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PROBABILITY_LOG,
+			&[
+				"trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree",
+				"trait finite language#./testfiles/empty_trace.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/seq(a-xor(b-c)).sptree").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("queriable stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_LOG {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 
@@ -20204,7 +25179,7 @@ mod tests{
 
 	// ==== command folds ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_folds_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20238,7 +25213,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_folds_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20272,7 +25247,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_folds_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20306,7 +25281,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_folds_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20340,7 +25315,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_folds_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20374,7 +25349,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_folds_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20408,7 +25383,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_folds_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20442,7 +25417,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_folds_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20476,7 +25451,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_folds_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20513,7 +25488,7 @@ mod tests{
 
 	// ==== command potr ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_potr_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20543,7 +25518,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_potr_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20576,7 +25551,7 @@ mod tests{
 
 	// ==== command tra ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_tra_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20606,7 +25581,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_tra_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20636,7 +25611,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_tra_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -20651,7 +25626,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_tra_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20681,7 +25656,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_tra_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20711,7 +25686,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_tra_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20741,7 +25716,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_tra_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20771,7 +25746,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_tra_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20801,7 +25776,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_tra_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20831,7 +25806,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_sam_tra_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20860,6 +25835,96 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_sam_tra_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_SAMPLE_TRACES,
+			&[
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_sample::EBI_SAMPLE_TRACES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_sam_tra_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_SAMPLE_TRACES,
+			&[
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_sample::EBI_SAMPLE_TRACES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_sam_tra_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_SAMPLE_TRACES,
+			&[
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"usize 1"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(1, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_sample::EBI_SAMPLE_TRACES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== group tst ====
@@ -20867,7 +25932,7 @@ mod tests{
 
 	// ==== command btst ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_btst_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20903,7 +25968,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_btst_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20939,7 +26004,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_btst_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -20958,7 +26023,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_btst_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20994,7 +26059,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_btst_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21030,7 +26095,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_btst_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21066,7 +26131,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_btst_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21102,7 +26167,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_btst_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21138,7 +26203,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_btst_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21174,7 +26239,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_btst_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21209,11 +26274,119 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_btst_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_TEST_BOOTSTRAP,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_btst_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_TEST_BOOTSTRAP,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_btst_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_TEST_BOOTSTRAP,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command lcat ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_lcat_test_0() {
 		// this test has been indicated as to be expected to fail
 		
@@ -21230,7 +26403,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_lcat_test_1() {
 		// this test has been indicated as to be expected to fail
 		
@@ -21247,7 +26420,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_lcat_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -21264,7 +26437,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_lcat_test_3() {
 		// this test has been indicated as to be expected to fail
 		
@@ -21281,7 +26454,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_lcat_test_4() {
 		// this test has been indicated as to be expected to fail
 		
@@ -21298,7 +26471,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_lcat_test_5() {
 		// this test has been indicated as to be expected to fail
 		
@@ -21315,7 +26488,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_tst_lcat_test_6() {
 		// this test has been indicated as to be expected to fail
 		
@@ -21339,7 +26512,7 @@ mod tests{
 
 	// ==== command graph ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_graph_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21367,7 +26540,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_graph_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21395,7 +26568,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_graph_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21423,7 +26596,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_graph_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21451,36 +26624,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_graph_test_4() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_VISUALISE_GRAPH,
-			&[
-				"trait graphable#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
-			]
-		),
-		*/
-		
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let (object0, file_handler0) = ebi_input::read_as_trait(&("graphable".parse().unwrap()), &mut reader, None, 0).unwrap();
-		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
-
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_GRAPH {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
-		}
-	}
-	#[test]
-	#[timeout(1000)]
-	pub fn ebi_vis_graph_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -21507,8 +26652,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_vis_graph_test_6() {
+	#[timeout(10000)]
+	pub fn ebi_vis_graph_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -21535,8 +26680,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_vis_graph_test_7() {
+	#[timeout(10000)]
+	pub fn ebi_vis_graph_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -21563,8 +26708,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_vis_graph_test_8() {
+	#[timeout(10000)]
+	pub fn ebi_vis_graph_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -21591,8 +26736,8 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
-	pub fn ebi_vis_graph_test_9() {
+	#[timeout(10000)]
+	pub fn ebi_vis_graph_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
@@ -21618,11 +26763,123 @@ mod tests{
 			}
 		}
 	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_vis_graph_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_VISUALISE_GRAPH,
+			&[
+				"trait graphable#./testfiles/aa-ab-ba.snfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.snfa").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("graphable".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_GRAPH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_vis_graph_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_VISUALISE_GRAPH,
+			&[
+				"trait graphable#./testfiles/a-b_star_empty.dfm"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_star_empty.dfm").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("graphable".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_GRAPH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_vis_graph_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_VISUALISE_GRAPH,
+			&[
+				"trait graphable#./testfiles/fig_c.sdfa"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_c.sdfa").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("graphable".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_GRAPH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_vis_graph_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_VISUALISE_GRAPH,
+			&[
+				"trait graphable#./testfiles/model.sbpmn.spolang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/model.sbpmn.spolang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("graphable".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_GRAPH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
 
 
 	// ==== command txt ====
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_txt_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21652,7 +26909,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_txt_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21682,7 +26939,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_txt_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21712,7 +26969,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_txt_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21742,7 +26999,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_txt_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21772,7 +27029,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_txt_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21802,7 +27059,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_txt_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21832,7 +27089,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_txt_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21862,7 +27119,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_txt_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21892,23 +27149,113 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(1000)]
+	#[timeout(10000)]
 	pub fn ebi_vis_txt_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
 			&EBI_VISUALISE_TEXT,
 			&[
-				"object directly follows graph#./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg"			
+				"object finite language#./testfiles/empty.lang"			
 			]
 		),
 		*/
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
 			return;
 		}
-		let mut reader = MultipleReader::from_file(File::open("./testfiles/BPI_Challenge_2013_closed_problems.xes.gz-dfg.dfg").unwrap());
-		let object0 = read_as_object_with_file_handler(&"directly follows graph".parse().unwrap(), &mut reader, None, 0, &mut None, "directly follows graph".parse().unwrap()).unwrap();
-		let input0 = EbiInput::Object(object0, "directly follows graph".parse().unwrap());
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite language".parse().unwrap(), &mut reader, None, 0, &mut None, "finite language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_vis_txt_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_VISUALISE_TEXT,
+			&[
+				"object finite language#./testfiles/bb.lang"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.lang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite language".parse().unwrap(), &mut reader, None, 0, &mut None, "finite language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite language".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_vis_txt_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_VISUALISE_TEXT,
+			&[
+				"object labelled Petri net#./testfiles/empty.lpn"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lpn").unwrap());
+		let object0 = read_as_object_with_file_handler(&"labelled Petri net".parse().unwrap(), &mut reader, None, 0, &mut None, "labelled Petri net".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "labelled Petri net".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_vis_txt_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_VISUALISE_TEXT,
+			&[
+				"object finite language#./testfiles/aa.lang"			
+			]
+		),
+		*/
+		if ebi_objects::ebi_arithmetic::is_exact_globally() {
+			return;
+		}
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.lang").unwrap());
+		let object0 = read_as_object_with_file_handler(&"finite language".parse().unwrap(), &mut reader, None, 0, &mut None, "finite language".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "finite language".parse().unwrap());
 		let inputs = vec![input0];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT {

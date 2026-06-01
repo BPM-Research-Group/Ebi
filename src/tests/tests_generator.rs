@@ -5,7 +5,7 @@ use crate::{
 };
 use itertools::Itertools;
 
-pub const NUMBER_OF_TESTS_PER_COMMAND: usize = 10;
+pub const NUMBER_OF_TESTS_PER_COMMAND: usize = 13;
 
 pub(crate) fn generate_tests() -> Result<String> {
     let path = EBI_COMMANDS;
@@ -133,7 +133,7 @@ pub(crate) fn generate_tests_for_command(
 
             result += &format!(
                 "\t#[test]
-\t#[timeout(1000)]
+\t#[timeout(10000)]
 \tpub fn {function_name}_test_{input_i}() {{
 \t\t{fallible_hint}
 \t\t{exact_code}

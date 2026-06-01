@@ -358,8 +358,6 @@ macro_rules! aut {
                     }
                 }
 
-                println!("\t livelock states {:?}", result);
-
                 Self(result)
             }
         }

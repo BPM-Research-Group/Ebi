@@ -234,7 +234,7 @@ pub const EBI_ANALYSE_MINPROB: EbiCommand = EbiCommand::Command {
     name_long: Some("minimum-probability-traces"), 
     explanation_short: "Find all traces that have a given minimum probability.", 
     explanation_long: Some("Find all traces that have a given minimum probability.
-Will return a finate stochastic language with the extracted traces.
+Will return a finite stochastic language with the extracted traces.
 Will return an error if there are no such traces.
 The computation may not terminate if the model is unbounded and this unboundedness can be triggered using silent transitions."),
     cli_command: None,
