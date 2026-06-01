@@ -125,7 +125,7 @@ mod tests {
             .parse::<StochasticDeterministicFiniteAutomaton>()
             .unwrap();
 
-        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics_trait() {
+        if let EbiTraitSemantics::AutomatonState(semantics) = dfa.to_semantics_trait() {
             assert!(semantics.get_initial_state().is_none());
         } else {
             assert!(false);

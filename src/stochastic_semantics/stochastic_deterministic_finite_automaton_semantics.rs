@@ -1,9 +1,7 @@
 use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;
 use ebi_objects::{
-    AutomatonState, StochasticDeterministicFiniteAutomaton,
-    anyhow::Result,
-    ebi_arithmetic::{Fraction, One},
-    ebi_objects::labelled_petri_net::TransitionIndex,
+    AutomatonState, StochasticAutomatonSemantics, StochasticDeterministicFiniteAutomaton,
+    anyhow::Result, ebi_arithmetic::Fraction, ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
 impl StochasticSemantics for StochasticDeterministicFiniteAutomaton {
@@ -14,15 +12,10 @@ impl StochasticSemantics for StochasticDeterministicFiniteAutomaton {
         state: &AutomatonState,
         transition: TransitionIndex,
     ) -> &Fraction {
-        if transition == self.sources.len() {
-            //terminating transition
-            &self.get_termination_probability(*state)
-        } else {
-            &self.probabilities[transition]
-        }
+        StochasticAutomatonSemantics::transition_2_weight(self, *state, transition).unwrap()
     }
 
-    fn get_total_weight_of_enabled_transitions(&self, _: &AutomatonState) -> Result<Fraction> {
-        Ok(Fraction::one())
+    fn get_total_weight_of_enabled_transitions(&self, state: &AutomatonState) -> Result<Fraction> {
+        Ok(StochasticAutomatonSemantics::outgoing_transitions_weight_sum(self, *state))
     }
 }

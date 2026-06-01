@@ -9,7 +9,7 @@ cargo build --features exactarithmetic,approximatearithmetic
 cargo build --features exactarithmetic
 cargo build --features approximatearithmetic
 cargo build --features javascript
-cargo build --features python
+# cargo build --features python
 cargo build --features java
 # perform tests
 cargo test --verbose

@@ -1,21 +1,24 @@
 use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;
 use ebi_objects::{
-    AutomatonState, StochasticAutomatonSemantics, StochasticNondeterministicFiniteAutomaton,
-    anyhow::Result, ebi_arithmetic::Fraction, ebi_objects::labelled_petri_net::TransitionIndex,
+    AutomatonState, DirectlyFollowsGraph, StochasticAutomatonSemantics, anyhow::Result,
+    ebi_arithmetic::Fraction, ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
-impl StochasticSemantics for StochasticNondeterministicFiniteAutomaton {
+impl StochasticSemantics for DirectlyFollowsGraph {
     type StoSemState = AutomatonState;
 
     fn get_transition_weight(
         &self,
-        state: &AutomatonState,
+        state: &<Self as StochasticSemantics>::StoSemState,
         transition: TransitionIndex,
     ) -> &Fraction {
         StochasticAutomatonSemantics::transition_2_weight(self, *state, transition).unwrap()
     }
 
-    fn get_total_weight_of_enabled_transitions(&self, state: &AutomatonState) -> Result<Fraction> {
+    fn get_total_weight_of_enabled_transitions(
+        &self,
+        state: &<Self as StochasticSemantics>::StoSemState,
+    ) -> Result<Fraction> {
         Ok(StochasticAutomatonSemantics::outgoing_transitions_weight_sum(self, *state))
     }
 }

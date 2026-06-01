@@ -237,7 +237,7 @@ pub mod tests {
         let fin = fs::read_to_string("testfiles/empty.dfa").unwrap();
         let dfa = fin.parse::<DeterministicFiniteAutomaton>().unwrap();
 
-        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics_trait() {
+        if let EbiTraitSemantics::AutomatonState(semantics) = dfa.to_semantics_trait() {
             assert!(semantics.get_initial_state().is_none());
         } else {
             assert!(false);
@@ -298,7 +298,7 @@ pub mod tests {
             .parse::<StochasticDeterministicFiniteAutomaton>()
             .unwrap();
 
-        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics_trait() {
+        if let EbiTraitSemantics::AutomatonState(semantics) = dfa.to_semantics_trait() {
             assert!(semantics.get_initial_state().is_none());
         } else {
             assert!(false);

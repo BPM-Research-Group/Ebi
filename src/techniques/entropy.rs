@@ -3,9 +3,11 @@ use crate::{
     techniques::livelock::IsPartOfLivelock,
 };
 use ebi_objects::{
-    AutomatonSemantics, StochasticDeterministicFiniteAutomaton, anyhow::{Context, Result, anyhow}, ebi_arithmetic::{
+    AutomatonSemantics, StochasticAutomatonSemantics, StochasticDeterministicFiniteAutomaton,
+    anyhow::{Context, Result, anyhow},
+    ebi_arithmetic::{
         EbiMatrix, Fraction, FractionMatrix, IdentityMinus, Inversion, Log, One, Signed, Zero, f,
-    }
+    },
 };
 use ebi_optimisation::ebi_arithmetic::log_polynomial::log_polynomial::LogPolynomial;
 use std::ops::Neg;
@@ -38,22 +40,12 @@ impl Entropy for StochasticDeterministicFiniteAutomaton {
 
         let mut sum = LogPolynomial::zero();
 
-        //termination
-        for state in self.states() {
-            if let Some(average_visits) = &state_visits[state] {
-                let termination_probability = self.get_termination_probability(state);
-                if termination_probability.is_positive() {
-                    let mut entropy = termination_probability.n_log_n()?;
-                    entropy *= average_visits;
-                    sum += entropy;
-                }
-            }
-        }
-
         //transitions
-        for (index, &source) in self.sources.iter().enumerate() {
+        for (transition, source, _, _) in self.transitions() {
             if let Some(average_visits) = &state_visits[source] {
-                let probability = &self.probabilities[index];
+                let probability = self
+                    .transition_2_weight(source, transition)
+                    .ok_or_else(|| anyhow!("Transition weight not found."))?;
                 if probability.is_positive() {
                     let mut entropy = probability.n_log_n()?;
                     entropy *= average_visits;

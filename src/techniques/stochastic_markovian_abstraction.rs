@@ -523,9 +523,9 @@ fn add_artificial_start_end_to_snfa(
 
     // Redirect original finals to q_minus via '-'
     for state in 0..snfa.number_of_states() - 1 {
-        if !snfa.terminating_probabilities[state].is_zero() {
+        if !snfa.termination_probabilities[state].is_zero() {
             // Copy the existing p_final value
-            let final_prob = snfa.terminating_probabilities[state].clone();
+            let final_prob = snfa.termination_probabilities[state].clone();
             // Add a "-" transition with the original final probability
             snfa.add_transition(
                 AutomatonState::of(state),

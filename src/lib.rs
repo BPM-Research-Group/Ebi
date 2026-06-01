@@ -172,6 +172,7 @@ pub mod stochastic_partially_ordered_semantics {
     pub mod stochastic_process_tree_stochastic_partially_ordered_semantics;
 }
 pub mod stochastic_semantics {
+    pub mod directly_follows_graph_stochastic_semantics;
     pub mod finite_stochastic_language_semantics;
     pub mod stochastic_deterministic_finite_automaton_semantics;
     pub mod stochastic_directly_follows_model_semantics;

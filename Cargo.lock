@@ -835,7 +835,7 @@ dependencies = [
 [[package]]
 name = "ebi_objects"
 version = "0.3.186"
-source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#651aac77bcc5ca233da5e9120959c08a7bd44f9c"
+source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#5849638193687df1bfe6e5e8bc397a084c2e9c7b"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -3950,9 +3950,9 @@ checksum = "383ad40bb927465ec0ce7720e033cb4ca06912855fc35db31b5755d0de75b1ee"
 
 [[package]]
 name = "unicode-segmentation"
-version = "1.13.2"
+version = "1.13.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9629274872b2bfaf8d66f5f15725007f635594914870f65218920345aa11aa8c"
+checksum = "c6f5d3c3b1bf09027a88a6bc961fc00497d651009560b5463668dc81b0fa87a8"
 
 [[package]]
 name = "unicode-vo"

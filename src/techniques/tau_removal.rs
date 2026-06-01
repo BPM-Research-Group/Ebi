@@ -191,7 +191,7 @@ impl TauRemoval for StochasticNondeterministicFiniteAutomaton {
 
         // Trim unreachable states (reachable over visible edges)
         {
-            let mut reachable = vec![false; self.terminating_probabilities.len()];
+            let mut reachable = vec![false; self.termination_probabilities.len()];
             let mut queue = VecDeque::new();
             queue.push_back(initial_state);
             while let Some(u) = queue.pop_front() {
@@ -207,9 +207,9 @@ impl TauRemoval for StochasticNondeterministicFiniteAutomaton {
                 }
             }
             if reachable.iter().any(|&r| !r) {
-                let mut map = vec![None; self.terminating_probabilities.len()];
+                let mut map = vec![None; self.termination_probabilities.len()];
                 let mut new_states: Vec<State> = Vec::new();
-                for old_idx in 0..self.terminating_probabilities.len() {
+                for old_idx in 0..self.termination_probabilities.len() {
                     if reachable[old_idx] {
                         let new_idx = new_states.len();
                         map[old_idx] = Some(AutomatonState::of(new_idx));
@@ -218,7 +218,7 @@ impl TauRemoval for StochasticNondeterministicFiniteAutomaton {
                         });
                     }
                 }
-                for old_idx in 0..self.terminating_probabilities.len() {
+                for old_idx in 0..self.termination_probabilities.len() {
                     if let Some(new_src) = map[old_idx] {
                         for (_, target, label, probability) in
                             self.outgoing_edges(AutomatonState::of(old_idx))
@@ -323,7 +323,7 @@ fn replace_everything(
     snfa.targets.clear();
     snfa.activities.clear();
     snfa.probabilities.clear();
-    snfa.terminating_probabilities.clear();
+    snfa.termination_probabilities.clear();
 
     for _ in 0..states.len() {
         snfa.add_state();
@@ -350,7 +350,7 @@ fn replace_states(
     snfa.targets.clear();
     snfa.activities.clear();
     snfa.probabilities.clear();
-    snfa.terminating_probabilities.fill(Fraction::one());
+    snfa.termination_probabilities.fill(Fraction::one());
 
     for (source, transitions) in transitionss.into_iter().enumerate() {
         for transition in transitions.into_iter() {
@@ -444,7 +444,7 @@ mod tests {
         let expect_final = [f0!(), frac!(1, 14), frac!(2, 7)];
 
         assert_eq!(collect(&snfa), expect, "visible multiset differs");
-        for (state, termination_probability) in snfa.terminating_probabilities.iter().enumerate() {
+        for (state, termination_probability) in snfa.termination_probabilities.iter().enumerate() {
             assert_eq!(
                 termination_probability, &expect_final[state],
                 "p_final mismatch state {}",
@@ -496,9 +496,9 @@ mod tests {
     #[test]
     fn tau_removal_empty_automaton() {
         let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
-        snfa.terminating_probabilities.clear();
+        snfa.termination_probabilities.clear();
         snfa.remove_tau_transitions().unwrap(); // should not panic
-        assert_eq!(snfa.terminating_probabilities.len(), 0);
+        assert_eq!(snfa.termination_probabilities.len(), 0);
     }
 
     // 4. identity when no tau-edges
@@ -510,12 +510,12 @@ mod tests {
             .unwrap();
 
         let before = collect(&snfa);
-        let before_final = snfa.terminating_probabilities[0].clone();
+        let before_final = snfa.termination_probabilities[0].clone();
 
         snfa.remove_tau_transitions().unwrap();
 
         assert_eq!(collect(&snfa), before);
-        assert_eq!(snfa.terminating_probabilities[0], before_final);
+        assert_eq!(snfa.termination_probabilities[0], before_final);
     }
 
     // 5. single-state trivial case
@@ -523,8 +523,8 @@ mod tests {
     fn tau_removal_single_state_self_final() {
         let mut snfa = StochasticNondeterministicFiniteAutomaton::new();
         snfa.remove_tau_transitions().unwrap();
-        assert_eq!(snfa.terminating_probabilities.len(), 1);
-        assert_eq!(snfa.terminating_probabilities[0], f1!());
+        assert_eq!(snfa.termination_probabilities.len(), 1);
+        assert_eq!(snfa.termination_probabilities[0], f1!());
     }
 
     // 6. simple acyclic tau-chain
