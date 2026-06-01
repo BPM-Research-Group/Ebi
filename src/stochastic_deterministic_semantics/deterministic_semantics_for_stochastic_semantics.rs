@@ -1,13 +1,13 @@
-use super::non_decreasing_livelock::NonDecreasingLivelock;
 use crate::{
     ebi_framework::displayable::Displayable,
     ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
     math::markov_model::MarkovModel, semantics::labelled_petri_net_semantics::LPNMarking,
     semantics::semantics::Semantics,
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    techniques::non_decreasing_livelock::NonDecreasingLivelock,
 };
 use ebi_objects::{
-    Activity, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    Activity, AutomatonState, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
     StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::Result,
     ebi_arithmetic::{Fraction, One, Signed, Zero},
@@ -34,8 +34,6 @@ macro_rules! default_stochastic_deterministic_semantics {
     ($t:ident, $s:ident) => {
         impl StochasticDeterministicSemantics for $t {
             type DetState = PMarking<$s>;
-            // impl StochasticDeterministicSemantics for StochasticLabelledPetriNet {
-            //     type DetState = PMarking<LPNMarking>;
 
             fn get_deterministic_initial_state(&self) -> Result<Option<Self::DetState>> {
                 let mut result = Self::DetState {
@@ -337,7 +335,10 @@ macro_rules! default_stochastic_deterministic_semantics {
 default_stochastic_deterministic_semantics!(StochasticLabelledPetriNet, LPNMarking);
 default_stochastic_deterministic_semantics!(StochasticProcessTree, TreeMarking);
 default_stochastic_deterministic_semantics!(StochasticDirectlyFollowsModel, usize);
-default_stochastic_deterministic_semantics!(StochasticNondeterministicFiniteAutomaton, usize);
+default_stochastic_deterministic_semantics!(
+    StochasticNondeterministicFiniteAutomaton,
+    AutomatonState
+);
 
 /**
  * Idea: as the computation of next p-states is expensive, it is performed once, and stored in this p-marking struct.

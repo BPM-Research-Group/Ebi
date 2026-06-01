@@ -11,10 +11,11 @@ use crate::{
     trait_definition_finalisation,
 };
 use ebi_objects::{
-    ActivityKey, DirectlyFollowsGraph, EventLog, EventLogPython, EventLogTraceAttributes,
-    EventLogXes, FiniteStochasticLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, TranslateActivityKey,
+    ActivityKey, AutomatonState, DirectlyFollowsGraph, EventLog, EventLogPython,
+    EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    TranslateActivityKey,
     anyhow::{Result, anyhow},
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
@@ -30,6 +31,15 @@ pub const TRAIT_DEFINITION_LATEX: &str = concat!(
 
 pub enum EbiTraitStochasticSemantics {
     Usize(Box<dyn StochasticSemantics<StoSemState = usize, SemState = usize, AliState = usize>>),
+    AutomatonState(
+        Box<
+            dyn StochasticSemantics<
+                    StoSemState = AutomatonState,
+                    SemState = AutomatonState,
+                    AliState = AutomatonState,
+                >,
+        >,
+    ),
     Marking(
         Box<
             dyn StochasticSemantics<
@@ -68,6 +78,7 @@ impl HasActivityKey for EbiTraitStochasticSemantics {
         match self {
             EbiTraitStochasticSemantics::Marking(semantics) => semantics.activity_key(),
             EbiTraitStochasticSemantics::Usize(semantics) => semantics.activity_key(),
+            EbiTraitStochasticSemantics::AutomatonState(semantics) => semantics.activity_key(),
             EbiTraitStochasticSemantics::TreeMarking(semantics) => semantics.activity_key(),
         }
     }
@@ -76,6 +87,7 @@ impl HasActivityKey for EbiTraitStochasticSemantics {
         match self {
             EbiTraitStochasticSemantics::Marking(semantics) => semantics.activity_key_mut(),
             EbiTraitStochasticSemantics::Usize(semantics) => semantics.activity_key_mut(),
+            EbiTraitStochasticSemantics::AutomatonState(semantics) => semantics.activity_key_mut(),
             EbiTraitStochasticSemantics::TreeMarking(semantics) => semantics.activity_key_mut(),
         }
     }
@@ -88,6 +100,9 @@ impl TranslateActivityKey for EbiTraitStochasticSemantics {
                 semantics.translate_using_activity_key(to_activity_key)
             }
             EbiTraitStochasticSemantics::Usize(semantics) => {
+                semantics.translate_using_activity_key(to_activity_key)
+            }
+            EbiTraitStochasticSemantics::AutomatonState(semantics) => {
                 semantics.translate_using_activity_key(to_activity_key)
             }
             EbiTraitStochasticSemantics::TreeMarking(semantics) => {
@@ -142,7 +157,7 @@ impl ToStochasticSemanticsTrait for StochasticDirectlyFollowsModel {
 
 impl ToStochasticSemanticsTrait for StochasticDeterministicFiniteAutomaton {
     fn to_stochastic_semantics_trait(self) -> EbiTraitStochasticSemantics {
-        EbiTraitStochasticSemantics::Usize(Box::new(self))
+        EbiTraitStochasticSemantics::AutomatonState(Box::new(self))
     }
 }
 

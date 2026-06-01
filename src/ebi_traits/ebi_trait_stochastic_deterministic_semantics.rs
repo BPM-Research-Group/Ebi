@@ -11,8 +11,8 @@ use crate::{
     trait_definition_finalisation,
 };
 use ebi_objects::{
-    Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogOcel, EventLogPython,
-    EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
+    Activity, AutomatonState, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogOcel,
+    EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::{Result, anyhow},
@@ -30,6 +30,14 @@ pub const TRAIT_DEFINITION_LATEX: &str = concat!(
 
 pub enum EbiTraitStochasticDeterministicSemantics {
     Usize(Box<dyn StochasticDeterministicSemantics<DetState = usize, LivState = usize>>),
+    AutomatonState(
+        Box<
+            dyn StochasticDeterministicSemantics<
+                    DetState = AutomatonState,
+                    LivState = AutomatonState,
+                >,
+        >,
+    ),
     UsizeDistribution(
         Box<dyn StochasticDeterministicSemantics<DetState = PMarking<usize>, LivState = usize>>,
     ),
@@ -184,7 +192,7 @@ impl ToStochasticDeterministicSemanticsTrait for StochasticDeterministicFiniteAu
     fn to_stochastic_deterministic_semantics_trait(
         self,
     ) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::Usize(Box::new(self))
+        EbiTraitStochasticDeterministicSemantics::AutomatonState(Box::new(self))
     }
 }
 
@@ -192,7 +200,7 @@ impl ToStochasticDeterministicSemanticsTrait for FiniteStochasticLanguage {
     fn to_stochastic_deterministic_semantics_trait(
         self,
     ) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::Usize(Box::new(Into::<
+        EbiTraitStochasticDeterministicSemantics::AutomatonState(Box::new(Into::<
             StochasticDeterministicFiniteAutomaton,
         >::into(self)))
     }

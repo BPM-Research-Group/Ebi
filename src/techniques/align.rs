@@ -523,7 +523,7 @@ impl AlignmentHeuristics for StochasticBusinessProcessModelAndNotation {
 }
 
 impl AlignmentHeuristics for DeterministicFiniteAutomaton {
-    type AliState = usize;
+    type AliState = AutomatonState;
 
     fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
         vec![]
@@ -533,7 +533,7 @@ impl AlignmentHeuristics for DeterministicFiniteAutomaton {
         &self,
         _: &Vec<Activity>,
         _: &usize,
-        _: &usize,
+        _: &AutomatonState,
         _: &Vec<Vec<usize>>,
     ) -> usize {
         0
@@ -656,8 +656,8 @@ macro_rules! treemarking {
     };
 }
 
-usize!(StochasticDeterministicFiniteAutomaton, usize);
-usize!(StochasticNondeterministicFiniteAutomaton, usize);
+usize!(StochasticDeterministicFiniteAutomaton, AutomatonState);
+usize!(StochasticNondeterministicFiniteAutomaton, AutomatonState);
 treemarking!(ProcessTree);
 treemarking!(StochasticProcessTree);
 usize!(DirectlyFollowsGraph, AutomatonState);

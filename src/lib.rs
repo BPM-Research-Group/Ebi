@@ -152,19 +152,21 @@ pub mod python {
 }
 
 pub mod semantics {
+    pub mod automaton_semantics;
     pub mod business_process_model_and_notation_semantics;
-    pub mod directly_follows_graph_semantics;
     pub mod finite_stochastic_language_semantics;
     pub mod finite_stochastic_partially_ordered_language_semantics;
     pub mod labelled_petri_net_semantics;
     pub mod process_tree_semantics;
     pub mod semantics;
     pub mod stochastic_business_process_model_and_notation_semantics;
-    pub mod stochastic_deterministic_finite_automaton_semantics;
     pub mod stochastic_directly_follows_graph_semantics;
     pub mod stochastic_labelled_petri_net_semantics;
-    pub mod stochastic_nondetermininstic_finite_automaton_semantics;
     pub mod stochastic_process_tree_semantics;
+}
+pub mod stochastic_deterministic_semantics {
+    pub mod deterministic_semantics_for_stochastic_semantics;
+    pub mod stochastic_deterministic_finite_automaton_deterministic;
 }
 pub mod stochastic_partially_ordered_semantics {
     pub mod stochastic_partially_ordered_semantics;
@@ -188,7 +190,6 @@ pub mod techniques {
     pub mod bounded;
     pub mod chi_square_stochastic_conformance;
     pub mod completeness;
-    pub mod deterministic_semantics_for_stochastic_semantics;
     pub mod directly_follows_graph_abstractor;
     pub mod directly_follows_model_miner;
     pub mod earth_movers_stochastic_conformance;

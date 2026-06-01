@@ -15,7 +15,7 @@ impl StochasticSemantics for StochasticNondeterministicFiniteAutomaton {
             //terminating transition
             &self.get_termination_probability(*state)
         } else {
-            &self.get_probabilities()[transition]
+            &self.probabilities[transition]
         }
     }
 

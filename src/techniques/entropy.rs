@@ -3,11 +3,9 @@ use crate::{
     techniques::livelock::IsPartOfLivelock,
 };
 use ebi_objects::{
-    StochasticDeterministicFiniteAutomaton,
-    anyhow::{Context, Result, anyhow},
-    ebi_arithmetic::{
+    AutomatonSemantics, StochasticDeterministicFiniteAutomaton, anyhow::{Context, Result, anyhow}, ebi_arithmetic::{
         EbiMatrix, Fraction, FractionMatrix, IdentityMinus, Inversion, Log, One, Signed, Zero, f,
-    },
+    }
 };
 use ebi_optimisation::ebi_arithmetic::log_polynomial::log_polynomial::LogPolynomial;
 use std::ops::Neg;
@@ -36,13 +34,12 @@ where
 
 impl Entropy for StochasticDeterministicFiniteAutomaton {
     fn entropy(&self) -> Result<LogPolynomial> {
-        let state_count = self.number_of_states();
         let state_visits = number_of_average_visits_per_state(self)?;
 
         let mut sum = LogPolynomial::zero();
 
         //termination
-        for state in 0..state_count {
+        for state in self.states() {
             if let Some(average_visits) = &state_visits[state] {
                 let termination_probability = self.get_termination_probability(state);
                 if termination_probability.is_positive() {
@@ -54,9 +51,9 @@ impl Entropy for StochasticDeterministicFiniteAutomaton {
         }
 
         //transitions
-        for (index, &source) in self.get_sources().iter().enumerate() {
+        for (index, &source) in self.sources.iter().enumerate() {
             if let Some(average_visits) = &state_visits[source] {
-                let probability = &self.get_probabilities()[index];
+                let probability = &self.probabilities[index];
                 if probability.is_positive() {
                     let mut entropy = probability.n_log_n()?;
                     entropy *= average_visits;
@@ -75,7 +72,7 @@ pub fn number_of_average_visits_per_state(
     sdfa: &StochasticDeterministicFiniteAutomaton,
 ) -> Result<Vec<Option<Fraction>>> {
     //verify initial marking
-    let initial_state = if let Some(initial_state) = sdfa.get_initial_state() {
+    let initial_state = if let Some(initial_state) = sdfa.initial_state() {
         initial_state
     } else {
         //This has no initial state, thus its states will never be visited.
@@ -87,7 +84,7 @@ pub fn number_of_average_visits_per_state(
     let mut transient_state_2_state = vec![];
     {
         let mut livelock_cache = sdfa.get_livelock_cache();
-        for state in 0..sdfa.number_of_states() {
+        for state in sdfa.states() {
             if !livelock_cache.is_state_part_of_livelock(&state)? {
                 let transient_state = transient_state_2_state.len();
                 transient_state_2_state.push(state);
@@ -130,7 +127,7 @@ pub fn number_of_average_visits_per_state(
     // It is up to the caller to figure out whether a recurrent state is reachable, should that be of interest.
     let mut result = vec![None; sdfa.number_of_states()];
     for (transient_state, state) in transient_state_2_state.iter().enumerate() {
-        result[*state] = matrix.get(initial_state, transient_state);
+        result[*state] = matrix.get(initial_state.0, transient_state);
     }
 
     Ok(result)
@@ -154,7 +151,7 @@ fn c_s_iterative(
     max_iterations: usize,
 ) -> Result<Vec<Fraction>> {
     let state_count = sdfa.number_of_states();
-    let Some(initial_state) = sdfa.get_initial_state() else {
+    let Some(initial_state) = sdfa.initial_state() else {
         return Ok(vec![Fraction::zero(); state_count]);
     };
 
@@ -166,9 +163,9 @@ fn c_s_iterative(
             *value = Fraction::zero();
         }
 
-        for (index, &source) in sdfa.get_sources().iter().enumerate() {
-            let target = sdfa.get_targets()[index];
-            let probability = &sdfa.get_probabilities()[index];
+        for (index, &source) in sdfa.sources.iter().enumerate() {
+            let target = sdfa.targets[index];
+            let probability = &sdfa.probabilities[index];
 
             if !probability.is_zero() {
                 next_state_visits[target] += &state_visits[source] * probability;

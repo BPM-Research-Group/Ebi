@@ -301,7 +301,7 @@ macro_rules! lpn {
 macro_rules! dfa {
     ($t:ident, $u:ident) => {
         impl IsPartOfLivelock for $t {
-            type LivState = usize;
+            type LivState = AutomatonState;
 
             fn is_state_part_of_livelock(&self, state: &Self::LivState) -> Result<bool> {
                 let mut queue = vec![];
@@ -314,9 +314,10 @@ macro_rules! dfa {
                         return Ok(false);
                     }
 
-                    for transition in self.get_enabled_transitions(&state) {
-                        let mut child_state = state.clone();
-                        self.execute_transition(&mut child_state, transition)?;
+                    for transition in self.outgoing_transitions(state) {
+                        let child_state = self
+                            .transition_2_target(transition)
+                            .ok_or_else(|| anyhow!("Transition does not exist."))?;
 
                         if visited.insert(child_state.clone()) {
                             queue.push(child_state);
@@ -336,13 +337,12 @@ macro_rules! dfa {
 
         impl $u {
             pub fn new(automaton: &$t) -> Self {
-                let mut result = vec![true; automaton.number_of_states() + 2];
-                let mut result_last = vec![true; automaton.number_of_states() + 2];
+                let mut result = vec![true; AutomatonSemantics::number_of_states(automaton)];
+                let mut result_last = vec![true; AutomatonSemantics::number_of_states(automaton)];
 
                 //stage 1: set final states
-                result[automaton.number_of_states() + 1] = false;
-                for state in 0..automaton.number_of_states() {
-                    if automaton.can_terminate_in_state(state) {
+                for state in automaton.states() {
+                    if automaton.is_final_state(&state) {
                         result[state] = false;
                     }
                 }
@@ -351,11 +351,9 @@ macro_rules! dfa {
                 while result != result_last {
                     result_last.clone_from(&result);
 
-                    for (source, target) in
-                        automaton.get_sources().iter().zip(automaton.get_targets())
-                    {
-                        if !result[*target] {
-                            result[*source] = false;
+                    for (source, target) in automaton.sources.iter().zip(automaton.targets) {
+                        if !result[target] {
+                            result[source] = false;
                         }
                     }
                 }
@@ -365,13 +363,10 @@ macro_rules! dfa {
         }
 
         impl LiveLockCache for $u {
-            type LivState = usize;
+            type LivState = AutomatonState;
 
             fn is_state_part_of_livelock(&mut self, state: &Self::LivState) -> Result<bool> {
-                self.0
-                    .get(*state)
-                    .copied()
-                    .ok_or_else(|| anyhow!("index out of bounds"))
+                Ok(self.0[state])
             }
         }
     };

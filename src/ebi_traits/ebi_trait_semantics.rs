@@ -156,7 +156,7 @@ impl ToSemanticsTrait for StochasticBusinessProcessModelAndNotation {
 
 impl ToSemanticsTrait for DeterministicFiniteAutomaton {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::Usize(Box::new(self))
+        EbiTraitSemantics::AutomatonState(Box::new(self))
     }
 }
 
@@ -210,13 +210,13 @@ impl ToSemanticsTrait for DirectlyFollowsModel {
 
 impl ToSemanticsTrait for StochasticDeterministicFiniteAutomaton {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::Usize(Box::new(self))
+        EbiTraitSemantics::AutomatonState(Box::new(self))
     }
 }
 
 impl ToSemanticsTrait for StochasticNondeterministicFiniteAutomaton {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::Usize(Box::new(self))
+        EbiTraitSemantics::AutomatonState(Box::new(self))
     }
 }
 

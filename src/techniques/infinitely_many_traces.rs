@@ -207,7 +207,7 @@ impl Display for CycleGraph {
     }
 }
 
-macro_rules! dfa_2 {
+macro_rules! dfa {
     ($t:ty, $s:ty) => {
         impl InfinitelyManyTraces for $t {
             type LivState = $s;
@@ -282,7 +282,7 @@ macro_rules! dfa_2 {
                 //Step 3: remove states that are not reachable
                 {
                     let mut reachability_cache = self.get_reachability_cache();
-                    for state in 0..self.number_of_states() {
+                    for state in self.states() {
                         if part_of_cycle[state] && !reachability_cache.is_state_reachable(&state)? {
                             part_of_cycle[state] = false;
                         }
@@ -295,7 +295,7 @@ macro_rules! dfa_2 {
     };
 }
 
-macro_rules! dfa {
+macro_rules! dfm {
     ($t:ident) => {
         impl InfinitelyManyTraces for $t {
             type LivState = usize;
@@ -369,12 +369,12 @@ macro_rules! lang {
     };
 }
 
-dfa!(StochasticDeterministicFiniteAutomaton);
-dfa!(DeterministicFiniteAutomaton);
-dfa!(StochasticNondeterministicFiniteAutomaton);
-dfa!(DirectlyFollowsModel);
-dfa!(StochasticDirectlyFollowsModel);
-dfa_2!(DirectlyFollowsGraph, AutomatonState);
+dfm!(DirectlyFollowsModel);
+dfm!(StochasticDirectlyFollowsModel);
+dfa!(StochasticDeterministicFiniteAutomaton, AutomatonState);
+dfa!(DeterministicFiniteAutomaton, AutomatonState);
+dfa!(StochasticNondeterministicFiniteAutomaton, AutomatonState);
+dfa!(DirectlyFollowsGraph, AutomatonState);
 lpn!(LabelledPetriNet);
 lpn!(StochasticLabelledPetriNet);
 lang!(EventLog);

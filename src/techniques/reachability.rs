@@ -1,7 +1,8 @@
 use crate::{ebi_framework::displayable::Displayable, semantics::semantics::Semantics};
 use ebi_objects::{
     AutomatonSemantics, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
-    StochasticDeterministicFiniteAutomaton, anyhow::Result,
+    StochasticDeterministicFiniteAutomaton, StochasticNondeterministicFiniteAutomaton,
+    anyhow::Result,
 };
 use std::collections::VecDeque;
 
@@ -78,3 +79,7 @@ dfa!(
     StochasticDeterministicFiniteAutomatonReachabilityCache
 );
 dfa!(DirectlyFollowsGraph, DirectlyFollowsGraphReachabilityCache);
+dfa!(
+    StochasticNondeterministicFiniteAutomaton,
+    StochasticNondeterministicFiniteAutomatonReachabilityCache
+);
