@@ -217,7 +217,7 @@ impl AbstractMarkovian for StochasticNondeterministicFiniteAutomaton {
         // println!("no empty language");
 
         // 3 Build matrix and solve for x
-        let n = self.number_of_states();
+        let n = self.termination_probabilities.len();
         // Build sparse A = (I - Delta)^T
         let delta = build_delta(&self);
 
@@ -549,7 +549,7 @@ fn add_artificial_start_end_to_snfa(
 fn build_delta(
     snfa: &StochasticNondeterministicFiniteAutomaton,
 ) -> Vec<FxHashMap<AutomatonState, Fraction>> {
-    let n = snfa.number_of_states();
+    let n = snfa.termination_probabilities.len();
     let mut delta = vec![FxHashMap::<AutomatonState, Fraction>::default(); n];
 
     for transition in 0..snfa.sources.len() {
