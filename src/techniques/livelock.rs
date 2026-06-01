@@ -298,7 +298,7 @@ macro_rules! lpn {
     };
 }
 
-macro_rules! dfa {
+macro_rules! aut {
     ($t:ident, $u:ident) => {
         impl IsPartOfLivelock for $t {
             type LivState = AutomatonState;
@@ -351,12 +351,14 @@ macro_rules! dfa {
                 while result != result_last {
                     result_last.clone_from(&result);
 
-                    for (source, target) in automaton.sources.iter().zip(automaton.targets) {
+                    for (_, source, target, _) in automaton.transitions() {
                         if !result[target] {
                             result[source] = false;
                         }
                     }
                 }
+
+                println!("\t livelock states {:?}", result);
 
                 Self(result)
             }
@@ -377,15 +379,15 @@ lpn!(
     StochasticLabelledPetriNet,
     LiveLockCacheStochasticLabelledPetriNet
 );
-dfa!(
+aut!(
     DeterministicFiniteAutomaton,
     LivelockCacheDeterministicFiniteAutomaton
 );
-dfa!(
+aut!(
     StochasticDeterministicFiniteAutomaton,
     LivelockCacheStochasticDeterministicAutomaton
 );
-dfa!(
+aut!(
     StochasticNondeterministicFiniteAutomaton,
     LivelockCacheStochasticNondeterministicAutomaton
 );

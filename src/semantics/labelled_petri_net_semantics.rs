@@ -118,10 +118,6 @@ impl Semantics for LabelledPetriNet {
     ) -> Option<Activity> {
         self.labels[transition]
     }
-
-    fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState) -> usize {
-        self.transition2input_places.len()
-    }
 }
 
 #[derive(Clone)]

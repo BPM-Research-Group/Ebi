@@ -1,4 +1,6 @@
-use crate::ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage;
+use crate::{
+    ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage, math::components::Components,
+};
 use ebi_objects::{
     Activity, ActivityKey, DirectlyFollowsGraph, FiniteLanguage, IntoRefTraceIterator, ProcessTree,
     ebi_arithmetic::{Fraction, One, Signed},
@@ -73,72 +75,6 @@ impl LogInfo {
             total_traces,
             activity_instances,
         }
-    }
-}
-
-/// Partitioning activities
-struct Components {
-    activities: Vec<Activity>,
-    groups: Vec<usize>,
-}
-
-impl Components {
-    fn new(activities: &HashSet<Activity>) -> Self {
-        let activities: Vec<Activity> = activities.iter().cloned().collect();
-        let n = activities.len();
-        Self {
-            activities,
-            groups: (0..n).collect(),
-        }
-    }
-
-    fn merge_components(&mut self, a: Activity, b: Activity) {
-        let g_a = self
-            .activities
-            .iter()
-            .position(|&x| x == a)
-            .map(|i| self.groups[i]);
-        let g_b = self
-            .activities
-            .iter()
-            .position(|&x| x == b)
-            .map(|i| self.groups[i]);
-        if let (Some(group_a), Some(group_b)) = (g_a, g_b) {
-            if group_a != group_b {
-                for g in self.groups.iter_mut() {
-                    if *g == group_a {
-                        *g = group_b;
-                    }
-                }
-            }
-        }
-    }
-
-    fn build_components(&self) -> HashMap<usize, HashSet<Activity>> {
-        let mut map: HashMap<usize, HashSet<Activity>> = HashMap::new();
-        for (index, &activity) in self.activities.iter().enumerate() {
-            map.entry(self.groups[index]).or_default().insert(activity);
-        }
-        map
-    }
-
-    fn into_components(self) -> Vec<HashSet<Activity>> {
-        self.build_components().into_values().collect()
-    }
-
-    fn same_component(&self, a: Activity, b: Activity) -> bool {
-        let ga = self
-            .activities
-            .iter()
-            .position(|&x| x == a)
-            .map(|i| self.groups[i]);
-        let gb = self
-            .activities
-            .iter()
-            .position(|&x| x == b)
-            .map(|i| self.groups[i]);
-
-        ga.is_some() && ga == gb
     }
 }
 
@@ -221,7 +157,7 @@ fn find_cut(info: &LogInfo) -> Option<Cut> {
 }
 
 fn xor_cut(info: &LogInfo) -> Option<Cut> {
-    let mut components = Components::new(&info.activities);
+    let mut components = Components::new(info.activities.iter().cloned().collect());
     for (src, tgt) in info.dfg.get_sources().zip(info.dfg.get_targets()) {
         components.merge_components(src, tgt);
     }
@@ -270,7 +206,7 @@ fn sequence_cut(info: &LogInfo) -> Option<Cut> {
     }
 
     //merge pairwise reachable and pairwise unreachable pairs
-    let mut components = Components::new(&info.activities);
+    let mut components = Components::new(info.activities.iter().cloned().collect());
     for i in 0..n {
         for j in (i + 1)..n {
             let (a, b) = (activities[i], activities[j]);
@@ -316,7 +252,7 @@ fn concurrent_cut(info: &LogInfo) -> Option<Cut> {
 
     let activities: Vec<Activity> = info.activities.iter().cloned().collect();
     let n = activities.len();
-    let mut components = Components::new(&info.activities);
+    let mut components = Components::new(info.activities.iter().cloned().collect());
 
     //merge pairs that aren't fully connected in both directions
     for i in 0..n {
@@ -384,7 +320,7 @@ fn loop_cut(info: &LogInfo) -> Option<Cut> {
         return None;
     }
 
-    let mut components = Components::new(&info.activities);
+    let mut components = Components::new(info.activities.iter().cloned().collect());
 
     //merge all start + end activities
     let pivot = *info.start_activities.iter().next().unwrap();

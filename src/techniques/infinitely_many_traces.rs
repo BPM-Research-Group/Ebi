@@ -8,13 +8,16 @@ use ebi_objects::{
     DirectlyFollowsModel, EventLog, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet,
     ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    anyhow::{Result, anyhow},
+    anyhow::Result,
     ebi_objects::process_tree::{Node, Operator, TreeMarking},
 };
+use intmap::IntMap;
+use rustc_hash::FxHashMap;
 use std::{
-    collections::{HashMap, VecDeque, hash_map::Entry},
+    collections::{HashMap, HashSet, VecDeque, hash_map::Entry},
     fmt::Display,
 };
+use strongly_connected_components::{Graph, SccDecomposition};
 
 pub trait InfinitelyManyTraces {
     type LivState: Displayable;
@@ -207,10 +210,10 @@ impl Display for CycleGraph {
     }
 }
 
-macro_rules! dfa {
-    ($t:ty, $s:ty) => {
-        impl InfinitelyManyTraces for $t {
-            type LivState = $s;
+macro_rules! aut {
+    ($type:ty) => {
+        impl InfinitelyManyTraces for $type {
+            type LivState = AutomatonState;
 
             fn infinitely_many_traces(&self) -> Result<bool> {
                 if self.get_initial_state().is_none() {
@@ -218,81 +221,92 @@ macro_rules! dfa {
                     return Ok(false);
                 };
 
-                // Step 1: apply Kahn's algorithm to find states that are part of a cycle.
-                let mut part_of_cycle = vec![true; self.number_of_states()];
+                //Step 1: create strongly connected components of nodes
+                let (sccs, state_2_node, node_2_state) = create_sccs(self);
+
+                //Step 2: remove components that have no visible intra-transition
+                let mut candidate_sccs = HashSet::new();
                 {
-                    let v = self.number_of_states();
-
-                    let mut queue = vec![];
-                    let mut visited = 0;
-
-                    //compute in-degrees
-                    let mut in_degree = vec![0; v];
-                    for target in &self.targets {
-                        in_degree[target] += 1;
-                    }
-
-                    //initialise queue with nodes with in-degree of 0
-                    for state in self.states() {
-                        if in_degree[state] == 0 {
-                            queue.push(state);
-                            part_of_cycle[state] = false;
-                        }
-                    }
-
-                    while let Some(state_u) = queue.pop() {
-                        visited += 1;
-
-                        //reduce the in-degree of neighbours
-                        for transition in self.outgoing_transitions(state_u) {
-                            let neighbour = self
-                                .transition_2_target(transition)
-                                .ok_or_else(|| anyhow!("Bug."))?;
-                            in_degree[neighbour] -= 1;
-                            if in_degree[neighbour] == 0 {
-                                queue.push(neighbour);
-                                part_of_cycle[neighbour] = false;
-                            }
-                        }
-                    }
-
-                    if visited == v {
-                        //no states on cycles detected -> not infinitely many traces
-                        return Ok(false);
-                    }
-                }
-
-                //Step 2: remove states that are part of livelocks
-                {
-                    let mut livelock_cache = self.get_livelock_cache();
-                    for state in self.states() {
-                        if part_of_cycle[state]
-                            && livelock_cache.is_state_part_of_livelock(&state)?
+                    for (_, source, target, activity) in self.transitions() {
+                        if activity.is_some()
+                            && sccs.scc_of_node(*state_2_node.get(source).unwrap())
+                                == sccs.scc_of_node(*state_2_node.get(target).unwrap())
                         {
-                            part_of_cycle[state] = false;
+                            candidate_sccs
+                                .insert(sccs.scc_of_node(*state_2_node.get(source).unwrap()));
                         }
                     }
                 }
 
-                //intermediate check: if no states are left, there are not infinitely many traces
-                if part_of_cycle.iter().all(|x| !x) {
+                // println!("part 2 {:?}", candidate_sccs);
+
+                //intermediate check: if no sccs are left, there are not infinitely many traces
+                if candidate_sccs.is_empty() {
                     return Ok(false);
                 }
 
-                //Step 3: remove states that are not reachable
+                //Step 3: remove states that are part of livelocks and unreachable states
                 {
+                    let mut livelock_cache = self.get_livelock_cache();
                     let mut reachability_cache = self.get_reachability_cache();
-                    for state in self.states() {
-                        if part_of_cycle[state] && !reachability_cache.is_state_reachable(&state)? {
-                            part_of_cycle[state] = false;
+                    // we only need to check one state per scc
+                    candidate_sccs.retain(|scc| {
+                        let node = scc.iter_nodes().next().unwrap();
+                        let state = node_2_state.get(&node).unwrap();
+
+                        if livelock_cache.is_state_part_of_livelock(&state).unwrap() {
+                            //one state in the scc is part of a livelock
+                            // -> all states in the scc are part of a livelock
+                            // -> scc cannot lead to infinitely many traces
+                            return false;
                         }
-                    }
+
+                        if !reachability_cache.is_state_reachable(&state).unwrap() {
+                            // one state in the scc is not reachable
+                            // -> all states in the scc are not reachbable
+                            // -> scc cannot lead to infinitely many traces
+                            return false;
+                        }
+
+                        true
+                    });
                 }
 
-                Ok(part_of_cycle.iter().any(|x| *x))
+                return Ok(!candidate_sccs.is_empty());
             }
         }
     };
+}
+
+fn create_sccs<T>(
+    automaton: &T,
+) -> (
+    SccDecomposition,
+    IntMap<AutomatonState, strongly_connected_components::Node>,
+    FxHashMap<strongly_connected_components::Node, AutomatonState>,
+)
+where
+    T: AutomatonSemantics,
+{
+    //create a graph of the states
+    let mut graph = Graph::new();
+    let mut state_2_node = IntMap::new();
+    let mut node_2_state = FxHashMap::default();
+
+    for state in automaton.states() {
+        let node = graph.new_node();
+        state_2_node.insert(state, node);
+        node_2_state.insert(node, state);
+    }
+
+    for (_, source, target, _) in automaton.transitions() {
+        graph.new_edge(
+            *state_2_node.get(source).unwrap(),
+            *state_2_node.get(target).unwrap(),
+        );
+    }
+
+    (graph.find_sccs(), state_2_node, node_2_state)
 }
 
 macro_rules! dfm {
@@ -371,10 +385,10 @@ macro_rules! lang {
 
 dfm!(DirectlyFollowsModel);
 dfm!(StochasticDirectlyFollowsModel);
-dfa!(StochasticDeterministicFiniteAutomaton, AutomatonState);
-dfa!(DeterministicFiniteAutomaton, AutomatonState);
-dfa!(StochasticNondeterministicFiniteAutomaton, AutomatonState);
-dfa!(DirectlyFollowsGraph, AutomatonState);
+aut!(StochasticDeterministicFiniteAutomaton);
+aut!(DeterministicFiniteAutomaton);
+aut!(StochasticNondeterministicFiniteAutomaton);
+aut!(DirectlyFollowsGraph);
 lpn!(LabelledPetriNet);
 lpn!(StochasticLabelledPetriNet);
 lang!(EventLog);
@@ -385,8 +399,9 @@ lang!(FiniteStochasticLanguage);
 mod tests {
     use crate::techniques::infinitely_many_traces::InfinitelyManyTraces;
     use ebi_objects::{
-        DeterministicFiniteAutomaton, DirectlyFollowsGraph, LabelledPetriNet, ProcessTree,
-        StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
+        AutomatonSemantics, DeterministicFiniteAutomaton, DirectlyFollowsGraph, LabelledPetriNet,
+        ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
+        StochasticNondeterministicFiniteAutomaton,
     };
     use std::fs;
 
@@ -409,19 +424,25 @@ mod tests {
     #[test]
     fn infinitely_many_traces_dfa() {
         let fin = fs::read_to_string("testfiles/a-loop.dfa").unwrap();
-        let lpn = fin.parse::<DeterministicFiniteAutomaton>().unwrap();
+        let dfa = fin.parse::<DeterministicFiniteAutomaton>().unwrap();
 
-        assert!(lpn.infinitely_many_traces().unwrap());
+        println!("states {:?}", dfa.states().collect::<Vec<_>>());
+        println!("transitions {:?}", dfa.transitions().collect::<Vec<_>>());
+
+        assert!(dfa.infinitely_many_traces().unwrap());
     }
 
     #[test]
     fn infinitely_many_traces_sdfa() {
         let fin = fs::read_to_string("testfiles/a-livelock-zeroweight.sdfa").unwrap();
-        let lpn = fin
+        let sdfa = fin
             .parse::<StochasticDeterministicFiniteAutomaton>()
             .unwrap();
 
-        assert!(!lpn.infinitely_many_traces().unwrap());
+        println!("states {:?}", sdfa.states().collect::<Vec<_>>());
+        println!("transitions {:?}", sdfa.transitions().collect::<Vec<_>>());
+
+        assert!(!sdfa.infinitely_many_traces().unwrap());
     }
 
     #[test]
@@ -459,5 +480,15 @@ mod tests {
         let dfg = fin.parse::<DirectlyFollowsGraph>().unwrap();
 
         assert!(!dfg.infinitely_many_traces().unwrap());
+    }
+
+    #[test]
+    fn infinitely_many_traces_snfa() {
+        let fin = fs::read_to_string("./testfiles/infinite_traces.snfa").unwrap();
+        let snfa = fin
+            .parse::<StochasticNondeterministicFiniteAutomaton>()
+            .unwrap();
+
+        assert!(snfa.infinitely_many_traces().unwrap());
     }
 }

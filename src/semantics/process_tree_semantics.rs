@@ -6,7 +6,7 @@ use ebi_objects::{
         labelled_petri_net::TransitionIndex,
         process_tree::{
             TreeMarking, execute_transition, get_enabled_transitions, get_initial_state,
-            get_number_of_transitions, get_transition_activity, is_final_state,
+            get_transition_activity, is_final_state,
         },
     },
 };
@@ -51,10 +51,6 @@ impl Semantics for ProcessTree {
         state: &<Self as Semantics>::SemState,
     ) -> Vec<TransitionIndex> {
         get_enabled_transitions(self, state)
-    }
-
-    fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState) -> usize {
-        get_number_of_transitions(self)
     }
 }
 

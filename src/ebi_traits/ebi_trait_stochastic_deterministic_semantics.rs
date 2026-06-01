@@ -4,10 +4,8 @@ use crate::{
         ebi_trait_object::EbiTraitObject, trait_importers::ToStochasticDeterministicSemanticsTrait,
     },
     semantics::labelled_petri_net_semantics::LPNMarking,
-    techniques::{
-        deterministic_semantics_for_stochastic_semantics::PMarking,
-        infinitely_many_traces::InfinitelyManyTraces,
-    },
+    stochastic_deterministic_semantics::deterministic_semantics_for_stochastic_semantics::PMarking,
+    techniques::infinitely_many_traces::InfinitelyManyTraces,
     trait_definition_finalisation,
 };
 use ebi_objects::{
@@ -34,6 +32,14 @@ pub enum EbiTraitStochasticDeterministicSemantics {
         Box<
             dyn StochasticDeterministicSemantics<
                     DetState = AutomatonState,
+                    LivState = AutomatonState,
+                >,
+        >,
+    ),
+    AutomatonStateDistribution(
+        Box<
+            dyn StochasticDeterministicSemantics<
+                    DetState = PMarking<AutomatonState>,
                     LivState = AutomatonState,
                 >,
         >,
@@ -176,7 +182,7 @@ impl ToStochasticDeterministicSemanticsTrait for StochasticNondeterministicFinit
     fn to_stochastic_deterministic_semantics_trait(
         self,
     ) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::UsizeDistribution(Box::new(self))
+        EbiTraitStochasticDeterministicSemantics::AutomatonStateDistribution(Box::new(self))
     }
 }
 

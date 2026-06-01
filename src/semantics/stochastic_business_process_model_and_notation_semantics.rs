@@ -45,8 +45,4 @@ impl Semantics for StochasticBusinessProcessModelAndNotation {
     ) -> Vec<TransitionIndex> {
         StochasticBusinessProcessModelAndNotation::get_enabled_transitions(&self, state).unwrap()
     }
-
-    fn number_of_transitions(&self, state: &<Self as Semantics>::SemState) -> usize {
-        StochasticBusinessProcessModelAndNotation::number_of_transitions(self, state)
-    }
 }

@@ -92,6 +92,7 @@ impl ExplainTrace for EbiTraitStochasticSemantics {
     ) -> Result<LanguageOfAlignments> {
         match self {
             EbiTraitStochasticSemantics::Usize(sem) => sem.explain_trace(trace, balance),
+            EbiTraitStochasticSemantics::AutomatonState(sem) => sem.explain_trace(trace, balance),
             EbiTraitStochasticSemantics::Marking(sem) => sem.explain_trace(trace, balance),
             EbiTraitStochasticSemantics::TreeMarking(sem) => sem.explain_trace(trace, balance),
         }

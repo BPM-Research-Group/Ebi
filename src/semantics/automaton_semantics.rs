@@ -49,10 +49,6 @@ macro_rules! aut {
             ) -> Vec<TransitionIndex> {
                 AutomatonSemantics::outgoing_transitions(self, *state)
             }
-
-            fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState) -> usize {
-                AutomatonSemantics::number_of_transitions(self)
-            }
         }
     };
 }

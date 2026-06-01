@@ -47,6 +47,4 @@ pub trait Semantics:
         &self,
         state: &<Self as Semantics>::SemState,
     ) -> Vec<TransitionIndex>;
-
-    fn number_of_transitions(&self, state: &<Self as Semantics>::SemState) -> usize;
 }

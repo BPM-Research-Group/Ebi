@@ -118,10 +118,6 @@ macro_rules! semantics_for_automaton {
                     result
                 }
             }
-
-            fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState) -> usize {
-                self.sources.len() + 1 + self.sources.len()
-            }
         }
     };
 }

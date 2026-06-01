@@ -1,6 +1,6 @@
 use crate::{ebi_framework::displayable::Displayable, semantics::semantics::Semantics};
 use ebi_objects::{
-    AutomatonSemantics, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
+    AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
     StochasticDeterministicFiniteAutomaton, StochasticNondeterministicFiniteAutomaton,
     anyhow::Result,
 };
@@ -20,10 +20,10 @@ pub trait ReachabilityCache {
     fn is_state_reachable(&mut self, state: &Self::ReaState) -> Result<bool>;
 }
 
-macro_rules! dfa {
+macro_rules! aut {
     ($t:ty, $c:ident) => {
         impl IsReachable for $t {
-            type ReaState = usize;
+            type ReaState = AutomatonState;
 
             fn get_reachability_cache(
                 &self,
@@ -45,9 +45,9 @@ macro_rules! dfa {
                     queue.push_back(initial_state);
                     while let Some(state) = queue.pop_front() {
                         reachable[state] = true;
-                        for transition in sdfa.get_enabled_transitions(&state) {
+                        for transition in sdfa.outgoing_transitions(state) {
                             //found a neighbour
-                            let neighbour = sdfa.targets[transition];
+                            let neighbour = sdfa.transition_2_target(transition).unwrap();
                             if !reachable[neighbour] {
                                 queue.push_back(neighbour);
                                 reachable[neighbour] = true;
@@ -61,7 +61,7 @@ macro_rules! dfa {
         }
 
         impl ReachabilityCache for $c {
-            type ReaState = usize;
+            type ReaState = AutomatonState;
 
             fn is_state_reachable(&mut self, state: &Self::ReaState) -> Result<bool> {
                 Ok(self.reachable[*state])
@@ -70,16 +70,16 @@ macro_rules! dfa {
     };
 }
 
-dfa!(
+aut!(
     DeterministicFiniteAutomaton,
     DeterministicFiniteAutomatonReachabilityCache
 );
-dfa!(
+aut!(
     StochasticDeterministicFiniteAutomaton,
     StochasticDeterministicFiniteAutomatonReachabilityCache
 );
-dfa!(DirectlyFollowsGraph, DirectlyFollowsGraphReachabilityCache);
-dfa!(
+aut!(DirectlyFollowsGraph, DirectlyFollowsGraphReachabilityCache);
+aut!(
     StochasticNondeterministicFiniteAutomaton,
     StochasticNondeterministicFiniteAutomatonReachabilityCache
 );

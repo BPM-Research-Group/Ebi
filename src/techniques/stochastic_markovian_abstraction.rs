@@ -5,7 +5,8 @@ use crate::{
     techniques::tau_removal::TauRemoval,
 };
 use ebi_objects::{
-    Activity, ActivityKey, HasActivityKey, StochasticNondeterministicFiniteAutomaton,
+    Activity, ActivityKey, AutomatonSemantics, AutomatonState, HasActivityKey,
+    StochasticNondeterministicFiniteAutomaton,
     anyhow::{Ok, Result, anyhow},
     ebi_arithmetic::{Fraction, One, Recip, ebi_number::Zero},
     ebi_objects::{
@@ -445,7 +446,7 @@ pub fn build_embedded_snfa(
     snfa.activity_key = net.activity_key().clone();
 
     // Reachability exploration queue
-    let mut state2snfa_state: FxHashMap<LPNMarking, usize> = FxHashMap::default();
+    let mut state2snfa_state: FxHashMap<LPNMarking, AutomatonState> = FxHashMap::default();
     let mut queue: VecDeque<LPNMarking> = VecDeque::new();
 
     // Insert the initial state of the Petri net
@@ -454,7 +455,7 @@ pub fn build_embedded_snfa(
     } else {
         return Ok(snfa);
     };
-    state2snfa_state.insert(initial_state.clone(), 0);
+    state2snfa_state.insert(initial_state.clone(), AutomatonState::zero());
     queue.push_back(initial_state);
 
     // println!("{:?}", state2snfa_state);
@@ -502,7 +503,7 @@ pub fn build_embedded_snfa(
     }
 
     // The first discovered marking is the initial state of the SNFA
-    snfa.initial_state = Some(0);
+    snfa.initial_state = Some(AutomatonState::zero());
     Ok(snfa)
 }
 
@@ -526,7 +527,12 @@ fn add_artificial_start_end_to_snfa(
             // Copy the existing p_final value
             let final_prob = snfa.terminating_probabilities[state].clone();
             // Add a "-" transition with the original final probability
-            snfa.add_transition(state, Some(end_activity), q_minus, final_prob)?;
+            snfa.add_transition(
+                AutomatonState::of(state),
+                Some(end_activity),
+                q_minus,
+                final_prob,
+            )?;
         }
     }
 
@@ -542,11 +548,11 @@ fn add_artificial_start_end_to_snfa(
 // Build sparse transition matrix
 fn build_delta(
     snfa: &StochasticNondeterministicFiniteAutomaton,
-) -> Vec<FxHashMap<usize, Fraction>> {
+) -> Vec<FxHashMap<AutomatonState, Fraction>> {
     let n = snfa.number_of_states();
-    let mut delta = vec![FxHashMap::<usize, Fraction>::default(); n];
+    let mut delta = vec![FxHashMap::<AutomatonState, Fraction>::default(); n];
 
-    for transition in 0..snfa.number_of_transitions() {
+    for transition in 0..snfa.sources.len() {
         delta[snfa.sources[transition]]
             .entry(snfa.targets[transition])
             .and_modify(|v| *v += &snfa.probabilities[transition])
@@ -793,19 +799,19 @@ fn compute_phi_ids(
     // Suffix map: subtrace (starting at the first symbol that leaves the current state) -> probability
     type SuffixMap = FxHashMap<Vec<usize>, Fraction>;
     // Cache stores Arc<SuffixMap> so a hit clones only the pointer
-    let mut cache: FxHashMap<(usize, usize), SuffixMap> = FxHashMap::default();
+    let mut cache: FxHashMap<(AutomatonState, usize), SuffixMap> = FxHashMap::default();
 
     // Recursively collect every suffix of length <= remaining that can be produced
     // from state_idx, together with its probability relative to the current state.
     // The probabilities stored in the map do not include any prefix probability.
     // This allows us to multiply the prefix probability later and still reuse the suffixes.
     fn collect_suffixes(
-        state_idx: usize,
+        state_idx: AutomatonState,
         remaining: usize,
         snfa: &StochasticNondeterministicFiniteAutomaton,
         start_activity: Activity,
         end_activity: Activity,
-        cache: &mut FxHashMap<(usize, usize), SuffixMap>,
+        cache: &mut FxHashMap<(AutomatonState, usize), SuffixMap>,
     ) -> SuffixMap {
         // Fast path -> already computed
         if let Some(m) = cache.get(&(state_idx, remaining)) {
@@ -858,7 +864,14 @@ fn compute_phi_ids(
 
     // Build phi for every potential start state
     for state in 0..n {
-        let suffixes = collect_suffixes(state, k, snfa, start_activity, end_activity, &mut cache);
+        let suffixes = collect_suffixes(
+            AutomatonState::of(state),
+            k,
+            snfa,
+            start_activity,
+            end_activity,
+            &mut cache,
+        );
 
         // println!("\tstate {}, suffixes {:?}", state, suffixes);
 

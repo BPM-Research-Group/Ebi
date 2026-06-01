@@ -147,4 +147,4 @@ is_non_decreasing_livelock_dfm!(DirectlyFollowsModel, usize);
 is_non_decreasing_livelock_dfm!(StochasticDirectlyFollowsModel, usize);
 is_non_decreasing_livelock_dfm!(DeterministicFiniteAutomaton, AutomatonState);
 is_non_decreasing_livelock_dfm!(StochasticDeterministicFiniteAutomaton, AutomatonState);
-is_non_decreasing_livelock_dfm!(StochasticNondeterministicFiniteAutomaton, usize);
+is_non_decreasing_livelock_dfm!(StochasticNondeterministicFiniteAutomaton, AutomatonState);

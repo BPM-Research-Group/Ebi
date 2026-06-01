@@ -91,8 +91,6 @@ mod tests {
         let state = dfa.get_initial_state().unwrap();
         let activity = dfa.activity_key_mut().process_activity("a");
 
-        dfa.get_sources();
-
         assert!(dfa.add_transition(state, activity, state).is_ok());
         assert!(dfa.add_transition(state, activity, state).is_err());
     }

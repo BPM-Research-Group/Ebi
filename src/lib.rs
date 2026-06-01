@@ -90,7 +90,11 @@ pub mod javascript {
 }
 pub mod math {
     pub mod average;
-
+    pub mod components;
+    pub mod correlation;
+    pub mod distances;
+    pub mod distances_matrix;
+    pub mod distances_triangular;
     pub mod fixed_denominator_fraction;
     #[cfg(any(
         all(
@@ -104,6 +108,7 @@ pub mod math {
     pub mod fixed_denominator_fraction_exact;
     #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
     pub mod fixed_denominator_fraction_f64;
+    pub mod levenshtein;
     pub mod log_div;
     #[cfg(any(
         all(
@@ -117,16 +122,10 @@ pub mod math {
     pub mod log_div_exact;
     #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
     pub mod log_div_f64;
-    pub mod sign;
-
-    pub mod correlation;
-    pub mod distances;
-    pub mod distances_matrix;
-    pub mod distances_triangular;
-    pub mod levenshtein;
     pub mod markov_model;
     pub mod root;
     pub mod root_log_div;
+    pub mod sign;
 }
 
 pub mod prom {
@@ -264,3 +263,4 @@ pub mod multiple_reader;
 pub mod text;
 
 pub use ebi_objects;
+pub use ebi_objects::AutomatonState;

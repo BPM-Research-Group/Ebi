@@ -19,6 +19,7 @@ mod tests{{
 \t}};
 \tuse ebi_objects::ebi_activity_key::TestActivityKey;
 \tuse crate::multiple_reader::MultipleReader;
+\tuse ntest::timeout;
 \tuse std::fs::File;
 
 {result}}}",
@@ -132,6 +133,7 @@ pub(crate) fn generate_tests_for_command(
 
             result += &format!(
                 "\t#[test]
+\t#[timeout(1000)]
 \tpub fn {function_name}_test_{input_i}() {{
 \t\t{fallible_hint}
 \t\t{exact_code}
