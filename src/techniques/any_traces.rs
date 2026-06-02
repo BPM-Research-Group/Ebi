@@ -85,9 +85,9 @@ macro_rules! lpn {
 }
 
 macro_rules! dfm {
-    ($t:ident, $s:ident) => {
+    ($t:ident) => {
         impl AnyTraces for $t {
-            type LivState = $s;
+            type LivState = AutomatonState;
 
             fn any_traces(&self) -> Result<bool> {
                 if let Some(initial_state) = self.get_initial_state() {
@@ -113,12 +113,12 @@ lang!(EventLogTraceAttributes);
 lang!(EventLogXes);
 lpn!(LabelledPetriNet);
 lpn!(StochasticLabelledPetriNet);
-dfm!(DeterministicFiniteAutomaton, AutomatonState);
-dfm!(StochasticDeterministicFiniteAutomaton, AutomatonState);
-dfm!(StochasticNondeterministicFiniteAutomaton, AutomatonState);
-dfm!(DirectlyFollowsModel, usize);
-dfm!(StochasticDirectlyFollowsModel, usize);
-dfm!(DirectlyFollowsGraph, AutomatonState);
+dfm!(DeterministicFiniteAutomaton);
+dfm!(StochasticDeterministicFiniteAutomaton);
+dfm!(StochasticNondeterministicFiniteAutomaton);
+dfm!(DirectlyFollowsModel);
+dfm!(StochasticDirectlyFollowsModel);
+dfm!(DirectlyFollowsGraph);
 
 #[cfg(test)]
 mod tests {

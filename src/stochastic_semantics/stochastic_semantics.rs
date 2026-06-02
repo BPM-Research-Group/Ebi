@@ -17,7 +17,7 @@ pub trait StochasticSemantics:
         &self,
         state: &<Self as StochasticSemantics>::StoSemState,
         transition: TransitionIndex,
-    ) -> &Fraction;
+    ) -> Result<&Fraction>;
 
     /**
      *

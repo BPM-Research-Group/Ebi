@@ -1,6 +1,6 @@
 use crate::semantics::semantics::Semantics;
 use ebi_objects::{
-    Activity, AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph, StochasticDeterministicFiniteAutomaton, StochasticNondeterministicFiniteAutomaton, anyhow::{Result, anyhow}, ebi_objects::labelled_petri_net::TransitionIndex
+    Activity, AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticNondeterministicFiniteAutomaton, anyhow::{Result, anyhow}, ebi_objects::labelled_petri_net::TransitionIndex
 };
 
 macro_rules! aut {
@@ -57,6 +57,8 @@ aut!(DeterministicFiniteAutomaton);
 aut!(DirectlyFollowsGraph);
 aut!(StochasticDeterministicFiniteAutomaton);
 aut!(StochasticNondeterministicFiniteAutomaton);
+aut!(DirectlyFollowsModel);
+aut!(StochasticDirectlyFollowsModel);
 
 #[cfg(test)]
 mod tests {

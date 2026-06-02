@@ -102,7 +102,7 @@ macro_rules! default_trace_probability {
                                     &state_a,
                                     new_state_a,
                                     new_state_b,
-                                );
+                                )?;
                             } else {
                                 //labelled transition; both A and B need to take steps
                                 if follower_b.is_final_state(&state_ab.state_b) {
@@ -111,7 +111,7 @@ macro_rules! default_trace_probability {
                                     y.outgoing_state_probabilities.push(
                                         <$t as StochasticSemantics>::get_transition_weight(
                                             self, &state_a, transition,
-                                        ) / &total_weight,
+                                        )? / &total_weight,
                                     );
                                 } else {
                                     let new_state_b = follower_b.take_step(
@@ -130,14 +130,14 @@ macro_rules! default_trace_probability {
                                             &state_a,
                                             new_state_a,
                                             new_state_b.unwrap(),
-                                        );
+                                        )?;
                                     } else {
                                         //dead state
                                         y.outgoing_states.push(dead_state_a);
                                         y.outgoing_state_probabilities.push(
                                             <$t as StochasticSemantics>::get_transition_weight(
                                                 self, &state_a, transition,
-                                            ) / &total_weight,
+                                            )? / &total_weight,
                                         );
                                     }
                                 }
@@ -200,7 +200,7 @@ fn process_new_state<T: StochasticSemantics<StoSemState = A>, A: Eq + Hash + Clo
     state_a: &A,
     new_state_a: A,
     new_state_b: usize,
-) {
+) -> Result<()> {
     let new_state_ab = ABState::<A> {
         state_a: new_state_a,
         state_b: new_state_b,
@@ -220,7 +220,8 @@ fn process_new_state<T: StochasticSemantics<StoSemState = A>, A: Eq + Hash + Clo
 
     y.outgoing_states.push(new_state_index);
     y.outgoing_state_probabilities
-        .push(semantics.get_transition_weight(&state_a, transition) / total_weight);
+        .push(semantics.get_transition_weight(&state_a, transition)? / total_weight);
+    Ok(())
 }
 
 pub trait CrossProductResult {

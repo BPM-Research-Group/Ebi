@@ -11,10 +11,17 @@ use ebi_objects::{
 impl StochasticSemantics for FiniteStochasticLanguageSemantics {
     type StoSemState = usize;
 
-    fn get_transition_weight(&self, state: &usize, transition: TransitionIndex) -> &Fraction {
+    fn get_transition_weight(
+        &self,
+        state: &usize,
+        transition: TransitionIndex,
+    ) -> Result<&Fraction> {
         let activity = self.transition_index_to_activity(transition);
 
-        &self.nodes[*state].get(&activity).unwrap().1
+        Ok(&self.nodes[*state]
+            .get(&activity)
+            .ok_or_else(|| anyhow!("Activity {:?} does not exist.", activity))?
+            .1)
     }
 
     fn get_total_weight_of_enabled_transitions(&self, state: &usize) -> Result<Fraction> {

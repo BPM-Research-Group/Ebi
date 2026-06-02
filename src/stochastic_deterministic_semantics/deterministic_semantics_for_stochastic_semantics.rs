@@ -285,7 +285,7 @@ macro_rules! default_stochastic_deterministic_semantics {
 
                     for transition in self.get_enabled_transitions(&marking) {
                         let probability =
-                            self.get_transition_weight(&marking, transition) / &total_weight;
+                            self.get_transition_weight(&marking, transition)? / &total_weight;
 
                         let mut new_marking = marking.clone();
                         self.execute_transition(&mut new_marking, transition)?;
@@ -334,7 +334,7 @@ macro_rules! default_stochastic_deterministic_semantics {
 
 default_stochastic_deterministic_semantics!(StochasticLabelledPetriNet, LPNMarking);
 default_stochastic_deterministic_semantics!(StochasticProcessTree, TreeMarking);
-default_stochastic_deterministic_semantics!(StochasticDirectlyFollowsModel, usize);
+default_stochastic_deterministic_semantics!(StochasticDirectlyFollowsModel, AutomatonState);
 default_stochastic_deterministic_semantics!(
     StochasticNondeterministicFiniteAutomaton,
     AutomatonState

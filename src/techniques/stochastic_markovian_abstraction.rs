@@ -475,7 +475,7 @@ pub fn build_embedded_snfa(
         let weight_sum = net.get_total_weight_of_enabled_transitions(&state)?;
 
         for &transition in &enabled_transitions {
-            let weight = net.get_transition_weight(&state, transition).clone();
+            let weight = net.get_transition_weight(&state, transition)?.clone();
             let prob = &weight / &weight_sum;
 
             // Fire transition (creates a successor state)

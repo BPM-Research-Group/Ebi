@@ -24,6 +24,7 @@ pub const EBI_CONVERT: EbiCommand = EbiCommand::Group {
         &EBI_CONVERT_LPN,
         &EBI_CONVERT_SLANG,
         &EBI_CONVERT_SDFA,
+        &EBI_CONVERT_SDFM,
         &EBI_CONVERT_SLPN,
         &EBI_CONVERT_SNFA,
     ],
@@ -179,6 +180,33 @@ pub const EBI_CONVERT_SLPN: EbiCommand = EbiCommand::Command {
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
+};
+
+
+pub const EBI_CONVERT_SDFM: EbiCommand = EbiCommand::Command {
+    name_short: "sdfm",
+    name_long: Some("stochastic-directly-follows-model"),
+    explanation_short: "Convert an object to a stochastic directly follows model.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[
+        &EbiInputType::Object(EbiObjectType::StochasticDirectlyFollowsModel), //every object that can be imported as an SDFM will be supported by the framework
+    ]],
+    input_names: &["FILE"],
+    input_helps: &[
+        "Any file supported by Ebi that can be converted. An SLPN must be livelock-free and bounded.",
+    ],
+    execute: |mut inputs, _| {
+        let snfa = inputs.remove(0).to_type()?;
+        Ok(EbiOutput::Object(
+            EbiObject::StochasticDirectlyFollowsModel(*snfa),
+        ))
+    },
+    output_type: &EbiOutputType::ObjectType(
+        EbiObjectType::StochasticDirectlyFollowsModel,
+    ),
 };
 
 pub const EBI_CONVERT_SNFA: EbiCommand = EbiCommand::Command {

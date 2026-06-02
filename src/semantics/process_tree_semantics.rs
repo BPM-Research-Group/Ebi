@@ -199,7 +199,10 @@ mod tests {
                 .unwrap(),
             Fraction::one()
         );
-        assert_eq!(tree.get_transition_weight(&state, 0), &Fraction::one());
+        assert_eq!(
+            tree.get_transition_weight(&state, 0).unwrap(),
+            &Fraction::one()
+        );
 
         assert!(tree.execute_transition(&mut state, 0).is_ok());
 
@@ -220,7 +223,10 @@ mod tests {
                 .unwrap(),
             Fraction::from(4)
         );
-        assert_eq!(tree.get_transition_weight(&state, 4), &Fraction::from(4));
+        assert_eq!(
+            tree.get_transition_weight(&state, 4).unwrap(),
+            &Fraction::from(4)
+        );
 
         assert!(tree.execute_transition(&mut state, 4).is_ok());
         assert!(tree.is_final_state(&state));

@@ -14,7 +14,7 @@ use ebi_objects::{
 use intmap::IntMap;
 use rustc_hash::FxHashMap;
 use std::{
-    collections::{HashMap, HashSet, VecDeque, hash_map::Entry},
+    collections::{HashMap, HashSet, hash_map::Entry},
     fmt::Display,
 };
 use strongly_connected_components::{Graph, SccDecomposition};
@@ -309,68 +309,6 @@ where
     (graph.find_sccs(), state_2_node, node_2_state)
 }
 
-macro_rules! dfm {
-    ($t:ident) => {
-        impl InfinitelyManyTraces for $t {
-            type LivState = usize;
-
-            fn infinitely_many_traces(&self) -> Result<bool> {
-                //in a DFA-like model, we must find a loop on which all states are not in a livelock.
-
-                let mut queue = VecDeque::new();
-                let mut distance_from_initial = vec![usize::MAX; self.number_of_states() + 2];
-                if let Some(initial_state) = self.get_initial_state() {
-                    queue.push_front(initial_state);
-                    distance_from_initial[initial_state] = 0;
-                } else {
-                    //a DFA without initial state has no traces.
-                    return Ok(false);
-                }
-
-                let mut livelock_cache = self.get_livelock_cache();
-
-                // log::debug!("queue {:?}", queue);
-                // log::debug!("distances {:?}", distance_from_initial);
-
-                while let Some(state) = queue.pop_front() {
-                    let state_distance = distance_from_initial[state];
-
-                    log::debug!("state {}, distance from initial {}", state, state_distance);
-                    log::debug!(
-                        "state {}, enabled transitions {:?}",
-                        state,
-                        self.get_enabled_transitions(&state)
-                    );
-
-                    for transition in self.get_enabled_transitions(&state) {
-                        let mut child_state = state;
-                        self.execute_transition(&mut child_state, transition)?;
-
-                        let child_distance = distance_from_initial[child_state];
-                        if state_distance + 1 > child_distance {
-                            //loopback edge detected
-
-                            //The transition must be labelled, so the loop causes infinitely many paths.
-                            log::debug!("loop detected with node {}", child_state);
-
-                            //however, there must be a path to a final state for these paths to be traces.
-                            if !livelock_cache.is_state_part_of_livelock(&state)? {
-                                log::debug!("witness of infinite traces: state {}", state);
-                                return Ok(true);
-                            }
-                        } else if child_distance == usize::MAX {
-                            //child hit for the first time
-                            distance_from_initial[child_state] = state_distance + 1;
-                            queue.push_front(child_state);
-                        }
-                    }
-                }
-                Ok(false)
-            }
-        }
-    };
-}
-
 macro_rules! lang {
     ($t:ident) => {
         impl InfinitelyManyTraces for $t {
@@ -383,8 +321,8 @@ macro_rules! lang {
     };
 }
 
-dfm!(DirectlyFollowsModel);
-dfm!(StochasticDirectlyFollowsModel);
+aut!(DirectlyFollowsModel);
+aut!(StochasticDirectlyFollowsModel);
 aut!(StochasticDeterministicFiniteAutomaton);
 aut!(DeterministicFiniteAutomaton);
 aut!(StochasticNondeterministicFiniteAutomaton);
@@ -478,6 +416,17 @@ mod tests {
     fn infinitely_many_traces_dfa_bpic12() {
         let fin = fs::read_to_string("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap();
         let dfg = fin.parse::<DirectlyFollowsGraph>().unwrap();
+
+        assert!(!dfg.infinitely_many_traces().unwrap());
+    }
+
+    #[test]
+    fn infinitely_many_traces_sem_bpic12() {
+        let fin = fs::read_to_string("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap();
+        let dfg = fin.parse::<DirectlyFollowsGraph>().unwrap();
+
+        // let sem = dfg.to_stochastic_deterministic_semantics_trait();
+        // let sem: Box<EbiTraitStochasticDeterministicSemantics> = Box::new(sem);
 
         assert!(!dfg.infinitely_many_traces().unwrap());
     }

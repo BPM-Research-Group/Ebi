@@ -379,6 +379,13 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &["*", "trait semantics#./testfiles/empty.sdfa"],
     ),
     (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/a-aa-bb.slpn",
+        ],
+    ),
+    (
         &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
         &["*", "trait semantics#./testfiles/empty.xes"],
     ),

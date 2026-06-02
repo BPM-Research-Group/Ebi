@@ -612,10 +612,10 @@ impl AlignmentHeuristics for StochasticLabelledPetriNet {
     }
 }
 
-macro_rules! usize {
-    ($t:ident, $s:ident) => {
+macro_rules! aut {
+    ($t:ident) => {
         impl AlignmentHeuristics for $t {
-            type AliState = $s;
+            type AliState = AutomatonState;
 
             fn initialise_alignment_heuristic_cache(&self) -> Vec<Vec<usize>> {
                 vec![]
@@ -625,7 +625,7 @@ macro_rules! usize {
                 &self,
                 _: &Vec<Activity>,
                 _: &usize,
-                _: &$s,
+                _: &AutomatonState,
                 _: &Vec<Vec<usize>>,
             ) -> usize {
                 0
@@ -656,13 +656,13 @@ macro_rules! treemarking {
     };
 }
 
-usize!(StochasticDeterministicFiniteAutomaton, AutomatonState);
-usize!(StochasticNondeterministicFiniteAutomaton, AutomatonState);
+aut!(StochasticDeterministicFiniteAutomaton);
+aut!(StochasticNondeterministicFiniteAutomaton);
 treemarking!(ProcessTree);
 treemarking!(StochasticProcessTree);
-usize!(DirectlyFollowsGraph, AutomatonState);
-usize!(DirectlyFollowsModel, usize);
-usize!(StochasticDirectlyFollowsModel, usize);
+aut!(DirectlyFollowsGraph);
+aut!(DirectlyFollowsModel);
+aut!(StochasticDirectlyFollowsModel);
 
 #[cfg(test)]
 mod tests {

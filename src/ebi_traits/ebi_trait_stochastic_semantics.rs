@@ -150,7 +150,7 @@ impl ToStochasticSemanticsTrait for DirectlyFollowsGraph {
 
 impl ToStochasticSemanticsTrait for StochasticDirectlyFollowsModel {
     fn to_stochastic_semantics_trait(self) -> EbiTraitStochasticSemantics {
-        EbiTraitStochasticSemantics::Usize(Box::new(self))
+        EbiTraitStochasticSemantics::AutomatonState(Box::new(self))
     }
 }
 

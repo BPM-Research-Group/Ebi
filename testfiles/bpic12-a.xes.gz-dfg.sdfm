@@ -1,0 +1,51 @@
+stochastic directly follows model
+# empty traces weight
+0
+# number of nodes
+10
+#node 0
+A_SUBMITTED
+#node 1
+A_PARTLYSUBMITTED
+#node 2
+A_PREACCEPTED
+#node 3
+A_DECLINED
+#node 4
+A_CANCELLED
+#node 5
+A_ACCEPTED
+#node 6
+A_FINALIZED
+#node 7
+A_APPROVED
+#node 8
+A_REGISTERED
+#node 9
+A_ACTIVATED
+# number of start nodes
+1
+0w11032
+# number of end nodes
+3
+3w7635
+4w2807
+9w590
+# number of edges
+15
+# edges
+0>1w11032
+1>2w5312
+1>3w5719
+1>4w1
+2>3w1085
+2>4w1100
+2>5w3127
+5>3w29
+5>4w66
+5>6w3032
+6>3w802
+6>4w1640
+6>7w590
+7>8w590
+8>9w590

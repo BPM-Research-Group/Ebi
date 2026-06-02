@@ -174,7 +174,7 @@ impl ToStochasticDeterministicSemanticsTrait for DirectlyFollowsGraph {
         self,
     ) -> EbiTraitStochasticDeterministicSemantics {
         let dfm: StochasticDirectlyFollowsModel = self.into();
-        EbiTraitStochasticDeterministicSemantics::UsizeDistribution(Box::new(dfm))
+        EbiTraitStochasticDeterministicSemantics::AutomatonStateDistribution(Box::new(dfm))
     }
 }
 
@@ -190,7 +190,7 @@ impl ToStochasticDeterministicSemanticsTrait for StochasticDirectlyFollowsModel 
     fn to_stochastic_deterministic_semantics_trait(
         self,
     ) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::UsizeDistribution(Box::new(self))
+        EbiTraitStochasticDeterministicSemantics::AutomatonStateDistribution(Box::new(self))
     }
 }
 

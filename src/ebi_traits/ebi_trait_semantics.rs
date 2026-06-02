@@ -192,7 +192,7 @@ impl ToSemanticsTrait for StochasticLabelledPetriNet {
 
 impl ToSemanticsTrait for StochasticDirectlyFollowsModel {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::Usize(Box::new(self))
+        EbiTraitSemantics::AutomatonState(Box::new(self))
     }
 }
 
@@ -204,7 +204,7 @@ impl ToSemanticsTrait for DirectlyFollowsGraph {
 
 impl ToSemanticsTrait for DirectlyFollowsModel {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::Usize(Box::new(self))
+        EbiTraitSemantics::AutomatonState(Box::new(self))
     }
 }
 

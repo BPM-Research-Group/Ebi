@@ -35,6 +35,9 @@ pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::FiniteStochasticPartiallyOrderedLanguage(
             ScalableVectorGraphics::export_from_object,
         ),
+        EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
+            ScalableVectorGraphics::export_from_object,
+        ),
     ],
     object_exporters_fallible: &[],
     java_object_handlers: &[

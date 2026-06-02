@@ -125,7 +125,7 @@ where
                     outgoing_probabilities.clear();
                     for transition in &enabled_transitions {
                         outgoing_probabilities.push(
-                            self.get_transition_weight(&current_state, *transition) / &total_weight,
+                            self.get_transition_weight(&current_state, *transition)? / &total_weight,
                         );
                     }
 

@@ -3,7 +3,10 @@ use crate::{
     semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
 };
 use ebi_objects::{
-    AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, anyhow::Result, ebi_objects::process_tree::TreeMarking
+    AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet,
+    ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    anyhow::Result, ebi_objects::process_tree::TreeMarking,
 };
 
 pub trait NonDecreasingLivelock {
@@ -105,11 +108,14 @@ macro_rules! lpn {
 }
 
 macro_rules! is_non_decreasing_livelock_dfm {
-    ($t:ident, $s:ty) => {
+    ($t:ident) => {
         impl NonDecreasingLivelock for $t {
-            type LivState = $s;
+            type LivState = AutomatonState;
 
-            fn is_part_of_non_decreasing_livelock(&self, state: &mut $s) -> Result<bool> {
+            fn is_part_of_non_decreasing_livelock(
+                &self,
+                state: &mut AutomatonState,
+            ) -> Result<bool> {
                 let mut trace = vec![*state];
 
                 while !self.is_final_state(state) && self.get_enabled_transitions(state).len() == 1
@@ -143,8 +149,8 @@ lpn!(
     StochasticLabelledPetriNet,
     crate::semantics::stochastic_labelled_petri_net_semantics::compute_enabled_transitions
 );
-is_non_decreasing_livelock_dfm!(DirectlyFollowsModel, usize);
-is_non_decreasing_livelock_dfm!(StochasticDirectlyFollowsModel, usize);
-is_non_decreasing_livelock_dfm!(DeterministicFiniteAutomaton, AutomatonState);
-is_non_decreasing_livelock_dfm!(StochasticDeterministicFiniteAutomaton, AutomatonState);
-is_non_decreasing_livelock_dfm!(StochasticNondeterministicFiniteAutomaton, AutomatonState);
+is_non_decreasing_livelock_dfm!(DirectlyFollowsModel);
+is_non_decreasing_livelock_dfm!(StochasticDirectlyFollowsModel);
+is_non_decreasing_livelock_dfm!(DeterministicFiniteAutomaton);
+is_non_decreasing_livelock_dfm!(StochasticDeterministicFiniteAutomaton);
+is_non_decreasing_livelock_dfm!(StochasticNondeterministicFiniteAutomaton);
