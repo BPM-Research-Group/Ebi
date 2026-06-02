@@ -34,6 +34,13 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         ],
     ),
     (
+        &EBI_ANALYSE_MEDOID,
+        &[
+            "trait finite stochastic language#./testfiles/empty.slang",
+            "usize 1",
+        ],
+    ),
+    (
         &EBI_ANALYSE_MINPROB,
         &[
             "trait stochastic deterministic semantics#./testfiles/empty.xes",

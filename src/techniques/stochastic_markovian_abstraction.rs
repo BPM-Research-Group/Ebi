@@ -5,7 +5,7 @@ use crate::{
     techniques::tau_removal::TauRemoval,
 };
 use ebi_objects::{
-    Activity, ActivityKey, AutomatonSemantics, AutomatonState, HasActivityKey,
+    Activity, ActivityKey, AutomatonState, HasActivityKey,
     StochasticNondeterministicFiniteAutomaton,
     anyhow::{Ok, Result, anyhow},
     ebi_arithmetic::{Fraction, One, Recip, ebi_number::Zero},
@@ -522,7 +522,7 @@ fn add_artificial_start_end_to_snfa(
     let q_minus = snfa.add_state();
 
     // Redirect original finals to q_minus via '-'
-    for state in 0..snfa.number_of_states() - 1 {
+    for state in 0..snfa.termination_probabilities.len() - 1 {
         if !snfa.termination_probabilities[state].is_zero() {
             // Copy the existing p_final value
             let final_prob = snfa.termination_probabilities[state].clone();
@@ -786,7 +786,7 @@ fn compute_phi_ids(
     start_activity: Activity,
     end_activity: Activity,
 ) -> Vec<FxHashMap<Vec<usize>, Fraction>> {
-    let n = snfa.number_of_states();
+    let n = snfa.termination_probabilities.len();
     // Compute numeric IDs for "+" and "-" for quick comparisons
     let id_plus = snfa.activity_key().get_id_from_activity(start_activity);
     let id_minus = snfa.activity_key().get_id_from_activity(end_activity);
