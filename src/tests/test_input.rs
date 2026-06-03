@@ -311,3 +311,31 @@ impl Debug for TestInput {
         }
     }
 }
+
+impl Ord for TestInput {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.to_unique_string().cmp(&other.to_unique_string())
+    }
+}
+
+impl PartialOrd for TestInput {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl Eq for TestInput {}
+
+impl PartialEq for TestInput {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Self::Trait(l0, l1), Self::Trait(r0, r1)) => l0 == r0 && l1 == r1,
+            (Self::Object(_, l1, l2), Self::Object(_, r1, r2)) => l1 == r1 && l2 == r2,
+            (Self::String(l0, l1), Self::String(r0, r1)) => l0 == r0 && l1 == r1,
+            (Self::Usize(l0, l1), Self::Usize(r0, r1)) => l0 == r0 && l1 == r1,
+            (Self::FileHandler(l0), Self::FileHandler(r0)) => l0 == r0,
+            (Self::Fraction(l0, l1), Self::Fraction(r0, r1)) => l0 == r0 && l1 == r1,
+            _ => false,
+        }
+    }
+}

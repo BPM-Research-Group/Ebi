@@ -76,6 +76,13 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         ],
     ),
     (
+        &EBI_ANALYSE_MINPROB,
+        &[
+            "trait stochastic deterministic semantics#./testfiles/aa-ab-ba.dfg",
+            "fraction 0",
+        ],
+    ),
+    (
         &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
         &["trait finite language#./testfiles/empty.xes", "usize 1"],
     ),
@@ -254,6 +261,59 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &[
             "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
             "trait semantics#./testfiles/bpic12-a.xes.gz-dfg.dfg",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &["*", "trait semantics#./testfiles/a-b_star_empty.dfm"],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/a-b.xes.gz",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/a-b.xes",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/a-b-flower.ptree",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/a-b-double.xes",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/aa-ab-ba.dfa",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/a.pnml",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/aa-aaa-bb.slpn",
         ],
     ),
     (

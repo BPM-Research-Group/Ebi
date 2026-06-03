@@ -61,7 +61,8 @@ pub(crate) fn generate_tests_for_command(
         && input_types.len() > 0
     {
         //for each input type, find all input combinations
-        let inputss = crate::tests::test_input::TestInput::find_inputs(input_types);
+        let mut inputss = crate::tests::test_input::TestInput::find_inputs(input_types);
+        inputss.sort();
         if inputss.is_empty() && input_types.len() > 0 {
             return Err(anyhow!(
                 "Could not find input to call command {}.",

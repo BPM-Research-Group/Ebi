@@ -366,6 +366,14 @@ pub fn convert_stochastic_deterministic_finite_automaton(javascript_inputs: Vec<
 }
 
 #[wasm_bindgen]
+pub fn convert_stochastic_directly_follows_model(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SDFM;
+    execute_javascript_command(command, javascript_inputs, "convert_stochastic_directly_follows_model", exporter_file_extension);
+}
+
+#[wasm_bindgen]
 pub fn convert_stochastic_labelled_petri_net(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = 
@@ -2077,6 +2085,36 @@ mod tests {
 
 		];
         crate::javascript::javascript_autogen::convert_stochastic_deterministic_finite_automaton(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn convert_stochastic_directly_follows_model_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap())
+			// object stochastic directly follows model#./testfiles/bpic12-a.xes.gz-dfg.dfg
+
+		];
+        crate::javascript::javascript_autogen::convert_stochastic_directly_follows_model(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn convert_stochastic_directly_follows_model_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/bpic12-a.xes.gz-dfg.sdfm").unwrap())
+			// object stochastic directly follows model#./testfiles/bpic12-a.xes.gz-dfg.sdfm
+
+		];
+        crate::javascript::javascript_autogen::convert_stochastic_directly_follows_model(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn convert_stochastic_directly_follows_model_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.sdfm").unwrap())
+			// object stochastic directly follows model#./testfiles/aa-ab-ba.sdfm
+
+		];
+        crate::javascript::javascript_autogen::convert_stochastic_directly_follows_model(inputs, ".xes");
     }
 
 	#[test]
