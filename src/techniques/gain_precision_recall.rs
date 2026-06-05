@@ -242,6 +242,8 @@ fn ratio(num: LogPolynomial, denom: LogPolynomial) -> Result<LogPolynomial> {
     test
 ))]
 mod tests {
+    use crate::semantics::semantics::Semantics;
+
     use super::*;
     use ebi_objects::anyhow::Result;
     use ebi_objects::ebi_arithmetic::{f, f0};
