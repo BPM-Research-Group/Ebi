@@ -250,20 +250,20 @@ mod tests {
 
     mod sdfa_fig_c {
         use super::*;
-        use ebi_objects::StochasticDeterministicFiniteAutomaton;
         use ebi_objects::anyhow::Result;
         use ebi_objects::ebi_arithmetic::f;
+        use ebi_objects::{AutomatonState, StochasticDeterministicFiniteAutomaton, a};
 
         /// Figure (c): 2-state SDFA with a self-loop.
         pub fn build_fig_c_loop() -> Result<StochasticDeterministicFiniteAutomaton> {
             let mut sdfa = StochasticDeterministicFiniteAutomaton::new();
-            sdfa.set_initial_state(Some(0));
+            sdfa.set_initial_state(Some(AutomatonState::zero()));
 
             let a = sdfa.activity_key.process_activity("a");
-            sdfa.add_transition(0, a, 1, f!(4, 5))?;
+            sdfa.add_transition(a!(0), a, a!(1), f!(4, 5))?;
 
             let a = sdfa.activity_key.process_activity("a");
-            sdfa.add_transition(1, a, 1, f!(1, 2))?;
+            sdfa.add_transition(a!(1), a, a!(1), f!(1, 2))?;
 
             Ok(sdfa)
         }

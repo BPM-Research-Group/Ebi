@@ -236,7 +236,7 @@ impl Display for ResourceModel {
                             .get_activity_label(&self.resource_key.get_activity_by_id(r)))
                         .join(", ")
                 ))
-                .join(", ")
+                .join("\n")
         )
     }
 }

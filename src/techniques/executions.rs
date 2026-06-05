@@ -385,6 +385,16 @@ impl ExecutionsSorter {
 
         log::info!("Sorting executions");
 
+        //invariant: the first move of every trace has a timestamp
+
+        //establish the invariant: sort all moves without timestamps
+        for trace_index in 0..traces.len() {
+            let trace = &mut traces[trace_index];
+            while !trace.is_empty() && trace[0].time_of_execution.is_none() {
+                result.push(trace.pop_front().unwrap());
+            }
+        }
+
         //initialise first-timestamps
         let mut first_timestamps = (0..traces.len())
             .map(|trace_index| Self::get_first_timestamp(&traces[trace_index]).cloned())
@@ -408,27 +418,18 @@ impl ExecutionsSorter {
             {
                 //process the trace with the lowest timestamp
 
-                //first, add all executions up to and including the first one that has a timestamp
-                while let Some(execution) = traces[trace_index].pop_front() {
-                    let has_timestamp = execution.time_of_execution.is_some();
-                    result.push(execution);
+                //first, add the first execution
+                result.push(traces[trace_index].pop_front().unwrap());
 
-                    if has_timestamp {
-                        break;
-                    }
+                //re-establish the invariant: add non-timestamped moves
+                let trace = &mut traces[trace_index];
+                while !trace.is_empty() && trace[0].time_of_execution.is_none() {
+                    result.push(trace.pop_front().unwrap());
                 }
 
                 //update the first timestamp
                 first_timestamps[trace_index] =
                     Self::get_first_timestamp(&traces[trace_index]).cloned();
-
-                //check whether the trace still has timestamps
-                if first_timestamps[trace_index].is_none() {
-                    //This trace does not have timestamps anymore; finish it first to avoid postponing it until the end of the log.
-                    let mut swap = VecDeque::new();
-                    std::mem::swap(&mut swap, &mut traces[trace_index]);
-                    result.extend(swap.into_iter());
-                }
             } else {
                 //no more timestamps, just append the result
                 result.extend(traces.into_iter().flatten());
