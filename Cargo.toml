@@ -16,7 +16,9 @@ name = "ebi"
 crate-type = ["cdylib", "lib"]
 
 [features]
-default = [ ]
+default = [ 
+    "approximatearithmetic"
+]
 test_generation = ["dep:syn"]
 eexactarithmetic = []
 exactarithmetic = [

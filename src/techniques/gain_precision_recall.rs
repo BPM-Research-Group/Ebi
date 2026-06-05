@@ -7,7 +7,7 @@ use crate::{
     techniques::entropy::{Entropy, number_of_average_visits_per_state_approximate},
 };
 use ebi_objects::{
-    AutomatonSemantics, StochasticDeterministicFiniteAutomaton,
+    StochasticDeterministicFiniteAutomaton,
     anyhow::{Result, anyhow},
     ebi_arithmetic::{
         ConstFraction, Fraction, Log, MaybeExact, One, OneMinus, Signed, Zero,
@@ -197,8 +197,8 @@ fn entropy_sdfa_with_lambda(
     let mut termination_entropy = LogPolynomial::zero();
     let mut lambda_step_entropy = LogPolynomial::zero();
 
-    for state in sdfa.states() {
-        let termination_probability = sdfa.get_termination_probability(state);
+    for state in 0..sdfa.terminating_probabilities.len() {
+        let termination_probability = &sdfa.terminating_probabilities[state];
         if termination_probability.is_zero() {
             continue;
         }

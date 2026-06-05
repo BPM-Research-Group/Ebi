@@ -31,7 +31,7 @@ impl StochasticDeterministicSemantics for StochasticDeterministicFiniteAutomaton
     }
 
     fn get_deterministic_termination_probability(&self, state: &AutomatonState) -> Fraction {
-        self.get_termination_probability(*state).clone()
+        self.terminating_probabilities[*state].clone()
     }
 
     fn get_deterministic_activity_probability(
