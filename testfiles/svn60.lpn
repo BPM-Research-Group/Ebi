@@ -1,0 +1,47 @@
+labelled Petri net
+# number of places
+4
+# initial marking
+1
+0
+1
+0
+# number of transitions
+5
+# transition 0
+label a
+# number of input places
+1
+0
+# number of output places
+1
+1
+# transition 1
+label d
+# number of input places
+1
+1
+# number of output places
+0
+# transition 2
+label b
+# number of input places
+1
+1
+# number of output places
+0
+# transition 3
+label c
+# number of input places
+1
+2
+# number of output places
+1
+3
+# transition 4
+label e
+# number of input places
+1
+3
+# number of output places
+0

@@ -190,7 +190,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
 };
 
 pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Command {
-    name_short: "exe",
+    name_short: "exs",
     name_long: Some("executions"),
     explanation_short: "Compute the executions of each transition of the model in the log.",
     explanation_long: Some(
