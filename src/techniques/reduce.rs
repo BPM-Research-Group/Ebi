@@ -112,6 +112,18 @@ struct Tau;
 
 impl TreeRule for Tau {
     fn apply(&self, tree: &mut ProcessTree, node: usize) -> bool {
+        //optimisation: everything is tau
+        if !tree.tree[node].is_leaf()
+            && !tree.tree[node..tree.traverse(node)]
+                .iter()
+                .any(|child| child.is_activity())
+        {
+            //subtree has no activities -> replace with tau
+            tree.tree.drain(node..tree.traverse(node));
+            tree.tree.insert(node, Node::Tau);
+            return true;
+        }
+
         match tree.tree[node] {
             Node::Tau | Node::Activity(_) => false,
             Node::Operator(Operator::Concurrent, number_of_children)
@@ -162,15 +174,54 @@ impl TreeRule for Tau {
                         //remove the tau
                         tree.tree.remove(tau_child);
                         _ = tree.tree[node].set_number_of_children(number_of_children - 1);
+                        return true;
                     }
                 }
                 return false;
             }
-            Node::Operator(Operator::Loop, _) => {
-                //todo
-                false
+            Node::Operator(Operator::Loop, number_of_children) if number_of_children > 1 => {
+
+                if let Some(tau_child) = tree
+                    .get_children(node)
+                    .skip(1)
+                    .find(|child| tree.tree[*child].is_tau())
+                {
+                    //there is a tau child
+
+                    if tree
+                        .get_children(node)
+                        .skip(1)
+                        .any(|child| child != tau_child && has_empty_traces_node(tree, child))
+                    {
+                        //there is another child with the empty trace
+                        //remove the tau
+                        tree.tree.remove(tau_child);
+                        _ = tree.tree[node].set_number_of_children(number_of_children - 1);
+                        return true;
+                    }
+                }
+
+                if tree.tree[tree.get_child(node, 0)].is_tau() {
+                    println!("target");
+                    //loop has a body tau; pull it up
+                    //remove the body tau
+                    tree.tree.remove(tree.get_child(node, 0));
+                    //change the loop to an xor
+                    tree.tree[node] = Node::Operator(Operator::Xor, number_of_children - 1);
+                    //insert redo-tau
+                    tree.tree.insert(tree.traverse(node), Node::Tau);
+                    //insert loop
+                    tree.tree.insert(node, Node::Operator(Operator::Loop, 2));
+                    //insert tau
+                    tree.tree.insert(node, Node::Tau);
+                    //insert xor
+                    tree.tree.insert(node, Node::Operator(Operator::Xor, 2));
+                    return true;
+                }
+
+                return false;
             }
-            _ => false
+            _ => false,
         }
     }
 }
@@ -179,9 +230,9 @@ impl TreeRule for Tau {
 mod tests {
     use crate::techniques::reduce::ReduceLanguageEquivalently;
     use ebi_objects::{
-        ActivityKey, ProcessTree, TranslateActivityKey,
+        ActivityKey, ActivityKeyTranslator, ProcessTree, activity,
         ebi_objects::process_tree::{Node, Operator},
-        seq, tau, xor,
+        seq, tau, tloop, xor,
     };
 
     #[test]
@@ -218,6 +269,54 @@ mod tests {
     fn associativity_seq() {
         let mut tree = seq!(tau!(), xor!(tau!()));
         let target = tau!();
+
+        tree.reduce_language_equivalently();
+
+        assert_eq!(tree.to_string(), target.to_string());
+    }
+
+    #[test]
+    fn loop_tau() {
+        let mut tree = seq!(tau!(), xor!(tau!(), tloop!(tau!(), tau!())));
+        let target = tau!();
+
+        tree.reduce_language_equivalently();
+
+        assert_eq!(tree.to_string(), target.to_string());
+    }
+
+    #[test]
+    fn loop_redo_tau() {
+        let a = activity!("a");
+        println!("{:?}", a);
+        println!("{}", a);
+
+        let b = activity!("b");
+        println!("{:?}", b);
+        println!("{}", b);
+
+        let xor = xor!(a, b);
+        println!("{:?}", xor);
+        println!("{}", xor);
+
+        let xortaub = xor!(tau!(), activity!("b"));
+        println!("{:?}", xortaub);
+        println!("{}", xortaub);
+
+        let mut tree = tloop!(activity!("a"), xor!(tau!(), activity!("b")), tau!());
+        let target = tloop!(activity!("a"), activity!("b"), tau!());
+
+        println!("{:?}", tree);
+
+        tree.reduce_language_equivalently();
+
+        assert_eq!(tree.to_string(), target.to_string());
+    }
+
+    #[test]
+    fn pull_loop_body_tau() {
+        let mut tree = tloop!(tau!(), activity!("a"), activity!("b"));
+        let target = xor!(tau!(), tloop!(xor!(activity!("a"), activity!("b")), tau!()));
 
         tree.reduce_language_equivalently();
 
