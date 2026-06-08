@@ -9,10 +9,10 @@ use crate::{
         ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_semantics::EbiTraitSemantics
     },
     techniques::{
-        any_traces::AnyTraces, timestamps_ordered::TimestampsOrdered, bounded::Bounded, executions::FindExecutions, infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic
+        any_traces::AnyTraces, bounded::Bounded, empty_traces::HasEmptyTraces, executions::FindExecutions, infinitely_many_traces::InfinitelyManyTraces, medoid_non_stochastic::MedoidNonStochastic, timestamps_ordered::TimestampsOrdered
     }, 
 };
-use ebi_objects::{EbiObject, EbiObjectType, anyhow::anyhow};
+use ebi_objects::{EbiObject, EbiObjectType, ProcessTree, anyhow::anyhow};
 use std::io::Write;
 
 pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
@@ -22,10 +22,11 @@ pub const EBI_ANALYSE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[
         &EBI_ANALYSE_NON_STOCHASTIC_ACTIVITIES,
+        &EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES,
         &EBI_ANALYSE_NON_STOCHASTIC_BOUNDED,
         &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
+        &EBI_ANALYSE_NON_STOCHASTIC_EMPTY_TRACES,
         &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
-        &EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES,
         &EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES,
         &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
         &EBI_ANALYSE_NON_STOCHASTIC_TIMESTAMPS_ORDERED,
@@ -188,6 +189,29 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_CLUSTER: EbiCommand = EbiCommand::Command {
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteLanguage),
 };
+
+pub const EBI_ANALYSE_NON_STOCHASTIC_EMPTY_TRACES: EbiCommand = EbiCommand::Command { 
+    name_short: "et", 
+    name_long: Some("empty-traces"), 
+    explanation_short: "Returns wheter the log or model contains empty traces.",
+    explanation_long: None, 
+    latex_link: None, 
+    cli_command: None, 
+    exact_arithmetic: true, 
+    input_types: &[
+        &[&EbiInputType::Object(EbiObjectType::ProcessTree)],
+    ], 
+    input_names: &["FILE"], 
+    input_helps: &["A file"], 
+    execute: |mut objects, _| {
+        let model = objects.remove(0).to_type::<ProcessTree>()?;
+
+        Ok(EbiOutput::Bool(model.has_empty_traces()))
+    }, 
+    output_type: &EbiOutputType::Bool
+};
+
+
 
 pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Command {
     name_short: "exs",

@@ -26,6 +26,7 @@ pub mod ebi_commands {
     pub mod ebi_command_info;
     pub mod ebi_command_itself;
     pub mod ebi_command_probability;
+    pub mod ebi_command_reduce;
     pub mod ebi_command_sample;
     pub mod ebi_command_test;
     pub mod ebi_command_validate;
@@ -206,6 +207,7 @@ pub mod techniques {
     pub mod earth_movers_stochastic_conformance_f64;
     pub mod edge_difference;
     pub mod edge_difference_no_freq;
+    pub mod empty_traces;
     pub mod entropic_relevance;
     pub mod entropy;
     pub mod escaping_edges_precision;
@@ -232,6 +234,7 @@ pub mod techniques {
     pub mod process_variety;
     pub mod random_stochastic_miner;
     pub mod reachability;
+    pub mod reduce;
     pub mod resource_utilisation;
     pub mod sample;
     pub mod sample_folds;
