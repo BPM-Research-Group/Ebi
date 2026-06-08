@@ -450,17 +450,17 @@ impl ExecutionsSorter {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_objects::{
-        StochasticDeterministicFiniteAutomaton, StochasticNondeterministicFiniteAutomaton,
-        ebi_objects::event_log_event_attributes::EventLogEventAttributes,
-    };
-
     use crate::{
+        ebi_framework::trait_importers::ToSemanticsTrait,
         ebi_traits::ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
         techniques::executions::FindExecutions,
     };
+    use ebi_objects::{
+        LabelledPetriNet, StochasticDeterministicFiniteAutomaton,
+        StochasticNondeterministicFiniteAutomaton,
+        ebi_objects::event_log_event_attributes::EventLogEventAttributes,
+    };
+    use std::fs;
 
     #[test]
     fn executions() {
@@ -477,7 +477,26 @@ mod tests {
         let mut log2: Box<dyn EbiTraitEventLogEventAttributes> = Box::new(log);
         let x = model.find_executions(&mut log2).unwrap();
 
-        assert_eq!(out, x.to_string() + "\n");
+        assert_eq!(out, x.to_string());
+    }
+
+    #[test]
+    fn svn60() {
+        let fin = fs::read_to_string("testfiles/svn60.xes").unwrap();
+        let log = fin.parse::<EventLogEventAttributes>().unwrap();
+        let mut log: Box<dyn EbiTraitEventLogEventAttributes> = Box::new(log);
+
+        let fin2 = fs::read_to_string("testfiles/svn60.lpn").unwrap();
+        let lpn = fin2.parse::<LabelledPetriNet>().unwrap();
+
+        let mut sem = lpn.to_semantics_trait();
+        let executions = sem.find_executions(&mut log).unwrap();
+
+        println!("{}", executions);
+
+        let fin3 = fs::read_to_string("testfiles/svn60.lpn.exs").unwrap();
+
+        assert_eq!(executions.to_string(), fin3);
     }
 
     #[test]

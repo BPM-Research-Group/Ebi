@@ -261,15 +261,8 @@ impl ResourceMarking {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        ebi_framework::trait_importers::ToSemanticsTrait,
-        ebi_traits::ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
-        techniques::{executions::FindExecutions, resource_utilisation::ResourceModel},
-    };
-    use ebi_objects::{
-        Executions, LabelledPetriNet,
-        ebi_objects::event_log_event_attributes::EventLogEventAttributes,
-    };
+    use crate::techniques::resource_utilisation::ResourceModel;
+    use ebi_objects::Executions;
     use std::fs;
 
     #[test]
@@ -278,25 +271,6 @@ mod tests {
         let exs = fin.parse::<Executions>().unwrap();
 
         let resource_model = ResourceModel::from_executions(&exs);
-
-        println!("{}", resource_model);
-    }
-
-    #[test]
-    fn svn60() {
-        let fin = fs::read_to_string("testfiles/svn60.xes").unwrap();
-        let log = fin.parse::<EventLogEventAttributes>().unwrap();
-        let mut log: Box<dyn EbiTraitEventLogEventAttributes> = Box::new(log);
-
-        let fin2 = fs::read_to_string("testfiles/svn60.lpn").unwrap();
-        let lpn = fin2.parse::<LabelledPetriNet>().unwrap();
-
-        let mut sem = lpn.to_semantics_trait();
-        let executions = sem.find_executions(&mut log).unwrap();
-
-        println!("{}", executions);
-
-        let resource_model = ResourceModel::from_executions(&executions);
 
         println!("{}", resource_model);
     }

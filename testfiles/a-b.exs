@@ -12,7 +12,7 @@
       ],
       "other_enabled_transitions_resource_utilisation": [
         "0",
-        null
+        "0"
       ],
       "resource": "John",
       "resource_utilisation_fired_transition": "0",
@@ -43,8 +43,8 @@
         2
       ],
       "other_enabled_transitions_resource_utilisation": [
-        "1",
-        null
+        "0",
+        "0"
       ],
       "resource": "Doe",
       "resource_utilisation_fired_transition": "0",
