@@ -1,9 +1,8 @@
+use crate::techniques::empty_traces::has_empty_traces_node;
 use ebi_objects::{
     ProcessTree,
     ebi_objects::process_tree::{Node, Operator},
 };
-
-use crate::techniques::empty_traces::has_empty_traces_node;
 
 pub trait ReduceLanguageEquivalently {
     fn reduce_language_equivalently(&mut self);
@@ -15,6 +14,7 @@ impl ReduceLanguageEquivalently for ProcessTree {
             Box::new(Singularity),
             Box::new(Associativity),
             Box::new(Tau),
+            Box::new(ImplicitConcurrent),
         ];
         let mut changed = true;
         while changed {
@@ -142,6 +142,7 @@ impl TreeRule for Tau {
                 return false;
             }
             Node::Operator(Operator::Or, number_of_children) if number_of_children > 1 => {
+                //option 1: diect tau
                 for child in tree.get_children(node) {
                     if tree.tree[child].is_tau() {
                         //move tau to xor(tau) above or
@@ -155,6 +156,29 @@ impl TreeRule for Tau {
                         tree.tree.insert(node, Node::Operator(Operator::Xor, 2));
 
                         return true;
+                    }
+                }
+
+                //option 2: tau-under-xor
+                for child in tree.get_children(node) {
+                    if let Some(number_of_children) = tree.get_number_of_children(child)
+                        && number_of_children >= 2
+                        && tree.tree[child].is_operator_xor()
+                    {
+                        //find a grandchild tau
+                        if let Some(grandchild_tau) = tree
+                            .get_children(child)
+                            .find(|grandchild| tree.tree[*grandchild].is_tau())
+                        {
+                            //remove the grandchild
+                            tree.tree.remove(grandchild_tau);
+                            _ = tree.tree[child].set_number_of_children(number_of_children - 1);
+
+                            //lift the or(..) to xor(tau, or(..))
+                            tree.tree.insert(node, Node::Tau);
+                            tree.tree.insert(node, Node::Operator(Operator::Xor, 2));
+                            return true;
+                        }
                     }
                 }
                 return false;
@@ -180,7 +204,6 @@ impl TreeRule for Tau {
                 return false;
             }
             Node::Operator(Operator::Loop, number_of_children) if number_of_children > 1 => {
-
                 if let Some(tau_child) = tree
                     .get_children(node)
                     .skip(1)
@@ -226,13 +249,106 @@ impl TreeRule for Tau {
     }
 }
 
+struct ImplicitConcurrent;
+
+impl TreeRule for ImplicitConcurrent {
+    fn apply(&self, tree: &mut ProcessTree, node: usize) -> bool {
+        match tree.tree[node] {
+            Node::Tau => false,
+            Node::Activity(_) => false,
+            Node::Operator(Operator::Sequence, _)
+            | Node::Operator(Operator::Loop, _)
+            | Node::Operator(Operator::Xor, _)
+            | Node::Operator(Operator::Or, _) => false,
+            Node::Operator(Operator::Interleaved, number_of_children) => {
+                if tree
+                    .get_children(node)
+                    .all(|child| max_trace_length(tree, child) <= 1)
+                {
+                    tree.tree[node] = Node::Operator(Operator::Concurrent, number_of_children);
+                    return true;
+                }
+                false
+            }
+            Node::Operator(Operator::Concurrent, number_of_children) => {
+                if let Some((i, child1)) = tree
+                    .get_children(node)
+                    .enumerate()
+                    .find(|(_, child)| has_empty_traces_node(tree, *child))
+                {
+                    if let Some(child2) = tree
+                        .get_children(node)
+                        .skip(i + 1)
+                        .find(|child| has_empty_traces_node(tree, *child))
+                    {
+                        //remove child2
+                        let end2 = tree.traverse(child2);
+                        let tchild2 = tree.tree.drain(child2..end2).collect::<Vec<_>>();
+
+                        //remove child1
+                        let end1 = tree.traverse(child1);
+                        let tchild1 = tree.tree.drain(child1..end1).collect::<Vec<_>>();
+
+                        //insert child2
+                        tree.tree.splice((node + 1)..(node + 1), tchild2);
+
+                        //insert child1
+                        tree.tree.splice((node + 1)..(node + 1), tchild1);
+
+                        //insert or
+                        tree.tree.insert(node + 1, Node::Operator(Operator::Or, 2));
+
+                        //change number of children
+                        _ = tree.tree[node].set_number_of_children(number_of_children - 1);
+
+                        return true;
+                    }
+                }
+                false
+            }
+        }
+    }
+}
+
+/// Return the maximum trace length. Returns a value >= 100 for loops.
+fn max_trace_length(tree: &ProcessTree, node: usize) -> usize {
+    match tree.tree[node] {
+        Node::Tau => 0,
+        Node::Activity(_) => 1,
+        Node::Operator(Operator::Xor, _) => tree
+            .get_children(node)
+            .map(|child| max_trace_length(tree, child))
+            .max()
+            .unwrap(),
+        Node::Operator(Operator::Sequence, _)
+        | Node::Operator(Operator::Concurrent, _)
+        | Node::Operator(Operator::Interleaved, _)
+        | Node::Operator(Operator::Or, _) => tree
+            .get_children(node)
+            .map(|child| max_trace_length(tree, child))
+            .sum(),
+        Node::Operator(Operator::Loop, _) => {
+            if tree
+                .get_children(node)
+                .map(|child| max_trace_length(tree, child))
+                .sum::<usize>()
+                > 0
+            {
+                100
+            } else {
+                0
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use crate::techniques::reduce::ReduceLanguageEquivalently;
     use ebi_objects::{
-        ActivityKey, ActivityKeyTranslator, ProcessTree, activity,
+        ActivityKey, ActivityKeyTranslator, ProcessTree, activity, con,
         ebi_objects::process_tree::{Node, Operator},
-        seq, tau, tloop, xor,
+        int, or, seq, tau, tloop, xor,
     };
 
     #[test]
@@ -242,7 +358,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_string(), target.to_string());
+        assert_eq!(tree.to_hash_string(), target.to_hash_string());
     }
 
     #[test]
@@ -252,7 +368,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_string(), target.to_string());
+        assert_eq!(tree.to_hash_string(), target.to_hash_string());
     }
 
     #[test]
@@ -262,7 +378,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_string(), target.to_string());
+        assert_eq!(tree.to_hash_string(), target.to_hash_string());
     }
 
     #[test]
@@ -272,7 +388,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_string(), target.to_string());
+        assert_eq!(tree.to_hash_string(), target.to_hash_string());
     }
 
     #[test]
@@ -282,7 +398,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_string(), target.to_string());
+        assert_eq!(tree.to_hash_string(), target.to_hash_string());
     }
 
     #[test]
@@ -310,7 +426,7 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_string(), target.to_string());
+        assert_eq!(tree.to_hash_string(), target.to_hash_string());
     }
 
     #[test]
@@ -320,6 +436,54 @@ mod tests {
 
         tree.reduce_language_equivalently();
 
-        assert_eq!(tree.to_string(), target.to_string());
+        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+    }
+
+    #[test]
+    fn double_skip_loop() {
+        let mut tree = tloop!(
+            activity!("a"),
+            activity!("a"),
+            xor!(tau!(), activity!("b")),
+            tau!()
+        );
+        let target = tloop!(activity!("a"), activity!("a"), tau!(), activity!("b"));
+
+        tree.reduce_language_equivalently();
+
+        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+    }
+
+    #[test]
+    fn pull_up_or() {
+        let mut tree = or!(activity!("a"), xor!(activity!("b"), activity!("c"), tau!()));
+        let target = xor!(
+            tau!(),
+            or!(activity!("a"), xor!(activity!("b"), activity!("c")))
+        );
+
+        tree.reduce_language_equivalently();
+
+        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+    }
+
+    #[test]
+    fn implicit_and() {
+        let mut tree = int!(activity!("a"), xor!(activity!("b"), activity!("c"), tau!()));
+        let target = con!(activity!("a"), xor!(activity!("b"), activity!("c"), tau!()));
+
+        tree.reduce_language_equivalently();
+
+        assert_eq!(tree.to_hash_string(), target.to_hash_string());
+    }
+
+    #[test]
+    fn implicit_and_2() {
+        let mut tree = con!(xor!(tau!(), activity!("a")), xor!(activity!("b"), activity!("c"), tau!()));
+        let target = xor!(tau!(), or!(activity!("a"), xor!(activity!("b"), activity!("c"))));
+
+        tree.reduce_language_equivalently();
+
+        assert_eq!(tree.to_hash_string(), target.to_hash_string());
     }
 }

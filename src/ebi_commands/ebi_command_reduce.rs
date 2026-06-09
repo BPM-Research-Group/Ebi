@@ -21,7 +21,7 @@ pub const EBI_REDUCE_PROCESS_TREE: EbiCommand = EbiCommand::Command {
     name_long: Some("process-tree-reduction"),
     explanation_short: "Reduce a process tree language-equivalently.",
     explanation_long: None,
-    latex_link: Some("\\cite{DBLP:series/lnbip/Leemans22}"),
+    latex_link: Some("\\cite{DBLP:journals/corr/abs-2203-10410}"),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[&[&EbiInputType::Object(EbiObjectType::ProcessTree)]],
