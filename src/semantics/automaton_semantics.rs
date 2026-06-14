@@ -1,6 +1,10 @@
 use crate::semantics::semantics::Semantics;
 use ebi_objects::{
-    Activity, AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticNondeterministicFiniteAutomaton, anyhow::{Result, anyhow}, ebi_objects::labelled_petri_net::TransitionIndex
+    Activity, AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton,
+    DirectlyFollowsGraph, DirectlyFollowsModel, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticNondeterministicFiniteAutomaton,
+    anyhow::{Result, anyhow},
+    ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
 macro_rules! aut {
@@ -92,7 +96,10 @@ mod tests {
 
         println!("{:?}", dfg.activity_key);
         println!("node_2_activity  {:?}", dfg.state_2_activity);
-        println!("start activities {:?}", dfg.start_activities);
+        println!(
+            "start activities {:?}",
+            dfg.start_activities().collect::<Vec<_>>()
+        );
 
         let mut state = dfg.get_initial_state().unwrap();
         println!("state {}\n", state);

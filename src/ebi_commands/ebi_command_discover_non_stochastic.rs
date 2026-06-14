@@ -9,7 +9,7 @@ use crate::{
     ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage,
     techniques::{
         flower_miner::{FlowerMinerDFA, FlowerMinerTree},
-        inductive_miner::InductiveMinerTree,
+        inductive_miner::InductiveMiner,
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
         trace_model_miner::TraceModelMinerTree,
     },

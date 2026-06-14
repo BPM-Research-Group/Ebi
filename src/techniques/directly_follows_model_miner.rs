@@ -144,7 +144,7 @@ fn get_edges_to_filter(
     let mut result = HashSet::new();
 
     //start edges
-    for (state, weight) in dfm.start_activities.iter() {
+    for (state, weight) in dfm.start_states.iter() {
         let activity = dfm.state_2_activity[state];
         if weight == min {
             result.insert((None, Some(activity)));
@@ -172,7 +172,7 @@ fn get_edges_to_filter(
         });
 
     //end edges
-    for (node, weight) in dfm.end_activities.iter() {
+    for (node, weight) in dfm.end_states.iter() {
         let activity = dfm.state_2_activity[node];
         if weight == min {
             result.insert((Some(activity.clone()), None));

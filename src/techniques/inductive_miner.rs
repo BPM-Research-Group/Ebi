@@ -1,5 +1,6 @@
 use crate::{
     ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage, math::components::Components,
+    techniques::reduce::ReduceLanguageEquivalently,
 };
 use ebi_objects::{
     Activity, ActivityKey, DirectlyFollowsGraph, FiniteLanguage, IntoRefTraceIterator, ProcessTree,
@@ -8,21 +9,20 @@ use ebi_objects::{
 };
 use std::collections::{HashMap, HashSet};
 
-pub trait InductiveMinerTree {
+pub trait InductiveMiner {
     fn inductive_miner(&self) -> ProcessTree;
 }
 
-impl InductiveMinerTree for dyn EbiTraitFiniteLanguage {
+impl InductiveMiner for dyn EbiTraitFiniteLanguage {
     fn inductive_miner(&self) -> ProcessTree {
-        inductive_miner(self)
+        let mut tree = inductive_miner(self);
+        tree.reduce_language_equivalently();
+        tree
     }
 }
 
 pub struct LogInfo {
     pub dfg: DirectlyFollowsGraph,
-    pub start_activities: HashSet<Activity>,
-    pub end_activities: HashSet<Activity>,
-    pub has_empty_traces: bool,
     pub activities: HashSet<Activity>,
     pub total_traces: usize,
     pub activity_instances: usize,
@@ -32,10 +32,7 @@ pub struct LogInfo {
 impl LogInfo {
     pub fn log_calcs(log: &dyn EbiTraitFiniteLanguage) -> Self {
         let mut dfg = DirectlyFollowsGraph::new(log.activity_key().clone());
-        let mut start_activities = HashSet::new();
-        let mut end_activities = HashSet::new();
         let mut activities = HashSet::new();
-        let mut has_empty_traces = false;
         let mut total_traces = 0;
         let mut activity_instances = 0;
 
@@ -49,7 +46,6 @@ impl LogInfo {
                     Some(prev) => dfg.add_edge(prev, activity, &Fraction::one()),
                     None => {
                         dfg.add_start_activity(activity, &Fraction::one());
-                        start_activities.insert(activity);
                     }
                 }
                 last_activity = Some(activity);
@@ -57,20 +53,15 @@ impl LogInfo {
             match last_activity {
                 Some(a) => {
                     dfg.add_end_activity(a, &Fraction::one());
-                    end_activities.insert(a);
                 }
                 None => {
                     dfg.add_empty_trace(&Fraction::one());
-                    has_empty_traces = true;
                 }
             }
         }
 
         LogInfo {
             dfg,
-            start_activities,
-            end_activities,
-            has_empty_traces,
             activities,
             total_traces,
             activity_instances,
@@ -89,12 +80,12 @@ enum Cut {
 }
 
 impl Cut {
-    fn split_log(&self, log: &dyn EbiTraitFiniteLanguage) -> Vec<Box<dyn EbiTraitFiniteLanguage>> {
+    fn split_log(&self, log: &dyn EbiTraitFiniteLanguage) -> Vec<FiniteLanguage> {
         match self {
-            Cut::ExclusiveChoice(parts) => xor_split(log, parts),
-            Cut::Sequence(parts) => seq_conc_split(log, parts),
-            Cut::Concurrent(parts) => seq_conc_split(log, parts),
-            Cut::Loop { body, redos } => loop_split(log, body, redos),
+            Cut::ExclusiveChoice(parts) => split_log_xor(log, parts),
+            Cut::Sequence(parts) => split_log_sequence(log, parts),
+            Cut::Concurrent(parts) => split_log_concurrent(log, parts),
+            Cut::Loop { body, redos } => split_log_loop(log, body, redos),
         }
     }
 
@@ -117,10 +108,7 @@ fn inductive_miner(log: &dyn EbiTraitFiniteLanguage) -> ProcessTree {
 
     if let Some(cut) = find_cut(&info) {
         let sublogs = cut.split_log(log);
-        let subtrees = sublogs
-            .iter()
-            .map(|s| inductive_miner(s.as_ref()))
-            .collect();
+        let subtrees = sublogs.iter().map(|s| inductive_miner(s)).collect();
         return cut.build_tree(subtrees, log.activity_key().clone());
     }
 
@@ -135,7 +123,7 @@ fn base_case(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Option<Process
     }
     //singleActivity: no empty traces, every trace has exactly one event
     if info.activities.len() == 1
-        && !info.has_empty_traces
+        && !info.dfg.empty_traces_weight.is_positive()
         && info.activity_instances == info.total_traces
     {
         let only_activity = *info.activities.iter().next().unwrap();
@@ -146,7 +134,7 @@ fn base_case(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Option<Process
 }
 
 fn find_cut(info: &LogInfo) -> Option<Cut> {
-    if info.has_empty_traces {
+    if info.dfg.empty_traces_weight.is_positive() {
         return None;
     }
 
@@ -246,7 +234,7 @@ fn concurrent_cut(info: &LogInfo) -> Option<Cut> {
     if info.activities.len() < 2 {
         return None;
     }
-    if info.start_activities.is_empty() || info.end_activities.is_empty() {
+    if info.dfg.start_activities().next().is_some() || info.dfg.end_activities().next().is_some() {
         return None;
     }
 
@@ -275,8 +263,12 @@ fn concurrent_cut(info: &LogInfo) -> Option<Cut> {
     let mut with_nothing: Vec<HashSet<Activity>> = vec![];
 
     for part in raw.into_values() {
-        let has_start = part.iter().any(|a| info.start_activities.contains(a));
-        let has_end = part.iter().any(|a| info.end_activities.contains(a));
+        let has_start = part
+            .iter()
+            .any(|a| info.dfg.start_activity_weight(*a).is_positive());
+        let has_end = part
+            .iter()
+            .any(|a| info.dfg.end_activity_weight(*a).is_positive());
         match (has_start, has_end) {
             (true, true) => with_start_end.push(part),
             (true, false) => with_start.push(part),
@@ -316,22 +308,23 @@ fn loop_cut(info: &LogInfo) -> Option<Cut> {
     if info.activities.len() < 2 {
         return None;
     }
-    if info.start_activities.is_empty() || info.end_activities.is_empty() {
+    if info.dfg.start_activities().next().is_some() || info.dfg.end_activities().next().is_some() {
         return None;
     }
 
     let mut components = Components::new(info.activities.iter().cloned().collect());
 
     //merge all start + end activities
-    let pivot = *info.start_activities.iter().next().unwrap();
-    for &a in info.start_activities.iter().chain(&info.end_activities) {
+    let mut it = info.dfg.start_activities();
+    let pivot = it.next().unwrap();
+    for a in it.chain(info.dfg.end_activities()) {
         components.merge_components(pivot, a);
     }
 
     for (src, tgt) in info.dfg.get_sources().zip(info.dfg.get_targets()) {
-        let src_is_start = info.start_activities.contains(&src);
-        let src_is_end = info.end_activities.contains(&src);
-        let tgt_is_start = info.start_activities.contains(&tgt);
+        let src_is_start = info.dfg.is_start_activity(src);
+        let src_is_end = info.dfg.is_end_activity(src);
+        let tgt_is_start = info.dfg.is_start_activity(tgt);
         if !src_is_start && !src_is_end && !tgt_is_start {
             components.merge_components(src, tgt);
         } else if src_is_start && !src_is_end {
@@ -358,7 +351,7 @@ fn loop_cut(info: &LogInfo) -> Option<Cut> {
         if components.same_component(sub_end, pivot) {
             continue;
         }
-        if info.start_activities.iter().any(|&s| {
+        if info.dfg.start_activities().any(|s| {
             info.dfg
                 .edge_weight_activities(sub_end, s)
                 .is_not_positive()
@@ -371,7 +364,7 @@ fn loop_cut(info: &LogInfo) -> Option<Cut> {
         if components.same_component(sub_start, pivot) {
             continue;
         }
-        if info.end_activities.iter().any(|&e| {
+        if info.dfg.end_activities().any(|e| {
             info.dfg
                 .edge_weight_activities(e, sub_start)
                 .is_not_positive()
@@ -398,10 +391,10 @@ fn new_sublog(log: &dyn EbiTraitFiniteLanguage) -> FiniteLanguage {
     }
 }
 
-fn xor_split(
+fn split_log_xor(
     log: &dyn EbiTraitFiniteLanguage,
     parts: &[HashSet<Activity>],
-) -> Vec<Box<dyn EbiTraitFiniteLanguage>> {
+) -> Vec<FiniteLanguage> {
     let mut sublogs: Vec<FiniteLanguage> = parts.iter().map(|_| new_sublog(log)).collect();
 
     'trace: for trace in log.iter_traces() {
@@ -414,15 +407,98 @@ fn xor_split(
     }
 
     sublogs
-        .into_iter()
-        .map(|s| Box::new(s) as Box<dyn EbiTraitFiniteLanguage>)
-        .collect()
 }
 
-fn seq_conc_split(
+fn split_log_sequence(
     log: &dyn EbiTraitFiniteLanguage,
     parts: &[HashSet<Activity>],
-) -> Vec<Box<dyn EbiTraitFiniteLanguage>> {
+) -> Vec<FiniteLanguage> {
+    let mut sublogs: Vec<FiniteLanguage> = parts.iter().map(|_| new_sublog(log)).collect();
+
+    //create map activity -> part
+    let mut activity_2_part = vec![usize::MAX; log.activity_key().get_number_of_activities()];
+    for (part_i, part) in parts.iter().enumerate() {
+        for activity in part {
+            activity_2_part[activity.id] = part_i;
+        }
+    }
+
+    for trace in log.iter_traces() {
+        let mut ignore = HashSet::new();
+        let mut at_position = 0;
+
+        for (sigma_i, sigma) in parts.iter().enumerate() {
+            let subtrace_start = at_position;
+
+            //find where this sigma's subtrace will end
+            if sigma_i < parts.len() - 1 {
+                at_position = find_optimal_split(trace, sigma, at_position, &ignore);
+            } else {
+                //if this is the last sigma, this sigma must finish the trace
+                at_position = trace.len();
+            }
+            ignore.extend(sigma);
+
+            //walk over this subtrace, remove all events not from sigma
+            let subtrace = trace[subtrace_start..at_position]
+                .iter()
+                .filter(|x| sigma.contains(x))
+                .copied()
+                .collect();
+
+            sublogs[sigma_i].push(subtrace);
+        }
+    }
+
+    sublogs
+}
+
+fn find_optimal_split(
+    trace: &Vec<Activity>,
+    sigma: &HashSet<Activity>,
+    start_position: usize,
+    ignore: &HashSet<Activity>,
+) -> usize {
+    let mut position_least_cost = 0;
+    let mut least_cost = 0;
+    let mut cost = 0;
+    let mut position = 0;
+
+    let mut it = trace.iter().peekable();
+
+    //debug("find optimal split in " + trace.toString() + " for " + sigma.toString());
+
+    //move to the start position
+    while position < start_position && it.peek().is_some() {
+        position = position + 1;
+        position_least_cost = position_least_cost + 1;
+        it.next();
+    }
+
+    while let Some(activity) = it.next() {
+        if ignore.contains(activity) {
+            //skip
+        } else if sigma.contains(activity) {
+            cost -= 1;
+        } else {
+            cost += 1;
+        }
+
+        position += 1;
+
+        if cost < least_cost {
+            least_cost = cost;
+            position_least_cost = position;
+        }
+    }
+
+    return position_least_cost;
+}
+
+fn split_log_concurrent(
+    log: &dyn EbiTraitFiniteLanguage,
+    parts: &[HashSet<Activity>],
+) -> Vec<FiniteLanguage> {
     let mut sublogs: Vec<FiniteLanguage> = parts.iter().map(|_| new_sublog(log)).collect();
 
     for trace in log.iter_traces() {
@@ -435,18 +511,14 @@ fn seq_conc_split(
             sublogs[i].push(subtrace);
         }
     }
-
     sublogs
-        .into_iter()
-        .map(|s| Box::new(s) as Box<dyn EbiTraitFiniteLanguage>)
-        .collect()
 }
 
-fn loop_split(
+fn split_log_loop(
     log: &dyn EbiTraitFiniteLanguage,
     body: &HashSet<Activity>,
     redos: &[HashSet<Activity>],
-) -> Vec<Box<dyn EbiTraitFiniteLanguage>> {
+) -> Vec<FiniteLanguage> {
     let mut sublogs: Vec<FiniteLanguage> = (0..redos.len() + 1).map(|_| new_sublog(log)).collect();
 
     let find_part = |a: Activity| -> usize {
@@ -474,9 +546,6 @@ fn loop_split(
     }
 
     sublogs
-        .into_iter()
-        .map(|s| Box::new(s) as Box<dyn EbiTraitFiniteLanguage>)
-        .collect()
 }
 
 fn build_operator_node(
@@ -505,7 +574,7 @@ fn fall_throughs(log: &dyn EbiTraitFiniteLanguage) -> ProcessTree {
 
 fn empty_traces(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
     let info = LogInfo::log_calcs(log);
-    if !info.has_empty_traces {
+    if !info.dfg.empty_traces_weight.is_positive() {
         return None;
     }
 
@@ -601,7 +670,7 @@ fn strict_tau_loop(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
         let mut current: Vec<Activity> = Vec::new();
         for &a in trace {
             if let Some(&last) = current.last() {
-                if info.end_activities.contains(&last) && info.start_activities.contains(&a) {
+                if info.dfg.is_end_activity(last) && info.dfg.is_start_activity(a) {
                     new_log.push(std::mem::take(&mut current));
                     any_split = true;
                 }
@@ -637,7 +706,7 @@ fn tau_loop(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
     for trace in log.iter_traces() {
         let mut current: Vec<Activity> = Vec::new();
         for &a in trace {
-            if info.start_activities.contains(&a) && !current.is_empty() {
+            if info.dfg.is_start_activity(a) && !current.is_empty() {
                 new_log.push(std::mem::take(&mut current));
                 any_split = true;
             }
