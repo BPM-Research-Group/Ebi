@@ -7,7 +7,10 @@ use ebi_objects::{
     ebi_arithmetic::{Fraction, One, Signed},
     ebi_objects::process_tree::{Node, Operator},
 };
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::Display,
+};
 
 pub trait InductiveMiner {
     fn inductive_miner(&self) -> ProcessTree;
@@ -15,16 +18,16 @@ pub trait InductiveMiner {
 
 impl InductiveMiner for dyn EbiTraitFiniteLanguage {
     fn inductive_miner(&self) -> ProcessTree {
-        let mut tree = inductive_miner(self);
-        // tree.reduce_language_equivalently();
+        let mut tree = inductive_miner(self, 0);
+        tree.reduce_language_equivalently();
         tree
     }
 }
 
 impl InductiveMiner for FiniteLanguage {
     fn inductive_miner(&self) -> ProcessTree {
-        let mut tree = inductive_miner(self);
-        // tree.reduce_language_equivalently();
+        let mut tree = inductive_miner(self, 0);
+        tree.reduce_language_equivalently();
         tree
     }
 }
@@ -108,29 +111,39 @@ impl Cut {
     }
 }
 
-fn inductive_miner(log: &dyn EbiTraitFiniteLanguage) -> ProcessTree {
+fn debug<S: AsRef<str> + Display>(message: S, recursion_depth: usize) {
+    println!("{}{}", "\t".repeat(recursion_depth), message);
+}
+
+fn inductive_miner(log: &dyn EbiTraitFiniteLanguage, recursion_depth: usize) -> ProcessTree {
     let info = LogInfo::log_calcs(log);
 
-    if let Some(tree) = base_case(log, &info) {
-        println!("base case {:?}", tree);
+    if let Some(tree) = base_case(log, &info, recursion_depth) {
         return tree;
     }
 
     if let Some(cut) = find_cut(&info) {
-        println!("cut found {:?}", cut);
+        debug(format!("cut found {:?}", cut), recursion_depth);
         let sublogs = cut.split_log(log);
-        let subtrees = sublogs.iter().map(|s| inductive_miner(s)).collect();
+        let subtrees = sublogs
+            .iter()
+            .map(|s| inductive_miner(s, recursion_depth + 1))
+            .collect();
         return cut.build_tree(subtrees, log.activity_key().clone());
     }
 
-    println!("fall through");
-    fall_throughs(log, &info)
+    fall_throughs(log, &info, recursion_depth)
 }
 
-fn base_case(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Option<ProcessTree> {
+fn base_case(
+    log: &dyn EbiTraitFiniteLanguage,
+    info: &LogInfo,
+    recursion_depth: usize,
+) -> Option<ProcessTree> {
     let activity_key = log.activity_key().clone();
     //emptyLog
     if info.total_traces == 0 {
+        debug("empty log", recursion_depth);
         return Some((activity_key, vec![]).into());
     }
     //singleActivity: no empty traces, every trace has exactly one event
@@ -139,6 +152,10 @@ fn base_case(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Option<Process
         && info.activity_instances == info.total_traces
     {
         let only_activity = *info.activities.iter().next().unwrap();
+        debug(
+            format!("single activity {}", only_activity),
+            recursion_depth,
+        );
         return Some((activity_key, vec![Node::Activity(only_activity)]).into());
     }
 
@@ -575,20 +592,29 @@ fn build_operator_node(
     (activity_key, nodes).into()
 }
 
-fn fall_throughs(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> ProcessTree {
-    empty_traces(log)
-        .or_else(|| activity_once_per_trace(log, info))
-        .or_else(|| activity_concurrent(log, info))
-        .or_else(|| strict_tau_loop(log, info))
-        .or_else(|| tau_loop(log, info))
-        .unwrap_or_else(|| flower_model(log, info))
+fn fall_throughs(
+    log: &dyn EbiTraitFiniteLanguage,
+    info: &LogInfo,
+    recursion_depth: usize,
+) -> ProcessTree {
+    empty_traces(log, info, recursion_depth)
+        .or_else(|| activity_once_per_trace(log, info, recursion_depth))
+        .or_else(|| activity_concurrent(log, info, recursion_depth))
+        .or_else(|| strict_tau_loop(log, info, recursion_depth))
+        .or_else(|| tau_loop(log, info, recursion_depth))
+        .unwrap_or_else(|| flower_model(log, info, recursion_depth))
 }
 
-fn empty_traces(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
-    let info = LogInfo::log_calcs(log);
+fn empty_traces(
+    log: &dyn EbiTraitFiniteLanguage,
+    info: &LogInfo,
+    recursion_depth: usize,
+) -> Option<ProcessTree> {
     if !info.dfg.empty_traces_weight.is_positive() {
         return None;
     }
+
+    debug("empty traces", recursion_depth);
 
     let mut filtered_log = new_sublog(log);
     for trace in log.iter_traces() {
@@ -597,38 +623,39 @@ fn empty_traces(log: &dyn EbiTraitFiniteLanguage) -> Option<ProcessTree> {
         }
     }
 
-    let activity_key = log.activity_key().clone();
-
-    if LogInfo::log_calcs(&filtered_log).total_traces == 0 {
-        return Some((activity_key, vec![Node::Tau]).into());
+    if filtered_log.iter_traces().next().is_none() {
+        return Some((log.activity_key().clone(), vec![Node::Tau]).into());
     }
 
-    let subtree = inductive_miner(&filtered_log);
-    let tau_leaf: ProcessTree = (activity_key.clone(), vec![Node::Tau]).into();
+    let subtree = inductive_miner(&filtered_log, recursion_depth + 1);
+    let tau_leaf: ProcessTree = (log.activity_key().clone(), vec![Node::Tau]).into();
     Some(build_operator_node(
         Operator::Xor,
         vec![tau_leaf, subtree],
-        activity_key,
+        log.activity_key().clone(),
     ))
 }
 
 fn activity_once_per_trace(
     log: &dyn EbiTraitFiniteLanguage,
     info: &LogInfo,
+    recursion_depth: usize,
 ) -> Option<ProcessTree> {
-    let a = *info.activities.iter().find(|&&a| {
+    let activity = *info.activities.iter().find(|&&a| {
         log.iter_traces()
             .all(|trace| trace.iter().filter(|&&x| x == a).count() == 1)
     })?;
 
+    debug("activity one per trace", recursion_depth);
+
     let activity_key = log.activity_key().clone();
     let mut filtered_log = new_sublog(log);
     for trace in log.iter_traces() {
-        filtered_log.push(trace.iter().filter(|&&x| x != a).cloned().collect());
+        filtered_log.push(trace.iter().filter(|&&x| x != activity).cloned().collect());
     }
 
-    let subtree = inductive_miner(&filtered_log);
-    let a_leaf: ProcessTree = (activity_key.clone(), vec![Node::Activity(a)]).into();
+    let subtree = inductive_miner(&filtered_log, recursion_depth);
+    let a_leaf: ProcessTree = (activity_key.clone(), vec![Node::Activity(activity)]).into();
     Some(build_operator_node(
         Operator::Concurrent,
         vec![a_leaf, subtree],
@@ -636,32 +663,39 @@ fn activity_once_per_trace(
     ))
 }
 
-fn activity_concurrent(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Option<ProcessTree> {
+fn activity_concurrent(
+    log: &dyn EbiTraitFiniteLanguage,
+    info: &LogInfo,
+    recursion_depth: usize,
+) -> Option<ProcessTree> {
     if info.activities.len() < 3 {
         return None;
     }
 
-    for &a in &info.activities {
-        let mut filtered_log = new_sublog(log);
-        for trace in log.iter_traces() {
-            filtered_log.push(trace.iter().filter(|&&x| x != a).cloned().collect());
-        }
+    for &activity in &info.activities {
+        let mut parts_1 = HashSet::new();
+        parts_1.insert(activity);
+        let mut parts_2 = info.activities.clone();
+        parts_2.remove(&activity);
+        let sub_logs = split_log_concurrent(log, &[parts_1, parts_2]);
+        let sub_log_1 = &sub_logs[0];
+        let sub_log_2 = &sub_logs[1];
 
-        let mut non_empty = new_sublog(log);
-        for trace in filtered_log.iter_traces() {
-            if !trace.is_empty() {
-                non_empty.push(trace.to_vec());
-            }
-        }
+        //perform cut dection on empty traces
+        let mut check_log = sub_log_2.clone();
+        check_log.traces.retain(|trace| !trace.is_empty());
 
-        if find_cut(&LogInfo::log_calcs(&non_empty)).is_some() {
+        if let Some(cut) = find_cut(&LogInfo::log_calcs(&check_log)) {
+            debug(
+                format!("activity concurrent {} with sub-cut {:?}", activity, cut),
+                recursion_depth,
+            );
             let activity_key = log.activity_key().clone();
-            let subtree = inductive_miner(&filtered_log);
-            let a_leaf: ProcessTree = (activity_key.clone(), vec![Node::Activity(a)]).into();
-            println!("activity concurrent");
+            let subtree_1 = inductive_miner(sub_log_1, recursion_depth + 1);
+            let subtree_2 = inductive_miner(sub_log_2, recursion_depth + 1);
             return Some(build_operator_node(
                 Operator::Concurrent,
-                vec![a_leaf, subtree],
+                vec![subtree_1, subtree_2],
                 activity_key,
             ));
         }
@@ -670,7 +704,11 @@ fn activity_concurrent(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Opti
     None
 }
 
-fn strict_tau_loop(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Option<ProcessTree> {
+fn strict_tau_loop(
+    log: &dyn EbiTraitFiniteLanguage,
+    info: &LogInfo,
+    recursion_depth: usize,
+) -> Option<ProcessTree> {
     if info.activities.len() <= 1 {
         return None;
     }
@@ -696,8 +734,10 @@ fn strict_tau_loop(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Option<P
         return None;
     }
 
+    debug("strict tau loop", recursion_depth);
+
     let activity_key = log.activity_key().clone();
-    let subtree = inductive_miner(&new_log);
+    let subtree = inductive_miner(&new_log, recursion_depth + 1);
     let tau_leaf: ProcessTree = (activity_key.clone(), vec![Node::Tau]).into();
     Some(build_operator_node(
         Operator::Loop,
@@ -706,7 +746,11 @@ fn strict_tau_loop(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Option<P
     ))
 }
 
-fn tau_loop(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Option<ProcessTree> {
+fn tau_loop(
+    log: &dyn EbiTraitFiniteLanguage,
+    info: &LogInfo,
+    recursion_depth: usize,
+) -> Option<ProcessTree> {
     if info.activities.len() <= 1 {
         return None;
     }
@@ -730,8 +774,10 @@ fn tau_loop(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Option<ProcessT
         return None;
     }
 
+    debug("tau loop", recursion_depth);
+
     let activity_key = log.activity_key().clone();
-    let subtree = inductive_miner(&new_log);
+    let subtree = inductive_miner(&new_log, recursion_depth + 1);
     let tau_leaf: ProcessTree = (activity_key.clone(), vec![Node::Tau]).into();
     Some(build_operator_node(
         Operator::Loop,
@@ -740,7 +786,11 @@ fn tau_loop(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> Option<ProcessT
     ))
 }
 
-fn flower_model(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> ProcessTree {
+fn flower_model(
+    log: &dyn EbiTraitFiniteLanguage,
+    info: &LogInfo,
+    recursion_depth: usize,
+) -> ProcessTree {
     let activity_key = log.activity_key().clone();
 
     if info.activities.len() == 1 {
@@ -757,6 +807,7 @@ fn flower_model(log: &dyn EbiTraitFiniteLanguage, info: &LogInfo) -> ProcessTree
         .collect();
     let xor_body = build_operator_node(Operator::Xor, activity_trees, activity_key.clone());
     let tau_leaf: ProcessTree = (activity_key.clone(), vec![Node::Tau]).into();
+    debug("flower model", recursion_depth);
     build_operator_node(Operator::Loop, vec![xor_body, tau_leaf], activity_key)
 }
 
@@ -766,7 +817,7 @@ mod tests {
     use ebi_objects::{
         ActivityKey, ActivityKeyTranslator, EventLog, FiniteLanguage, ProcessTree, activity, con,
         ebi_objects::process_tree::{Node, Operator},
-        event_log, seq, tau, trace, xor,
+        event_log, or, seq, tau, trace, xor,
     };
 
     #[test]
@@ -786,15 +837,19 @@ mod tests {
             activity!("a"),
             con!(
                 activity!("b"),
-                xor!(tau!(), activity!("c")),
-                activity!("d"),
-                xor!(tau!(), activity!("e"))
+                xor!(
+                    tau!(),
+                    or!(
+                        activity!("c"),
+                        seq!(xor!(tau!(), activity!("d")), activity!("e"))
+                    )
+                )
             )
         );
 
         println!("{}", tree);
 
-        //assert_eq!(tree.to_hash_string(), should_tree.to_hash_string());
+        assert_eq!(tree.to_hash_string(), should_tree.to_hash_string());
     }
 
     #[test]
@@ -810,14 +865,17 @@ mod tests {
         let lang = FiniteLanguage::from(log);
         let tree = lang.inductive_miner();
 
-        let should_tree = con!(
-            xor!(tau!(), activity!("c")),
-            activity!("d"),
-            xor!(tau!(), activity!("e"))
+        let should_tree = xor!(
+            tau!(),
+            or!(
+                activity!("c"),
+                seq!(xor!(tau!(), activity!("d")), activity!("e"))
+            )
         );
 
-        println!("{}", tree);
+        println!("{}", tree.activity_key);
+        println!("result {}", tree);
 
-        //assert_eq!(tree.to_hash_string(), should_tree.to_hash_string());
+        assert_eq!(tree.to_hash_string(), should_tree.to_hash_string());
     }
 }

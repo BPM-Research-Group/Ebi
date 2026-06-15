@@ -113,7 +113,7 @@ pub const EBI_CONFORMANCE_UEMSC_SAMPLE: EbiCommand = EbiCommand::Command {
     ),
     latex_link: Some("see \\cref{def:uemsc}"),
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         SAMPLED_OBJECT_INPUTS,
         SAMPLED_OBJECT_INPUTS,

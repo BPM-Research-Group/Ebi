@@ -10,7 +10,7 @@ use crate::{
             EBI_CONFORMANCE_CHI_SQUARED_SAMPLE, EBI_CONFORMANCE_EARTH_MOVERS,
             EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE, EBI_CONFORMANCE_GAIN_PRECISION,
             EBI_CONFORMANCE_GAIN_RECALL, EBI_CONFORMANCE_HELLINGER_SAMPLE,
-            EBI_CONFORMANCE_JSSC_SAMPLE,
+            EBI_CONFORMANCE_JSSC_SAMPLE, EBI_CONFORMANCE_UEMSC_SAMPLE,
         },
         ebi_command_conformance_non_stochastic::{
             EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
@@ -143,10 +143,25 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         ],
     ),
     (
+        &EBI_CONFORMANCE_CHI_SQUARED_SAMPLE,
+        &[
+            "*",
+            "trait finite stochastic language#./testfiles/empty.slang",
+            "usize 1",
+        ],
+    ),
+    (
         &EBI_CONFORMANCE_EARTH_MOVERS,
         &[
             "*",
             "trait finite stochastic language#./testfiles/empty.xes",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_EARTH_MOVERS,
+        &[
+            "*",
+            "trait finite stochastic language#./testfiles/empty.slang",
         ],
     ),
     (
@@ -155,6 +170,14 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
             "*",
             "trait finite stochastic language#./testfiles/empty.xes",
             "*",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_EARTH_MOVERS_SAMPLE,
+        &[
+            "*",
+            "trait finite stochastic language#./testfiles/empty.slang",
+            "usize 1",
         ],
     ),
     (
@@ -230,6 +253,14 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         ],
     ),
     (
+        &EBI_CONFORMANCE_GAIN_PRECISION,
+        &[
+            "*",
+            "object stochastic deterministic finite automaton#./testfiles/ba.slang",
+            "fraction 0",
+        ],
+    ),
+    (
         &EBI_CONFORMANCE_GAIN_RECALL,
         &[
             "trait finite stochastic language#./testfiles/a-b.csv",
@@ -246,7 +277,39 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         ],
     ),
     (
+        &EBI_CONFORMANCE_HELLINGER_SAMPLE,
+        &[
+            "*",
+            "trait finite stochastic language#./testfiles/empty.slang",
+            "usize 1",
+        ],
+    ),
+    (
         &EBI_CONFORMANCE_JSSC_SAMPLE,
+        &[
+            "*",
+            "trait finite stochastic language#./testfiles/empty.xes",
+            "usize 1",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_JSSC_SAMPLE,
+        &[
+            "*",
+            "trait finite stochastic language#./testfiles/empty.slang",
+            "usize 1",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_UEMSC_SAMPLE,
+        &[
+            "*",
+            "trait finite stochastic language#./testfiles/empty.slang",
+            "usize 1",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_UEMSC_SAMPLE,
         &[
             "*",
             "trait finite stochastic language#./testfiles/empty.xes",
@@ -478,6 +541,20 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         ],
     ),
     (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/aa-ab-ba.dfg",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/aa-ab-ba.lpn",
+        ],
+    ),
+    (
         &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
         &["*", "trait semantics#./testfiles/empty.xes"],
     ),
@@ -515,6 +592,15 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         ],
     ),
     (
+        &EBI_TEST_BOOTSTRAP,
+        &[
+            "*",
+            "trait finite stochastic language#./testfiles/empty.slang",
+            "usize 10",
+            "fraction 0.05",
+        ],
+    ),
+    (
         &EBI_TEST_LOG_ATTRIBUTE,
         &["*", "string some string", "*", "*"],
     ),
@@ -522,6 +608,13 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &EBI_SAMPLE_TRACES,
         &[
             "trait finite stochastic language#./testfiles/empty.xes",
+            "*",
+        ],
+    ),
+    (
+        &EBI_SAMPLE_TRACES,
+        &[
+            "trait finite stochastic language#./testfiles/empty.slang",
             "*",
         ],
     ),
