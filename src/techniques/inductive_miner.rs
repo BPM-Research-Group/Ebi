@@ -82,7 +82,7 @@ enum Cut {
 impl Cut {
     fn split_log(&self, log: &dyn EbiTraitFiniteLanguage) -> Vec<FiniteLanguage> {
         match self {
-            Cut::ExclusiveChoice(parts) => split_log_xor(log, parts),
+            Cut::ExclusiveChoice(parts) => split_log_exclusive(log, parts),
             Cut::Sequence(parts) => split_log_sequence(log, parts),
             Cut::Concurrent(parts) => split_log_concurrent(log, parts),
             Cut::Loop { body, redos } => split_log_loop(log, body, redos),
@@ -391,7 +391,7 @@ fn new_sublog(log: &dyn EbiTraitFiniteLanguage) -> FiniteLanguage {
     }
 }
 
-fn split_log_xor(
+fn split_log_exclusive(
     log: &dyn EbiTraitFiniteLanguage,
     parts: &[HashSet<Activity>],
 ) -> Vec<FiniteLanguage> {
