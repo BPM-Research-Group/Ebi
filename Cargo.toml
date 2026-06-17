@@ -69,7 +69,7 @@ indicatif = "0.18.4"
 indexmap = "2.14.0"
 pathfinding = "4.15.0"
 fnv = "1.0.7"
-itertools = "0.14.0"
+itertools = "0.15.0"
 serde = "1.0.228"
 logging_timer = "1.1.1"
 svg2pdf = "0.13.0"
@@ -90,7 +90,7 @@ pyo3 = { version = "0.27.1", features = [
 ], optional = true }
 polars = { version = "0.32", features = ["ipc", "timezones"], optional = true }
 num-traits = { version = "0.2", optional = true }
-syn = { version = "2.0.117", features = ["parsing", "full"], optional = true }
+syn = { version = "2.0.118", features = ["parsing", "full"], optional = true }
 jni = { version = "0.21.1", optional = true }
 num-bigint = { version = "0.4.6", optional = true }
 wasm-bindgen = { version = "0.2.121", optional = true }

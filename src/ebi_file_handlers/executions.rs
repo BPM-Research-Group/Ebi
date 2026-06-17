@@ -9,7 +9,7 @@ use crate::ebi_framework::{
 
 pub const EBI_EXECUTIONS: EbiFileHandler = EbiFileHandler {
     name: "executions",
-    article: "",
+    article: "an",
     file_extension: "exs",
     is_binary: false,
     format_specification: &Executions::FILE_FORMAT_SPECIFICATION_LATEX,
