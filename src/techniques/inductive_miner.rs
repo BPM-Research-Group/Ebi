@@ -112,7 +112,7 @@ impl Cut {
 }
 
 fn debug<S: AsRef<str> + Display>(message: S, recursion_depth: usize) {
-    println!("{}{}", "\t".repeat(recursion_depth), message);
+    // println!("{}{}", "\t".repeat(recursion_depth), message);
 }
 
 fn inductive_miner(log: &dyn EbiTraitFiniteLanguage, recursion_depth: usize) -> ProcessTree {
