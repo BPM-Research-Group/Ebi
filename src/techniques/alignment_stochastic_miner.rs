@@ -57,13 +57,11 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
                 {
                     // println!("move {:?}", movee);
                     match movee {
-                        Move::LogMove(_) => {}
-                        Move::ModelMove(_, transition_index)
-                        | Move::SynchronousMove(_, transition_index)
-                        | Move::SilentMove(transition_index) => {
-                            for token in
-                                self.transition_2_produced_tokens(*transition_index, &marking)?
-                            {
+                        Move::LogMove { .. } => {}
+                        Move::ModelMove { transition, .. }
+                        | Move::SynchronousMove { transition, .. }
+                        | Move::SilentMove { transition, .. } => {
+                            for token in self.transition_2_produced_tokens(*transition, &marking)? {
                                 // println!("\ttoken {:?}", token);
                                 if let Token::SequenceFlow(sequence_flow_index) = token {
                                     let sequence_flow = self
@@ -76,7 +74,7 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
                                 }
                             }
 
-                            self.execute_transition(&mut marking, *transition_index)?;
+                            self.execute_transition(&mut marking, *transition)?;
                         }
                     }
                 }
@@ -112,10 +110,10 @@ impl AlignmentMiner for LabelledPetriNet {
                 .ok_or_else(|| anyhow!("should not happen"))?
             {
                 match movee {
-                    Move::LogMove(_) => {}
-                    Move::ModelMove(_, transition)
-                    | Move::SynchronousMove(_, transition)
-                    | Move::SilentMove(transition) => {
+                    Move::LogMove { .. } => {}
+                    Move::ModelMove { transition, .. }
+                    | Move::SynchronousMove { transition, .. }
+                    | Move::SilentMove { transition } => {
                         probabilities[*transition] += probability;
                     }
                 }

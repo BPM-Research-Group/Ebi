@@ -9,12 +9,14 @@ use crate::{
 };
 use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
-    Activity, ActivityKey, Executions,
+    Activity, ActivityKey, Attribute, Executions,
     anyhow::{Context, Error, Ok, Result, anyhow},
     ebi_objects::{
         executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
     },
 };
+use intmap::IntMap;
+use process_mining::core::event_data::case_centric::AttributeValue;
 use rayon::iter::{IndexedParallelIterator, ParallelIterator};
 use std::{
     collections::VecDeque,
@@ -65,6 +67,7 @@ where
         let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
         let resource_key = Arc::new(Mutex::new(ActivityKey::new()));
+        let attibute_key = Arc::new(Mutex::new(log.attribute_key().clone()));
 
         self.translate_using_activity_key(log.activity_key_mut());
 
@@ -121,6 +124,7 @@ where
         let mut executions = (
             log.activity_key().clone(),
             Arc::try_unwrap(resource_key).unwrap().into_inner().unwrap(),
+            Arc::try_unwrap(attibute_key).unwrap().into_inner().unwrap(),
             execution_list,
         )
             .into();
@@ -162,10 +166,13 @@ impl C {
 
         for move_index in 0..self.moves.len() {
             match self.moves[move_index] {
-                Move::LogMove(_) => {
+                Move::LogMove { .. } => {
                     //logmoves are not linked to transitions and have no executions
                 }
-                Move::ModelMove(activity, transition) => {
+                Move::ModelMove {
+                    activity,
+                    transition,
+                } => {
                     let move_index_of_enablement = self.get_enabling_move(move_index, semantics);
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
@@ -174,6 +181,7 @@ impl C {
                     executions.push_back(Execution {
                         trace: self.trace_index,
                         move_index,
+                        event_attributes: None,
                         activity: Some(activity),
                         also_in_log: false,
                         fired_transition: transition,
@@ -187,15 +195,23 @@ impl C {
 
                     semantics.execute_transition(&mut state, transition)?;
                 }
-                Move::SynchronousMove(activity, transition) => {
+                Move::SynchronousMove {
+                    activity,
+                    transition,
+                } => {
                     let move_index_of_enablement = self.get_enabling_move(move_index, semantics);
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
+                    let event_attributes =
+                        Some(self.get_event_attributes(move_index, log).ok_or_else(|| {
+                            anyhow!("Could not obtain event attributes for move {}.", move_index)
+                        })?);
 
                     let l = other_enabled_transitions.len();
                     executions.push_back(Execution {
                         trace: self.trace_index,
                         move_index,
+                        event_attributes,
                         activity: Some(activity),
                         also_in_log: true,
                         fired_transition: transition,
@@ -209,7 +225,7 @@ impl C {
 
                     semantics.execute_transition(&mut state, transition)?;
                 }
-                Move::SilentMove(transition) => {
+                Move::SilentMove { transition } => {
                     let move_index_of_enablement = self.get_enabling_move(move_index, semantics);
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
@@ -218,6 +234,7 @@ impl C {
                     executions.push_back(Execution {
                         trace: self.trace_index,
                         move_index,
+                        event_attributes: None,
                         activity: None,
                         also_in_log: false,
                         fired_transition: transition,
@@ -242,7 +259,7 @@ impl C {
         move_index: Option<usize>,
         log: &'a Box<dyn EbiTraitEventLogEventAttributes>,
     ) -> Option<&'a DateTime<FixedOffset>> {
-        let event_index = self.get_event_index(move_index?);
+        let event_index = self.get_event_index(move_index?)?;
         log.get_event_time(self.trace_index, event_index)
     }
 
@@ -252,7 +269,7 @@ impl C {
         log: &'a Box<dyn EbiTraitEventLogEventAttributes>,
         resource_key: &Arc<Mutex<ActivityKey>>,
     ) -> Option<Activity> {
-        let event_index = self.get_event_index(move_index?);
+        let event_index = self.get_event_index(move_index?)?;
         let resource_string = log.get_event_resource(self.trace_index, event_index)?;
 
         Some(
@@ -264,16 +281,28 @@ impl C {
         )
     }
 
-    fn get_event_index(&self, move_index: usize) -> usize {
+    fn get_event_attributes<'a>(
+        &self,
+        move_index: usize,
+        log: &'a Box<dyn EbiTraitEventLogEventAttributes>,
+    ) -> Option<IntMap<Attribute, AttributeValue>> {
+        let event_index = self.get_event_index(move_index)?;
+        log.get_event_attributes(self.trace_index, event_index)
+    }
+
+    fn get_event_index(&self, move_index: usize) -> Option<usize> {
         let mut event_index = 0;
-        for movee in self.moves.iter().take(move_index) {
+        let mut last = false;
+        for movee in self.moves.iter().take(move_index + 1) {
             match movee {
-                Move::LogMove(_) | Move::SynchronousMove(_, _) => event_index += 1,
-                _ => {}
+                Move::LogMove { .. } | Move::SynchronousMove { .. } => {
+                    event_index += 1;
+                    last = true;
+                }
+                _ => last = false,
             }
         }
-
-        event_index
+        if last { Some(event_index - 1) } else { None }
     }
 
     /**
@@ -482,11 +511,6 @@ mod tests {
 
     #[test]
     fn svn60() {
-        if !is_exact_globally() {
-            //string output looks slightly different in approximate mode; thus this will fail
-            return;
-        }
-
         let fin = fs::read_to_string("testfiles/svn60.xes").unwrap();
         let log = fin.parse::<EventLogEventAttributes>().unwrap();
         let mut log: Box<dyn EbiTraitEventLogEventAttributes> = Box::new(log);
@@ -500,6 +524,11 @@ mod tests {
         println!("{}", executions);
 
         let fin3 = fs::read_to_string("testfiles/svn60.lpn.exs").unwrap();
+
+        if !is_exact_globally() {
+            //string output looks slightly different in approximate mode; thus this will fail
+            return;
+        }
 
         assert_eq!(executions.to_string(), fin3);
     }

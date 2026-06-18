@@ -359,10 +359,13 @@ where
                 find_transition_with_label(semantics, &previous_state, &state, activity)
             {
                 //we could have moved on the model => synchronous move (this assumes that a synchronous move is cheaper than a log move)
-                alignment.push(Move::SynchronousMove(activity, transition));
+                alignment.push(Move::SynchronousMove {
+                    activity,
+                    transition,
+                });
             } else {
                 //we could not have moved on the model => log move
-                alignment.push(Move::LogMove(activity));
+                alignment.push(Move::LogMove { activity });
             }
         } else {
             //we did not do a move on the log
@@ -371,16 +374,16 @@ where
                 is_there_a_silent_transition_enabled(semantics, &previous_state, &state)
             {
                 //there is a silent transition enabled, which is the cheapest
-                alignment.push(Move::SilentMove(transition));
+                alignment.push(Move::SilentMove { transition });
             } else {
                 //otherwise, we take an arbitrary labelled model move
                 let transition = find_labelled_transition(semantics, &previous_state, &state)?;
-                alignment.push(Move::ModelMove(
-                    semantics
+                alignment.push(Move::ModelMove {
+                    activity: semantics
                         .get_transition_activity(transition, &previous_state)
                         .unwrap(),
                     transition,
-                ));
+                });
             }
         }
 
@@ -697,16 +700,28 @@ mod tests {
         let (alignment, _) = semantics.align_trace(&trace).unwrap();
 
         let correct_1 = vec![
-            Move::SynchronousMove(b, 1),
-            Move::ModelMove(a, 4),
-            Move::SilentMove(5),
-            Move::LogMove(b),
+            Move::SynchronousMove {
+                activity: b,
+                transition: 1,
+            },
+            Move::ModelMove {
+                activity: a,
+                transition: 4,
+            },
+            Move::SilentMove { transition: 5 },
+            Move::LogMove { activity: b },
         ];
         let correct_2 = vec![
-            Move::SynchronousMove(b, 1),
-            Move::LogMove(b),
-            Move::ModelMove(a, 4),
-            Move::SilentMove(5),
+            Move::SynchronousMove {
+                activity: b,
+                transition: 1,
+            },
+            Move::LogMove { activity: b },
+            Move::ModelMove {
+                activity: a,
+                transition: 4,
+            },
+            Move::SilentMove { transition: 5 },
         ];
 
         assert!(alignment == correct_1 || alignment == correct_2);
@@ -729,16 +744,28 @@ mod tests {
         let alignment = semantics.align_language(lang).unwrap();
 
         let correct_1 = vec![
-            Move::SynchronousMove(b, 1),
-            Move::ModelMove(a, 4),
-            Move::SilentMove(5),
-            Move::LogMove(b),
+            Move::SynchronousMove {
+                activity: b,
+                transition: 1,
+            },
+            Move::ModelMove {
+                activity: a,
+                transition: 4,
+            },
+            Move::SilentMove { transition: 5 },
+            Move::LogMove { activity: b },
         ];
         let correct_2 = vec![
-            Move::SynchronousMove(b, 1),
-            Move::LogMove(b),
-            Move::ModelMove(a, 4),
-            Move::SilentMove(5),
+            Move::SynchronousMove {
+                activity: b,
+                transition: 1,
+            },
+            Move::LogMove { activity: b },
+            Move::ModelMove {
+                activity: a,
+                transition: 4,
+            },
+            Move::SilentMove { transition: 5 },
         ];
 
         assert!(alignment.get(0) == Some(&correct_1) || alignment.get(0) == Some(&correct_2));
@@ -759,16 +786,28 @@ mod tests {
         let alignment = semantics.align_language(lang).unwrap();
 
         let correct_1 = vec![
-            Move::ModelMove(a, 1),
-            Move::SynchronousMove(b, 2),
-            Move::SilentMove(0),
-            Move::LogMove(b),
+            Move::ModelMove {
+                activity: a,
+                transition: 1,
+            },
+            Move::SynchronousMove {
+                activity: b,
+                transition: 2,
+            },
+            Move::SilentMove { transition: 0 },
+            Move::LogMove { activity: b },
         ]; //other options may be valid, please check semantically when this fails
         let correct_2 = vec![
-            Move::SynchronousMove(b, 2),
-            Move::ModelMove(a, 1),
-            Move::SilentMove(0),
-            Move::LogMove(b),
+            Move::SynchronousMove {
+                activity: b,
+                transition: 2,
+            },
+            Move::ModelMove {
+                activity: a,
+                transition: 1,
+            },
+            Move::SilentMove { transition: 0 },
+            Move::LogMove { activity: b },
         ]; //other options may be valid, please check semantically when this fails
         assert!(*alignment.get(0).unwrap() == correct_1 || *alignment.get(0).unwrap() == correct_2);
     }
@@ -788,10 +827,16 @@ mod tests {
         let alignment = semantics.align_language(lang).unwrap();
 
         let correct_1 = vec![
-            Move::SynchronousMove(b, 1),
-            Move::ModelMove(a, 2),
-            Move::SilentMove(5),
-            Move::LogMove(b),
+            Move::SynchronousMove {
+                activity: b,
+                transition: 1,
+            },
+            Move::ModelMove {
+                activity: a,
+                transition: 2,
+            },
+            Move::SilentMove { transition: 5 },
+            Move::LogMove { activity: b },
         ]; //other options may be valid, please check semantically when this fails
 
         assert_eq!(*alignment.get(0).unwrap(), correct_1);
@@ -813,10 +858,16 @@ mod tests {
         let alignment = semantics.align_language(lang).unwrap();
 
         let correct_1 = vec![
-            Move::SynchronousMove(b, 1),
-            Move::ModelMove(a, 4),
-            Move::SilentMove(5),
-            Move::LogMove(b),
+            Move::SynchronousMove {
+                activity: b,
+                transition: 1,
+            },
+            Move::ModelMove {
+                activity: a,
+                transition: 4,
+            },
+            Move::SilentMove { transition: 5 },
+            Move::LogMove { activity: b },
         ]; //other options may be valid, please check semantically when this fails
         assert_eq!(*alignment.get(0).unwrap(), correct_1);
     }
@@ -837,10 +888,16 @@ mod tests {
         let b = semantics.activity_key_mut().process_activity("b");
 
         let correct_1 = vec![
-            Move::SynchronousMove(b, 1),
-            Move::ModelMove(a, 4),
-            Move::SilentMove(5),
-            Move::LogMove(b),
+            Move::SynchronousMove {
+                activity: b,
+                transition: 1,
+            },
+            Move::ModelMove {
+                activity: a,
+                transition: 4,
+            },
+            Move::SilentMove { transition: 5 },
+            Move::LogMove { activity: b },
         ]; //other options may be valid, please check semantically when this fails
         assert_eq!(*alignment.get(0).unwrap(), correct_1);
     }
