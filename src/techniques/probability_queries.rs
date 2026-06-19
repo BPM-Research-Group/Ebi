@@ -13,6 +13,7 @@ use ebi_objects::{
     anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, One, OneMinus, Signed, Zero},
 };
+use fnv::FnvBuildHasher;
 use priority_queue::PriorityQueue;
 use std::{
     cmp::Ordering,
@@ -126,9 +127,11 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
         number_of_traces: &usize,
     ) -> Result<FiniteStochasticLanguage> {
         if self.number_of_traces() == 0 {
-            Ok((self.activity_key().clone(), HashMap::new()).into())
+            Ok(FiniteStochasticLanguage::new_with_activity_key(
+                self.activity_key().clone(),
+            ))
         } else if number_of_traces.is_one() {
-            let mut result = HashMap::new();
+            let mut result = FiniteStochasticLanguage::new_hashmap();
 
             let (mut max_trace, mut max_probability) =
                 self.iter_traces_probabilities().next().ok_or_else(|| {
@@ -164,7 +167,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
                 }
             }
 
-            let mut result2 = HashMap::new();
+            let mut result2 = FiniteStochasticLanguage::new_hashmap();
             for (trace, probability) in result {
                 result2.insert(trace.clone(), probability.clone());
             }
@@ -181,7 +184,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
             }
         }
 
-        let mut result2 = HashMap::new();
+        let mut result2 = FiniteStochasticLanguage::new_hashmap();
         for (trace, probability) in result {
             result2.insert(trace.clone(), probability.clone());
         }
@@ -194,7 +197,11 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
         coverage: &Fraction,
     ) -> Result<FiniteStochasticLanguage> {
         if coverage.is_zero() {
-            return Ok((self.activity_key().clone(), HashMap::new()).into());
+            return Ok((
+                self.activity_key().clone(),
+                FiniteStochasticLanguage::new_hashmap(),
+            )
+                .into());
         } else if self.number_of_traces() == 0 {
             return Err(anyhow!(
                 "A coverage of {:.4} is unattainable as the stochastic language is empty.",
@@ -237,7 +244,7 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
             ));
         }
 
-        let mut result2 = HashMap::new();
+        let mut result2 = FiniteStochasticLanguage::new_hashmap();
         for (trace, probability) in result {
             result2.insert(trace.clone(), probability.clone());
         }
@@ -492,7 +499,7 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
         )?;
         progress_bar.finish_and_clear();
 
-        let map: HashMap<_, _> = s.into_iter().collect();
+        let map: HashMap<_, _, FnvBuildHasher> = s.into_iter().collect();
         Ok((self.activity_key().clone(), map).into())
     }
 
@@ -519,7 +526,7 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
         )?;
         progress_bar.finish_and_clear();
 
-        let map: HashMap<_, _> = s.into_iter().collect();
+        let map: HashMap<_, _, FnvBuildHasher> = s.into_iter().collect();
         Ok((self.activity_key().clone(), map).into())
     }
 
@@ -567,7 +574,7 @@ impl<DState: Displayable, LState: Displayable> ProbabilityQueries
         )?;
         progress_bar.finish_and_clear();
 
-        let map: HashMap<_, _> = s.into_iter().collect();
+        let map: HashMap<_, _, FnvBuildHasher> = s.into_iter().collect();
         Ok((self.activity_key().clone(), map).into())
     }
 }

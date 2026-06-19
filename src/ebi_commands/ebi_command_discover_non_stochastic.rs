@@ -6,10 +6,13 @@ use crate::{
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
     },
-    ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage,
+    ebi_traits::{
+        ebi_trait_finite_language::EbiTraitFiniteLanguage,
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    },
     techniques::{
         flower_miner::{FlowerMinerDFA, FlowerMinerTree},
-        inductive_miner::InductiveMiner,
+        inductive_miner::{InductiveMiner, InductiveMinerInfrequent},
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
         trace_model_miner::TraceModelMinerTree,
     },
@@ -17,6 +20,7 @@ use crate::{
 use ebi_objects::{
     EbiObject, EbiObjectType, HasActivityKey,
     anyhow::{Context, anyhow},
+    ebi_arithmetic::{ConstFraction, Fraction},
 };
 
 pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
@@ -29,6 +33,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
         &EBI_DISCOVER_NON_STOCHASTIC_PREFIX,
         &EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL,
         &EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER,
+        &EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
     ],
 };
 
@@ -191,18 +196,56 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER: EbiCommand = EbiCommand::
     name_short: "im",
     name_long: Some("inductive-miner"),
     explanation_short: "Discover a process tree using the Inductive Miner algorithm.",
-    explanation_long: None,
-    latex_link: Some("\\cite{DBLP:conf/bpm/LeemansFA13}"),
+    explanation_long: Some("Discover a process tree using the Inductive Miner.
+    Please note that this implementation closely follows the thesis version; it is not equivalent to the ProM implementation."),
+    latex_link: Some("\\cite{DBLP:series/lnbip/Leemans22}"),
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteLanguage)]],
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteLanguage)],
+    ],
     input_names: &["LANG"],
-    input_helps: &["A finite language."],
+    input_helps: &[
+        "A finite language."
+    ],
     execute: |mut inputs, _| {
         let lang = inputs.remove(0).to_type::<dyn EbiTraitFiniteLanguage>()?;
-        Ok(EbiOutput::Object(EbiObject::ProcessTree(
-            lang.inductive_miner(),
-        )))
+            Ok(EbiOutput::Object(EbiObject::ProcessTree(
+                lang.inductive_miner(),
+            )))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::ProcessTree),
+};
+
+pub const EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT: EbiCommand = EbiCommand::Command {
+    name_short: "imf",
+    name_long: Some("inductive-miner-infrequent"),
+    explanation_short: "Discover a process tree using the Inductive Miner-infrequent algorithm.",
+    explanation_long: Some("Discover a process tree using the Inductive Miner-infrequent algorithm. 
+    If the given noise parameter is 0, then behaves as the Inductive Miner algorithm.
+    Please note that this implementation closely follows the thesis version; it is not equivalent to the ProM implementation."),
+    latex_link: Some("\\cite{DBLP:series/lnbip/Leemans22}"),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Fraction(
+            Some(ConstFraction::zero()),
+            Some(ConstFraction::one()),
+            Some(ConstFraction::of(2, 10)),
+        )],
+    ],
+    input_names: &["SLANG", "NOISE"],
+    input_helps: &[
+        "A finite stochastic language.",
+        "The amount of noise filtering, where 0 means no noise filtering is applied, and 1 means that maximum noise filtering is applied.",
+    ],
+    execute: |mut inputs, _| {
+        let slang = inputs.remove(0).to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let noise = inputs.remove(0).to_type::<Fraction>()?;
+            Ok(EbiOutput::Object(EbiObject::ProcessTree(
+                slang.inductive_miner_infrequent(&noise),
+            )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::ProcessTree),
 };

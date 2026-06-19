@@ -17,7 +17,7 @@ use ebi_objects::{
 };
 use rand::RngExt;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use std::collections::{HashMap, hash_map::Entry};
+use std::collections::hash_map::Entry;
 
 pub trait Sampler {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage>;
@@ -48,7 +48,7 @@ impl Sampler for EbiTraitStochasticSemantics {
 
 impl Sampler for dyn EbiTraitFiniteStochasticLanguage {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage> {
-        let mut result = HashMap::new();
+        let mut result = FiniteStochasticLanguage::new_hashmap();
 
         let cache = self.resample_cache_init()?;
 
@@ -108,7 +108,7 @@ where
 {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage> {
         if let Some(initial_state) = self.get_initial_state() {
-            let mut result = HashMap::new();
+            let mut result = FiniteStochasticLanguage::new_hashmap();
 
             for _ in 0..number_of_traces {
                 let mut current_state = initial_state.clone();
@@ -125,7 +125,8 @@ where
                     outgoing_probabilities.clear();
                     for transition in &enabled_transitions {
                         outgoing_probabilities.push(
-                            self.get_transition_weight(&current_state, *transition)? / &total_weight,
+                            self.get_transition_weight(&current_state, *transition)?
+                                / &total_weight,
                         );
                     }
 
@@ -213,7 +214,7 @@ impl Sampler
 {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage> {
         if let Some(initial_state) = self.get_initial_state() {
-            let mut result = HashMap::new();
+            let mut result = FiniteStochasticLanguage::new_hashmap();
 
             for _ in 0..number_of_traces {
                 let mut current_state = initial_state.clone();
