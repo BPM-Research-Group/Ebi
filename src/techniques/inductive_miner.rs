@@ -161,7 +161,7 @@ fn inductive_miner_recursion(
     if info.dfg.empty_traces_weight.is_not_positive() {
         if let Some(cut) = (parameters.cut_finders)(log, &info, parameters, recursion_depth) {
             debug(format!("cut found {:?}", cut), recursion_depth);
-            let sublogs = log.split_log(&cut);
+            let sublogs = log.split_log(&cut, recursion_depth);
             let subtrees = sublogs
                 .iter()
                 .map(|s| inductive_miner_recursion(s, parameters, recursion_depth + 1))
@@ -174,7 +174,11 @@ fn inductive_miner_recursion(
 }
 
 fn debug<S: AsRef<str> + Display>(message: S, recursion_depth: usize) {
-    println!("{}{}", "\t".repeat(recursion_depth), message);
+    if cfg!(test) {
+        println!("{}{}", "\t".repeat(recursion_depth), message);
+    } else {
+        log::info!("{}{}", "\t".repeat(recursion_depth), message);
+    }
 }
 
 fn build_operator_node(operator: Operator, subtrees: Vec<Vec<Node>>) -> Vec<Node> {
@@ -247,19 +251,19 @@ mod log_splitting {
         techniques::inductive_miner::cut_finding::Cut,
     };
     use ebi_objects::{Activity, FiniteStochasticLanguage};
-    use std::collections::HashSet;
+    use std::collections::{HashMap, HashSet};
 
     pub(super) trait SplitLog<T> {
-        fn split_log(&self, cut: &Cut) -> Vec<T>;
+        fn split_log(&self, cut: &Cut, recursion_depth: usize) -> Vec<T>;
     }
 
     macro_rules! split_log_imf {
         ($t:ty, $r:ty) => {
             impl SplitLog<$r> for $t {
-                fn split_log(&self, cut: &Cut) -> Vec<$r> {
+                fn split_log(&self, cut: &Cut, recursion_depth: usize) -> Vec<$r> {
                     match cut {
                         Cut::ExclusiveChoice(parts) => split_log_exclusive(self, parts),
-                        Cut::Sequence(parts) => split_log_sequence(self, parts),
+                        Cut::Sequence(parts) => split_log_sequence(self, parts, recursion_depth),
                         Cut::Concurrent(parts) => split_log_concurrent(self, parts),
                         Cut::Loop { body, redos } => split_log_loop(self, body, redos),
                     }
@@ -282,11 +286,47 @@ mod log_splitting {
             .map(|_| FiniteStochasticLanguage::new_with_activity_key(log.activity_key().clone()))
             .collect();
 
-        'trace: for (trace, probability) in log.iter_traces_probabilities() {
-            for (i, partition) in parts.iter().enumerate() {
-                if trace.iter().any(|a| partition.contains(a)) {
-                    sublogs[i].push_raw(trace.clone(), probability).unwrap();
-                    continue 'trace;
+        //map activities to sigmas
+        let mut eventclass2sigma_index = HashMap::new();
+        let mut sigma_index2sigma = HashMap::new();
+        {
+            let mut p = 0;
+            for sigma in parts {
+                sigma_index2sigma.insert(p, sigma);
+                for activity in sigma {
+                    eventclass2sigma_index.insert(activity, p);
+                }
+                p += 1;
+            }
+        }
+
+        for (trace, probability) in log.iter_traces_probabilities() {
+            //walk through the events and count how many go in each sigma
+            let mut sigma_event_counters = vec![0; parts.len()];
+            let mut max_counter = 0;
+            let mut max_sigma = None;
+            for activity in trace {
+                let sigma_index = eventclass2sigma_index.get(activity).unwrap();
+                sigma_event_counters[*sigma_index] += 1;
+                if sigma_event_counters[*sigma_index] > max_counter {
+                    max_counter = sigma_event_counters[*sigma_index];
+                    max_sigma = Some(sigma_index);
+                }
+            }
+
+            //determine whether this trace should go in this sublog
+            if let Some(sigma) = max_sigma {
+                //put it in the right sigma, but remove events not from sigma
+                let mut trace = trace.clone();
+                trace.retain(|activity| eventclass2sigma_index.get(activity) == max_sigma);
+                _ = sublogs[*sigma].push_raw(trace, probability);
+            } else {
+                /*
+                 * We have no information which sigma could
+                 * have produced an empty trace, so we keep it in all sublogs.
+                 */
+                for sublog in sublogs.iter_mut() {
+                    _ = sublog.push_raw(vec![], probability);
                 }
             }
         }
@@ -302,6 +342,7 @@ mod log_splitting {
     fn split_log_sequence(
         log: &dyn EbiTraitFiniteStochasticLanguage,
         parts: &[HashSet<Activity>],
+        _recursion_depth: usize,
     ) -> Vec<FiniteStochasticLanguage> {
         let mut sublogs: Vec<FiniteStochasticLanguage> = parts
             .iter()
@@ -342,6 +383,8 @@ mod log_splitting {
                 sublogs[sigma_i].push_raw(subtrace, probability).unwrap();
             }
         }
+
+        // debug(format!("logs {:?}", sublogs), recursion_depth);
 
         sublogs
     }
@@ -609,6 +652,16 @@ mod cut_finding {
             }
         }
 
+        //Apply an extension to the IM algorithm to account for loops that have the same directly follows graph as a parallel operator would have
+        //make sure that activities on the minimum-self-distance-path are not separated by a parallel operator.
+        {
+            for activity in &info.activities {
+                for (activity2, _) in info.msd.get(*activity).unwrap() {
+                    components.merge_components(*activity, activity2);
+                }
+            }
+        }
+
         let raw = components.build_components();
         let mut with_start_end: Vec<HashSet<Activity>> = vec![];
         let mut with_start: Vec<HashSet<Activity>> = vec![];
@@ -797,7 +850,10 @@ mod find_fall_throughs {
                 .all(|trace| trace.iter().filter(|&&x| x == a).count() == 1)
         })?;
 
-        debug("activity one per trace", recursion_depth);
+        debug(
+            format!("activity one per trace {}", activity),
+            recursion_depth,
+        );
 
         let mut filtered_log =
             FiniteStochasticLanguage::new_with_activity_key(log.activity_key().clone());
@@ -971,13 +1027,16 @@ mod log_info {
     use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
     use ebi_objects::{
         Activity, DirectlyFollowsGraph, FiniteStochasticLanguage, HasActivityKey,
-        IntoRefTraceProbabilityIterator, ebi_arithmetic::Fraction, ebi_arithmetic::Zero,
+        IntoRefTraceIterator, IntoRefTraceProbabilityIterator, ebi_arithmetic::Fraction,
+        ebi_arithmetic::Zero,
     };
+    use intmap::IntMap;
     use std::collections::HashSet;
 
     #[derive(Clone)]
     pub struct LogInfo {
         pub dfg: DirectlyFollowsGraph,
+        pub msd: IntMap<Activity, IntMap<Activity, usize>>,
         pub activities: HashSet<Activity>,
         pub total_traces: Fraction,
         pub activity_instances: Fraction,
@@ -996,6 +1055,7 @@ mod log_info {
                     let mut total_traces = Fraction::zero();
                     let mut activity_instances = Fraction::zero();
 
+                    //dfg
                     for (trace, probability) in self.iter_traces_probabilities() {
                         total_traces += probability;
                         let mut last_activity = None;
@@ -1020,8 +1080,72 @@ mod log_info {
                         }
                     }
 
+                    //msd
+                    let mut minimum_self_distances_between: IntMap<
+                        Activity,
+                        IntMap<Activity, usize>,
+                    > = IntMap::new();
+                    {
+                        let mut minimum_self_distances = IntMap::new();
+
+                        //walk trough the log
+                        for trace in self.iter_traces() {
+                            let mut trace_size = 0;
+                            let mut event_seen_at = IntMap::new();
+                            let mut read_trace = vec![];
+
+                            for to_event_class in trace {
+                                read_trace.push(to_event_class);
+
+                                if (event_seen_at.contains_key(*to_event_class)) {
+                                    //we have detected an activity for the second time
+                                    //check whether this is shorter than what we had already seen
+                                    let old_distance = minimum_self_distances
+                                        .get(*to_event_class)
+                                        .unwrap_or(&usize::MAX);
+
+                                    if !minimum_self_distances.contains_key(*to_event_class)
+                                        || trace_size
+                                            - event_seen_at.get(*to_event_class).unwrap_or(&0)
+                                            <= *old_distance
+                                    {
+                                        //keep the new minimum self distance
+                                        let new_distance = trace_size
+                                            - event_seen_at.get(*to_event_class).unwrap_or(&0);
+                                        if *old_distance > new_distance {
+                                            //we found a shorter minimum self distance, record and restart with a new multiset
+                                            minimum_self_distances
+                                                .insert(*to_event_class, new_distance);
+
+                                            minimum_self_distances_between
+                                                .insert(*to_event_class, IntMap::new());
+                                        }
+
+                                        //store the minimum self-distance activities
+                                        let mb: &mut IntMap<Activity, usize> =
+                                            minimum_self_distances_between
+                                                .get_mut(*to_event_class)
+                                                .unwrap();
+                                        for x in &read_trace[(event_seen_at
+                                            .get(*to_event_class)
+                                            .unwrap_or(&0)
+                                            + 1)
+                                            ..trace_size]
+                                        {
+                                            *mb.entry(**x).or_insert(0) += 1;
+                                        }
+                                    }
+                                }
+                                event_seen_at.insert(*to_event_class, trace_size);
+
+                                trace_size += 1;
+                            }
+                        }
+                    }
+
                     LogInfo {
                         dfg,
+                        msd: minimum_self_distances_between,
                         activities,
                         total_traces,
                         activity_instances,
@@ -1070,7 +1194,7 @@ pub fn filter_log_info(
                             .outgoing_edges(*activity)
                             .into_iter()
                             .map(|(_, weight)| weight)
-                            .sum()),
+                            .sum::<Fraction>()),
             );
         }
 
