@@ -1259,7 +1259,7 @@ mod tests {
 
         println!("{}", tree);
 
-        assert_eq!(tree.to_hash_string(), should_tree.to_hash_string());
+        assert_eq!(tree, should_tree);
     }
 
     #[test]
@@ -1286,10 +1286,11 @@ mod tests {
         println!("{}", tree.activity_key);
         println!("result {}", tree);
 
-        assert_eq!(tree.to_hash_string(), should_tree.to_hash_string());
+        assert_eq!(tree, should_tree);
     }
 
     #[test]
+    /// Differs from the example in the thesis: there are actually two optimal splits for the noisy trace in the sequence cut.
     fn imf_l92() {
         let log = event_log!(
             trace!("a", "b", "c", "d", "e"),
@@ -1349,6 +1350,17 @@ mod tests {
 
         let tree = slang.inductive_miner_infrequent(&f!(15, 100));
 
+        let should_tree = seq!(
+            activity!("a"),
+            con!(
+                activity!("b"),
+                activity!("c"),
+                xor!(tau!(), seq!(activity!("d"), activity!("e")))
+            )
+        );
+
         println!("{}", tree);
+
+        assert_eq!(tree, should_tree);
     }
 }

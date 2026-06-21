@@ -154,9 +154,9 @@ checksum = "76a2e8124351fda1ef8aaaa3bbd7ebbcb486bbcd4225aca0aa0d84bb2db8fecb"
 
 [[package]]
 name = "arrayvec"
-version = "0.7.6"
+version = "0.7.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c02d123df017efcdfbd739ef81735b36c5ba83ec3c59c80a9d7ecc718f92e50"
+checksum = "f02882884d3e1bc524fb12c79f107f6ad0e1cfd498c536ffb494301740995dfe"
 
 [[package]]
 name = "arrow-format"
@@ -312,9 +312,9 @@ checksum = "8ae3f5d315924270530207e2a68396c3cc547f6dca3fbdca317cfb1a51edb593"
 
 [[package]]
 name = "cc"
-version = "1.2.64"
+version = "1.2.65"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dad887fd958be91b5098c0248def011f4523ab786cd411be668777e55063501f"
+checksum = "e228eec9be7c17ccb640b59b36a5cd805ea2a564a4c5e162c2f659fea30d3b96"
 dependencies = [
  "find-msvc-tools",
  "jobserver",
@@ -659,6 +659,38 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "be1e0bca6c3637f992fc1cc7cbc52a78c1ef6db076dbf1059c4323d6a2048376"
 
 [[package]]
+name = "defmt"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a6e524506490a1953d237cb87b1cfc1e46f88c18f10a22dfe0f507dc6bfc7f7f"
+dependencies = [
+ "bitflags 1.3.2",
+ "defmt-macros",
+]
+
+[[package]]
+name = "defmt-macros"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f0a27770e9c8f719a79d8b638281f4d828f77d8fd61e0bd94451b9b85e576a0b"
+dependencies = [
+ "defmt-parser",
+ "proc-macro-error2",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.118",
+]
+
+[[package]]
+name = "defmt-parser"
+version = "1.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "10d60334b3b2e7c9d91ef8150abfb6fa4c1c39ebbcf4a81c2e346aad939fee3e"
+dependencies = [
+ "thiserror 2.0.18",
+]
+
+[[package]]
 name = "deprecate-until"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -721,7 +753,7 @@ checksum = "d0881ea181b1df73ff77ffaaf9c7544ecc11e82fba9b5f27b262a3c73a332555"
 
 [[package]]
 name = "ebi"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "Inflector",
  "bitvec",
@@ -778,9 +810,9 @@ dependencies = [
 
 [[package]]
 name = "ebi_activity_key"
-version = "0.0.2"
+version = "0.0.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "41eab2d4244b7796f898c473fa432cdd7741b18fb23f95663bd32eda50ae12b9"
+checksum = "6707d47b66cf177c4e2c11624c08fd2b08d6dd54f6593f784e8566133f3d16df"
 dependencies = [
  "intmap",
  "uuid",
@@ -788,13 +820,13 @@ dependencies = [
 
 [[package]]
 name = "ebi_arithmetic"
-version = "0.3.12"
-source = "git+https://github.com/BPM-Research-Group/Ebi_arithmetic.git#250f59c82bb36133425a543432f42f1d23758461"
+version = "0.3.13"
+source = "git+https://github.com/BPM-Research-Group/Ebi_arithmetic.git#af365bfefaf06487ae550b803c4c1dda8a468072"
 dependencies = [
  "anyhow",
  "fnv",
  "intmap",
- "itertools 0.14.0",
+ "itertools 0.15.0",
  "malachite",
  "prime_factorization",
  "rand 0.9.4",
@@ -804,26 +836,26 @@ dependencies = [
 
 [[package]]
 name = "ebi_bpmn"
-version = "0.0.48"
-source = "git+https://github.com/BPM-Research-Group/Ebi_BPMN.git#fb37ef3e15291d44fc2f0d43224d2ef07071a448"
+version = "0.0.49"
+source = "git+https://github.com/BPM-Research-Group/Ebi_BPMN.git#a8cf03d38a4dca53ea41e8f085b7bea22b3a35b2"
 dependencies = [
  "anyhow",
  "bitvec",
  "ebi_activity_key",
  "ebi_arithmetic",
  "ebi_derive",
- "itertools 0.14.0",
+ "itertools 0.15.0",
  "layout-rs",
- "quick-xml 0.39.4",
+ "quick-xml 0.40.1",
  "strum",
  "strum_macros 0.28.0",
 ]
 
 [[package]]
 name = "ebi_derive"
-version = "0.2.10"
+version = "0.2.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1277ad700e42976df7be0a59add349710a40ac6ed5634a569f9a21707fe5b0ee"
+checksum = "89802b0c8318deed3c749930845ac616379c32188f3f61cb5b53c72835894d6c"
 dependencies = [
  "darling",
  "quote",
@@ -833,8 +865,8 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
-version = "0.3.186"
-source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#6764dc5ba8cece7a1f79868fbb81c94a8d86d65d"
+version = "0.3.187"
+source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#8b51244868130ec54e3eb1fd58efbf2a7f4afd58"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -846,7 +878,7 @@ dependencies = [
  "flate2",
  "fnv",
  "intmap",
- "itertools 0.14.0",
+ "itertools 0.15.0",
  "layout-rs",
  "log",
  "pastey",
@@ -865,8 +897,8 @@ dependencies = [
 
 [[package]]
 name = "ebi_optimisation"
-version = "0.3.7"
-source = "git+https://github.com/BPM-Research-Group/Ebi_optimisation.git#3c2fe927eb5dbc5cbddbde623e50bea6ccf2ae9e"
+version = "0.3.8"
+source = "git+https://github.com/BPM-Research-Group/Ebi_optimisation.git#734557b44072526b759ca9bf20285239876e3bc1"
 dependencies = [
  "ebi_arithmetic",
  "indexmap 2.14.0",
@@ -1521,10 +1553,11 @@ checksum = "8f42a60cbdf9a97f5d2305f08a87dc4e09308d1276d28c869c684d7777685682"
 
 [[package]]
 name = "jiff"
-version = "0.2.28"
+version = "0.2.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4603d3033e49e2b0e31229fcab20a5d40089c607d975cd9c80551dc69eed9102"
+checksum = "34f877a98676d2fb664698d74cc6a51ce6c484ce8c770f05d0108ec9090aeb46"
 dependencies = [
+ "defmt",
  "jiff-static",
  "log",
  "portable-atomic",
@@ -1534,9 +1567,9 @@ dependencies = [
 
 [[package]]
 name = "jiff-static"
-version = "0.2.28"
+version = "0.2.29"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "782d32378dddf207193ac91cefb848ad41abb58195c95168e1291227a0832b47"
+checksum = "0666b5ab5ecaca213fc2a85b8c0083d9004e84ee2d5f9a7e0017aaf50986f25f"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -1775,9 +1808,9 @@ dependencies = [
 
 [[package]]
 name = "log"
-version = "0.4.32"
+version = "0.4.33"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "953f07c43838f8e6f9758cab68bf5bed85465e7587ebe0b823f1bcd81978ad3a"
+checksum = "0ceec5bc11778974d1bcb055b18002eba7f4b3518b6a0081b3af5f21666da9ad"
 
 [[package]]
 name = "logging_timer"
@@ -2716,6 +2749,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "proc-macro-error-attr2"
+version = "2.0.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "96de42df36bb9bba5542fe9f1a054b8cc87e172759a1868aa05c1f3acc89dfc5"
+dependencies = [
+ "proc-macro2",
+ "quote",
+]
+
+[[package]]
+name = "proc-macro-error2"
+version = "2.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "11ec05c52be0a07b08061f7dd003e7d7092e0472bc731b4af7bb1ef876109802"
+dependencies = [
+ "proc-macro-error-attr2",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.118",
+]
+
+[[package]]
 name = "proc-macro2"
 version = "1.0.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2840,16 +2895,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "331e97a1af0bf59823e6eadffe373d7b27f485be8748f71471c662c1f269b7fb"
 dependencies = [
  "memchr",
-]
-
-[[package]]
-name = "quick-xml"
-version = "0.39.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cdcc8dd4e2f670d309a5f0e83fe36dfdc05af317008fea29144da1a2ac858e5e"
-dependencies = [
- "memchr",
- "serde",
 ]
 
 [[package]]

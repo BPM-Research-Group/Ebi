@@ -1,6 +1,6 @@
 [package]
 name = "ebi"
-version = "0.3.11"
+version = "0.3.12"
 edition = "2024"
 license = "MIT OR Apache-2.0"
 keywords = ["stochastic-processes", "process-mining", "business-processes"]
@@ -44,9 +44,9 @@ javascript = ["dep:wasm-bindgen", "dep:syn", "dep:js-sys"]
 extension-module = ["pyo3/extension-module"]
 
 [dependencies]
-ebi_optimisation = { git = "https://github.com/BPM-Research-Group/Ebi_optimisation.git", version = "0.3.7" }
-ebi_objects = { git = "https://github.com/BPM-Research-Group/Ebi_objects.git", version = "0.3.186" }
-ebi_derive = "0.2.10"
+ebi_optimisation = { git = "https://github.com/BPM-Research-Group/Ebi_optimisation.git", version = "0.3.8" }
+ebi_objects = { git = "https://github.com/BPM-Research-Group/Ebi_objects.git", version = "0.3.187" }
+ebi_derive = "0.2.11"
 bitvec = "1.0.1"
 clap = { version = "4.6.1", features = ["derive", "cargo", "string"] }
 clap-verbosity-flag = "3.0.3"
