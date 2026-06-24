@@ -238,6 +238,7 @@ pub mod techniques {
     pub mod resource_utilisation;
     pub mod sample;
     pub mod sample_folds;
+    pub mod split_miner;
     pub mod stochastic_markovian_abstraction;
     pub mod stochastic_markovian_abstraction_conformance;
     pub mod tau_removal;
