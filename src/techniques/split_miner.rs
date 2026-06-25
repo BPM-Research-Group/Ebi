@@ -1,20 +1,16 @@
-use std::collections::{HashMap, HashSet};
-
-use ebi_objects::{
-    Activity, BusinessProcessModelAndNotation, HasActivityKey, LabelledPetriNet,
-    ebi_arithmetic::{Fraction, Zero, f},
-    ebi_bpmn::elements::process::BPMNProcess,
-};
-use intmap::IntMap;
-use uuid::Uuid;
-
 use crate::{
-    ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
+    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     techniques::stochastic_markovian_abstraction::MarkovianAbstraction,
 };
+use ebi_objects::{
+    Activity, BusinessProcessModelAndNotation, FiniteStochasticLanguage, HasActivityKey, ebi_arithmetic::{Fraction, Zero, f},
+};
+use intmap::IntMap;
+use std::{
+    collections::{HashMap, HashSet},
+    hash::Hash,
+};
+use uuid::Uuid;
 
 pub trait SplitMiner {
     fn split_miner(&self) -> BusinessProcessModelAndNotation;
@@ -97,18 +93,20 @@ fn generateDFGP<'a>(
 }
 
 struct DirectlyFollowGraphPlus<'a> {
-    log: &'a dyn EbiTraitFiniteStochasticLanguage,
+    log: &'a FiniteStochasticLanguage,
     startcode: Activity,
     endcode: Activity,
 
     edges: HashSet<DFGEdge>,
+    edge_2_frequency: HashMap<Uuid, Fraction>,
     nodes: IntMap<Activity, DFGNode>,
-    outgoings: IntMap<usize, HashSet<DFGEdge>>,
-    incomings: IntMap<usize, HashSet<DFGEdge>>,
-    dfgp: IntMap<Activity, IntMap<usize, DFGEdge>>,
+    node_2_frequency: HashMap<Uuid, Fraction>,
+    outgoings: IntMap<Activity, HashSet<DFGEdge>>,
+    incomings: IntMap<Activity, HashSet<DFGEdge>>,
+    dfgp: IntMap<Activity, IntMap<Activity, DFGEdge>>,
 
     loopsL1: HashSet<Activity>,
-    loopsL1Freq: IntMap<Activity, usize>,
+    loopsL1Freq: IntMap<Activity, Fraction>,
     loopsL2: HashSet<DFGEdge>,
     parallelisms: IntMap<usize, HashSet<usize>>,
     concurrencyMatrix: Vec<Fraction>,
@@ -126,7 +124,7 @@ struct DirectlyFollowGraphPlus<'a> {
 
 impl<'a> DirectlyFollowGraphPlus<'a> {
     fn new(
-        log: &'a dyn EbiTraitFiniteStochasticLanguage,
+        log: &'a FiniteStochasticLanguage,
         parameters: &SplitMinerParameters,
         start_activity: Activity,
         end_activity: Activity,
@@ -136,6 +134,7 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
             startcode: start_activity,
             endcode: end_activity,
             edges: HashSet::new(),
+            edge_2_frequency: HashMap::new(),
             nodes: IntMap::new(),
             outgoings: IntMap::new(),
             incomings: IntMap::new(),
@@ -183,13 +182,14 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
     }
 
     fn buildDirectlyFollowsGraph(&mut self) {
-        let autogenStart = DFGNode::new(events.get(startcode), self.startcode);
-        self.addNode(autogenStart);
+        let autogenStart = DFGNode::new(self.startcode);
+        self.addNode(autogenStart.clone());
         //        while parsing the simple log we will always skip the start event,
         //        so we set now the maximum frequency because it is an artificial start event
+        self.increase_node_frequency(autogenStart.id, &self.log.get_probability_sum());
         autogenStart.increaseFrequency(&f!(self.log.number_of_traces()));
 
-        let autogenEnd = DFGNode::new(events.get(endcode), self.endcode);
+        let autogenEnd = DFGNode::new(self.endcode);
         self.addNode(autogenEnd);
 
         for (trace, traceFrequency) in self.log.iter_traces_probabilities() {
@@ -205,47 +205,80 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
 
                 if prevEvent == *event {
                     if self.loopsL1.contains(event) {
-                        *self.loopsL1Freq.get_mut(*event).unwrap() += 1;
+                        *self.loopsL1Freq.get_mut(*event).unwrap() += traceFrequency;
                     } else {
                         self.loopsL1.insert(*event);
-                        self.loopsL1Freq.insert(*event, 1);
+                        self.loopsL1Freq.insert(*event, traceFrequency.clone());
                     }
                     continue;
                 }
 
                 let node;
                 if !self.nodes.contains_key(*event) {
-                    node = DFGNode::new(events.get(event), event);
-                    self.addNode(node);
+                    node = DFGNode::new(*event);
+                    self.addNode(node.clone());
                 } else {
-                    node = nodes.get(event);
+                    node = self.nodes.get(*event).unwrap().clone();
                 }
 
                 //                  increasing frequency of this event occurrence
-                node.increaseFrequency(traceFrequency);
+                self.increase_node_frequency(node.id, traceFrequency);
 
-                if (!dfgp.containsKey(prevEvent)
-                    || !self.dfgp.get(prevEvent).unwrap().contains_key(event))
+                if !self.dfgp.contains_key(prevEvent)
+                    || !self.dfgp.get(prevEvent).unwrap().contains_key(*event)
                 {
-                    edge = DFGEdge::new(prevNode, node);
-                    self.addEdge(edge);
+                    let edge = DFGEdge::new(prevNode, node);
+                    self.addEdge(edge, traceFrequency.clone());
                 }
 
                 //                  increasing frequency of this directly following relationship
-                self.dfgp
-                    .get(prevEvent)
-                    .get(event)
-                    .increaseFrequency(traceFrequency);
+                let edge_id = self.dfgp.get(prevEvent).unwrap().get(*event).unwrap().id;
+                self.increase_edge_frequency(edge_id, traceFrequency);
 
                 prevEvent = *event;
                 prevNode = node;
             }
         }
     }
+
+    fn addNode(&mut self, n: DFGNode) {
+        let code = n.code;
+
+        self.nodes.insert(code, n);
+        if !self.incomings.contains_key(code) {
+            self.incomings.insert(code, HashSet::new());
+        }
+        if !self.outgoings.contains_key(code) {
+            self.outgoings.insert(code, HashSet::new());
+        }
+        if !self.dfgp.contains_key(code) {
+            self.dfgp.insert(code, IntMap::new());
+        }
+        self.node_2_frequency.insert(n.id, Fraction::zero());
+    }
+
+    fn addEdge(&mut self, e: DFGEdge, frequency: Fraction) {
+        let src = e.getSourceCode();
+        let tgt = e.getTargetCode();
+
+        self.edges.insert(e.clone());
+        self.incomings.get_mut(tgt).unwrap().insert(e.clone());
+        self.outgoings.get_mut(src).unwrap().insert(e.clone());
+        self.dfgp.get_mut(src).unwrap().insert(tgt, e.clone());
+        self.edge_2_frequency.insert(e, frequency);
+    }
+
+    fn increase_edge_frequency(&mut self, e: Uuid, frequency: &Fraction) {
+        *self.edge_2_frequency.get_mut(&e).unwrap() += frequency;
+    }
+
+    fn increase_node_frequency(&mut self, n: Uuid, frequency: &Fraction) {
+        *self.node_2_frequency.get_mut(&n).unwrap() += frequency;
+    }
 }
 
+#[derive(Clone)]
 struct DFGEdge {
-    frequency: Fraction,
     isLoop: bool,
     id: Uuid,
     label: Option<String>,
@@ -256,7 +289,6 @@ struct DFGEdge {
 impl DFGEdge {
     fn new(source: DFGNode, target: DFGNode) -> Self {
         Self {
-            frequency: Fraction::zero(),
             isLoop: false,
             id: uuid::Uuid::new_v4(),
             label: None,
@@ -264,11 +296,33 @@ impl DFGEdge {
             target,
         }
     }
+
+    fn getSourceCode(&self) -> Activity {
+        return self.source.code;
+    }
+
+    fn getTargetCode(&self) -> Activity {
+        return self.target.code;
+    }
 }
 
+impl PartialEq for DFGEdge {
+    fn eq(&self, other: &Self) -> bool {
+        self.id == other.id
+    }
+}
+
+impl Eq for DFGEdge {}
+
+impl Hash for DFGEdge {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.id.hash(state);
+    }
+}
+
+#[derive(Clone)]
 struct DFGNode {
-    id: String,
-    label: String,
+    id: Uuid,
     code: Activity,
 
     frequency: Fraction,
@@ -277,10 +331,13 @@ struct DFGNode {
 }
 
 impl DFGNode {
-    fn new(label: String, code: Activity) -> Self {}
+    fn new(code: Activity) -> Self {
+        id: Uuid::new_v4(),
+        code
+    }
 
     fn increaseFrequency(&mut self, amount: &Fraction) {
-        *self.frequency += amount;
+        self.frequency += amount;
     }
 }
 
