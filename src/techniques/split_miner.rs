@@ -2,11 +2,11 @@ use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     techniques::stochastic_markovian_abstraction::MarkovianAbstraction,
 };
-use bitset::BitSet;
+use bit_set::BitSet;
 use ebi_objects::{
     Activity, BusinessProcessModelAndNotation, FiniteStochasticLanguage, HasActivityKey,
     IntoRefTraceIterator, IntoRefTraceProbabilityIterator,
-    ebi_arithmetic::{Fraction, Round, Signed, ToNative, Zero, f},
+    ebi_arithmetic::{Fraction, Round, Signed, ToNative, Zero, f, f0},
     malachite::base::num::conversion::traits::RoundingInto,
 };
 use intmap::IntMap;
@@ -432,8 +432,8 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
 
         //        these two structures keep track of the mapping between integer successors codes and the BPMN nodes
         //        as well as the incoming edge of each successor, this is fundamental to edit the BPMN diagram later
-        let mut successorsToNodes = IntMap::new();
-        let mut successorsToEdges = IntMap::new();
+        let successorsToNodes: IntMap<(), ()> = IntMap::new();
+        let successorsToEdges: IntMap<(), ()> = IntMap::new();
 
         //      TRACE-DEPENDENT DATA STRUCTURES
 
@@ -445,7 +445,7 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
         let mut distances = IntMap::new();
 
         let MAXD = usize::MAX;
-        let skipcounter = 0;
+        let mut skipcounter = 0;
 
         for TID in self.nodes.keys() {
             let size = self.outgoings.get(TID).unwrap().len();
@@ -456,7 +456,7 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
                 for e in self.outgoings.get(TID).unwrap() {
                     let SID = e.getTargetCode();
                     tmpSuccessors.push(SID);
-                    splitMaps.get(TID).addSuccessor(SID);
+                    splitMaps.get_mut(TID).unwrap().addSuccessor(SID);
                 }
                 successors.insert(TID, tmpSuccessors);
             }
@@ -478,7 +478,7 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
                     }
                 }
 
-                for sti in splitTasksInTrace.keys() {
+                for (sti, value) in splitTasksInTrace.iter_mut() {
                     //                    we now scan all the split tasks that we encountered so far
                     //                    however, split task executed too long ago or same of the current event are not taken into account
                     //                    distances.put(sti, distances.get(sti)+1);
@@ -489,32 +489,37 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
                     //                    if the current event is a successor for one or more of them (in which case the event is also a join)
                     //                    we update the observation bitset of the split task for this trace
                     if let Some(i) = successors.get(sti).unwrap().iter().position(|e| e == event) {
-                        splitTasksInTrace.get(sti).unwrap().set(i, true);
+                        value.insert(i);
                     }
                 }
             }
 
             //            once the whole trace has been parsed, we add the bitset of each split task to its matrix of bitsets
             for sti in splitTasksInTrace.keys() {
-                splitMaps
-                    .get(sti)
-                    .addBitset(splitTasksInTrace.get(sti), trace_frequency);
+                splitMaps.get_mut(sti).expect("sti not found").addBitset(
+                    splitTasksInTrace.get(sti).expect("sti not found").clone(),
+                    trace_frequency,
+                );
             }
         }
 
-        for sti in splitMaps.keys() {
-            generateSplitsHierarchyFromObservationMatrix(sti, splitMaps.get(sti));
+        for (sti, value) in splitMaps.iter_mut() {
+            self.generateSplitsHierarchyFromObservationMatrix(sti, value);
         }
 
         // System.out.println("DEBUG - skipcounter = " + skipcounter);
     }
 
-    fn generateSplitsHierarchyFromObservationMatrix(&mut self, split: usize, matrix: Matrix) {
+    fn generateSplitsHierarchyFromObservationMatrix(
+        &mut self,
+        split: Activity,
+        matrix: &mut Matrix,
+    ) {
         let print = false;
 
         // System.out.println("DEBUG - split task: " + log.getEvents().get(split) + " (" + split + ")");
         //        matrix.print();
-        matrix.prune(self.parameters.parallelismsThreshold);
+        matrix.prune(&self.parameters.parallelismsThreshold);
 
         let mut transposedMatrix: IntMap<Activity, BitSet> = IntMap::new();
         let rows = matrix.rows();
@@ -524,14 +529,16 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
             transposedMatrix.insert(matrix.successors[i], BitSet::with_capacity(rows));
         }
 
-        let r = 0; // row = bitset
+        let mut r = 0; // row = bitset
         for bs in matrix.matrix.keys() {
             let sl = 0; // location of the successor in the current biset
             for sl in 0..matrix.totalSuccessors() {
-                transposedMatrix
-                    .get_mut(matrix.successors[sl])
-                    .unwrap()
-                    .set(r, bs.get(sl));
+                if bs.contains(sl) {
+                    transposedMatrix
+                        .get_mut(matrix.successors[sl])
+                        .unwrap()
+                        .insert(r);
+                }
             }
             r += 1;
         }
@@ -542,7 +549,7 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
             for s in transposedMatrix.keys() {
                 print!("S: {}: ", s);
                 for si in 0..rows {
-                    if transposedMatrix.get(s).get(si) {
+                    if transposedMatrix.get(s).unwrap().contains(si) {
                         print!("1");
                     } else {
                         print!("0");
@@ -563,15 +570,15 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
 
         // System.out.println("DEBUG - discovering relations");
         for s1 in transposedMatrix.keys() {
-            let bs1 = transposedMatrix.get(s1);
+            let bs1 = transposedMatrix.get(s1).expect("bs1 not found");
             analysed.insert(s1);
             for s2 in transposedMatrix.keys() {
-                if analysed.contains(s2) {
+                if analysed.contains(&s2) {
                     continue;
                 }
-                let bs2 = transposedMatrix.get(s2);
+                let bs2 = transposedMatrix.get(s2).expect("bs2 not found");
 
-                match determineRelation(s1, s2, bs1, bs2, rows, skips) {
+                match self.determineRelation(s1, s2, bs1, bs2, rows, &mut skips) {
                     Gate::SAND => SANDs.insert((s1, s2)),
                     Gate::AND => ANDs.insert((s1, s2)),
                     Gate::XOR => XORs.insert((s1, s2)),
@@ -584,12 +591,12 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
         for p in ANDs {
             //                if(removableSuccessors.contains(p.getLeft()) || removableSuccessors.contains(p.getRight())) continue;
             //                when we find an AND we can remove one of the two without any issues
-            let bs1 = transposedMatrix.get(p.0);
+            let bs1 = transposedMatrix.get(p.0).expect("bs1 not found");
             removableSuccessors.insert(p.0);
             removableSuccessors.insert(p.1);
-            let bs0 = BitSet::new();
+            let mut bs0 = BitSet::new();
             for i in 0..rows {
-                bs0.set(i, bs1.get(i));
+                bs0.set(i, bs1.contains(i));
             }
             //                transposedMatrix.put(p.getLeft()*100, bs0);
             //            System.out.println("DEBUG - AND("+ p.getLeft() + "," + p.getRight() + ")");
@@ -602,13 +609,13 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
             //                if(removableSuccessors.contains(p.getLeft()) || removableSuccessors.contains(p.getRight())) continue;
             //            System.out.println("DEBUG - XOR("+ p.getLeft() + "," + p.getRight() + ")");
             //                when we find an XOR....
-            let bs1 = transposedMatrix.get(p.0);
-            let bs2 = transposedMatrix.get(p.1);
-            removableSuccessors.add(p.0);
-            removableSuccessors.add(p.1);
-            let bs0 = BitSet::new();
+            let bs1 = transposedMatrix.get(p.0).expect("bs1 not found");
+            let bs2 = transposedMatrix.get(p.1).expect("bs2 not found");
+            removableSuccessors.insert(p.0);
+            removableSuccessors.insert(p.1);
+            let mut bs0 = BitSet::new();
             for i in 0..rows {
-                bs0.set(i, bs1.get(i) || bs2.get(i));
+                bs0.set(i, bs1.contains(i) || bs2.contains(i));
             }
             //                transposedMatrix.put(p.getLeft()*100, bs0);
             // if(relations.containsKey(p) && relations.get(p) != Gate.XOR) System.out.println("WARNING - double relation for: ("+ p.getLeft() + "," + p.getRight() + ")");
@@ -620,41 +627,96 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
             //                if(removableSuccessors.contains(p.getLeft()) || removableSuccessors.contains(p.getRight())) continue;
             //            System.out.println("DEBUG - OR("+ p.getLeft() + "," + p.getRight() + ")");
             //                when we find an OR...
-            let bs1 = transposedMatrix.get(p.0);
-            let bs2 = transposedMatrix.get(p.1);
-            removableSuccessors.add(p.0);
-            removableSuccessors.add(p.1);
-            let bs0 = BitSet::new();
+            let bs1 = transposedMatrix.get(p.0).expect("bs1 not found");
+            let bs2 = transposedMatrix.get(p.1).expect("bs2 not found");
+            removableSuccessors.insert(p.0);
+            removableSuccessors.insert(p.1);
+            let mut bs0 = BitSet::new();
             for i in 0..rows {
-                bs0.set(i, bs1.get(i) || bs2.get(i));
+                bs0.set(i, bs1.contains(i) || bs2.contains(i));
             }
             //                transposedMatrix.put(p.getLeft()*100, bs0);
             // if(relations.containsKey(p) && relations.get(p) != Gate.OR) System.out.println("WARNING - double relation for: ("+ p.getLeft() + "," + p.getRight() + ")");
             self.relations.insert(p, Gate::OR);
         }
-
-        /*      NOT USED ATM                 finally we consider ANDs with skips
-                for (Pair<Integer, Integer> p : SANDs) {
-        //                if(removableSuccessors.contains(p.getLeft()) || removableSuccessors.contains(p.getRight())) continue;
-                    bs1 = transposedMatrix.get(p.getLeft());
-                    bs2 = transposedMatrix.get(p.getRight());
-                    removableSuccessors.add(p.getLeft());
-                    removableSuccessors.add(p.getRight());
-                    bs0 = new BitSet();
-
-                    if( skips.contains(p.getLeft()) ) {
-                        System.out.println("DEBUG - AND(SKIP(" + p.getLeft() + ")," + p.getRight() + ")");
-                        for (int i = 0; i < ROWS; i++) bs0.set(i, bs2.get(i));
-                    } else {
-                        System.out.println("DEBUG - AND("+ p.getLeft() + ",SKIP(" + p.getRight() + "))");
-                        for(int i = 0; i<ROWS; i++) bs0.set(i, bs1.get(i));
-                    }
-        //                transposedMatrix.put(p.getLeft()*100, bs0);
-                }
-        */
-
         for rs in removableSuccessors {
             transposedMatrix.remove(rs);
+        }
+    }
+
+    fn determineRelation(
+        &self,
+        s1: Activity,
+        s2: Activity,
+        bs1: &BitSet,
+        bs2: &BitSet,
+        size: usize,
+        skips: &mut HashSet<Activity>,
+    ) -> Gate {
+        let typee = Gate::OR;
+        let safe = true;
+        let mut mismatch = 0;
+        let mut matchh = 0;
+
+        if self
+            .loopsL2
+            .contains(self.dfgp.get(s1).unwrap().get(s2).unwrap())
+        {
+            // System.out.println("DEBUG - pair ("+ s1 + "," + s2 + ") - shortloop");
+            return Gate::XOR;
+        }
+
+        let mut observations = HashSet::new();
+        for i in 0..size {
+            observations.insert((bs1.contains(i), bs2.contains(i)));
+        }
+
+        //        System.out.println("DEBUG - obs for ("+ s1 + "," + s2 + "): " + observations.size());
+
+        let mut size = observations.len();
+        if observations.remove(&(false, false)) {
+            size -= 1;
+        }
+        if observations.len() >= 3 {
+            return Gate::OR;
+        }
+
+        //        if all the observations match, we have an AND
+        for p in &observations {
+            if p.0 == p.1 {
+                matchh += 1;
+            } else {
+                mismatch += 1;
+            };
+        }
+
+        if matchh == size {
+            return Gate::AND;
+        }
+        if safe && (s1 < 0) || (s2 < 0) {
+            return Gate::XOR; // this is to play safe with successor-joins
+        }
+
+        //        otherwise we could have a XOR or OR
+        let skipL = (false, true);
+        let skipR = (true, false);
+        let skipNone = (true, true);
+        //        Pair<Boolean, Boolean> skipBoth = new ImmutablePair<>(false, false);
+
+        if observations.contains(&skipL) && observations.contains(&skipNone) {
+            skips.insert(s1);
+            return Gate::XOR;
+        }
+
+        if observations.contains(&skipR) && observations.contains(&skipNone) {
+            skips.insert(s2);
+            return Gate::XOR;
+        }
+
+        if observations.contains(&skipL) && observations.contains(&skipR) {
+            return Gate::XOR;
+        } else {
+            return Gate::OR;
         }
     }
 
@@ -874,6 +936,10 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
     }
 }
 
+fn transformDFGPintoBPMN(dfgp: DirectlyFollowGraphPlus) -> BusinessProcessModelAndNotation {}
+
+fn structure(bpmnDiagram: BusinessProcessModelAndNotation) -> BusinessProcessModelAndNotation {}
+
 #[derive(Clone)]
 struct DFGEdge {
     isLoop: bool,
@@ -952,6 +1018,95 @@ enum Gate {
     XOR,
 }
 
-fn transformDFGPintoBPMN(dfgp: DirectlyFollowGraphPlus) -> BusinessProcessModelAndNotation {}
+struct Matrix {
+    successors: Vec<Activity>,
+    is: usize,
+    matrix: HashMap<BitSet, usize>,
+    totalFrequency: Fraction,
+}
 
-fn structure(bpmnDiagram: BusinessProcessModelAndNotation) -> BusinessProcessModelAndNotation {}
+impl Matrix {
+    fn new(successors: usize) -> Self {
+        Self {
+            successors: Vec::with_capacity(successors),
+            matrix: HashMap::new(),
+            is: 0,
+            totalFrequency: f0!(),
+        }
+    }
+
+    fn addSuccessor(&mut self, s: Activity) {
+        self.successors.push(s);
+        self.is += 1;
+    }
+
+    fn addBitset(&mut self, combo: BitSet, frequency: &Fraction) {
+        self.totalFrequency += frequency;
+        if !self.matrix.contains_key(combo) {
+            self.matrix.insert(combo, frequency);
+        } else {
+            self.matrix
+                .insert(combo, self.matrix.get(combo) + frequency);
+        }
+    }
+
+    fn prune(&mut self, threshold: &Fraction) {
+        let lowFrequency = HashSet::new();
+        let avgFrequency = self.totalFrequency / f!(self.matrix.len());
+
+        for bs in self.matrix.keys() {
+            if (self.matrix.get(bs) / avgFrequency) < threshold {
+                lowFrequency.insert(bs);
+            }
+        }
+        // System.out.println("DEBUG - removing " + lowFrequency.size() + " low frequency observations");
+
+        for bs in lowFrequency {
+            self.matrix.remove(bs);
+        }
+    }
+
+    fn totalSuccessors(&self) -> usize {
+        self.is
+    }
+    fn rows(&self) -> usize {
+        self.matrix.len()
+    }
+
+    fn getObservations(&self) -> impl Iterator<Item = &BitSet> {
+        self.matrix.keys()
+    }
+
+    fn print(&self) {
+        println!("DEBUG - # successors: {}", self.is);
+        println!("DEBUG - matrix size: {}", self.matrix.len());
+        println!(
+            "DEBUG - matrix full @: {}",
+            2u32.pow(self.is.try_into().unwrap()) - 1
+        );
+        for combo in self.matrix.keys() {
+            for s in 0..self.is {
+                if combo.test(s) {
+                    print!("1");
+                } else {
+                    print!("0");
+                }
+            }
+            println!();
+        }
+    }
+}
+
+trait Set {
+    fn set(&mut self, element: usize, value: bool);
+}
+
+impl Set for BitSet {
+    fn set(&mut self, element: usize, value: bool) {
+        if value {
+            self.insert(element)
+        } else {
+            self.remove(element)
+        }
+    }
+}
