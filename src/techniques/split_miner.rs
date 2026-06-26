@@ -1,16 +1,19 @@
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    techniques::stochastic_markovian_abstraction::MarkovianAbstraction,
+    techniques::{
+        split_miner::bpmn::{BPMNNode, structure, transformDFGPintoBPMN},
+        stochastic_markovian_abstraction::MarkovianAbstraction,
+    },
 };
 use bit_set::BitSet;
 use ebi_objects::{
     Activity, BusinessProcessModelAndNotation, FiniteStochasticLanguage, HasActivityKey,
     IntoRefTraceIterator, IntoRefTraceProbabilityIterator,
-    ebi_arithmetic::{Fraction, Round, Signed, ToNative, Zero, f, f0},
-    malachite::base::num::conversion::traits::RoundingInto,
+    anyhow::{Result, anyhow},
+    ebi_arithmetic::{Fraction, Signed, ToNative, Zero, f, f0},
+    ebi_bpmn::{BPMNCreator, EndEventType, StartEventType},
 };
 use intmap::IntMap;
-use itertools::Itertools;
 use std::{
     collections::{HashMap, HashSet, VecDeque},
     hash::Hash,
@@ -18,11 +21,11 @@ use std::{
 use uuid::Uuid;
 
 pub trait SplitMiner {
-    fn split_miner(&self) -> BusinessProcessModelAndNotation;
+    fn split_miner(&self) -> Result<BusinessProcessModelAndNotation>;
 }
 
 impl SplitMiner for dyn EbiTraitFiniteStochasticLanguage {
-    fn split_miner(&self) -> BusinessProcessModelAndNotation {
+    fn split_miner(&self) -> Result<BusinessProcessModelAndNotation> {
         split_miner(self, &SplitMinerParameters::default())
     }
 }
@@ -70,7 +73,7 @@ pub enum FilterType {
 pub fn split_miner(
     log: &dyn EbiTraitFiniteStochasticLanguage,
     parameters: &SplitMinerParameters,
-) -> BusinessProcessModelAndNotation {
+) -> Result<BusinessProcessModelAndNotation> {
     let mut slang = log.to_finite_stochastic_language();
 
     //add start and end activities to each trace
@@ -78,11 +81,11 @@ pub fn split_miner(
         MarkovianAbstraction::create_start_end(slang.activity_key_mut());
 
     let dfgp = generateDFGP(&slang, parameters, start_activity, end_activity);
-    let mut bpmnDiagram = transformDFGPintoBPMN(dfgp);
+    let mut bpmnDiagram = transformDFGPintoBPMN(dfgp, parameters)?;
     if parameters.structuringTime == StructuringTime::Post {
         bpmnDiagram = structure(bpmnDiagram);
     }
-    bpmnDiagram
+    Ok(bpmnDiagram)
 }
 
 fn generateDFGP<'a>(
@@ -498,7 +501,7 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
             for sti in splitTasksInTrace.keys() {
                 splitMaps.get_mut(sti).expect("sti not found").addBitset(
                     splitTasksInTrace.get(sti).expect("sti not found").clone(),
-                    trace_frequency,
+                    trace_frequency.clone(),
                 );
             }
         }
@@ -934,11 +937,468 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
     fn get_edge_frequency(&self, edge: &DFGEdge) -> &Fraction {
         self.edge_2_frequency.get(&edge.id).unwrap_or(&self.zero)
     }
+
+    fn convertIntoBPMNDiagram(&self) -> Result<(BPMNCreator, BPMNNode, BPMNNode)> {
+        let mut creator = BPMNCreator::new();
+        let process = creator.add_process(Some("eDFGP-diagram".to_string()));
+        let mut mapping = HashMap::new();
+
+        let mut start_event = None;
+        let mut end_event = None;
+
+        for event in self.nodes.keys() {
+            let label = self.log.activity_key().deprocess_activity(&event);
+
+            let node = match (event == self.startcode, event == self.endcode) {
+                (true, false) => {
+                    let e = creator.add_start_event(process, StartEventType::None)?;
+                    start_event = Some(e);
+                    e
+                }
+                (false, true) => {
+                    let e = creator.add_end_event(process, EndEventType::None)?;
+                    end_event = Some(e);
+                    e
+                }
+                _ => creator.add_task(process, event)?,
+            };
+            mapping.insert(event, node);
+        }
+
+        for edge in &self.edges {
+            let src = mapping.get(&edge.getSourceCode()).expect("src not found");
+            let tgt = mapping.get(&edge.getTargetCode()).expect("tgt not found");
+            creator.add_sequence_flow(process, *src, *tgt)?;
+        }
+
+        return Ok((
+            creator,
+            start_event.ok_or_else(|| anyhow!("no start event"))?,
+            end_event.ok_or_else(|| anyhow!("no end event"))?,
+        ));
+    }
 }
 
-fn transformDFGPintoBPMN(dfgp: DirectlyFollowGraphPlus) -> BusinessProcessModelAndNotation {}
+mod bpmn {
+    use crate::techniques::split_miner::{
+        DirectlyFollowGraphPlus, SplitMinerParameters,
+        oracle::{Oracle, OracleItem},
+    };
+    use ebi_objects::{BusinessProcessModelAndNotation, anyhow::Result, ebi_bpmn::BPMNCreator};
+    use std::collections::{HashMap, HashSet, VecDeque};
 
-fn structure(bpmnDiagram: BusinessProcessModelAndNotation) -> BusinessProcessModelAndNotation {}
+    pub(super) type BPMNNode = (usize, ());
+
+    pub(super) fn transformDFGPintoBPMN(
+        dfgp: DirectlyFollowGraphPlus,
+        parameters: &SplitMinerParameters,
+    ) -> Result<BusinessProcessModelAndNotation> {
+        //        System.out.println("SplitMiner - generating bpmn diagram");
+
+        let gateCounter = 0;
+
+        //        we retrieve the starting BPMN diagram from the DFGP,
+        //        it is a DFGP with start and end events, but no gateways
+        let (bpmnDiagram, entry, exit) = dfgp.convertIntoBPMNDiagram()?;
+        let candidateJoins = HashMap::new();
+
+        //        we start the transformation of the DFGP into BPMN by generating the splits
+        //        generateBitmatrixSplits();
+        generateSplits(&dfgp, bpmnDiagram, entry, exit);
+
+        //        after generating the split hierarchy we should have only SPLITs,
+        //        however, it may happen that some JOINs are generated as well (due to shared future)
+        //        it is important that we do not leave any gateway that is both a SPLIT and a JOIN
+        helper.removeJoinSplit(bpmnDiagram);
+
+        //        at this point, all the splits were generated, along with just a few joins
+        //        now we focus only on the joins. we use the RPST in order to place INCLUSIVE joins
+        //        which will be turned into AND or XOR joins later
+        //        System.out.println("SplitMiner - generating SESE joins ...");
+        let bondsEntries = HashSet::new();
+        let rigidsEntries = HashSet::new();
+        while (generateSESEjoins()) {}
+
+        //        this second method adds the remaining joins, which were no entry neither exits of any RPST node
+        //        System.out.println("SplitMiner - generating inner joins ...");
+        generateInnerJoins();
+
+        //        if( structuringTime == SplitMinerUIResult.StructuringTime.PRE ) structure();
+        //        helper.removeEmptyParallelFlows(bpmnDiagram);
+        helper.fixSoundness(bpmnDiagram);
+
+        //        finally, we turn all the inclusive joins placed, into proper joins: ANDs or XORs
+        //        System.out.println("SplitMiner - turning inclusive joins ...");
+        replaceIORs(helper);
+
+        updateLabels(dfgp.log.getEvents());
+
+        //            helper.collapseSplitGateways(bpmnDiagram);
+        //            helper.collapseJoinGateways(bpmnDiagram);
+
+        if (self.removeLoopActivities) {
+            helper.removeLoopActivityMarkers(bpmnDiagram);
+        }
+
+        bpmnDiagram
+
+        //        System.out.println("SplitMiner - bpmn diagram generated successfully");
+    }
+
+    fn generateSplits(
+        dfgp: &DirectlyFollowGraphPlus,
+        bpmnDiagram: BPMNCreator,
+        entry: BPMNNode,
+        exit: BPMNNode,
+    ) {
+        let mut mapping = HashMap::new();
+        let mut toVisit = VecDeque::new();
+        let mut visited = HashSet::new();
+
+        let oracle = Oracle::new();
+
+        //        we perform a breadth-first exploration of the DFGP-diagram
+        //        every time we find a node with multiple outgoing edges we stop
+        //        and we generate the corresponding hierarchy of gateways
+
+        toVisit.push_back(entry);
+        while let Some(entry) = toVisit.pop_front() {
+            visited.insert(entry);
+            //            System.out.println("DEBUG - visiting: " + entry.getLabel());
+
+            if entry == exit {
+                continue;
+            }
+
+            if bpmnDiagram.getOutEdges(entry).size() > 1 {
+                //                entry is a node with multiple outgoing edges
+
+                let mut successors = HashSet::new();
+                let mut removableEdges = HashSet::new();
+                for oe in bpmnDiagram.getOutEdges(entry) {
+                    let tgt = oe.getTarget();
+                    //                    we remove all the outgoing edges, because we will restore them with the split gateways
+                    removableEdges.insert(oe);
+                    successors.insert(tgt.0);
+                    mapping.insert(tgt.0, tgt);
+                    if !toVisit.contains(tgt) && !visited.contains(tgt) {
+                        toVisit.push_back(tgt);
+                    }
+                }
+
+                for e in removableEdges {
+                    bpmnDiagram.removeEdge(e);
+                }
+
+                //                to decide the hierarchy of the gateways we use an Oracle item
+                //                an Oracle item is a string of the type past|future
+                //                more info about this object in its own class
+                let mut oracleItems = HashSet::new();
+                for a in successors {
+                    //                    we generate one Oracle item for each successor of the entry
+                    //                    the successor will be the past
+                    let oracleItem = OracleItem::new();
+                    oracleItem.fillPast(a);
+
+                    //                    then we fill its future with all the successors which are in a concurrency relationship with it
+                    //                    if a successor is not concurrent, it means it will we exclusive or directly follow
+                    //                    if exclusive we do not have to care about it
+                    //                    if directly follow, it will be processed later
+                    for b in successors {
+                        if (a != b) && (dfgp.areConcurrent(a, b)) {
+                            oracleItem.fillFuture(b);
+                        }
+                    }
+
+                    oracleItem.engrave();
+                    oracleItems.insert(oracleItem);
+                }
+
+                let finalOracleItem = oracle.getFinalOracleItem(oracleItems);
+
+                //                the finalOracleItem is a matryoshka containing the info about the gateway hierarchy
+                //                the following method will explore inside-out this matryoshka and will place the gateways accordingly
+                //                the entry will be the last node to be linked to the outer gateway of the hierarchy
+                generateSplitsHierarchy(entry, finalOracleItem, mapping);
+            } else {
+                //                we save the only successor of the src
+                let tgt = bpmnDiagram
+                    .getOutEdges(entry)
+                    .iter()
+                    .next()
+                    .unwrap()
+                    .getTarget();
+                if !toVisit.contains(tgt) && !visited.contains(tgt) {
+                    toVisit.push(tgt);
+                }
+            }
+        }
+    }
+
+    pub(super) fn structure(
+        bpmnDiagram: BusinessProcessModelAndNotation,
+    ) -> BusinessProcessModelAndNotation {
+        todo!()
+    }
+}
+
+mod oracle {
+    use std::{collections::HashSet, hash::Hash};
+
+    use ebi_objects::Activity;
+
+    pub(super) struct Oracle;
+
+    impl Oracle {
+        pub(super) fn new() -> Self {
+            Self
+        }
+
+        fn getFinalOracleItem(oracleItems: HashSet<OracleItem>) -> Option<OracleItem> {
+            let mut matryoshka = None;
+            let mut forced = true;
+            let mut counter = 0;
+            let mut toMerge = HashSet::new();
+
+            while oracleItems.len() != 1 {
+                //            System.out.println("DEBUG - oracle items: " + oracleItems.size());
+                //            for( OracleItem oi : oracleItems ) System.out.println("DEBUG - oracle item: " + oi);
+                let mut merged = false;
+
+                //            firstly we try to merge XORs,
+                //            because XORs have priority on ANDs for the merging technique
+                loop {
+                    let mut toMerge = HashSet::new();
+                    for oi in &oracleItems {
+                        //                    if we found oracle items to be merged we add the Oracle item we were analysing
+                        //                    to the toMerge set and we proceed with the merging
+                        for oii in &oracleItems {
+                            if oi != oii && oi.isXOR(oii) {
+                                toMerge.insert(oii);
+                            }
+                        }
+
+                        //                    if we found some Oracle item that can be merged we add also the one we used for the comparisons
+                        if toMerge.len() != 0 {
+                            toMerge.insert(oi);
+                            break;
+                        }
+                    }
+
+                    //                merging time: XORs
+                    if toMerge.len() != 0 {
+                        merged = true;
+                        matryoshka = Some(OracleItem::mergeXORs(toMerge));
+                        //                    System.out.println("DEBUG - merging XORs ...");
+                        oracleItems.removeAll(toMerge);
+                        oracleItems.insert(matryoshka);
+                    } else {
+                        break;
+                    }
+                }
+
+                //            after we merged all the possible XORs Oracle items,
+                //            we try to merge the ANDs Oracle items, using the same technique
+                for oi in &oracleItems {
+                    toMerge = HashSet::new();
+                    for oii in &oracleItems {
+                        if (oi != oii) && oi.isAND(oii) {
+                            toMerge.insert(oii);
+                        }
+                    }
+                    if toMerge.len() != 0 {
+                        toMerge.insert(oi);
+                        break;
+                    }
+                }
+
+                //            merging time: ANDs
+                if toMerge.len() != 0 {
+                    merged = true;
+                    matryoshka = Some(OracleItem::mergeANDs(toMerge));
+                    //                System.out.println("DEBUG - merging ANDs ...");
+                    oracleItems.removeAll(toMerge);
+                    oracleItems.insert(matryoshka);
+                }
+
+                //            it can happens that we did not merge anything, but there are still Oracle items
+                //            this can happen because the concurrency relationships are not complete
+                //            in such case, we have to force the merging
+                if !merged {
+                    let mut minDistance = usize::MAX;
+                    //                System.out.println("WARNING - impossible merging oracle items, extending the concurrency relationships");
+
+                    //                if we have to force a merging, we try to merge the minimum distance couple of Oracle items
+                    //                that is: we are trying to introduce the less possible changes in the concurrency relationships
+                    //                we prefer to assume that a concurrency relationship was missing
+                    //                rather than a concurrency relationship was an error
+                    for oi in &oracleItems {
+                        for oii in &oracleItems {
+                            if (oi == oii) {
+                                continue;
+                            }
+                            let tmpDistance = oi.getANDDistance(oii);
+                            if tmpDistance < minDistance {
+                                minDistance = tmpDistance;
+                                toMerge = HashSet::new();
+                                toMerge.add(oi);
+                                toMerge.add(oii);
+                            }
+                        }
+                    }
+
+                    if forced {
+                        matryoshka = OracleItem::forcedMergeANDs(toMerge);
+                    } else {
+                        matryoshka = OracleItem::mergeANDs(toMerge);
+                    }
+
+                    //                System.out.println("WARNING - forcing AND merge ...");
+                    counter += 1;
+                    oracleItems.removeAll(toMerge);
+                    oracleItems.insert(matryoshka);
+                }
+            }
+
+            // if( counter != 0 ) System.out.println("DEBUG - forced AND merging: " + counter);
+            //        System.out.println("DEBUG - matryoshka: " + matryoshka);
+            return matryoshka;
+        }
+    }
+
+    #[derive(Clone)]
+    pub(super) struct OracleItem {
+        past: HashSet<Activity>,
+        future: HashSet<Activity>,
+
+        oracle: Vec<Activity>,
+        oraclePast: Vec<Activity>,
+        oracleFuture: Vec<Activity>,
+
+        xorBrothers: HashSet<OracleItem>,
+        andBrothers: HashSet<OracleItem>,
+    }
+
+    impl OracleItem {
+        pub(super) fn new() -> Self {
+            Self {
+                past: HashSet::new(),
+                future: HashSet::new(),
+                xorBrothers: HashSet::new(),
+                andBrothers: HashSet::new(),
+                oracle: vec![],
+                oracleFuture: vec![],
+                oraclePast: vec![],
+            }
+        }
+
+        pub(super) fn isAND(&self, o_item: &OracleItem) -> bool {
+            o_item.oracle == self.oracle
+        }
+
+        pub(super) fn isXOR(&self, oItem: &OracleItem) -> bool {
+            oItem.oracleFuture == self.oracleFuture
+        }
+
+        pub(super) fn mergeANDs(and_brothers: HashSet<OracleItem>) -> OracleItem {
+            /*
+             * merging two or more AND oracle items means:
+             * 1. create a new oracle item that contains all the oracle items to be merged as andBrothers
+             * 2. its future will be only the part of shared future of all the andBrothers in input
+             * 3. its past will be the union of the pasts of all the andBrothers in input
+             *
+             * eg: inputs = { (:A:|:B:C:D:), (:B:|:A:C:D:) } output = (:A:B:|:C:D:)
+             */
+
+            let mut oiUnion = OracleItem::new();
+            oiUnion.andBrothers.extend(and_brothers.clone());
+
+            for and in &and_brothers {
+                oiUnion.future.extend(and.future.clone());
+            }
+            for and in &and_brothers {
+                oiUnion.future.extend(and.future.clone());
+            }
+
+            for and in &and_brothers {
+                oiUnion.past.extend(and.past.clone());
+            }
+
+            oiUnion.engrave();
+            return oiUnion;
+        }
+
+        pub(super) fn mergeXORs(xorBrothers: &HashSet<OracleItem>) -> OracleItem {
+            /*
+             * merging two or more XOR oracle items means:
+             * 1. create a new oracle item that contains all the oracle items to be merged as xorBrothers
+             * 2. its future will be the same shared future of all the xorBrothers in input (see also isXOR)
+             * 3. its past will be the union of the pasts of all the xorBrothers in input
+             *
+             * eg: inputs = { (:A:|:C:D:), (:B:|:C:D:) } output = (:A:B:|:C:D:)
+             */
+
+            let mut oiUnion = OracleItem::new();
+            oiUnion.xorBrothers.extend(xorBrothers.clone());
+
+            for xor in xorBrothers {
+                oiUnion.future.extend(xor.future.clone());
+                break;
+            }
+
+            for xor in xorBrothers {
+                oiUnion.past.extend(xor.past.clone());
+            }
+
+            oiUnion.engrave();
+            return oiUnion;
+        }
+
+        pub(super) fn engrave(&mut self) {
+            //        this method should be called when we want to finalize an Oracle item
+            //        that means, it is ready to be successively used
+            //        it transform the Oracle item into its final string of type:
+            //        past|future where past = :x:y:z: and future = :j:k:l:
+            //        therefore: Oracle item = :x:y:z:|:j:k:l:
+
+            let mut past = self.past.iter().cloned().collect::<Vec<_>>();
+            let mut future = self.future.iter().cloned().collect::<Vec<_>>();
+
+            let mut present = vec![];
+            present.extend(&self.past);
+            present.extend(&self.future);
+
+            let i = 0;
+            past.sort();
+            self.oraclePast = past.clone();
+
+            let i = 0;
+            future.sort();
+            self.oracleFuture = future.clone();
+
+            //        this is an extra string used to merge AND Oracle items
+            //        it contains all the ordered elements of the past and the future
+            let i = 0;
+            present.sort();
+            self.oracle = present.clone();
+        }
+    }
+
+    impl Eq for OracleItem {}
+
+    impl PartialEq for OracleItem {
+        fn eq(&self, other: &Self) -> bool {
+            self.oraclePast == other.oraclePast && self.oracleFuture == self.oracleFuture
+        }
+    }
+
+    impl Hash for OracleItem {
+        fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+            self.oraclePast.hash(state);
+            self.oracleFuture.hash(state);
+        }
+    }
+}
 
 #[derive(Clone)]
 struct DFGEdge {
@@ -1021,7 +1481,7 @@ enum Gate {
 struct Matrix {
     successors: Vec<Activity>,
     is: usize,
-    matrix: HashMap<BitSet, usize>,
+    matrix: HashMap<BitSet, Fraction>,
     totalFrequency: Fraction,
 }
 
@@ -1040,35 +1500,36 @@ impl Matrix {
         self.is += 1;
     }
 
-    fn addBitset(&mut self, combo: BitSet, frequency: &Fraction) {
-        self.totalFrequency += frequency;
-        if !self.matrix.contains_key(combo) {
+    fn addBitset(&mut self, combo: BitSet, frequency: Fraction) {
+        self.totalFrequency += &frequency;
+        if !self.matrix.contains_key(&combo) {
             self.matrix.insert(combo, frequency);
         } else {
-            self.matrix
-                .insert(combo, self.matrix.get(combo) + frequency);
+            let f = self.matrix.get(&combo).expect("combo not find") + &frequency;
+            self.matrix.insert(combo, f);
         }
     }
 
     fn prune(&mut self, threshold: &Fraction) {
-        let lowFrequency = HashSet::new();
-        let avgFrequency = self.totalFrequency / f!(self.matrix.len());
+        let mut lowFrequency = HashSet::new();
+        let avgFrequency = &self.totalFrequency / &f!(self.matrix.len());
 
         for bs in self.matrix.keys() {
-            if (self.matrix.get(bs) / avgFrequency) < threshold {
-                lowFrequency.insert(bs);
+            if &(self.matrix.get(bs).expect("bs not found") / &avgFrequency) < threshold {
+                lowFrequency.insert(bs.clone());
             }
         }
         // System.out.println("DEBUG - removing " + lowFrequency.size() + " low frequency observations");
 
         for bs in lowFrequency {
-            self.matrix.remove(bs);
+            self.matrix.remove(&bs);
         }
     }
 
     fn totalSuccessors(&self) -> usize {
         self.is
     }
+
     fn rows(&self) -> usize {
         self.matrix.len()
     }
@@ -1086,7 +1547,7 @@ impl Matrix {
         );
         for combo in self.matrix.keys() {
             for s in 0..self.is {
-                if combo.test(s) {
+                if combo.contains(s) {
                     print!("1");
                 } else {
                     print!("0");
@@ -1104,9 +1565,9 @@ trait Set {
 impl Set for BitSet {
     fn set(&mut self, element: usize, value: bool) {
         if value {
-            self.insert(element)
+            self.insert(element);
         } else {
-            self.remove(element)
+            self.remove(element);
         }
     }
 }

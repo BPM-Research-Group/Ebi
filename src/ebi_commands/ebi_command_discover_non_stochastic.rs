@@ -10,7 +10,7 @@ use crate::{
         ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
+        ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
     techniques::{
@@ -271,7 +271,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER: EbiCommand = EbiCommand::Comm
             .remove(0)
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         Ok(EbiOutput::Object(
-            EbiObject::BusinessProcessModelAndNotation(log.split_miner()),
+            EbiObject::BusinessProcessModelAndNotation(log.split_miner()?),
         ))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::BusinessProcessModelAndNotation),
