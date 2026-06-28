@@ -11,7 +11,7 @@ use ebi_objects::{
     IntoRefTraceIterator, IntoRefTraceProbabilityIterator,
     anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, Signed, ToNative, Zero, f, f0},
-    ebi_bpmn::{BPMNCreator, EndEventType, StartEventType},
+    ebi_bpmn::{BPMNCreator, Container, EndEventType, StartEventType},
 };
 use intmap::IntMap;
 use std::{
@@ -85,7 +85,7 @@ pub fn split_miner(
     if parameters.structuringTime == StructuringTime::Post {
         bpmnDiagram = structure(bpmnDiagram);
     }
-    Ok(bpmnDiagram)
+    bpmnDiagram.to_bpmn()
 }
 
 fn generateDFGP<'a>(
@@ -938,7 +938,7 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
         self.edge_2_frequency.get(&edge.id).unwrap_or(&self.zero)
     }
 
-    fn convertIntoBPMNDiagram(&self) -> Result<(BPMNCreator, BPMNNode, BPMNNode)> {
+    fn convertIntoBPMNDiagram(&self) -> Result<(BPMNCreator, Container, BPMNNode, BPMNNode)> {
         let mut creator = BPMNCreator::new();
         let process = creator.add_process(Some("eDFGP-diagram".to_string()));
         let mut mapping = HashMap::new();
@@ -973,6 +973,7 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
 
         return Ok((
             creator,
+            process,
             start_event.ok_or_else(|| anyhow!("no start event"))?,
             end_event.ok_or_else(|| anyhow!("no end event"))?,
         ));
@@ -984,7 +985,11 @@ mod bpmn {
         DirectlyFollowGraphPlus, SplitMinerParameters,
         oracle::{Oracle, OracleItem},
     };
-    use ebi_objects::{BusinessProcessModelAndNotation, anyhow::Result, ebi_bpmn::BPMNCreator};
+    use ebi_objects::{
+        BusinessProcessModelAndNotation,
+        anyhow::Result,
+        ebi_bpmn::{BPMNCreator, Container},
+    };
     use std::collections::{HashMap, HashSet, VecDeque};
 
     pub(super) type BPMNNode = (usize, ());
@@ -992,19 +997,19 @@ mod bpmn {
     pub(super) fn transformDFGPintoBPMN(
         dfgp: DirectlyFollowGraphPlus,
         parameters: &SplitMinerParameters,
-    ) -> Result<BusinessProcessModelAndNotation> {
+    ) -> Result<BPMNCreator> {
         //        System.out.println("SplitMiner - generating bpmn diagram");
 
         let gateCounter = 0;
 
         //        we retrieve the starting BPMN diagram from the DFGP,
         //        it is a DFGP with start and end events, but no gateways
-        let (bpmnDiagram, entry, exit) = dfgp.convertIntoBPMNDiagram()?;
+        let (bpmnDiagram, process, entry, exit) = dfgp.convertIntoBPMNDiagram()?;
         let candidateJoins = HashMap::new();
 
         //        we start the transformation of the DFGP into BPMN by generating the splits
         //        generateBitmatrixSplits();
-        generateSplits(&dfgp, bpmnDiagram, entry, exit);
+        generateSplits(&dfgp, bpmnDiagram, process, entry, exit);
 
         //        after generating the split hierarchy we should have only SPLITs,
         //        however, it may happen that some JOINs are generated as well (due to shared future)
@@ -1036,21 +1041,22 @@ mod bpmn {
         //            helper.collapseSplitGateways(bpmnDiagram);
         //            helper.collapseJoinGateways(bpmnDiagram);
 
-        if (self.removeLoopActivities) {
+        if parameters.removeLoopActivities {
             helper.removeLoopActivityMarkers(bpmnDiagram);
         }
 
-        bpmnDiagram
+        Ok(bpmnDiagram)
 
         //        System.out.println("SplitMiner - bpmn diagram generated successfully");
     }
 
     fn generateSplits(
         dfgp: &DirectlyFollowGraphPlus,
-        bpmnDiagram: BPMNCreator,
+        bpmn_diagram: BPMNCreator,
+        process: Container,
         entry: BPMNNode,
         exit: BPMNNode,
-    ) {
+    ) -> Result<()> {
         let mut mapping = HashMap::new();
         let mut toVisit = VecDeque::new();
         let mut visited = HashSet::new();
@@ -1070,24 +1076,30 @@ mod bpmn {
                 continue;
             }
 
-            if bpmnDiagram.getOutEdges(entry).size() > 1 {
+            if bpmn_diagram
+                .outgoing_sequence_flows_of_element(process, entry)?
+                .count()
+                > 1
+            {
                 //                entry is a node with multiple outgoing edges
 
                 let mut successors = HashSet::new();
                 let mut removableEdges = HashSet::new();
-                for oe in bpmnDiagram.getOutEdges(entry) {
-                    let tgt = oe.getTarget();
+                for oe in bpmn_diagram.outgoing_sequence_flows_of_element(process, entry)? {
+                    let tgt = bpmn_diagram
+                        .target_of_sequence_flow(oe)
+                        .expect("target not found");
                     //                    we remove all the outgoing edges, because we will restore them with the split gateways
                     removableEdges.insert(oe);
                     successors.insert(tgt.0);
                     mapping.insert(tgt.0, tgt);
-                    if !toVisit.contains(tgt) && !visited.contains(tgt) {
+                    if !toVisit.contains(&tgt) && !visited.contains(&tgt) {
                         toVisit.push_back(tgt);
                     }
                 }
 
                 for e in removableEdges {
-                    bpmnDiagram.removeEdge(e);
+                    bpmn_diagram.remove_sequence_flow(process, e);
                 }
 
                 //                to decide the hierarchy of the gateways we use an Oracle item
@@ -1122,22 +1134,21 @@ mod bpmn {
                 generateSplitsHierarchy(entry, finalOracleItem, mapping);
             } else {
                 //                we save the only successor of the src
-                let tgt = bpmnDiagram
-                    .getOutEdges(entry)
+                let tgt = bpmn_diagram
+                    .outgoing_sequence_flows_of_element(process, entry)?
                     .iter()
                     .next()
                     .unwrap()
                     .getTarget();
                 if !toVisit.contains(tgt) && !visited.contains(tgt) {
-                    toVisit.push(tgt);
+                    toVisit.push_back(tgt);
                 }
             }
         }
+        Ok(())
     }
 
-    pub(super) fn structure(
-        bpmnDiagram: BusinessProcessModelAndNotation,
-    ) -> BusinessProcessModelAndNotation {
+    pub(super) fn structure(bpmnDiagram: BPMNCreator) -> BPMNCreator {
         todo!()
     }
 }
