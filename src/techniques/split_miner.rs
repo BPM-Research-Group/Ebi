@@ -968,7 +968,7 @@ impl<'a> DirectlyFollowGraphPlus<'a> {
         for edge in &self.edges {
             let src = mapping.get(&edge.getSourceCode()).expect("src not found");
             let tgt = mapping.get(&edge.getTargetCode()).expect("tgt not found");
-            creator.add_sequence_flow(process, *src, *tgt)?;
+            creator.add_sequence_flow(*src, *tgt)?;
         }
 
         return Ok((
@@ -988,7 +988,7 @@ mod bpmn {
     use ebi_objects::{
         BusinessProcessModelAndNotation,
         anyhow::Result,
-        ebi_bpmn::{BPMNCreator, Container},
+        ebi_bpmn::{BPMNCreator, Container, GatewayType, if_not::IfNot},
     };
     use std::collections::{HashMap, HashSet, VecDeque};
 
@@ -1004,18 +1004,19 @@ mod bpmn {
 
         //        we retrieve the starting BPMN diagram from the DFGP,
         //        it is a DFGP with start and end events, but no gateways
-        let (bpmnDiagram, process, entry, exit) = dfgp.convertIntoBPMNDiagram()?;
-        let candidateJoins = HashMap::new();
+        let (mut bpmn_diagram, process, entry, exit) = dfgp.convertIntoBPMNDiagram()?;
 
         //        we start the transformation of the DFGP into BPMN by generating the splits
         //        generateBitmatrixSplits();
-        generateSplits(&dfgp, bpmnDiagram, process, entry, exit);
+        generateSplits(&dfgp, &mut bpmn_diagram, process, entry, exit);
 
         //        after generating the split hierarchy we should have only SPLITs,
         //        however, it may happen that some JOINs are generated as well (due to shared future)
         //        it is important that we do not leave any gateway that is both a SPLIT and a JOIN
-        helper.removeJoinSplit(bpmnDiagram);
+        removeJoinSplit(&mut bpmn_diagram, process);
 
+        //Translating this code would require RPSTs, which are for now out of scope.
+        /*
         //        at this point, all the splits were generated, along with just a few joins
         //        now we focus only on the joins. we use the RPST in order to place INCLUSIVE joins
         //        which will be turned into AND or XOR joins later
@@ -1030,7 +1031,7 @@ mod bpmn {
 
         //        if( structuringTime == SplitMinerUIResult.StructuringTime.PRE ) structure();
         //        helper.removeEmptyParallelFlows(bpmnDiagram);
-        helper.fixSoundness(bpmnDiagram);
+        helper.fixSoundness(bpmn_diagram);
 
         //        finally, we turn all the inclusive joins placed, into proper joins: ANDs or XORs
         //        System.out.println("SplitMiner - turning inclusive joins ...");
@@ -1042,17 +1043,39 @@ mod bpmn {
         //            helper.collapseJoinGateways(bpmnDiagram);
 
         if parameters.removeLoopActivities {
-            helper.removeLoopActivityMarkers(bpmnDiagram);
+            helper.removeLoopActivityMarkers(bpmn_diagram);
         }
+        */
 
-        Ok(bpmnDiagram)
+        Ok(bpmn_diagram)
 
         //        System.out.println("SplitMiner - bpmn diagram generated successfully");
     }
 
+    fn removeJoinSplit(diagram: &mut BPMNCreator, parent: Container) -> Result<()> {
+        //        this method removes join/split gateways, transforming them into a sequence of a join and a split
+
+        for split in diagram.elements() {
+            if diagram.incoming_sequence_flows_of_element(split)?.count() > 1
+                && diagram.outgoing_sequence_flows_of_element(split)?.count() > 1
+            {
+                //add a join
+                let join = diagram.add_gateway(parent, GatewayType::Inclusive)?;
+
+                //move incoming sequence flows of the split to the join
+                diagram.swap_incoming_sequence_flows(split, join)?;
+
+                //add a sequence flow
+                diagram.add_sequence_flow(join, split)?;
+            }
+        }
+        //       System.out.println("DEBUG - join/split removed: " + jsCounter);
+        Ok(())
+    }
+
     fn generateSplits(
         dfgp: &DirectlyFollowGraphPlus,
-        bpmn_diagram: BPMNCreator,
+        bpmn_diagram: &mut BPMNCreator,
         process: Container,
         entry: BPMNNode,
         exit: BPMNNode,
@@ -1077,7 +1100,7 @@ mod bpmn {
             }
 
             if bpmn_diagram
-                .outgoing_sequence_flows_of_element(process, entry)?
+                .outgoing_sequence_flows_of_element(entry)?
                 .count()
                 > 1
             {
@@ -1085,7 +1108,7 @@ mod bpmn {
 
                 let mut successors = HashSet::new();
                 let mut removableEdges = HashSet::new();
-                for oe in bpmn_diagram.outgoing_sequence_flows_of_element(process, entry)? {
+                for oe in bpmn_diagram.outgoing_sequence_flows_of_element(entry)? {
                     let tgt = bpmn_diagram
                         .target_of_sequence_flow(oe)
                         .expect("target not found");
@@ -1099,7 +1122,7 @@ mod bpmn {
                 }
 
                 for e in removableEdges {
-                    bpmn_diagram.remove_sequence_flow(process, e);
+                    bpmn_diagram.remove_sequence_flow(e);
                 }
 
                 //                to decide the hierarchy of the gateways we use an Oracle item
@@ -1134,13 +1157,14 @@ mod bpmn {
                 generateSplitsHierarchy(entry, finalOracleItem, mapping);
             } else {
                 //                we save the only successor of the src
-                let tgt = bpmn_diagram
-                    .outgoing_sequence_flows_of_element(process, entry)?
-                    .iter()
+                let sequence_flow = bpmn_diagram
+                    .outgoing_sequence_flows_of_element(entry)?
                     .next()
-                    .unwrap()
-                    .getTarget();
-                if !toVisit.contains(tgt) && !visited.contains(tgt) {
+                    .unwrap();
+                let tgt = bpmn_diagram
+                    .target_of_sequence_flow(sequence_flow)
+                    .and_if_not("target not found")?;
+                if !toVisit.contains(&tgt) && !visited.contains(&tgt) {
                     toVisit.push_back(tgt);
                 }
             }
@@ -1392,6 +1416,10 @@ mod oracle {
             let i = 0;
             present.sort();
             self.oracle = present.clone();
+        }
+
+        pub(super) fn fillPast(&mut self, p: Activity) {
+            self.past.insert(p);
         }
     }
 

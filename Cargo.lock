@@ -856,7 +856,7 @@ dependencies = [
 [[package]]
 name = "ebi_bpmn"
 version = "0.0.49"
-source = "git+https://github.com/BPM-Research-Group/Ebi_BPMN.git#387e5f9e588f2b2e269e461aea8aac1215fd6b65"
+source = "git+https://github.com/BPM-Research-Group/Ebi_BPMN.git#2a9a74115fb2e08d4e017bd061329442fc2c4bb9"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -885,7 +885,7 @@ dependencies = [
 [[package]]
 name = "ebi_objects"
 version = "0.3.187"
-source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#8b51244868130ec54e3eb1fd58efbf2a7f4afd58"
+source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#023bf69de0128871a8bb672c7c536bf4b4875fc0"
 dependencies = [
  "anyhow",
  "bitvec",
