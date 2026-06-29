@@ -12,10 +12,9 @@ use ebi_objects::{
     HasActivityKey, IntoRefTraceIterator, IntoRefTraceProbabilityIterator,
     anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, Signed, ToNative, Zero, f, f0},
-    ebi_bpmn::{BPMNCreator, Container, EndEventType, StartEventType},
+    ebi_bpmn::{BPMNCreator, Container, EndEventType, StartEventType, if_not::IfNot},
 };
 use intmap::IntMap;
-use rayon::iter::Filter;
 use std::{
     collections::{HashMap, HashSet, VecDeque},
     hash::Hash,
@@ -107,6 +106,7 @@ struct PrunedDfg {
     dfg: DirectlyFollowsGraph,
     self_loops: Vec<Activity>,
     short_loops: Vec<(Activity, Activity)>,
+    concurrent_activities: Vec<(Activity, Activity)>,
 }
 
 fn step_2_concurrency_discovery(
@@ -120,17 +120,23 @@ fn step_2_concurrency_discovery(
     } = filtered_dfg;
 
     let mut remove_edges = vec![];
+    let mut concurrent_activities = vec![];
     for (source, (target, weight)) in dfg.edges() {
         if !self_loops.contains(&source) && !self_loops.contains(&target) {
             let weight_ab = weight;
             let weight_ba = dfg.edge_weight_activities(target, source);
             if (weight_ab - &weight_ba).abs() / (weight_ab + &weight_ba)
                 <= parameters.parallelismsThreshold
-                //paper says "<", but example suggests "<="
+            //paper says "<", but example suggests "<="
             {
-                //do something
+                //activities are concurrent
                 remove_edges.push((source, target));
                 remove_edges.push((target, source));
+                if !concurrent_activities.contains(&(source, target))
+                    && !concurrent_activities.contains(&(target, source))
+                {
+                    concurrent_activities.push((source, target));
+                }
             } else if weight_ab < &weight_ba {
                 remove_edges.push((source, target));
             } else {
@@ -147,12 +153,63 @@ fn step_2_concurrency_discovery(
         dfg,
         self_loops,
         short_loops,
+        concurrent_activities,
     }
 }
 
-fn step_3_filtering() {}
+struct FilteredPrunedDdg {
+    dfg: DirectlyFollowsGraph,
+    self_loops: Vec<Activity>,
+    short_loops: Vec<(Activity, Activity)>,
+    concurrent_activities: Vec<(Activity, Activity)>,
+}
 
-fn step_4_splits_discovery() {}
+fn step_3_filtering(parameters: &SplitMinerParameters, pruned_dfg: PrunedDfg) -> FilteredPrunedDdg {
+}
+
+fn step_4_splits_discovery(filtered_pruned_dfg: FilteredPrunedDdg) -> Result<()> {
+    let FilteredPrunedDdg {
+        dfg,
+        self_loops,
+        short_loops,
+        concurrent_activities,
+    } = filtered_pruned_dfg;
+
+    let mut bpmn_creator = BPMNCreator::new_with_activity_key(dfg.activity_key.clone());
+    let process = bpmn_creator.add_process(None);
+
+    let start_event = bpmn_creator.add_start_event(process, StartEventType::None)?;
+    let end_event = bpmn_creator.add_end_event(process, EndEventType::None)?;
+
+    //add tasks
+    let mut activity_2_task = IntMap::new();
+    for activity in dfg.activities() {
+        let task = bpmn_creator.add_task(process, activity)?;
+        activity_2_task.insert(activity, task);
+    }
+
+    //start flows
+    for start_activity in dfg.start_activities() {
+        bpmn_creator.add_sequence_flow(
+            start_event,
+            *activity_2_task
+                .get(start_activity)
+                .and_if_not("Start task not found.")?,
+        )?;
+    }
+
+    //end flows
+    for end_activity in dfg.end_activities() {
+        bpmn_creator.add_sequence_flow(
+            *activity_2_task
+                .get(end_activity)
+                .and_if_not("End task not found.")?,
+            end_event,
+        )?;
+    }
+
+    Ok(())
+}
 
 fn step_5_joins_discovery() {}
 

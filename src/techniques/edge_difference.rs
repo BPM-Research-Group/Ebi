@@ -49,21 +49,16 @@ impl EdgeDifference for DirectlyFollowsGraph {
         }
 
         //edges
-        for (a, b) in self
-            .activity_key
-            .get_activities()
-            .iter()
-            .zip(self.activity_key.get_activities().iter())
-        {
-            let e1 = self.edge_weight_activities(**a, **b);
+        for (a, b) in self.activities().zip(self.activities()) {
+            let e1 = self.edge_weight(a, b);
 
-            let e2 = other.edge_weight_activities(**a, **b);
+            let e2 = other.edge_weight(a, b);
 
             if e1 != e2 {
                 log::debug!(
                     "edge different: {}->{} first {} second {}",
-                    self.activity_key.get_activity_label(a),
-                    self.activity_key.get_activity_label(b),
+                    self.activity_key.get_activity_label(&a),
+                    self.activity_key.get_activity_label(&b),
                     e1,
                     e2,
                 );

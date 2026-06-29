@@ -643,8 +643,8 @@ mod cut_finding {
             for j in (i + 1)..n {
                 let (a, b) = (activities[i], activities[j]);
                 if !components.same_component(a, b) {
-                    let a_to_b = info.dfg.edge_weight_activities(a, b).is_positive();
-                    let b_to_a = info.dfg.edge_weight_activities(b, a).is_positive();
+                    let a_to_b = info.dfg.edge_weight(a, b).is_positive();
+                    let b_to_a = info.dfg.edge_weight(b, a).is_positive();
                     if !(a_to_b && b_to_a) {
                         components.merge_components(a, b);
                     }
@@ -759,11 +759,11 @@ mod cut_finding {
             if components.same_component(sub_end, pivot) {
                 continue;
             }
-            if info.dfg.start_activities().any(|s| {
-                info.dfg
-                    .edge_weight_activities(sub_end, s)
-                    .is_not_positive()
-            }) {
+            if info
+                .dfg
+                .start_activities()
+                .any(|s| info.dfg.edge_weight(sub_end, s).is_not_positive())
+            {
                 components.merge_components(sub_end, pivot);
             }
         }
@@ -772,11 +772,11 @@ mod cut_finding {
             if components.same_component(sub_start, pivot) {
                 continue;
             }
-            if info.dfg.end_activities().any(|e| {
-                info.dfg
-                    .edge_weight_activities(e, sub_start)
-                    .is_not_positive()
-            }) {
+            if info
+                .dfg
+                .end_activities()
+                .any(|e| info.dfg.edge_weight(e, sub_start).is_not_positive())
+            {
                 components.merge_components(sub_start, pivot);
             }
         }
@@ -1029,9 +1029,7 @@ mod log_info {
         techniques::directly_follows_graph_abstractor::DirectlyFollowsAbstractor,
     };
     use ebi_objects::{
-        Activity, DirectlyFollowsGraph, FiniteStochasticLanguage, HasActivityKey,
-        IntoRefTraceIterator, IntoRefTraceProbabilityIterator, ebi_arithmetic::Fraction,
-        ebi_arithmetic::Zero,
+        Activity, DirectlyFollowsGraph, FiniteStochasticLanguage, ebi_arithmetic::Fraction,
     };
     use intmap::IntMap;
     use std::collections::HashSet;
