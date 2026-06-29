@@ -1024,7 +1024,10 @@ mod find_fall_throughs {
 }
 
 mod log_info {
-    use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
+    use crate::{
+        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        techniques::directly_follows_graph_abstractor::DirectlyFollowsAbstractor,
+    };
     use ebi_objects::{
         Activity, DirectlyFollowsGraph, FiniteStochasticLanguage, HasActivityKey,
         IntoRefTraceIterator, IntoRefTraceProbabilityIterator, ebi_arithmetic::Fraction,
@@ -1050,33 +1053,17 @@ mod log_info {
         ($t:ty) => {
             impl ComputeLogInfo for $t {
                 fn compute_log_info(&self) -> LogInfo {
-                    let mut dfg = DirectlyFollowsGraph::new(self.activity_key().clone());
+                    let dfg = self.abstract_to_directly_follows_graph();
                     let mut activities = HashSet::new();
                     let mut total_traces = Fraction::zero();
                     let mut activity_instances = Fraction::zero();
 
-                    //dfg
+                    //basic data
                     for (trace, probability) in self.iter_traces_probabilities() {
                         total_traces += probability;
-                        let mut last_activity = None;
                         for &activity in trace {
                             activities.insert(activity);
                             activity_instances += probability;
-                            match last_activity {
-                                Some(prev) => dfg.add_edge(prev, activity, probability),
-                                None => {
-                                    dfg.add_start_activity(activity, probability);
-                                }
-                            }
-                            last_activity = Some(activity);
-                        }
-                        match last_activity {
-                            Some(a) => {
-                                dfg.add_end_activity(a, probability);
-                            }
-                            None => {
-                                dfg.add_empty_trace(probability);
-                            }
                         }
                     }
 

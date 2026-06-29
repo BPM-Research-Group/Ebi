@@ -1,19 +1,21 @@
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     techniques::{
+        directly_follows_graph_abstractor::DirectlyFollowsAbstractor,
         split_miner::bpmn::{BPMNNode, structure, transformDFGPintoBPMN},
         stochastic_markovian_abstraction::MarkovianAbstraction,
     },
 };
 use bit_set::BitSet;
 use ebi_objects::{
-    Activity, BusinessProcessModelAndNotation, FiniteStochasticLanguage, HasActivityKey,
-    IntoRefTraceIterator, IntoRefTraceProbabilityIterator,
+    Activity, BusinessProcessModelAndNotation, DirectlyFollowsGraph, FiniteStochasticLanguage,
+    HasActivityKey, IntoRefTraceIterator, IntoRefTraceProbabilityIterator,
     anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, Signed, ToNative, Zero, f, f0},
     ebi_bpmn::{BPMNCreator, Container, EndEventType, StartEventType},
 };
 use intmap::IntMap;
+use rayon::iter::Filter;
 use std::{
     collections::{HashMap, HashSet, VecDeque},
     hash::Hash,
@@ -54,6 +56,102 @@ impl Default for SplitMinerParameters {
         }
     }
 }
+
+struct FilteredDfg {
+    dfg: DirectlyFollowsGraph,
+    self_loops: Vec<Activity>,
+    short_loops: Vec<(Activity, Activity)>,
+}
+
+fn step_1_dfg_and_loop_discovery(log: &dyn EbiTraitFiniteStochasticLanguage) -> FilteredDfg {
+    let mut dfg = log.abstract_to_directly_follows_graph();
+
+    //detect and remove self-loops
+    let self_loops = dfg
+        .edges_mut()
+        .filter_map(|(source, (target, weight))| {
+            if source == target {
+                weight.set_zero();
+                Some(source)
+            } else {
+                None
+            }
+        })
+        .collect::<Vec<_>>();
+
+    //detect short-loops
+    let mut short_loops = vec![];
+    for trace in log.iter_traces() {
+        for window in trace.windows(3) {
+            if window[0] == window[2]
+                && !short_loops.contains(&(window[0], window[1]))
+                && !short_loops.contains(&(window[1], window[0]))
+            {
+                short_loops.push((window[0], window[1]));
+            }
+        }
+    }
+    for (a, b) in short_loops.iter() {
+        dfg.remove_edge(*a, *b);
+        dfg.remove_edge(*b, *a);
+    }
+
+    FilteredDfg {
+        dfg,
+        self_loops,
+        short_loops,
+    }
+}
+
+struct PrunedDfg {
+    dfg: DirectlyFollowsGraph,
+    self_loops: Vec<Activity>,
+    short_loops: Vec<(Activity, Activity)>,
+}
+
+fn step_2_concurrency_discovery(
+    parameters: &SplitMinerParameters,
+    filtered_dfg: FilteredDfg,
+) -> PrunedDfg {
+    let FilteredDfg {
+        mut dfg,
+        self_loops,
+        short_loops,
+    } = filtered_dfg;
+
+    let mut remove_edges = vec![];
+    for (source, (target, weight)) in dfg.edges() {
+        let weight_ab = weight;
+        let weight_ba = dfg.edge_weight_activities(target, source);
+        if (weight_ab - &weight_ba).abs() / (weight_ab + &weight_ba)
+            < parameters.parallelismsThreshold
+        {
+            //do something
+            remove_edges.push((source, target));
+            remove_edges.push((target, source));
+        } else if weight_ab < &weight_ba {
+            remove_edges.push((source, target));
+        } else {
+            remove_edges.push((target, source));
+        }
+    }
+
+    for (source, target) in remove_edges {
+        dfg.remove_edge(source, target);
+    }
+
+    PrunedDfg {
+        dfg,
+        self_loops,
+        short_loops,
+    }
+}
+
+fn step_3_filtering() {}
+
+fn step_4_splits_discovery() {}
+
+fn step_5_joins_discovery() {}
 
 #[derive(Clone, Eq, PartialEq)]
 pub enum StructuringTime {
