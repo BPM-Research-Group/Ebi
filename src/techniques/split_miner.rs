@@ -121,18 +121,21 @@ fn step_2_concurrency_discovery(
 
     let mut remove_edges = vec![];
     for (source, (target, weight)) in dfg.edges() {
-        let weight_ab = weight;
-        let weight_ba = dfg.edge_weight_activities(target, source);
-        if (weight_ab - &weight_ba).abs() / (weight_ab + &weight_ba)
-            < parameters.parallelismsThreshold
-        {
-            //do something
-            remove_edges.push((source, target));
-            remove_edges.push((target, source));
-        } else if weight_ab < &weight_ba {
-            remove_edges.push((source, target));
-        } else {
-            remove_edges.push((target, source));
+        if !self_loops.contains(&source) && !self_loops.contains(&target) {
+            let weight_ab = weight;
+            let weight_ba = dfg.edge_weight_activities(target, source);
+            if (weight_ab - &weight_ba).abs() / (weight_ab + &weight_ba)
+                <= parameters.parallelismsThreshold
+                //paper says "<", but example suggests "<="
+            {
+                //do something
+                remove_edges.push((source, target));
+                remove_edges.push((target, source));
+            } else if weight_ab < &weight_ba {
+                remove_edges.push((source, target));
+            } else {
+                remove_edges.push((target, source));
+            }
         }
     }
 
