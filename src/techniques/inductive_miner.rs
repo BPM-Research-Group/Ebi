@@ -1029,7 +1029,9 @@ mod log_info {
         techniques::directly_follows_graph_abstractor::DirectlyFollowsAbstractor,
     };
     use ebi_objects::{
-        Activity, DirectlyFollowsGraph, FiniteStochasticLanguage, ebi_arithmetic::Fraction,
+        Activity, DirectlyFollowsGraph, FiniteStochasticLanguage, IntoRefTraceIterator,
+        IntoRefTraceProbabilityIterator,
+        ebi_arithmetic::{Fraction, Zero},
     };
     use intmap::IntMap;
     use std::collections::HashSet;

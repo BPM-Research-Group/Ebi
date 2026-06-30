@@ -12,7 +12,10 @@ use ebi_objects::{
     HasActivityKey, IntoRefTraceIterator, IntoRefTraceProbabilityIterator,
     anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, Signed, ToNative, Zero, f, f0},
-    ebi_bpmn::{BPMNCreator, Container, EndEventType, StartEventType, if_not::IfNot},
+    ebi_bpmn::{
+        BPMNCreator, Container, EndEventType, GatewayType, GlobalIndex, StartEventType,
+        if_not::IfNot,
+    },
 };
 use intmap::IntMap;
 use std::{
@@ -106,7 +109,23 @@ struct PrunedDfg {
     dfg: DirectlyFollowsGraph,
     self_loops: Vec<Activity>,
     short_loops: Vec<(Activity, Activity)>,
-    concurrent_activities: Vec<(Activity, Activity)>,
+    concurrent_activities: HashSet<ConcurrentPair>,
+}
+
+#[derive(Hash, Eq, PartialEq)]
+struct ConcurrentPair {
+    a: Activity,
+    b: Activity,
+}
+
+impl ConcurrentPair {
+    fn new(a: Activity, b: Activity) -> Self {
+        if a > b {
+            Self { a, b }
+        } else {
+            Self { a: b, b: a }
+        }
+    }
 }
 
 fn step_2_concurrency_discovery(
@@ -120,11 +139,11 @@ fn step_2_concurrency_discovery(
     } = filtered_dfg;
 
     let mut remove_edges = vec![];
-    let mut concurrent_activities = vec![];
+    let mut concurrent_activities = HashSet::new();
     for (source, (target, weight)) in dfg.edges() {
         if !self_loops.contains(&source) && !self_loops.contains(&target) {
             let weight_ab = weight;
-            let weight_ba = dfg.edge_weight_activities(target, source);
+            let weight_ba = dfg.edge_weight(target, source);
             if (weight_ab - &weight_ba).abs() / (weight_ab + &weight_ba)
                 <= parameters.parallelismsThreshold
             //paper says "<", but example suggests "<="
@@ -132,11 +151,8 @@ fn step_2_concurrency_discovery(
                 //activities are concurrent
                 remove_edges.push((source, target));
                 remove_edges.push((target, source));
-                if !concurrent_activities.contains(&(source, target))
-                    && !concurrent_activities.contains(&(target, source))
-                {
-                    concurrent_activities.push((source, target));
-                }
+
+                concurrent_activities.insert(ConcurrentPair::new(source, target));
             } else if weight_ab < &weight_ba {
                 remove_edges.push((source, target));
             } else {
@@ -161,13 +177,35 @@ struct FilteredPrunedDdg {
     dfg: DirectlyFollowsGraph,
     self_loops: Vec<Activity>,
     short_loops: Vec<(Activity, Activity)>,
-    concurrent_activities: Vec<(Activity, Activity)>,
+    concurrent_activities: HashSet<ConcurrentPair>,
 }
 
 fn step_3_filtering(parameters: &SplitMinerParameters, pruned_dfg: PrunedDfg) -> FilteredPrunedDdg {
+    let PrunedDfg {
+        dfg,
+        self_loops,
+        short_loops,
+        concurrent_activities,
+    } = pruned_dfg;
+    FilteredPrunedDdg {
+        dfg,
+        self_loops,
+        short_loops,
+        concurrent_activities,
+    }
 }
 
-fn step_4_splits_discovery(filtered_pruned_dfg: FilteredPrunedDdg) -> Result<()> {
+struct InitialBPMN {
+    dfg: DirectlyFollowsGraph,
+    self_loops: Vec<Activity>,
+    short_loops: Vec<(Activity, Activity)>,
+    concurrent_activities: HashSet<ConcurrentPair>,
+    activity_2_task: IntMap<Activity, GlobalIndex>,
+    bpmn_creator: BPMNCreator,
+    process: Container,
+}
+
+fn step_4_splits_discovery(filtered_pruned_dfg: FilteredPrunedDdg) -> Result<InitialBPMN> {
     let FilteredPrunedDdg {
         dfg,
         self_loops,
@@ -208,8 +246,212 @@ fn step_4_splits_discovery(filtered_pruned_dfg: FilteredPrunedDdg) -> Result<()>
         )?;
     }
 
+    //edges
+    // In contrast to the paper, we do not add the task-task edges,
+    // as Algorithm 5 removes them.
+
+    Ok(InitialBPMN {
+        dfg,
+        self_loops,
+        short_loops,
+        concurrent_activities,
+        activity_2_task,
+        bpmn_creator,
+        process,
+    })
+}
+
+/// Algorithm 5
+fn step_4_a_discover_splits(initial_bpmn: InitialBPMN) -> Result<()> {
+    let InitialBPMN {
+        dfg,
+        self_loops,
+        short_loops,
+        concurrent_activities,
+        activity_2_task,
+        mut bpmn_creator,
+        process,
+    } = initial_bpmn;
+
+    for (activity, task) in activity_2_task.iter() {
+        let outgoing_edges = dfg.outgoing_edges(activity);
+        if outgoing_edges.len() > 1 {
+            //compute d-successors
+            let mut d_successors = outgoing_edges
+                .into_iter()
+                .map(|(target, _)| target)
+                .collect::<Vec<_>>();
+
+            let mut cover = IntMap::new();
+            let mut future = IntMap::new();
+
+            //line 6
+            for successor in d_successors.iter().copied() {
+                //line 7
+                let mut s = HashSet::new();
+                s.insert(successor);
+                cover.insert(successor, s);
+
+                //line 8
+                future.insert(successor, HashSet::new());
+
+                //line 9
+                for successor_b in d_successors.iter().copied() {
+                    //line 10
+                    if successor != successor_b
+                        && concurrent_activities
+                            .contains(&ConcurrentPair::new(successor, successor_b))
+                    {
+                        future
+                            .get_mut(successor)
+                            .and_if_not("successor not found")?
+                            .insert(successor_b);
+                    }
+                }
+            }
+
+            //line 11
+            //we did not add any edges, so we don't have to remove them here
+
+            //change to algorithm: we switch to BPMN elements in set S (d_successors up till now).
+            let mut s_set = d_successors
+                .into_iter()
+                .map(|activity| {
+                    activity_2_task
+                        .get(activity)
+                        .and_if_not("Activity not found")
+                        .copied()
+                })
+                .collect::<Result<HashSet<_>>>()?;
+
+            let mut cover = cover
+                .into_iter()
+                .map(|(activity, map)| {
+                    Ok((
+                        activity_2_task
+                            .get(activity)
+                            .and_if_not("Activity not found")
+                            .copied()?,
+                        map,
+                    ))
+                })
+                .collect::<Result<HashMap<_, _>>>()?;
+
+            let mut f_set = future
+                .into_iter()
+                .map(|(activity, map)| {
+                    Ok((
+                        activity_2_task
+                            .get(activity)
+                            .and_if_not("Activity not found")
+                            .copied()?,
+                        map,
+                    ))
+                })
+                .collect::<Result<HashMap<_, _>>>()?;
+
+            //line 12
+            while s_set.len() > 1 {
+                //line 13
+                step_4_b_discover_xor_splits(
+                    &mut bpmn_creator,
+                    process,
+                    &mut s_set,
+                    &mut cover,
+                    &mut f_set,
+                );
+
+                //line 14
+                step_4_c_discover_and_splits();
+            }
+
+            //line 15
+            let s = s_set.iter().next().unwrap();
+
+            //line 16
+            let source_task = activity_2_task
+                .get(activity)
+                .and_if_not("Task not found.")?;
+            bpmn_creator.add_sequence_flow(*source_task, *s)?;
+        } else if outgoing_edges.len() == 1 {
+            // optimisation of the algorithm: add an edge if there is one
+            let (target, _) = outgoing_edges[0];
+            let source_task = activity_2_task
+                .get(activity)
+                .and_if_not("Task not found.")?;
+            let target_task = activity_2_task.get(target).and_if_not("Task not found.")?;
+            bpmn_creator.add_sequence_flow(*source_task, *target_task);
+        }
+    }
     Ok(())
 }
+
+/// Algorithm 6
+fn step_4_b_discover_xor_splits(
+    bpmn_creator: &mut BPMNCreator,
+    process: Container,
+    s_set: &mut HashSet<GlobalIndex>,
+    cover: &mut HashMap<GlobalIndex, HashSet<Activity>>,
+    future: &mut HashMap<GlobalIndex, HashSet<Activity>>,
+) -> Result<()> {
+    loop {
+        //line 2
+        let mut x = HashSet::new();
+
+        //line 3
+        for s_1 in s_set.iter().copied() {
+            //line 4
+            let mut c_u = cover.get(&s_1).and_if_not("Activity not found.")?.clone();
+
+            //line 5
+            for s_2 in s_set.iter().copied() {
+                //line 6
+                if s_1 != s_2 && future.get(&s_1) == future.get(&s_2) {
+                    //line 7
+                    x.insert(s_2);
+                    //line 8
+                    c_u.extend(cover.get(&s_2).and_if_not("Activity not found.")?);
+                }
+            }
+
+            //line 9
+            if !x.is_empty() {
+                //line 10
+                x.insert(s_1);
+                //line 11
+                break;
+            }
+        }
+
+        //line 12
+        if !x.is_empty() {
+            //line 13 & 14
+            let g = bpmn_creator.add_gateway(process, GatewayType::Exclusive)?;
+            //line 15
+            for s in x.iter().copied() {
+                //line 16
+                let s_task = bpmn_creator.add_sequence_flow(g, s)?;
+                //line 17
+                s_set.remove(&s);
+            }
+
+            //line 18
+            s_set.insert(g);
+
+            //line 19
+            future.insert(g, future.get(s_1).and_if_not("Element not found")?.clone());
+
+            //line 20
+            cover.insert(g, c_u);
+        }
+
+        if x.is_empty() {
+            return Ok(());
+        }
+    }
+}
+
+fn step_4_c_discover_and_splits() {}
 
 fn step_5_joins_discovery() {}
 
