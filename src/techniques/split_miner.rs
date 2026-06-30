@@ -3,7 +3,7 @@ use crate::{
     techniques::directly_follows_graph_abstractor::DirectlyFollowsAbstractor,
 };
 use ebi_objects::{
-    Activity, BusinessProcessModelAndNotation, DirectlyFollowsGraph,
+    Activity, BusinessProcessModelAndNotation, DirectlyFollowsGraph, HasActivityKey,
     anyhow::Result,
     ebi_arithmetic::{Fraction, Signed, Zero, f},
     ebi_bpmn::{
@@ -48,6 +48,8 @@ pub fn split_miner(
     let filtered_pruned_dfg = algorithm_1_generate_filtered_dfg(pruned_dfg);
 
     let initial_bpmn = algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg)?;
+
+    println!("{}", initial_bpmn.bpmn_creator);
 
     initial_bpmn.bpmn_creator.to_bpmn()
 }
@@ -501,7 +503,42 @@ fn algorithm_8_discover_joins(initial_bpmn: &mut InitialBPMN) -> Result<()> {
     } = initial_bpmn;
 
     //todo: implement the actual algorithm 8 of the paper, which uses SESE fragments.
-    
+    //for now, replace every implicit join with an OR gateway
+
+    for (activity, task) in activity_2_task {
+        let incoming_flows = bpmn_creator
+            .incoming_sequence_flows_of_element(*task)?
+            .collect::<Vec<_>>();
+
+        if incoming_flows.len() > 1 {
+            println!(
+                "add OR for task {}",
+                dfg.activity_key().deprocess_activity(&activity)
+            );
+            //add an OR gateway
+            let or = bpmn_creator.add_gateway(*process, GatewayType::Inclusive)?;
+
+            //add a sequence flow from the gateway to the task
+            bpmn_creator.add_sequence_flow(*task, or)?;
+
+            for sequence_flow in incoming_flows {
+                let source = bpmn_creator
+                    .source_of_sequence_flow(sequence_flow)
+                    .and_if_not("Source not found.")?;
+
+                //remove the old sequence flow
+                bpmn_creator.remove_sequence_flow(sequence_flow)?;
+
+                //add a new sequence flow
+                bpmn_creator.add_sequence_flow(source, or)?;
+            }
+        } else {
+            println!(
+                "do not add OR for task {}",
+                dfg.activity_key().deprocess_activity(&activity)
+            );
+        }
+    }
 
     Ok(())
 }
