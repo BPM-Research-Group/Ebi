@@ -856,7 +856,7 @@ dependencies = [
 [[package]]
 name = "ebi_bpmn"
 version = "0.0.49"
-source = "git+https://github.com/BPM-Research-Group/Ebi_BPMN.git#2a9a74115fb2e08d4e017bd061329442fc2c4bb9"
+source = "git+https://github.com/BPM-Research-Group/Ebi_BPMN.git#e8cb6697e3ad45902aff762f92b0513ebb136a2c"
 dependencies = [
  "anyhow",
  "bitvec",

@@ -258,9 +258,12 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT: EbiCommand = E
 pub const EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER: EbiCommand = EbiCommand::Command {
     name_short: "sm",
     name_long: Some("split-miner"),
-    explanation_short: "Applly the Split Miner 1.0 algorithm.",
-    explanation_long: None,
-    latex_link: Some("\\cite{}"),
+    explanation_short: "Apply a simplified version of the Split Miner algorithm.",
+    explanation_long: Some(
+        "Apply a simplified version of the Split Miner algorithm.
+        For now, this implementation does not filter the DFG (Algorithm 1) and does not reduce using SESE fragments (Algorithm 9).",
+    ),
+    latex_link: Some("\\cite{DBLP:journals/kais/AugustoCDRP19}"),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)]],
