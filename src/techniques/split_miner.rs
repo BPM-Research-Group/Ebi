@@ -146,6 +146,7 @@ fn algorithm_1_generate_filtered_dfg(pruned_dfg: PrunedDfg) -> FilteredPrunedDdg
         short_loops,
         concurrent_activities,
     } = pruned_dfg;
+    todo!();
     FilteredPrunedDdg {
         dfg,
         self_loops,
