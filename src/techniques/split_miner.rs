@@ -57,9 +57,6 @@ pub fn split_miner(
 fn step_1_dfg_and_loop_discovery(log: &dyn EbiTraitFiniteStochasticLanguage) -> FilteredDfg {
     let mut dfg = log.abstract_to_directly_follows_graph();
 
-    // println!("{}", dfg);
-    // todo!();
-
     //detect and remove self-loops
     let self_loops = dfg
         .edges_mut()
@@ -149,6 +146,20 @@ fn algorithm_1_generate_filtered_dfg(pruned_dfg: PrunedDfg) -> FilteredPrunedDdg
         short_loops,
         concurrent_activities,
     } = pruned_dfg;
+
+    // let mut c_f = IntMap::new();
+    // let mut c_b = IntMap::new();
+    // let mut f = HashSet::new();
+
+    // //line 8
+    // for t in dfg.activities() {
+    //     c_f.insert(t, Fraction::zero());
+    //     c_b.insert(t, Fraction::zero());
+
+    //     f_i = dfg.incom
+    // }
+
+
     FilteredPrunedDdg {
         dfg,
         self_loops,
@@ -218,7 +229,6 @@ fn algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg: FilteredPrunedDdg) -> R
         .and_if_not("Activity not found.")?;
 
     let mut initial_bpmn = InitialBPMN {
-        dfg,
         self_loops,
         short_loops,
         concurrent_tasks,
@@ -229,9 +239,9 @@ fn algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg: FilteredPrunedDdg) -> R
 
     algorithm_5_discover_splits(&mut initial_bpmn)?;
 
-    // algorithm_8_discover_joins(&mut initial_bpmn)?;
+    algorithm_8_discover_joins(&mut initial_bpmn)?;
 
-    // algorithm_9_replace_ors(&mut initial_bpmn)?;
+    algorithm_9_replace_ors(&mut initial_bpmn)?;
 
     Ok(initial_bpmn)
 }
@@ -239,7 +249,6 @@ fn algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg: FilteredPrunedDdg) -> R
 /// Algorithm 5
 fn algorithm_5_discover_splits(initial_bpmn: &mut InitialBPMN) -> Result<()> {
     let InitialBPMN {
-        dfg,
         self_loops,
         short_loops,
         concurrent_tasks: concurrent_activities,
@@ -424,7 +433,7 @@ fn algorithm_7_discover_and_splits(
                         c_u.extend(c_s_2);
 
                         //line 12
-                        let f_s_2 = future.get(&s_2).and_if_not("Element not found.")?.clone();
+                        let f_s_2 = future.get(s_2).and_if_not("Element not found.")?.clone();
                         f_i.retain(|x| f_s_2.contains(x));
                     }
                 }
@@ -469,7 +478,6 @@ fn algorithm_7_discover_and_splits(
 
 fn algorithm_8_discover_joins(initial_bpmn: &mut InitialBPMN) -> Result<()> {
     let InitialBPMN {
-        dfg,
         self_loops,
         short_loops,
         concurrent_tasks: concurrent_activities,
@@ -489,13 +497,13 @@ fn algorithm_8_discover_joins(initial_bpmn: &mut InitialBPMN) -> Result<()> {
         if incoming_flows.len() > 1 {
             println!(
                 "add OR for task {}",
-                dfg.activity_key().deprocess_activity(&activity)
+                bpmn_creator.activity_key().deprocess_activity(&activity)
             );
             //add an OR gateway
             let or = bpmn_creator.add_gateway(*process, GatewayType::Inclusive)?;
 
             //add a sequence flow from the gateway to the task
-            bpmn_creator.add_sequence_flow(*task, or)?;
+            bpmn_creator.add_sequence_flow(or, *task)?;
 
             for sequence_flow in incoming_flows {
                 let source = bpmn_creator
@@ -511,7 +519,7 @@ fn algorithm_8_discover_joins(initial_bpmn: &mut InitialBPMN) -> Result<()> {
         } else {
             println!(
                 "do not add OR for task {}",
-                dfg.activity_key().deprocess_activity(&activity)
+                bpmn_creator.activity_key().deprocess_activity(&activity)
             );
         }
     }
@@ -521,7 +529,6 @@ fn algorithm_8_discover_joins(initial_bpmn: &mut InitialBPMN) -> Result<()> {
 
 fn algorithm_9_replace_ors(initial_bpmn: &mut InitialBPMN) -> Result<()> {
     let InitialBPMN {
-        dfg,
         self_loops,
         short_loops,
         concurrent_tasks: concurrent_activities,
@@ -570,7 +577,6 @@ struct FilteredPrunedDdg {
 }
 
 struct InitialBPMN {
-    dfg: DirectlyFollowsGraph,
     self_loops: Vec<Activity>,
     short_loops: Vec<(Activity, Activity)>,
     concurrent_tasks: HashSet<ConcurrentPair<GlobalIndex>>,
