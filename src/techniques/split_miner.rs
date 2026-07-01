@@ -57,6 +57,9 @@ pub fn split_miner(
 fn step_1_dfg_and_loop_discovery(log: &dyn EbiTraitFiniteStochasticLanguage) -> FilteredDfg {
     let mut dfg = log.abstract_to_directly_follows_graph();
 
+    // println!("{}", dfg);
+    // todo!();
+
     //detect and remove self-loops
     let self_loops = dfg
         .edges_mut()
@@ -146,7 +149,6 @@ fn algorithm_1_generate_filtered_dfg(pruned_dfg: PrunedDfg) -> FilteredPrunedDdg
         short_loops,
         concurrent_activities,
     } = pruned_dfg;
-    todo!();
     FilteredPrunedDdg {
         dfg,
         self_loops,
@@ -197,8 +199,11 @@ fn algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg: FilteredPrunedDdg) -> R
     }
 
     //edges
-    // In contrast to the paper, we do not add the task-task edges,
-    // as Algorithm 5 removes them.
+    for (source, (target, _)) in dfg.edges() {
+        let source_task = activity_2_task.get(source).and_if_not("Task not found.")?;
+        let target_task = activity_2_task.get(target).and_if_not("Task not found.")?;
+        bpmn_creator.add_sequence_flow(*source_task, *target_task)?;
+    }
 
     let mut initial_bpmn = InitialBPMN {
         dfg,
@@ -212,9 +217,9 @@ fn algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg: FilteredPrunedDdg) -> R
 
     algorithm_5_discover_splits(&mut initial_bpmn)?;
 
-    algorithm_8_discover_joins(&mut initial_bpmn)?;
+    // algorithm_8_discover_joins(&mut initial_bpmn)?;
 
-    algorithm_9_replace_ors(&mut initial_bpmn)?;
+    // algorithm_9_replace_ors(&mut initial_bpmn)?;
 
     Ok(initial_bpmn)
 }
