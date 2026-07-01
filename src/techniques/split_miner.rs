@@ -12,7 +12,7 @@ use ebi_objects::{
     },
 };
 use intmap::IntMap;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 pub trait SplitMiner {
     fn split_miner(&self) -> Result<BusinessProcessModelAndNotation>;
@@ -205,11 +205,23 @@ fn algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg: FilteredPrunedDdg) -> R
         bpmn_creator.add_sequence_flow(*source_task, *target_task)?;
     }
 
+    //transform the concurrent activities
+    let concurrent_tasks = concurrent_activities
+        .into_iter()
+        .map(|pair| {
+            Some(ConcurrentPair::new(
+                *activity_2_task.get(pair.a)?,
+                *activity_2_task.get(pair.b)?,
+            ))
+        })
+        .collect::<Option<HashSet<_>>>()
+        .and_if_not("Activity not found.")?;
+
     let mut initial_bpmn = InitialBPMN {
         dfg,
         self_loops,
         short_loops,
-        concurrent_activities,
+        concurrent_tasks,
         activity_2_task,
         bpmn_creator,
         process,
@@ -230,88 +242,54 @@ fn algorithm_5_discover_splits(initial_bpmn: &mut InitialBPMN) -> Result<()> {
         dfg,
         self_loops,
         short_loops,
-        concurrent_activities,
+        concurrent_tasks: concurrent_activities,
         activity_2_task,
         bpmn_creator,
         process,
     } = initial_bpmn;
 
-    for (activity, _task) in activity_2_task.iter() {
-        let outgoing_edges = dfg.outgoing_edges(activity);
-        if outgoing_edges.len() > 1 {
+    for (activity, task) in activity_2_task.iter() {
+        let t_dot = bpmn_creator
+            .outgoing_sequence_flows_of_element(*task)?
+            .collect::<Vec<_>>();
+        if t_dot.len() > 1 {
             //compute d-successors
-            let d_successors = outgoing_edges
-                .into_iter()
-                .map(|(target, _)| target)
-                .collect::<Vec<_>>();
+            let mut s_set = t_dot
+                .iter()
+                .map(|flow| bpmn_creator.target_of_sequence_flow(*flow))
+                .collect::<Option<HashSet<_>>>()
+                .and_if_not("Target not found.")?;
 
             let mut cover = IntMap::new();
             let mut future = IntMap::new();
 
             //line 6
-            for successor in d_successors.iter().copied() {
+            for s_1 in s_set.iter().copied() {
                 //line 7
                 let mut s = HashSet::new();
-                s.insert(successor);
-                cover.insert(successor, s);
+                s.insert(s_1);
+                cover.insert(s_1, s);
 
                 //line 8
-                future.insert(successor, HashSet::new());
+                future.insert(s_1, HashSet::new());
 
                 //line 9
-                for successor_b in d_successors.iter().copied() {
+                for s_2 in s_set.iter().copied() {
                     //line 10
-                    if successor != successor_b
-                        && concurrent_activities
-                            .contains(&ConcurrentPair::new(successor, successor_b))
+                    if s_1 != s_2 && concurrent_activities.contains(&ConcurrentPair::new(s_1, s_2))
                     {
                         future
-                            .get_mut(successor)
+                            .get_mut(s_1)
                             .and_if_not("successor not found")?
-                            .insert(successor_b);
+                            .insert(s_2);
                     }
                 }
             }
 
             //line 11
-            //we did not add any edges, so we don't have to remove them here
-
-            //change to algorithm: we switch to BPMN elements in set S (d_successors up till now).
-            let mut s_set = d_successors
-                .into_iter()
-                .map(|activity| {
-                    activity_2_task
-                        .get(activity)
-                        .and_if_not("Activity not found")
-                        .copied()
-                })
-                .collect::<Result<HashSet<_>>>()?;
-
-            let mut cover = cover
-                .into_iter()
-                .map(|(activity, map)| {
-                    Ok((
-                        activity_2_task
-                            .get(activity)
-                            .and_if_not("Activity not found")
-                            .copied()?,
-                        map,
-                    ))
-                })
-                .collect::<Result<HashMap<_, _>>>()?;
-
-            let mut f_set = future
-                .into_iter()
-                .map(|(activity, map)| {
-                    Ok((
-                        activity_2_task
-                            .get(activity)
-                            .and_if_not("Activity not found")
-                            .copied()?,
-                        map,
-                    ))
-                })
-                .collect::<Result<HashMap<_, _>>>()?;
+            for flow in t_dot {
+                bpmn_creator.remove_sequence_flow(flow)?;
+            }
 
             //line 12
             while s_set.len() > 1 {
@@ -321,7 +299,7 @@ fn algorithm_5_discover_splits(initial_bpmn: &mut InitialBPMN) -> Result<()> {
                     *process,
                     &mut s_set,
                     &mut cover,
-                    &mut f_set,
+                    &mut future,
                 )?;
 
                 //line 14
@@ -330,7 +308,7 @@ fn algorithm_5_discover_splits(initial_bpmn: &mut InitialBPMN) -> Result<()> {
                     *process,
                     &mut s_set,
                     &mut cover,
-                    &mut f_set,
+                    &mut future,
                 )?;
             }
 
@@ -342,14 +320,6 @@ fn algorithm_5_discover_splits(initial_bpmn: &mut InitialBPMN) -> Result<()> {
                 .get(activity)
                 .and_if_not("Task not found.")?;
             bpmn_creator.add_sequence_flow(*source_task, *s)?;
-        } else if outgoing_edges.len() == 1 {
-            // optimisation of the algorithm: add an edge if there is one
-            let (target, _) = outgoing_edges[0];
-            let source_task = activity_2_task
-                .get(activity)
-                .and_if_not("Task not found.")?;
-            let target_task = activity_2_task.get(target).and_if_not("Task not found.")?;
-            bpmn_creator.add_sequence_flow(*source_task, *target_task)?;
         }
     }
     Ok(())
@@ -360,8 +330,8 @@ fn algorithm_6_discover_xor_splits(
     bpmn_creator: &mut BPMNCreator,
     process: Container,
     s_set: &mut HashSet<GlobalIndex>,
-    cover: &mut HashMap<GlobalIndex, HashSet<Activity>>,
-    future: &mut HashMap<GlobalIndex, HashSet<Activity>>,
+    cover: &mut IntMap<GlobalIndex, HashSet<GlobalIndex>>,
+    future: &mut IntMap<GlobalIndex, HashSet<GlobalIndex>>,
 ) -> Result<()> {
     loop {
         //line 2
@@ -370,16 +340,16 @@ fn algorithm_6_discover_xor_splits(
         //line 3
         for s_1 in s_set.iter().copied() {
             //line 4
-            let mut c_u = cover.get(&s_1).and_if_not("Activity not found.")?.clone();
+            let mut c_u = cover.get(s_1).and_if_not("Activity not found.")?.clone();
 
             //line 5
             for s_2 in s_set.iter().copied() {
                 //line 6
-                if s_1 != s_2 && future.get(&s_1) == future.get(&s_2) {
+                if s_1 != s_2 && future.get(s_1) == future.get(s_2) {
                     //line 7
                     x.insert(s_2);
                     //line 8
-                    c_u.extend(cover.get(&s_2).and_if_not("Activity not found.")?);
+                    c_u.extend(cover.get(s_2).and_if_not("Activity not found.")?);
                 }
             }
 
@@ -405,7 +375,7 @@ fn algorithm_6_discover_xor_splits(
                 s_set.insert(g);
 
                 //line 19
-                future.insert(g, future.get(&s_1).and_if_not("Element not found")?.clone());
+                future.insert(g, future.get(s_1).and_if_not("Element not found")?.clone());
 
                 //line 20
                 cover.insert(g, c_u);
@@ -426,15 +396,15 @@ fn algorithm_7_discover_and_splits(
     bpmn_creator: &mut BPMNCreator,
     process: Container,
     s_set: &mut HashSet<GlobalIndex>,
-    cover: &mut HashMap<GlobalIndex, HashSet<Activity>>,
-    future: &mut HashMap<GlobalIndex, HashSet<Activity>>,
+    cover: &mut IntMap<GlobalIndex, HashSet<GlobalIndex>>,
+    future: &mut IntMap<GlobalIndex, HashSet<GlobalIndex>>,
 ) -> Result<()> {
     loop {
         let mut a = HashSet::new();
         for s_1 in s_set.iter().copied() {
-            let mut c_u = cover.get(&s_1).and_if_not("Element not found")?.clone();
+            let mut c_u = cover.get(s_1).and_if_not("Element not found")?.clone();
 
-            let mut f_i = future.get(&s_1).and_if_not("Element not found.")?.clone();
+            let mut f_i = future.get(s_1).and_if_not("Element not found.")?.clone();
 
             let mut cfs1 = c_u.clone();
             cfs1.extend(f_i.clone());
@@ -442,15 +412,15 @@ fn algorithm_7_discover_and_splits(
             //line 7
             for s_2 in s_set.iter().copied() {
                 if s_1 != s_2 {
-                    let mut cfs2 = cover.get(&s_1).and_if_not("Element not found")?.clone();
-                    cfs2.extend(future.get(&s_1).and_if_not("Element not found.")?.clone());
+                    let mut cfs2 = cover.get(s_1).and_if_not("Element not found")?.clone();
+                    cfs2.extend(future.get(s_1).and_if_not("Element not found.")?.clone());
 
                     if cfs1 == cfs2 {
                         //line 10
                         a.insert(s_2);
 
                         //line 11
-                        let c_s_2 = cover.get(&s_2).and_if_not("Element not found")?.clone();
+                        let c_s_2 = cover.get(s_2).and_if_not("Element not found")?.clone();
                         c_u.extend(c_s_2);
 
                         //line 12
@@ -502,7 +472,7 @@ fn algorithm_8_discover_joins(initial_bpmn: &mut InitialBPMN) -> Result<()> {
         dfg,
         self_loops,
         short_loops,
-        concurrent_activities,
+        concurrent_tasks: concurrent_activities,
         activity_2_task,
         bpmn_creator,
         process,
@@ -554,7 +524,7 @@ fn algorithm_9_replace_ors(initial_bpmn: &mut InitialBPMN) -> Result<()> {
         dfg,
         self_loops,
         short_loops,
-        concurrent_activities,
+        concurrent_tasks: concurrent_activities,
         activity_2_task,
         bpmn_creator,
         process,
@@ -573,17 +543,17 @@ struct PrunedDfg {
     dfg: DirectlyFollowsGraph,
     self_loops: Vec<Activity>,
     short_loops: Vec<(Activity, Activity)>,
-    concurrent_activities: HashSet<ConcurrentPair>,
+    concurrent_activities: HashSet<ConcurrentPair<Activity>>,
 }
 
 #[derive(Hash, Eq, PartialEq)]
-struct ConcurrentPair {
-    a: Activity,
-    b: Activity,
+struct ConcurrentPair<T> {
+    a: T,
+    b: T,
 }
 
-impl ConcurrentPair {
-    fn new(a: Activity, b: Activity) -> Self {
+impl<T: Ord> ConcurrentPair<T> {
+    fn new(a: T, b: T) -> Self {
         if a > b {
             Self { a, b }
         } else {
@@ -596,14 +566,14 @@ struct FilteredPrunedDdg {
     dfg: DirectlyFollowsGraph,
     self_loops: Vec<Activity>,
     short_loops: Vec<(Activity, Activity)>,
-    concurrent_activities: HashSet<ConcurrentPair>,
+    concurrent_activities: HashSet<ConcurrentPair<Activity>>,
 }
 
 struct InitialBPMN {
     dfg: DirectlyFollowsGraph,
     self_loops: Vec<Activity>,
     short_loops: Vec<(Activity, Activity)>,
-    concurrent_activities: HashSet<ConcurrentPair>,
+    concurrent_tasks: HashSet<ConcurrentPair<GlobalIndex>>,
     activity_2_task: IntMap<Activity, GlobalIndex>,
     bpmn_creator: BPMNCreator,
     process: Container,

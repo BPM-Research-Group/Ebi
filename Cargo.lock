@@ -856,16 +856,17 @@ dependencies = [
 [[package]]
 name = "ebi_bpmn"
 version = "0.0.49"
-source = "git+https://github.com/BPM-Research-Group/Ebi_BPMN.git#90bec7a1833a8f54a07c44f8e8b411440860792c"
+source = "git+https://github.com/BPM-Research-Group/Ebi_BPMN.git#2b415018f0eafe31ba32c099e54c92e4a684df9f"
 dependencies = [
  "anyhow",
  "bitvec",
  "ebi_activity_key",
  "ebi_arithmetic",
  "ebi_derive",
+ "intmap",
  "itertools 0.15.0",
  "layout-rs",
- "quick-xml 0.40.1",
+ "quick-xml 0.41.0",
  "strum",
  "strum_macros 0.28.0",
 ]
@@ -885,7 +886,7 @@ dependencies = [
 [[package]]
 name = "ebi_objects"
 version = "0.3.187"
-source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#cdb3aa5e73fad3b51426ac66f717eb5d4b851029"
+source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#c2646ef8cc985847116d4759cb90b52ab193446e"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -2927,6 +2928,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "quick-xml"
+version = "0.41.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e660451e55124f798a69a5af3f49ccfbefbd41910eefd25caf2393e1f3473ec1"
+dependencies = [
+ "memchr",
+ "serde",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.46"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3800,9 +3811,9 @@ dependencies = [
 
 [[package]]
 name = "time"
-version = "0.3.52"
+version = "0.3.53"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0e48db7b415311b615f910b3dcaa4557bcd4bf1982379c95c223fd8c2a20e210"
+checksum = "18dfaaeddcb932337b5e7866ee7d0ce9b76d2fd092997146f187ec09b4558a50"
 dependencies = [
  "deranged",
  "num-conv",
