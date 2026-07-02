@@ -347,16 +347,33 @@ mod tree {
 }
 
 mod labelled_petri_net {
-    use crate::techniques::reduce::ReduceLanguageEquivalently;
-    use ebi_objects::LabelledPetriNet;
+    use crate::techniques::reduce::{ReduceLanguageEquivalently, single_unit_arc};
+    use ebi_objects::{LabelledPetriNet, ebi_objects::labelled_petri_net::TransitionIndex};
 
     impl ReduceLanguageEquivalently for LabelledPetriNet {
         fn reduce_language_equivalently(&mut self) {
-            let place_rules: Vec<Box<dyn LpnPlaceRule>> = vec![Box::new(FusionOfSeriesPlaces)];
+            let place_rules: Vec<Box<dyn LpnPlaceRule>> = vec![
+                Box::new(FusionOfSeriesPlaces),
+                Box::new(FusionOfSeriesTransitions),
+                Box::new(FusionOfParallelTransitions),
+                Box::new(EliminationOfSelfLoopPlaces),
+            ];
+            let transition_rules: Vec<Box<dyn LpnTransitionRule>> = vec![
+                Box::new(EliminationOfSelfLoopTransitions),
+                Box::new(FusionOfParallelPlaces),
+            ];
             'outer: loop {
                 for place in 0..self.get_number_of_places() {
                     for rule in &place_rules {
-                        if rule.apply(self, place) {
+                        if rule.apply(self, place).is_some() {
+                            continue 'outer;
+                        }
+                    }
+                }
+
+                for transition in 0..self.get_number_of_transitions() {
+                    for rule in &transition_rules {
+                        if rule.apply(self, transition).is_some() {
                             continue 'outer;
                         }
                     }
@@ -368,54 +385,323 @@ mod labelled_petri_net {
     }
 
     trait LpnPlaceRule {
-        /// Apply the rule to the node; returns whether the rule changed the tree.
-        fn apply(&self, lpn: &mut LabelledPetriNet, place: usize) -> bool;
+        /// Apply the rule to the place; returns whether the rule changed the net.
+        fn apply(&self, lpn: &mut LabelledPetriNet, place: usize) -> Option<()>;
+    }
+
+    trait LpnTransitionRule {
+        /// Apply the rule to the transition; returns whether the rule changed the net.
+        fn apply(&self, lpn: &mut LabelledPetriNet, transition: TransitionIndex) -> Option<()>;
     }
 
     struct FusionOfSeriesPlaces;
 
     impl LpnPlaceRule for FusionOfSeriesPlaces {
-        fn apply(&self, lpn: &mut LabelledPetriNet, place: usize) -> bool {
+        fn apply(&self, lpn: &mut LabelledPetriNet, place: usize) -> Option<()> {
             //the place must have only one outgoing transition
-            if lpn.get_outgoing_transitions(place).unwrap().len() != 1 {
-                return false;
-            }
-            let transition = lpn.get_outgoing_transitions(place).unwrap()[0];
+            let transition = single_unit_arc(lpn.get_outgoing_transitions(place))?;
 
             //that transition must be silent
             if !lpn.is_transition_silent(transition) {
-                return false;
+                return None;
             }
 
             //the transition must have one outgoing place
-            if lpn.get_outgoing_places(transition).unwrap().len() != 1 {
-                return false;
-            }
+            let place_2 = single_unit_arc(lpn.get_outgoing_places(transition))?;
 
-            let place_2 = lpn.get_outgoing_places(transition).unwrap()[0];
+            //rule applies
+            log::info!("fusion of series places");
 
             //move intial marking from place to place_2
             if let Some(marking) = &mut lpn.initial_marking {
                 marking.increase(place_2, marking.get(place)).unwrap();
             }
 
-            //copy incoming edges of place to place_2
-            for (transition, cardinality) in lpn
+            //copy incoming arcs of place to place_2
+            let incoming = lpn
                 .get_incoming_transitions(place)
                 .unwrap()
-                .collect::<Vec<_>>()
-            {
-                let _ = lpn.add_transition_place_arc(transition, place_2, cardinality);
+                .collect::<Vec<_>>();
+            for (transition_2, cardinality) in incoming {
+                lpn.add_transition_place_arc(transition_2, place_2, cardinality)
+                    .unwrap();
             }
 
-            //remove transition (will also remove its edges)
+            //remove transition (will also remove its arcs)
             lpn.remove_transition(transition).unwrap();
+
+            //remove place (will also remove its arcs)
+            lpn.remove_place(place).unwrap();
+
+            Some(())
+        }
+    }
+
+    struct FusionOfSeriesTransitions;
+
+    impl LpnPlaceRule for FusionOfSeriesTransitions {
+        fn apply(&self, lpn: &mut LabelledPetriNet, place: usize) -> Option<()> {
+            //the place must have one incoming transition with cardinality 1
+            let transition = single_unit_arc(lpn.get_incoming_transitions(place))?;
+
+            //the place must have one outgoing transition with cardinality 1
+            let transition_2 = single_unit_arc(lpn.get_outgoing_transitions(place))?;
+
+            //place is not marked
+            if let Some(marking) = &lpn.initial_marking {
+                if marking.get(place) != 0 {
+                    return None;
+                }
+            }
+
+            //transition 2 must be silent
+            if !lpn.is_transition_silent(transition_2) {
+                return None;
+            }
+
+            //transition 2 must not have any other incoming arcs
+            if lpn.get_incoming_places(transition_2).unwrap().count() != 1 {
+                return None;
+            }
+
+            //rule applies
+            log::info!("fusion of series transitions");
+
+            //copy outgoing arcs of transition_2 to transition
+            let outgoing = lpn
+                .get_outgoing_places(transition_2)
+                .unwrap()
+                .collect::<Vec<_>>();
+            for (place_2, cardinality) in outgoing {
+                lpn.add_transition_place_arc(transition, place_2, cardinality)
+                    .unwrap();
+            }
 
             //remove place
             lpn.remove_place(place).unwrap();
 
-            true
+            //remove transition 2
+            lpn.remove_transition(transition_2).unwrap();
+
+            Some(())
         }
+    }
+
+    struct FusionOfParallelTransitions;
+
+    impl LpnPlaceRule for FusionOfParallelTransitions {
+        fn apply(&self, lpn: &mut LabelledPetriNet, place: usize) -> Option<()> {
+            for (transition_1, cardinality_1) in lpn
+                .get_incoming_transitions(place)
+                .unwrap()
+                .collect::<Vec<_>>()
+            {
+                for (transition_2, cardinality_2) in lpn
+                    .get_incoming_transitions(place)
+                    .unwrap()
+                    .collect::<Vec<_>>()
+                {
+                    if transition_1 != transition_2 && cardinality_1 == cardinality_2 {
+                        //transitions need to have the same label
+                        if lpn.get_transition_label(transition_1)
+                            != lpn.get_transition_label(transition_2)
+                        {
+                            break;
+                        }
+
+                        //transitions must have the same input arcs
+                        let mut in_1 = lpn
+                            .get_incoming_places(transition_1)
+                            .unwrap()
+                            .collect::<Vec<_>>();
+                        in_1.sort();
+                        let mut in_2 = lpn
+                            .get_incoming_places(transition_2)
+                            .unwrap()
+                            .collect::<Vec<_>>();
+                        in_2.sort();
+                        if in_1 != in_2 {
+                            break;
+                        }
+
+                        //transitions must have the same output arcs
+                        let mut out_1 = lpn
+                            .get_outgoing_places(transition_1)
+                            .unwrap()
+                            .collect::<Vec<_>>();
+                        out_1.sort();
+                        let mut out_2 = lpn
+                            .get_outgoing_places(transition_2)
+                            .unwrap()
+                            .collect::<Vec<_>>();
+                        out_2.sort();
+                        if out_1 != out_2 {
+                            break;
+                        }
+
+                        //rule applies
+                        lpn.remove_transition(transition_2).unwrap();
+
+                        return Some(());
+                    }
+                }
+            }
+
+            None
+        }
+    }
+
+    struct EliminationOfSelfLoopPlaces;
+
+    impl LpnPlaceRule for EliminationOfSelfLoopPlaces {
+        fn apply(&self, lpn: &mut LabelledPetriNet, place: usize) -> Option<()> {
+            //the place is marked
+            if let Some(marking) = &lpn.initial_marking {
+                if marking.get(place) == 0 {
+                    return None;
+                }
+            } else {
+                return None;
+            }
+
+            let mut in_ = lpn
+                .get_incoming_transitions(place)
+                .unwrap()
+                .collect::<Vec<_>>();
+            in_.sort();
+
+            let mut out_ = lpn
+                .get_outgoing_transitions(place)
+                .unwrap()
+                .collect::<Vec<_>>();
+            out_.sort();
+
+            //incoming transitions must be equal to outgoing transitions
+            if in_ != out_ {
+                return None;
+            }
+
+            //rule applies
+
+            lpn.remove_place(place).unwrap();
+
+            Some(())
+        }
+    }
+
+    struct EliminationOfSelfLoopTransitions;
+
+    impl LpnTransitionRule for EliminationOfSelfLoopTransitions {
+        fn apply(&self, lpn: &mut LabelledPetriNet, transition: TransitionIndex) -> Option<()> {
+            //the transition is silent
+            if !lpn.is_transition_silent(transition) {
+                return None;
+            }
+
+            let mut in_ = lpn
+                .get_incoming_places(transition)
+                .unwrap()
+                .collect::<Vec<_>>();
+            in_.sort();
+
+            let mut out_ = lpn
+                .get_outgoing_places(transition)
+                .unwrap()
+                .collect::<Vec<_>>();
+            out_.sort();
+
+            //incoming places must be equal to outgoing places
+            if in_ != out_ {
+                return None;
+            }
+
+            //rule applies
+
+            lpn.remove_transition(transition).unwrap();
+
+            Some(())
+        }
+    }
+
+    struct FusionOfParallelPlaces;
+
+    impl LpnTransitionRule for FusionOfParallelPlaces {
+        fn apply(&self, lpn: &mut LabelledPetriNet, transition: TransitionIndex) -> Option<()> {
+            for (place_1, _) in lpn.get_outgoing_places(transition).unwrap().collect::<Vec<_>>() {
+                for (place_2, _) in lpn.get_outgoing_places(transition).unwrap().collect::<Vec<_>>() {
+                    //check pairs only twice
+                    if place_1 <= place_2 {
+                        continue;
+                    }
+
+                    //places have the same marking
+                    if let Some(marking) = &lpn.initial_marking
+                        && marking.get(place_1) != marking.get(place_2)
+                    {
+                        continue;
+                    }
+
+                    //places have the same incoming arcs
+                    let mut in_1 = lpn
+                        .get_incoming_transitions(place_1)
+                        .unwrap()
+                        .collect::<Vec<_>>();
+                    in_1.sort();
+
+                    let mut in_2 = lpn
+                        .get_incoming_transitions(place_2)
+                        .unwrap()
+                        .collect::<Vec<_>>();
+                    in_2.sort();
+
+                    if in_1 != in_2 {
+                        continue;
+                    }
+
+                    //places have the same outgoing arcs
+                    let mut out_1 = lpn
+                        .get_outgoing_transitions(place_1)
+                        .unwrap()
+                        .collect::<Vec<_>>();
+                    out_1.sort();
+
+                    let mut out_2 = lpn
+                        .get_outgoing_transitions(place_2)
+                        .unwrap()
+                        .collect::<Vec<_>>();
+                    out_2.sort();
+
+                    if out_1 != out_2 {
+                        continue;
+                    }
+
+                    //rule applies
+
+                    lpn.remove_place(place_2).unwrap();
+
+                    return Some(());
+                }
+            }
+
+            None
+        }
+    }
+}
+
+pub fn single_unit_arc(it: Option<impl Iterator<Item = (usize, u64)>>) -> Option<usize> {
+    let mut it = it?;
+    if let Some((transition, cardinality)) = it.next() {
+        if cardinality != 1 {
+            None
+        } else {
+            if it.next().is_some() {
+                return None;
+            }
+
+            Some(transition)
+        }
+    } else {
+        None
     }
 }
 
