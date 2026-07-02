@@ -18,8 +18,15 @@ use ebi_objects::{
 use rand::seq::index;
 use std::collections::{HashMap, HashSet};
 
-pub trait PermutationTestMl {
-    fn permutation_test_ml(
+pub trait PermutationTestLogModel {
+    /// Perform a permutation test on the hypothesis that this log and the
+    /// stochastic model are derived from identical processes, and return the
+    /// p-value and whether the hypothesis was sustained.
+    ///
+    /// The model is sampled with the same number of traces as the log for each
+    /// permutation. Samples that cannot be represented as trace cardinalities
+    /// are discarded.
+    fn permutation_test_log_model(
         &mut self,
         model: &mut EbiTraitStochasticSemantics,
         number_of_samples: usize,
@@ -27,8 +34,8 @@ pub trait PermutationTestMl {
     ) -> Result<(Fraction, bool)>;
 }
 
-impl PermutationTestMl for dyn EbiTraitEventLog {
-    fn permutation_test_ml(
+impl PermutationTestLogModel for dyn EbiTraitEventLog {
+    fn permutation_test_log_model(
         &mut self,
         model: &mut EbiTraitStochasticSemantics,
         number_of_samples: usize,
@@ -36,14 +43,14 @@ impl PermutationTestMl for dyn EbiTraitEventLog {
     ) -> Result<(Fraction, bool)> {
         if number_of_samples == 0 {
             return Err(anyhow!(
-                "Cannot perform a model-log permutation test without samples."
+                "Cannot perform a log-model permutation test without samples."
             ));
         }
 
         let number_of_traces = self.number_of_traces();
         if number_of_traces == 0 {
             return Err(anyhow!(
-                "Cannot perform a model-log permutation test on an empty log."
+                "Cannot perform a log-model permutation test on an empty log."
             ));
         }
 
@@ -57,14 +64,14 @@ impl PermutationTestMl for dyn EbiTraitEventLog {
 
         let mut errors = 0;
 
-        log::info!("Perform the model-log permutation test");
+        log::info!("Perform the log-model permutation test");
         let progress_bar = EbiCommand::get_progress_bar_ticks(number_of_samples);
 
         let mut e = 0;
         for _ in 0..number_of_samples {
             // Keep this loop serial: downstream conformance computation can parallelise internally.
             let result = iteration(&mut log_language, model, number_of_traces)
-                .with_context(|| "Compute one model-log permutation test iteration.");
+                .with_context(|| "Compute one log-model permutation test iteration.");
 
             progress_bar.inc(1);
 
@@ -105,7 +112,7 @@ fn iteration(
     let log_language_trait: &mut dyn EbiTraitFiniteStochasticLanguage = log_language;
     let base_conformance = sample_language_trait
         .earth_movers_stochastic_conformance(log_language_trait)
-        .context("Compute base model-log conformance.")?;
+        .context("Compute base log-model conformance.")?;
 
     let (mut permuted_a, mut permuted_b) =
         permuted_split(log_language, &sample_language, number_of_traces)?;

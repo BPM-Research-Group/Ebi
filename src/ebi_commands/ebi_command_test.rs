@@ -16,7 +16,7 @@ use crate::{
     techniques::{
         bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
         permutation_test::PermutationTest,
-        permutation_test_ml::PermutationTestMl,
+        permutation_test_log_model::PermutationTestLogModel,
     },
     tests::test_ebi_command,
 };
@@ -35,7 +35,7 @@ pub const EBI_TEST: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[
         &EBI_BOOTSTRAP_TEST,
-        &EBI_PERMUTATION_TEST_ML,
+        &EBI_PERMUTATION_TEST_LOG_MODEL,
         &EBI_TEST_LOG_ATTRIBUTE,
     ],
 };
@@ -251,9 +251,9 @@ pub const EBI_PERMUTATION_TEST: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
-pub const EBI_PERMUTATION_TEST_ML: EbiCommand = EbiCommand::Command {
-    name_short: "perm-ml",
-    name_long: Some("permutation-test-ml"),
+pub const EBI_PERMUTATION_TEST_LOG_MODEL: EbiCommand = EbiCommand::Command {
+    name_short: "perm-l-m",
+    name_long: Some("permutation-test-log-model"),
     explanation_short:
         "Test the hypothesis that the log and model are derived from identical processes.",
     explanation_long: None,
@@ -288,8 +288,8 @@ pub const EBI_PERMUTATION_TEST_ML: EbiCommand = EbiCommand::Command {
         let p_value_threshold = inputs.remove(0).to_type::<Fraction>()?;
 
         let (value, sustained) = log
-            .permutation_test_ml(&mut model, *number_of_samples, &p_value_threshold)
-            .context("Run model-log permutation test.")?;
+            .permutation_test_log_model(&mut model, *number_of_samples, &p_value_threshold)
+            .context("Run log-model permutation test.")?;
 
         let mut f = vec![];
         writeln!(f, "p-value \t {}", value)?;
