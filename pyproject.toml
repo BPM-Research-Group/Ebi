@@ -10,7 +10,8 @@ authors = [
   {name = "Philipp Moch"},
   {name = "Leonhard Mühlmeyer"},
   {name = "Adam Burke"},
-  {name = "Renas Demir"}
+  {name = "Renas Demir"},
+  {name = "Felix Britzelmaier"}
 ]
 description = "Ebi: a stochastic process mining utility"
 readme = "README.md"

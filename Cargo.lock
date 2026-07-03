@@ -809,7 +809,7 @@ dependencies = [
  "priority-queue",
  "process_mining",
  "pyo3",
- "quick-xml 0.40.1",
+ "quick-xml 0.41.0",
  "rand 0.10.2",
  "rand_chacha 0.10.0",
  "rayon",
