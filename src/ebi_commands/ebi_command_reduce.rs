@@ -21,7 +21,7 @@ pub const EBI_REDUCE_PETRI_NET: EbiCommand = EbiCommand::Command {
     name_long: Some("labelled-petri-net"),
     explanation_short: "Reduce a labelled Petri net language-equivalently.",
     explanation_long: Some(
-        "Reduce a labelled Petri net language-equivalently, using the Murata rules, which remove certain places and silent transitions.",
+        "Reduce a labelled Petri net language-equivalently, using adapted Murata rules, which remove certain places and silent transitions.",
     ),
     latex_link: Some("\\cite{murata1989petri}"),
     cli_command: None,
