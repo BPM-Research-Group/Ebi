@@ -8,12 +8,15 @@ use crate::{
     },
     ebi_info,
     ebi_traits::{
+        ebi_trait_event_log::EbiTraitEventLog,
         ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
     techniques::{
         bootstrap_test::{BootstrapTest, StatisticalTestsLogCategoricalAttribute},
         permutation_test::PermutationTest,
+        permutation_test_log_model::PermutationTestLogModel,
     },
 };
 use ebi_objects::{
@@ -29,7 +32,11 @@ pub const EBI_TEST: EbiCommand = EbiCommand::Group {
     name_long: Some("test"),
     explanation_short: "Test a hypothesis.",
     explanation_long: None,
-    children: &[&EBI_TEST_BOOTSTRAP, &EBI_TEST_LOG_ATTRIBUTE],
+    children: &[
+        &EBI_TEST_BOOTSTRAP,
+        &EBI_PERMUTATION_TEST_LOG_MODEL,
+        &EBI_TEST_LOG_ATTRIBUTE,
+    ],
 };
 
 pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
@@ -234,6 +241,70 @@ pub const EBI_PERMUTATION_TEST: EbiCommand = EbiCommand::Command {
             writeln!(
                 f,
                 "The data provides enough evidence to conclude that the logs are derived from different processes.\nReject the null-hypothesis.",
+            )?;
+        };
+
+        Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
+    },
+    output_type: &EbiOutputType::String,
+};
+
+pub const EBI_PERMUTATION_TEST_LOG_MODEL: EbiCommand = EbiCommand::Command {
+    name_short: "perm-l-m",
+    name_long: Some("permutation-test-log-model"),
+    explanation_short:
+        "Test the hypothesis that the log and model are derived from identical processes.",
+    explanation_long: None,
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::EventLog)],
+        &[&EbiInputType::Trait(EbiTrait::StochasticSemantics)],
+        &[&EbiInputType::Usize(
+            Some(1),
+            None,
+            Some(DEFAULT_NUMBER_OF_SAMPLES),
+        )],
+        &[&EbiInputType::Fraction(
+            Some(ConstFraction::zero()),
+            Some(ConstFraction::one()),
+            Some(DEFAULT_P_VALUE),
+        )],
+    ],
+    input_names: &["LOG", "MODEL", "SAMPLES", "P-VALUE"],
+    input_helps: &[
+        "The event log.",
+        "The stochastic model to sample from.",
+        "The number of samples/permutations to execute.",
+        "The threshold p-value",
+    ],
+    execute: |mut inputs, _| {
+        let mut log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
+        let mut model = inputs.remove(0).to_type::<EbiTraitStochasticSemantics>()?;
+        let number_of_samples = inputs.remove(0).to_type::<usize>()?;
+        let p_value_threshold = inputs.remove(0).to_type::<Fraction>()?;
+
+        let (value, sustained) = log
+            .permutation_test_log_model(&mut model, *number_of_samples, &p_value_threshold)
+            .context("Run log-model permutation test.")?;
+
+        let mut f = vec![];
+        writeln!(f, "p-value \t {}", value)?;
+        writeln!(
+            f,
+            "Null-hypothesis: the log and model follow identical processes."
+        )?;
+
+        if sustained {
+            writeln!(
+                f,
+                "The data does not provide enough evidence to make a claim on this hypothesis.\nDo not reject the null-hypothesis."
+            )?;
+        } else {
+            writeln!(
+                f,
+                "The data provides enough evidence to conclude that the log and model are derived from different processes.\nReject the null-hypothesis.",
             )?;
         };
 
