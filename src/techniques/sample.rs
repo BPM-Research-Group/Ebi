@@ -291,7 +291,7 @@ mod tests {
             ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
         },
     };
-    use ebi_objects::FiniteStochasticLanguage;
+    use ebi_objects::{FiniteStochasticLanguage, StochasticDirectlyFollowsModel};
     use std::fs;
 
     use super::Sampler;
@@ -365,5 +365,15 @@ mod tests {
                 assert_eq!(trace.len(), 2);
             }
         }
+    }
+
+    #[test]
+    fn sdfm_sample() {
+        let fin = fs::read_to_string("./testfiles/aa-ab-ba.sdfm").unwrap();
+        let sdfm = fin.parse::<StochasticDirectlyFollowsModel>().unwrap();
+
+        let sem = sdfm.to_stochastic_semantics_trait();
+
+        sem.sample(10).unwrap();
     }
 }

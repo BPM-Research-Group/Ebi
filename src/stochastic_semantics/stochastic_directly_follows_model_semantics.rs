@@ -1,11 +1,10 @@
+use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;
 use ebi_objects::{
     AutomatonState, StochasticAutomatonSemantics, StochasticDirectlyFollowsModel,
     anyhow::{Result, anyhow},
     ebi_arithmetic::Fraction,
     ebi_objects::labelled_petri_net::TransitionIndex,
 };
-
-use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;
 
 impl StochasticSemantics for StochasticDirectlyFollowsModel {
     type StoSemState = AutomatonState;

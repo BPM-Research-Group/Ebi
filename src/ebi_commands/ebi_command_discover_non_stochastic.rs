@@ -261,9 +261,10 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER: EbiCommand = EbiCommand::Comm
     latex_link: Some("\\cite{DBLP:journals/kais/AugustoCDRP19}"),
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
-    &[&EbiInputType::Fraction(Some(ConstFraction::zero()), Some(ConstFraction::one()), Some(ConstFraction::of(1, 10)))],
-    &[&EbiInputType::Fraction(Some(ConstFraction::zero()), Some(ConstFraction::one()), Some(ConstFraction::of(4, 10)))]],
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Fraction(Some(ConstFraction::zero()), Some(ConstFraction::one()), Some(ConstFraction::of(1, 10)))],
+        &[&EbiInputType::Fraction(Some(ConstFraction::zero()), Some(ConstFraction::one()), Some(ConstFraction::of(4, 10)))]],
     input_names: &["LOG", "CONC", "FREQ"],
     input_helps: &["The event log.", "Parallelism threshold", "Frequency threshold"],
     execute: |mut inputs, _| {

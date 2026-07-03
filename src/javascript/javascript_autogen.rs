@@ -654,6 +654,14 @@ pub fn test_log_categorical_attribute(javascript_inputs: Vec<JavascriptInput>, e
 }
 
 #[wasm_bindgen]
+pub fn test_permutation_test_log_model(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL;
+    execute_javascript_command(command, javascript_inputs, "test_permutation_test_log_model", exporter_file_extension);
+}
+
+#[wasm_bindgen]
 pub fn visualise_graph(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = 
@@ -2901,6 +2909,12 @@ mod tests {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// trait finite stochastic language#./testfiles/svn60.xes
+			,
+			JavascriptInput::from("0.1".to_string())
+			// fraction 0.1
+			,
+			JavascriptInput::from("0.4".to_string())
+			// fraction 0.4
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_split_miner(inputs, ".xes");
@@ -2911,6 +2925,12 @@ mod tests {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
 			// trait finite stochastic language#./testfiles/a-b.csv
+			,
+			JavascriptInput::from("0.1".to_string())
+			// fraction 0.1
+			,
+			JavascriptInput::from("0.4".to_string())
+			// fraction 0.4
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_split_miner(inputs, ".xes");
@@ -2921,6 +2941,12 @@ mod tests {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
 			// trait finite stochastic language#./testfiles/a-b-double.xes
+			,
+			JavascriptInput::from("0.1".to_string())
+			// fraction 0.1
+			,
+			JavascriptInput::from("0.4".to_string())
+			// fraction 0.4
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_split_miner(inputs, ".xes");
@@ -3448,6 +3474,63 @@ mod tests {
 
 		];
         crate::javascript::javascript_autogen::test_log_categorical_attribute(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn test_permutation_test_log_model_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log#./testfiles/svn60.xes
+			,
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
+			// trait stochastic semantics#./testfiles/seq(a-xor(b-c)).sptree
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+			,
+			JavascriptInput::from("0.05".to_string())
+			// fraction 0.05
+
+		];
+        crate::javascript::javascript_autogen::test_permutation_test_log_model(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn test_permutation_test_log_model_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log#./testfiles/svn60.xes
+			,
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_markovian_abstraction.slpn").unwrap())
+			// trait stochastic semantics#./testfiles/simple_markovian_abstraction.slpn
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+			,
+			JavascriptInput::from("0.05".to_string())
+			// fraction 0.05
+
+		];
+        crate::javascript::javascript_autogen::test_permutation_test_log_model(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn test_permutation_test_log_model_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log#./testfiles/svn60.xes
+			,
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait stochastic semantics#./testfiles/svn60.xes
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+			,
+			JavascriptInput::from("0.05".to_string())
+			// fraction 0.05
+
+		];
+        crate::javascript::javascript_autogen::test_permutation_test_log_model(inputs, ".xes");
     }
 
 	#[test]

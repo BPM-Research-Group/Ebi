@@ -32943,7 +32943,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/a-b-double.xes"			
+				"trait finite stochastic language#./testfiles/a-b-double.xes",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -32951,7 +32953,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -32971,7 +32975,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/a-b.csv"			
+				"trait finite stochastic language#./testfiles/a-b.csv",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -32979,7 +32985,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -32999,7 +33007,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/a-b.slang"			
+				"trait finite stochastic language#./testfiles/a-b.slang",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33007,7 +33017,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33027,7 +33039,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/a-b.xes"			
+				"trait finite stochastic language#./testfiles/a-b.xes",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33035,7 +33049,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33055,7 +33071,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/a-b.xes.gz"			
+				"trait finite stochastic language#./testfiles/a-b.xes.gz",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33063,7 +33081,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33083,7 +33103,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/a-b_multiple_separators.csv"			
+				"trait finite stochastic language#./testfiles/a-b_multiple_separators.csv",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33091,7 +33113,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33111,7 +33135,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/aa-ab-ba.slang"			
+				"trait finite stochastic language#./testfiles/aa-ab-ba.slang",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33119,7 +33145,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33139,7 +33167,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/aa.slang"			
+				"trait finite stochastic language#./testfiles/aa.slang",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33147,7 +33177,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33167,7 +33199,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang"			
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33175,7 +33209,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33195,7 +33231,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang"			
+				"trait finite stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33203,7 +33241,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33223,7 +33263,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/ba-aa-ab.slang"			
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33231,7 +33273,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33251,7 +33295,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/ba.slang"			
+				"trait finite stochastic language#./testfiles/ba.slang",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33259,7 +33305,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33279,7 +33327,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/bb.slang"			
+				"trait finite stochastic language#./testfiles/bb.slang",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33287,7 +33337,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33307,7 +33359,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/bpic12-a-sample.slang"			
+				"trait finite stochastic language#./testfiles/bpic12-a-sample.slang",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33315,7 +33369,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a-sample.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33335,7 +33391,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/empty.slang"			
+				"trait finite stochastic language#./testfiles/empty.slang",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33343,7 +33401,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33363,7 +33423,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/empty.xes"			
+				"trait finite stochastic language#./testfiles/empty.xes",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33371,7 +33433,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33391,7 +33455,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/empty_trace.slang"			
+				"trait finite stochastic language#./testfiles/empty_trace.slang",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33399,7 +33465,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -33419,7 +33487,9 @@ mod tests{
 		(
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
-				"trait finite stochastic language#./testfiles/fig_a.xes"			
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"fraction 0.1",
+				"fraction 0.4"			
 			]
 		),
 		*/
@@ -33427,7 +33497,9 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let inputs = vec![input0];
+		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
 			match (execute)(inputs, None) {
@@ -37800,6 +37872,657 @@ mod tests{
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+
+
+	// ==== command perm-l-m ====
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_0() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/a-aa-bb.slpn",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-aa-bb.slpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_1() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/a-b-double.xes",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_2() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/a-b.csv",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_3() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/a-b.slang",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_4() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/a-b.xes",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_5() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/a-b.xes.gz",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_6() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/a-b_multiple_separators.csv",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_7() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/aa-aaa-bb.slpn",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-aaa-bb.slpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_8() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/aa-ab-ba.dfg",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.dfg").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/aa-ab-ba.sdfa",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfa").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/aa-ab-ba.sdfm",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sdfm").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/aa-ab-ba.slang",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/aa-ab-ba.snfa",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.snfa").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_13() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/aa-ab-ba_ali.slpn",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_ali.slpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_14() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/aa-ab-ba_occ-f64.slpn",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ-f64.slpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_15() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/aa-ab-ba_occ.slpn",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_occ.slpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_16() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/aa-ab-ba_uni.slpn",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba_uni.slpn").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_tst_perm_l_m_test_17() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_PERMUTATION_TEST_LOG_MODEL,
+			&[
+				"trait event log#./testfiles/a-b-double.xes",
+				"trait stochastic semantics#./testfiles/aa.slang",
+				"usize 10",
+				"fraction 0.05"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
+		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input1 = EbiInput::Trait(object1, file_handler1);
+		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
+		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let inputs = vec![input0, input1, input2, input3];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();

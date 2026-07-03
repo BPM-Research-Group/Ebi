@@ -125,7 +125,7 @@ fn step_1_dfg(
         {
             let weight_ab = weight;
             let weight_ba = dfg.edge_weight(target, source);
-            if (weight_ab - &weight_ba).abs() / (weight_ab + &weight_ba) <= parameters.epsilon_parallelism
+            if (weight_ab - weight_ba).abs() / (weight_ab + weight_ba) <= parameters.epsilon_parallelism
             //paper says "<", but example suggests "<="
             {
                 //activities are concurrent
@@ -138,7 +138,7 @@ fn step_1_dfg(
     let mut remove_edges = vec![];
     for (a, (b, weight)) in dfg.edges() {
         if concurrent_activities.contains(&PairSet::new(a, b))
-            || (dfg.contains_edge(b, a) && *weight < dfg.edge_weight(b, a))
+            || (dfg.contains_edge(b, a) && weight < dfg.edge_weight(b, a))
         {
             remove_edges.push((a, b));
         }
