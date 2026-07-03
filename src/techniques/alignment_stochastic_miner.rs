@@ -129,8 +129,7 @@ mod tests {
     use std::fs;
 
     use ebi_objects::{
-        BusinessProcessModelAndNotation, FiniteStochasticLanguage, HasActivityKey,
-        LabelledPetriNet, TranslateActivityKey, ebi_bpmn::Token,
+        BusinessProcessModelAndNotation, FiniteStochasticLanguage, HasActivityKey, LabelledPetriNet, TranslateActivityKey, ebi_bpmn::{GlobalIndex, Token},
     };
 
     use crate::techniques::alignment_stochastic_miner::AlignmentMiner;
@@ -168,7 +167,7 @@ mod tests {
             assert_eq!(bpmn.get_enabled_transitions(&marking).unwrap(), vec![0]);
             assert_eq!(
                 bpmn.transition_2_produced_tokens(0, &marking).unwrap(),
-                vec![Token::SequenceFlow((7, ()))]
+                vec![Token::SequenceFlow(GlobalIndex(7))]
             );
             bpmn.execute_transition(&mut marking, 0).unwrap();
 
@@ -178,7 +177,7 @@ mod tests {
             assert_eq!(bpmn.get_enabled_transitions(&marking).unwrap(), vec![2]);
             assert_eq!(
                 bpmn.transition_2_produced_tokens(2, &marking).unwrap(),
-                vec![Token::SequenceFlow((9, ()))]
+                vec![Token::SequenceFlow(GlobalIndex(9))]
             );
             bpmn.execute_transition(&mut marking, 2).unwrap();
         }

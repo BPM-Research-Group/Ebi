@@ -10,14 +10,14 @@ use crate::{
         ebi_trait_object::EbiTraitObject,
     },
     ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage,
+        ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
     techniques::{
         flower_miner::{FlowerMinerDFA, FlowerMinerTree},
         inductive_miner::{InductiveMiner, InductiveMinerInfrequent},
         prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
-        // split_miner::SplitMiner,
+        split_miner::SplitMiner,
         trace_model_miner::TraceModelMinerTree,
     },
 };
@@ -38,7 +38,7 @@ pub const EBI_DISCOVER_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
         &EBI_DISCOVER_NON_STOCHASTIC_TRACE_MODEL,
         &EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER,
         &EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
-        // &EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
+        &EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
     ],
 };
 
@@ -255,24 +255,28 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT: EbiCommand = E
     output_type: &EbiOutputType::ObjectType(EbiObjectType::ProcessTree),
 };
 
-// pub const EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER: EbiCommand = EbiCommand::Command {
-//     name_short: "sm",
-//     name_long: Some("split-miner"),
-//     explanation_short: "Applly the Split Miner 1.0 algorithm.",
-//     explanation_long: None,
-//     latex_link: Some("\\cite{}"),
-//     cli_command: None,
-//     exact_arithmetic: true,
-//     input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)]],
-//     input_names: &["LOG"],
-//     input_helps: &["The event log."],
-//     execute: |mut inputs, _| {
-//         let log = inputs
-//             .remove(0)
-//             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
-//         Ok(EbiOutput::Object(
-//             EbiObject::BusinessProcessModelAndNotation(log.split_miner()),
-//         ))
-//     },
-//     output_type: &EbiOutputType::ObjectType(EbiObjectType::BusinessProcessModelAndNotation),
-// };
+pub const EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER: EbiCommand = EbiCommand::Command {
+    name_short: "sm",
+    name_long: Some("split-miner"),
+    explanation_short: "Apply a simplified version of the Split Miner algorithm.",
+    explanation_long: Some(
+        "Apply a simplified version of the Split Miner algorithm.
+        In this implementation, it is not necessary to have a unique start and end activity.
+        For now, this implementation does not reduce splits or SESE fragments (Algorithms 8 and 9).",
+    ),
+    latex_link: Some("\\cite{DBLP:journals/kais/AugustoCDRP19}"),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)]],
+    input_names: &["LOG"],
+    input_helps: &["The event log."],
+    execute: |mut inputs, _| {
+        let log = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        Ok(EbiOutput::Object(
+            EbiObject::BusinessProcessModelAndNotation(log.split_miner()?),
+        ))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::BusinessProcessModelAndNotation),
+};

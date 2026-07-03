@@ -643,8 +643,8 @@ mod cut_finding {
             for j in (i + 1)..n {
                 let (a, b) = (activities[i], activities[j]);
                 if !components.same_component(a, b) {
-                    let a_to_b = info.dfg.edge_weight_activities(a, b).is_positive();
-                    let b_to_a = info.dfg.edge_weight_activities(b, a).is_positive();
+                    let a_to_b = info.dfg.edge_weight(a, b).is_positive();
+                    let b_to_a = info.dfg.edge_weight(b, a).is_positive();
                     if !(a_to_b && b_to_a) {
                         components.merge_components(a, b);
                     }
@@ -759,11 +759,11 @@ mod cut_finding {
             if components.same_component(sub_end, pivot) {
                 continue;
             }
-            if info.dfg.start_activities().any(|s| {
-                info.dfg
-                    .edge_weight_activities(sub_end, s)
-                    .is_not_positive()
-            }) {
+            if info
+                .dfg
+                .start_activities()
+                .any(|s| info.dfg.edge_weight(sub_end, s).is_not_positive())
+            {
                 components.merge_components(sub_end, pivot);
             }
         }
@@ -772,11 +772,11 @@ mod cut_finding {
             if components.same_component(sub_start, pivot) {
                 continue;
             }
-            if info.dfg.end_activities().any(|e| {
-                info.dfg
-                    .edge_weight_activities(e, sub_start)
-                    .is_not_positive()
-            }) {
+            if info
+                .dfg
+                .end_activities()
+                .any(|e| info.dfg.edge_weight(e, sub_start).is_not_positive())
+            {
                 components.merge_components(sub_start, pivot);
             }
         }
@@ -1024,11 +1024,14 @@ mod find_fall_throughs {
 }
 
 mod log_info {
-    use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
+    use crate::{
+        ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+        techniques::directly_follows_graph_abstractor::DirectlyFollowsAbstractor,
+    };
     use ebi_objects::{
-        Activity, DirectlyFollowsGraph, FiniteStochasticLanguage, HasActivityKey,
-        IntoRefTraceIterator, IntoRefTraceProbabilityIterator, ebi_arithmetic::Fraction,
-        ebi_arithmetic::Zero,
+        Activity, DirectlyFollowsGraph, FiniteStochasticLanguage, IntoRefTraceIterator,
+        IntoRefTraceProbabilityIterator,
+        ebi_arithmetic::{Fraction, Zero},
     };
     use intmap::IntMap;
     use std::collections::HashSet;
@@ -1050,33 +1053,17 @@ mod log_info {
         ($t:ty) => {
             impl ComputeLogInfo for $t {
                 fn compute_log_info(&self) -> LogInfo {
-                    let mut dfg = DirectlyFollowsGraph::new(self.activity_key().clone());
+                    let dfg = self.abstract_to_directly_follows_graph();
                     let mut activities = HashSet::new();
                     let mut total_traces = Fraction::zero();
                     let mut activity_instances = Fraction::zero();
 
-                    //dfg
+                    //basic data
                     for (trace, probability) in self.iter_traces_probabilities() {
                         total_traces += probability;
-                        let mut last_activity = None;
                         for &activity in trace {
                             activities.insert(activity);
                             activity_instances += probability;
-                            match last_activity {
-                                Some(prev) => dfg.add_edge(prev, activity, probability),
-                                None => {
-                                    dfg.add_start_activity(activity, probability);
-                                }
-                            }
-                            last_activity = Some(activity);
-                        }
-                        match last_activity {
-                            Some(a) => {
-                                dfg.add_end_activity(a, probability);
-                            }
-                            None => {
-                                dfg.add_empty_trace(probability);
-                            }
                         }
                     }
 
@@ -1189,7 +1176,7 @@ pub fn filter_log_info(
                 *activity,
                 &parameters.noise_filtering
                     * &(result.dfg.end_activity_weight(*activity)
-                        + result
+                        + &result
                             .dfg
                             .outgoing_edges(*activity)
                             .into_iter()
@@ -1207,7 +1194,7 @@ pub fn filter_log_info(
 
         //remove end activities
         for activity in &result.activities {
-            if &result.dfg.end_activity_weight(*activity)
+            if result.dfg.end_activity_weight(*activity)
                 < activity_2_threshold.get(*activity).unwrap()
             {
                 result.dfg.remove_end_activity(*activity);

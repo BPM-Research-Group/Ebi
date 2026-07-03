@@ -74,8 +74,8 @@ impl EdgeDifferenceNoFrequencies for DirectlyFollowsGraph {
 
         for &a in &activities {
             for &b in &activities {
-                let e1 = self.edge_weight_activities(*a, *b);
-                let e2 = other.edge_weight_activities(*a, *b);
+                let e1 = self.edge_weight(*a, *b);
+                let e2 = other.edge_weight(*a, *b);
 
                 let p1 = is_present(&e1);
                 let p2 = is_present(&e2);
