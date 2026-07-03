@@ -16,7 +16,7 @@ use ebi_objects::{
     TranslateActivityKey,
 };
 use rand::seq::index;
-use std::collections::{HashMap, HashSet};
+use std::collections::HashSet;
 
 pub trait PermutationTestLogModel {
     /// Perform a permutation test on the hypothesis that this log and the
@@ -137,8 +137,8 @@ fn permuted_split(
         .into_iter()
         .collect::<HashSet<_>>();
 
-    let mut traces_a = HashMap::new();
-    let mut traces_b = HashMap::new();
+    let mut traces_a = FiniteStochasticLanguage::new_hashmap();
+    let mut traces_b = FiniteStochasticLanguage::new_hashmap();
     let trace_weight = Fraction::from((1, half_size));
 
     let mut pool_index = 0;
