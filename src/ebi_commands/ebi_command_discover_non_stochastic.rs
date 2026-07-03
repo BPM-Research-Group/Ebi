@@ -261,7 +261,8 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER: EbiCommand = EbiCommand::Comm
     explanation_short: "Apply a simplified version of the Split Miner algorithm.",
     explanation_long: Some(
         "Apply a simplified version of the Split Miner algorithm.
-        For now, this implementation does not reduce using SESE fragments (Algorithm 9).",
+        In this implementation, it is not necessary to have a unique start and end activity.
+        For now, this implementation does not reduce splits or SESE fragments (Algorithms 8 and 9).",
     ),
     latex_link: Some("\\cite{DBLP:journals/kais/AugustoCDRP19}"),
     cli_command: None,

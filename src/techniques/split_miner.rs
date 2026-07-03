@@ -52,7 +52,9 @@ pub fn split_miner(
 
     let filtered_pruned_dfg = algorithm_1_generate_filtered_dfg(parameters, pruned_dfg)?;
 
-    let initial_bpmn = algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg)?;
+    let mut initial_bpmn = algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg)?;
+
+    process_loops(&mut initial_bpmn)?;
 
     initial_bpmn.bpmn_creator.to_bpmn()
 }
@@ -163,6 +165,7 @@ fn algorithm_1_generate_filtered_dfg(
     //we do not have explicit start and end
 
     //line 8
+    let zero = Fraction::zero();
     for t in dfg.activities() {
         c_f.insert(t, Fraction::zero());
         c_b.insert(t, Fraction::zero());
@@ -171,13 +174,13 @@ fn algorithm_1_generate_filtered_dfg(
             .incoming_edges(t)
             .map(|(_, weight)| weight)
             .max()
-            .and_if_not("Activity has no incoming edges.")?;
+            .unwrap_or(&zero);
         let f_o = dfg
             .outgoing_edges(t)
             .iter()
             .map(|(_, weight)| *weight)
             .max()
-            .and_if_not("Activity has no outgoing edges.")?;
+            .unwrap_or(&zero);
         f.insert(f_i);
         f.insert(f_o);
     }
@@ -397,12 +400,11 @@ fn algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg: FilteredPrunedDdg) -> R
 /// Algorithm 5
 fn algorithm_5_discover_splits(initial_bpmn: &mut InitialBPMN) -> Result<()> {
     let InitialBPMN {
-        self_loops,
-        short_loops,
         concurrent_tasks: concurrent_activities,
         activity_2_task,
         bpmn_creator,
         process,
+        ..
     } = initial_bpmn;
 
     for (activity, task) in activity_2_task.iter() {
@@ -626,12 +628,10 @@ fn algorithm_7_discover_and_splits(
 
 fn algorithm_8_discover_joins(initial_bpmn: &mut InitialBPMN) -> Result<()> {
     let InitialBPMN {
-        self_loops,
-        short_loops,
-        concurrent_tasks: concurrent_activities,
         activity_2_task,
         bpmn_creator,
         process,
+        ..
     } = initial_bpmn;
 
     //todo: implement the actual algorithm 8 of the paper, which uses SESE fragments.
@@ -675,15 +675,32 @@ fn algorithm_8_discover_joins(initial_bpmn: &mut InitialBPMN) -> Result<()> {
     Ok(())
 }
 
-fn algorithm_9_replace_ors(initial_bpmn: &mut InitialBPMN) -> Result<()> {
+fn algorithm_9_replace_ors(_initial_bpmn: &mut InitialBPMN) -> Result<()> {
+    Ok(())
+}
+
+fn process_loops(initial_bpmn: &mut InitialBPMN) -> Result<()> {
     let InitialBPMN {
         self_loops,
-        short_loops,
-        concurrent_tasks: concurrent_activities,
         activity_2_task,
         bpmn_creator,
         process,
+        ..
     } = initial_bpmn;
+
+    for activity in self_loops {
+        let task = activity_2_task
+            .get(*activity)
+            .and_if_not("Activity not found.")?;
+
+        let pre_gateway = bpmn_creator.add_gateway(*process, GatewayType::Exclusive)?;
+        bpmn_creator.swap_incoming_sequence_flows(*task, pre_gateway)?;
+        bpmn_creator.add_sequence_flow(pre_gateway, *task)?;
+
+        let post_gateway = bpmn_creator.add_gateway(*process, GatewayType::Exclusive)?;
+        bpmn_creator.swap_outgoing_sequence_flows(*task, post_gateway)?;
+        bpmn_creator.add_sequence_flow(*task, post_gateway)?;
+    }
 
     Ok(())
 }
