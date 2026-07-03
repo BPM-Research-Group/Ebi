@@ -49,7 +49,7 @@
 
 //     Fraction::set_exact_globally(true);
 // }
-#[cfg(test)]
+
 use crate::{
     ebi_framework::{
         ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
@@ -57,10 +57,8 @@ use crate::{
     },
     multiple_reader::MultipleReader,
 };
-#[cfg(test)]
 use std::fs::{self, DirEntry, File};
 
-#[cfg(test)]
 pub fn get_all_test_files() -> Vec<(
     EbiInput,
     Option<EbiObjectImporter>,
@@ -76,7 +74,6 @@ pub fn get_all_test_files() -> Vec<(
     result
 }
 
-#[cfg(test)]
 pub fn get_all_test_files_for_file(
     file: DirEntry,
 ) -> Vec<(
@@ -173,7 +170,6 @@ pub fn get_all_test_files_for_file(
     result
 }
 
-#[cfg(test)]
 pub fn should_file_be_tested(
     file: &DirEntry,
     importer: &EbiObjectImporter,
@@ -192,21 +188,6 @@ pub fn should_file_be_tested(
         && (file.file_name().into_string().unwrap() == "empty.ptree"
             || file.file_name().into_string().unwrap() == "empty_2.ptree"))
 }
-
-macro_rules! test_ebi_command {
-    ($name:ident) => {
-        #[cfg(test)]
-        pastey::paste! {
-            #[test]
-            #[ntest::timeout(1000000)]
-            #[allow(non_snake_case)]
-            fn [<test_ebi_command_ $name>]() {
-                crate::ebi_framework::ebi_command::tests::ebi_command_test(&$name);
-            }
-        }
-    };
-}
-pub(crate) use test_ebi_command;
 
 #[cfg(test)]
 pub mod tests {
@@ -231,7 +212,7 @@ pub mod tests {
 
     #[test]
     fn objects() {
-        for (input, _, _, _) in crate::tests::get_all_test_files() {
+        for (input, _, _, _) in crate::tests::tests::get_all_test_files() {
             if let EbiInput::Object(object, _) = input {
                 object.get_type();
                 object.to_string();
@@ -243,7 +224,7 @@ pub mod tests {
 
     #[test]
     fn all_infoable() {
-        for (input, _, _, _) in crate::tests::get_all_test_files() {
+        for (input, _, _, _) in crate::tests::tests::get_all_test_files() {
             if let EbiInput::Object(object, _) = input {
                 let mut f = vec![];
                 object.info(&mut f).unwrap();
@@ -256,7 +237,7 @@ pub mod tests {
         let fin = fs::read_to_string("testfiles/empty.dfa").unwrap();
         let dfa = fin.parse::<DeterministicFiniteAutomaton>().unwrap();
 
-        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics_trait() {
+        if let EbiTraitSemantics::AutomatonState(semantics) = dfa.to_semantics_trait() {
             assert!(semantics.get_initial_state().is_none());
         } else {
             assert!(false);
@@ -317,7 +298,7 @@ pub mod tests {
             .parse::<StochasticDeterministicFiniteAutomaton>()
             .unwrap();
 
-        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics_trait() {
+        if let EbiTraitSemantics::AutomatonState(semantics) = dfa.to_semantics_trait() {
             assert!(semantics.get_initial_state().is_none());
         } else {
             assert!(false);

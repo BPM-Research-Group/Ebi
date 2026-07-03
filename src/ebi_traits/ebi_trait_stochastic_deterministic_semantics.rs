@@ -4,15 +4,13 @@ use crate::{
         ebi_trait_object::EbiTraitObject, trait_importers::ToStochasticDeterministicSemanticsTrait,
     },
     semantics::labelled_petri_net_semantics::LPNMarking,
-    techniques::{
-        deterministic_semantics_for_stochastic_semantics::PMarking,
-        infinitely_many_traces::InfinitelyManyTraces,
-    },
+    stochastic_deterministic_semantics::deterministic_semantics_for_stochastic_semantics::PMarking,
+    techniques::infinitely_many_traces::InfinitelyManyTraces,
     trait_definition_finalisation,
 };
 use ebi_objects::{
-    Activity, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogOcel, EventLogPython,
-    EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
+    Activity, AutomatonState, CompressedEventLog, DirectlyFollowsGraph, EventLog, EventLogOcel,
+    EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::{Result, anyhow},
@@ -30,6 +28,22 @@ pub const TRAIT_DEFINITION_LATEX: &str = concat!(
 
 pub enum EbiTraitStochasticDeterministicSemantics {
     Usize(Box<dyn StochasticDeterministicSemantics<DetState = usize, LivState = usize>>),
+    AutomatonState(
+        Box<
+            dyn StochasticDeterministicSemantics<
+                    DetState = AutomatonState,
+                    LivState = AutomatonState,
+                >,
+        >,
+    ),
+    AutomatonStateDistribution(
+        Box<
+            dyn StochasticDeterministicSemantics<
+                    DetState = PMarking<AutomatonState>,
+                    LivState = AutomatonState,
+                >,
+        >,
+    ),
     UsizeDistribution(
         Box<dyn StochasticDeterministicSemantics<DetState = PMarking<usize>, LivState = usize>>,
     ),
@@ -160,7 +174,7 @@ impl ToStochasticDeterministicSemanticsTrait for DirectlyFollowsGraph {
         self,
     ) -> EbiTraitStochasticDeterministicSemantics {
         let dfm: StochasticDirectlyFollowsModel = self.into();
-        EbiTraitStochasticDeterministicSemantics::UsizeDistribution(Box::new(dfm))
+        EbiTraitStochasticDeterministicSemantics::AutomatonStateDistribution(Box::new(dfm))
     }
 }
 
@@ -168,7 +182,7 @@ impl ToStochasticDeterministicSemanticsTrait for StochasticNondeterministicFinit
     fn to_stochastic_deterministic_semantics_trait(
         self,
     ) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::UsizeDistribution(Box::new(self))
+        EbiTraitStochasticDeterministicSemantics::AutomatonStateDistribution(Box::new(self))
     }
 }
 
@@ -176,7 +190,7 @@ impl ToStochasticDeterministicSemanticsTrait for StochasticDirectlyFollowsModel 
     fn to_stochastic_deterministic_semantics_trait(
         self,
     ) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::UsizeDistribution(Box::new(self))
+        EbiTraitStochasticDeterministicSemantics::AutomatonStateDistribution(Box::new(self))
     }
 }
 
@@ -184,7 +198,7 @@ impl ToStochasticDeterministicSemanticsTrait for StochasticDeterministicFiniteAu
     fn to_stochastic_deterministic_semantics_trait(
         self,
     ) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::Usize(Box::new(self))
+        EbiTraitStochasticDeterministicSemantics::AutomatonState(Box::new(self))
     }
 }
 
@@ -192,7 +206,7 @@ impl ToStochasticDeterministicSemanticsTrait for FiniteStochasticLanguage {
     fn to_stochastic_deterministic_semantics_trait(
         self,
     ) -> EbiTraitStochasticDeterministicSemantics {
-        EbiTraitStochasticDeterministicSemantics::Usize(Box::new(Into::<
+        EbiTraitStochasticDeterministicSemantics::AutomatonState(Box::new(Into::<
             StochasticDeterministicFiniteAutomaton,
         >::into(self)))
     }

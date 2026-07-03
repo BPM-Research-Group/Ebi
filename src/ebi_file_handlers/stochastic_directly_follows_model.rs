@@ -1,9 +1,13 @@
 use crate::ebi_framework::{
     ebi_file_handler::EbiFileHandler,
-    ebi_input::{EbiObjectImporter, EbiObjectImporterFallible, EbiTraitImporter},
+    ebi_input::{EbiInput, EbiObjectImporter, EbiObjectImporterFallible, EbiTraitImporter},
     ebi_output::EbiObjectExporter,
+    ebi_trait::FromEbiTraitObject,
     object_importers::{
-        ImportAsDirectlyFollowsModelObject, ImportAsLabelledPetriNetObject, ImportAsStochasticLabelledPetriNetObject, ImportAsStochasticNondeterministicFiniteAutomatonObject, TryToBusinessProcessModelAndNotationObject
+        ImportAsDirectlyFollowsModelObject, ImportAsLabelledPetriNetObject,
+        ImportAsStochasticLabelledPetriNetObject,
+        ImportAsStochasticNondeterministicFiniteAutomatonObject,
+        TryToBusinessProcessModelAndNotationObject,
     },
     trait_importers::{
         ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsQueriableStochasticLanguageTrait,
@@ -12,7 +16,10 @@ use crate::ebi_framework::{
     },
     validate::Validate,
 };
-use ebi_objects::{Exportable, Importable, StochasticDirectlyFollowsModel};
+use ebi_objects::{
+    EbiObject, Exportable, Importable, StochasticDirectlyFollowsModel,
+    anyhow::{Result, anyhow},
+};
 
 pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler {
     name: "stochastic directly follows model",
@@ -69,7 +76,7 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
             StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
         EbiObjectImporter::StochasticNondeterministicFiniteAutomaton(
-             StochasticDirectlyFollowsModel::import_as_stochastic_nondeterministic_finite_automaton_object, 
+             StochasticDirectlyFollowsModel::import_as_stochastic_nondeterministic_finite_automaton_object,
              StochasticDirectlyFollowsModel::IMPORTER_PARAMETERS,
         ),
     ],
@@ -86,3 +93,16 @@ pub const EBI_STOCHASTIC_DIRECTLY_FOLLOWS_MODEL: EbiFileHandler = EbiFileHandler
     object_exporters_fallible: &[],
     java_object_handlers: &[],
 };
+
+impl FromEbiTraitObject for StochasticDirectlyFollowsModel {
+    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(e), _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "Cannot read {} {} as a stochastic deterministic finite automaton.",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
+    }
+}

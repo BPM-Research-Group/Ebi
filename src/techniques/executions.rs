@@ -9,12 +9,14 @@ use crate::{
 };
 use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
-    Activity, ActivityKey, Executions,
-    anyhow::{Context, Error, Ok, Result},
+    Activity, ActivityKey, Attribute, Executions,
+    anyhow::{Context, Error, Ok, Result, anyhow},
     ebi_objects::{
         executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
     },
 };
+use intmap::IntMap;
+use process_mining::core::event_data::case_centric::AttributeValue;
 use rayon::iter::{IndexedParallelIterator, ParallelIterator};
 use std::{
     collections::VecDeque,
@@ -37,6 +39,7 @@ impl FindExecutions for EbiTraitSemantics {
     ) -> Result<Executions> {
         match self {
             EbiTraitSemantics::Usize(sem) => sem.find_executions(log),
+            EbiTraitSemantics::AutomatonState(sem) => sem.find_executions(log),
             EbiTraitSemantics::Marking(sem) => sem.find_executions(log),
             EbiTraitSemantics::TreeMarking(sem) => sem.find_executions(log),
             EbiTraitSemantics::BPMNMarking(sem) => sem.find_executions(log),
@@ -54,10 +57,17 @@ where
         &mut self,
         log: &mut Box<dyn EbiTraitEventLogEventAttributes>,
     ) -> Result<Executions> {
+        if self.get_initial_state().is_none() {
+            return Err(anyhow!(
+                "Model has the empty language, and can therefore not be aligned."
+            ));
+        }
+
         log::info!("Compute alignments");
         let progress_bar = EbiCommand::get_progress_bar_ticks(log.number_of_traces());
         let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
         let resource_key = Arc::new(Mutex::new(ActivityKey::new()));
+        let attibute_key = Arc::new(Mutex::new(log.attribute_key().clone()));
 
         self.translate_using_activity_key(log.activity_key_mut());
 
@@ -73,6 +83,7 @@ where
                 match alignment {
                     Result::Ok((aligned_trace, _)) => {
                         //process the moves of this trace
+                        // println!("{:?}", aligned_trace);
                         let c = C::new(trace_index, aligned_trace);
                         match c.alignment_to_executions(self, &log, &resource_key) {
                             Result::Ok(c) => Some(c),
@@ -95,6 +106,8 @@ where
 
         progress_bar.finish_and_clear();
 
+        // println!("{}", self.activity_key());
+
         //see whether an error was reported
         if let Result::Ok(mutex) = Arc::try_unwrap(error) {
             if let Result::Ok(err) = mutex.into_inner() {
@@ -111,6 +124,7 @@ where
         let mut executions = (
             log.activity_key().clone(),
             Arc::try_unwrap(resource_key).unwrap().into_inner().unwrap(),
+            Arc::try_unwrap(attibute_key).unwrap().into_inner().unwrap(),
             execution_list,
         )
             .into();
@@ -152,10 +166,13 @@ impl C {
 
         for move_index in 0..self.moves.len() {
             match self.moves[move_index] {
-                Move::LogMove(_) => {
+                Move::LogMove { .. } => {
                     //logmoves are not linked to transitions and have no executions
                 }
-                Move::ModelMove(activity, transition) => {
+                Move::ModelMove {
+                    activity,
+                    transition,
+                } => {
                     let move_index_of_enablement = self.get_enabling_move(move_index, semantics);
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
@@ -164,6 +181,7 @@ impl C {
                     executions.push_back(Execution {
                         trace: self.trace_index,
                         move_index,
+                        event_attributes: None,
                         activity: Some(activity),
                         also_in_log: false,
                         fired_transition: transition,
@@ -177,15 +195,23 @@ impl C {
 
                     semantics.execute_transition(&mut state, transition)?;
                 }
-                Move::SynchronousMove(activity, transition) => {
+                Move::SynchronousMove {
+                    activity,
+                    transition,
+                } => {
                     let move_index_of_enablement = self.get_enabling_move(move_index, semantics);
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
+                    let event_attributes =
+                        Some(self.get_event_attributes(move_index, log).ok_or_else(|| {
+                            anyhow!("Could not obtain event attributes for move {}.", move_index)
+                        })?);
 
                     let l = other_enabled_transitions.len();
                     executions.push_back(Execution {
                         trace: self.trace_index,
                         move_index,
+                        event_attributes,
                         activity: Some(activity),
                         also_in_log: true,
                         fired_transition: transition,
@@ -194,12 +220,12 @@ impl C {
                         time_of_execution: self.get_time(Some(move_index), log).cloned(),
                         resource: self.get_resource(Some(move_index), log, resource_key),
                         resource_utilisation_fired_transition: None,
-                        resource_utilisation_other_enabled_transitions: vec![None; l]
+                        resource_utilisation_other_enabled_transitions: vec![None; l],
                     });
 
                     semantics.execute_transition(&mut state, transition)?;
                 }
-                Move::SilentMove(transition) => {
+                Move::SilentMove { transition } => {
                     let move_index_of_enablement = self.get_enabling_move(move_index, semantics);
                     let mut other_enabled_transitions = semantics.get_enabled_transitions(&state);
                     other_enabled_transitions.retain(|t| *t != transition);
@@ -208,6 +234,7 @@ impl C {
                     executions.push_back(Execution {
                         trace: self.trace_index,
                         move_index,
+                        event_attributes: None,
                         activity: None,
                         also_in_log: false,
                         fired_transition: transition,
@@ -216,7 +243,7 @@ impl C {
                         time_of_execution: None,
                         resource: None,
                         resource_utilisation_fired_transition: None,
-                        resource_utilisation_other_enabled_transitions: vec![None; l]
+                        resource_utilisation_other_enabled_transitions: vec![None; l],
                     });
 
                     semantics.execute_transition(&mut state, transition)?;
@@ -232,7 +259,7 @@ impl C {
         move_index: Option<usize>,
         log: &'a Box<dyn EbiTraitEventLogEventAttributes>,
     ) -> Option<&'a DateTime<FixedOffset>> {
-        let event_index = self.get_event_index(move_index?);
+        let event_index = self.get_event_index(move_index?)?;
         log.get_event_time(self.trace_index, event_index)
     }
 
@@ -242,7 +269,7 @@ impl C {
         log: &'a Box<dyn EbiTraitEventLogEventAttributes>,
         resource_key: &Arc<Mutex<ActivityKey>>,
     ) -> Option<Activity> {
-        let event_index = self.get_event_index(move_index?);
+        let event_index = self.get_event_index(move_index?)?;
         let resource_string = log.get_event_resource(self.trace_index, event_index)?;
 
         Some(
@@ -254,16 +281,28 @@ impl C {
         )
     }
 
-    fn get_event_index(&self, move_index: usize) -> usize {
+    fn get_event_attributes<'a>(
+        &self,
+        move_index: usize,
+        log: &'a Box<dyn EbiTraitEventLogEventAttributes>,
+    ) -> Option<IntMap<Attribute, AttributeValue>> {
+        let event_index = self.get_event_index(move_index)?;
+        log.get_event_attributes(self.trace_index, event_index)
+    }
+
+    fn get_event_index(&self, move_index: usize) -> Option<usize> {
         let mut event_index = 0;
-        for movee in self.moves.iter().take(move_index) {
+        let mut last = false;
+        for movee in self.moves.iter().take(move_index + 1) {
             match movee {
-                Move::LogMove(_) | Move::SynchronousMove(_, _) => event_index += 1,
-                _ => {}
+                Move::LogMove { .. } | Move::SynchronousMove { .. } => {
+                    event_index += 1;
+                    last = true;
+                }
+                _ => last = false,
             }
         }
-
-        event_index
+        if last { Some(event_index - 1) } else { None }
     }
 
     /**
@@ -373,6 +412,18 @@ impl ExecutionsSorter {
         let number_of_executions = traces.iter().map(|t| t.len()).sum();
         let mut result = Vec::with_capacity(number_of_executions);
 
+        log::info!("Sorting executions");
+
+        //invariant: the first move of every trace has a timestamp
+
+        //establish the invariant: sort all moves without timestamps
+        for trace_index in 0..traces.len() {
+            let trace = &mut traces[trace_index];
+            while !trace.is_empty() && trace[0].time_of_execution.is_none() {
+                result.push(trace.pop_front().unwrap());
+            }
+        }
+
         //initialise first-timestamps
         let mut first_timestamps = (0..traces.len())
             .map(|trace_index| Self::get_first_timestamp(&traces[trace_index]).cloned())
@@ -382,42 +433,32 @@ impl ExecutionsSorter {
             if let Some((trace_index, _)) = first_timestamps
                 .iter()
                 .enumerate()
-                .filter_map(|(trace_index, first)| {
-                    if let Some(first) = first {
+                .filter_map(|(trace_index, first_timestamp)| {
+                    if let Some(first) = first_timestamp {
                         Some((trace_index, first))
                     } else {
                         None
                     }
                 })
-                .min_by(|a, b| a.cmp(b))
+                .min_by(|a, b| {
+                    let c = a.1.cmp(&b.1);
+                    if !c.is_eq() { c } else { a.0.cmp(&b.0) }
+                })
             {
                 //process the trace with the lowest timestamp
 
-                //first, add all executions that do not have a timestamp
-                while let Some(execution) = traces[trace_index].pop_front() {
-                    let has_timestamp = execution.time_of_execution.is_none();
-                    result.push(execution);
+                //first, add the first execution
+                result.push(traces[trace_index].pop_front().unwrap());
 
-                    if has_timestamp {
-                        break;
-                    }
+                //re-establish the invariant: add non-timestamped moves
+                let trace = &mut traces[trace_index];
+                while !trace.is_empty() && trace[0].time_of_execution.is_none() {
+                    result.push(trace.pop_front().unwrap());
                 }
 
-                //second, add the execution that has a timestamp (if it exists)
-                if let Some(execution) = traces[trace_index].pop_front() {
-                    result.push(execution);
-                }
-
+                //update the first timestamp
                 first_timestamps[trace_index] =
                     Self::get_first_timestamp(&traces[trace_index]).cloned();
-
-                //check whether the trace still has timestamps
-                if first_timestamps[trace_index].is_none() {
-                    //This trace does not have timestamps anymore; finish it first to avoid postponing it until the end of the log.
-                    let mut swap = VecDeque::new();
-                    std::mem::swap(&mut swap, &mut traces[trace_index]);
-                    result.extend(swap.into_iter());
-                }
             } else {
                 //no more timestamps, just append the result
                 result.extend(traces.into_iter().flatten());
@@ -438,17 +479,17 @@ impl ExecutionsSorter {
 
 #[cfg(test)]
 mod tests {
-    use std::fs;
-
-    use ebi_objects::{
-        StochasticDeterministicFiniteAutomaton, StochasticNondeterministicFiniteAutomaton,
-        ebi_objects::event_log_event_attributes::EventLogEventAttributes,
-    };
-
     use crate::{
+        ebi_framework::trait_importers::ToSemanticsTrait,
         ebi_traits::ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
         techniques::executions::FindExecutions,
     };
+    use ebi_objects::{
+        LabelledPetriNet, StochasticDeterministicFiniteAutomaton,
+        StochasticNondeterministicFiniteAutomaton, ebi_arithmetic::is_exact_globally,
+        ebi_objects::event_log_event_attributes::EventLogEventAttributes,
+    };
+    use std::fs;
 
     #[test]
     fn executions() {
@@ -465,7 +506,31 @@ mod tests {
         let mut log2: Box<dyn EbiTraitEventLogEventAttributes> = Box::new(log);
         let x = model.find_executions(&mut log2).unwrap();
 
-        assert_eq!(out, x.to_string() + "\n");
+        assert_eq!(out, x.to_string());
+    }
+
+    #[test]
+    fn svn60() {
+        let fin = fs::read_to_string("testfiles/svn60.xes").unwrap();
+        let log = fin.parse::<EventLogEventAttributes>().unwrap();
+        let mut log: Box<dyn EbiTraitEventLogEventAttributes> = Box::new(log);
+
+        let fin2 = fs::read_to_string("testfiles/svn60.lpn").unwrap();
+        let lpn = fin2.parse::<LabelledPetriNet>().unwrap();
+
+        let mut sem = lpn.to_semantics_trait();
+        let executions = sem.find_executions(&mut log).unwrap();
+
+        println!("{}", executions);
+
+        let fin3 = fs::read_to_string("testfiles/svn60.lpn.exs").unwrap();
+
+        if !is_exact_globally() {
+            //string output looks slightly different in approximate mode; thus this will fail
+            return;
+        }
+
+        assert_eq!(executions.to_string(), fin3);
     }
 
     #[test]

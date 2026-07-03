@@ -1,4 +1,6 @@
-use ebi_objects::{EbiObject, EbiObjectType, ebi_objects::scalable_vector_graphics::ToSVG};
+use ebi_objects::{
+    EbiObject, EbiObjectType, anyhow::anyhow, ebi_objects::scalable_vector_graphics::ToSVG,
+};
 
 use crate::{
     ebi_framework::{
@@ -8,7 +10,6 @@ use crate::{
         ebi_trait::EbiTrait,
     },
     ebi_traits::ebi_trait_graphable::EbiTraitGraphable,
-    tests::test_ebi_command,
 };
 
 pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
@@ -18,7 +19,6 @@ pub const EBI_VISUALISE: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[&EBI_VISUALISE_GRAPH, &EBI_VISUALISE_TEXT],
 };
-test_ebi_command!(EBI_VISUALISE);
 
 pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
     name_short: "txt",
@@ -32,7 +32,8 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
     input_names: &["FILE"],
     input_helps: &["Any file that can be visualised textually."],
     execute: |mut inputs, _| {
-        let result = match inputs.remove(0) {
+        let object = inputs.remove(0);
+        let result = match object {
             EbiInput::Object(EbiObject::BusinessProcessModelAndNotation(bpmn), _) => {
                 bpmn.to_string()
             }
@@ -71,11 +72,36 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::ScalableVectorGraphics(s), _) => s.to_string(),
             EbiInput::Object(EbiObject::PortableDocumentFormat(s), _) => s.to_string(),
             EbiInput::Object(EbiObject::PortableNetworkGraphics(s), _) => s.to_string(),
-            EbiInput::FileHandler(_) => unreachable!(),
-            EbiInput::Trait(_, _) => unreachable!(),
-            EbiInput::String(_, _) => unreachable!(),
-            EbiInput::Usize(_, _) => unreachable!(),
-            EbiInput::Fraction(_, _) => unreachable!(),
+            EbiInput::FileHandler(_) => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    object.get_type()
+                ));
+            }
+            EbiInput::Trait(_, _) => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    object.get_type()
+                ));
+            }
+            EbiInput::String(_, _) => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    object.get_type()
+                ));
+            }
+            EbiInput::Usize(_, _) => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    object.get_type()
+                ));
+            }
+            EbiInput::Fraction(_, _) => {
+                return Err(anyhow!(
+                    "Unsupported object {:?} provided.",
+                    object.get_type()
+                ));
+            }
         };
         Ok(EbiOutput::String(result))
     },
@@ -107,11 +133,6 @@ pub const EBI_VISUALISE_GRAPH: EbiCommand = EbiCommand::Command {
 #[cfg(test)]
 mod tests {
 
-    use ebi_objects::{
-        FiniteLanguage,
-        ebi_arithmetic::{Fraction, One},
-    };
-
     use crate::{
         ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT,
         ebi_file_handlers::stochastic_labelled_petri_net::EBI_STOCHASTIC_LABELLED_PETRI_NET,
@@ -123,10 +144,14 @@ mod tests {
             ebi_trait_object::EbiTraitObject,
         },
     };
+    use ebi_objects::{
+        FiniteLanguage,
+        ebi_arithmetic::{Fraction, One},
+    };
 
     #[test]
     fn visualise_as_text() {
-        for (object, _, _, _) in crate::tests::get_all_test_files() {
+        for (object, _, _, _) in crate::tests::tests::get_all_test_files() {
             if let EbiInput::Object(_, _) = object {
                 if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
                     let _ = (execute)(vec![object], None);
@@ -136,43 +161,38 @@ mod tests {
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_filehandler() {
         let object = EbiInput::FileHandler(EBI_STOCHASTIC_LABELLED_PETRI_NET);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
-            let _ = (execute)(vec![object], None);
+            assert!((execute)(vec![object], None).is_err());
         }
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_string() {
         let object = EbiInput::String("abc".to_string(), &TEST_INPUT_TYPE_STRING);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
-            let _ = (execute)(vec![object], None);
+            assert!((execute)(vec![object], None).is_err());
         }
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_usize() {
         let object = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
-            let _ = (execute)(vec![object], None);
+            assert!((execute)(vec![object], None).is_err());
         }
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_fraction() {
         let object = EbiInput::Fraction(Fraction::one(), &TEST_INPUT_TYPE_FRACTION);
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
-            let _ = (execute)(vec![object], None);
+            assert!((execute)(vec![object], None).is_err());
         }
     }
 
     #[test]
-    #[should_panic]
     fn unreachable_trait() {
         let net = "finite language\n0";
         let lang = net.parse::<FiniteLanguage>().unwrap();
@@ -181,7 +201,7 @@ mod tests {
             &EBI_STOCHASTIC_LABELLED_PETRI_NET,
         );
         if let EbiCommand::Command { execute, .. } = EBI_VISUALISE_TEXT {
-            let _ = (execute)(vec![object], None);
+            assert!((execute)(vec![object], None).is_err());
         }
     }
 }

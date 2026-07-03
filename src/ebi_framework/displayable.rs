@@ -1,4 +1,6 @@
-use ebi_objects::{ebi_bpmn::BPMNMarking, ebi_objects::process_tree::TreeMarking, marking::Marking};
+use ebi_objects::{
+    AutomatonState, ebi_bpmn::BPMNMarking, ebi_objects::process_tree::TreeMarking, marking::Marking,
+};
 use std::{
     fmt::{Debug, Display},
     hash::Hash,
@@ -13,3 +15,5 @@ impl Displayable for TreeMarking {}
 impl Displayable for Marking {}
 
 impl Displayable for BPMNMarking {}
+
+impl Displayable for AutomatonState {}

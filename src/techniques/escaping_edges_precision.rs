@@ -26,6 +26,9 @@ impl EscapingEdgesPrecision for EbiTraitSemantics {
     ) -> Result<Fraction> {
         match self {
             EbiTraitSemantics::Usize(semantics) => semantics.escaping_edges_precision(alignments),
+            EbiTraitSemantics::AutomatonState(semantics) => {
+                semantics.escaping_edges_precision(alignments)
+            }
             EbiTraitSemantics::Marking(semantics) => semantics.escaping_edges_precision(alignments),
             EbiTraitSemantics::TreeMarking(semantics) => {
                 semantics.escaping_edges_precision(alignments)
@@ -64,10 +67,10 @@ where
             //walk through the moves
             for movee in alignment {
                 match movee {
-                    Move::LogMove(_) => {} //a log move is ignored in precision
-                    Move::ModelMove(_, transition)
-                    | Move::SynchronousMove(_, transition)
-                    | Move::SilentMove(transition) => {
+                    Move::LogMove { .. } => {} //a log move is ignored in precision
+                    Move::ModelMove { transition, .. }
+                    | Move::SynchronousMove { transition, .. }
+                    | Move::SilentMove { transition } => {
                         /*
                             Update the state.
                             As we cannot rely on the alignment and the model belonging to one another, perform an enablement check.

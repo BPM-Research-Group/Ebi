@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+  <extension name="Concept" prefix="concept" uri="http://code.deckfour.org/xes/concept.xesext"/>
+  <extension name="Time" prefix="time" uri="http://code.deckfour.org/xes/time.xesext"/>
+  <extension name="Organizational" prefix="org" uri="http://code.deckfour.org/xes/org.xesext"/>
+  <global scope="trace">
+    <string key="concept:name" value="name"/>
+  </global>
+  <global scope="event">
+    <string key="concept:name" value="name"/>
+  </global>
+  <classifier name="Activity" keys="Activity"/>
+  <trace>
+    <string key="concept:name" value="acbe"/>
+    <event>
+      <string key="concept:name" value="a"/>
+      <date key="time:timestamp" value="2017-01-03T00:00:00.000+01:00"/>
+      <string key="org:resource" value="Blue"/>
+    </event>
+    <event>
+      <string key="concept:name" value="c"/>
+      <date key="time:timestamp" value="2017-01-09T00:00:00.000+01:00"/>
+      <string key="org:resource" value="Red"/>
+    </event>
+    <event>
+      <string key="concept:name" value="b"/>
+      <date key="time:timestamp" value="2017-01-15T00:00:00.000+01:00"/>
+      <string key="org:resource" value="Red"/>
+    </event>
+    <event>
+      <string key="concept:name" value="e"/>
+      <date key="time:timestamp" value="2017-01-16T00:00:00.000+01:00"/>
+      <string key="org:resource" value="Blue"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="adcfe"/>
+    <event>
+      <string key="concept:name" value="a"/>
+      <date key="time:timestamp" value="2017-01-06T00:00:00.000+01:00"/>
+      <string key="org:resource" value="Blue"/>
+    </event>
+    <event>
+      <string key="concept:name" value="d"/>
+      <date key="time:timestamp" value="2017-01-18T00:00:00.000+01:00"/>
+      <string key="org:resource" value="Blue"/>
+    </event>
+    <event>
+      <string key="concept:name" value="c"/>
+      <date key="time:timestamp" value="2017-01-21T00:00:00.000+01:00"/>
+      <string key="org:resource" value="Red"/>
+    </event>
+    <event>
+      <string key="concept:name" value="f"/>
+      <date key="time:timestamp" value="2017-01-22T00:00:00.000+01:00"/>
+      <string key="org:resource" value="Blue"/>
+    </event>
+    <event>
+      <string key="concept:name" value="e"/>
+      <date key="time:timestamp" value="2017-01-24T00:00:00.000+01:00"/>
+      <string key="org:resource" value="Blue"/>
+    </event>
+  </trace>
+  <trace>
+    <string key="concept:name" value="ced"/>
+    <event>
+      <string key="concept:name" value="c"/>
+      <date key="time:timestamp" value="2017-01-04T00:00:00.000+01:00"/>
+      <string key="org:resource" value="Red"/>
+    </event>
+    <event>
+      <string key="concept:name" value="e"/>
+      <date key="time:timestamp" value="2017-01-10T00:00:00.000+01:00"/>
+      <string key="org:resource" value="Blue"/>
+    </event>
+    <event>
+      <string key="concept:name" value="d"/>
+      <date key="time:timestamp" value="2017-01-19T00:00:00.000+01:00"/>
+      <string key="org:resource" value="Red"/>
+    </event>
+  </trace>
+</log>

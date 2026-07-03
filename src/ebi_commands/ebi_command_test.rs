@@ -21,7 +21,7 @@ use crate::{
     tests::test_ebi_command,
 };
 use ebi_objects::{
-    anyhow::{anyhow, Context},
+    anyhow::{Context, anyhow},
     ebi_arithmetic::{ConstFraction, Fraction},
 };
 use std::io::Write;
@@ -39,7 +39,6 @@ pub const EBI_TEST: EbiCommand = EbiCommand::Group {
         &EBI_TEST_LOG_ATTRIBUTE,
     ],
 };
-test_ebi_command!(EBI_TEST);
 
 pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     name_short: "lcat",
@@ -119,7 +118,7 @@ pub const EBI_TEST_LOG_ATTRIBUTE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
-pub const EBI_BOOTSTRAP_TEST: EbiCommand = EbiCommand::Command {
+pub const EBI_TEST_BOOTSTRAP: EbiCommand = EbiCommand::Command {
     name_short: "btst",
     name_long: Some("bootstrap-test"),
     explanation_short: "Test the hypothesis that the logs are derived from identical processes.",

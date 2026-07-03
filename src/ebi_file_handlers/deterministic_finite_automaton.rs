@@ -91,8 +91,6 @@ mod tests {
         let state = dfa.get_initial_state().unwrap();
         let activity = dfa.activity_key_mut().process_activity("a");
 
-        dfa.get_sources();
-
         assert!(dfa.add_transition(state, activity, state).is_ok());
         assert!(dfa.add_transition(state, activity, state).is_err());
     }
@@ -102,7 +100,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/empty.dfa").unwrap();
         let dfa = fin.parse::<DeterministicFiniteAutomaton>().unwrap();
 
-        if let EbiTraitSemantics::Usize(semantics) = dfa.to_semantics_trait() {
+        if let EbiTraitSemantics::AutomatonState(semantics) = dfa.to_semantics_trait() {
             assert!(semantics.get_initial_state().is_none());
         } else {
             assert!(false);

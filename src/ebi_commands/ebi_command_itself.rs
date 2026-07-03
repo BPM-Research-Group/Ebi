@@ -1,16 +1,13 @@
-#[cfg(feature = "javascript")]
+use crate::ebi_framework::{
+    documentation::{documentation_commands, documentation_filehandlers, documentation_home},
+    ebi_command::EbiCommand,
+    ebi_output::{EbiOutput, EbiOutputType},
+    manual::{graph, html, manual},
+};
+#[cfg(all(feature = "javascript", feature = "test_generation"))]
 use crate::javascript::javascript_generator_rust::generate_javascript_rust;
 #[cfg(feature = "java")]
 use crate::prom::prom_plugin_generator::print_java_plugins;
-use crate::{
-    ebi_framework::{
-        documentation::{documentation_commands, documentation_filehandlers, documentation_home},
-        ebi_command::EbiCommand,
-        ebi_output::{EbiOutput, EbiOutputType},
-        manual::{graph, html, manual},
-    },
-    tests::test_ebi_command,
-};
 use ebi_objects::{EbiObject, EbiObjectType, ebi_objects::scalable_vector_graphics::ToSVGMut};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
@@ -41,15 +38,16 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
         &EBI_ITSELF_HTML,
         #[cfg(feature = "java")]
         &EBI_ITSELF_JAVA,
-        #[cfg(feature = "javascript")]
+        #[cfg(all(feature = "javascript", feature = "test_generation"))]
         &EBI_ITSELF_JAVASCRIPT,
         &EBI_ITSELF_LOGO,
         &EBI_ITSELF_MANUAL,
         #[cfg(feature = "python")]
         &EBI_ITSELF_PYTHON,
+        #[cfg(feature = "test_generation")]
+        &EBI_ITSELF_TESTS,
     ],
 };
-test_ebi_command!(EBI_ITSELF);
 
 pub const EBI_ITSELF_DOCUMENTATION: EbiCommand = EbiCommand::Group {
     name_short: "docs",
@@ -172,7 +170,7 @@ pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
-#[cfg(feature = "javascript")]
+#[cfg(all(feature = "javascript", feature = "test_generation"))]
 pub const EBI_ITSELF_JAVASCRIPT: EbiCommand = EbiCommand::Command {
     name_short: "js",
     name_long: Some("javascript"),
@@ -216,5 +214,25 @@ pub const EBI_ITSELF_PYTHON: EbiCommand = EbiCommand::Command {
     input_names: &[],
     input_helps: &[],
     execute: |_, _| Ok(crate::python::python_module_generator::generate_pm4py_module()?),
+    output_type: &EbiOutputType::String,
+};
+
+#[cfg(feature = "test_generation")]
+pub const EBI_ITSELF_TESTS: EbiCommand = EbiCommand::Command {
+    name_short: "tests",
+    name_long: None,
+    explanation_short: "Generate blanket tests for commands.",
+    explanation_long: None,
+    cli_command: None,
+    latex_link: None,
+    exact_arithmetic: false,
+    input_types: &[],
+    input_names: &[],
+    input_helps: &[],
+    execute: |_, _| {
+        Ok(EbiOutput::String(
+            crate::tests::tests_generator::generate_tests()?,
+        ))
+    },
     output_type: &EbiOutputType::String,
 };

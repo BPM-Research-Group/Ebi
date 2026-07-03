@@ -46,10 +46,15 @@ impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
                 "This method is only available in approximate mode."
             ));
         }
-        is_valid_sdfa(&self)?;
 
         let numerator = gain_numerator_lambda(slang, self, lambda)?;
         let denominator = entropy_eventlog_with_lambda(slang, lambda)?;
+
+        if denominator.is_zero() {
+            return Err(anyhow!(
+                "Entropy is zero. Consider setting lambda to a small positive value to add a bit of uncertainty to the languages."
+            ));
+        }
 
         ratio(numerator, denominator)
     }
@@ -64,10 +69,15 @@ impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
                 "This method is only available in approximate mode."
             ));
         }
-        is_valid_sdfa(&self)?;
 
         let numerator = gain_numerator_lambda(&slang, self, lambda)?;
         let denominator = entropy_sdfa_with_lambda(&self, lambda)?;
+
+        if denominator.is_zero() {
+            return Err(anyhow!(
+                "Entropy is zero. Consider setting lambda to a small positive value to add a bit of uncertainty to the languages."
+            ));
+        }
 
         ratio(numerator, denominator)
     }
@@ -78,54 +88,6 @@ fn check_lambda(lambda: &Fraction) -> Result<()> {
     if lambda.is_negative() || *lambda > Fraction::one() {
         return Err(anyhow!("Lambda must be in [0, 1], but is {}.", lambda));
     }
-    Ok(())
-}
-
-/// Check whether the SDFA is a valid stochastic model.
-///
-/// Rules:
-/// 1. For each state, outgoing probabilities plus termination probability sum to 1.
-/// 2. Each transition probability is strictly positive.
-/// 3. At least one state has a non-zero termination probability.
-pub fn is_valid_sdfa(sdfa: &StochasticDeterministicFiniteAutomaton) -> Result<()> {
-    if sdfa.get_initial_state().is_none() {
-        return Ok(());
-    }
-
-    let state_count = sdfa.number_of_states();
-
-    for state in 0..state_count {
-        let mut total_probability = Fraction::zero();
-
-        for (index, &source) in sdfa.get_sources().iter().enumerate() {
-            if source == state {
-                total_probability += sdfa.get_probabilities()[index].clone();
-            }
-        }
-
-        total_probability += sdfa.get_termination_probability(state).clone();
-
-        if !total_probability.is_one() {
-            return Err(anyhow!(
-                "Invalid probability sum at state {state}: total = {total_probability} (expected 1)."
-            ));
-        }
-    }
-
-    for (index, probability) in sdfa.get_probabilities().iter().enumerate() {
-        if probability.is_zero() || probability.is_negative() {
-            return Err(anyhow!(
-                "Invalid transition probability at index {index}: {probability} (must be > 0)."
-            ));
-        }
-    }
-
-    if !(0..state_count).any(|state| !sdfa.get_termination_probability(state).is_zero()) {
-        return Err(anyhow!(
-            "No terminating state found (model can only livelock)."
-        ));
-    }
-
     Ok(())
 }
 
@@ -212,19 +174,17 @@ fn entropy_sdfa_with_lambda(
     lambda: &Fraction,
 ) -> Result<LogPolynomial> {
     check_lambda(lambda)?;
-    is_valid_sdfa(sdfa)?;
 
     if lambda.is_zero() {
         return sdfa.entropy();
     }
 
-    let state_count = sdfa.number_of_states();
     let state_visits = number_of_average_visits_per_state_approximate(sdfa)?;
     let one_minus_lambda = lambda.clone().one_minus();
 
     let mut transition_entropy = LogPolynomial::zero();
-    for (index, &source) in sdfa.get_sources().iter().enumerate() {
-        let probability = &sdfa.get_probabilities()[index];
+    for (index, &source) in sdfa.sources.iter().enumerate() {
+        let probability = &sdfa.probabilities[index];
         if probability.is_zero() {
             continue;
         }
@@ -237,8 +197,8 @@ fn entropy_sdfa_with_lambda(
     let mut termination_entropy = LogPolynomial::zero();
     let mut lambda_step_entropy = LogPolynomial::zero();
 
-    for state in 0..state_count {
-        let termination_probability = sdfa.get_termination_probability(state);
+    for state in 0..sdfa.terminating_probabilities.len() {
+        let termination_probability = &sdfa.terminating_probabilities[state];
         if termination_probability.is_zero() {
             continue;
         }
@@ -282,6 +242,8 @@ fn ratio(num: LogPolynomial, denom: LogPolynomial) -> Result<LogPolynomial> {
     test
 ))]
 mod tests {
+    use crate::semantics::semantics::Semantics;
+
     use super::*;
     use ebi_objects::anyhow::Result;
     use ebi_objects::ebi_arithmetic::{f, f0};
@@ -290,20 +252,20 @@ mod tests {
 
     mod sdfa_fig_c {
         use super::*;
-        use ebi_objects::StochasticDeterministicFiniteAutomaton;
         use ebi_objects::anyhow::Result;
         use ebi_objects::ebi_arithmetic::f;
+        use ebi_objects::{AutomatonState, StochasticDeterministicFiniteAutomaton, a};
 
         /// Figure (c): 2-state SDFA with a self-loop.
         pub fn build_fig_c_loop() -> Result<StochasticDeterministicFiniteAutomaton> {
             let mut sdfa = StochasticDeterministicFiniteAutomaton::new();
-            sdfa.set_initial_state(Some(0));
+            sdfa.set_initial_state(Some(AutomatonState::zero()));
 
             let a = sdfa.activity_key.process_activity("a");
-            sdfa.add_transition(0, a, 1, f!(4, 5))?;
+            sdfa.add_transition(a!(0), a, a!(1), f!(4, 5))?;
 
             let a = sdfa.activity_key.process_activity("a");
-            sdfa.add_transition(1, a, 1, f!(1, 2))?;
+            sdfa.add_transition(a!(1), a, a!(1), f!(1, 2))?;
 
             Ok(sdfa)
         }

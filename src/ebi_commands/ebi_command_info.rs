@@ -1,12 +1,11 @@
-use ebi_objects::Infoable;
-use inflector::Inflector;
-use std::io::Write;
-
-use crate::{ebi_framework::{
+use crate::ebi_framework::{
     ebi_command::EbiCommand,
     ebi_input::{EbiInput, EbiInputType},
     ebi_output::{EbiOutput, EbiOutputType},
-}, tests::test_ebi_command};
+};
+use ebi_objects::{Infoable, anyhow::anyhow};
+use inflector::Inflector;
+use std::io::Write;
 
 #[macro_export]
 macro_rules! ebi_info {
@@ -75,8 +74,7 @@ pub const EBI_INFO: EbiCommand = EbiCommand::Command {
             return Ok(EbiOutput::String(String::from_utf8(f).unwrap()));
         }
 
-        unreachable!()
+        return Err(anyhow!("Unsupported object provided."));
     },
     output_type: &EbiOutputType::String,
 };
-test_ebi_command!(EBI_INFO);

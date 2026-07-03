@@ -141,7 +141,7 @@ To get started with development, or to compile for Mac OS X:
 Information on the architecture of Ebi, including its sub-crates, can be found in the [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
 
 We welcome pull requests on [Github](https://github.com/BPM-Research-Group/Ebi).
-Before opening a pull request, please ensure that the test batch file test.sh finishes without errors (on Windows, rename it to .bat and remove the first three lines).
+Before opening a pull request, please ensure that the test batch file src/tests/test.sh finishes without errors (on Windows, rename it to .bat and remove the first three lines).
 This file may take up to an hour to run, depending on your machine.
 
 ## License

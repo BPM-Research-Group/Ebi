@@ -1,25 +1,30 @@
+use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;
 use ebi_objects::{
-    StochasticDeterministicFiniteAutomaton,
-    anyhow::Result,
-    ebi_arithmetic::{Fraction, One},
+    AutomatonState, StochasticAutomatonSemantics, StochasticDeterministicFiniteAutomaton,
+    anyhow::{Result, anyhow},
+    ebi_arithmetic::Fraction,
     ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
-use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;
-
 impl StochasticSemantics for StochasticDeterministicFiniteAutomaton {
-    type StoSemState = usize;
+    type StoSemState = AutomatonState;
 
-    fn get_transition_weight(&self, state: &usize, transition: TransitionIndex) -> &Fraction {
-        if transition == self.number_of_transitions() {
-            //terminating transition
-            &self.get_termination_probability(*state)
-        } else {
-            &self.get_probabilities()[transition]
-        }
+    fn get_transition_weight(
+        &self,
+        state: &AutomatonState,
+        transition: TransitionIndex,
+    ) -> Result<&Fraction> {
+        StochasticAutomatonSemantics::transition_2_weight(self, *state, transition).ok_or_else(
+            || {
+                anyhow!(
+                    "Transition {} does not exist or is not enabled.",
+                    transition
+                )
+            },
+        )
     }
 
-    fn get_total_weight_of_enabled_transitions(&self, _: &usize) -> Result<Fraction> {
-        Ok(Fraction::one())
+    fn get_total_weight_of_enabled_transitions(&self, state: &AutomatonState) -> Result<Fraction> {
+        Ok(StochasticAutomatonSemantics::outgoing_transitions_weight_sum(self, *state))
     }
 }

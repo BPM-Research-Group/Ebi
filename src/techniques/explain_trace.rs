@@ -92,6 +92,7 @@ impl ExplainTrace for EbiTraitStochasticSemantics {
     ) -> Result<LanguageOfAlignments> {
         match self {
             EbiTraitStochasticSemantics::Usize(sem) => sem.explain_trace(trace, balance),
+            EbiTraitStochasticSemantics::AutomatonState(sem) => sem.explain_trace(trace, balance),
             EbiTraitStochasticSemantics::Marking(sem) => sem.explain_trace(trace, balance),
             EbiTraitStochasticSemantics::TreeMarking(sem) => sem.explain_trace(trace, balance),
         }
@@ -138,7 +139,7 @@ impl<State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState =
                     let _ = self.execute_transition(&mut new_state, transition);
                     // log::debug!("\t\tnew state after {}", new_state);
 
-                    let transition_weight = self.get_transition_weight(&state, transition);
+                    let transition_weight = self.get_transition_weight(&state, transition).unwrap();
                     let transition_probability = transition_weight / &total_weight;
 
                     if let Some(activity) = self.get_transition_activity(transition, state) {

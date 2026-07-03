@@ -3,8 +3,8 @@ use crate::{
     semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
 };
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet, ProcessTree,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsModel, LabelledPetriNet,
+    ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::Result, ebi_objects::process_tree::TreeMarking,
 };
@@ -110,9 +110,12 @@ macro_rules! lpn {
 macro_rules! is_non_decreasing_livelock_dfm {
     ($t:ident) => {
         impl NonDecreasingLivelock for $t {
-            type LivState = usize;
+            type LivState = AutomatonState;
 
-            fn is_part_of_non_decreasing_livelock(&self, state: &mut usize) -> Result<bool> {
+            fn is_part_of_non_decreasing_livelock(
+                &self,
+                state: &mut AutomatonState,
+            ) -> Result<bool> {
                 let mut trace = vec![*state];
 
                 while !self.is_final_state(state) && self.get_enabled_transitions(state).len() == 1

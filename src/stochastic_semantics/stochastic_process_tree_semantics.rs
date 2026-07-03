@@ -1,7 +1,7 @@
 use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;
 use ebi_objects::{
     StochasticProcessTree,
-    anyhow::Result,
+    anyhow::{Result, anyhow},
     ebi_arithmetic::Fraction,
     ebi_objects::{
         labelled_petri_net::TransitionIndex,
@@ -17,8 +17,13 @@ impl StochasticSemantics for StochasticProcessTree {
         &self,
         state: &<Self as StochasticSemantics>::StoSemState,
         transition: TransitionIndex,
-    ) -> &Fraction {
-        get_transition_weight(self, state, transition)
+    ) -> Result<&Fraction> {
+        get_transition_weight(self, state, transition).ok_or_else(|| {
+            anyhow!(
+                "Transition {} does not exist or is not enabled.",
+                transition
+            )
+        })
     }
 
     fn get_total_weight_of_enabled_transitions(

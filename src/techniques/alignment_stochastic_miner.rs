@@ -25,6 +25,11 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
         mut self,
         language: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<Self::T> {
+        if self.get_initial_marking()?.is_none() {
+            //empty language stays empty
+            return Ok(StochasticBusinessProcessModelAndNotation { bpmn: self });
+        }
+
         //reset the weights
         {
             let ids = self
@@ -52,13 +57,11 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
                 {
                     // println!("move {:?}", movee);
                     match movee {
-                        Move::LogMove(_) => {}
-                        Move::ModelMove(_, transition_index)
-                        | Move::SynchronousMove(_, transition_index)
-                        | Move::SilentMove(transition_index) => {
-                            for token in
-                                self.transition_2_produced_tokens(*transition_index, &marking)?
-                            {
+                        Move::LogMove { .. } => {}
+                        Move::ModelMove { transition, .. }
+                        | Move::SynchronousMove { transition, .. }
+                        | Move::SilentMove { transition, .. } => {
+                            for token in self.transition_2_produced_tokens(*transition, &marking)? {
                                 // println!("\ttoken {:?}", token);
                                 if let Token::SequenceFlow(sequence_flow_index) = token {
                                     let sequence_flow = self
@@ -71,7 +74,7 @@ impl AlignmentMiner for BusinessProcessModelAndNotation {
                                 }
                             }
 
-                            self.execute_transition(&mut marking, *transition_index)?;
+                            self.execute_transition(&mut marking, *transition)?;
                         }
                     }
                 }
@@ -89,6 +92,10 @@ impl AlignmentMiner for LabelledPetriNet {
         mut self,
         language: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<StochasticLabelledPetriNet> {
+        if self.initial_marking.is_none() {
+            return Ok(StochasticLabelledPetriNet::new_empty_language());
+        }
+
         let mut probabilities: Vec<Fraction> =
             vec![Fraction::zero(); self.get_number_of_transitions()];
 
@@ -103,10 +110,10 @@ impl AlignmentMiner for LabelledPetriNet {
                 .ok_or_else(|| anyhow!("should not happen"))?
             {
                 match movee {
-                    Move::LogMove(_) => {}
-                    Move::ModelMove(_, transition)
-                    | Move::SynchronousMove(_, transition)
-                    | Move::SilentMove(transition) => {
+                    Move::LogMove { .. } => {}
+                    Move::ModelMove { transition, .. }
+                    | Move::SynchronousMove { transition, .. }
+                    | Move::SilentMove { transition } => {
                         probabilities[*transition] += probability;
                     }
                 }
@@ -122,8 +129,7 @@ mod tests {
     use std::fs;
 
     use ebi_objects::{
-        BusinessProcessModelAndNotation, FiniteStochasticLanguage, HasActivityKey,
-        LabelledPetriNet, TranslateActivityKey, ebi_bpmn::Token,
+        BusinessProcessModelAndNotation, FiniteStochasticLanguage, HasActivityKey, LabelledPetriNet, TranslateActivityKey, ebi_bpmn::{GlobalIndex, Token},
     };
 
     use crate::techniques::alignment_stochastic_miner::AlignmentMiner;
@@ -161,7 +167,7 @@ mod tests {
             assert_eq!(bpmn.get_enabled_transitions(&marking).unwrap(), vec![0]);
             assert_eq!(
                 bpmn.transition_2_produced_tokens(0, &marking).unwrap(),
-                vec![Token::SequenceFlow((7, ()))]
+                vec![Token::SequenceFlow(GlobalIndex(7))]
             );
             bpmn.execute_transition(&mut marking, 0).unwrap();
 
@@ -171,7 +177,7 @@ mod tests {
             assert_eq!(bpmn.get_enabled_transitions(&marking).unwrap(), vec![2]);
             assert_eq!(
                 bpmn.transition_2_produced_tokens(2, &marking).unwrap(),
-                vec![Token::SequenceFlow((9, ()))]
+                vec![Token::SequenceFlow(GlobalIndex(9))]
             );
             bpmn.execute_transition(&mut marking, 2).unwrap();
         }

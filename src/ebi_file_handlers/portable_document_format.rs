@@ -35,6 +35,9 @@ pub const EBI_PORTABLE_DOCUMENT_FORMAT: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::FiniteStochasticPartiallyOrderedLanguage(
             PortableDocumentFormat::export_from_object,
         ),
+        EbiObjectExporter::StochasticDirectlyFollowsModel(
+            PortableDocumentFormat::export_from_object,
+        ),
     ],
     object_exporters_fallible: &[],
     java_object_handlers: &[],

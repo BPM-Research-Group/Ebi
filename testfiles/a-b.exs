@@ -3,6 +3,12 @@
     {
       "activity": "a",
       "also_in_log": true,
+      "event_attributes": {
+        "concept:name": "a",
+        "org:resource": "John",
+        "other_attribute": "z",
+        "time:timestamp": "2017-05-09 00:00:00 +01:00"
+      },
       "fired_transition": 0,
       "move_index": 0,
       "move_index_of_enablement": null,
@@ -12,7 +18,7 @@
       ],
       "other_enabled_transitions_resource_utilisation": [
         "0",
-        null
+        "0"
       ],
       "resource": "John",
       "resource_utilisation_fired_transition": "0",
@@ -22,6 +28,7 @@
     {
       "activity": null,
       "also_in_log": false,
+      "event_attributes": null,
       "fired_transition": 4,
       "move_index": 1,
       "move_index_of_enablement": 0,
@@ -35,6 +42,12 @@
     {
       "activity": "b",
       "also_in_log": true,
+      "event_attributes": {
+        "concept:name": "b",
+        "org:resource": "Doe",
+        "other_attribute": "y",
+        "time:timestamp": "2017-05-09 00:00:00 +01:00"
+      },
       "fired_transition": 1,
       "move_index": 0,
       "move_index_of_enablement": null,
@@ -43,8 +56,8 @@
         2
       ],
       "other_enabled_transitions_resource_utilisation": [
-        "1",
-        null
+        "0",
+        "0"
       ],
       "resource": "Doe",
       "resource_utilisation_fired_transition": "0",
@@ -54,6 +67,7 @@
     {
       "activity": null,
       "also_in_log": false,
+      "event_attributes": null,
       "fired_transition": 4,
       "move_index": 1,
       "move_index_of_enablement": 0,

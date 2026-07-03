@@ -1,6 +1,6 @@
 use ebi_objects::{
     DirectlyFollowsGraph, TranslateActivityKey,
-    ebi_arithmetic::{Fraction, Signed, Zero},
+    ebi_arithmetic::{Fraction, Signed},
 };
 
 pub trait EdgeDifference {
@@ -10,15 +10,14 @@ pub trait EdgeDifference {
 impl EdgeDifference for DirectlyFollowsGraph {
     fn edge_difference(&mut self, other: &mut Self) -> Fraction {
         other.translate_using_activity_key(&mut self.activity_key);
-        let zero = Fraction::zero();
 
         //empty traces
         let mut result = (&self.empty_traces_weight - &other.empty_traces_weight).abs();
 
         //start activities
         for activity in self.activity_key.get_activities() {
-            let start1 = self.start_activities.get(activity).unwrap_or(&zero);
-            let start2 = other.start_activities.get(activity).unwrap_or(&zero);
+            let start1 = self.start_activity_weight(*activity);
+            let start2 = other.start_activity_weight(*activity);
 
             if start1 != start2 {
                 log::debug!(
@@ -34,8 +33,8 @@ impl EdgeDifference for DirectlyFollowsGraph {
 
         //end activities
         for activity in self.activity_key.get_activities() {
-            let end1 = self.end_activities.get(activity).unwrap_or(&zero);
-            let end2 = other.end_activities.get(activity).unwrap_or(&zero);
+            let end1 = self.end_activity_weight(*activity);
+            let end2 = other.end_activity_weight(*activity);
 
             if end1 != end2 {
                 log::debug!(
@@ -50,20 +49,16 @@ impl EdgeDifference for DirectlyFollowsGraph {
         }
 
         //edges
-        for (a, b) in self
-            .activity_key
-            .get_activities()
-            .iter()
-            .zip(self.activity_key.get_activities().iter())
-        {
-            let e1 = self.edge_weight(**a, **b).unwrap_or(&zero);
-            let e2 = other.edge_weight(**a, **b).unwrap_or(&zero);
+        for (a, b) in self.activities().zip(self.activities()) {
+            let e1 = self.edge_weight(a, b);
+
+            let e2 = other.edge_weight(a, b);
 
             if e1 != e2 {
                 log::debug!(
                     "edge different: {}->{} first {} second {}",
-                    self.activity_key.get_activity_label(a),
-                    self.activity_key.get_activity_label(b),
+                    self.activity_key.get_activity_label(&a),
+                    self.activity_key.get_activity_label(&b),
                     e1,
                     e2,
                 );

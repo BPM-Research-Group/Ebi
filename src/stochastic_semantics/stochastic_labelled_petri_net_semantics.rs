@@ -11,8 +11,13 @@ use ebi_objects::{
 impl StochasticSemantics for StochasticLabelledPetriNet {
     type StoSemState = LPNMarking;
 
-    fn get_transition_weight(&self, _state: &LPNMarking, transition: usize) -> &Fraction {
-        &self.weights[transition]
+    fn get_transition_weight(&self, _state: &LPNMarking, transition: usize) -> Result<&Fraction> {
+        self.weights.get(transition).ok_or_else(|| {
+            anyhow!(
+                "Transition {} does not exist.",
+                transition
+            )
+        })
     }
 
     fn get_total_weight_of_enabled_transitions(&self, state: &LPNMarking) -> Result<Fraction> {

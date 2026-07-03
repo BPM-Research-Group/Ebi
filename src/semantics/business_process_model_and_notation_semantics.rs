@@ -46,7 +46,4 @@ impl Semantics for BusinessProcessModelAndNotation {
         BusinessProcessModelAndNotation::get_enabled_transitions(&self, state).unwrap()
     }
 
-    fn number_of_transitions(&self, state: &<Self as Semantics>::SemState) -> usize {
-        BusinessProcessModelAndNotation::number_of_transitions(self, state)
-    }
 }

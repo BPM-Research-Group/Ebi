@@ -175,9 +175,6 @@ impl Semantics for FiniteStochasticLanguageSemantics {
         return result;
     }
 
-    fn number_of_transitions(&self, _state: &<Self as Semantics>::SemState) -> usize {
-        self.activity_key.get_number_of_activities()
-    }
 }
 
 #[cfg(test)]

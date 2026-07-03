@@ -26,6 +26,7 @@ pub mod ebi_commands {
     pub mod ebi_command_info;
     pub mod ebi_command_itself;
     pub mod ebi_command_probability;
+    pub mod ebi_command_reduce;
     pub mod ebi_command_sample;
     pub mod ebi_command_test;
     pub mod ebi_command_validate;
@@ -83,14 +84,18 @@ pub mod javascript {
     #[cfg(feature = "javascript")]
     pub mod javascript_autogen;
     pub mod javascript_generator_html;
-    #[cfg(feature = "javascript")]
+    #[cfg(all(feature = "javascript", feature = "test_generation"))]
     pub mod javascript_generator_rust;
     #[cfg(feature = "javascript")]
     pub mod javascript_link;
 }
 pub mod math {
     pub mod average;
-
+    pub mod components;
+    pub mod correlation;
+    pub mod distances;
+    pub mod distances_matrix;
+    pub mod distances_triangular;
     pub mod fixed_denominator_fraction;
     #[cfg(any(
         all(
@@ -104,6 +109,7 @@ pub mod math {
     pub mod fixed_denominator_fraction_exact;
     #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
     pub mod fixed_denominator_fraction_f64;
+    pub mod levenshtein;
     pub mod log_div;
     #[cfg(any(
         all(
@@ -117,16 +123,10 @@ pub mod math {
     pub mod log_div_exact;
     #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
     pub mod log_div_f64;
-    pub mod sign;
-
-    pub mod correlation;
-    pub mod distances;
-    pub mod distances_matrix;
-    pub mod distances_triangular;
-    pub mod levenshtein;
     pub mod markov_model;
     pub mod root;
     pub mod root_log_div;
+    pub mod sign;
 }
 
 pub mod prom {
@@ -152,25 +152,27 @@ pub mod python {
 }
 
 pub mod semantics {
+    pub mod automaton_semantics;
     pub mod business_process_model_and_notation_semantics;
-    pub mod directly_follows_graph_semantics;
     pub mod finite_stochastic_language_semantics;
     pub mod finite_stochastic_partially_ordered_language_semantics;
     pub mod labelled_petri_net_semantics;
     pub mod process_tree_semantics;
     pub mod semantics;
     pub mod stochastic_business_process_model_and_notation_semantics;
-    pub mod stochastic_deterministic_finite_automaton_semantics;
-    pub mod stochastic_directly_follows_graph_semantics;
     pub mod stochastic_labelled_petri_net_semantics;
-    pub mod stochastic_nondetermininstic_finite_automaton_semantics;
     pub mod stochastic_process_tree_semantics;
+}
+pub mod stochastic_deterministic_semantics {
+    pub mod deterministic_semantics_for_stochastic_semantics;
+    pub mod stochastic_deterministic_finite_automaton_deterministic;
 }
 pub mod stochastic_partially_ordered_semantics {
     pub mod stochastic_partially_ordered_semantics;
     pub mod stochastic_process_tree_stochastic_partially_ordered_semantics;
 }
 pub mod stochastic_semantics {
+    pub mod directly_follows_graph_stochastic_semantics;
     pub mod finite_stochastic_language_semantics;
     pub mod stochastic_deterministic_finite_automaton_semantics;
     pub mod stochastic_directly_follows_model_semantics;
@@ -188,7 +190,6 @@ pub mod techniques {
     pub mod bounded;
     pub mod chi_square_stochastic_conformance;
     pub mod completeness;
-    pub mod deterministic_semantics_for_stochastic_semantics;
     pub mod directly_follows_graph_abstractor;
     pub mod directly_follows_model_miner;
     pub mod earth_movers_stochastic_conformance;
@@ -205,6 +206,8 @@ pub mod techniques {
     #[cfg(all(not(feature = "eexactarithmetic"), feature = "eapproximatearithmetic"))]
     pub mod earth_movers_stochastic_conformance_f64;
     pub mod edge_difference;
+    pub mod edge_difference_no_freq;
+    pub mod empty_traces;
     pub mod entropic_relevance;
     pub mod entropy;
     pub mod escaping_edges_precision;
@@ -215,6 +218,7 @@ pub mod techniques {
     pub mod flower_miner;
     pub mod gain_precision_recall;
     pub mod hellinger_stochastic_conformance;
+    pub mod inductive_miner;
     pub mod infinitely_many_traces;
     pub mod jensen_shannon_stochastic_conformance;
     pub mod livelock;
@@ -230,19 +234,38 @@ pub mod techniques {
     pub mod probability_queries;
     pub mod process_variety;
     pub mod random_stochastic_miner;
+    pub mod reachability;
+    pub mod reduce;
     pub mod resource_utilisation;
     pub mod sample;
     pub mod sample_folds;
+    pub mod split_miner;
     pub mod stochastic_markovian_abstraction;
     pub mod stochastic_markovian_abstraction_conformance;
     pub mod tau_removal;
+    pub mod timestamps_ordered;
+    pub mod trace_model_miner;
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
 }
+pub mod tests {
+    #[cfg(feature = "test_generation")]
+    pub mod fallible_test;
+    #[cfg(feature = "test_generation")]
+    pub mod fallible_test_list;
+    #[cfg(feature = "test_generation")]
+    pub mod test_input;
+    #[cfg(any(test, feature = "test_generation"))]
+    pub mod tests;
+    #[cfg(test)]
+    pub mod tests_autogen;
+    #[cfg(feature = "test_generation")]
+    pub mod tests_generator;
+}
 pub mod follower_semantics;
 pub mod multiple_reader;
-pub mod tests;
 pub mod text;
 
 pub use ebi_objects;
+pub use ebi_objects::AutomatonState;

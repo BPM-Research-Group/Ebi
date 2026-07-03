@@ -85,14 +85,6 @@ impl Semantics for FiniteStochasticPartiallyOrderedLanguage {
             (0..self.number_of_traces()).collect()
         }
     }
-
-    fn number_of_transitions(&self, state: &<Self as Semantics>::SemState) -> usize {
-        if let Some(trace) = state.trace {
-            self.traces[trace].number_of_edges()
-        } else {
-            self.number_of_traces()
-        }
-    }
 }
 
 #[derive(Clone, Eq, PartialEq, Hash, Debug)]

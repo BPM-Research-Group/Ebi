@@ -43,6 +43,14 @@ pub fn merge_importer_parameters(
                             }
                         }
                     }
+                    for importer in file_handler.object_importers_fallible {
+                        if &importer.get_type() == ebi_object_type {
+                            //found an importer for this trait; copy its parameters
+                            for parameter in importer.parameters() {
+                                result.insert(parameter);
+                            }
+                        }
+                    }
                 }
             }
             EbiInputType::AnyObject => {

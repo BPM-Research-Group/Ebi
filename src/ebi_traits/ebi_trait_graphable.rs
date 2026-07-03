@@ -58,7 +58,7 @@ pub mod tests {
 
     #[test]
     fn all_graphable() {
-        for (input, _, _, _) in crate::tests::get_all_test_files() {
+        for (input, _, _, _) in crate::tests::tests::get_all_test_files() {
             if let EbiInput::Trait(object, _) = input {
                 if let EbiTraitObject::Graphable(object) = object {
                     assert!(object.to_dot().is_ok());

@@ -16,13 +16,13 @@ impl Fitness for StochasticLanguageOfAlignments {
             let mut count_moves = 0usize;
             for movee in alignment {
                 match movee {
-                    Move::LogMove(_) => count_moves += 1,
-                    Move::ModelMove(_, _) => count_moves += 1,
-                    Move::SynchronousMove(_, _) => {
+                    Move::LogMove { .. } => count_moves += 1,
+                    Move::ModelMove { .. } => count_moves += 1,
+                    Move::SynchronousMove { .. } => {
                         count_moves += 1;
                         count_synchronous += 1;
                     }
-                    Move::SilentMove(_) => {}
+                    Move::SilentMove { .. } => {}
                 }
             }
             probability *= Fraction::from((count_synchronous, count_moves));

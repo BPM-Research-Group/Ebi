@@ -10,7 +10,7 @@ use crate::{
     },
 };
 use ebi_objects::{
-    ActivityKey, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
+    ActivityKey, AutomatonState, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton,
     DirectlyFollowsGraph, DirectlyFollowsModel, EventLog, EventLogPython, EventLogTraceAttributes,
     EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
     FiniteStochasticPartiallyOrderedLanguage, HasActivityKey, LabelledPetriNet, LolaNet,
@@ -55,6 +55,7 @@ pub const TRAIT_DEFINITION_LATEX: &str = concat!(
 /// For these methods, such as 'get_initial_state' and 'get_enabled_transitions', please access the struct directly.
 pub enum EbiTraitSemantics {
     Usize(Box<dyn Semantics<SemState = usize, AliState = usize>>),
+    AutomatonState(Box<dyn Semantics<SemState = AutomatonState, AliState = AutomatonState>>),
     Marking(Box<dyn Semantics<SemState = LPNMarking, AliState = LPNMarking>>),
     TreeMarking(Box<dyn Semantics<SemState = TreeMarking, AliState = TreeMarking>>),
     BPMNMarking(Box<dyn Semantics<SemState = BPMNMarking, AliState = BPMNMarking>>),
@@ -66,6 +67,7 @@ impl HasActivityKey for EbiTraitSemantics {
         match self {
             EbiTraitSemantics::Marking(semantics) => semantics.activity_key(),
             EbiTraitSemantics::Usize(semantics) => semantics.activity_key(),
+            EbiTraitSemantics::AutomatonState(semantics) => semantics.activity_key(),
             EbiTraitSemantics::TreeMarking(semantics) => semantics.activity_key(),
             EbiTraitSemantics::BPMNMarking(semantics) => semantics.activity_key(),
             EbiTraitSemantics::FspolangMarking(semantics) => semantics.activity_key(),
@@ -76,6 +78,7 @@ impl HasActivityKey for EbiTraitSemantics {
         match self {
             EbiTraitSemantics::Marking(semantics) => semantics.activity_key_mut(),
             EbiTraitSemantics::Usize(semantics) => semantics.activity_key_mut(),
+            EbiTraitSemantics::AutomatonState(semantics) => semantics.activity_key_mut(),
             EbiTraitSemantics::TreeMarking(semantics) => semantics.activity_key_mut(),
             EbiTraitSemantics::BPMNMarking(semantics) => semantics.activity_key_mut(),
             EbiTraitSemantics::FspolangMarking(semantics) => semantics.activity_key_mut(),
@@ -90,6 +93,9 @@ impl TranslateActivityKey for EbiTraitSemantics {
                 semantics.translate_using_activity_key(to_activity_key)
             }
             EbiTraitSemantics::Usize(semantics) => {
+                semantics.translate_using_activity_key(to_activity_key)
+            }
+            EbiTraitSemantics::AutomatonState(semantics) => {
                 semantics.translate_using_activity_key(to_activity_key)
             }
             EbiTraitSemantics::TreeMarking(semantics) => {
@@ -150,7 +156,7 @@ impl ToSemanticsTrait for StochasticBusinessProcessModelAndNotation {
 
 impl ToSemanticsTrait for DeterministicFiniteAutomaton {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::Usize(Box::new(self))
+        EbiTraitSemantics::AutomatonState(Box::new(self))
     }
 }
 
@@ -186,32 +192,31 @@ impl ToSemanticsTrait for StochasticLabelledPetriNet {
 
 impl ToSemanticsTrait for StochasticDirectlyFollowsModel {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::Usize(Box::new(self))
+        EbiTraitSemantics::AutomatonState(Box::new(self))
     }
 }
 
 impl ToSemanticsTrait for DirectlyFollowsGraph {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        let dfm: DirectlyFollowsModel = self.into();
-        EbiTraitSemantics::Usize(Box::new(dfm))
+        EbiTraitSemantics::AutomatonState(Box::new(self))
     }
 }
 
 impl ToSemanticsTrait for DirectlyFollowsModel {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::Usize(Box::new(self))
+        EbiTraitSemantics::AutomatonState(Box::new(self))
     }
 }
 
 impl ToSemanticsTrait for StochasticDeterministicFiniteAutomaton {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::Usize(Box::new(self))
+        EbiTraitSemantics::AutomatonState(Box::new(self))
     }
 }
 
 impl ToSemanticsTrait for StochasticNondeterministicFiniteAutomaton {
     fn to_semantics_trait(self) -> EbiTraitSemantics {
-        EbiTraitSemantics::Usize(Box::new(self))
+        EbiTraitSemantics::AutomatonState(Box::new(self))
     }
 }
 

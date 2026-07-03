@@ -1,5 +1,5 @@
 use ebi_objects::{
-    DirectlyFollowsGraph,
+    DirectlyFollowsGraph, FiniteStochasticLanguage,
     ebi_arithmetic::{Fraction, One},
 };
 
@@ -42,7 +42,7 @@ impl DirectlyFollowsAbstractor for dyn EbiTraitEventLog {
     }
 }
 
-impl DirectlyFollowsAbstractor for dyn EbiTraitFiniteStochasticLanguage {
+impl DirectlyFollowsAbstractor for dyn EbiTraitFiniteStochasticLanguage + '_ {
     fn abstract_to_directly_follows_graph(&self) -> DirectlyFollowsGraph {
         let mut result = DirectlyFollowsGraph::new(self.activity_key().clone());
 
@@ -71,5 +71,11 @@ impl DirectlyFollowsAbstractor for dyn EbiTraitFiniteStochasticLanguage {
         }
 
         result
+    }
+}
+
+impl DirectlyFollowsAbstractor for FiniteStochasticLanguage {
+    fn abstract_to_directly_follows_graph(&self) -> DirectlyFollowsGraph {
+        <dyn EbiTraitFiniteStochasticLanguage>::abstract_to_directly_follows_graph(self)
     }
 }

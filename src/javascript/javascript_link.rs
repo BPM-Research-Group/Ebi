@@ -1,5 +1,3 @@
-use std::path::PathBuf;
-
 use crate::{
     ebi_framework::{
         ebi_command::EbiCommand,
@@ -11,8 +9,10 @@ use crate::{
 use ebi_objects::anyhow::{Context, Error, Result, anyhow};
 use itertools::Itertools;
 use js_sys::Uint8Array;
+use std::path::PathBuf;
 use wasm_bindgen::prelude::*;
 
+#[cfg(not(test))]
 #[wasm_bindgen]
 extern "C" {
     pub fn ebi_error(s: &str, command_name: &str);
@@ -21,6 +21,20 @@ extern "C" {
 
     pub fn ebi_log(s: &str, command_name: &str);
 }
+
+#[cfg(test)]
+pub fn ebi_error(s: &str, command_name: &str) {
+    use std::backtrace::Backtrace;
+
+    println!("Custom backtrace: {}", Backtrace::force_capture());
+    panic!("{command_name}: {s}");
+}
+
+#[cfg(test)]
+pub fn ebi_output(_s: &str, _command_name: &str, _file_extension: &str) {}
+
+#[cfg(test)]
+pub fn ebi_log(_s: &str, _command_name: &str) {}
 
 #[wasm_bindgen(getter_with_clone)]
 pub struct JavascriptInput {
@@ -57,6 +71,15 @@ impl JavascriptInput {
     }
 }
 
+impl From<String> for JavascriptInput {
+    fn from(value: String) -> Self {
+        Self {
+            textual: Some(value),
+            binary: None,
+        }
+    }
+}
+
 pub fn read_inputs(
     javascript_inputs: Vec<JavascriptInput>,
     command: &EbiCommand,
@@ -80,7 +103,9 @@ pub fn read_inputs(
                 (Some(string_input), None) => MultipleReader::String(string_input),
                 (None, Some(array)) => MultipleReader::Bytes(array.to_vec()),
                 _ => {
-                    return Err(anyhow!("No or both textual and binary inputs given."));
+                    return Err(anyhow!(
+                        "No inputs or both textual and binary inputs given."
+                    ));
                 }
             };
 

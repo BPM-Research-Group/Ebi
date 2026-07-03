@@ -2,12 +2,13 @@ use bitvec::{bitvec, vec::BitVec};
 use ebi_objects::{
     Activity, ActivityKey, Executions,
     anyhow::{Result, anyhow},
-    ebi_arithmetic::{Fraction, f},
+    ebi_arithmetic::{Fraction, Zero, f},
 };
 use itertools::Itertools;
 use std::fmt::Display;
 
 pub fn set_resource_utilisations(executions: &mut Executions) -> Result<()> {
+    log::info!("Computing resource utilisations");
     //discover a resource model
     let resource_model = ResourceModel::from_executions(&executions);
 
@@ -22,27 +23,24 @@ pub fn set_resource_utilisations(executions: &mut Executions) -> Result<()> {
         .iter()
         .map(|execution| vec![None; execution.other_enabled_transitions.len()])
         .collect::<Vec<_>>();
-    {
-        for (execution_i, started_by) in execution_2_started_by.iter().enumerate() {
-            if let Some(resource) = executions.executions[execution_i].resource
-                && started_by.is_none()
-            {
-                //set resource utilisation
-                let execution = &executions.executions[execution_i];
-                execution_2_resource_utilisation_fired[execution_i] = resource_model
-                    .resource_utilisation(&resource_marking, execution.fired_transition);
-                for (j, other_enabled_transition) in executions.executions[execution_i]
-                    .other_enabled_transitions
-                    .iter()
-                    .enumerate()
-                {
-                    execution_2_resource_utilisation_enabled[execution_i][j] = resource_model
-                        .resource_utilisation(&resource_marking, *other_enabled_transition);
-                }
 
-                //set resource marking
-                resource_marking.occupy(resource)?;
+    //Iinitialise: any execution that starts with the multi-run has a resource utilisation of 0
+    for (execution_i, started_by) in execution_2_started_by.iter().enumerate() {
+        if let Some(resource) = executions.executions[execution_i].resource
+            && started_by.is_none()
+        {
+            //set resource utilisation
+            execution_2_resource_utilisation_fired[execution_i] = Some(Fraction::zero());
+            for (j, _) in executions.executions[execution_i]
+                .other_enabled_transitions
+                .iter()
+                .enumerate()
+            {
+                execution_2_resource_utilisation_enabled[execution_i][j] = Some(Fraction::zero());
             }
+
+            //set resource marking
+            resource_marking.occupy(resource)?;
         }
     }
 
@@ -235,7 +233,7 @@ impl Display for ResourceModel {
                             .get_activity_label(&self.resource_key.get_activity_by_id(r)))
                         .join(", ")
                 ))
-                .join(", ")
+                .join("\n")
         )
     }
 }

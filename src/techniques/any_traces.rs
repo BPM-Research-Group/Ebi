@@ -4,11 +4,12 @@ use crate::{
     techniques::livelock::IsPartOfLivelock,
 };
 use ebi_objects::{
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, EventLog,
-    EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage,
-    FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet, NumberOfTraces, ProcessTree,
-    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
+    EventLog, EventLogPython, EventLogTraceAttributes, EventLogXes, FiniteLanguage,
+    FiniteStochasticLanguage, FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet,
+    NumberOfTraces, ProcessTree, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::Result,
     ebi_arithmetic::ebi_number::Zero,
     ebi_objects::{
@@ -86,7 +87,7 @@ macro_rules! lpn {
 macro_rules! dfm {
     ($t:ident) => {
         impl AnyTraces for $t {
-            type LivState = usize;
+            type LivState = AutomatonState;
 
             fn any_traces(&self) -> Result<bool> {
                 if let Some(initial_state) = self.get_initial_state() {

@@ -37,6 +37,9 @@ pub const EBI_PORTABLE_NETWORK_GRAPHCIS: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::FiniteStochasticPartiallyOrderedLanguage(
             PortableNetworkGraphics::export_from_object,
         ),
+        EbiObjectExporter::StochasticDirectlyFollowsModel(
+            PortableNetworkGraphics::export_from_object,
+        ),
     ],
     object_exporters_fallible: &[],
     java_object_handlers: &[],
