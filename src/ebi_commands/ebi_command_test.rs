@@ -18,7 +18,6 @@ use crate::{
         permutation_test::PermutationTest,
         permutation_test_log_model::PermutationTestLogModel,
     },
-    tests::test_ebi_command,
 };
 use ebi_objects::{
     anyhow::{Context, anyhow},
@@ -34,7 +33,7 @@ pub const EBI_TEST: EbiCommand = EbiCommand::Group {
     explanation_short: "Test a hypothesis.",
     explanation_long: None,
     children: &[
-        &EBI_BOOTSTRAP_TEST,
+        &EBI_TEST_BOOTSTRAP,
         &EBI_PERMUTATION_TEST_LOG_MODEL,
         &EBI_TEST_LOG_ATTRIBUTE,
     ],
