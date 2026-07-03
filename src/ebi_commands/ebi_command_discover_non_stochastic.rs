@@ -8,17 +8,11 @@ use crate::{
         },
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
-    },
-    ebi_traits::{
+    }, ebi_traits::{
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
-    techniques::{
-        flower_miner::{FlowerMinerDFA, FlowerMinerTree},
-        inductive_miner::{InductiveMiner, InductiveMinerInfrequent},
-        prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree},
-        split_miner::SplitMiner,
-        trace_model_miner::TraceModelMinerTree,
+    }, techniques::{
+        flower_miner::{FlowerMinerDFA, FlowerMinerTree}, inductive_miner::{InductiveMiner, InductiveMinerInfrequent}, prefix_tree_miner::{PrefixTreeMinerDFA, PrefixTreeMinerTree}, split_miner::{SplitMiner, SplitMinerParameters}, trace_model_miner::TraceModelMinerTree,
     },
 };
 use ebi_objects::{
@@ -267,15 +261,22 @@ pub const EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER: EbiCommand = EbiCommand::Comm
     latex_link: Some("\\cite{DBLP:journals/kais/AugustoCDRP19}"),
     cli_command: None,
     exact_arithmetic: true,
-    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)]],
-    input_names: &["LOG"],
-    input_helps: &["The event log."],
+    input_types: &[&[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+    &[&EbiInputType::Fraction(Some(ConstFraction::zero()), Some(ConstFraction::one()), Some(ConstFraction::of(1, 10)))],
+    &[&EbiInputType::Fraction(Some(ConstFraction::zero()), Some(ConstFraction::one()), Some(ConstFraction::of(4, 10)))]],
+    input_names: &["LOG", "CONC", "FREQ"],
+    input_helps: &["The event log.", "Parallelism threshold", "Frequency threshold"],
     execute: |mut inputs, _| {
         let log = inputs
             .remove(0)
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let epsilon_parallelism = inputs.remove(0).to_type::<Fraction>()?;
+        let eta_frequency = inputs.remove(0).to_type::<Fraction>()?;
+
+        let parameters = SplitMinerParameters{epsilon_parallelism: *epsilon_parallelism, eta_frequency: *eta_frequency};
+    
         Ok(EbiOutput::Object(
-            EbiObject::BusinessProcessModelAndNotation(log.split_miner()?),
+            EbiObject::BusinessProcessModelAndNotation(log.split_miner(&parameters)?),
         ))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::BusinessProcessModelAndNotation),

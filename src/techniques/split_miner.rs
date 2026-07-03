@@ -16,28 +16,35 @@ use itertools::Itertools;
 use std::collections::{HashSet, VecDeque};
 
 pub trait SplitMiner {
-    fn split_miner(&self) -> Result<BusinessProcessModelAndNotation>;
+    fn split_miner(
+        &self,
+        parameters: &SplitMinerParameters,
+    ) -> Result<BusinessProcessModelAndNotation>;
+
+    fn split_miner_default(&self) -> Result<BusinessProcessModelAndNotation> {
+        self.split_miner(&SplitMinerParameters::default())
+    }
 }
 
 impl SplitMiner for dyn EbiTraitFiniteStochasticLanguage {
-    fn split_miner(&self) -> Result<BusinessProcessModelAndNotation> {
-        split_miner(self, &SplitMinerParameters::default())
+    fn split_miner(&self, parameters: &SplitMinerParameters) -> Result<BusinessProcessModelAndNotation> {
+        split_miner(self, parameters)
     }
 }
 
 #[derive(Clone)]
 pub struct SplitMinerParameters {
     /// Threshold for whether a pair of back-and-forth edges gets treated as concurrent or as infrequent behaviour (Parallelisms Threshold).
-    epsilon: Fraction,
+    pub epsilon_parallelism: Fraction,
     /// Threshold for filtering dfg edges (Percentile Frequency Threshold).
-    eta: Fraction,
+    pub eta_frequency: Fraction,
 }
 
 impl Default for SplitMinerParameters {
     fn default() -> Self {
         Self {
-            epsilon: f!(1, 10),
-            eta: f!(4, 10),
+            epsilon_parallelism: f!(1, 10),
+            eta_frequency: f!(4, 10),
         }
     }
 }
@@ -118,7 +125,7 @@ fn step_1_dfg(
         {
             let weight_ab = weight;
             let weight_ba = dfg.edge_weight(target, source);
-            if (weight_ab - &weight_ba).abs() / (weight_ab + &weight_ba) <= parameters.epsilon
+            if (weight_ab - &weight_ba).abs() / (weight_ab + &weight_ba) <= parameters.epsilon_parallelism
             //paper says "<", but example suggests "<="
             {
                 //activities are concurrent
@@ -190,7 +197,7 @@ fn algorithm_1_prune_dfg(
     // Here, we follow the implementation, as to match how ties are dealt with.
     let mut f = f.into_iter().collect::<Vec<_>>();
     f.sort();
-    let mut i = (&f!(f.len()) * &parameters.eta).to_usize();
+    let mut i = (&f!(f.len()) * &parameters.eta_frequency).to_usize();
     if i == f.len() {
         i -= 1
     };
@@ -754,7 +761,7 @@ mod tests {
 
         println!("{}", x);
 
-        x.split_miner().unwrap();
+        x.split_miner_default().unwrap();
     }
 
     #[test]
@@ -765,7 +772,7 @@ mod tests {
 
         println!("{}", x);
 
-        x.split_miner().unwrap();
+        x.split_miner_default().unwrap();
     }
 
     #[test]
@@ -774,6 +781,6 @@ mod tests {
         let log = fin.parse::<FiniteStochasticLanguage>().unwrap();
         let x = log.to_finite_stochastic_language_trait();
 
-        x.split_miner().unwrap();
+        x.split_miner_default().unwrap();
     }
 }
