@@ -542,6 +542,14 @@ pub fn discover_non_stochastic_prefix_tree_process_tree(javascript_inputs: Vec<J
 }
 
 #[wasm_bindgen]
+pub fn discover_non_stochastic_split_miner(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER;
+    execute_javascript_command(command, javascript_inputs, "discover_non_stochastic_split_miner", exporter_file_extension);
+}
+
+#[wasm_bindgen]
 pub fn discover_non_stochastic_trace_model(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = 
@@ -590,11 +598,19 @@ pub fn probability_log(javascript_inputs: Vec<JavascriptInput>, exporter_file_ex
 }
 
 #[wasm_bindgen]
-pub fn reduce_process_tree_reduction(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+pub fn reduce_labelled_petri_net(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_reduce::EBI_REDUCE_PETRI_NET;
+    execute_javascript_command(command, javascript_inputs, "reduce_labelled_petri_net", exporter_file_extension);
+}
+
+#[wasm_bindgen]
+pub fn reduce_process_tree(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = 
         &&crate::ebi_commands::ebi_command_reduce::EBI_REDUCE_PROCESS_TREE;
-    execute_javascript_command(command, javascript_inputs, "reduce_process_tree_reduction", exporter_file_extension);
+    execute_javascript_command(command, javascript_inputs, "reduce_process_tree", exporter_file_extension);
 }
 
 #[wasm_bindgen]
@@ -2881,6 +2897,36 @@ mod tests {
     }
 
 	#[test]
+	pub fn discover_non_stochastic_split_miner_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
+
+		];
+        crate::javascript::javascript_autogen::discover_non_stochastic_split_miner(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn discover_non_stochastic_split_miner_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
+
+		];
+        crate::javascript::javascript_autogen::discover_non_stochastic_split_miner(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn discover_non_stochastic_split_miner_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
+
+		];
+        crate::javascript::javascript_autogen::discover_non_stochastic_split_miner(inputs, ".xes");
+    }
+
+	#[test]
 	pub fn discover_non_stochastic_trace_model_test_0() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
@@ -3106,33 +3152,63 @@ mod tests {
     }
 
 	#[test]
-	pub fn reduce_process_tree_reduction_test_0() {
+	pub fn reduce_labelled_petri_net_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
+			// object labelled Petri net#./testfiles/seq(a-xor(b-c)).sptree
+
+		];
+        crate::javascript::javascript_autogen::reduce_labelled_petri_net(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn reduce_labelled_petri_net_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object labelled Petri net#./testfiles/empty_2.ptree
+
+		];
+        crate::javascript::javascript_autogen::reduce_labelled_petri_net(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn reduce_labelled_petri_net_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa.ptree").unwrap())
+			// object labelled Petri net#./testfiles/aa.ptree
+
+		];
+        crate::javascript::javascript_autogen::reduce_labelled_petri_net(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn reduce_process_tree_test_0() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// object process tree#./testfiles/seq(a-xor(b-c)).sptree
 
 		];
-        crate::javascript::javascript_autogen::reduce_process_tree_reduction(inputs, ".xes");
+        crate::javascript::javascript_autogen::reduce_process_tree(inputs, ".xes");
     }
 
 	#[test]
-	pub fn reduce_process_tree_reduction_test_1() {
+	pub fn reduce_process_tree_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
 			// object process tree#./testfiles/empty_2.ptree
 
 		];
-        crate::javascript::javascript_autogen::reduce_process_tree_reduction(inputs, ".xes");
+        crate::javascript::javascript_autogen::reduce_process_tree(inputs, ".xes");
     }
 
 	#[test]
-	pub fn reduce_process_tree_reduction_test_2() {
+	pub fn reduce_process_tree_test_2() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa.ptree").unwrap())
 			// object process tree#./testfiles/aa.ptree
 
 		];
-        crate::javascript::javascript_autogen::reduce_process_tree_reduction(inputs, ".xes");
+        crate::javascript::javascript_autogen::reduce_process_tree(inputs, ".xes");
     }
 
 	#[test]

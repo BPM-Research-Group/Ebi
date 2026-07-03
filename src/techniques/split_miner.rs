@@ -3,7 +3,7 @@ use crate::{
     techniques::directly_follows_graph_abstractor::DirectlyFollowsAbstractor,
 };
 use ebi_objects::{
-    Activity, BusinessProcessModelAndNotation, DirectlyFollowsGraph, HasActivityKey,
+    Activity, BusinessProcessModelAndNotation, DirectlyFollowsGraph,
     anyhow::Result,
     ebi_arithmetic::{Fraction, Signed, ToNative, Zero, f},
     ebi_bpmn::{
@@ -46,113 +46,113 @@ pub fn split_miner(
     log: &dyn EbiTraitFiniteStochasticLanguage,
     parameters: &SplitMinerParameters,
 ) -> Result<BusinessProcessModelAndNotation> {
-    let filtered_dfg = step_1_dfg_and_loop_discovery(log);
+    //special case: empty log
+    if log.number_of_traces() == 0 {
+        //empty model
+        return BPMNCreator::new().to_bpmn();
+    }
 
-    let pruned_dfg = step_2_concurrency_discovery(parameters, filtered_dfg);
+    //special case: only empty traces
+    if log.number_of_events() == 0 {
+        //model with only an empty trace
+        let mut bpmn_creator = BPMNCreator::new();
+        let process = bpmn_creator.add_process(None);
+        let start_event = bpmn_creator.add_start_event(process, StartEventType::None)?;
+        let end_event = bpmn_creator.add_end_event(process, EndEventType::None)?;
+        bpmn_creator.add_sequence_flow(start_event, end_event)?;
+        return bpmn_creator.to_bpmn();
+    }
 
-    let filtered_pruned_dfg = algorithm_1_generate_filtered_dfg(parameters, pruned_dfg)?;
+    let mut filtered_dfg = step_1_dfg(parameters, log);
 
-    let mut initial_bpmn = algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg)?;
+    println!("2 {}", filtered_dfg.dfg);
+
+    algorithm_1_prune_dfg(parameters, &mut filtered_dfg)?;
+
+    println!("3 {}", filtered_dfg.dfg);
+
+    let mut initial_bpmn = algorithm_4_filtered_dfg_to_bpmn(filtered_dfg)?;
 
     process_loops(&mut initial_bpmn)?;
+
+    println!("{}", initial_bpmn.bpmn_creator);
 
     initial_bpmn.bpmn_creator.to_bpmn()
 }
 
-fn step_1_dfg_and_loop_discovery(log: &dyn EbiTraitFiniteStochasticLanguage) -> FilteredDfg {
+fn step_1_dfg(
+    parameters: &SplitMinerParameters,
+    log: &dyn EbiTraitFiniteStochasticLanguage,
+) -> FilteredDfg {
+    //create dfg
     let mut dfg = log.abstract_to_directly_follows_graph();
 
-    //detect and remove self-loops
+    println!("1 {}", dfg);
+
+    //detect self-loops
     let self_loops = dfg
-        .edges_mut()
-        .filter_map(|(source, (target, weight))| {
-            if source == target {
-                weight.set_zero();
-                Some(source)
-            } else {
-                None
-            }
-        })
+        .edges()
+        .filter_map(
+            |(source, (target, _))| {
+                if source == target { Some(source) } else { None }
+            },
+        )
         .collect::<Vec<_>>();
 
     //detect short-loops
-    let mut short_loops = vec![];
+    let mut short_loops = HashSet::new();
     for trace in log.iter_traces() {
         for window in trace.windows(3) {
-            if window[0] == window[2]
-                && !short_loops.contains(&(window[0], window[1]))
-                && !short_loops.contains(&(window[1], window[0]))
-            {
-                short_loops.push((window[0], window[1]));
+            if window[0] == window[2] {
+                short_loops.insert(PairSet::new(window[0], window[1]));
             }
         }
     }
-    for (a, b) in short_loops.iter() {
-        dfg.remove_edge(*a, *b);
-        dfg.remove_edge(*b, *a);
-    }
 
-    FilteredDfg {
-        dfg,
-        self_loops,
-        short_loops,
-    }
-}
-
-fn step_2_concurrency_discovery(
-    parameters: &SplitMinerParameters,
-    filtered_dfg: FilteredDfg,
-) -> PrunedDfg {
-    let FilteredDfg {
-        mut dfg,
-        self_loops,
-        short_loops,
-    } = filtered_dfg;
-
-    let mut remove_edges = vec![];
+    //detect concurrent activities
     let mut concurrent_activities = HashSet::new();
     for (source, (target, weight)) in dfg.edges() {
-        if !self_loops.contains(&source) && !self_loops.contains(&target) {
+        if !self_loops.contains(&source)
+            && !self_loops.contains(&target)
+            && !short_loops.contains(&PairSet::new(source, target))
+        {
             let weight_ab = weight;
             let weight_ba = dfg.edge_weight(target, source);
             if (weight_ab - &weight_ba).abs() / (weight_ab + &weight_ba) <= parameters.epsilon
             //paper says "<", but example suggests "<="
             {
                 //activities are concurrent
-                remove_edges.push((source, target));
-                remove_edges.push((target, source));
-
-                concurrent_activities.insert(ConcurrentPair::new(source, target));
-            } else if weight_ab < &weight_ba {
-                remove_edges.push((source, target));
-            } else {
-                remove_edges.push((target, source));
+                concurrent_activities.insert(PairSet::new(source, target));
             }
         }
     }
 
-    for (source, target) in remove_edges {
-        dfg.remove_edge(source, target);
+    //filter the dfg
+    let mut remove_edges = vec![];
+    for (a, (b, weight)) in dfg.edges() {
+        if concurrent_activities.contains(&PairSet::new(a, b))
+            || (dfg.contains_edge(b, a) && *weight < dfg.edge_weight(b, a))
+        {
+            remove_edges.push((a, b));
+        }
     }
 
-    PrunedDfg {
+    for (a, b) in remove_edges {
+        dfg.remove_edge(a, b);
+    }
+
+    FilteredDfg {
         dfg,
         self_loops,
-        short_loops,
         concurrent_activities,
     }
 }
 
-fn algorithm_1_generate_filtered_dfg(
+fn algorithm_1_prune_dfg(
     parameters: &SplitMinerParameters,
-    pruned_dfg: PrunedDfg,
-) -> Result<FilteredPrunedDdg> {
-    let PrunedDfg {
-        mut dfg,
-        self_loops,
-        short_loops,
-        concurrent_activities,
-    } = pruned_dfg;
+    filtered_dfg: &mut FilteredDfg,
+) -> Result<()> {
+    let FilteredDfg { dfg, .. } = filtered_dfg;
 
     //line 3
     let mut c_f = IntMap::new();
@@ -165,7 +165,6 @@ fn algorithm_1_generate_filtered_dfg(
     //we do not have explicit start and end
 
     //line 8
-    let zero = Fraction::zero();
     for t in dfg.activities() {
         c_f.insert(t, Fraction::zero());
         c_b.insert(t, Fraction::zero());
@@ -173,14 +172,16 @@ fn algorithm_1_generate_filtered_dfg(
         let f_i = dfg
             .incoming_edges(t)
             .map(|(_, weight)| weight)
+            .chain(vec![dfg.start_activity_weight(t)])
             .max()
-            .unwrap_or(&zero);
+            .unwrap();
         let f_o = dfg
             .outgoing_edges(t)
             .iter()
             .map(|(_, weight)| *weight)
+            .chain(vec![dfg.end_activity_weight(t)])
             .max()
-            .unwrap_or(&zero);
+            .unwrap();
         f.insert(f_i);
         f.insert(f_o);
     }
@@ -207,8 +208,8 @@ fn algorithm_1_generate_filtered_dfg(
     //here, the paper removes edges; we instead remove them
     for (source, (target, weight)) in dfg.edges_mut() {
         //line 21
-        if !(e_i.values().contains(&(source, target)))
-            && !(e_o.values().contains(&(source, target)))
+        if !(e_i.values().contains(&(Some(source), target)))
+            && !(e_o.values().contains(&(source, Some(target))))
             && !(*weight > f_th)
         {
             //remove edge
@@ -216,18 +217,13 @@ fn algorithm_1_generate_filtered_dfg(
         }
     }
 
-    Ok(FilteredPrunedDdg {
-        dfg,
-        self_loops,
-        short_loops,
-        concurrent_activities,
-    })
+    Ok(())
 }
 
 fn algorithm_2_discover_best_incoming_edges(
     dfg: &DirectlyFollowsGraph,
     c_f: &mut IntMap<Activity, Fraction>,
-    e_i: &mut IntMap<Activity, (Activity, Activity)>,
+    e_i: &mut IntMap<Activity, (Option<Activity>, Activity)>,
 ) -> Result<()> {
     let mut q = VecDeque::new();
 
@@ -237,10 +233,19 @@ fn algorithm_2_discover_best_incoming_edges(
     //line 3
     //Change w.r.t. paper: we have an implicit start event
     //unfold the loop of line 7 for `i` manually
-    //line 11 evaluates to false, thus we only perform line 15-17
-    let start_activities = dfg.start_activities().collect::<HashSet<_>>();
-    u.retain(|activity| !start_activities.contains(activity));
-    q.extend(start_activities);
+    for start_activity in dfg.start_activities() {
+        let c_max = dfg.start_activity_weight(start_activity);
+        if c_max
+            > c_f
+                .get(start_activity)
+                .and_if_not("Start activity not found.")?
+        {
+            c_f.insert(start_activity, c_max.clone());
+            e_i.insert(start_activity, (None, start_activity));
+        }
+        u.remove(&start_activity);
+        q.push_back(start_activity);
+    }
 
     //line 4
     while let Some(p) = q.pop_front() {
@@ -255,7 +260,7 @@ fn algorithm_2_discover_best_incoming_edges(
                 c_f.insert(n, c_max.clone());
 
                 //line 13
-                e_i.insert(n, (p, n));
+                e_i.insert(n, (Some(p), n));
 
                 //line 14
                 if !q.contains(&n) && !u.contains(&n) {
@@ -277,7 +282,7 @@ fn algorithm_2_discover_best_incoming_edges(
 fn algorithm_3_discover_best_outgoing_edges(
     dfg: &DirectlyFollowsGraph,
     c_b: &mut IntMap<Activity, Fraction>,
-    e_o: &mut IntMap<Activity, (Activity, Activity)>,
+    e_o: &mut IntMap<Activity, (Activity, Option<Activity>)>,
 ) -> Result<()> {
     let mut q = VecDeque::new();
     let mut u = dfg.activities().collect::<HashSet<_>>();
@@ -287,9 +292,16 @@ fn algorithm_3_discover_best_outgoing_edges(
     //follow the loop manually for `o`,
     //then line 10 evaluates to false.
     //only line 14 is executed
-    let end_activities = dfg.end_activities().collect::<HashSet<_>>();
-    u.retain(|activity| !end_activities.contains(activity));
-    q.extend(end_activities);
+    for p in dfg.end_activities() {
+        let f_e = dfg.end_activity_weight(p);
+        let c_max = f_e;
+        if c_max > c_b.get(p).and_if_not("End activity not found")? {
+            c_b.insert(p, c_max.clone());
+            e_o.insert(p, (p, None));
+        }
+        u.remove(&p);
+        q.push_back(p);
+    }
 
     //line 3
     while let Some(n) = q.pop_front() {
@@ -300,7 +312,7 @@ fn algorithm_3_discover_best_outgoing_edges(
             //line 10
             if c_max > c_b.get(p).and_if_not("Activity not found.")? {
                 c_b.insert(p, c_max.clone());
-                e_o.insert(p, (p, n));
+                e_o.insert(p, (p, Some(n)));
 
                 //line 13
                 if !q.contains(&p) && !u.contains(&p) {
@@ -319,11 +331,10 @@ fn algorithm_3_discover_best_outgoing_edges(
     Ok(())
 }
 
-fn algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg: FilteredPrunedDdg) -> Result<InitialBPMN> {
-    let FilteredPrunedDdg {
+fn algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg: FilteredDfg) -> Result<InitialBPMN> {
+    let FilteredDfg {
         dfg,
         self_loops,
-        short_loops,
         concurrent_activities,
     } = filtered_pruned_dfg;
 
@@ -371,7 +382,7 @@ fn algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg: FilteredPrunedDdg) -> R
     let concurrent_tasks = concurrent_activities
         .into_iter()
         .map(|pair| {
-            Some(ConcurrentPair::new(
+            Some(PairSet::new(
                 *activity_2_task.get(pair.a)?,
                 *activity_2_task.get(pair.b)?,
             ))
@@ -381,7 +392,6 @@ fn algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg: FilteredPrunedDdg) -> R
 
     let mut initial_bpmn = InitialBPMN {
         self_loops,
-        short_loops,
         concurrent_tasks,
         activity_2_task,
         bpmn_creator,
@@ -400,7 +410,7 @@ fn algorithm_4_filtered_dfg_to_bpmn(filtered_pruned_dfg: FilteredPrunedDdg) -> R
 /// Algorithm 5
 fn algorithm_5_discover_splits(initial_bpmn: &mut InitialBPMN) -> Result<()> {
     let InitialBPMN {
-        concurrent_tasks: concurrent_activities,
+        concurrent_tasks,
         activity_2_task,
         bpmn_creator,
         process,
@@ -435,8 +445,7 @@ fn algorithm_5_discover_splits(initial_bpmn: &mut InitialBPMN) -> Result<()> {
                 //line 9
                 for s_2 in s_set.iter().copied() {
                     //line 10
-                    if s_1 != s_2 && concurrent_activities.contains(&ConcurrentPair::new(s_1, s_2))
-                    {
+                    if s_1 != s_2 && concurrent_tasks.contains(&PairSet::new(s_1, s_2)) {
                         future
                             .get_mut(s_1)
                             .and_if_not("successor not found")?
@@ -637,16 +646,12 @@ fn algorithm_8_discover_joins(initial_bpmn: &mut InitialBPMN) -> Result<()> {
     //todo: implement the actual algorithm 8 of the paper, which uses SESE fragments.
     //for now, replace every implicit join with an OR gateway
 
-    for (activity, task) in activity_2_task {
+    for (_activity, task) in activity_2_task {
         let incoming_flows = bpmn_creator
             .incoming_sequence_flows_of_element(*task)?
             .collect::<Vec<_>>();
 
         if incoming_flows.len() > 1 {
-            println!(
-                "add OR for task {}",
-                bpmn_creator.activity_key().deprocess_activity(&activity)
-            );
             //add an OR gateway
             let or = bpmn_creator.add_gateway(*process, GatewayType::Inclusive)?;
 
@@ -664,11 +669,6 @@ fn algorithm_8_discover_joins(initial_bpmn: &mut InitialBPMN) -> Result<()> {
                 //add a new sequence flow
                 bpmn_creator.add_sequence_flow(source, or)?;
             }
-        } else {
-            println!(
-                "do not add OR for task {}",
-                bpmn_creator.activity_key().deprocess_activity(&activity)
-            );
         }
     }
 
@@ -679,6 +679,7 @@ fn algorithm_9_replace_ors(_initial_bpmn: &mut InitialBPMN) -> Result<()> {
     Ok(())
 }
 
+/// This is a guess as it is not in the paper, but: transforms each self-loop task into an `a+` loop.
 fn process_loops(initial_bpmn: &mut InitialBPMN) -> Result<()> {
     let InitialBPMN {
         self_loops,
@@ -708,23 +709,16 @@ fn process_loops(initial_bpmn: &mut InitialBPMN) -> Result<()> {
 struct FilteredDfg {
     dfg: DirectlyFollowsGraph,
     self_loops: Vec<Activity>,
-    short_loops: Vec<(Activity, Activity)>,
-}
-
-struct PrunedDfg {
-    dfg: DirectlyFollowsGraph,
-    self_loops: Vec<Activity>,
-    short_loops: Vec<(Activity, Activity)>,
-    concurrent_activities: HashSet<ConcurrentPair<Activity>>,
+    concurrent_activities: HashSet<PairSet<Activity>>,
 }
 
 #[derive(Hash, Eq, PartialEq)]
-struct ConcurrentPair<T> {
+struct PairSet<T> {
     a: T,
     b: T,
 }
 
-impl<T: Ord> ConcurrentPair<T> {
+impl<T: Ord> PairSet<T> {
     fn new(a: T, b: T) -> Self {
         if a > b {
             Self { a, b }
@@ -734,18 +728,52 @@ impl<T: Ord> ConcurrentPair<T> {
     }
 }
 
-struct FilteredPrunedDdg {
-    dfg: DirectlyFollowsGraph,
-    self_loops: Vec<Activity>,
-    short_loops: Vec<(Activity, Activity)>,
-    concurrent_activities: HashSet<ConcurrentPair<Activity>>,
-}
-
 struct InitialBPMN {
     self_loops: Vec<Activity>,
-    short_loops: Vec<(Activity, Activity)>,
-    concurrent_tasks: HashSet<ConcurrentPair<GlobalIndex>>,
+    concurrent_tasks: HashSet<PairSet<GlobalIndex>>,
     activity_2_task: IntMap<Activity, GlobalIndex>,
     bpmn_creator: BPMNCreator,
     process: Container,
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        ebi_framework::trait_importers::ToFiniteStochasticLanguageTrait,
+        techniques::split_miner::SplitMiner,
+    };
+    use ebi_objects::FiniteStochasticLanguage;
+    use std::fs;
+
+    #[test]
+    fn ab() {
+        let fin = fs::read_to_string("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap();
+        let log = fin.parse::<FiniteStochasticLanguage>().unwrap();
+
+        let x = log.to_finite_stochastic_language_trait();
+
+        println!("{}", x);
+
+        x.split_miner().unwrap();
+    }
+
+    #[test]
+    fn empty() {
+        let fin = fs::read_to_string("./testfiles/empty.slang").unwrap();
+        let log = fin.parse::<FiniteStochasticLanguage>().unwrap();
+        let x = log.to_finite_stochastic_language_trait();
+
+        println!("{}", x);
+
+        x.split_miner().unwrap();
+    }
+
+    #[test]
+    fn empty_traces() {
+        let fin = fs::read_to_string("./testfiles/empty_trace.slang").unwrap();
+        let log = fin.parse::<FiniteStochasticLanguage>().unwrap();
+        let x = log.to_finite_stochastic_language_trait();
+
+        x.split_miner().unwrap();
+    }
 }

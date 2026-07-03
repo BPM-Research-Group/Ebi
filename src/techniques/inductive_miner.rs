@@ -1176,7 +1176,7 @@ pub fn filter_log_info(
                 *activity,
                 &parameters.noise_filtering
                     * &(result.dfg.end_activity_weight(*activity)
-                        + result
+                        + &result
                             .dfg
                             .outgoing_edges(*activity)
                             .into_iter()
@@ -1194,7 +1194,7 @@ pub fn filter_log_info(
 
         //remove end activities
         for activity in &result.activities {
-            if &result.dfg.end_activity_weight(*activity)
+            if result.dfg.end_activity_weight(*activity)
                 < activity_2_threshold.get(*activity).unwrap()
             {
                 result.dfg.remove_end_activity(*activity);
