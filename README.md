@@ -9,13 +9,15 @@ Ebi provides process mining and stochastic process mining algorithms, and suppor
 
 More information on its use can be found in its [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
 
-## Use Ebi from a browser
+## Using Ebi
+
+### Use Ebi from a browser
 
 Most commands of Ebi can be used directly from the browser on the [commands page](https://leemans.ch/ebi/commands.php).
 
 This will run fully on your computer, is limited to 4GB of RAM, and does not upload files.
 
-## Use Ebi as a command line utility
+### Use Ebi as a command line utility
 
 1. Download Ebi CLI for [Windows](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/cli/Ebi-x86_64-windows.exe?ref_type=heads&inline=false) or for [Linux](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/cli/Ebi-x86_64-linux?ref_type=heads&inline=false).
 1. In Linux, give the file execution permissions.
@@ -27,7 +29,7 @@ Ebi runs on Mac OS X and many other platforms by self-compilation; please see be
 
 A good way to get started is to try `ebi info` followed by a file name, which will parse the file and print some information about it.
 
-## Use Ebi in ProM
+### Use Ebi in ProM
 
 Ebi is also available in the [ProM framework](https://promtools.org) on Windows and Linux.
 In the ProM Package Manager, install Ebi. 
@@ -36,7 +38,7 @@ As Ebi is extremely flexible in its inputs and outputs, please ensure you choose
 
 The [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true) indicates which commands are available in ProM.
 
-## Call Ebi from Python
+### Call Ebi from Python
 
 Ebi can be used as a Python package, which integrates with [PM4Py](https://pypi.org/project/pm4py/).
 
@@ -66,7 +68,7 @@ The names of the Ebi functions can be found on the [commands page](https://leema
 Some PM4Py objects, such as event logs, are read directly by Ebi, but most are passed as strings.
 If Ebi returns an exact fraction, it is returned as an array consisting of 1) a floating-point approximation, 2) the full numerator, and 3) the full denominator.
 
-## Call Ebi from Rust
+### Call Ebi from Rust
 
 Ebi can be used as a Rust crate, available from [crates.io](https://crates.io/crates/ebi).
 
@@ -98,7 +100,7 @@ Ebi can be used as a Rust crate, available from [crates.io](https://crates.io/cr
             .unwrap();
         assert_eq!(emsc, Fraction::one());
 
-## Call Ebi from Java
+### Call Ebi from Java
 
 To use Ebi from Java:
 1.  Download the Ebi library for [Windows](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/java/ebi.dll?ref_type=heads&inline=false) or [Linux](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/java/libebi.so?ref_type=heads&inline=false) and put it in a folder that is accessible to the Path of your program.
@@ -121,11 +123,14 @@ To use Ebi from Java:
 
 The [commands](https://leemans.ch/ebi/commands.php) page indicates the commands that can be called from Java.
 
-## Call Ebi from Javascript
+### Call Ebi from Javascript
 
 Ebi is available as an [NPM library](https://www.npmjs.com/package/ebi_pm).
 
-## Getting started with development
+## Feedback & Development
+
+Got a feature request? Found a bug? 
+Please use our [Github issue page](https://github.com/BPM-Research-Group/Ebi/issues).
 
 Ebi is hosted on [Github](https://github.com/BPM-Research-Group/Ebi).
 To get started with development, or to compile for Mac OS X:
