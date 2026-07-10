@@ -86,7 +86,8 @@ pub const EBI_SAMPLE_TRACES: EbiCommand = EbiCommand::Command {
     name_long: Some("traces"),
     explanation_short: "Draw traces randomly from a model.",
     explanation_long: Some(
-        "Sample traces randomly. Please note that this may run forever if the model contains a livelock.",
+        "Sample traces randomly.
+        If a livelock is hit, restarts the sampling for that trace. Exception: for BPMN models with a livelock, the computation may run forever.",
     ),
     latex_link: None,
     cli_command: None,
@@ -181,7 +182,7 @@ pub const EBI_SAMPLE_FOLDS: EbiCommand = EbiCommand::Command {
 
         if return_fold >= number_of_folds {
             return Err(anyhow!(
-                "fold {} was requested, but there are only {} folds.",
+                "Fold {} was requested, but there are only {} folds. Please note that folds start counting at zero.",
                 return_fold,
                 number_of_folds
             ));

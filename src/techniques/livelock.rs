@@ -1,12 +1,15 @@
 use crate::{
     ebi_framework::displayable::Displayable,
-    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
+    semantics::{
+        finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
+        labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
+    },
 };
 use ebi_objects::{
     AutomatonSemantics, AutomatonState, DeterministicFiniteAutomaton, DirectlyFollowsGraph,
     DirectlyFollowsModel, LabelledPetriNet, ProcessTree, StochasticDeterministicFiniteAutomaton,
     StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::{Result, anyhow},
     ebi_objects::process_tree::TreeMarking,
 };
@@ -34,27 +37,36 @@ pub trait LiveLockCache {
     fn is_state_part_of_livelock(&mut self, state: &Self::LivState) -> Result<bool>;
 }
 
-impl IsPartOfLivelock for ProcessTree {
-    type LivState = TreeMarking;
+macro_rules! dummy {
+    ($t:ty, $m:ty) => {
+        paste! {
+            impl IsPartOfLivelock for $t {
+                type LivState = $m;
 
-    fn is_state_part_of_livelock(&self, _state: &Self::LivState) -> Result<bool> {
-        Ok(false)
-    }
+                fn is_state_part_of_livelock(&self, _state: &Self::LivState) -> Result<bool> {
+                    Ok(false)
+                }
 
-    fn get_livelock_cache(&self) -> Box<dyn LiveLockCache<LivState = Self::LivState> + '_> {
-        Box::new(LiveLockCacheProcessTree {})
-    }
+                fn get_livelock_cache(&self) -> Box<dyn LiveLockCache<LivState = Self::LivState> + '_> {
+                    Box::new([<LiveLockCache $t>] {})
+                }
+            }
+
+            pub struct [<LiveLockCache $t>] {}
+
+            impl LiveLockCache for [<LiveLockCache $t>] {
+                type LivState = $m;
+
+                fn is_state_part_of_livelock(&mut self, _: &Self::LivState) -> Result<bool> {
+                    Ok(false)
+                }
+            }
+        }
+    };
 }
-
-pub struct LiveLockCacheProcessTree {}
-
-impl LiveLockCache for LiveLockCacheProcessTree {
-    type LivState = TreeMarking;
-
-    fn is_state_part_of_livelock(&mut self, _: &Self::LivState) -> Result<bool> {
-        Ok(false)
-    }
-}
+dummy!(ProcessTree, TreeMarking);
+dummy!(StochasticProcessTree, TreeMarking);
+dummy!(FiniteStochasticLanguageSemantics, usize);
 
 macro_rules! lpn {
     ($t:ident, $u:ident) => {

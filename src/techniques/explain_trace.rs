@@ -99,7 +99,7 @@ impl ExplainTrace for EbiTraitStochasticSemantics {
     }
 }
 
-impl<State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState = State, AliState = State> {
+impl<State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState = State, AliState = State, LivState = State> {
     pub fn explain_trace(
         &self,
         trace: &Vec<Activity>,

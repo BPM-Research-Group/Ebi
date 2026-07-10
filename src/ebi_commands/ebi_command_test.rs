@@ -252,9 +252,10 @@ pub const EBI_PERMUTATION_TEST: EbiCommand = EbiCommand::Command {
 pub const EBI_PERMUTATION_TEST_LOG_MODEL: EbiCommand = EbiCommand::Command {
     name_short: "perm-l-m",
     name_long: Some("permutation-test-log-model"),
-    explanation_short:
-        "Test the hypothesis that the log and model are derived from identical processes.",
-    explanation_long: None,
+    explanation_short: "Test the hypothesis that the log and model are derived from identical processes.",
+    explanation_long: Some(
+        "Test the hypothesis that the log and model are derived from identical processes. In case the model contains livelocks, these are silently ignored.",
+    ),
     latex_link: None,
     cli_command: None,
     exact_arithmetic: true,

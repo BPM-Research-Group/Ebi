@@ -7,6 +7,7 @@ use crate::{
     },
     stochastic_partially_ordered_semantics::stochastic_partially_ordered_semantics::StochasticPartiallyOrderedSemantics,
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    techniques::livelock::LiveLockCache,
 };
 use ebi_objects::{
     FiniteStochasticLanguage, FiniteStochasticPartiallyOrderedLanguage, HasActivityKey,
@@ -108,11 +109,19 @@ where
 {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage> {
         if let Some(initial_state) = self.get_initial_state() {
-            let mut result = FiniteStochasticLanguage::new_hashmap();
 
-            for _ in 0..number_of_traces {
+            //We need to ensure that we don't get stuck in a livelock.
+            //Strategy: check it every 1000 states.
+            let mut maybe_livelock_cache: Option<Box<dyn LiveLockCache<LivState = State>>> = None;
+
+            let mut result = FiniteStochasticLanguage::new_hashmap();
+            let mut sampled_traces = 0;
+
+            'outer: while sampled_traces < number_of_traces {
                 let mut current_state = initial_state.clone();
                 let mut trace = vec![];
+
+                let mut number_of_states_checked = 0;
 
                 let mut outgoing_probabilities = vec![];
 
@@ -143,6 +152,36 @@ where
                         Some(activity) => trace.push(activity),
                         None => {}
                     }
+
+                    // Ensure we do not end up in a livelock, but only every 1000 states.
+                    number_of_states_checked += 1;
+                    if number_of_states_checked == 1000 {
+                        if let Some(cache) = &mut maybe_livelock_cache {
+                            if cache.is_state_part_of_livelock(&current_state)? {
+                                //we have hit a livelock; restart the sample
+                                continue 'outer;
+                            }
+                        } else {
+                            //create the cache
+                            let mut cache = self.get_livelock_cache();
+
+                            //check whether the initial state is a livelock
+                            if cache.is_state_part_of_livelock(&initial_state)? {
+                                return Err(anyhow!(
+                                    "The initial state is a livelock, therefore there are no traces to sample."
+                                ));
+                            }
+
+                            //check whether the current state is a livelock
+                            if cache.is_state_part_of_livelock(&current_state)? {
+                                //we have hit a livelock; restart the sample
+                                continue 'outer;
+                            }
+
+                            maybe_livelock_cache = Some(cache);
+                        }
+                        number_of_states_checked = 0;
+                    }
                 }
 
                 match result.entry(trace) {
@@ -151,6 +190,7 @@ where
                         e.insert(Fraction::one());
                     }
                 };
+                sampled_traces += 1;
             }
 
             if result.is_empty() {
@@ -272,7 +312,7 @@ impl Sampler
 }
 
 /**
- * Fills the given vector with uniformly random numbers in the range 0..number_of_indices
+ * Fills the given vector with uniformly random numbers in the range 0..`number_of_indices`.
  */
 pub fn sample_indices_uniform(number_of_indices: usize, result: &mut Vec<usize>) {
     let mut rng = rand::rng();

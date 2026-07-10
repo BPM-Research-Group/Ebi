@@ -1,10 +1,11 @@
-use crate::semantics::semantics::Semantics;
+use crate::{semantics::semantics::Semantics, techniques::livelock::IsPartOfLivelock};
 use ebi_objects::{
     anyhow::Result, ebi_arithmetic::Fraction, ebi_objects::labelled_petri_net::TransitionIndex,
 };
 
 pub trait StochasticSemantics:
     Semantics<SemState = <Self as StochasticSemantics>::StoSemState>
+    + IsPartOfLivelock<LivState = <Self as StochasticSemantics>::StoSemState>
 {
     type StoSemState;
 

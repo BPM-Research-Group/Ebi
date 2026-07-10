@@ -30,13 +30,23 @@ pub const TRAIT_DEFINITION_LATEX: &str = concat!(
 );
 
 pub enum EbiTraitStochasticSemantics {
-    Usize(Box<dyn StochasticSemantics<StoSemState = usize, SemState = usize, AliState = usize>>),
+    Usize(
+        Box<
+            dyn StochasticSemantics<
+                    StoSemState = usize,
+                    SemState = usize,
+                    AliState = usize,
+                    LivState = usize,
+                >,
+        >,
+    ),
     AutomatonState(
         Box<
             dyn StochasticSemantics<
                     StoSemState = AutomatonState,
                     SemState = AutomatonState,
                     AliState = AutomatonState,
+                    LivState = AutomatonState,
                 >,
         >,
     ),
@@ -46,6 +56,7 @@ pub enum EbiTraitStochasticSemantics {
                     StoSemState = LPNMarking,
                     SemState = LPNMarking,
                     AliState = LPNMarking,
+                    LivState = LPNMarking,
                 >,
         >,
     ),
@@ -55,6 +66,7 @@ pub enum EbiTraitStochasticSemantics {
                     StoSemState = TreeMarking,
                     SemState = TreeMarking,
                     AliState = TreeMarking,
+                    LivState = TreeMarking,
                 >,
         >,
     ),
