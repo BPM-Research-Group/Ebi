@@ -201,6 +201,9 @@ where
         let regex_h2 = Regex::new("(?m)\\n*^## (.*)$\\n+").unwrap();
         let base = regex_h2.replace_all(&base, "\n<h2>${1}</h2>\n");
 
+        let regex_h3 = Regex::new("(?m)\\n*^### (.*)$\\n+").unwrap();
+        let base = regex_h3.replace_all(&base, "\n<h3>${1}</h3>\n");
+
         let regex_link = Regex::new("\\[([^\\]]*)\\]\\(([^\\)]*)\\)").unwrap();
         let base = regex_link.replace_all(&base, "<a href=\"${2}\">${1}</a>");
 
