@@ -12,17 +12,8 @@ use crate::{
     },
 };
 use ebi_objects::{
-    Activity, ActivityKeyTranslator, AutomatonState, BusinessProcessModelAndNotation,
-    DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel,
-    FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet, LanguageOfAlignments, ProcessTree,
-    StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
-    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    anyhow::{Context, Error, Result, anyhow},
-    ebi_bpmn::BPMNMarking,
-    ebi_objects::{
-        labelled_petri_net::TransitionIndex, language_of_alignments::Move,
-        process_tree::TreeMarking,
+    Activity, ActivityKeyTranslator, AutomatonState, BusinessProcessModelAndNotation, DeterministicFiniteAutomaton, DirectlyFollowsGraph, DirectlyFollowsModel, FiniteStochasticPartiallyOrderedLanguage, LabelledPetriNet, LanguageOfAlignments, ProcessTree, StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, anyhow::{Context, Error, Result, anyhow}, ebi_bpmn::BPMNMarking, ebi_objects::{
+        labelled_petri_net::TransitionIndex, language_of_alignments::Move, partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage, process_tree::TreeMarking,
     },
 };
 use rayon::iter::ParallelIterator;
@@ -663,6 +654,7 @@ aut!(StochasticDeterministicFiniteAutomaton);
 aut!(StochasticNondeterministicFiniteAutomaton);
 treemarking!(ProcessTree);
 treemarking!(StochasticProcessTree);
+treemarking!(PartiallyOrderedWorkflowLanguage);
 aut!(DirectlyFollowsGraph);
 aut!(DirectlyFollowsModel);
 aut!(StochasticDirectlyFollowsModel);

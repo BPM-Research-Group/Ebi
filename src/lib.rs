@@ -49,6 +49,7 @@ pub mod ebi_file_handlers {
     pub mod labelled_petri_net;
     pub mod language_of_alignments;
     pub mod lola_net;
+    pub mod partially_ordered_workflow_language;
     pub mod petri_net_markup_language;
     pub mod portable_document_format;
     pub mod portable_network_graphics;
@@ -157,6 +158,7 @@ pub mod semantics {
     pub mod finite_stochastic_language_semantics;
     pub mod finite_stochastic_partially_ordered_language_semantics;
     pub mod labelled_petri_net_semantics;
+    pub mod partially_ordered_workflow_language_semantics;
     pub mod process_tree_semantics;
     pub mod semantics;
     pub mod stochastic_business_process_model_and_notation_semantics;

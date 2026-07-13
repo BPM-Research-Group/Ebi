@@ -10,7 +10,10 @@ use ebi_objects::{
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::Result,
     ebi_objects::{
-        event_log_csv::EventLogCsv, event_log_event_attributes::EventLogEventAttributes, event_log_ocel::EventLogOcel, process_tree::TreeMarking
+        event_log_csv::EventLogCsv, event_log_event_attributes::EventLogEventAttributes,
+        event_log_ocel::EventLogOcel,
+        partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage,
+        process_tree::TreeMarking,
     },
 };
 use std::collections::{HashMap, hash_map::Entry};
@@ -173,6 +176,7 @@ LPNMarking!(LabelledPetriNet);
 LPNMarking!(StochasticLabelledPetriNet);
 TreeMarking!(ProcessTree);
 TreeMarking!(StochasticProcessTree);
+TreeMarking!(PartiallyOrderedWorkflowLanguage);
 
 impl Bounded for FiniteStochasticPartiallyOrderedLanguage {
     type LivState = usize;

@@ -919,6 +919,10 @@ pub enum EbiObjectImporter {
         fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
         &'static [ImporterParameter],
     ),
+    PartiallyOrderedWorkflowLanguage(
+        fn(&mut dyn BufRead, &ImporterParameterValues) -> Result<EbiObject>,
+        &'static [ImporterParameter],
+    ),
 }
 
 impl EbiObjectImporter {
@@ -971,6 +975,9 @@ impl EbiObjectImporter {
             }
             EbiObjectImporter::ProcessTree(_, _) => EbiObjectType::ProcessTree,
             EbiObjectImporter::StochasticProcessTree(_, _) => EbiObjectType::StochasticProcessTree,
+            EbiObjectImporter::PartiallyOrderedWorkflowLanguage(_, _) => {
+                EbiObjectType::PartiallyOrderedWorkflowLanguage
+            }
             EbiObjectImporter::Executions(_, _) => EbiObjectType::Executions,
         }
     }
@@ -1007,6 +1014,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::Executions(_, parameters) => parameters,
             EbiObjectImporter::StochasticLanguageOfAlignments(_, parameters) => parameters,
             EbiObjectImporter::StochasticProcessTree(_, parameters) => parameters,
+            EbiObjectImporter::PartiallyOrderedWorkflowLanguage(_, parameters) => parameters,
         }
     }
 
@@ -1045,6 +1053,7 @@ impl EbiObjectImporter {
             EbiObjectImporter::DeterministicFiniteAutomaton(importer, _) => *importer,
             EbiObjectImporter::ProcessTree(importer, _) => *importer,
             EbiObjectImporter::StochasticProcessTree(importer, _) => *importer,
+            EbiObjectImporter::PartiallyOrderedWorkflowLanguage(importer, _) => *importer,
             EbiObjectImporter::Executions(importer, _) => *importer,
         }
     }
