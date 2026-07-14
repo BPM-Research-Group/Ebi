@@ -41,6 +41,9 @@ impl Semantics for PartiallyOrderedWorkflowLanguage {
         match transition_type {
             TransitionType::Start => {
                 state[node_index] = NodeState::Started;
+            }
+            TransitionType::Execute => {
+                state[node_index] = NodeState::Executed;
                 //reset all children
                 if !node_type.is_activity() {
                     for child in (node_index + 1)..self.traverse(node_index) {
@@ -48,7 +51,6 @@ impl Semantics for PartiallyOrderedWorkflowLanguage {
                     }
                 }
             }
-            TransitionType::Execute => state[node_index] = NodeState::Executed,
             TransitionType::End => {
                 state[node_index] = NodeState::Closed;
                 //close all children
@@ -205,26 +207,39 @@ fn enabled_transitions(
             //this node is closed and there's nothing to execute
             vec![]
         }
-        //activity started
+
+        //started
         (
             PowlNode::Activity {
-                skippable: false,
-                ..
+                skippable: false, ..
+            }
+            | PowlNode::PartialOrder {
+                skippable: false, ..
+            }
+            | PowlNode::ChoiceGraph {
+                skippable: false, ..
             },
             NodeState::Started,
         ) => {
-            //once activity
+            //once or one-or-more
             vec![t_execute]
         }
         (
             PowlNode::Activity {
                 skippable: true, ..
+            }
+            | PowlNode::PartialOrder {
+                skippable: true, ..
+            }
+            | PowlNode::ChoiceGraph {
+                skippable: true, ..
             },
             NodeState::Started,
         ) => {
-            //zero-or-once or zero-or-more activity
+            //zero-or-one or zero-or-more
             vec![t_execute, t_close]
         }
+
         //activity executed
         (
             PowlNode::Activity {
@@ -241,9 +256,164 @@ fn enabled_transitions(
             },
             NodeState::Executed,
         ) => {
-            //zero-or-more activity
+            //zero-or-more or one-or-more activity
             vec![t_execute, t_close]
         }
-        _ => todo!()
+
+        //partial order executed
+        (
+            PowlNode::PartialOrder {
+                skippable: true,
+                repeatable,
+                number_of_children,
+                edges,
+                ..
+            },
+            NodeState::Executed,
+        ) => {
+            //zero-or-one or zero-or-more
+            enabled_transitions_partial_order_execute(
+                powl,
+                state,
+                node_index,
+                *repeatable,
+                *number_of_children,
+                edges,
+            )
+        }
+
+        //choice graph executed
+        (
+            PowlNode::ChoiceGraph {
+                skippable: true,
+                repeatable,
+                edges,
+                start_children,
+                end_children,
+                ..
+            },
+            NodeState::Executed,
+        ) => {
+            //zero-or-one or zero-or-more
+            enabled_transitions_choice_graph_execute(
+                powl,
+                state,
+                node_index,
+                *repeatable,
+                edges,
+                start_children,
+                end_children,
+            )
+        }
+        _ => todo!(),
     }
+}
+
+//execute a choice graph
+fn enabled_transitions_choice_graph_execute(
+    powl: &PartiallyOrderedWorkflowLanguage,
+    state: &TreeMarking,
+    node_index: usize,
+    repeatable: bool,
+    edges: &[(usize, usize)],
+    start_children: &[usize],
+    end_children: &[usize],
+) -> Vec<usize> {
+    let t_execute = node_index * 3 + 1;
+    let t_close = node_index * 3 + 2;
+
+    if end_children
+        .iter()
+        .map(|child_rank| powl.get_child(node_index, *child_rank))
+        .any(|child_index| state.states[child_index] == NodeState::Closed)
+    {
+        // one end child is closed; we can close (or repeat) this node
+        if repeatable {
+            return vec![t_execute, t_close];
+        } else {
+            return vec![t_close];
+        }
+    }
+
+    //if any child has started execution, allow it to continue (there can only be one such child in a choice graph)
+    for child_index in powl.get_children(node_index) {
+        if state.states[child_index] == NodeState::Started
+            || state.states[child_index] != NodeState::Executed
+        {
+            return enabled_transitions(powl, state, child_index);
+        }
+    }
+
+    //if no child has started yet, we can start the choice graph
+    if powl
+        .get_children(node_index)
+        .all(|child_index| state.states[child_index] == NodeState::Enabled)
+    {
+        //start the choice graph
+        return start_children
+            .iter()
+            .map(|child_rank| powl.get_child(node_index, *child_rank) * 3)
+            .collect();
+    }
+
+    let mut result = vec![];
+    //a node with an incoming edge from a closed node can start
+    for (source_rank, target_rank) in edges {
+        let source = powl.get_child(node_index, *source_rank);
+        let target = powl.get_child(node_index, *target_rank);
+
+        if state.states[source] == NodeState::Closed && state.states[target] == NodeState::Enabled {
+            //source is closed, which means that target can start
+            result.push(target * 3);
+        }
+    }
+
+    vec![]
+}
+
+//execute a partial order
+fn enabled_transitions_partial_order_execute(
+    powl: &PartiallyOrderedWorkflowLanguage,
+    state: &TreeMarking,
+    node_index: usize,
+    repeatable: bool,
+    number_of_children: usize,
+    edges: &Vec<(usize, usize)>,
+) -> Vec<usize> {
+    let t_execute = node_index * 3 + 1;
+    let t_close = node_index * 3 + 2;
+
+    if powl
+        .get_children(node_index)
+        .all(|child_index| state[child_index] == NodeState::Closed)
+    {
+        // all children are closed; we can close (or repeat) this node
+        if repeatable {
+            return vec![t_execute, t_close];
+        } else {
+            return vec![t_close];
+        }
+    }
+
+    let mut result = vec![];
+
+    //gather for each child whether all predecessors are closed
+    let mut child_rank_2_all_predecessors_closed = vec![true; number_of_children];
+    for (source_rank, target_rank) in edges {
+        let source_index = powl.get_child(node_index, *source_rank);
+        if state.states[source_index] != NodeState::Closed {
+            child_rank_2_all_predecessors_closed[*target_rank] = false;
+        }
+    }
+
+    for (child_rank, all_predecessors_closed) in
+        child_rank_2_all_predecessors_closed.into_iter().enumerate()
+    {
+        if all_predecessors_closed {
+            let child_index = powl.get_child(node_index, child_rank);
+            result.extend(enabled_transitions(powl, state, child_index));
+        }
+    }
+
+    result
 }
