@@ -1,0 +1,11 @@
+{
+  "format": "powl-json",
+  "format_version": "1.0",
+  "model": {
+        "id": "admission_ic",
+        "type": "activity",
+        "repeatable": false,
+        "skippable": true,
+        "label": "a"
+  }
+}

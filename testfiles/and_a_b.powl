@@ -1,0 +1,26 @@
+{
+  "format": "powl-json",
+  "format_version": "1.0",
+  "model": {
+  	"type": "partial_order",
+  	"nodes": [
+	  {
+		    "id": "a",
+		    "type": "activity",
+		    "repeatable": false,
+		    "skippable": false,
+		    "label": "a"
+	  },
+	  {
+		    "id": "b",
+		    "type": "activity",
+		    "repeatable": false,
+		    "skippable": false,
+		    "label": "b"
+	  }
+  	],
+  	"edges": [
+  		{ "source": "a", "target": "b" }
+  	]
+  }
+}

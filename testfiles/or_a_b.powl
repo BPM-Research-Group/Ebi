@@ -1,0 +1,29 @@
+{
+  "format": "powl-json",
+  "format_version": "1.0",
+  "model": {
+  	"type": "choice_graph",
+  	"nodes": [
+	  {
+		    "id": "a",
+		    "type": "activity",
+		    "repeatable": false,
+		    "skippable": false,
+		    "label": "a"
+	  },
+	  {
+		    "id": "b",
+		    "type": "activity",
+		    "repeatable": false,
+		    "skippable": false,
+		    "label": "b"
+	  }
+  	],
+  	"edges": [
+  		{ "source": "@start", "target": "a" },
+  		{ "source": "@start", "target": "b" },
+  		{ "source": "a", "target": "@end" },
+  		{ "source": "b", "target": "@end" }
+  	]
+  }
+}

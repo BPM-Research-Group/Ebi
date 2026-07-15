@@ -1,0 +1,47 @@
+{
+  "format": "powl-json",
+  "format_version": "1.0",
+  "model": {
+  	"type": "choice_graph",
+  	"nodes": [
+	  {
+		    "id": "once",
+		    "type": "activity",
+		    "repeatable": false,
+		    "skippable": false,
+		    "label": "once"
+	  },
+	  {
+		    "id": "zeroorone",
+		    "type": "activity",
+		    "repeatable": false,
+		    "skippable": true,
+		    "label": "zero-or-one"
+	  },
+	  {
+		    "id": "oneormore",
+		    "type": "activity",
+		    "repeatable": true,
+		    "skippable": false,
+		    "label": "one-or-more"
+	  },
+	  {
+		    "id": "zeroormore",
+		    "type": "activity",
+		    "repeatable": true,
+		    "skippable": true,
+		    "label": "zero-or-more"
+	  }
+  	],
+  	"edges": [
+  		{ "source": "@start", "target": "once" },
+  		{ "source": "@start", "target": "zeroorone" },
+  		{ "source": "@start", "target": "oneormore" },
+  		{ "source": "@start", "target": "zeroormore" },
+  		{ "source": "once", "target": "@end" },
+  		{ "source": "zeroorone", "target": "@end" },
+  		{ "source": "oneormore", "target": "@end" },
+  		{ "source": "zeroormore", "target": "@end" }
+  	]
+  }
+}
