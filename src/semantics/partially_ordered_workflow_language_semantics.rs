@@ -263,7 +263,6 @@ fn enabled_transitions(
         //partial order executed
         (
             PowlNode::PartialOrder {
-                skippable: true,
                 repeatable,
                 number_of_children,
                 edges,
@@ -285,7 +284,6 @@ fn enabled_transitions(
         //choice graph executed
         (
             PowlNode::ChoiceGraph {
-                skippable: true,
                 repeatable,
                 edges,
                 start_children,
@@ -305,7 +303,6 @@ fn enabled_transitions(
                 end_children,
             )
         }
-        _ => todo!(),
     }
 }
 
@@ -338,7 +335,7 @@ fn enabled_transitions_choice_graph_execute(
     //if any child has started execution, allow it to continue (there can only be one such child in a choice graph)
     for child_index in powl.get_children(node_index) {
         if state.states[child_index] == NodeState::Started
-            || state.states[child_index] != NodeState::Executed
+            || state.states[child_index] == NodeState::Executed
         {
             return enabled_transitions(powl, state, child_index);
         }
@@ -355,6 +352,8 @@ fn enabled_transitions_choice_graph_execute(
             .map(|child_rank| powl.get_child(node_index, *child_rank) * 3)
             .collect();
     }
+
+    println!("4");
 
     let mut result = vec![];
     //a node with an incoming edge from a closed node can start
@@ -416,4 +415,202 @@ fn enabled_transitions_partial_order_execute(
     }
 
     result
+}
+
+#[cfg(test)]
+
+mod tests {
+    use crate::semantics::semantics::Semantics;
+    use ebi_objects::{
+        HasActivityKey,
+        ebi_objects::partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage,
+    };
+    use std::fs;
+
+    #[test]
+    fn powl_sem_a() {
+        let fin = fs::read_to_string("testfiles/a.powl").unwrap();
+        let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
+
+        let mut state = powl.get_initial_state().unwrap();
+        let a = Some(powl.activity_key().process_activity_attempt("a").unwrap());
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
+        assert!(powl.is_transition_silent(0, &state));
+
+        powl.execute_transition(&mut state, 0).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![1]);
+        assert_eq!(powl.get_transition_activity(1, &state), a);
+        assert!(!powl.is_final_state(&state));
+
+        powl.execute_transition(&mut state, 1).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![2]);
+        assert!(powl.is_transition_silent(2, &state));
+        assert!(!powl.is_final_state(&state));
+
+        powl.execute_transition(&mut state, 2).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), Vec::<usize>::new());
+        assert!(powl.is_final_state(&state));
+    }
+
+    #[test]
+    fn powl_sem_a_skippable() {
+        let fin = fs::read_to_string("testfiles/a_skippable.powl").unwrap();
+        let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
+
+        let mut state = powl.get_initial_state().unwrap();
+        let a = Some(powl.activity_key().process_activity_attempt("a").unwrap());
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
+        assert!(powl.is_transition_silent(0, &state));
+
+        powl.execute_transition(&mut state, 0).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![1, 2]);
+        assert_eq!(powl.get_transition_activity(1, &state), a);
+        assert!(!powl.is_final_state(&state));
+
+        powl.execute_transition(&mut state, 1).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![2]);
+        assert!(powl.is_transition_silent(2, &state));
+        assert!(!powl.is_final_state(&state));
+
+        powl.execute_transition(&mut state, 2).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), Vec::<usize>::new());
+        assert!(powl.is_final_state(&state));
+    }
+
+    #[test]
+    fn powl_sem_or_a_b() {
+        let fin = fs::read_to_string("testfiles/or_a_b.powl").unwrap();
+        let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
+
+        let mut state = powl.get_initial_state().unwrap();
+        let b = Some(powl.activity_key().process_activity_attempt("b").unwrap());
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
+        assert!(powl.is_transition_silent(0, &state));
+
+        //start choice
+        powl.execute_transition(&mut state, 0).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![1]);
+        assert!(powl.is_transition_silent(1, &state));
+        assert!(!powl.is_final_state(&state));
+
+        //execute choice
+        powl.execute_transition(&mut state, 1).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![3, 6]);
+        assert!(powl.is_transition_silent(3, &state));
+        assert!(powl.is_transition_silent(6, &state));
+        assert!(!powl.is_final_state(&state));
+
+        //start executing b
+        powl.execute_transition(&mut state, 6).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![7]);
+        assert_eq!(powl.get_transition_activity(7, &state), b);
+        assert!(!powl.is_final_state(&state));
+
+        //execute b
+        powl.execute_transition(&mut state, 7).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![8]);
+        assert!(powl.is_transition_silent(8, &state));
+        assert!(!powl.is_final_state(&state));
+
+        //close b
+        powl.execute_transition(&mut state, 8).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![2]);
+        assert!(powl.is_transition_silent(2, &state));
+        assert!(!powl.is_final_state(&state));
+
+        //close or
+        powl.execute_transition(&mut state, 2).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), Vec::<usize>::new());
+        assert!(powl.is_final_state(&state));
+    }
+
+    #[test]
+    fn powl_sem_and_a_b() {
+        let fin = fs::read_to_string("testfiles/and_a_b.powl").unwrap();
+        let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
+
+        let mut state = powl.get_initial_state().unwrap();
+        let a = Some(powl.activity_key().process_activity_attempt("a").unwrap());
+        let b = Some(powl.activity_key().process_activity_attempt("b").unwrap());
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
+        assert!(powl.is_transition_silent(0, &state));
+
+        //start and
+        powl.execute_transition(&mut state, 0).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![1]);
+        assert!(powl.is_transition_silent(1, &state));
+        assert!(!powl.is_final_state(&state));
+
+        //execute and
+        powl.execute_transition(&mut state, 1).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![3]);
+        assert!(powl.is_transition_silent(3, &state));
+        assert!(!powl.is_final_state(&state));
+
+        //start a
+        powl.execute_transition(&mut state, 3).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![4]);
+        assert_eq!(powl.get_transition_activity(4, &state), a);
+        assert!(!powl.is_final_state(&state));
+
+        //execute a
+        powl.execute_transition(&mut state, 4).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![5]);
+        assert!(powl.is_transition_silent(5, &state));
+        assert!(!powl.is_final_state(&state));
+
+        //close a
+        powl.execute_transition(&mut state, 5).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![6]);
+        assert!(powl.is_transition_silent(6, &state));
+        assert!(!powl.is_final_state(&state));
+
+        //start b
+        powl.execute_transition(&mut state, 6).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![7]);
+        assert_eq!(powl.get_transition_activity(7, &state), b);
+        assert!(!powl.is_final_state(&state));
+
+        //execute b
+        powl.execute_transition(&mut state, 7).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![8]);
+        assert!(powl.is_transition_silent(8, &state));
+        assert!(!powl.is_final_state(&state));
+
+        //close b
+        powl.execute_transition(&mut state, 8).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![2]);
+        assert!(powl.is_transition_silent(2, &state));
+        assert!(!powl.is_final_state(&state));
+
+        //close and
+        powl.execute_transition(&mut state, 2).unwrap();
+
+        assert!(powl.is_final_state(&state));
+
+    }
 }

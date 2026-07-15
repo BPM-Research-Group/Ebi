@@ -5,7 +5,7 @@
         "id": "admission_ic",
         "type": "activity",
         "repeatable": false,
-        "skippable": false,
+        "skippable": true,
         "label": "a"
   }
 }
