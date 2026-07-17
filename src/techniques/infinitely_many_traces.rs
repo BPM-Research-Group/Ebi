@@ -9,7 +9,10 @@ use ebi_objects::{
     ProcessTree, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
     StochasticLabelledPetriNet, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::Result,
-    ebi_objects::process_tree::{Node, Operator, TreeMarking},
+    ebi_objects::{
+        partially_ordered_workflow_language::{PartiallyOrderedWorkflowLanguage, PowlNode},
+        process_tree::{Node, Operator, TreeMarking},
+    },
 };
 use intmap::IntMap;
 use rustc_hash::FxHashMap;
@@ -51,6 +54,75 @@ macro_rules! tree {
 }
 tree!(ProcessTree);
 tree!(StochasticProcessTree);
+
+impl InfinitelyManyTraces for PartiallyOrderedWorkflowLanguage {
+    type LivState = TreeMarking;
+
+    fn infinitely_many_traces(&self) -> Result<bool> {
+        for (node_index, node) in self.nodes().enumerate() {
+            match node {
+                PowlNode::Activity {
+                    activity,
+                    repeatable,
+                    ..
+                } => {
+                    if *repeatable && activity.is_some() {
+                        return Ok(true);
+                    }
+                }
+                PowlNode::PartialOrder { repeatable, .. } => {
+                    if *repeatable && !self.only_empty_trace(node_index) {
+                        return Ok(true);
+                    }
+                }
+                PowlNode::ChoiceGraph {
+                    repeatable,
+                    edges,
+                    number_of_children,
+                    ..
+                } => {
+                    if *repeatable && !self.only_empty_trace(node_index) {
+                        return Ok(true);
+                    }
+
+                    //look for strongly connected components in the edges
+                    let mut graph = Graph::new();
+                    let mut child_2_node = IntMap::new();
+                    let mut node_2_child = FxHashMap::default();
+
+                    for child_index in 0..*number_of_children {
+                        let node = graph.new_node();
+                        child_2_node.insert(child_index, node);
+                        node_2_child.insert(node, child_index);
+                    }
+
+                    for (source, target) in edges {
+                        graph.new_edge(
+                            *child_2_node.get(*source).unwrap(),
+                            *child_2_node.get(*target).unwrap(),
+                        );
+                    }
+
+                    let sccs = graph.find_sccs();
+                    for scc in sccs.iter_sccs() {
+                        //there must a scc with one node that has an activity
+                        if scc.len() >= 2 {
+                            for node in scc.iter_nodes() {
+                                let child_rank = node_2_child.get(&node).unwrap();
+                                let child = self.get_child(node_index, *child_rank);
+                                if !self.only_empty_trace(child) {
+                                    return Ok(true);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Ok(false)
+    }
+}
 
 macro_rules! lpn {
     ($t:ident) => {

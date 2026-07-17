@@ -375,6 +375,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
         &EbiInputType::Object(EbiObjectType::FiniteLanguage),
         &EbiInputType::Object(EbiObjectType::DirectlyFollowsGraph),
         &EbiInputType::Object(EbiObjectType::StochasticDirectlyFollowsModel),
+        &EbiInputType::Object(EbiObjectType::PartiallyOrderedWorkflowLanguage),
         &EbiInputType::Object(EbiObjectType::DirectlyFollowsModel),
         &EbiInputType::Object(EbiObjectType::StochasticProcessTree),
         &EbiInputType::Object(EbiObjectType::ProcessTree),
@@ -424,6 +425,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_INFINITELY_MANY_TRACES: EbiCommand = EbiCom
                 object.infinitely_many_traces()?
             }
             EbiInput::Object(EbiObject::StochasticDirectlyFollowsModel(object), _) => {
+                object.infinitely_many_traces()?
+            }
+            EbiInput::Object(EbiObject::PartiallyOrderedWorkflowLanguage(object), _) => {
                 object.infinitely_many_traces()?
             }
             _ => return Err(anyhow!("Unsupported object {:?} provided.", model.get_type())),
