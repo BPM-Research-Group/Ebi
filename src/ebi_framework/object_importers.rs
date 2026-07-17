@@ -1,6 +1,17 @@
 use crate::ebi_framework::ebi_input::FallibleImporterError;
 use ebi_objects::{
-    BusinessProcessModelAndNotation, DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject, EventLog, EventLogCsv, EventLogOcel, EventLogTraceAttributes, EventLogXes, FiniteLanguage, FiniteStochasticLanguage, LabelledPetriNet, LanguageOfAlignments, ProcessTree, StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments, StochasticNondeterministicFiniteAutomaton, StochasticProcessTree, anyhow::{Error, Result}, ebi_objects::event_log_event_attributes::EventLogEventAttributes, traits::importable::{Importable, ImporterParameterValues}
+    BusinessProcessModelAndNotation, DeterministicFiniteAutomaton, DirectlyFollowsModel, EbiObject,
+    EventLog, EventLogCsv, EventLogOcel, EventLogTraceAttributes, EventLogXes, FiniteLanguage,
+    FiniteStochasticLanguage, LabelledPetriNet, LanguageOfAlignments, ProcessTree,
+    StochasticBusinessProcessModelAndNotation, StochasticDeterministicFiniteAutomaton,
+    StochasticDirectlyFollowsModel, StochasticLabelledPetriNet, StochasticLanguageOfAlignments,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
+    anyhow::{Error, Result},
+    ebi_objects::{
+        event_log_event_attributes::EventLogEventAttributes,
+        partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage,
+    },
+    traits::importable::{Importable, ImporterParameterValues},
 };
 use pastey::paste;
 use std::io::BufRead;
@@ -93,6 +104,10 @@ import_as_object!(FiniteStochasticLanguage, finite_stochastic_language);
 import_as_object!(DeterministicFiniteAutomaton, deterministic_finite_automaton);
 import_as_object!(ProcessTree, process_tree);
 import_as_object!(StochasticProcessTree, stochastic_process_tree);
+import_as_object!(
+    PartiallyOrderedWorkflowLanguage,
+    partially_ordered_workflow_language
+);
 import_as_object!(LanguageOfAlignments, language_of_alignments);
 import_as_object!(
     StochasticLanguageOfAlignments,

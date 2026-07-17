@@ -1,0 +1,98 @@
+{
+  "format": "powl-json",
+  "format_version": "1.0",
+  "metadata": {
+    "name": "Request handling example",
+    "description": "Nested choice example."
+  },
+  "model": {
+    "type": "partial_order",
+    "attributes": {
+      "name": "Request handling process"
+    },
+    "nodes": [
+      {
+        "id": "register",
+        "type": "activity",
+        "label": "Register request",
+        "attributes": {
+          "resource": "Backoffice",
+          "role": "Clerk"
+        }
+      },
+      {
+        "id": "decision",
+        "type": "choice_graph",
+        "nodes": [
+          {
+            "id": "approve",
+            "type": "activity",
+            "label": "Approve request",
+            "attributes": {
+              "resource": "Management",
+              "role": "Manager"
+            }
+          },
+          {
+            "id": "clarification",
+            "type": "partial_order",
+            "nodes": [
+              {
+                "id": "request_info",
+                "type": "activity",
+                "label": "Request additional information",
+                "repeatable": true,
+                "attributes": {
+                  "resource": "Backoffice",
+                  "role": "Clerk"
+                }
+              },
+              {
+                "id": "approve_after_info",
+                "type": "activity",
+                "label": "Approve after clarification",
+                "attributes": {
+                  "resource": "Management",
+                  "role": "Manager"
+                }
+              }
+            ],
+            "edges": [
+              { "source": "request_info", "target": "approve_after_info" }
+            ]
+          },
+          {
+            "id": "reject",
+            "type": "activity",
+            "label": "Reject request",
+            "attributes": {
+              "resource": "Management",
+              "role": "Manager"
+            }
+          }
+        ],
+        "edges": [
+          { "source": "@start", "target": "approve" },
+          { "source": "@start", "target": "clarification" },
+          { "source": "@start", "target": "reject" },
+          { "source": "approve", "target": "@end" },
+          { "source": "clarification", "target": "@end" },
+          { "source": "reject", "target": "@end" }
+        ]
+        },
+      {
+        "id": "archive",
+        "type": "activity",
+        "label": "Archive case",
+        "skippable": true,
+        "attributes": {
+          "resource": "System"
+        }
+      }
+    ],
+    "edges": [
+      { "source": "register", "target": "decision" },
+      { "source": "decision", "target": "archive" }
+    ]
+  }
+}

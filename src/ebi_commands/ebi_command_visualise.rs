@@ -67,6 +67,7 @@ pub const EBI_VISUALISE_TEXT: EbiCommand = EbiCommand::Command {
             EbiInput::Object(EbiObject::DeterministicFiniteAutomaton(s), _) => s.to_string(),
             EbiInput::Object(EbiObject::ProcessTree(pt), _) => pt.to_string(),
             EbiInput::Object(EbiObject::StochasticProcessTree(pt), _) => pt.to_string(),
+            EbiInput::Object(EbiObject::PartiallyOrderedWorkflowLanguage(pt), _) => pt.to_string(),
             EbiInput::Object(EbiObject::Executions(s), _) => s.to_string(),
             EbiInput::Object(EbiObject::DirectlyFollowsGraph(s), _) => s.to_string(),
             EbiInput::Object(EbiObject::ScalableVectorGraphics(s), _) => s.to_string(),

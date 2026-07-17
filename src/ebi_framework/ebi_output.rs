@@ -15,6 +15,7 @@ use crate::{
         finite_stochastic_partially_ordered_language::EBI_FINITE_STOCHASTIC_PARTIALLY_ORDERED_LANGUAGE,
         labelled_petri_net::EBI_LABELLED_PETRI_NET,
         language_of_alignments::EBI_LANGUAGE_OF_ALIGNMENTS,
+        partially_ordered_workflow_language::EBI_PARTIALLY_ORDERED_WORKFLOW_LANGUAGE,
         portable_document_format::EBI_PORTABLE_DOCUMENT_FORMAT,
         portable_network_graphics::EBI_PORTABLE_NETWORK_GRAPHCIS, process_tree::EBI_PROCESS_TREE,
         scalable_vector_graphics::EBI_SCALABLE_VECTOR_GRAPHICS,
@@ -49,6 +50,7 @@ use ebi_objects::{
         event_log_csv::EventLogCsv, event_log_ocel::EventLogOcel, executions::Executions,
         finite_language::FiniteLanguage, finite_stochastic_language::FiniteStochasticLanguage,
         labelled_petri_net::LabelledPetriNet, language_of_alignments::LanguageOfAlignments,
+        partially_ordered_workflow_language::PartiallyOrderedWorkflowLanguage,
         process_tree::ProcessTree, scalable_vector_graphics::ScalableVectorGraphics,
         stochastic_deterministic_finite_automaton::StochasticDeterministicFiniteAutomaton,
         stochastic_directly_follows_model::StochasticDirectlyFollowsModel,
@@ -331,6 +333,14 @@ impl EbiOutputType {
                 ),
                 &EBI_STOCHASTIC_PROCESS_TREE,
             ),
+            EbiOutputType::ObjectType(EbiObjectType::PartiallyOrderedWorkflowLanguage) => {
+                EbiExporter::Object(
+                    &&EbiObjectExporter::PartiallyOrderedWorkflowLanguage(
+                        PartiallyOrderedWorkflowLanguage::export_from_object,
+                    ),
+                    &EBI_PARTIALLY_ORDERED_WORKFLOW_LANGUAGE,
+                )
+            }
             EbiOutputType::ObjectType(EbiObjectType::ScalableVectorGraphics) => {
                 EbiExporter::Object(
                     &EbiObjectExporter::ScalableVectorGraphics(
@@ -558,6 +568,7 @@ pub enum EbiObjectExporter {
     DeterministicFiniteAutomaton(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     ProcessTree(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     StochasticProcessTree(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
+    PartiallyOrderedWorkflowLanguage(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     Executions(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     DirectlyFollowsGraph(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     ScalableVectorGraphics(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
@@ -611,6 +622,9 @@ impl EbiObjectExporter {
             }
             EbiObjectExporter::ProcessTree(_) => EbiObjectType::ProcessTree,
             EbiObjectExporter::StochasticProcessTree(_) => EbiObjectType::StochasticProcessTree,
+            EbiObjectExporter::PartiallyOrderedWorkflowLanguage(_) => {
+                EbiObjectType::PartiallyOrderedWorkflowLanguage
+            }
             EbiObjectExporter::Executions(_) => EbiObjectType::Executions,
             EbiObjectExporter::DirectlyFollowsGraph(_) => EbiObjectType::DirectlyFollowsGraph,
             EbiObjectExporter::ScalableVectorGraphics(_) => EbiObjectType::ScalableVectorGraphics,
@@ -659,6 +673,9 @@ impl EbiObjectExporter {
                 EbiObjectExporter::DeterministicFiniteAutomaton(exporter) => (exporter)(object, f),
                 EbiObjectExporter::ProcessTree(exporter) => (exporter)(object, f),
                 EbiObjectExporter::StochasticProcessTree(exporter) => (exporter)(object, f),
+                EbiObjectExporter::PartiallyOrderedWorkflowLanguage(exporter) => {
+                    (exporter)(object, f)
+                }
                 EbiObjectExporter::Executions(exporter) => (exporter)(object, f),
                 EbiObjectExporter::DirectlyFollowsGraph(exporter) => (exporter)(object, f),
                 EbiObjectExporter::ScalableVectorGraphics(exporter) => (exporter)(object, f),

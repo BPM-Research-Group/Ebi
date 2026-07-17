@@ -1,0 +1,240 @@
+{
+  "format": "powl-json",
+  "format_version": "1.0",
+  "model": {
+    "type": "choice_graph",
+    "nodes": [
+      {
+        "id": "partial_order",
+        "type": "partial_order",
+        "nodes": [
+          {
+            "id": "er_registration",
+            "type": "activity",
+            "label": "ER Registration"
+          },
+          {
+            "id": "er_sepsis_triage",
+            "type": "activity",
+            "label": "ER Sepsis Triage"
+          },
+          {
+            "id": "choice_graph",
+            "type": "choice_graph",
+            "nodes": [
+              {
+                "id": "admission_ic",
+                "type": "activity",
+                "repeatable": true,
+                "label": "Admission IC"
+              },
+              {
+                "id": "admission_nc",
+                "type": "activity",
+                "repeatable": true,
+                "label": "Admission NC"
+              },
+              {
+                "id": "iv_antibiotics",
+                "type": "activity",
+                "label": "IV Antibiotics"
+              },
+              {
+                "id": "release_a",
+                "type": "activity",
+                "label": "Release A"
+              },
+              {
+                "id": "iv_liquid",
+                "type": "activity",
+                "label": "IV Liquid"
+              },
+              {
+                "id": "release_b",
+                "type": "activity",
+                "label": "Release B"
+              },
+              {
+                "id": "partial_order",
+                "type": "partial_order",
+                "nodes": [
+                  {
+                    "id": "crp",
+                    "type": "activity",
+                    "repeatable": true,
+                    "label": "CRP"
+                  },
+                  {
+                    "id": "lacticacid",
+                    "type": "activity",
+                    "skippable": true,
+                    "repeatable": true,
+                    "label": "LacticAcid"
+                  },
+                  {
+                    "id": "leucocytes",
+                    "type": "activity",
+                    "repeatable": true,
+                    "label": "Leucocytes"
+                  }
+                ],
+                "edges": []
+              }
+            ],
+            "edges": [
+              {
+                "source": "@start",
+                "target": "iv_antibiotics"
+              },
+              {
+                "source": "@start",
+                "target": "iv_liquid"
+              },
+              {
+                "source": "@start",
+                "target": "partial_order"
+              },
+              {
+                "source": "admission_ic",
+                "target": "partial_order"
+              },
+              {
+                "source": "admission_nc",
+                "target": "release_a"
+              },
+              {
+                "source": "admission_nc",
+                "target": "partial_order"
+              },
+              {
+                "source": "iv_antibiotics",
+                "target": "admission_ic"
+              },
+              {
+                "source": "iv_antibiotics",
+                "target": "admission_nc"
+              },
+              {
+                "source": "iv_liquid",
+                "target": "iv_antibiotics"
+              },
+              {
+                "source": "partial_order",
+                "target": "release_a"
+              },
+              {
+                "source": "partial_order",
+                "target": "iv_liquid"
+              },
+              {
+                "source": "partial_order",
+                "target": "release_b"
+              },
+              {
+                "source": "release_a",
+                "target": "@end"
+              },
+              {
+                "source": "release_b",
+                "target": "@end"
+              }
+            ]
+          },
+          {
+            "id": "er_triage",
+            "type": "activity",
+            "repeatable": true,
+            "label": "ER Triage"
+          }
+        ],
+        "edges": [
+          {
+            "source": "er_registration",
+            "target": "er_triage"
+          },
+          {
+            "source": "er_sepsis_triage",
+            "target": "choice_graph"
+          },
+          {
+            "source": "er_triage",
+            "target": "er_sepsis_triage"
+          }
+        ]
+      },
+      {
+        "id": "return_er",
+        "type": "activity",
+        "label": "Return ER"
+      },
+      {
+        "id": "release_d",
+        "type": "activity",
+        "skippable": true,
+        "label": "Release D"
+      },
+      {
+        "id": "release_c",
+        "type": "activity",
+        "skippable": true,
+        "label": "Release C"
+      },
+      {
+        "id": "release_e",
+        "type": "activity",
+        "skippable": true,
+        "label": "Release E"
+      }
+    ],
+    "edges": [
+      {
+        "source": "@start",
+        "target": "partial_order"
+      },
+      {
+        "source": "partial_order",
+        "target": "release_d"
+      },
+      {
+        "source": "partial_order",
+        "target": "release_c"
+      },
+      {
+        "source": "partial_order",
+        "target": "release_e"
+      },
+      {
+        "source": "return_er",
+        "target": "partial_order"
+      },
+      {
+        "source": "release_d",
+        "target": "return_er"
+      },
+      {
+        "source": "release_c",
+        "target": "return_er"
+      },
+      {
+        "source": "release_e",
+        "target": "return_er"
+      },
+      {
+        "source": "return_er",
+        "target": "@end"
+      },
+      {
+        "source": "release_d",
+        "target": "@end"
+      },
+      {
+        "source": "release_c",
+        "target": "@end"
+      },
+      {
+        "source": "release_e",
+        "target": "@end"
+      }
+    ]
+  }
+}
