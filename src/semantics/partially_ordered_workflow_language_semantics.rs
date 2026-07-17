@@ -30,6 +30,8 @@ impl Semantics for PartiallyOrderedWorkflowLanguage {
         }
     }
 
+    /// Strategy: do not perform any checking and just update the current node as requested.
+    /// However, do not 
     fn execute_transition(
         &self,
         state: &mut <Self as Semantics>::SemState,
@@ -40,6 +42,15 @@ impl Semantics for PartiallyOrderedWorkflowLanguage {
                 .ok_or_else(|| anyhow!("Transition not found."))?;
         match transition_type {
             TransitionType::Start => {
+                //if our parent is a choice graph, reset all children
+                if let Some((parent_index, _)) = self.get_parent(node_index)
+                    && self.tree[parent_index].is_choice_graph()
+                {
+                    for child in (parent_index + 1)..self.traverse(parent_index) {
+                        state[child] = NodeState::Enabled;
+                    }
+                }
+                //start the current child
                 state[node_index] = NodeState::Started;
             }
             TransitionType::Execute => {
@@ -319,19 +330,6 @@ fn enabled_transitions_choice_graph_execute(
     let t_execute = node_index * 3 + 1;
     let t_close = node_index * 3 + 2;
 
-    if end_children
-        .iter()
-        .map(|child_rank| powl.get_child(node_index, *child_rank))
-        .any(|child_index| state.states[child_index] == NodeState::Closed)
-    {
-        // one end child is closed; we can close (or repeat) this node
-        if repeatable {
-            return vec![t_execute, t_close];
-        } else {
-            return vec![t_close];
-        }
-    }
-
     //if any child has started execution, allow it to continue (there can only be one such child in a choice graph)
     for child_index in powl.get_children(node_index) {
         if state.states[child_index] == NodeState::Started
@@ -353,9 +351,20 @@ fn enabled_transitions_choice_graph_execute(
             .collect();
     }
 
-    println!("4");
-
     let mut result = vec![];
+    if end_children
+        .iter()
+        .map(|child_rank| powl.get_child(node_index, *child_rank))
+        .any(|child_index| state.states[child_index] == NodeState::Closed)
+    {
+        result.push(t_close);
+        // one end child is closed; we can close this node
+        if repeatable {
+            // if it is repeatable, we can execute it again
+            result.push(t_execute)
+        }
+    }
+
     //a node with an incoming edge from a closed node can start
     for (source_rank, target_rank) in edges {
         let source = powl.get_child(node_index, *source_rank);
@@ -367,7 +376,7 @@ fn enabled_transitions_choice_graph_execute(
         }
     }
 
-    vec![]
+    result
 }
 
 //execute a partial order
@@ -611,6 +620,78 @@ mod tests {
         powl.execute_transition(&mut state, 2).unwrap();
 
         assert!(powl.is_final_state(&state));
+    }
+
+    #[test]
+    fn powl_sem_loop_a_b() {
+        let fin = fs::read_to_string("testfiles/loop(a,b).powl").unwrap();
+        let powl = fin.parse::<PartiallyOrderedWorkflowLanguage>().unwrap();
+
+        let mut state = powl.get_initial_state().unwrap();
+        let a = Some(powl.activity_key().process_activity_attempt("a").unwrap());
+        let b = Some(powl.activity_key().process_activity_attempt("b").unwrap());
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![0]);
+        assert!(powl.is_transition_silent(0, &state));
+
+        //start or
+        powl.execute_transition(&mut state, 0).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![1]);
+        assert!(powl.is_transition_silent(1, &state));
+        assert!(!powl.is_final_state(&state));
+
+        //execute or
+        powl.execute_transition(&mut state, 1).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![3]);
+        assert!(powl.is_transition_silent(3, &state));
+        assert!(!powl.is_final_state(&state));
+
+        //start a
+        powl.execute_transition(&mut state, 3).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![4]);
+        assert_eq!(powl.get_transition_activity(4, &state), a);
+        assert!(!powl.is_final_state(&state));
+
+        //execute a
+        powl.execute_transition(&mut state, 4).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![5]);
+        assert!(powl.is_transition_silent(5, &state));
+        assert!(!powl.is_final_state(&state));
+
+        //close a
+        powl.execute_transition(&mut state, 5).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![2, 6]);
+        assert!(!powl.is_final_state(&state));
+        assert!(powl.is_transition_silent(6, &state));
+
+        //start b
+        powl.execute_transition(&mut state, 6).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![7]);
+        assert!(!powl.is_final_state(&state));
+        assert_eq!(powl.get_transition_activity(7, &state), b);
+
+        //execute b
+        powl.execute_transition(&mut state, 7).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![8]);
+        assert!(!powl.is_final_state(&state));
+        assert!(powl.is_transition_silent(8, &state));
+
+        //close b
+        powl.execute_transition(&mut state, 8).unwrap();
+
+        assert_eq!(powl.get_enabled_transitions(&state), vec![3]);
+        assert!(!powl.is_final_state(&state));
+        assert!(powl.is_transition_silent(3, &state));
+
+        //execute a
+        powl.execute_transition(&mut state, 3).unwrap();
 
     }
 }
