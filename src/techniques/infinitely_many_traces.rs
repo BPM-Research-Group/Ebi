@@ -13,14 +13,12 @@ use ebi_objects::{
         partially_ordered_workflow_language::{PartiallyOrderedWorkflowLanguage, PowlNode},
         process_tree::{Node, Operator, TreeMarking},
     },
+    strongly_connected_components::StronglyConnectedComponents,
 };
-use intmap::IntMap;
-use rustc_hash::FxHashMap;
 use std::{
     collections::{HashMap, HashSet, hash_map::Entry},
     fmt::Display,
 };
-use strongly_connected_components::{Graph, SccDecomposition};
 
 pub trait InfinitelyManyTraces {
     type LivState: Displayable;
@@ -86,36 +84,18 @@ impl InfinitelyManyTraces for PartiallyOrderedWorkflowLanguage {
                     }
 
                     //look for strongly connected components in the edges
-                    let mut graph = Graph::new();
-                    let mut child_2_node = IntMap::new();
-                    let mut node_2_child = FxHashMap::default();
-
-                    for child_index in 0..*number_of_children {
-                        let node = graph.new_node();
-                        child_2_node.insert(child_index, node);
-                        node_2_child.insert(node, child_index);
-                    }
-
-                    for (source, target) in edges {
-                        graph.new_edge(
-                            *child_2_node.get(*source).unwrap(),
-                            *child_2_node.get(*target).unwrap(),
-                        );
-                    }
-
-                    let sccs = graph.find_sccs();
-                    for scc in sccs.iter_sccs() {
-                        //there must a scc with one node that has an activity
-                        if scc.len() >= 2 {
-                            for node in scc.iter_nodes() {
-                                let child_rank = node_2_child.get(&node).unwrap();
-                                let child = self.get_child(node_index, *child_rank);
-                                if !self.only_empty_trace(child) {
-                                    return Ok(true);
-                                }
-                            }
-                        }
-                    }
+                    return Ok((edges, number_of_children)
+                        .strongly_connected_components()
+                        .0
+                        .iter()
+                        .any(|scc| {
+                            scc.len() >= 2
+                                && scc.iter().any(|child_rank| {
+                                    //if the SCC can produce an activity, there are infinitely many traces
+                                    let child = self.get_child(node_index, *child_rank);
+                                    !self.only_empty_trace(child)
+                                })
+                        }));
                 }
             }
         }
@@ -294,18 +274,15 @@ macro_rules! aut {
                 };
 
                 //Step 1: create strongly connected components of nodes
-                let (sccs, state_2_node, node_2_state) = create_sccs(self);
+                // let (sccs, state_2_node, node_2_state) = create_sccs(self);
+                let (sccs, node_2_scc) = self.strongly_connected_components();
 
                 //Step 2: remove components that have no visible intra-transition
                 let mut candidate_sccs = HashSet::new();
                 {
                     for (_, source, target, activity) in self.transitions() {
-                        if activity.is_some()
-                            && sccs.scc_of_node(*state_2_node.get(source).unwrap())
-                                == sccs.scc_of_node(*state_2_node.get(target).unwrap())
-                        {
-                            candidate_sccs
-                                .insert(sccs.scc_of_node(*state_2_node.get(source).unwrap()));
+                        if activity.is_some() && node_2_scc[source] == node_2_scc[target] {
+                            candidate_sccs.insert(sccs[node_2_scc[source]].clone());
                         }
                     }
                 }
@@ -323,17 +300,22 @@ macro_rules! aut {
                     let mut reachability_cache = self.get_reachability_cache();
                     // we only need to check one state per scc
                     candidate_sccs.retain(|scc| {
-                        let node = scc.iter_nodes().next().unwrap();
-                        let state = node_2_state.get(&node).unwrap();
+                        let node = scc.iter().next().unwrap();
 
-                        if livelock_cache.is_state_part_of_livelock(&state).unwrap() {
+                        if livelock_cache
+                            .is_state_part_of_livelock(&AutomatonState::of(*node))
+                            .unwrap()
+                        {
                             //one state in the scc is part of a livelock
                             // -> all states in the scc are part of a livelock
                             // -> scc cannot lead to infinitely many traces
                             return false;
                         }
 
-                        if !reachability_cache.is_state_reachable(&state).unwrap() {
+                        if !reachability_cache
+                            .is_state_reachable(&AutomatonState::of(*node))
+                            .unwrap()
+                        {
                             // one state in the scc is not reachable
                             // -> all states in the scc are not reachbable
                             // -> scc cannot lead to infinitely many traces
@@ -348,37 +330,6 @@ macro_rules! aut {
             }
         }
     };
-}
-
-fn create_sccs<T>(
-    automaton: &T,
-) -> (
-    SccDecomposition,
-    IntMap<AutomatonState, strongly_connected_components::Node>,
-    FxHashMap<strongly_connected_components::Node, AutomatonState>,
-)
-where
-    T: AutomatonSemantics,
-{
-    //create a graph of the states
-    let mut graph = Graph::new();
-    let mut state_2_node = IntMap::new();
-    let mut node_2_state = FxHashMap::default();
-
-    for state in automaton.states() {
-        let node = graph.new_node();
-        state_2_node.insert(state, node);
-        node_2_state.insert(node, state);
-    }
-
-    for (_, source, target, _) in automaton.transitions() {
-        graph.new_edge(
-            *state_2_node.get(source).unwrap(),
-            *state_2_node.get(target).unwrap(),
-        );
-    }
-
-    (graph.find_sccs(), state_2_node, node_2_state)
 }
 
 macro_rules! lang {

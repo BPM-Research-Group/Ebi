@@ -87,6 +87,10 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &["trait finite language#./testfiles/empty.xes", "usize 1"],
     ),
     (
+        &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,
+        &["trait finite language#./testfiles/empty.slang", "usize 1"],
+    ),
+    (
         &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
         &["*", "trait semantics#./testfiles/empty_2.ptree"],
     ),
@@ -101,6 +105,10 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
     (
         &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
         &["trait finite language#./testfiles/empty.xes", "usize 1"],
+    ),
+    (
+        &EBI_ANALYSE_NON_STOCHASTIC_MEDOID,
+        &["trait finite language#./testfiles/empty.slang", "usize 1"],
     ),
     (
         &EBI_ASSOCIATION_ATTRIBUTE,
@@ -559,6 +567,13 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &[
             "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
             "trait semantics#./testfiles/aa-ab-ba.ptml",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/aa-ab-ba.sdfa",
         ],
     ),
     (
