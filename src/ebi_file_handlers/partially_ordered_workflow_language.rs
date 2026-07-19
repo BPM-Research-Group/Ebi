@@ -51,9 +51,15 @@ pub const EBI_PARTIALLY_ORDERED_WORKFLOW_LANGUAGE: EbiFileHandler = EbiFileHandl
         ),
     ],
     object_importers_fallible: &[],
-    object_exporters: &[EbiObjectExporter::PartiallyOrderedWorkflowLanguage(
-        PartiallyOrderedWorkflowLanguage::export_from_object,
-    )],
+    object_exporters: &[
+        EbiObjectExporter::PartiallyOrderedWorkflowLanguage(
+            PartiallyOrderedWorkflowLanguage::export_from_object,
+        ),
+        EbiObjectExporter::ProcessTree(PartiallyOrderedWorkflowLanguage::export_from_object),
+        EbiObjectExporter::StochasticProcessTree(
+            PartiallyOrderedWorkflowLanguage::export_from_object,
+        ),
+    ],
     object_exporters_fallible: &[],
     java_object_handlers: &[],
 };

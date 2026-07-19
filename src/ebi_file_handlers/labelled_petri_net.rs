@@ -53,6 +53,7 @@ pub const EBI_LABELLED_PETRI_NET: EbiFileHandler = EbiFileHandler {
         EbiObjectExporter::StochasticDirectlyFollowsModel(LabelledPetriNet::export_from_object),
         EbiObjectExporter::LabelledPetriNet(LabelledPetriNet::export_from_object),
         EbiObjectExporter::ProcessTree(LabelledPetriNet::export_from_object),
+        EbiObjectExporter::PartiallyOrderedWorkflowLanguage(LabelledPetriNet::export_from_object),
         EbiObjectExporter::StochasticProcessTree(LabelledPetriNet::export_from_object),
         EbiObjectExporter::StochasticLabelledPetriNet(LabelledPetriNet::export_from_object),
         EbiObjectExporter::StochasticDeterministicFiniteAutomaton(

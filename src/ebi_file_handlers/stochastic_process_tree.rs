@@ -1,18 +1,11 @@
 use crate::ebi_framework::{
-    ebi_file_handler::EbiFileHandler,
-    ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
-    ebi_output::EbiObjectExporter,
-    ebi_trait::FromEbiTraitObject,
-    object_importers::{
-        ImportAsBusinessProcessModelAndNotationObject, ImportAsLabelledPetriNetObject,
-        ImportAsProcessTreeObject, ImportAsStochasticNondeterministicFiniteAutomatonObject,
-    },
-    trait_importers::{
+    ebi_file_handler::EbiFileHandler, ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter}, ebi_output::EbiObjectExporter, ebi_trait::FromEbiTraitObject, object_importers::{
+        ImportAsBusinessProcessModelAndNotationObject, ImportAsLabelledPetriNetObject, ImportAsPartiallyOrderedWorkflowLanguageObject, ImportAsProcessTreeObject, ImportAsStochasticNondeterministicFiniteAutomatonObject,
+    }, trait_importers::{
         ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsQueriableStochasticLanguageTrait,
         ImportAsSemanticsTrait, ImportAsStochasticDeterministicSemanticsTrait,
         ImportAsStochasticSemanticsTrait,
-    },
-    validate::Validate,
+    }, validate::Validate,
 };
 use ebi_objects::{
     EbiObject, Exportable, Importable, StochasticProcessTree,
@@ -71,6 +64,10 @@ pub const EBI_STOCHASTIC_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
         ),
         EbiObjectImporter::BusinessProcessModelAndNotation(
             StochasticProcessTree::import_as_business_process_model_and_notation_object,
+            StochasticProcessTree::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::PartiallyOrderedWorkflowLanguage(
+            StochasticProcessTree::import_as_partially_ordered_workflow_language_object,
             StochasticProcessTree::IMPORTER_PARAMETERS,
         ),
     ],

@@ -6,6 +6,7 @@ use crate::{
         ebi_trait::FromEbiTraitObject,
         object_importers::{
             ImportAsBusinessProcessModelAndNotationObject, ImportAsLabelledPetriNetObject,
+            ImportAsPartiallyOrderedWorkflowLanguageObject,
         },
         trait_importers::{
             ImportAsActivitiesTrait, ImportAsGraphableTrait, ImportAsSemanticsTrait,
@@ -51,6 +52,10 @@ pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {
         ),
         EbiObjectImporter::BusinessProcessModelAndNotation(
             ProcessTree::import_as_business_process_model_and_notation_object,
+            ProcessTree::IMPORTER_PARAMETERS,
+        ),
+        EbiObjectImporter::PartiallyOrderedWorkflowLanguage(
+            ProcessTree::import_as_partially_ordered_workflow_language_object,
             ProcessTree::IMPORTER_PARAMETERS,
         ),
     ],
