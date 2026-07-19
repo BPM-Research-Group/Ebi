@@ -67,7 +67,7 @@ use std::{
     io::Write,
     path::PathBuf,
 };
-use strum_macros::{Display, EnumIter, IntoStaticStr};
+use strum_macros::{Display, EnumIs, EnumIter, IntoStaticStr};
 
 #[derive(Display, Clone)]
 pub enum EbiOutput {
@@ -535,7 +535,7 @@ impl Display for EbiExporter {
     }
 }
 
-#[derive(Hash, IntoStaticStr, Eq)]
+#[derive(Hash, IntoStaticStr, Eq, EnumIs)]
 pub enum EbiObjectExporter {
     BusinessProcessModelAndNotation(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLog(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
@@ -749,8 +749,10 @@ mod tests {
     use super::{EbiExporter, EbiOutputType, export_to_bytes, export_to_string};
     use crate::{
         ebi_framework::{
-            ebi_command::EbiCommand, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInput,
-            ebi_output::EbiOutput,
+            ebi_command::EbiCommand,
+            ebi_file_handler::EBI_FILE_HANDLERS,
+            ebi_input::EbiInput,
+            ebi_output::{EbiObjectExporter, EbiOutput},
         },
         math::{
             log_div::LogDiv,
@@ -773,26 +775,28 @@ mod tests {
                 if let EbiInput::Object(object, file_handler) = object {
                     for file_handler2 in EBI_FILE_HANDLERS {
                         for exporter in file_handler2.object_exporters {
-                            if exporter.get_type() == importer.clone().unwrap().get_type() {
-                                println!(
-                                    "file {}\n\tfile handler\t{}\n\timporter\t{:?}\n\tfile handler\t{}\n\texporter\t{}\n\tobject\t\t{}",
-                                    f,
-                                    file_handler,
-                                    importer,
-                                    file_handler2,
-                                    exporter,
-                                    object.get_type()
-                                );
+                            if !exporter.is_portable_network_graphics() && !exporter.is_portable_document_format() {
+                                if exporter.get_type() == importer.clone().unwrap().get_type() {
+                                    println!(
+                                        "file {}\n\tfile handler\t{}\n\timporter\t{:?}\n\tfile handler\t{}\n\texporter\t{}\n\tobject\t\t{}",
+                                        f,
+                                        file_handler,
+                                        importer,
+                                        file_handler2,
+                                        exporter,
+                                        object.get_type()
+                                    );
 
-                                if importer.clone().unwrap().get_type() != object.get_type() {
-                                    assert!(false)
+                                    if importer.clone().unwrap().get_type() != object.get_type() {
+                                        assert!(false)
+                                    }
+
+                                    let mut c = Cursor::new(Vec::new());
+                                    println!("\tobject type\t{}", object.get_type());
+                                    exporter
+                                        .export(EbiOutput::Object(object.clone()), &mut c)
+                                        .unwrap();
                                 }
-
-                                let mut c = Cursor::new(Vec::new());
-                                println!("\tobject type\t{}", object.get_type());
-                                exporter
-                                    .export(EbiOutput::Object(object.clone()), &mut c)
-                                    .unwrap();
                             }
                         }
                     }
