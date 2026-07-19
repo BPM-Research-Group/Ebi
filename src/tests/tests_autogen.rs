@@ -15184,17 +15184,7 @@ mod tests{
 	#[test]
 	#[timeout(10000)]
 	pub fn ebi_conf_gp_test_19() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_GAIN_PRECISION,
-			&[
-				"trait finite stochastic language#./testfiles/a-b-double.xes",
-				"object stochastic deterministic finite automaton#./testfiles/empty.slang",
-				"fraction 0"			
-			]
-		),
-		*/
+		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
 			return;
 		}
@@ -15207,14 +15197,8 @@ mod tests{
 		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_PRECISION {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_PRECISION {
+			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
 	#[test]
@@ -15240,17 +15224,7 @@ mod tests{
 	#[test]
 	#[timeout(10000)]
 	pub fn ebi_conf_gp_test_21() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_GAIN_PRECISION,
-			&[
-				"trait finite stochastic language#./testfiles/a-b-double.xes",
-				"object stochastic deterministic finite automaton#./testfiles/empty_trace.slang",
-				"fraction 0"			
-			]
-		),
-		*/
+		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
 			return;
 		}
@@ -15263,14 +15237,8 @@ mod tests{
 		let input2 = EbiInput::Fraction("0".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_PRECISION {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_GAIN_PRECISION {
+			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
 

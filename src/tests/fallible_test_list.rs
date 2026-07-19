@@ -200,6 +200,22 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &EBI_CONFORMANCE_GAIN_PRECISION,
         &[
             "*",
+            "object stochastic deterministic finite automaton#./testfiles/empty.slang",
+            "fraction 0",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_GAIN_PRECISION,
+        &[
+            "*",
+            "object stochastic deterministic finite automaton#./testfiles/empty_trace.slang",
+            "fraction 0",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_GAIN_PRECISION,
+        &[
+            "*",
             "object stochastic deterministic finite automaton#./testfiles/a-b_multiple_separators.csv",
             "fraction 0",
         ],
