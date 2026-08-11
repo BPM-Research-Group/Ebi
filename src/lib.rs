@@ -17,6 +17,7 @@ pub mod ebi_commands {
     pub mod ebi_command_analyse;
     pub mod ebi_command_analyse_non_stochastic;
     pub mod ebi_command_association;
+    pub mod ebi_command_cohort_analysis;
     pub mod ebi_command_conformance;
     pub mod ebi_command_conformance_non_stochastic;
     pub mod ebi_command_convert;
@@ -186,6 +187,7 @@ pub mod stochastic_semantics {
 pub mod techniques {
     pub mod align;
     pub mod alignment_stochastic_miner;
+    pub mod cohort_analysis;
     pub mod any_traces;
     pub mod association;
     pub mod bootstrap_test;
