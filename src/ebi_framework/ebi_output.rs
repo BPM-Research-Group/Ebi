@@ -749,10 +749,8 @@ mod tests {
     use super::{EbiExporter, EbiOutputType, export_to_bytes, export_to_string};
     use crate::{
         ebi_framework::{
-            ebi_command::EbiCommand,
-            ebi_file_handler::EBI_FILE_HANDLERS,
-            ebi_input::EbiInput,
-            ebi_output::{EbiObjectExporter, EbiOutput},
+            ebi_command::EbiCommand, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInput,
+            ebi_output::EbiOutput,
         },
         math::{
             log_div::LogDiv,
