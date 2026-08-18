@@ -4,14 +4,12 @@ use crate::{
         ebi_input::EbiInputType,
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
-    },
-    ebi_traits::{
+    }, ebi_traits::{
         ebi_trait_finite_language::EbiTraitFiniteLanguage,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_semantics::EbiTraitSemantics,
-    },
-    techniques::{
-        align::Align, escaping_edges_precision::EscapingEdgesPrecision, fitness::Fitness,
+    }, techniques::{
+        align::Align, escaping_edges_precision::EscapingEdgesPrecision, fitness::Fitness, fitting_traces::FittingTraces,
     },
 };
 use ebi_objects::{EbiObject, EbiObjectType, StochasticLanguageOfAlignments, anyhow::Context};
@@ -24,6 +22,7 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC: EbiCommand = EbiCommand::Group {
     children: &[
         &EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
         &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &EBI_CONFORMANCE_NON_STOCHASTIC_FITTING_TRACES,
         &EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS,
         &EBI_CONFORMANCE_NON_STOCHASTIC_TRACE_FITNESS,
     ],
@@ -101,6 +100,31 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION: EbiCommand =
         },
         output_type: &EbiOutputType::Fraction,
     };
+
+pub const EBI_CONFORMANCE_NON_STOCHASTIC_FITTING_TRACES: EbiCommand = EbiCommand::Command {
+    name_short: "fitt",
+    name_long: Some("fitting-traces"),
+    explanation_short: "Compute the fraction of fitting traces in a stochastic language of alignments.",
+    explanation_long: Some(
+        "Compute the fraction of fitting traces in a stochastic language of alignments: the fraction of traces that have only synchronous and silent moves.",
+    ),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[&[&EbiInputType::Object(
+        EbiObjectType::StochasticLanguageOfAlignments,
+    )]],
+    input_names: &["ALIGNMENTS"],
+    input_helps: &["The stochastic language of alignments."],
+    execute: |mut objects, _| {
+        let alignments = objects
+            .remove(0)
+            .to_type::<StochasticLanguageOfAlignments>()?;
+
+        Ok(EbiOutput::Fraction(alignments.fitting_traces()))
+    },
+    output_type: &EbiOutputType::Fraction,
+};
 
 pub const EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS: EbiCommand = EbiCommand::Command {
     name_short: "setali",

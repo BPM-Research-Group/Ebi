@@ -217,6 +217,7 @@ pub mod techniques {
     pub mod explain_trace;
     pub mod filter;
     pub mod fitness;
+    pub mod fitting_traces;
     pub mod flower_miner;
     pub mod gain_precision_recall;
     pub mod hellinger_stochastic_conformance;
