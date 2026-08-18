@@ -161,7 +161,7 @@ pub const EBI_CONFORMANCE_ENTROPIC_RELEVANCE: EbiCommand = EbiCommand::Command {
         
         \begin{definition}[Entropic Relevance~\cite{DBLP:journals/is/AlkhammashPMG22}]
             \label{def:ER}
-                Let $L$ be a finite stochastic language and let $M$ be a queriable stochastic langauge.
+                Let $L$ be a finite stochastic language and let $M$ be a queriable stochastic language.
                 Let $\Lambda$ be the set of all activities appearing in the traces of $L$.
                 Then, the \emph{entropic relevance ($\entrel$) of $M$ to $L$} is defined as follows: 
                 \begin{align*}
