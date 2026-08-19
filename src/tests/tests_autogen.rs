@@ -22346,6 +22346,37 @@ mod tests{
 	}
 
 
+	// ==== command fitt ====
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_confns_fitt_test_0() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_CONFORMANCE_NON_STOCHASTIC_FITTING_TRACES,
+			&[
+				"object stochastic language of alignments#./testfiles/aa-ab-ba.sali"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
+		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
+		let input0 = EbiInput::Object(object0, "stochastic language of alignments".parse().unwrap());
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_FITTING_TRACES {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+
+
 	// ==== command setali ====
 	#[test]
 	#[timeout(10000)]

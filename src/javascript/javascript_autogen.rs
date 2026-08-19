@@ -310,6 +310,14 @@ pub fn conformance_non_stochastic_escaping_edges_precision(javascript_inputs: Ve
 }
 
 #[wasm_bindgen]
+pub fn conformance_non_stochastic_fitting_traces(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_FITTING_TRACES;
+    execute_javascript_command(command, javascript_inputs, "conformance_non_stochastic_fitting_traces", exporter_file_extension);
+}
+
+#[wasm_bindgen]
 pub fn conformance_non_stochastic_set_alignments(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = 
@@ -1979,6 +1987,16 @@ mod tests {
 
 		];
         crate::javascript::javascript_autogen::conformance_non_stochastic_escaping_edges_precision(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn conformance_non_stochastic_fitting_traces_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.sali").unwrap())
+			// object stochastic language of alignments#./testfiles/aa-ab-ba.sali
+
+		];
+        crate::javascript::javascript_autogen::conformance_non_stochastic_fitting_traces(inputs, ".xes");
     }
 
 	#[test]
