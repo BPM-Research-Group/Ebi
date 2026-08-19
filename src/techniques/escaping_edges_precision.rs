@@ -8,9 +8,10 @@ use ebi_objects::{
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::language_of_alignments::Move,
 };
+use fnv::FnvBuildHasher;
 use std::collections::{HashMap, hash_map::Entry};
 
-pub const UNMATCHING: &str = "alignments and model do not belong to one another";
+pub const UNMATCHING: &str = "Alignments and model do not belong to one another";
 
 pub trait EscapingEdgesPrecision {
     fn escaping_edges_precision(
@@ -77,13 +78,13 @@ where
                         */
                         if !self.get_enabled_transitions(&state).contains(&transition) {
                             return Err(anyhow!(
-                                "{}: transition {} is not enabled",
+                                "{}: transition {} is not enabled.",
                                 UNMATCHING,
                                 transition
                             ));
                         }
                         self.execute_transition(&mut state, transition)
-                            .with_context(|| format!("cannot execute transition"))?;
+                            .with_context(|| format!("Cannot execute transition."))?;
 
                         //process the model move
                         let new_node_index = nodes.len();
@@ -101,9 +102,10 @@ where
                                     number_of_outgoing_edges_in_model: self
                                         .get_enabled_transitions(&state)
                                         .len(),
-                                    children: HashMap::new(),
+                                    children: HashMap::default(),
                                 });
                                 vacant_entry.insert(new_node_index);
+                                node_index = new_node_index;
                             }
                         }
                         if let Some(new_add) = new_node {
@@ -134,10 +136,11 @@ where
     }
 }
 
+#[derive(Debug)]
 struct PrefixTreeNode {
     probability: Fraction,
     number_of_outgoing_edges_in_model: usize,
-    children: HashMap<usize, usize>,
+    children: HashMap<usize, usize, FnvBuildHasher>,
 }
 
 impl PrefixTreeNode {
@@ -145,7 +148,7 @@ impl PrefixTreeNode {
         Self {
             probability: Fraction::zero(),
             number_of_outgoing_edges_in_model: number_of_outgoing_edges_in_model,
-            children: HashMap::new(),
+            children: HashMap::default(),
         }
     }
 }
