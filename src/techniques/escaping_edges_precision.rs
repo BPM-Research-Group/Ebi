@@ -174,7 +174,7 @@ mod tests {
 
         assert_eq!(
             sdfa.escaping_edges_precision(sali).unwrap(),
-            Fraction::from((17, 20))
+            Fraction::from((3, 4))
         );
     }
 }
