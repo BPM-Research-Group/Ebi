@@ -131,7 +131,7 @@ pub fn cohort_analysis(log: &dyn EbiTraitEventLogTraceAttributes) -> Result<Stri
         let raw_emsc_display = raw_emsc.clone();
 
         // Baseline: average EMSC over PHI random splits of the same size.
-        // Algorithm 1, line 7: d = real_dist / avg_random_dist (ratio formula).
+        // Algorithm 1, line 7: d = real_dist - avg_random_dist (subtraction formula per paper).
         // Optimisation: precompute the N×N Levenshtein distance matrix once in
         // parallel, then only run the transport solver for each of the PHI shuffles.
         let corrected = if PHI == 0 {
@@ -224,18 +224,14 @@ pub fn cohort_analysis(log: &dyn EbiTraitEventLogTraceAttributes) -> Result<Stri
                 baseline_sum += rand_emsc;
             }
 
-            // Algorithm 1, line 7: d = real_distance / avg_random_distance
+            // Algorithm 1, line 7: d = real_distance - avg_random_distance (subtraction).
             // Ebi returns EMSC as similarity (1=identical), so distance = 1 - EMSC.
             // real_dist = 1 - raw_emsc; avg_random_dist = 1 - baseline_avg_similarity
-            // d > 1: cohort is more different than random (interesting, ranked first)
+            // d > 0: cohort deviates more than random (interesting, ranked first)
             let baseline_avg_sim = &baseline_sum / PHI as u64;
             let real_dist = Fraction::one() - raw_emsc.clone();
             let avg_random_dist = Fraction::one() - baseline_avg_sim;
-            if avg_random_dist == Fraction::zero() {
-                Fraction::zero()
-            } else {
-                real_dist / avg_random_dist
-            }
+            real_dist - avg_random_dist
         };
 
         results.push((attr_name.clone(), value.clone(), raw_emsc_display, corrected, cohort_size));
@@ -287,7 +283,7 @@ pub fn cohort_analysis(log: &dyn EbiTraitEventLogTraceAttributes) -> Result<Stri
     } else {
         out.push_str(&format!(
             "{:<4}  {:<w_a$}  {:<w_v$}  {:>6}  {:>14}  {}\n",
-            "Rank", "Attribute", "Value", "Cases", "EMSC (raw)", "d (ratio)",
+            "Rank", "Attribute", "Value", "Cases", "EMSC (raw)", "d",
             w_a = w_attr, w_v = w_val
         ));
         out.push_str(&format!(
