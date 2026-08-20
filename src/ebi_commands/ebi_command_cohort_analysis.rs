@@ -7,7 +7,6 @@ use crate::{
     },
     ebi_traits::ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
     techniques::cohort_analysis::cohort_analysis,
-    tests::test_ebi_command,
 };
 
 pub const EBI_COHORT_ANALYSIS: EbiCommand = EbiCommand::Command {
@@ -40,4 +39,3 @@ pub const EBI_COHORT_ANALYSIS: EbiCommand = EbiCommand::Command {
     },
     output_type: &EbiOutputType::String,
 };
-test_ebi_command!(EBI_COHORT_ANALYSIS);
