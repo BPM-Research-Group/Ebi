@@ -7,6 +7,7 @@ use ebi_objects::{
 };
 use rand::seq::SliceRandom;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
+use fnv::FnvBuildHasher;
 
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
@@ -89,8 +90,8 @@ pub fn cohort_analysis(log: &dyn EbiTraitEventLogTraceAttributes) -> Result<Stri
     let mut results: Vec<(String, String, Fraction, Fraction, usize)> = Vec::new();
 
     for (attr_name, value, attribute) in &all_pairs {
-        let mut cohort_a: HashMap<Vec<Activity>, Fraction> = HashMap::new();
-        let mut cohort_b: HashMap<Vec<Activity>, Fraction> = HashMap::new();
+        let mut cohort_a: HashMap<Vec<Activity>, Fraction, FnvBuildHasher> = HashMap::default();
+        let mut cohort_b: HashMap<Vec<Activity>, Fraction, FnvBuildHasher> = HashMap::default();
         // Flat instance lists are needed for the shuffle baseline.
         let mut instances_a: Vec<Vec<Activity>> = Vec::new();
         let mut instances_b: Vec<Vec<Activity>> = Vec::new();
