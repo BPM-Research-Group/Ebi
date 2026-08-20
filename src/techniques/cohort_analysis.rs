@@ -3,6 +3,7 @@ use std::collections::HashMap;
 use ebi_objects::{
     Activity, Attribute, DataType, FiniteStochasticLanguage,
     anyhow::Result,
+    ebi_objects::event_log_xes::XES_DEFAULT_PARAMETER_TIMESTAMP_ATTRIBUTE,
     ebi_arithmetic::{Fraction, One, Zero},
 };
 use rand::seq::SliceRandom;
@@ -12,7 +13,7 @@ use fnv::FnvBuildHasher;
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
     ebi_traits::{
-        ebi_trait_event_log_trace_attributes::{EbiTraitEventLogTraceAttributes, ATTRIBUTE_TIME},
+        ebi_trait_event_log_trace_attributes::{EbiTraitEventLogTraceAttributes},
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     },
     math::{distances::WeightedDistances, distances_matrix::WeightedDistanceMatrix, levenshtein},
@@ -44,7 +45,7 @@ pub fn cohort_analysis(log: &dyn EbiTraitEventLogTraceAttributes) -> Result<Stri
             match ak.attribute_to_label(attr) {
                 None => break,
                 Some(name) => {
-                    if name != ATTRIBUTE_TIME {
+                    if name != XES_DEFAULT_PARAMETER_TIMESTAMP_ATTRIBUTE {
                         if let Some(DataType::Categorical) = ak.attribute_to_data_type(attr) {
                             result.push((attr, name.clone()));
                         }
