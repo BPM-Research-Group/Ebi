@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log xes.version="1.0">
+  <extension name="Concept" prefix="concept" uri="http://code.deckfour.org/xes/concept.xesext"/>
+
+  <!-- ================================================================ -->
+  <!-- GROUP 1: ACME · Standard Order · IT (20 cases)                  -->
+  <!--   15 normal: Create Order→Approve→Send to Vendor→Receive Goods  -->
+  <!--              →Pay Invoice                                         -->
+  <!--    5 reject: same but with Reject→Resubmit before Approve        -->
+  <!-- ================================================================ -->
+  <trace><string key="concept:name" value="case-1"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-2"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-3"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-4"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-5"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-6"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-7"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-8"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-9"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-10"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-11"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-12"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-13"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-14"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-15"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <!-- ACME rejections -->
+  <trace><string key="concept:name" value="case-16"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Reject"/></event><event><string key="concept:name" value="Resubmit"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-17"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Reject"/></event><event><string key="concept:name" value="Resubmit"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-18"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Reject"/></event><event><string key="concept:name" value="Resubmit"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-19"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Reject"/></event><event><string key="concept:name" value="Resubmit"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-20"/><string key="vendor" value="ACME"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Reject"/></event><event><string key="concept:name" value="Resubmit"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+
+  <!-- ================================================================ -->
+  <!-- GROUP 2: GlobalTech · Standard Order · Services (15 cases)      -->
+  <!--   14 normal, 1 rejection — GlobalTech is the "normal" vendor    -->
+  <!-- ================================================================ -->
+  <trace><string key="concept:name" value="case-21"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-22"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-23"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-24"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-25"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-26"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-27"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-28"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-29"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-30"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-31"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-32"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-33"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-34"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-35"/><string key="vendor" value="GlobalTech"/><string key="document_type" value="Standard Order"/><string key="spend_area" value="Services"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Reject"/></event><event><string key="concept:name" value="Resubmit"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+
+  <!-- ================================================================ -->
+  <!-- GROUP 3: Siemens · Framework Order · Construction (15 cases)    -->
+  <!--   All use 2-level approval — completely different from Groups 1/2 -->
+  <!-- ================================================================ -->
+  <trace><string key="concept:name" value="case-36"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-37"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-38"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-39"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-40"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-41"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-42"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-43"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-44"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-45"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-46"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-47"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-48"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-49"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-50"/><string key="vendor" value="Siemens"/><string key="document_type" value="Framework Order"/><string key="spend_area" value="Construction"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Level 1 Approve"/></event><event><string key="concept:name" value="Level 2 Approve"/></event><event><string key="concept:name" value="Send to Vendor"/></event><event><string key="concept:name" value="Receive Goods"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+
+  <!-- ================================================================ -->
+  <!-- GROUP 4: Bosch · Blanket PO · IT (10 cases)                     -->
+  <!--   Quick path: skip goods receipt, pay directly after approval    -->
+  <!-- ================================================================ -->
+  <trace><string key="concept:name" value="case-51"/><string key="vendor" value="Bosch"/><string key="document_type" value="Blanket PO"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-52"/><string key="vendor" value="Bosch"/><string key="document_type" value="Blanket PO"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-53"/><string key="vendor" value="Bosch"/><string key="document_type" value="Blanket PO"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-54"/><string key="vendor" value="Bosch"/><string key="document_type" value="Blanket PO"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-55"/><string key="vendor" value="Bosch"/><string key="document_type" value="Blanket PO"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-56"/><string key="vendor" value="Bosch"/><string key="document_type" value="Blanket PO"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-57"/><string key="vendor" value="Bosch"/><string key="document_type" value="Blanket PO"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-58"/><string key="vendor" value="Bosch"/><string key="document_type" value="Blanket PO"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-59"/><string key="vendor" value="Bosch"/><string key="document_type" value="Blanket PO"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+  <trace><string key="concept:name" value="case-60"/><string key="vendor" value="Bosch"/><string key="document_type" value="Blanket PO"/><string key="spend_area" value="IT"/>
+    <event><string key="concept:name" value="Create Order"/></event><event><string key="concept:name" value="Approve"/></event><event><string key="concept:name" value="Pay Invoice"/></event>
+  </trace>
+
+</log>
