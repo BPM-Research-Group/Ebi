@@ -6,15 +6,21 @@ use crate::{
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
     },
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    ebi_traits::{
+        ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    },
     techniques::{
+        alergia::Alergia,
         alignment_stochastic_miner::AlignmentMiner,
         directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
+        gaspd::Gaspd,
         occurrences_stochastic_miner::{
             OccurrencesStochasticMinerBPMN, OccurrencesStochasticMinerLPN,
             OccurrencesStochasticMinerTree,
         },
         random_stochastic_miner::{RandomMinerSBPMN, RandomMinerSTREE},
+        select::select,
         uniform_stochastic_miner::{
             UniformStochasticBusinessProcessModelAndNotation, UniformStochasticMinerLPN,
             UniformStochasticMinerTree,
@@ -33,12 +39,53 @@ pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
     explanation_short: "Discover a stochastic process model.",
     explanation_long: None,
     children: &[
+        &EBI_DISCOVER_ALERGIA,
         &EBI_DISCOVER_ALIGNMENTS,
         &EBI_DISCOVER_DIRECTLY_FOLLOWS,
+        &EBI_DISCOVER_GASPD,
         &EBI_DISCOVER_OCCURRENCE,
         &EBI_DISCOVER_RANDOM,
+        &EBI_DISCOVER_SELECT,
         &EBI_DISCOVER_UNIFORM,
+
     ],
+};
+
+pub const EBI_DISCOVER_ALERGIA: EbiCommand = EbiCommand::Command {
+    name_short: "al",
+    name_long: Some("alergia"),
+    explanation_short: "Discover an SDFA from an event log using ALERGIA.",
+    explanation_long: Some("Learns a Stochastic Deterministic Finite Automaton (SDFA) from an \
+                        event log using the ALERGIA algorithm, which iteratively merges \
+                        statistically similar states of the log's frequency prefix tree."),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::EventLog)],
+        &[&EbiInputType::Fraction(
+            Some(ConstFraction::zero()),
+            Some(ConstFraction::one()),
+            Some(ConstFraction::one()),
+        )],
+        &[&EbiInputType::Usize(Some(0), Some(1000), Some(30))],
+    ],
+    input_names: &["Event Log", "Filter frequency", "Minimum visits"],
+    input_helps: &[
+        "An event log to discover the model from.",
+        "The fraction of most-frequent trace variants to retain before learning (the rest are filtered out).",
+        "The minimum number of times a state must be visited before it is eligible to be merged.",
+    ],
+    execute: |mut inputs, _| {
+        let log = inputs.remove(0)
+            .to_type::<dyn EbiTraitEventLog>()?;
+        let filter_frequency = *inputs.remove(0)
+            .to_type::<Fraction>().unwrap();
+        let min_visits = *inputs.remove(0)
+            .to_type::<usize>().unwrap();
+        Ok(EbiOutput::Object(EbiObject::StochasticDeterministicFiniteAutomaton(log.alergia(filter_frequency, min_visits)?)))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticDeterministicFiniteAutomaton),
 };
 
 pub const EBI_DISCOVER_ALIGNMENTS: EbiCommand = EbiCommand::Group {
@@ -169,6 +216,46 @@ pub const EBI_DISCOVER_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
         }
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsGraph),
+};
+pub const EBI_DISCOVER_GASPD: EbiCommand = EbiCommand::Command {
+    name_short: "gaspd",
+    name_long: Some("genetic algorithm for stochastic process discovery"),
+    explanation_short: "Discover a family of SDFMs from an event log using GASPD.",
+    explanation_long: Some("Learns a family of Stochastic Directly Follows Models (SDFMs) \
+                           from an event log by evolving a population of ALERGIA parameter \
+                           settings (confidence factor, filter frequency, minimum visits) \
+                           via a genetic search, retaining the Pareto-optimal trade-offs \
+                           between model simplicity, relevance, and adhesion."),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: false,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::EventLog)],
+        &[&EbiInputType::Usize(Some(0),Some(500),Some(50))],
+        &[&EbiInputType::Usize(Some(0),Some(100),Some(50))],
+        &[&EbiInputType::Usize(Some(0),Some(10),Some(3))],
+    ],
+    input_names: &["Event Log", "Population Size", "Generation Limit", "Number of Parents"],
+    input_helps: &[
+        "The event log to discover a family of models from.",
+        "The number of candidate ALERGIA parameter settings in the initial population.",
+        "The number of generations the genetic search runs for.",
+        "The number of parents selected from the Pareto frontier to produce each new generation.",
+    ],
+    execute: |mut inputs, _| {
+        let mut log = inputs.remove(0)
+            .to_type::<dyn EbiTraitEventLog>()?;
+        let population_size = *inputs.remove(0)
+            .to_type::<usize>().unwrap();
+        let generation_limit = *inputs.remove(0)
+            .to_type::<usize>().unwrap();
+        let number_of_parents = *inputs.remove(0)
+            .to_type::<usize>().unwrap();
+
+        let res = log.gaspd(generation_limit, number_of_parents, population_size).unwrap();
+        Ok(EbiOutput::String(res))
+    },
+    output_type: &EbiOutputType::String,
 };
 
 pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Group {
@@ -358,6 +445,37 @@ pub const EBI_DISCOVER_RANDOM_SPTREE: EbiCommand = EbiCommand::Command {
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticProcessTree),
+};
+
+pub const EBI_DISCOVER_SELECT: EbiCommand = EbiCommand::Command {
+    name_short: "select",
+    name_long: Some("select model"),
+    explanation_short: "Select an SDFM from a family of models.",
+    explanation_long: Some("Selects a single SDFM from a GASPD-produced Pareto frontier, \
+                           using a weighted Chebyshev scalarization over the objectives \
+                           simplicity, relevance, and adhesion, according to user-derived \
+                           preference weights."),
+    latex_link: None,
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::String(None, Some("Path"))],
+        &[&EbiInputType::String(None, Some("Test"))],
+        &[&EbiInputType::String(None, Some("Test"))],
+    ],
+    input_names: &["Path", "Simplicity", "Relevance"],
+    input_helps: &[
+        "The path to a CSV file (as produced by GASPD) containing the objective values and their associated models.",
+        "The preference weight for simplicity, in [0, 1]; the sum of both preferences must be <= 1.",
+        "The preference weight for relevance, in [0, 1]; the sum of both preferences must be <= 1.",
+    ],
+    execute: |mut inputs, _| {
+        let path = *inputs.remove(0).to_type::<String>().unwrap().clone();
+        let w_s: String = *inputs.remove(0).to_type::<String>().unwrap().clone();
+        let w_r: String = *inputs.remove(0).to_type::<String>().unwrap().clone();
+        Ok(EbiOutput::String(select(path, w_s, w_r)))
+    },
+    output_type: &EbiOutputType::String,
 };
 
 pub const EBI_DISCOVER_UNIFORM: EbiCommand = EbiCommand::Group {
