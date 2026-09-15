@@ -6,6 +6,7 @@ use ebi_objects::{
     Activity, EventLog, EventLogTraceAttributes, EventLogXes,
     anyhow::{Result, anyhow},
     ebi_derive::EbiInputEnum,
+    ebi_objects::event_log_event_attributes::EventLogEventAttributes,
 };
 
 pub trait Filter {
@@ -45,6 +46,7 @@ macro_rules! filter {
 
 filter!(EventLog);
 filter!(EventLogTraceAttributes);
+filter!(EventLogEventAttributes);
 filter!(EventLogXes);
 
 #[derive(EbiInputEnum)]

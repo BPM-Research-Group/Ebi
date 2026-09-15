@@ -23,9 +23,7 @@ use crate::{
     prom::java_object_handler::JavaObjectHandler,
 };
 use ebi_objects::{
-    EbiObject, EventLog, EventLogTraceAttributes, EventLogXes, Exportable, Importable,
-    anyhow::{Result, anyhow},
-    ebi_objects::event_log_event_attributes::EventLogEventAttributes,
+    EbiObject, EventLog, EventLogCsv, EventLogTraceAttributes, EventLogXes, Exportable, Importable, anyhow::{Result, anyhow}, ebi_objects::event_log_event_attributes::EventLogEventAttributes,
 };
 
 pub const EBI_EVENT_LOG_XES: EbiFileHandler = EbiFileHandler {
@@ -127,9 +125,10 @@ pub const EBI_EVENT_LOG_XES: EbiFileHandler = EbiFileHandler {
     object_importers_fallible: &[],
     object_exporters: &[
         EbiObjectExporter::EventLog(EventLog::export_from_object),
-        EbiObjectExporter::EventLogTraceAttributes(EventLog::export_from_object),
-        EbiObjectExporter::EventLogXes(EventLog::export_from_object),
-        EbiObjectExporter::EventLogCsv(EventLog::export_from_object),
+        EbiObjectExporter::EventLogTraceAttributes(EventLogTraceAttributes::export_from_object),
+        EbiObjectExporter::EventLogEventAttributes(EventLogEventAttributes::export_from_object),
+        EbiObjectExporter::EventLogXes(EventLogXes::export_from_object),
+        EbiObjectExporter::EventLogCsv(EventLogCsv::export_from_object),
     ],
     object_exporters_fallible: &[],
     java_object_handlers: &[JavaObjectHandler {
