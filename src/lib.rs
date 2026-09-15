@@ -17,7 +17,6 @@ pub mod ebi_commands {
     pub mod ebi_command_analyse;
     pub mod ebi_command_analyse_non_stochastic;
     pub mod ebi_command_association;
-    pub mod ebi_command_cohort_analysis;
     pub mod ebi_command_conformance;
     pub mod ebi_command_conformance_non_stochastic;
     pub mod ebi_command_convert;
