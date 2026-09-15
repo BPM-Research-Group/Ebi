@@ -103,6 +103,14 @@ impl WeightedDistanceMatrix {
         }
     }
 
+    pub fn from_precomputed(
+        weights_a: Vec<Fraction>,
+        weights_b: Vec<Fraction>,
+        distances: Vec<Vec<Fraction>>,
+    ) -> Self {
+        Self { weights_a, weights_b, distances }
+    }
+
     pub fn from_partially_ordered_languages(
         lang_a: &FiniteStochasticPartiallyOrderedLanguage,
         lang_b: &FiniteStochasticPartiallyOrderedLanguage,

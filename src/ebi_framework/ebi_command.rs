@@ -6,6 +6,7 @@ use super::{
 use crate::{
     ebi_commands::{
         ebi_command_analyse, ebi_command_analyse_non_stochastic, ebi_command_association,
+        ebi_command_cohort_analysis,
         ebi_command_conformance, ebi_command_conformance_non_stochastic, ebi_command_convert,
         ebi_command_discover, ebi_command_discover_non_stochastic, ebi_command_filter,
         ebi_command_info,
@@ -45,6 +46,7 @@ pub const EBI_COMMANDS: EbiCommand = EbiCommand::Group {
         &ebi_command_analyse::EBI_ANALYSE,
         &ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC,
         &ebi_command_association::EBI_ASSOCIATION,
+        &ebi_command_cohort_analysis::EBI_COHORT_ANALYSIS,
         &ebi_command_conformance::EBI_CONFORMANCE,
         &ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC,
         &ebi_command_convert::EBI_CONVERT,
