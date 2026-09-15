@@ -770,27 +770,23 @@ mod tests {
         let files = files.into_iter().map(|d| d.unwrap()).collect::<Vec<_>>();
         files.into_par_iter().for_each(|file| {
             for (object, importer, _, f) in get_all_test_files_for_file(file) {
-                if let EbiInput::Object(object, file_handler) = object {
-                    for file_handler2 in EBI_FILE_HANDLERS {
-                        for exporter in file_handler2.object_exporters {
-                            if !exporter.is_portable_network_graphics() && !exporter.is_portable_document_format() {
+                if let EbiInput::Object(object, import_file_handler) = object {
+                    for export_file_handler in EBI_FILE_HANDLERS {
+                        if !["pdf", "png"].contains(&export_file_handler.file_extension) {
+                            for exporter in export_file_handler.object_exporters {
                                 if exporter.get_type() == importer.clone().unwrap().get_type() {
                                     println!(
-                                        "file {}\n\tfile handler\t{}\n\timporter\t{:?}\n\tfile handler\t{}\n\texporter\t{}\n\tobject\t\t{}",
-                                        f,
-                                        file_handler,
+                                        "file {f}\n\timport file handler\t{import_file_handler}\n\timporter\t\t{:?}\n\texport file handler\t{export_file_handler}\n\texporter\t\t{exporter}\n\tobject\t\t\t{}",
                                         importer,
-                                        file_handler2,
-                                        exporter,
                                         object.get_type()
                                     );
 
                                     if importer.clone().unwrap().get_type() != object.get_type() {
-                                        assert!(false)
+                                        panic!("importer doesn't match object");
                                     }
 
                                     let mut c = Cursor::new(Vec::new());
-                                    println!("\tobject type\t{}", object.get_type());
+                                    println!("\tobject type\t\t{}", object.get_type());
                                     exporter
                                         .export(EbiOutput::Object(object.clone()), &mut c)
                                         .unwrap();
