@@ -90,18 +90,8 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
 pub const EBI_ANALYSE_COHORT_ANALYSIS: EbiCommand = EbiCommand::Command {
     name_short: "ca",
     name_long: Some("cohort-analysis"),
-    explanation_short: "Discover which trace attributes drive the largest behavioural differences.",
-    explanation_long: Some(
-        "Scans every categorical trace attribute in the event log. \
-        For each attribute-value pair, the log is partitioned into a target cohort \
-        (traces that carry that specific value) and a rest cohort (all other traces). \
-        Both sub-logs are normalised into proper stochastic languages and their \
-        behavioural distance is measured with the Earth Mover's Stochastic Conformance \
-        (EMSC) using normalised Levenshtein as the ground distance. \
-        The output is a ranked leaderboard: the attribute-value pairs at the top cause \
-        the greatest shift in process behaviour and are therefore the best candidates \
-        for further investigation.",
-    ),
+    explanation_short: "Returns which trace attribute values correspond with the largest behavioural differences.",
+    explanation_long: Some("Returns which trace attribute values correspond with the largest behavioural differences. Only categorical attributes are supported."),
     latex_link: Some("\\cite{DBLP:conf/er/LeemansS0KSW20}"),
     cli_command: None,
     exact_arithmetic: true,
@@ -114,10 +104,10 @@ pub const EBI_ANALYSE_COHORT_ANALYSIS: EbiCommand = EbiCommand::Command {
             Some(ConstFraction::of(1, 20)),
         )],
     ],
-    input_names: &["FILE", "RNDSHF", "MINSIZ"],
+    input_names: &["FILE", "RNDSPL", "MINSIZ"],
     input_helps: &[
         "An event log with trace attributes.",
-        "The number of random shuffles to perform.",
+        "The number of random splits to perform.",
         "The minimum number of traces per cohort, as a fraction of the total number of traces.",
     ],
     execute: |mut inputs, _| {

@@ -1,359 +1,321 @@
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
-    ebi_traits::{
-        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
-    math::{distances::WeightedDistances, distances_matrix::WeightedDistanceMatrix, levenshtein},
-    techniques::earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
+    ebi_traits::ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
+    math::{distances::WeightedDistances, distances_triangular::WeightedTriangularDistanceMatrix},
 };
 use ebi_objects::{
-    Attribute, DataType, FiniteStochasticLanguage,
+    Attribute, AttributeKey, DataType,
     anyhow::{Result, anyhow},
-    ebi_arithmetic::{Fraction, One, Zero},
+    ebi_arithmetic::{Fraction, Recip, ToNative, fraction::approximate::Approximate},
 };
-use rand::seq::SliceRandom;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use std::{collections::HashMap, fmt::Display};
+use std::{collections::HashMap, fmt::Display, sync::Arc};
 
 pub trait CohortAnalysis {
     fn cohort_analysis(
         &self,
-        number_of_random_shuffles: usize,
+        number_of_random_splits: usize,
         minimum_cohort_size_fraction: &Fraction,
-    ) -> Result<Cohorts>;
+    ) -> Result<RankedCohorts>;
 }
 
-pub struct Cohorts {}
+pub struct RankedCohorts {
+    attribute_key: AttributeKey,
+    features: Vec<Feature>,
+    emsc: Vec<Fraction>,
+    emsc_corrected: Option<Vec<Fraction>>,
+}
 
-impl Display for Cohorts {
+impl Display for RankedCohorts {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        todo!()
+        if self.features.len() == 0 {
+            return write!(f, "No cohorts.");
+        }
+
+        let attribute_name_max_length = self
+            .features
+            .iter()
+            .map(|feature| {
+                self.attribute_key
+                    .attribute_to_label(feature.attribute())
+                    .unwrap()
+                    .len()
+            })
+            .max()
+            .unwrap()
+            .max(9);
+
+        let attribute_value_max_length = self
+            .features
+            .iter()
+            .map(|feature| feature.value_to_string().len())
+            .max()
+            .unwrap()
+            .max(5);
+
+        if let Some(emsc_corrected) = &self.emsc_corrected {
+            let exact_value_max_length = emsc_corrected
+                .iter()
+                .map(|emsc| format!("{}", emsc.clone().approximate().unwrap()).len())
+                .max()
+                .unwrap()
+                .max(26);
+
+            writeln!(
+                f,
+                "{:<attribute_name_max_length$}  {:<attribute_value_max_length$}  {:<exact_value_max_length$}  {:>6}",
+                "Attribute", "value", "approximate corrected EMSC", "corrected EMSC"
+            )?;
+            writeln!(f, "")?;
+
+            for (feature, emsc_corrected) in self.features.iter().zip(emsc_corrected) {
+                writeln!(
+                    f,
+                    "{:<attribute_name_max_length$}  {:<attribute_value_max_length$}  {:<exact_value_max_length$}  {:>6}",
+                    self.attribute_key
+                        .attribute_to_label(feature.attribute())
+                        .unwrap(),
+                    feature.value_to_string(),
+                    emsc_corrected.clone().approximate().unwrap(),
+                    emsc_corrected
+                )?;
+            }
+        } else {
+            let exact_value_max_length = self
+                .emsc
+                .iter()
+                .map(|emsc| format!("{}", emsc.clone().approximate().unwrap()).len())
+                .max()
+                .unwrap()
+                .max(16);
+
+            writeln!(
+                f,
+                "{:<attribute_name_max_length$}  {:<attribute_value_max_length$}  {:<exact_value_max_length$}  {:>6}",
+                "Attribute", "value", "approximate EMSC", "EMSC"
+            )?;
+            writeln!(f, "")?;
+
+            for (feature, emsc) in self.features.iter().zip(self.emsc.iter()) {
+                writeln!(
+                    f,
+                    "{:<attribute_name_max_length$}  {:<attribute_value_max_length$}  {:<exact_value_max_length$}  {:>6}",
+                    self.attribute_key
+                        .attribute_to_label(feature.attribute())
+                        .unwrap(),
+                    feature.value_to_string(),
+                    emsc.clone().approximate().unwrap(),
+                    emsc,
+                )?;
+            }
+        }
+        write!(f, "")
     }
 }
 
-/// For each categorical trace attribute-value pair, partition the log into a
-/// target cohort and the rest, compute their EMSC, optionally subtract a
-/// random baseline to correct for size bias, and return a ranked leaderboard.
-/// EMSC = 0 means identical behaviour, 1 means maximally different.
+pub enum Feature {
+    Categorical {
+        attribute: Attribute,
+        value: Option<String>,
+    },
+}
+
+impl Feature {
+    pub fn attribute(&self) -> Attribute {
+        match self {
+            Feature::Categorical { attribute, .. } => *attribute,
+        }
+    }
+
+    pub fn value_to_string(&self) -> String {
+        match self {
+            Feature::Categorical { value, .. } => {
+                if let Some(s) = value {
+                    format!("{s}")
+                } else {
+                    format!("-missing-")
+                }
+            }
+        }
+    }
+}
+
 impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
     fn cohort_analysis(
         &self,
-        number_of_random_shuffles: usize,
+        number_of_random_splits: usize,
         minimum_cohort_size_fraction: &Fraction,
-    ) -> Result<Cohorts> {
-        // Collect categorical attributes upfront so the attribute_key borrow is
-        // dropped before we borrow `log` again for iteration.
+    ) -> Result<RankedCohorts> {
+        // gather features and remove too-small or too-large cohorts
+        let features = elicit_features(self, minimum_cohort_size_fraction);
 
-        let attrs: Vec<(Attribute, String)> = {
-            let ak = self.attribute_key();
-            let mut result = vec![];
-            let mut id = 0;
-            loop {
-                let attr = ak.id_to_attribute(id);
-                match ak.attribute_to_label(attr) {
-                    None => break,
-                    Some(name) => {
-                        if let Some(DataType::Categorical) = ak.attribute_to_data_type(attr) {
-                            result.push((attr, name.clone()));
-                        }
-                    }
-                }
-                id += 1;
-            }
-            result
-        };
-
-        if attrs.is_empty() {
+        if features.len() == 0 {
             return Err(anyhow!(
-                "No categorical trace attributes found in this log."
+                "Event log contains no suitable features. A feature must yield more traces than the minimum cohort size."
             ));
         }
 
-        // Shared activity key: must be the same for both cohorts when computing EMSC.
-        let activity_key = self.activity_key().clone();
+        //prepare distances
+        let distances =
+            Arc::new(WeightedTriangularDistanceMatrix::new_from_event_log_trace_attributes(self));
 
-        // Pre-scan each attribute with a cheap frequency count so we can apply
-        // the alpha filter before building the pairs list. This avoids collecting
-        // tens of thousands of pairs for high-cardinality attributes (e.g. case IDs
-        // or activity names) that would all be filtered anyway.
-        let mut all_pairs = vec![];
-        for (attribute, attr_name) in &attrs {
-            let mut value_counts = HashMap::new();
-            let mut total = 0;
-            for opt_val in self.iter_categorical(*attribute) {
-                total += 1;
-                if let Some(val) = opt_val {
-                    *value_counts.entry(val).or_insert(0) += 1;
-                }
-            }
-            for (value, count) in value_counts {
-                if count >= 2 && Fraction::from(count) >= minimum_cohort_size_fraction * total {
-                    all_pairs.push((attr_name.clone(), value, *attribute));
-                }
-            }
-        }
+        let progress_bar = EbiCommand::get_progress_bar_ticks(features.len());
 
-        let progress_bar = EbiCommand::get_progress_bar_ticks(all_pairs.len());
+        let mut results = features
+            .into_par_iter()
+            .map(|feature| {
+                //create cohorts
+                let (cohorts_distances, cohort_a_size) =
+                    split_log_on_feature(self, &feature, Arc::clone(&distances));
 
-        // Results store (attribute_name, value, raw_emsc, corrected_emsc, cohort_size).
-        let mut results = vec![];
+                let raw_emsc = cohorts_distances.earth_movers_stochastic_conformance()?;
 
-        for (attr_name, value, attribute) in &all_pairs {
-            let mut cohort_a = HashMap::default();
-            let mut cohort_b = HashMap::default();
-            // Flat instance lists are needed for the shuffle baseline.
-            let mut instances_a = vec![];
-            let mut instances_b = vec![];
-
-            for (trace, opt_val) in self.iter_categorical_and_traces(*attribute) {
-                if opt_val.as_deref() == Some(value.as_str()) {
-                    *cohort_a.entry(trace.clone()).or_insert_with(Fraction::zero) +=
-                        Fraction::one();
-                    instances_a.push(trace.clone());
+                if number_of_random_splits == 0 {
+                    progress_bar.inc(1);
+                    Ok((feature, (raw_emsc, None)))
                 } else {
-                    *cohort_b.entry(trace.clone()).or_insert_with(Fraction::zero) +=
-                        Fraction::one();
-                    instances_b.push(trace.clone());
+                    let random_splits = perform_random_splits(
+                        self,
+                        number_of_random_splits,
+                        cohort_a_size,
+                        Arc::clone(&distances),
+                    )?;
+                    let random_avg =
+                        (&random_splits.iter().sum::<Fraction>()) / random_splits.len();
+                    progress_bar.inc(1);
+                    Ok((feature, (raw_emsc.clone(), Some(raw_emsc / random_avg))))
                 }
-            }
-
-            // Skip if one side is empty (can happen if the log has missing values).
-            if instances_a.is_empty() || cohort_b.is_empty() {
-                progress_bar.inc(1);
-                continue;
-            }
-
-            let cohort_size = instances_a.len();
-
-            // Normalise both cohorts into proper probability distributions.
-            let mut lang_a = FiniteStochasticLanguage::from((activity_key.clone(), cohort_a));
-            let mut lang_b = FiniteStochasticLanguage::from((activity_key.clone(), cohort_b));
-
-            // EMSC = 1 means identical distributions (zero transport cost), 0 means maximally different.
-            let raw_emsc = {
-                let t: &mut dyn EbiTraitFiniteStochasticLanguage = &mut lang_a;
-                t.earth_movers_stochastic_conformance(&mut lang_b)?
-            };
-            let raw_emsc_display = raw_emsc.clone();
-
-            // Baseline: average EMSC over PHI random splits of the same size.
-            // Algorithm 1, line 7: d = real_dist - avg_random_dist (subtraction formula per paper).
-            // Optimisation: precompute the N×N Levenshtein distance matrix once in
-            // parallel, then only run the transport solver for each of the PHI shuffles.
-            let corrected = if number_of_random_shuffles == 0 {
-                raw_emsc
-            } else {
-                // Assign every unique trace an index so shuffle iterations work with
-                // cheap usize copies instead of cloning Vec<Activity>.
-                let mut trace_to_idx = HashMap::new();
-                let mut unique_traces = vec![];
-                for trace in instances_a.iter().chain(instances_b.iter()) {
-                    if !trace_to_idx.contains_key(trace) {
-                        trace_to_idx.insert(trace.clone(), unique_traces.len());
-                        unique_traces.push(trace.clone());
-                    }
-                }
-                let n_unique = unique_traces.len();
-
-                // Precompute all pairwise Levenshtein distances in parallel, paid once.
-                let precomputed = (0..n_unique)
-                    .into_par_iter()
-                    .map(|i| {
-                        (0..n_unique)
-                            .map(|j| levenshtein::normalised(&unique_traces[i], &unique_traces[j]))
-                            .collect::<Vec<_>>()
-                    })
-                    .collect::<Vec<_>>();
-
-                let n_a = instances_a.len();
-                let n_b = instances_b.len();
-                let mut all_indices: Vec<usize> = instances_a
-                    .iter()
-                    .chain(instances_b.iter())
-                    .map(|t| trace_to_idx[t])
-                    .collect();
-
-                let mut rng = rand::rng();
-                let mut baseline_sum = Fraction::zero();
-
-                for _ in 0..number_of_random_shuffles {
-                    all_indices.shuffle(&mut rng);
-
-                    // Count how often each unique trace appears in each random cohort.
-                    let mut counts_a = vec![0usize; n_unique];
-                    let mut counts_b = vec![0usize; n_unique];
-                    for &idx in &all_indices[..n_a] {
-                        counts_a[idx] += 1;
-                    }
-                    for &idx in &all_indices[n_a..] {
-                        counts_b[idx] += 1;
-                    }
-
-                    // Only keep traces that actually appear in this split, avoids
-                    // passing a large sparse matrix to the transport solver.
-                    let active_a: Vec<usize> = (0..n_unique).filter(|&i| counts_a[i] > 0).collect();
-                    let active_b: Vec<usize> = (0..n_unique).filter(|&j| counts_b[j] > 0).collect();
-
-                    let weights_a: Vec<Fraction> = active_a
-                        .iter()
-                        .map(|&i| {
-                            let mut f = Fraction::from(counts_a[i]);
-                            f /= n_a;
-                            f
-                        })
-                        .collect();
-                    let weights_b: Vec<Fraction> = active_b
-                        .iter()
-                        .map(|&j| {
-                            let mut f = Fraction::from(counts_b[j]);
-                            f /= n_b;
-                            f
-                        })
-                        .collect();
-
-                    // Build a compact sub-matrix using precomputed distances.
-                    let distances: Vec<Vec<Fraction>> = active_a
-                        .iter()
-                        .map(|&i| {
-                            active_b
-                                .iter()
-                                .map(|&j| precomputed[i][j].clone())
-                                .collect()
-                        })
-                        .collect();
-
-                    let shuffle_matrix =
-                        WeightedDistanceMatrix::from_precomputed(weights_a, weights_b, distances);
-                    let rand_emsc = {
-                        let d: &dyn WeightedDistances = &shuffle_matrix;
-                        d.earth_movers_stochastic_conformance()?
-                    };
-                    baseline_sum += rand_emsc;
-                }
-
-                // Algorithm 1, line 7: d = real_distance - avg_random_distance (subtraction).
-                // Ebi returns EMSC as similarity (1=identical), so distance = 1 - EMSC.
-                // real_dist = 1 - raw_emsc; avg_random_dist = 1 - baseline_avg_similarity
-                // d > 0: cohort deviates more than random (interesting, ranked first)
-                let baseline_avg_sim = &baseline_sum / number_of_random_shuffles;
-                let real_dist = Fraction::one() - raw_emsc.clone();
-                let avg_random_dist = Fraction::one() - baseline_avg_sim;
-                real_dist - avg_random_dist
-            };
-
-            results.push((
-                attr_name.clone(),
-                value.clone(),
-                raw_emsc_display,
-                corrected,
-                cohort_size,
-            ));
-            progress_bar.inc(1);
-        }
+            })
+            .collect::<Result<Vec<_>>>()?;
 
         progress_bar.finish_and_clear();
 
-        if results.is_empty() {
-            return Err(anyhow!(
-                "No behaviorally distinct cohorts found (all attribute partitions are trivial)."
-                    .to_string(),
-            ));
-        }
-
-        // PHI == 0: sort ascending by raw EMSC (lower similarity means more divergent).
-        // PHI > 0: sort descending by corrected (higher means more behaviorally distinct).
-        todo!();
         results.sort_by(|a, b| {
-            if number_of_random_shuffles == 0 {
-                a.2.partial_cmp(&b.2).unwrap_or(std::cmp::Ordering::Equal)
+            if number_of_random_splits == 0 {
+                a.1.0
+                    .partial_cmp(&b.1.0)
+                    .unwrap_or(std::cmp::Ordering::Equal)
             } else {
-                b.3.partial_cmp(&a.3).unwrap_or(std::cmp::Ordering::Equal)
+                a.1.1
+                    .partial_cmp(&b.1.1)
+                    .unwrap_or(std::cmp::Ordering::Equal)
             }
         });
 
-        let w_attr = results
-            .iter()
-            .map(|(a, _, _, _, _)| a.len())
-            .max()
-            .unwrap_or(9)
-            .max(9);
-        let w_val = results
-            .iter()
-            .map(|(_, v, _, _, _)| v.len())
-            .max()
-            .unwrap_or(5)
-            .max(5);
+        let (features, arr): (Vec<_>, Vec<_>) = results.into_iter().unzip();
+        let (emsc, emsc_corrected): (Vec<_>, Vec<_>) = arr.into_iter().unzip();
+        let emsc_corrected = emsc_corrected.into_iter().collect::<Option<Vec<_>>>();
+        Ok(RankedCohorts {
+            attribute_key: self.attribute_key().clone(),
+            features,
+            emsc,
+            emsc_corrected,
+        })
+    }
+}
 
-        let mut out = String::new();
+fn elicit_features(
+    log: &dyn EbiTraitEventLogTraceAttributes,
+    minimum_cohort_size_fraction: &Fraction,
+) -> Vec<Feature> {
+    let min_traces = (minimum_cohort_size_fraction * log.number_of_traces()).to_usize();
+    let max_traces = log.number_of_traces() - min_traces;
 
-        if number_of_random_shuffles == 0 {
-            out.push_str(&format!(
-                "{:<4}  {:<w_a$}  {:<w_v$}  {:>6}  {}\n",
-                "Rank",
-                "Attribute",
-                "Value",
-                "Cases",
-                "EMSC (raw)",
-                w_a = w_attr,
-                w_v = w_val
-            ));
-            out.push_str(&format!(
-                "{}  {}  {}  {}  {}\n",
-                "-".repeat(4),
-                "-".repeat(w_attr),
-                "-".repeat(w_val),
-                "-".repeat(6),
-                "-".repeat(10)
-            ));
-            for (rank, (attr, val, raw, _corrected, size)) in results.iter().enumerate() {
-                out.push_str(&format!(
-                    "{:<4}  {:<w_a$}  {:<w_v$}  {:>6}  {}\n",
-                    rank + 1,
-                    attr,
-                    val,
-                    size,
-                    raw,
-                    w_a = w_attr,
-                    w_v = w_val
-                ));
+    let mut features = vec![];
+    for attribute in log.attribute_key().attributes() {
+        if let Some(DataType::Categorical) = log.attribute_key().attribute_to_data_type(attribute) {
+            let mut value_counts = HashMap::new();
+            for opt_val in log.iter_categorical(attribute) {
+                *value_counts.entry(opt_val).or_insert(0) += 1;
             }
-        } else {
-            out.push_str(&format!(
-                "{:<4}  {:<w_a$}  {:<w_v$}  {:>6}  {:>14}  {}\n",
-                "Rank",
-                "Attribute",
-                "Value",
-                "Cases",
-                "EMSC (raw)",
-                "d",
-                w_a = w_attr,
-                w_v = w_val
-            ));
-            out.push_str(&format!(
-                "{}  {}  {}  {}  {}  {}\n",
-                "-".repeat(4),
-                "-".repeat(w_attr),
-                "-".repeat(w_val),
-                "-".repeat(6),
-                "-".repeat(14),
-                "-".repeat(9)
-            ));
-            for (rank, (attr, val, raw, corrected, size)) in results.iter().enumerate() {
-                out.push_str(&format!(
-                    "{:<4}  {:<w_a$}  {:<w_v$}  {:>6}  {:>14}  {}\n",
-                    rank + 1,
-                    attr,
-                    val,
-                    size,
-                    raw,
-                    corrected,
-                    w_a = w_attr,
-                    w_v = w_val
-                ));
+            for (value, count) in value_counts {
+                if min_traces <= count && count <= max_traces {
+                    features.push(Feature::Categorical { attribute, value });
+                }
             }
         }
-
-        Ok(out)
     }
+    features
+}
+
+fn split_log_on_feature(
+    log: &dyn EbiTraitEventLogTraceAttributes,
+    feature: &Feature,
+    distances: Arc<WeightedTriangularDistanceMatrix>,
+) -> (Box<dyn WeightedDistances>, usize) {
+    let mut cohort_has = Vec::with_capacity(log.number_of_traces() / 2);
+    let mut cohort_has_not = Vec::with_capacity(log.number_of_traces() / 2);
+    match feature {
+        Feature::Categorical {
+            attribute,
+            value: feature_value,
+        } => {
+            for (trace_index, (_, value)) in log.iter_categorical_and_traces(*attribute).enumerate()
+            {
+                if value == *feature_value {
+                    cohort_has.push(trace_index);
+                } else {
+                    cohort_has_not.push(trace_index);
+                }
+            }
+        }
+    }
+
+    //set weights
+    let mut distances = WeightedDistances::clone_weights_zero(distances.as_ref());
+    {
+        let has_weight = Fraction::from(cohort_has.len()).recip();
+        for trace_index in &cohort_has {
+            *distances.weight_a_mut(*trace_index) = has_weight.clone();
+        }
+    }
+    {
+        let has_not_weight = Fraction::from(cohort_has_not.len()).recip();
+        for trace_index in cohort_has_not {
+            *distances.weight_b_mut(trace_index) = has_not_weight.clone();
+        }
+    }
+
+    (distances, cohort_has.len())
+}
+
+fn perform_random_splits(
+    log: &dyn EbiTraitEventLogTraceAttributes,
+    sample_size: usize,
+    number_of_random_splits: usize,
+    distances: Arc<WeightedTriangularDistanceMatrix>,
+) -> Result<Vec<Fraction>> {
+    (0..number_of_random_splits)
+        .into_par_iter()
+        .map(|_| {
+            //create sample
+            let mut cohort_has = Vec::with_capacity(sample_size);
+            let mut cohort_has_not = Vec::with_capacity(log.number_of_traces() - sample_size);
+            for trace_index in 0..log.number_of_traces() {
+                if rand::random_range(0..log.number_of_traces()) <= sample_size {
+                    cohort_has.push(trace_index);
+                } else {
+                    cohort_has_not.push(trace_index);
+                }
+            }
+
+            //set weights
+            let mut distances = WeightedDistances::clone_weights_zero(distances.as_ref());
+            {
+                let has_weight = Fraction::from(cohort_has.len()).recip();
+                for trace_index in cohort_has {
+                    *distances.weight_a_mut(trace_index) = has_weight.clone();
+                }
+            }
+            {
+                let has_not_weight = Fraction::from(cohort_has_not.len()).recip();
+                for trace_index in cohort_has_not {
+                    *distances.weight_b_mut(trace_index) = has_not_weight.clone();
+                }
+            }
+
+            //compute emsc
+            distances.earth_movers_stochastic_conformance()
+        })
+        .collect::<Result<Vec<_>>>()
 }

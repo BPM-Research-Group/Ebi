@@ -955,7 +955,7 @@ dependencies = [
 [[package]]
 name = "ebi_objects"
 version = "0.3.191"
-source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#ed437de15352ea122e5b7865b45a8f7bcb52e421"
+source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#e26a6e8778dc8782c84496ba75b2ff5f3b85b729"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -4586,9 +4586,9 @@ dependencies = [
 
 [[package]]
 name = "zlib-rs"
-version = "0.6.7"
+version = "0.6.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "34b31d188d9d685a4f9c7b46d6e36631b07058d2cfe190267adce54dc230bf12"
+checksum = "b268e58e7c693d7c271f93ffc4ba3b380412554231c85bf61ca7af91042a4112"
 
 [[package]]
 name = "zmij"

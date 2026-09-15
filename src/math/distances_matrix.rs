@@ -8,8 +8,7 @@
 ))]
 use ebi_objects::ebi_arithmetic::malachite::Natural;
 use ebi_objects::{
-    FiniteStochasticPartiallyOrderedLanguage,
-    ebi_arithmetic::Fraction,
+    FiniteStochasticPartiallyOrderedLanguage, ebi_arithmetic::{Fraction, Zero},
 };
 #[cfg(any(
     all(
@@ -53,7 +52,7 @@ impl WeightedDistanceMatrix {
     /**
      * It is the responsibility of the caller to ensure that the two input languages use the same activity key, for instance using `translate_using_activity_key`.
      */
-    pub fn new<L, K>(lang_a: &mut L, lang_b: &mut K) -> Self
+    pub fn new<L, K>(lang_a: &L, lang_b: &K) -> Self
     where
         L: EbiTraitFiniteStochasticLanguage + ?Sized,
         K: EbiTraitFiniteStochasticLanguage + ?Sized,
@@ -253,6 +252,13 @@ impl WeightedDistances for WeightedDistanceMatrix {
 
     fn clone(&self) -> Box<dyn WeightedDistances> {
         Box::new(Clone::clone(self))
+    }
+
+    fn clone_weights_zero(&self) -> Box<dyn WeightedDistances> {
+        let mut result = Clone::clone(self);
+        result.weights_a.fill(Fraction::zero());
+        result.weights_b.fill(Fraction::zero());
+        Box::new(result)
     }
 
     #[cfg(any(
