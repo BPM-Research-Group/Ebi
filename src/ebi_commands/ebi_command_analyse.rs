@@ -128,7 +128,7 @@ pub const EBI_ANALYSE_COHORT_ANALYSIS: EbiCommand = EbiCommand::Command {
         let minimum_cohort_size_fraction = inputs.remove(0).to_type::<Fraction>()?;
         let result =
             log.cohort_analysis(*number_of_random_shuffles, &minimum_cohort_size_fraction)?;
-        Ok(EbiOutput::String(result))
+        Ok(EbiOutput::String(result.to_string()))
     },
     output_type: &EbiOutputType::String,
 };

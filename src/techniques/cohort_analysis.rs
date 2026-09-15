@@ -9,19 +9,27 @@ use crate::{
 };
 use ebi_objects::{
     Attribute, DataType, FiniteStochasticLanguage,
-    anyhow::Result,
+    anyhow::{Result, anyhow},
     ebi_arithmetic::{Fraction, One, Zero},
 };
 use rand::seq::SliceRandom;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
-use std::collections::HashMap;
+use std::{collections::HashMap, fmt::Display};
 
 pub trait CohortAnalysis {
     fn cohort_analysis(
         &self,
         number_of_random_shuffles: usize,
         minimum_cohort_size_fraction: &Fraction,
-    ) -> Result<String>;
+    ) -> Result<Cohorts>;
+}
+
+pub struct Cohorts {}
+
+impl Display for Cohorts {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        todo!()
+    }
 }
 
 /// For each categorical trace attribute-value pair, partition the log into a
@@ -33,7 +41,7 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
         &self,
         number_of_random_shuffles: usize,
         minimum_cohort_size_fraction: &Fraction,
-    ) -> Result<String> {
+    ) -> Result<Cohorts> {
         // Collect categorical attributes upfront so the attribute_key borrow is
         // dropped before we borrow `log` again for iteration.
 
@@ -57,7 +65,9 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
         };
 
         if attrs.is_empty() {
-            return Ok("No categorical trace attributes found in this log.".to_string());
+            return Err(anyhow!(
+                "No categorical trace attributes found in this log."
+            ));
         }
 
         // Shared activity key: must be the same for both cohorts when computing EMSC.
@@ -245,14 +255,15 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
         progress_bar.finish_and_clear();
 
         if results.is_empty() {
-            return Ok(
+            return Err(anyhow!(
                 "No behaviorally distinct cohorts found (all attribute partitions are trivial)."
                     .to_string(),
-            );
+            ));
         }
 
         // PHI == 0: sort ascending by raw EMSC (lower similarity means more divergent).
         // PHI > 0: sort descending by corrected (higher means more behaviorally distinct).
+        todo!();
         results.sort_by(|a, b| {
             if number_of_random_shuffles == 0 {
                 a.2.partial_cmp(&b.2).unwrap_or(std::cmp::Ordering::Equal)
