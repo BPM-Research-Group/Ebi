@@ -46,6 +46,8 @@ pub trait WeightedDistances: Send + Sync {
 
     fn clone(&self) -> Box<dyn WeightedDistances>;
 
+    fn clone_weights_zero(&self) -> Box<dyn WeightedDistances>;
+
     #[cfg(any(
         all(
             not(feature = "eexactarithmetic"),

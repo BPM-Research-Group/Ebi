@@ -9,7 +9,7 @@ use std::sync::Arc;
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use ebi_objects::ebi_arithmetic::malachite::Natural;
-use ebi_objects::ebi_arithmetic::{Fraction, Zero};
+use ebi_objects::ebi_arithmetic::{Fraction, Recip, Zero};
 use rayon::iter::{IndexedParallelIterator, ParallelIterator};
 
 #[cfg(any(
@@ -24,7 +24,10 @@ use ebi_objects::ebi_arithmetic::exact::MaybeExact;
 
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    ebi_traits::{
+        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    },
     math::{distances::WeightedDistances, levenshtein},
 };
 
@@ -42,7 +45,7 @@ pub struct WeightedTriangularDistanceMatrix {
 }
 
 impl WeightedTriangularDistanceMatrix {
-    pub fn new<L>(lang: &mut L) -> Self
+    pub fn new<L>(lang: &L) -> Self
     where
         L: EbiTraitFiniteStochasticLanguage + ?Sized,
     {
@@ -72,6 +75,58 @@ impl WeightedTriangularDistanceMatrix {
                 .take(lang.number_of_traces() - 1)
                 .map(|trace_a| {
                     let row: Vec<Arc<Fraction>> = lang
+                        .par_iter_traces()
+                        .map(|trace_b| {
+                            let result = levenshtein::normalised(trace_a, trace_b);
+                            progress_bar.inc(1);
+                            Arc::new(result)
+                        })
+                        .collect();
+                    row
+                })
+                .collect::<Vec<_>>()
+        });
+
+        // log::debug!("distances {:?}", distances);
+
+        progress_bar.finish_and_clear();
+
+        Self {
+            weights_a,
+            weights_b,
+            distances,
+            zero: Arc::new(Fraction::zero()),
+        }
+    }
+
+    pub fn new_from_event_log_trace_attributes(log: &dyn EbiTraitEventLogTraceAttributes) -> Self {
+        log::info!("Compute triangular distances");
+
+        // Create thread pool with custom configuration
+        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
+
+        // Create weights vectors
+        let weights_a =
+            vec![Fraction::from(log.number_of_traces()).recip(); log.number_of_traces()];
+        let weights_b = weights_a.clone();
+
+        // log::debug!("weights_a {:?}", weights_a);
+        // log::debug!("weights_b {:?}", weights_b);
+
+        let progress_bar = EbiCommand::get_progress_bar_ticks(
+            (log.number_of_traces() * log.number_of_traces())
+                .try_into()
+                .unwrap(),
+        );
+
+        // Compute in chunks for better cache utilisation
+        let mut distances = vec![];
+        pool.install(|| {
+            distances = log
+                .par_iter_traces()
+                .take(log.number_of_traces() - 1)
+                .map(|trace_a| {
+                    let row: Vec<Arc<Fraction>> = log
                         .par_iter_traces()
                         .map(|trace_b| {
                             let result = levenshtein::normalised(trace_a, trace_b);
@@ -141,6 +196,13 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
         Box::new(Clone::clone(self))
     }
 
+    fn clone_weights_zero(&self) -> Box<dyn WeightedDistances> {
+        let mut result = Clone::clone(self);
+        result.weights_a.fill(Fraction::zero());
+        result.weights_b.fill(Fraction::zero());
+        Box::new(result)
+    }
+
     #[cfg(any(
         all(
             not(feature = "eexactarithmetic"),
@@ -149,7 +211,9 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
         all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
         all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
-    fn lowest_common_multiple_denominators_distances(&self) -> ebi_objects::anyhow::Result<Natural> {
+    fn lowest_common_multiple_denominators_distances(
+        &self,
+    ) -> ebi_objects::anyhow::Result<Natural> {
         use ebi_objects::ebi_arithmetic::malachite::base::num::arithmetic::traits::Lcm;
         use ebi_objects::ebi_arithmetic::malachite::base::num::basic::traits::One;
         // 2a. Calculate the Least Common Multiple (LCM) of all denominators of distances (i.e. the elements in the DistanceMatrix).
