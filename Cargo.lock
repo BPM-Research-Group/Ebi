@@ -851,6 +851,7 @@ dependencies = [
  "clap",
  "clap-verbosity-flag",
  "const_format",
+ "csv",
  "ebi",
  "ebi_derive",
  "ebi_objects",
