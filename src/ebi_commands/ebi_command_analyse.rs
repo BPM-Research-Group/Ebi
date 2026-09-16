@@ -97,7 +97,7 @@ pub const EBI_ANALYSE_COHORT_ANALYSIS: EbiCommand = EbiCommand::Command {
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::EventLogTraceAttributes)],
-        &[&EbiInputType::Usize(Some(0), None, Some(0))],
+        &[&EbiInputType::Usize(Some(0), None, Some(10))],
         &[&EbiInputType::Fraction(
             Some(ConstFraction::zero()),
             Some(ConstFraction::one()),
@@ -135,7 +135,7 @@ pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
     input_names: &["FILE"],
     input_helps: &["An event log."],
     execute: |mut objects, _| {
-        let mut log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
+        let log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
 
         let result = log.to_multiset().estimate_completeness();
 

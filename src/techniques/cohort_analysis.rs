@@ -1,13 +1,17 @@
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
-    ebi_traits::ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
+    ebi_traits::{
+        ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
+    },
     math::{distances::WeightedDistances, distances_triangular::WeightedTriangularDistanceMatrix},
 };
 use ebi_objects::{
     Attribute, AttributeKey, DataType,
     anyhow::{Result, anyhow},
-    ebi_arithmetic::{Fraction, Recip, ToNative, fraction::approximate::Approximate},
+    ebi_arithmetic::{Fraction, Recip, ToNative, Zero, fraction::approximate::Approximate},
 };
+use fnv::FnvBuildHasher;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::{collections::HashMap, fmt::Display, sync::Arc};
 
@@ -113,6 +117,7 @@ impl Display for RankedCohorts {
     }
 }
 
+#[derive(Debug)]
 pub enum Feature {
     Categorical {
         attribute: Attribute,
@@ -168,18 +173,36 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
             ));
         }
 
+        //create variant map
+        let variant_2_cardinality = <dyn EbiTraitEventLog>::to_multiset(self);
+        let variant_2_variant_index = variant_2_cardinality
+            .iter()
+            .map(|(trace, _)| trace)
+            .enumerate()
+            .map(|(x, y)| (y, x))
+            .collect::<HashMap<_, _, FnvBuildHasher>>();
+        let trace_index_2_variant_index = self
+            .iter_traces()
+            .map(|trace| *variant_2_variant_index.get(trace).unwrap())
+            .collect::<Vec<_>>();
+
         //prepare distances
-        let distances =
-            Arc::new(WeightedTriangularDistanceMatrix::new_from_event_log_trace_attributes(self));
+        let distances = Arc::new(WeightedTriangularDistanceMatrix::new_from_iterator(
+            variant_2_cardinality.iter(),
+        ));
 
         let progress_bar = EbiCommand::get_progress_bar_ticks(features.len());
 
         let mut results = features
-            .into_par_iter()
+            .into_iter()
             .map(|feature| {
                 //create cohorts
-                let (cohorts_distances, cohort_a_size) =
-                    split_log_on_feature(self, &feature, Arc::clone(&distances));
+                let (cohorts_distances, cohort_a_size) = split_log_on_feature(
+                    self,
+                    &trace_index_2_variant_index,
+                    &feature,
+                    Arc::clone(&distances),
+                );
 
                 let raw_emsc = cohorts_distances.earth_movers_stochastic_conformance()?;
 
@@ -189,6 +212,7 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
                 } else {
                     let random_splits = perform_random_splits(
                         self,
+                        &trace_index_2_variant_index,
                         number_of_random_splits,
                         cohort_a_size,
                         Arc::clone(&distances),
@@ -196,7 +220,11 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
                     let random_avg =
                         (&random_splits.iter().sum::<Fraction>()) / random_splits.len();
                     progress_bar.inc(1);
-                    Ok((feature, (raw_emsc.clone(), Some(raw_emsc / random_avg))))
+                    if !random_avg.is_zero() {
+                        Ok((feature, (raw_emsc.clone(), Some(raw_emsc / random_avg))))
+                    } else {
+                        Err(anyhow!("A random split did not yield any variance."))
+                    }
                 }
             })
             .collect::<Result<Vec<_>>>()?;
@@ -281,6 +309,7 @@ fn elicit_features(
 
 fn split_log_on_feature(
     log: &dyn EbiTraitEventLogTraceAttributes,
+    trace_index_2_variant_index: &Vec<usize>,
     feature: &Feature,
     distances: Arc<WeightedTriangularDistanceMatrix>,
 ) -> (Box<dyn WeightedDistances>, usize) {
@@ -294,9 +323,9 @@ fn split_log_on_feature(
             for (trace_index, (_, value)) in log.iter_categorical_and_traces(*attribute).enumerate()
             {
                 if value == *feature_value {
-                    cohort_has.push(trace_index);
+                    cohort_has.push(trace_index_2_variant_index[trace_index]);
                 } else {
-                    cohort_has_not.push(trace_index);
+                    cohort_has_not.push(trace_index_2_variant_index[trace_index]);
                 }
             }
         }
@@ -310,9 +339,9 @@ fn split_log_on_feature(
                     if let Some(value) = value
                         && value < *threshold
                     {
-                        cohort_has.push(trace_index);
+                        cohort_has.push(trace_index_2_variant_index[trace_index]);
                     } else {
-                        cohort_has_not.push(trace_index);
+                        cohort_has_not.push(trace_index_2_variant_index[trace_index]);
                     }
                 }
             } else {
@@ -320,9 +349,9 @@ fn split_log_on_feature(
                 for (trace_index, (_, value)) in log.iter_numeric_and_traces(*attribute).enumerate()
                 {
                     if value.is_none() {
-                        cohort_has.push(trace_index);
+                        cohort_has.push(trace_index_2_variant_index[trace_index]);
                     } else {
-                        cohort_has_not.push(trace_index);
+                        cohort_has_not.push(trace_index_2_variant_index[trace_index]);
                     }
                 }
             }
@@ -333,14 +362,14 @@ fn split_log_on_feature(
     let mut distances = WeightedDistances::clone_weights_zero(distances.as_ref());
     {
         let has_weight = Fraction::from(cohort_has.len()).recip();
-        for trace_index in &cohort_has {
-            *distances.weight_a_mut(*trace_index) = has_weight.clone();
+        for variant_index in &cohort_has {
+            *distances.weight_a_mut(*variant_index) += &has_weight;
         }
     }
     {
         let has_not_weight = Fraction::from(cohort_has_not.len()).recip();
-        for trace_index in cohort_has_not {
-            *distances.weight_b_mut(trace_index) = has_not_weight.clone();
+        for variant_index in cohort_has_not {
+            *distances.weight_b_mut(variant_index) += &has_not_weight;
         }
     }
 
@@ -349,6 +378,7 @@ fn split_log_on_feature(
 
 fn perform_random_splits(
     log: &dyn EbiTraitEventLogTraceAttributes,
+    trace_index_2_variant_index: &Vec<usize>,
     sample_size: usize,
     number_of_random_splits: usize,
     distances: Arc<WeightedTriangularDistanceMatrix>,
@@ -361,9 +391,9 @@ fn perform_random_splits(
             let mut cohort_has_not = Vec::with_capacity(log.number_of_traces() - sample_size);
             for trace_index in 0..log.number_of_traces() {
                 if rand::random_range(0..log.number_of_traces()) <= sample_size {
-                    cohort_has.push(trace_index);
+                    cohort_has.push(trace_index_2_variant_index[trace_index]);
                 } else {
-                    cohort_has_not.push(trace_index);
+                    cohort_has_not.push(trace_index_2_variant_index[trace_index]);
                 }
             }
 
@@ -372,13 +402,13 @@ fn perform_random_splits(
             {
                 let has_weight = Fraction::from(cohort_has.len()).recip();
                 for trace_index in cohort_has {
-                    *distances.weight_a_mut(trace_index) = has_weight.clone();
+                    *distances.weight_a_mut(trace_index) += &has_weight;
                 }
             }
             {
                 let has_not_weight = Fraction::from(cohort_has_not.len()).recip();
                 for trace_index in cohort_has_not {
-                    *distances.weight_b_mut(trace_index) = has_not_weight.clone();
+                    *distances.weight_b_mut(trace_index) += &has_not_weight;
                 }
             }
 

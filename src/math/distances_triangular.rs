@@ -9,8 +9,11 @@ use std::sync::Arc;
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use ebi_objects::ebi_arithmetic::malachite::Natural;
-use ebi_objects::ebi_arithmetic::{Fraction, Recip, Zero};
-use rayon::iter::{IndexedParallelIterator, ParallelIterator};
+use ebi_objects::{
+    Activity,
+    ebi_arithmetic::{Fraction, Recip, Zero},
+};
+use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
 #[cfg(any(
     all(
@@ -36,7 +39,7 @@ use crate::{
  * Computes each distance once, and supports changing the weights of the language in the comparison with itself.
  * Cloning will not clone the distances, but will clone the weights, which can be changed.
  */
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct WeightedTriangularDistanceMatrix {
     weights_a: Vec<Fraction>,
     weights_b: Vec<Fraction>,
@@ -90,6 +93,56 @@ impl WeightedTriangularDistanceMatrix {
         // log::debug!("distances {:?}", distances);
 
         progress_bar.finish_and_clear();
+
+        Self {
+            weights_a,
+            weights_b,
+            distances,
+            zero: Arc::new(Fraction::zero()),
+        }
+    }
+
+    //distances for an iterator (trace, cardinality)
+    pub fn new_from_iterator<'a, I>(it: I) -> Self
+    where
+        I: Iterator<Item = (&'a Vec<Activity>, &'a u64)> + Send + Clone + Sync,
+    {
+        log::info!("Compute triangular distances");
+
+        let traces = it.collect::<Vec<_>>();
+
+        // Create thread pool with custom configuration
+        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
+
+        //create weight vectors
+        let sum_cardinality = traces
+            .iter()
+            .map(|(_, cardinality)| *cardinality)
+            .sum::<u64>();
+        let weights_a = traces
+            .iter()
+            .map(|(_, cardinality)| Fraction::from((**cardinality, sum_cardinality)))
+            .collect::<Vec<_>>();
+        let weights_b = weights_a.clone();
+
+        // Compute in chunks for better cache utilisation
+        let mut distances = vec![];
+        pool.install(|| {
+            distances = traces
+                .par_iter()
+                .take(traces.len() - 1)
+                .map(|trace_a| {
+                    let row: Vec<Arc<Fraction>> = traces
+                        .par_iter()
+                        .map(|trace_b| {
+                            let result = levenshtein::normalised(trace_a.0, trace_b.0);
+                            Arc::new(result)
+                        })
+                        .collect();
+                    row
+                })
+                .collect::<Vec<_>>()
+        });
 
         Self {
             weights_a,
@@ -178,13 +231,15 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
     }
 
     fn distance(&self, index_a: usize, index_b: usize) -> &Fraction {
-        // log::debug!("distance {}, {}", index_a, index_b);
         if index_a == index_b {
+            // log::debug!("distance {}, {}: zero", index_a, index_b);
             &self.zero
         } else if index_a < index_b {
-            &self.distances[index_a][index_b - 1]
+            // log::debug!("distance {}, {}: {}", index_a, index_b, self.distances[index_a][index_b - 1]);
+            &self.distances[index_a][index_b]
         } else {
-            &self.distances[index_b][index_a - 1]
+            // log::debug!("distance {}, {}: {}", index_a, index_b, self.distances[index_b][index_a - 1]);
+            &self.distances[index_b][index_a]
         }
     }
 

@@ -27,7 +27,7 @@ use std::fmt;
 use std::fmt::Debug;
 use std::{iter::FusedIterator, sync::Arc};
 
-pub trait WeightedDistances: Send + Sync {
+pub trait WeightedDistances: Send + Sync + Debug {
     fn len_a(&self) -> usize;
 
     fn len_b(&self) -> usize;

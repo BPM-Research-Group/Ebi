@@ -41,7 +41,7 @@ use crate::{
 /**
  * A standard weighted distance matrix.
  */
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct WeightedDistanceMatrix {
     pub(crate) weights_a: Vec<Fraction>,
     pub(crate) weights_b: Vec<Fraction>,
