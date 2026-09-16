@@ -91,13 +91,13 @@ pub const EBI_ANALYSE_COHORT_ANALYSIS: EbiCommand = EbiCommand::Command {
     name_short: "ca",
     name_long: Some("cohort-analysis"),
     explanation_short: "Returns which trace attribute values correspond with the largest behavioural differences.",
-    explanation_long: Some("Returns which trace attribute values correspond with the largest behavioural differences. Only categorical attributes are supported."),
+    explanation_long: Some("Returns which trace attribute values correspond with the largest behavioural differences. Only categorical attributes are supported. A lower EMSC value indicates a larger difference."),
     latex_link: Some("\\cite{DBLP:conf/er/LeemansS0KSW20}"),
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::EventLogTraceAttributes)],
-        &[&EbiInputType::Usize(Some(0), None, Some(10))],
+        &[&EbiInputType::Usize(Some(0), None, Some(0))],
         &[&EbiInputType::Fraction(
             Some(ConstFraction::zero()),
             Some(ConstFraction::one()),

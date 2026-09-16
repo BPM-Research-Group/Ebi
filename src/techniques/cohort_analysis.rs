@@ -118,12 +118,18 @@ pub enum Feature {
         attribute: Attribute,
         value: Option<String>,
     },
+    NumericLess {
+        attribute: Attribute,
+        threshold: Option<Fraction>,
+    },
 }
 
 impl Feature {
     pub fn attribute(&self) -> Attribute {
         match self {
-            Feature::Categorical { attribute, .. } => *attribute,
+            Feature::Categorical { attribute, .. } | Feature::NumericLess { attribute, .. } => {
+                *attribute
+            }
         }
     }
 
@@ -132,6 +138,13 @@ impl Feature {
             Feature::Categorical { value, .. } => {
                 if let Some(s) = value {
                     format!("{s}")
+                } else {
+                    format!("-missing-")
+                }
+            }
+            Feature::NumericLess { threshold, .. } => {
+                if let Some(s) = threshold {
+                    format!("< {s}")
                 } else {
                     format!("-missing-")
                 }
@@ -223,16 +236,44 @@ fn elicit_features(
 
     let mut features = vec![];
     for attribute in log.attribute_key().attributes() {
-        if let Some(DataType::Categorical) = log.attribute_key().attribute_to_data_type(attribute) {
-            let mut value_counts = HashMap::new();
-            for opt_val in log.iter_categorical(attribute) {
-                *value_counts.entry(opt_val).or_insert(0) += 1;
-            }
-            for (value, count) in value_counts {
-                if min_traces <= count && count <= max_traces {
-                    features.push(Feature::Categorical { attribute, value });
+        match log.attribute_key().attribute_to_data_type(attribute) {
+            Some(DataType::Categorical) => {
+                let mut value_counts = HashMap::new();
+                for opt_val in log.iter_categorical(attribute) {
+                    *value_counts.entry(opt_val).or_insert(0) += 1;
+                }
+                for (value, count) in value_counts {
+                    if min_traces <= count && count <= max_traces {
+                        features.push(Feature::Categorical { attribute, value });
+                    }
                 }
             }
+            Some(DataType::Numerical(_, _)) => {
+                let mut values = log.iter_numeric(attribute).flatten().collect::<Vec<_>>();
+                let values_len = values.len();
+
+                let empty_traces = log.number_of_traces() - values.len();
+                if min_traces <= empty_traces && empty_traces <= max_traces {
+                    features.push(Feature::NumericLess {
+                        attribute,
+                        threshold: None,
+                    });
+                }
+
+                if min_traces <= values.len() / 2 && values.len() / 2 <= max_traces {
+                    let (smaller, median, _) = values.select_nth_unstable(values_len / 2);
+
+                    //verify that there are enough smaller values
+                    let count = smaller.iter().filter(|x| *x < median).count();
+                    if min_traces <= count && count / 2 <= max_traces {
+                        features.push(Feature::NumericLess {
+                            attribute,
+                            threshold: Some(median.clone()),
+                        });
+                    }
+                }
+            }
+            _ => {}
         }
     }
     features
@@ -256,6 +297,33 @@ fn split_log_on_feature(
                     cohort_has.push(trace_index);
                 } else {
                     cohort_has_not.push(trace_index);
+                }
+            }
+        }
+        Feature::NumericLess {
+            attribute,
+            threshold,
+        } => {
+            if let Some(threshold) = threshold {
+                for (trace_index, (_, value)) in log.iter_numeric_and_traces(*attribute).enumerate()
+                {
+                    if let Some(value) = value
+                        && value < *threshold
+                    {
+                        cohort_has.push(trace_index);
+                    } else {
+                        cohort_has_not.push(trace_index);
+                    }
+                }
+            } else {
+                //absent
+                for (trace_index, (_, value)) in log.iter_numeric_and_traces(*attribute).enumerate()
+                {
+                    if value.is_none() {
+                        cohort_has.push(trace_index);
+                    } else {
+                        cohort_has_not.push(trace_index);
+                    }
                 }
             }
         }
