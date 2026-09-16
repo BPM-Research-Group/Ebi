@@ -91,7 +91,7 @@ pub const EBI_ANALYSE_COHORT_ANALYSIS: EbiCommand = EbiCommand::Command {
     name_short: "ca",
     name_long: Some("cohort-analysis"),
     explanation_short: "Returns which trace attribute values correspond with the largest behavioural differences.",
-    explanation_long: Some("Returns which trace attribute values correspond with the largest behavioural differences. Only categorical attributes are supported."),
+    explanation_long: Some("Returns which trace attribute values correspond with the largest behavioural differences. Only categorical attributes are supported. A lower EMSC value indicates a larger difference."),
     latex_link: Some("\\cite{DBLP:conf/er/LeemansS0KSW20}"),
     cli_command: None,
     exact_arithmetic: true,
@@ -135,7 +135,7 @@ pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
     input_names: &["FILE"],
     input_helps: &["An event log."],
     execute: |mut objects, _| {
-        let mut log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
+        let log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
 
         let result = log.to_multiset().estimate_completeness();
 

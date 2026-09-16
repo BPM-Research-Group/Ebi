@@ -12,6 +12,7 @@ use ebi_objects::{
         event_log_event_attributes::EventLogEventAttributes,
     },
 };
+use fnv::FnvBuildHasher;
 use std::collections::HashMap;
 
 #[macro_export]
@@ -67,8 +68,8 @@ pub trait EbiTraitEventLog: HasActivityKey + IntoRefTraceIterator + NumberOfTrac
 }
 
 impl dyn EbiTraitEventLog {
-    pub fn to_multiset(&mut self) -> HashMap<Vec<Activity>, usize> {
-        let mut map = HashMap::new();
+    pub fn to_multiset(&self) -> HashMap<Vec<Activity>, u64, FnvBuildHasher> {
+        let mut map = HashMap::default();
         for trace in self.iter_traces() {
             match map.entry(trace.clone()) {
                 std::collections::hash_map::Entry::Occupied(mut e) => {

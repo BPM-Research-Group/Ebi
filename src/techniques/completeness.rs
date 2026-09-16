@@ -1,4 +1,5 @@
 use ebi_objects::ebi_arithmetic::{Fraction, One, Zero, f};
+use fnv::FnvBuildHasher;
 use std::collections::HashMap;
 
 pub trait Completeness {
@@ -11,7 +12,7 @@ pub trait Completeness {
     fn estimate_completeness(&self) -> Fraction;
 }
 
-impl<T> Completeness for HashMap<T, usize> {
+impl<T> Completeness for HashMap<T, u64, FnvBuildHasher> {
     fn estimate_completeness(&self) -> Fraction {
         //from https://github.com/MartinKabierski/process-completeness-estimation/blob/main/src/estimation/metrics.py
 
@@ -25,15 +26,15 @@ impl<T> Completeness for HashMap<T, usize> {
     }
 }
 
-fn get_singletons<T>(multiset: &HashMap<T, usize>) -> usize {
+fn get_singletons<T>(multiset: &HashMap<T, u64, FnvBuildHasher>) -> usize {
     multiset.iter().filter(|&(_, c)| c == &1).count()
 }
 
-fn get_doubletons<T>(multiset: &HashMap<T, usize>) -> usize {
+fn get_doubletons<T>(multiset: &HashMap<T, u64, FnvBuildHasher>) -> usize {
     multiset.iter().filter(|&(_, c)| c == &2).count()
 }
 
-fn get_number_observed_species<T>(multiset: &HashMap<T, usize>) -> usize {
+fn get_number_observed_species<T>(multiset: &HashMap<T, u64, FnvBuildHasher>) -> usize {
     multiset.len()
 }
 
@@ -43,7 +44,7 @@ fn get_number_observed_species<T>(multiset: &HashMap<T, usize>) -> usize {
  * :param obs_species_counts: the species with corresponding incidence counts
  * :return: the estimated species richness
  **/
-fn estimate_species_richness_chao<T>(multiset: &HashMap<T, usize>) -> Fraction {
+fn estimate_species_richness_chao<T>(multiset: &HashMap<T, u64, FnvBuildHasher>) -> Fraction {
     let mut obs_species_count: Fraction = get_number_observed_species(multiset).into();
     let f_1: Fraction = get_singletons(multiset).into();
     let f_2: Fraction = get_doubletons(multiset).into();
