@@ -8,7 +8,7 @@ use crate::{
 };
 use ebi_objects::{
     Attribute, AttributeKey, DataType,
-    anyhow::{Result, anyhow},
+    anyhow::Result,
     ebi_arithmetic::{Fraction, Recip, ToNative, Zero, fraction::approximate::Approximate},
 };
 use fnv::FnvBuildHasher;
@@ -27,13 +27,32 @@ pub struct RankedCohorts {
     attribute_key: AttributeKey,
     features: Vec<Feature>,
     emsc: Vec<Fraction>,
-    emsc_corrected: Option<Vec<Fraction>>,
+    emsc_corrected: Option<Vec<Option<Fraction>>>,
+}
+
+fn emsc_corrected_to_string(f: &Option<Fraction>) -> String {
+    if let Some(f) = f {
+        f.to_string()
+    } else {
+        format!("correction failed")
+    }
+}
+
+fn emsc_corrected_to_approximated_string(f: &Option<Fraction>) -> String {
+    if let Some(f) = f {
+        f.clone().approximate().unwrap().to_string()
+    } else {
+        format!("correction failed")
+    }
 }
 
 impl Display for RankedCohorts {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         if self.features.len() == 0 {
-            return write!(f, "No cohorts.");
+            return write!(
+                f,
+                "No suitable cohorts found. The event log may not have supported attributes, or the cohorts that they yield are too small."
+            );
         }
 
         let attribute_name_max_length = self
@@ -60,7 +79,7 @@ impl Display for RankedCohorts {
         if let Some(emsc_corrected) = &self.emsc_corrected {
             let exact_value_max_length = emsc_corrected
                 .iter()
-                .map(|emsc| format!("{}", emsc.clone().approximate().unwrap()).len())
+                .map(|emsc| format!("{}", emsc_corrected_to_string(emsc)).len())
                 .max()
                 .unwrap()
                 .max(26);
@@ -80,8 +99,8 @@ impl Display for RankedCohorts {
                         .attribute_to_label(feature.attribute())
                         .unwrap(),
                     feature.value_to_string(),
-                    emsc_corrected.clone().approximate().unwrap(),
-                    emsc_corrected
+                    emsc_corrected_to_approximated_string(emsc_corrected),
+                    emsc_corrected_to_string(emsc_corrected),
                 )?;
             }
         } else {
@@ -168,9 +187,12 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
         let features = elicit_features(self, minimum_cohort_size_fraction);
 
         if features.len() == 0 {
-            return Err(anyhow!(
-                "Event log contains no suitable features. A feature must yield more traces than the minimum cohort size."
-            ));
+            return Ok(RankedCohorts {
+                attribute_key: self.attribute_key().clone(),
+                features,
+                emsc: vec![],
+                emsc_corrected: None,
+            });
         }
 
         //create variant map
@@ -194,7 +216,7 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
         let progress_bar = EbiCommand::get_progress_bar_ticks(features.len());
 
         let mut results = features
-            .into_iter()
+            .into_par_iter()
             .map(|feature| {
                 //create cohorts
                 let (cohorts_distances, cohort_a_size) = split_log_on_feature(
@@ -213,17 +235,20 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
                     let random_splits = perform_random_splits(
                         self,
                         &trace_index_2_variant_index,
-                        number_of_random_splits,
                         cohort_a_size,
+                        number_of_random_splits,
                         Arc::clone(&distances),
                     )?;
                     let random_avg =
                         (&random_splits.iter().sum::<Fraction>()) / random_splits.len();
                     progress_bar.inc(1);
                     if !random_avg.is_zero() {
-                        Ok((feature, (raw_emsc.clone(), Some(raw_emsc / random_avg))))
+                        Ok((
+                            feature,
+                            (raw_emsc.clone(), Some(Some(raw_emsc / random_avg))),
+                        ))
                     } else {
-                        Err(anyhow!("A random split did not yield any variance."))
+                        Ok((feature, (raw_emsc.clone(), Some(None))))
                     }
                 }
             })
@@ -259,8 +284,15 @@ fn elicit_features(
     log: &dyn EbiTraitEventLogTraceAttributes,
     minimum_cohort_size_fraction: &Fraction,
 ) -> Vec<Feature> {
-    let min_traces = (minimum_cohort_size_fraction * log.number_of_traces()).to_usize();
-    let max_traces = log.number_of_traces() - min_traces;
+
+    if log.number_of_traces() == 0 {
+        return vec![];
+    }
+
+    let min_traces = (minimum_cohort_size_fraction * log.number_of_traces())
+        .to_usize()
+        .max(1);
+    let max_traces = (log.number_of_traces() - min_traces).max(1);
 
     let mut features = vec![];
     for attribute in log.attribute_key().attributes() {
@@ -386,34 +418,41 @@ fn perform_random_splits(
     (0..number_of_random_splits)
         .into_par_iter()
         .map(|_| {
-            //create sample
-            let mut cohort_has = Vec::with_capacity(sample_size);
-            let mut cohort_has_not = Vec::with_capacity(log.number_of_traces() - sample_size);
-            for trace_index in 0..log.number_of_traces() {
-                if rand::random_range(0..log.number_of_traces()) <= sample_size {
-                    cohort_has.push(trace_index_2_variant_index[trace_index]);
-                } else {
-                    cohort_has_not.push(trace_index_2_variant_index[trace_index]);
+            loop {
+                //create sample
+                let mut cohort_has = Vec::with_capacity(sample_size);
+                let mut cohort_has_not = Vec::with_capacity(sample_size);
+                for trace_index in 0..log.number_of_traces() {
+                    if rand::random_range(0..=log.number_of_traces()) <= sample_size {
+                        cohort_has.push(trace_index_2_variant_index[trace_index]);
+                    } else {
+                        cohort_has_not.push(trace_index_2_variant_index[trace_index]);
+                    }
                 }
-            }
 
-            //set weights
-            let mut distances = WeightedDistances::clone_weights_zero(distances.as_ref());
-            {
-                let has_weight = Fraction::from(cohort_has.len()).recip();
-                for trace_index in cohort_has {
-                    *distances.weight_a_mut(trace_index) += &has_weight;
+                if cohort_has.len() == 0 || cohort_has_not.len() == 0 {
+                    //It may occasionally happen that either of the sides is empty; just try again.
+                    continue;
                 }
-            }
-            {
-                let has_not_weight = Fraction::from(cohort_has_not.len()).recip();
-                for trace_index in cohort_has_not {
-                    *distances.weight_b_mut(trace_index) += &has_not_weight;
-                }
-            }
 
-            //compute emsc
-            distances.earth_movers_stochastic_conformance()
+                //set weights
+                let mut distances = WeightedDistances::clone_weights_zero(distances.as_ref());
+                {
+                    let has_weight = Fraction::from(cohort_has.len()).recip();
+                    for variant_index in cohort_has {
+                        *distances.weight_a_mut(variant_index) += &has_weight;
+                    }
+                }
+                {
+                    let has_not_weight = Fraction::from(cohort_has_not.len()).recip();
+                    for variant_index in cohort_has_not {
+                        *distances.weight_b_mut(variant_index) += &has_not_weight;
+                    }
+                }
+
+                //compute emsc
+                return distances.earth_movers_stochastic_conformance();
+            }
         })
         .collect::<Result<Vec<_>>>()
 }

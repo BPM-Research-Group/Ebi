@@ -206,7 +206,7 @@ checksum = "82f6aeea286b8eb4dd3431a1be1b59d290ace00f5bfd8e2a159bc2a05e2c1667"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -309,7 +309,7 @@ dependencies = [
  "proc-macro-crate",
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -344,7 +344,7 @@ checksum = "6a1f896587b6f2c069c73d2f0913e2d590c3990285cd2f0b6aa02b786b4c679c"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -379,9 +379,9 @@ checksum = "6d43a04d8753f35258c91f8ec639f792891f748a1edbd759cf1dcea3382ad83c"
 
 [[package]]
 name = "cfg-if"
-version = "1.0.4"
+version = "1.0.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
+checksum = "4e7648175b45a9a48536d676f68d918270699102aa8dab5496df06904c914600"
 
 [[package]]
 name = "cfg_aliases"
@@ -477,7 +477,7 @@ dependencies = [
  "heck 0.5.0",
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -716,7 +716,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "strsim",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -738,7 +738,7 @@ checksum = "2ac7135c3ef02b2f7833bbeb1be5ba7f966dcde8a87c6b87f65a778d71a02785"
 dependencies = [
  "darling_core 0.24.1",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -891,7 +891,7 @@ dependencies = [
  "strum",
  "strum_macros 0.28.0",
  "svg2pdf",
- "syn 3.0.5",
+ "syn 3.0.6",
  "uuid",
  "wasm-bindgen",
 ]
@@ -908,8 +908,8 @@ dependencies = [
 
 [[package]]
 name = "ebi_arithmetic"
-version = "0.3.14"
-source = "git+https://github.com/BPM-Research-Group/Ebi_arithmetic.git#37c8ea607a197716783fb8e8951c9dfdf589d193"
+version = "0.3.15"
+source = "git+https://github.com/BPM-Research-Group/Ebi_arithmetic.git#7ecca6e51a1ead69c044dd6a0d140967c3d58f26"
 dependencies = [
  "anyhow",
  "fnv",
@@ -924,8 +924,8 @@ dependencies = [
 
 [[package]]
 name = "ebi_bpmn"
-version = "0.0.51"
-source = "git+https://github.com/BPM-Research-Group/Ebi_BPMN.git#bec16e7990b5f3556c9a1420322e4d43b4a71dfb"
+version = "0.0.52"
+source = "git+https://github.com/BPM-Research-Group/Ebi_BPMN.git#246d536217ea67e68f63c5538120d3b9f6986241"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -935,7 +935,7 @@ dependencies = [
  "intmap",
  "itertools 0.15.0",
  "layout-rs",
- "quick-xml 0.41.0",
+ "quick-xml 0.42.0",
  "strum",
  "strum_macros 0.28.0",
 ]
@@ -954,8 +954,8 @@ dependencies = [
 
 [[package]]
 name = "ebi_objects"
-version = "0.3.191"
-source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#e26a6e8778dc8782c84496ba75b2ff5f3b85b729"
+version = "0.3.192"
+source = "git+https://github.com/BPM-Research-Group/Ebi_objects.git#5139f8e7619471eae0920f04e3d037148d71ae2d"
 dependencies = [
  "anyhow",
  "bitvec",
@@ -972,7 +972,7 @@ dependencies = [
  "log",
  "pastey",
  "process_mining",
- "quick-xml 0.41.0",
+ "quick-xml 0.42.0",
  "rayon",
  "resvg 0.48.1",
  "serde",
@@ -986,8 +986,8 @@ dependencies = [
 
 [[package]]
 name = "ebi_optimisation"
-version = "0.3.9"
-source = "git+https://github.com/BPM-Research-Group/Ebi_optimisation.git#7000ad6fec76a1069bfdd9215a43132f3e71922a"
+version = "0.3.10"
+source = "git+https://github.com/BPM-Research-Group/Ebi_optimisation.git#e00c2c2658fd6f9479d8d55709c0052bdd1305e1"
 dependencies = [
  "ebi_arithmetic",
  "indexmap 2.14.2",
@@ -1268,7 +1268,7 @@ checksum = "9fb9654ba8355388abeb8dcb4fc62f511300867002afc858860463bdd9fe0c44"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -2023,9 +2023,9 @@ dependencies = [
 
 [[package]]
 name = "malachite"
-version = "0.9.2"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bba00455c89cf785ef73a0dfc941ab3c21211963c86130c0bd48d7994b942707"
+checksum = "6b901debd3ecb90199e51e10c13654f8c6149b2b7f84b00273c6ea6a63ebe06e"
 dependencies = [
  "malachite-base",
  "malachite-float",
@@ -2035,9 +2035,9 @@ dependencies = [
 
 [[package]]
 name = "malachite-base"
-version = "0.9.2"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a4f44099731f17094b07825c88ccb5fbd1bfa1f82fafff7daa33e8b8652db16e"
+checksum = "17073d2b5f3fe81b6abec0efcbdb6933d7adbda942854095f87c2f82633eafa5"
 dependencies = [
  "getrandom 0.2.17",
  "hashbrown 0.16.1",
@@ -2051,9 +2051,9 @@ dependencies = [
 
 [[package]]
 name = "malachite-float"
-version = "0.9.2"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a23982acc6f68aa384504a44d112f42fc82207035272f23485220a861e2cf1af"
+checksum = "87a4f0cf52cbb68035b067b00809cfdf642839001f886826426ec596f5abafa7"
 dependencies = [
  "itertools 0.14.0",
  "malachite-base",
@@ -2063,9 +2063,9 @@ dependencies = [
 
 [[package]]
 name = "malachite-nz"
-version = "0.9.2"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a137660cdba20f136c8a223125f08088adb4e0b72fbb8466f08c43e31cc0427d"
+checksum = "c2f37fc9ab5654d216d8ae22b57f0b8d9f1741ef160649d37ce1864a1e308993"
 dependencies = [
  "itertools 0.14.0",
  "libm",
@@ -2075,9 +2075,9 @@ dependencies = [
 
 [[package]]
 name = "malachite-q"
-version = "0.9.2"
+version = "0.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5ffcbeed95e34c0fcc3864ccd146e129cbbf7de1513d3afbcfb47c7674c82d94"
+checksum = "6542042c11f3d94433ed4262cf5e82eb43eff687fc5bf1fe1b4b5cde2215836e"
 dependencies = [
  "itertools 0.14.0",
  "libm",
@@ -3044,16 +3044,6 @@ dependencies = [
 
 [[package]]
 name = "quick-xml"
-version = "0.41.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e660451e55124f798a69a5af3f49ccfbefbd41910eefd25caf2393e1f3473ec1"
-dependencies = [
- "memchr",
- "serde",
-]
-
-[[package]]
-name = "quick-xml"
 version = "0.42.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "41b1177fdf999d2321d3fb46ff47159d9c1fb9ad66a4879f8c50a0b504615e9b"
@@ -3258,7 +3248,7 @@ checksum = "92ecd8964f8453721699a1ed72037b0db49ce2f5a5138486ee89bed6f67cdf3a"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -3372,9 +3362,9 @@ dependencies = [
 
 [[package]]
 name = "rustix"
-version = "1.1.4"
+version = "1.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6fe4565b9518b83ef4f91bb47ce29620ca828bd32cb7e408f0062e9930ba190"
+checksum = "891efababe418670775f199f0d233d84843c227a0949a883ce15b37c78d6629d"
 dependencies = [
  "bitflags 2.13.2",
  "errno",
@@ -3467,7 +3457,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "serde_derive_internals",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -3509,7 +3499,7 @@ checksum = "e7a5d71263a5a7d47b41f6b3f06ba276f10cc18b0931f1799f710578e2309348"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -3520,7 +3510,7 @@ checksum = "f852137cce035d6a4df67ccce505ff6b3e9fd3a10e3e52b24dc71e650bb1a9bd"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -3566,14 +3556,14 @@ dependencies = [
  "darling 0.24.1",
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
 name = "serial_test"
-version = "3.5.0"
+version = "4.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "699f4197115b8a7e7ff19c9a315a4bd6fffec26cc4626ef45ecaea389e081c6d"
+checksum = "a6df5ed973ad8d834e09f824f9e9f449af6b9a3745f78dec7cc752770bd3bf11"
 dependencies = [
  "futures-executor",
  "futures-util",
@@ -3585,13 +3575,13 @@ dependencies = [
 
 [[package]]
 name = "serial_test_derive"
-version = "3.5.0"
+version = "4.0.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "94e153fc76e1c6a068703d6d29c508a0b15c061c4b7e43da59cc097bc342673c"
+checksum = "a22144e767da4ddd8416dbf383700542ffd8a5dc493dfecedfe1fe3ad03c98ae"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 2.0.119",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -3857,9 +3847,9 @@ dependencies = [
 
 [[package]]
 name = "syn"
-version = "3.0.5"
+version = "3.0.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "12df2e0110f65b775f769bb17ef989067a1d931b2eb822bd4346631eeada89f9"
+checksum = "8593e8e72159ed2257d083c7a454a85cbf854f37a0966d8d483aff8c8a3ebcee"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -3948,7 +3938,7 @@ checksum = "bc04cd3e1236dd4a98afca4569f2deb3f120e5422a4023be2cb683f8486292af"
 dependencies = [
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
 ]
 
 [[package]]
@@ -4123,9 +4113,9 @@ checksum = "ce61d488bcdc9bc8b5d1772c404828b17fc481c0a582b5581e95fb233aef503e"
 
 [[package]]
 name = "unicode-ident"
-version = "1.0.24"
+version = "1.0.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e6e4313cd5fcd3dad5cafa179702e2b244f760991f45397d14d4ebf38247da75"
+checksum = "d245f478577f809a851594d02313b640fb437e0bb33866753cff937863096954"
 
 [[package]]
 name = "unicode-properties"
@@ -4311,7 +4301,7 @@ dependencies = [
  "bumpalo",
  "proc-macro2",
  "quote",
- "syn 3.0.5",
+ "syn 3.0.6",
  "wasm-bindgen-shared",
 ]
 

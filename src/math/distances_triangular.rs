@@ -232,13 +232,13 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
 
     fn distance(&self, index_a: usize, index_b: usize) -> &Fraction {
         if index_a == index_b {
-            // log::debug!("distance {}, {}: zero", index_a, index_b);
+            // println!("distance {}, {}: zero", index_a, index_b);
             &self.zero
         } else if index_a < index_b {
-            // log::debug!("distance {}, {}: {}", index_a, index_b, self.distances[index_a][index_b - 1]);
+            // println!("distance {}, {}: {}", index_a, index_b, self.distances[index_a][index_b]);
             &self.distances[index_a][index_b]
         } else {
-            // log::debug!("distance {}, {}: {}", index_a, index_b, self.distances[index_b][index_a - 1]);
+            // println!("distance {}, {}: {}", index_a, index_b, self.distances[index_b][index_a]);
             &self.distances[index_b][index_a]
         }
     }
