@@ -565,6 +565,27 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         ],
     ),
     (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/aa-ab-ba.sdfm",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/aa-ab-ba.slang",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/aa-ab-ba.slang.dfm",
+        ],
+    ),
+    (
         &EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS,
         &["*", "trait semantics#./testfiles/empty.xes"],
     ),

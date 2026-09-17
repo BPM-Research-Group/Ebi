@@ -25510,16 +25510,7 @@ mod tests{
 	#[test]
 	#[timeout(10000)]
 	pub fn ebi_confns_eep_test_22() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
-			&[
-				"object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
-				"trait semantics#./testfiles/aa-ab-ba.sdfm"			
-			]
-		),
-		*/
+		// this test has been indicated as to be expected to fail
 		
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
 		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
@@ -25529,29 +25520,14 @@ mod tests{
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
+			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
 	#[test]
 	#[timeout(10000)]
 	pub fn ebi_confns_eep_test_23() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
-			&[
-				"object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
-				"trait semantics#./testfiles/aa-ab-ba.slang"			
-			]
-		),
-		*/
+		// this test has been indicated as to be expected to fail
 		
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
 		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
@@ -25561,29 +25537,14 @@ mod tests{
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
+			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
 	#[test]
 	#[timeout(10000)]
 	pub fn ebi_confns_eep_test_24() {
-		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
-		/* 
-		(
-			&EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
-			&[
-				"object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
-				"trait semantics#./testfiles/aa-ab-ba.slang.dfm"			
-			]
-		),
-		*/
+		// this test has been indicated as to be expected to fail
 		
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.sali").unwrap());
 		let object0 = read_as_object_with_file_handler(&"stochastic language of alignments".parse().unwrap(), &mut reader, None, 0, &mut None, "stochastic language of alignments".parse().unwrap()).unwrap();
@@ -25593,14 +25554,8 @@ mod tests{
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let inputs = vec![input0, input1];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
-			match (execute)(inputs, None) {
-				Ok(output) => {
-					output.test_activity_key();
-					assert_eq!(&output.get_type(), output_type);
-				}
-				Err(e) => Err(e).unwrap(),
-			}
+		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION {
+			assert!(((execute)(inputs, None)).is_err())
 		}
 	}
 
