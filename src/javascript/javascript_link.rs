@@ -9,7 +9,7 @@ use crate::{
 use ebi_objects::anyhow::{Context, Error, Result, anyhow};
 use itertools::Itertools;
 use js_sys::Uint8Array;
-use std::path::PathBuf;
+use std::{panic, path::PathBuf};
 use wasm_bindgen::prelude::*;
 
 #[cfg(not(test))]
@@ -126,6 +126,7 @@ pub(crate) fn execute_javascript_command(
     command_name: &str,
     exporter_file_extension: &str,
 ) {
+    panic::set_hook(Box::new(console_error_panic_hook::hook));
     let (inputs, output_type) =
         match read_inputs(javascript_inputs, command).with_context(|| anyhow!("Reading inputs.")) {
             Ok(t) => t,
