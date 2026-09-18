@@ -107,8 +107,8 @@ pub const EBI_ANALYSE_COHORT_ANALYSIS: EbiCommand = EbiCommand::Command {
     input_names: &["FILE", "RNDSPL", "MINSIZ"],
     input_helps: &[
         "An event log with trace attributes.",
-        "The number of random splits to perform.",
-        "The minimum number of traces per cohort, as a fraction of the total number of traces.",
+        "The size of cohorts may have an influence on the measured distances. To correct for this, these measures can be scaled by randomly generated cohorts of the same size. This parameter sets the number of such random splits. Set this to 0 to not perform this correction.",
+        "The minimum number of traces per cohort, as a fraction of the total number of traces. In case the cohort (or its complement) contains fewer traces, it is left out.",
     ],
     execute: |mut inputs, _| {
         let log = inputs
