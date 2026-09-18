@@ -81,20 +81,14 @@ impl PartiallyOrderedSampler for StochasticBusinessProcessModelAndNotation {
 
         let progress_bar = EbiCommand::get_progress_bar_ticks(number_of_traces);
 
-        // Create thread pool with custom configuration
-        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
-
-        let mut traces = Vec::with_capacity(number_of_traces);
-        pool.install(|| {
-            traces = (0..number_of_traces)
-                .into_par_iter()
-                .map(|_| {
-                    let run = PartiallyOrderedRun::new_random(self).unwrap().into();
-                    progress_bar.inc(1);
-                    run
-                })
-                .collect();
-        });
+        let mut traces = (0..number_of_traces)
+            .into_par_iter()
+            .map(|_| {
+                let run = PartiallyOrderedRun::new_random(self).unwrap().into();
+                progress_bar.inc(1);
+                run
+            })
+            .collect();
 
         progress_bar.finish_and_clear();
 
@@ -109,7 +103,6 @@ where
 {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage> {
         if let Some(initial_state) = self.get_initial_state() {
-
             //We need to ensure that we don't get stuck in a livelock.
             //Strategy: check it every 1000 states.
             let mut maybe_livelock_cache: Option<Box<dyn LiveLockCache<LivState = State>>> = None;

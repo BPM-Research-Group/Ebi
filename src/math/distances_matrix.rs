@@ -8,7 +8,8 @@
 ))]
 use ebi_objects::ebi_arithmetic::malachite::Natural;
 use ebi_objects::{
-    FiniteStochasticPartiallyOrderedLanguage, ebi_arithmetic::{Fraction, Zero},
+    FiniteStochasticPartiallyOrderedLanguage,
+    ebi_arithmetic::{Fraction, Zero},
 };
 #[cfg(any(
     all(
@@ -59,12 +60,6 @@ impl WeightedDistanceMatrix {
     {
         log::info!("Compute distances");
 
-        // Pre-allocate the entire matrix
-        let mut distances = Vec::with_capacity(lang_a.number_of_traces());
-
-        // Create thread pool with custom configuration
-        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
-
         // Create weights vectors
         let weights_a = lang_a.iter_probabilities().cloned().collect();
         let weights_b = lang_b.iter_probabilities().cloned().collect();
@@ -76,22 +71,20 @@ impl WeightedDistanceMatrix {
         );
 
         // Compute in chunks for better cache utilisation
-        pool.install(|| {
-            distances = lang_a
-                .par_iter_traces()
-                .map(|trace_a| {
-                    let row: Vec<Fraction> = lang_b
-                        .par_iter_traces()
-                        .map(|trace_b| {
-                            let result = levenshtein::normalised(trace_a, trace_b);
-                            progress_bar.inc(1);
-                            result
-                        })
-                        .collect();
-                    row
-                })
-                .collect();
-        });
+        let distances = lang_a
+            .par_iter_traces()
+            .map(|trace_a| {
+                let row: Vec<Fraction> = lang_b
+                    .par_iter_traces()
+                    .map(|trace_b| {
+                        let result = levenshtein::normalised(trace_a, trace_b);
+                        progress_bar.inc(1);
+                        result
+                    })
+                    .collect();
+                row
+            })
+            .collect();
 
         progress_bar.finish_and_clear();
 
@@ -107,7 +100,11 @@ impl WeightedDistanceMatrix {
         weights_b: Vec<Fraction>,
         distances: Vec<Vec<Fraction>>,
     ) -> Self {
-        Self { weights_a, weights_b, distances }
+        Self {
+            weights_a,
+            weights_b,
+            distances,
+        }
     }
 
     pub fn from_partially_ordered_languages(
@@ -115,12 +112,6 @@ impl WeightedDistanceMatrix {
         lang_b: &FiniteStochasticPartiallyOrderedLanguage,
     ) -> Self {
         log::info!("Compute partially ordered - partially ordered distances.");
-
-        // Pre-allocate the entire matrix
-        let mut distances = Vec::with_capacity(lang_a.number_of_traces());
-
-        // Create thread pool with custom configuration
-        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
 
         // Create weights vectors
         let weights_a = lang_a.probabilities.clone();
@@ -133,25 +124,22 @@ impl WeightedDistanceMatrix {
         );
 
         // Compute in chunks for better cache utilisation
-        pool.install(|| {
-            distances = lang_a
-                .traces
-                .par_iter()
-                .map(|trace_a| {
-                    let row: Vec<Fraction> = lang_b
-                        .traces
-                        .par_iter()
-                        .map(|trace_b| {
-                            let distance =
-                                trace_a.normalised_partially_ordered_trace_distance(trace_b);
-                            progress_bar.inc(1);
-                            distance
-                        })
-                        .collect();
-                    row
-                })
-                .collect();
-        });
+        let distances = lang_a
+            .traces
+            .par_iter()
+            .map(|trace_a| {
+                let row: Vec<Fraction> = lang_b
+                    .traces
+                    .par_iter()
+                    .map(|trace_b| {
+                        let distance = trace_a.normalised_partially_ordered_trace_distance(trace_b);
+                        progress_bar.inc(1);
+                        distance
+                    })
+                    .collect();
+                row
+            })
+            .collect();
 
         progress_bar.finish_and_clear();
 
@@ -171,12 +159,6 @@ impl WeightedDistanceMatrix {
     {
         log::info!("Compute distances");
 
-        // Pre-allocate the entire matrix
-        let mut distances = Vec::with_capacity(lang_a.number_of_traces());
-
-        // Create thread pool with custom configuration
-        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
-
         // Create weights vectors
         let weights_a = lang_a.iter_probabilities().cloned().collect();
         let weights_b = lang_b.probabilities.clone();
@@ -188,24 +170,21 @@ impl WeightedDistanceMatrix {
         );
 
         // Compute in chunks for better cache utilisation
-        pool.install(|| {
-            distances = lang_a
-                .par_iter_traces()
-                .map(|trace_a| {
-                    let row: Vec<Fraction> = lang_b
-                        .traces
-                        .par_iter()
-                        .map(|trace_b| {
-                            let distance =
-                                trace_a.normalised_partially_ordered_trace_distance(trace_b);
-                            progress_bar.inc(1);
-                            distance
-                        })
-                        .collect();
-                    row
-                })
-                .collect();
-        });
+        let distances = lang_a
+            .par_iter_traces()
+            .map(|trace_a| {
+                let row: Vec<Fraction> = lang_b
+                    .traces
+                    .par_iter()
+                    .map(|trace_b| {
+                        let distance = trace_a.normalised_partially_ordered_trace_distance(trace_b);
+                        progress_bar.inc(1);
+                        distance
+                    })
+                    .collect();
+                row
+            })
+            .collect();
 
         progress_bar.finish_and_clear();
 

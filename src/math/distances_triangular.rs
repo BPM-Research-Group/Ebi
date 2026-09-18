@@ -54,9 +54,6 @@ impl WeightedTriangularDistanceMatrix {
     {
         log::info!("Compute triangular distances");
 
-        // Create thread pool with custom configuration
-        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
-
         // Create weights vectors
         let weights_a = lang.iter_probabilities().cloned().collect::<Vec<_>>();
         let weights_b = weights_a.clone();
@@ -71,24 +68,21 @@ impl WeightedTriangularDistanceMatrix {
         );
 
         // Compute in chunks for better cache utilisation
-        let mut distances = vec![];
-        pool.install(|| {
-            distances = lang
-                .par_iter_traces()
-                .take(lang.number_of_traces() - 1)
-                .map(|trace_a| {
-                    let row: Vec<Arc<Fraction>> = lang
-                        .par_iter_traces()
-                        .map(|trace_b| {
-                            let result = levenshtein::normalised(trace_a, trace_b);
-                            progress_bar.inc(1);
-                            Arc::new(result)
-                        })
-                        .collect();
-                    row
-                })
-                .collect::<Vec<_>>()
-        });
+        let distances = lang
+            .par_iter_traces()
+            .take(lang.number_of_traces() - 1)
+            .map(|trace_a| {
+                let row: Vec<Arc<Fraction>> = lang
+                    .par_iter_traces()
+                    .map(|trace_b| {
+                        let result = levenshtein::normalised(trace_a, trace_b);
+                        progress_bar.inc(1);
+                        Arc::new(result)
+                    })
+                    .collect();
+                row
+            })
+            .collect::<Vec<_>>();
 
         // log::debug!("distances {:?}", distances);
 
@@ -111,9 +105,6 @@ impl WeightedTriangularDistanceMatrix {
 
         let traces = it.collect::<Vec<_>>();
 
-        // Create thread pool with custom configuration
-        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
-
         //create weight vectors
         let sum_cardinality = traces
             .iter()
@@ -126,23 +117,20 @@ impl WeightedTriangularDistanceMatrix {
         let weights_b = weights_a.clone();
 
         // Compute in chunks for better cache utilisation
-        let mut distances = vec![];
-        pool.install(|| {
-            distances = traces
-                .par_iter()
-                .take(traces.len() - 1)
-                .map(|trace_a| {
-                    let row: Vec<Arc<Fraction>> = traces
-                        .par_iter()
-                        .map(|trace_b| {
-                            let result = levenshtein::normalised(trace_a.0, trace_b.0);
-                            Arc::new(result)
-                        })
-                        .collect();
-                    row
-                })
-                .collect::<Vec<_>>()
-        });
+        let distances = traces
+            .par_iter()
+            .take(traces.len() - 1)
+            .map(|trace_a| {
+                let row: Vec<Arc<Fraction>> = traces
+                    .par_iter()
+                    .map(|trace_b| {
+                        let result = levenshtein::normalised(trace_a.0, trace_b.0);
+                        Arc::new(result)
+                    })
+                    .collect();
+                row
+            })
+            .collect::<Vec<_>>();
 
         Self {
             weights_a,
@@ -154,9 +142,6 @@ impl WeightedTriangularDistanceMatrix {
 
     pub fn new_from_event_log_trace_attributes(log: &dyn EbiTraitEventLogTraceAttributes) -> Self {
         log::info!("Compute triangular distances");
-
-        // Create thread pool with custom configuration
-        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
 
         // Create weights vectors
         let weights_a =
@@ -173,24 +158,21 @@ impl WeightedTriangularDistanceMatrix {
         );
 
         // Compute in chunks for better cache utilisation
-        let mut distances = vec![];
-        pool.install(|| {
-            distances = log
-                .par_iter_traces()
-                .take(log.number_of_traces() - 1)
-                .map(|trace_a| {
-                    let row: Vec<Arc<Fraction>> = log
-                        .par_iter_traces()
-                        .map(|trace_b| {
-                            let result = levenshtein::normalised(trace_a, trace_b);
-                            progress_bar.inc(1);
-                            Arc::new(result)
-                        })
-                        .collect();
-                    row
-                })
-                .collect::<Vec<_>>()
-        });
+        let distances = log
+            .par_iter_traces()
+            .take(log.number_of_traces() - 1)
+            .map(|trace_a| {
+                let row: Vec<Arc<Fraction>> = log
+                    .par_iter_traces()
+                    .map(|trace_b| {
+                        let result = levenshtein::normalised(trace_a, trace_b);
+                        progress_bar.inc(1);
+                        Arc::new(result)
+                    })
+                    .collect();
+                row
+            })
+            .collect::<Vec<_>>();
 
         // log::debug!("distances {:?}", distances);
 
