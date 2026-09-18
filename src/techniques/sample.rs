@@ -81,7 +81,7 @@ impl PartiallyOrderedSampler for StochasticBusinessProcessModelAndNotation {
 
         let progress_bar = EbiCommand::get_progress_bar_ticks(number_of_traces);
 
-        let mut traces = (0..number_of_traces)
+        let traces = (0..number_of_traces)
             .into_par_iter()
             .map(|_| {
                 let run = PartiallyOrderedRun::new_random(self).unwrap().into();
