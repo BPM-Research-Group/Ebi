@@ -96,7 +96,6 @@ num-bigint = { version = "0.4.6", optional = true }
 wasm-bindgen = { version = "0.2.127", optional = true }
 js-sys = { version = "0.3.104", optional = true }
 console_error_panic_hook = { version = "0.1.7", optional = true }
-csv = "1.4.0"
 
 [profile.release]
 debug = false

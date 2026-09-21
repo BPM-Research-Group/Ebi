@@ -2,7 +2,7 @@ use std::collections::{HashMap, HashSet};
 
 use ebi_objects::{
     Activity, AutomatonState, EventLog, FiniteStochasticLanguage, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, ebi_arithmetic::{
-    Fraction, One, Signed, f, f_a, fraction::{approximate::Approximate, fraction_f64::FractionF64}, set_exact_globally,
+    Fraction, One, Signed, f, fraction::{approximate::Approximate}, set_exact_globally,
     },
 };
 use ebi_optimisation::anyhow::Result;
@@ -10,16 +10,18 @@ use rand::{RngExt, prelude::SliceRandom};
 use rayon::prelude::*;
 use rustc_hash::FxHashMap;
 
-use crate::ebi_traits::{
+use crate::{ebi_traits::{
     ebi_trait_event_log::EbiTraitEventLog,
     ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-};
+}};
 use crate::techniques::{
     alergia::{FrequencyPrefixTree, alergia_gaspd},
     earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
     entropic_relevance::EntropicRelvance,
     sample::Sampler,
+    select::select,
+    select::Preference,
 };
 
 
@@ -34,14 +36,14 @@ const FILTER_FACTOR_RESOLUTION_DIGITS: u32 = 6;
 /// One candidate ALERGIA parameter setting plus its stochastic conformance scores.
 /// `relevance == -1` means "not yet evaluated".
 #[derive(Debug, Clone, PartialEq)]
-struct Entry {
+pub struct Entry {
     confidence_factor: Fraction,
-    relevance: FractionF64,
-    adhesion: Fraction,
+    pub relevance: Fraction,
+    pub adhesion: Fraction,
     filter_frequency: Fraction,
     generation: usize,
     min_visits: usize,
-    simplicity: usize,
+    pub simplicity: usize,
 }
 
 
@@ -70,7 +72,7 @@ impl Entry {
             population.push(Entry {
                 confidence_factor,
                 adhesion: f!(0),
-                relevance: f_a!(-1),
+                relevance: f!(-1),
                 filter_frequency,
                 generation: 0,
                 min_visits,
@@ -87,20 +89,24 @@ pub trait Gaspd {
         generation_limit: usize,
         number_of_parents: usize,
         population_size: usize,
-    ) -> Result<String>;
+        w_s: Fraction,
+        w_r: Fraction
+    ) -> Result<StochasticDirectlyFollowsModel>;
 }
 
 /// Runs the GASPD genetic search and returns the final Pareto-optimal
-/// models as CSV.
+/// model according to the specified weights.
 impl Gaspd for dyn EbiTraitEventLog {
     fn gaspd(
         &mut self,
         generation_limit: usize,
         number_of_parents: usize,
         population_size: usize,
-    ) -> Result<String> {
-
+        w_s: Fraction,
+        w_r: Fraction,
+    ) -> Result<StochasticDirectlyFollowsModel> {
         set_exact_globally(false);
+        let preference = Preference::new(w_s, w_r)?;
         let event_log = convert_trait_to_log(self);
         let test_lang = convert_trait_to_finite_stochastic_language(self);
         //test_log.translate_using_activity_key(&mut event_log.activity_key);
@@ -130,9 +136,11 @@ impl Gaspd for dyn EbiTraitEventLog {
         
         let unique_frontier = dedup_frontier(population);
         let model_list: Vec<StochasticDirectlyFollowsModel> = create_concrete_models(&unique_frontier, &event_log);
-        let content = archive_to_csv_for_sdfm(&unique_frontier, &Some(model_list));
+        //let content = archive_to_csv_for_sdfm(&unique_frontier, &Some(model_list));
         
-        Ok(content) 
+        let model = select(model_list, unique_frontier, preference).unwrap_or_else(|| panic!("Error: no candidates to select from"));     
+        
+        Ok(model) 
 
     }   
 }
@@ -171,7 +179,7 @@ pub fn convert_trait_to_finite_stochastic_language(log: &mut dyn EbiTraitEventLo
 
     fslang
 }
-
+/* 
 /// Standard CSV field escaping (wraps in quotes, doubles embedded quotes).
 fn csv_escape(field: &str) -> String {
     format!("\"{}\"", field.replace('"', "\"\""))
@@ -211,6 +219,7 @@ fn archive_to_csv_for_sdfm(archive: &[Entry], models: &Option<Vec<StochasticDire
 
     out
 }
+*/
 
 /// Hashable key for a candidate's parameters, used for dedup/`seen` sets.
 fn param_key(confidence_factor: &Fraction, filter_frequency: &Fraction, min_visits: usize) -> (u64, u64, u64) {
@@ -274,7 +283,7 @@ fn dedup_frontier(frontier: Vec<Entry>) -> Vec<Entry> {
     frontier
         .into_iter()
         .filter(|e| {
-            let key = (f_a!(e.relevance.clone()) * f_a!(1000), e.simplicity);
+            let key = (f!(e.relevance.clone()) * f!(1000), e.simplicity);
             seen.insert(key)
         })
         .collect()
@@ -318,12 +327,12 @@ fn select_parallel(
         .iter()
         .enumerate()
         .filter(|(_, entry)| {
-            entry.relevance == f_a!(-1)
+            entry.relevance == f!(-1)
         })
         .map(|(i, _)| i)
         .collect();
 
-    let results: Vec<(usize, usize, FractionF64, Fraction)> = to_evaluate
+    let results: Vec<(usize, usize, Fraction, Fraction)> = to_evaluate
         .par_iter()
         .map(|&i| {
             let entry = &population[i];
@@ -337,6 +346,7 @@ fn select_parallel(
         population[i].relevance = er.clone();
         population[i].adhesion = em.clone();
     }
+    population.retain(|e| e.relevance != f!(-1));
     archive.extend(population.clone());
 }
 /// Computes an SDFM's "simplicity" size of the ouput type SDFM directly from the SDFA, without
@@ -379,7 +389,7 @@ fn retain_elite_parallel(
     archive: &mut Vec<Entry>,
 )
 {
-    let results: Vec<(usize, usize, FractionF64, Fraction)> = offspring
+    let results: Vec<(usize, usize, Fraction, Fraction)> = offspring
         .par_iter()
         .enumerate()
         .map(|(i, entry)| {
@@ -396,7 +406,7 @@ fn retain_elite_parallel(
 
     let evaluated_u: Vec<Entry> = offspring
         .iter()
-        .filter(|e| e.relevance != f_a!(-1))
+        .filter(|e| e.relevance != f!(-1))
         .cloned()
         .collect();
 
@@ -411,13 +421,13 @@ fn retain_elite_parallel(
 /// Scores one candidate by rebuilding its SDFA via ALERGIA and computing
 /// its simplicity, entropic relevance, and earth movers' stochastic
 /// conformance against the reference language.
-fn evaluate_entry(entry: &Entry, log: &EventLog, lang: &FiniteStochasticLanguage) -> (usize, FractionF64, Fraction) {
+fn evaluate_entry(entry: &Entry, log: &EventLog, lang: &FiniteStochasticLanguage) -> (usize, Fraction, Fraction) {
     set_exact_globally(false);
     let sdfa = alergia_gaspd(&entry.confidence_factor, &entry.filter_frequency, log.clone(), entry.min_visits).unwrap();
     let mut trait_fslang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(lang.clone());
     let size = derived_sdfm_detail(&sdfa);
     let model: Box<dyn EbiTraitQueriableStochasticLanguage> = Box::new(sdfa.clone());
-    let er = trait_fslang.entropic_relevance(model).ok().and_then(|lp| lp.approximate().ok()).map(|v| f_a!(v)).unwrap_or(f_a!(0));
+    let er = trait_fslang.entropic_relevance(model).ok().and_then(|lp| lp.approximate().ok()).and_then(|v| v.to_string().parse::<Fraction>().ok()).unwrap_or(f!(-1));
     let mut slang: FiniteStochasticLanguage = sdfa.sample(200).unwrap();
     let em = trait_fslang.earth_movers_stochastic_conformance(&mut slang).unwrap();
     (size, er, em)
@@ -465,7 +475,7 @@ fn crossover_mutation(
 
         crossover_children.push(Entry {
             confidence_factor: p1.confidence_factor.clone(),
-            relevance: f_a!(-1),
+            relevance: f!(-1),
             adhesion: f!(0),
             filter_frequency: p2.filter_frequency.clone(),
             generation,
@@ -475,7 +485,7 @@ fn crossover_mutation(
         crossover_children.push(Entry {
             adhesion: f!(0),
             confidence_factor: p2.confidence_factor.clone(),
-            relevance: f_a!(-1),
+            relevance: f!(-1),
             filter_frequency: p1.filter_frequency.clone(),
             generation,
             min_visits: p1.min_visits,
@@ -485,7 +495,7 @@ fn crossover_mutation(
         crossover_children.push(Entry {
             adhesion: f!(0),
             confidence_factor: p1.confidence_factor.clone(),
-            relevance: f_a!(-1),
+            relevance: f!(-1),
             filter_frequency: p2.filter_frequency.clone(),
             generation,
             min_visits: p1.min_visits,
@@ -494,7 +504,7 @@ fn crossover_mutation(
         crossover_children.push(Entry {
             adhesion: f!(0),
             confidence_factor: p2.confidence_factor.clone(),
-            relevance: f_a!(-1),
+            relevance: f!(-1),
             filter_frequency: p1.filter_frequency.clone(),
             generation,
             min_visits: p2.min_visits,
@@ -504,7 +514,7 @@ fn crossover_mutation(
         crossover_children.push(Entry {
             adhesion: f!(0),
             confidence_factor: p1.confidence_factor.clone(),
-            relevance: f_a!(-1),
+            relevance: f!(-1),
             filter_frequency: p1.filter_frequency.clone(),
             generation,
             min_visits: p2.min_visits,
@@ -513,7 +523,7 @@ fn crossover_mutation(
         crossover_children.push(Entry {
             adhesion: f!(0),
             confidence_factor: p2.confidence_factor.clone(),
-            relevance: f_a!(-1),
+            relevance: f!(-1),
             filter_frequency: p2.filter_frequency.clone(),
             generation,
             min_visits: p1.min_visits,
@@ -525,7 +535,7 @@ fn crossover_mutation(
         .iter()
         .map(|e| Entry {
             confidence_factor: mutate_confidence_factor(&e.confidence_factor, &mut rng),
-            relevance: f_a!(-1),
+            relevance: f!(-1),
             adhesion: f!(0),
             filter_frequency: mutate_filter_frequency(&e.filter_frequency, &mut rng),
             generation,
@@ -538,6 +548,7 @@ fn crossover_mutation(
     offspring.extend(mutated);
     offspring
 }
+
 /// Perturbs `current` by a random rational step of at most `half_range_units`
 /// with `1 / 10^resolution_digits` resolution, clamped to `[lower_bound, upper_bound]`.
 fn mutate_fraction(
