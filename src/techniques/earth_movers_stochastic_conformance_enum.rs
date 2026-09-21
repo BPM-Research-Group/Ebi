@@ -51,7 +51,7 @@ impl dyn WeightedDistances {
         if is_exact_globally() {
             //exact mode
             // 2. Is exact arithmetic required?
-            log::info!("Calculating exact EMSC value");
+            // log::info!("Calculating exact EMSC value");
             // 2a. Calculate the Least Common Multiple (LCM) of all denominators of distances (i.e. the elements in the DistanceMatrix).
             let lcm_distances = self.lowest_common_multiple_denominators_distances()?;
             let lcm_probabilities = self.lowest_common_multiple_denominators_weights()?;
@@ -64,11 +64,11 @@ impl dyn WeightedDistances {
             let lcm_probability_fraction =
                 FractionEnum::Exact(Rational::from(lcm_probabilities.clone()));
 
-            log::debug!(
-                "LCM of distances: {:?} \n LCM of probabilities {:?}",
-                lcm_distances,
-                lcm_probabilities
-            );
+            // log::debug!(
+            //     "LCM of distances: {:?} \n LCM of probabilities {:?}",
+            //     lcm_distances,
+            //     lcm_probabilities
+            // );
 
             // 2c. If the LCMs are within the range of i64, use i64 for the NetworkSimplex computation (remains exact but faster). Otherwise use BigInt.
             if lcm_probabilities <= Integer::from(i64::MAX)
@@ -76,7 +76,7 @@ impl dyn WeightedDistances {
                     * Integer::from(n + m)
                     <= Integer::from(i64::MAX)
             {
-                log::info!("Using i64 for NetworkSimplex computation.");
+                // log::info!("Using i64 for NetworkSimplex computation.");
 
                 // (i64) 2e. Create a network graph with the scaled distances and probabilities:
                 // (i64) 2e(i). For each trace in the first language, create a supply node with the corresponding trace probability as supply.
@@ -126,7 +126,7 @@ impl dyn WeightedDistances {
                 }
 
                 // (i64) 2f. Run the NetworkSimplex algorithm to find the optimal flow between the supply and demand nodes.
-                log::info!("Starting Network Simplex.");
+                // log::info!("Starting Network Simplex.");
                 let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, false, false);
 
                 ns.run(false);
@@ -135,7 +135,7 @@ impl dyn WeightedDistances {
                     .get_bigint_result()
                     .context("NetworkSimplex did not return a result, cannot calculate EMSC")?;
 
-                log::debug!("NetworkSimplex result: {:?}", ns_result);
+                // log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // (i64) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
                 let mut result = FractionEnum::one();
@@ -150,7 +150,7 @@ impl dyn WeightedDistances {
                     * Integer::from(n + m)
                     <= Integer::from(i128::MAX)
             {
-                log::info!("Using i128 for NetworkSimplex computation.");
+                // log::info!("Using i128 for NetworkSimplex computation.");
 
                 // (i128) 2e. Create a network graph with the scaled distances and probabilities:
                 // (i128) 2e(i). For each trace in the first language, create a supply node with the corresponding trace probability as supply.
@@ -200,7 +200,7 @@ impl dyn WeightedDistances {
                 }
 
                 // 2f. Run the NetworkSimplex algorithm to find the optimal flow between the supply and demand nodes.
-                log::info!("Starting Network Simplex.");
+                // log::info!("Starting Network Simplex.");
                 let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, false, false);
 
                 ns.run(false);
@@ -208,7 +208,7 @@ impl dyn WeightedDistances {
                 let ns_result = ns
                     .get_bigint_result()
                     .context("NetworkSimplex did not return a result, cannot calculate EMSC")?;
-                log::debug!("NetworkSimplex result: {:?}", ns_result);
+                // log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // (i128) 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
                 let mut result = FractionEnum::one();
@@ -219,7 +219,7 @@ impl dyn WeightedDistances {
 
                 return Ok(result);
             } else {
-                log::info!("Using BigInt for NetworkSimplex computation.");
+                // log::info!("Using BigInt for NetworkSimplex computation.");
 
                 // (BigInt) 2e. Create a network graph with the scaled distances and probabilities:
                 // (BigInt) 2e(i). For each trace in the first language, create a supply node with the corresponding trace probability as supply.
@@ -260,7 +260,7 @@ impl dyn WeightedDistances {
                 }
 
                 // 2f. Run the NetworkSimplex algorithm to find the optimal flow between the supply and demand nodes.
-                log::info!("Starting Network Simplex.");
+                // log::info!("Starting Network Simplex.");
                 let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, false, false);
 
                 ns.run(false);
@@ -268,7 +268,7 @@ impl dyn WeightedDistances {
                 let ns_result = ns
                     .get_result()
                     .context("NetworkSimplex did not return a result, cannot calculate EMSC")?;
-                log::debug!("NetworkSimplex result: {:?}", ns_result);
+                // log::debug!("NetworkSimplex result: {:?}", ns_result);
 
                 // 2g. Calculate the EMSC value as 1 - (result / (LCM of distances * LCM of probabilities)) (i.e. undo the scaling trick).
                 let mut result = FractionEnum::one();
@@ -285,9 +285,9 @@ impl dyn WeightedDistances {
             //not applicable in this compilation mode
 
             // 3. Exact arithmetic is not required, use f64 for the NetworkSimplex computation.
-            log::info!(
-                "Calculating approximate EMSC value. Using f64 for NetworkSimplex computation."
-            );
+            // log::info!(
+            //     "Calculating approximate EMSC value. Using f64 for NetworkSimplex computation."
+            // );
 
             // 3a. Create a network graph with the scaled distances and probabilities:
             let n = self.len_a();
@@ -320,7 +320,7 @@ impl dyn WeightedDistances {
 
             // 3b. Run the NetworkSimplex algorithm to find the optimal flow between the supply and demand nodes.
             let mut ns = NetworkSimplex::new(&graph_and_costs, &supply, false, true);
-            log::info!("Starting Network Simplex.");
+            // log::info!("Starting Network Simplex.");
 
             ns.run(true);
 
@@ -340,7 +340,7 @@ impl dyn WeightedDistances {
                 }
             };
 
-            log::debug!("NetworkSimplex result: {:?}", ns_result);
+            // log::debug!("NetworkSimplex result: {:?}", ns_result);
             // 3c. Calculate the EMSC value as 1 - result.
             let result = 1.0 - ns_result;
 

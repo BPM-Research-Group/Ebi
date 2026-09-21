@@ -187,6 +187,7 @@ pub mod techniques {
     pub mod align;
     pub mod alignment_stochastic_miner;
     pub mod alergia;
+    pub mod cohort_analysis;
     pub mod any_traces;
     pub mod association;
     pub mod bootstrap_test;

@@ -292,7 +292,7 @@ mod tests {
         let mut slpn2 = slpn.clone();
         let mut slpn: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slpn);
         let (_, sustain) = slpn
-            .bootstrap_test(&mut slpn2, 1, &Fraction::from((1, 20)))
+            .bootstrap_test(&mut slpn2, 100, &Fraction::from((1, 20)))
             .unwrap();
         assert!(sustain);
     }

@@ -9,8 +9,11 @@ use std::sync::Arc;
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use ebi_objects::ebi_arithmetic::malachite::Natural;
-use ebi_objects::ebi_arithmetic::{Fraction, Zero};
-use rayon::iter::{IndexedParallelIterator, ParallelIterator};
+use ebi_objects::{
+    Activity,
+    ebi_arithmetic::{Fraction, Recip, Zero},
+};
+use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
 #[cfg(any(
     all(
@@ -24,7 +27,10 @@ use ebi_objects::ebi_arithmetic::exact::MaybeExact;
 
 use crate::{
     ebi_framework::ebi_command::EbiCommand,
-    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    ebi_traits::{
+        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    },
     math::{distances::WeightedDistances, levenshtein},
 };
 
@@ -33,7 +39,7 @@ use crate::{
  * Computes each distance once, and supports changing the weights of the language in the comparison with itself.
  * Cloning will not clone the distances, but will clone the weights, which can be changed.
  */
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct WeightedTriangularDistanceMatrix {
     weights_a: Vec<Fraction>,
     weights_b: Vec<Fraction>,
@@ -42,14 +48,11 @@ pub struct WeightedTriangularDistanceMatrix {
 }
 
 impl WeightedTriangularDistanceMatrix {
-    pub fn new<L>(lang: &mut L) -> Self
+    pub fn new<L>(lang: &L) -> Self
     where
         L: EbiTraitFiniteStochasticLanguage + ?Sized,
     {
         log::info!("Compute triangular distances");
-
-        // Create thread pool with custom configuration
-        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
 
         // Create weights vectors
         let weights_a = lang.iter_probabilities().cloned().collect::<Vec<_>>();
@@ -65,24 +68,111 @@ impl WeightedTriangularDistanceMatrix {
         );
 
         // Compute in chunks for better cache utilisation
-        let mut distances = vec![];
-        pool.install(|| {
-            distances = lang
-                .par_iter_traces()
-                .take(lang.number_of_traces() - 1)
-                .map(|trace_a| {
-                    let row: Vec<Arc<Fraction>> = lang
-                        .par_iter_traces()
-                        .map(|trace_b| {
-                            let result = levenshtein::normalised(trace_a, trace_b);
-                            progress_bar.inc(1);
-                            Arc::new(result)
-                        })
-                        .collect();
-                    row
-                })
-                .collect::<Vec<_>>()
-        });
+        let distances = lang
+            .par_iter_traces()
+            .take(lang.number_of_traces() - 1)
+            .map(|trace_a| {
+                let row: Vec<Arc<Fraction>> = lang
+                    .par_iter_traces()
+                    .map(|trace_b| {
+                        let result = levenshtein::normalised(trace_a, trace_b);
+                        progress_bar.inc(1);
+                        Arc::new(result)
+                    })
+                    .collect();
+                row
+            })
+            .collect::<Vec<_>>();
+
+        // log::debug!("distances {:?}", distances);
+
+        progress_bar.finish_and_clear();
+
+        Self {
+            weights_a,
+            weights_b,
+            distances,
+            zero: Arc::new(Fraction::zero()),
+        }
+    }
+
+    //distances for an iterator (trace, cardinality)
+    pub fn new_from_iterator<'a, I>(it: I) -> Self
+    where
+        I: Iterator<Item = (&'a Vec<Activity>, &'a u64)> + Send + Clone + Sync,
+    {
+        log::info!("Compute triangular distances");
+
+        let traces = it.collect::<Vec<_>>();
+
+        //create weight vectors
+        let sum_cardinality = traces
+            .iter()
+            .map(|(_, cardinality)| *cardinality)
+            .sum::<u64>();
+        let weights_a = traces
+            .iter()
+            .map(|(_, cardinality)| Fraction::from((**cardinality, sum_cardinality)))
+            .collect::<Vec<_>>();
+        let weights_b = weights_a.clone();
+
+        // Compute in chunks for better cache utilisation
+        let distances = traces
+            .par_iter()
+            .take(traces.len() - 1)
+            .map(|trace_a| {
+                let row: Vec<Arc<Fraction>> = traces
+                    .par_iter()
+                    .map(|trace_b| {
+                        let result = levenshtein::normalised(trace_a.0, trace_b.0);
+                        Arc::new(result)
+                    })
+                    .collect();
+                row
+            })
+            .collect::<Vec<_>>();
+
+        Self {
+            weights_a,
+            weights_b,
+            distances,
+            zero: Arc::new(Fraction::zero()),
+        }
+    }
+
+    pub fn new_from_event_log_trace_attributes(log: &dyn EbiTraitEventLogTraceAttributes) -> Self {
+        log::info!("Compute triangular distances");
+
+        // Create weights vectors
+        let weights_a =
+            vec![Fraction::from(log.number_of_traces()).recip(); log.number_of_traces()];
+        let weights_b = weights_a.clone();
+
+        // log::debug!("weights_a {:?}", weights_a);
+        // log::debug!("weights_b {:?}", weights_b);
+
+        let progress_bar = EbiCommand::get_progress_bar_ticks(
+            (log.number_of_traces() * log.number_of_traces())
+                .try_into()
+                .unwrap(),
+        );
+
+        // Compute in chunks for better cache utilisation
+        let distances = log
+            .par_iter_traces()
+            .take(log.number_of_traces() - 1)
+            .map(|trace_a| {
+                let row: Vec<Arc<Fraction>> = log
+                    .par_iter_traces()
+                    .map(|trace_b| {
+                        let result = levenshtein::normalised(trace_a, trace_b);
+                        progress_bar.inc(1);
+                        Arc::new(result)
+                    })
+                    .collect();
+                row
+            })
+            .collect::<Vec<_>>();
 
         // log::debug!("distances {:?}", distances);
 
@@ -123,13 +213,15 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
     }
 
     fn distance(&self, index_a: usize, index_b: usize) -> &Fraction {
-        // log::debug!("distance {}, {}", index_a, index_b);
         if index_a == index_b {
+            // println!("distance {}, {}: zero", index_a, index_b);
             &self.zero
         } else if index_a < index_b {
-            &self.distances[index_a][index_b - 1]
+            // println!("distance {}, {}: {}", index_a, index_b, self.distances[index_a][index_b]);
+            &self.distances[index_a][index_b]
         } else {
-            &self.distances[index_b][index_a - 1]
+            // println!("distance {}, {}: {}", index_a, index_b, self.distances[index_b][index_a]);
+            &self.distances[index_b][index_a]
         }
     }
 
@@ -141,6 +233,13 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
         Box::new(Clone::clone(self))
     }
 
+    fn clone_weights_zero(&self) -> Box<dyn WeightedDistances> {
+        let mut result = Clone::clone(self);
+        result.weights_a.fill(Fraction::zero());
+        result.weights_b.fill(Fraction::zero());
+        Box::new(result)
+    }
+
     #[cfg(any(
         all(
             not(feature = "eexactarithmetic"),
@@ -149,7 +248,9 @@ impl WeightedDistances for WeightedTriangularDistanceMatrix {
         all(feature = "eexactarithmetic", feature = "eapproximatearithmetic"),
         all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
-    fn lowest_common_multiple_denominators_distances(&self) -> ebi_objects::anyhow::Result<Natural> {
+    fn lowest_common_multiple_denominators_distances(
+        &self,
+    ) -> ebi_objects::anyhow::Result<Natural> {
         use ebi_objects::ebi_arithmetic::malachite::base::num::arithmetic::traits::Lcm;
         use ebi_objects::ebi_arithmetic::malachite::base::num::basic::traits::One;
         // 2a. Calculate the Least Common Multiple (LCM) of all denominators of distances (i.e. the elements in the DistanceMatrix).

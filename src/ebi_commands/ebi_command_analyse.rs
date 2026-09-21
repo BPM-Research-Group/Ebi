@@ -8,13 +8,15 @@ use crate::{
     },
     ebi_traits::{
         ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics,
     },
     techniques::{
-        completeness::Completeness, edge_difference::EdgeDifference, entropy::Entropy, medoid,
-        probability_queries::ProbabilityQueries, process_variety::ProcessVariety, 
-        edge_difference_no_freq::EdgeDifferenceNoFrequencies,
+        cohort_analysis::CohortAnalysis, completeness::Completeness,
+        edge_difference::EdgeDifference, edge_difference_no_freq::EdgeDifferenceNoFrequencies,
+        entropy::Entropy, medoid, probability_queries::ProbabilityQueries,
+        process_variety::ProcessVariety,
     },
 };
 use ebi_objects::{
@@ -30,6 +32,7 @@ pub const EBI_ANALYSE: EbiCommand = EbiCommand::Group {
     explanation_long: None,
     children: &[
         &EBI_ANALYSE_ALL,
+        &EBI_ANALYSE_COHORT_ANALYSIS,
         &EBI_ANALYSE_COMPLETENESS,
         &EBI_ANALYSE_COVERAGE,
         &EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE,
@@ -84,6 +87,42 @@ pub const EBI_ANALYSE_ALL: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticLanguage),
 };
 
+pub const EBI_ANALYSE_COHORT_ANALYSIS: EbiCommand = EbiCommand::Command {
+    name_short: "ca",
+    name_long: Some("cohort-analysis"),
+    explanation_short: "Returns which trace attribute values correspond with the largest behavioural differences.",
+    explanation_long: Some("Returns which trace attribute values correspond with the largest behavioural differences. Only categorical attributes are supported. A lower EMSC value indicates a larger difference."),
+    latex_link: Some("\\cite{DBLP:conf/er/LeemansS0KSW20}"),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::EventLogTraceAttributes)],
+        &[&EbiInputType::Usize(Some(0), None, Some(10))],
+        &[&EbiInputType::Fraction(
+            Some(ConstFraction::zero()),
+            Some(ConstFraction::one()),
+            Some(ConstFraction::of(1, 20)),
+        )],
+    ],
+    input_names: &["FILE", "RNDSPL", "MINSIZ"],
+    input_helps: &[
+        "An event log with trace attributes.",
+        "The size of cohorts may have an influence on the measured distances. To correct for this, these measures can be scaled by randomly generated cohorts of the same size. This parameter sets the number of such random splits. Set this to 0 to not perform this correction.",
+        "The minimum number of traces per cohort, as a fraction of the total number of traces. In case the cohort (or its complement) contains fewer traces, it is left out.",
+    ],
+    execute: |mut inputs, _| {
+        let log = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitEventLogTraceAttributes>()?;
+        let number_of_random_shuffles = inputs.remove(0).to_type::<usize>()?;
+        let minimum_cohort_size_fraction = inputs.remove(0).to_type::<Fraction>()?;
+        let result =
+            log.cohort_analysis(*number_of_random_shuffles, &minimum_cohort_size_fraction)?;
+        Ok(EbiOutput::String(result.to_string()))
+    },
+    output_type: &EbiOutputType::String,
+};
+
 pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
     name_short: "comp",
     name_long: Some("completeness"),
@@ -96,7 +135,7 @@ pub const EBI_ANALYSE_COMPLETENESS: EbiCommand = EbiCommand::Command {
     input_names: &["FILE"],
     input_helps: &["An event log."],
     execute: |mut objects, _| {
-        let mut log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
+        let log = objects.remove(0).to_type::<dyn EbiTraitEventLog>()?;
 
         let result = log.to_multiset().estimate_completeness();
 
@@ -164,7 +203,8 @@ pub const EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE: EbiCommand = EbiCommand:
     output_type: &EbiOutputType::Fraction,
 };
 
-pub const EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES: EbiCommand = EbiCommand::Command {
+pub const EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES: EbiCommand =
+    EbiCommand::Command {
         name_short: "dfgedi-nf",
         name_long: Some("directly-follows-edge-difference-no-frequencies"),
         explanation_short: "The number of edges that differ between two directly follows graphs, ignoring frequencies.",
@@ -177,7 +217,7 @@ pub const EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES: EbiComman
             &[&EbiInputType::Object(EbiObjectType::DirectlyFollowsGraph)],
         ],
         input_names: &["DFG_1", "DFG_2"],
-        input_helps: &[ "A directly follows graph.", "A directly follows graph."],
+        input_helps: &["A directly follows graph.", "A directly follows graph."],
         execute: |mut objects, _| {
             let mut dfg1 = objects.remove(0).to_type::<DirectlyFollowsGraph>()?;
             let mut dfg2 = objects.remove(0).to_type::<DirectlyFollowsGraph>()?;

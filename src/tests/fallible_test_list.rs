@@ -115,34 +115,6 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &["*", "string some string", "*"],
     ),
     (
-        &EBI_ASSOCIATION_ATTRIBUTES,
-        &[
-            "trait event log with trace attributes#./testfiles/a-b-double.xes",
-            "*",
-        ],
-    ),
-    (
-        &EBI_ASSOCIATION_ATTRIBUTES,
-        &[
-            "trait event log with trace attributes#./testfiles/a-b.xes",
-            "*",
-        ],
-    ),
-    (
-        &EBI_ASSOCIATION_ATTRIBUTES,
-        &[
-            "trait event log with trace attributes#./testfiles/a-b.xes.gz",
-            "*",
-        ],
-    ),
-    (
-        &EBI_ASSOCIATION_ATTRIBUTES,
-        &[
-            "trait event log with trace attributes#./testfiles/oc-log.ocel",
-            "*",
-        ],
-    ),
-    (
         &EBI_CONFORMANCE_CHI_SQUARED_SAMPLE,
         &[
             "*",
@@ -590,6 +562,27 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &[
             "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
             "trait semantics#./testfiles/aa-ab-ba.sdfa",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/aa-ab-ba.sdfm",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/aa-ab-ba.slang",
+        ],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ESCAPING_EDGES_PRECISION,
+        &[
+            "object stochastic language of alignments#./testfiles/aa-ab-ba.sali",
+            "trait semantics#./testfiles/aa-ab-ba.slang.dfm",
         ],
     ),
     (

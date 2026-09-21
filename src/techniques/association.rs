@@ -32,7 +32,7 @@ impl Associations for dyn EbiTraitEventLogTraceAttributes {
         match self.attribute_key().attribute_to_data_type(attribute) {
             Some(d_type) => self.association_type(number_of_samples, attribute, d_type),
             None => Err(anyhow!(
-                "attribute is missing, attribute type is not consistent, or attribute type is not supported"
+                "Attribute is missing, attribute type is not consistent, or attribute type is not supported."
             )),
         }
     }

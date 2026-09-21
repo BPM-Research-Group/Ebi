@@ -9,7 +9,7 @@
 use ebi_objects::ebi_arithmetic::malachite::Natural;
 use ebi_objects::{
     FiniteStochasticPartiallyOrderedLanguage,
-    ebi_arithmetic::Fraction,
+    ebi_arithmetic::{Fraction, Zero},
 };
 #[cfg(any(
     all(
@@ -42,7 +42,7 @@ use crate::{
 /**
  * A standard weighted distance matrix.
  */
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct WeightedDistanceMatrix {
     pub(crate) weights_a: Vec<Fraction>,
     pub(crate) weights_b: Vec<Fraction>,
@@ -53,18 +53,12 @@ impl WeightedDistanceMatrix {
     /**
      * It is the responsibility of the caller to ensure that the two input languages use the same activity key, for instance using `translate_using_activity_key`.
      */
-    pub fn new<L, K>(lang_a: &mut L, lang_b: &mut K) -> Self
+    pub fn new<L, K>(lang_a: &L, lang_b: &K) -> Self
     where
         L: EbiTraitFiniteStochasticLanguage + ?Sized,
         K: EbiTraitFiniteStochasticLanguage + ?Sized,
     {
         log::info!("Compute distances");
-
-        // Pre-allocate the entire matrix
-        let mut distances = Vec::with_capacity(lang_a.number_of_traces());
-
-        // Create thread pool with custom configuration
-        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
 
         // Create weights vectors
         let weights_a = lang_a.iter_probabilities().cloned().collect();
@@ -77,25 +71,35 @@ impl WeightedDistanceMatrix {
         );
 
         // Compute in chunks for better cache utilisation
-        pool.install(|| {
-            distances = lang_a
-                .par_iter_traces()
-                .map(|trace_a| {
-                    let row: Vec<Fraction> = lang_b
-                        .par_iter_traces()
-                        .map(|trace_b| {
-                            let result = levenshtein::normalised(trace_a, trace_b);
-                            progress_bar.inc(1);
-                            result
-                        })
-                        .collect();
-                    row
-                })
-                .collect();
-        });
+        let distances = lang_a
+            .par_iter_traces()
+            .map(|trace_a| {
+                let row: Vec<Fraction> = lang_b
+                    .par_iter_traces()
+                    .map(|trace_b| {
+                        let result = levenshtein::normalised(trace_a, trace_b);
+                        progress_bar.inc(1);
+                        result
+                    })
+                    .collect();
+                row
+            })
+            .collect();
 
         progress_bar.finish_and_clear();
 
+        Self {
+            weights_a,
+            weights_b,
+            distances,
+        }
+    }
+
+    pub fn from_precomputed(
+        weights_a: Vec<Fraction>,
+        weights_b: Vec<Fraction>,
+        distances: Vec<Vec<Fraction>>,
+    ) -> Self {
         Self {
             weights_a,
             weights_b,
@@ -109,12 +113,6 @@ impl WeightedDistanceMatrix {
     ) -> Self {
         log::info!("Compute partially ordered - partially ordered distances.");
 
-        // Pre-allocate the entire matrix
-        let mut distances = Vec::with_capacity(lang_a.number_of_traces());
-
-        // Create thread pool with custom configuration
-        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
-
         // Create weights vectors
         let weights_a = lang_a.probabilities.clone();
         let weights_b = lang_b.probabilities.clone();
@@ -126,25 +124,22 @@ impl WeightedDistanceMatrix {
         );
 
         // Compute in chunks for better cache utilisation
-        pool.install(|| {
-            distances = lang_a
-                .traces
-                .par_iter()
-                .map(|trace_a| {
-                    let row: Vec<Fraction> = lang_b
-                        .traces
-                        .par_iter()
-                        .map(|trace_b| {
-                            let distance =
-                                trace_a.normalised_partially_ordered_trace_distance(trace_b);
-                            progress_bar.inc(1);
-                            distance
-                        })
-                        .collect();
-                    row
-                })
-                .collect();
-        });
+        let distances = lang_a
+            .traces
+            .par_iter()
+            .map(|trace_a| {
+                let row: Vec<Fraction> = lang_b
+                    .traces
+                    .par_iter()
+                    .map(|trace_b| {
+                        let distance = trace_a.normalised_partially_ordered_trace_distance(trace_b);
+                        progress_bar.inc(1);
+                        distance
+                    })
+                    .collect();
+                row
+            })
+            .collect();
 
         progress_bar.finish_and_clear();
 
@@ -164,12 +159,6 @@ impl WeightedDistanceMatrix {
     {
         log::info!("Compute distances");
 
-        // Pre-allocate the entire matrix
-        let mut distances = Vec::with_capacity(lang_a.number_of_traces());
-
-        // Create thread pool with custom configuration
-        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
-
         // Create weights vectors
         let weights_a = lang_a.iter_probabilities().cloned().collect();
         let weights_b = lang_b.probabilities.clone();
@@ -181,24 +170,21 @@ impl WeightedDistanceMatrix {
         );
 
         // Compute in chunks for better cache utilisation
-        pool.install(|| {
-            distances = lang_a
-                .par_iter_traces()
-                .map(|trace_a| {
-                    let row: Vec<Fraction> = lang_b
-                        .traces
-                        .par_iter()
-                        .map(|trace_b| {
-                            let distance =
-                                trace_a.normalised_partially_ordered_trace_distance(trace_b);
-                            progress_bar.inc(1);
-                            distance
-                        })
-                        .collect();
-                    row
-                })
-                .collect();
-        });
+        let distances = lang_a
+            .par_iter_traces()
+            .map(|trace_a| {
+                let row: Vec<Fraction> = lang_b
+                    .traces
+                    .par_iter()
+                    .map(|trace_b| {
+                        let distance = trace_a.normalised_partially_ordered_trace_distance(trace_b);
+                        progress_bar.inc(1);
+                        distance
+                    })
+                    .collect();
+                row
+            })
+            .collect();
 
         progress_bar.finish_and_clear();
 
@@ -245,6 +231,13 @@ impl WeightedDistances for WeightedDistanceMatrix {
 
     fn clone(&self) -> Box<dyn WeightedDistances> {
         Box::new(Clone::clone(self))
+    }
+
+    fn clone_weights_zero(&self) -> Box<dyn WeightedDistances> {
+        let mut result = Clone::clone(self);
+        result.weights_a.fill(Fraction::zero());
+        result.weights_b.fill(Fraction::zero());
+        Box::new(result)
     }
 
     #[cfg(any(

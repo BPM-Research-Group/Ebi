@@ -27,7 +27,7 @@ use std::fmt;
 use std::fmt::Debug;
 use std::{iter::FusedIterator, sync::Arc};
 
-pub trait WeightedDistances: Send + Sync {
+pub trait WeightedDistances: Send + Sync + Debug {
     fn len_a(&self) -> usize;
 
     fn len_b(&self) -> usize;
@@ -45,6 +45,8 @@ pub trait WeightedDistances: Send + Sync {
     fn iter(&self) -> Box<dyn Iterator<Item = (usize, usize, &Fraction)> + '_>;
 
     fn clone(&self) -> Box<dyn WeightedDistances>;
+
+    fn clone_weights_zero(&self) -> Box<dyn WeightedDistances>;
 
     #[cfg(any(
         all(
@@ -259,31 +261,23 @@ impl DistanceMatrix {
         let len_a = lang_a.number_of_traces();
         let len_b = lang_b.number_of_traces();
 
-        // Pre-allocate the entire matrix
-        let mut distances = Vec::with_capacity(len_a);
-
-        // Create thread pool with custom configuration
-        let pool = rayon::ThreadPoolBuilder::new().build().unwrap();
-
         let progress_bar = EbiCommand::get_progress_bar_ticks((len_a * len_b).try_into().unwrap());
 
         // Compute in chunks for better cache utilization
-        pool.install(|| {
-            distances = lang_a
-                .par_iter_traces()
-                .map(|trace_a| {
-                    let row: Vec<Arc<Fraction>> = lang_b
-                        .par_iter_traces()
-                        .map(|trace_b| {
-                            let result = levenshtein::normalised(trace_a, trace_b);
-                            progress_bar.inc(1);
-                            Arc::new(result)
-                        })
-                        .collect();
-                    row
-                })
-                .collect();
-        });
+        let distances = lang_a
+            .par_iter_traces()
+            .map(|trace_a| {
+                let row: Vec<Arc<Fraction>> = lang_b
+                    .par_iter_traces()
+                    .map(|trace_b| {
+                        let result = levenshtein::normalised(trace_a, trace_b);
+                        progress_bar.inc(1);
+                        Arc::new(result)
+                    })
+                    .collect();
+                row
+            })
+            .collect();
 
         progress_bar.finish_and_clear();
 

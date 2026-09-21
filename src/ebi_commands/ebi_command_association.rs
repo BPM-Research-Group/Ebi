@@ -102,15 +102,17 @@ pub const EBI_ASSOCIATION_ATTRIBUTES: EbiCommand = EbiCommand::Command {
         let result = event_log.associations(*number_of_samples);
 
         let mut f = vec![];
-        for (x, y) in result {
-            let y = y?;
-            writeln!(
-                f,
-                "Trace atribute `{}` has an association of approximately {}. Exact value: {:?}",
-                x,
-                &y.approximate(),
-                &y
-            )?;
+        for (attribute, y) in result {
+            match y {
+                Ok(y) => writeln!(
+                    f,
+                    "Trace atribute `{}` has an association of approximately {}. Exact value: {:?}",
+                    attribute,
+                    &y.approximate(),
+                    &y
+                )?,
+                Err(e) => writeln!(f, "Trace atribute `{}` has no association, as {:?}.", attribute, e)?,
+            }
         }
         Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
     },
