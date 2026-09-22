@@ -1,13 +1,11 @@
 finite stochastic language
 # number of traces
 6
-# trace 0
+# trace 5
 # probability
 1/15
 # number of events
-3
-b
-b
+1
 a
 # trace 1
 # probability
@@ -43,6 +41,7 @@ a
 # probability
 1/15
 # number of events
-1
+3
+b
+b
 a
-
