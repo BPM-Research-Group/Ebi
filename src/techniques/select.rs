@@ -1,11 +1,9 @@
+use super::gaspd::Entry;
 use ebi_objects::{
     StochasticDirectlyFollowsModel,
-    anyhow::{Result, anyhow},
-    ebi_arithmetic::{Fraction, One, f},
+    ebi_arithmetic::{Fraction, One, Zero, f},
 };
 use std::fmt::Write;
-
-use super::gaspd::Entry;
 
 /// Holds the normalised objectives for one candidate; 1.0 is best on every objective.
 #[derive(Debug, Clone)]
@@ -17,23 +15,38 @@ pub struct NormalisedEntry {
 
 #[derive(Debug, Clone)]
 pub struct Preference {
-    pub w_s: Fraction, // simplicity
-    pub w_r: Fraction, // relevance
-    pub w_a: Fraction, // remainder, derived: 1 - w_s - w_r
+    pub weight_simplicity: Fraction, // simplicity
+    pub weight_relevance: Fraction,  // relevance
+    pub weight_a: Fraction,          // remainder, derived: 1 - w_s - w_r
 }
 
 impl Preference {
     /// Checks that simplicity + relevance is at most 1, and derives the
     /// remainder weight so all three sum to 1.
-    pub fn new(w_s: Fraction, w_r: Fraction) -> Result<Self> {
-        let sum = &w_s + &w_r;
-        if sum > Fraction::one() {
-            return Err(anyhow!("SIMP + REL must be at most 1"));
+    pub fn new(
+        mut weight_simplicity: Fraction,
+        mut weight_relevance: Fraction,
+        mut weight_a: Fraction,
+    ) -> Self {
+        let sum = &(&weight_simplicity + &weight_relevance) + &weight_a;
+
+        if sum.is_zero() {
+            return Self {
+                weight_simplicity,
+                weight_relevance,
+                weight_a: Fraction::one(),
+            };
         }
 
-        let w_a = &Fraction::one() - &sum;
+        weight_simplicity /= &sum;
+        weight_relevance /= &sum;
+        weight_a /= &sum;
 
-        Ok(Self { w_s, w_r, w_a })
+        Self {
+            weight_simplicity,
+            weight_relevance,
+            weight_a,
+        }
     }
 }
 
@@ -70,16 +83,32 @@ fn format_trade_off_report(
     let mut out = String::new();
 
     let _ = writeln!(out, "trade-off report");
-    let _ = writeln!(out, "  weights     simplicity={:.3}  relevance={:.3}  remainder={:.3}",
-        preference.w_s, preference.w_r, preference.w_a);
+    let _ = writeln!(
+        out,
+        "  weights     simplicity={:.3}  relevance={:.3}  remainder={:.3}",
+        preference.weight_simplicity, preference.weight_relevance, preference.weight_a
+    );
     let _ = writeln!(out);
-    let _ = writeln!(out, "  {:<20} {:>12} {:>12}", "objective", "raw", "normalized");
-    let _ = writeln!(out, "  {:<20} {:>12.4} {:>12.4}", "entropic_relevance",
-        best.relevance, normalised.norm_entropic_relevance);
-    let _ = writeln!(out, "  {:<20} {:>12.0} {:>12.4}", "size",
-        best.simplicity, normalised.norm_size);
-    let _ = writeln!(out, "  {:<20} {:>12.4} {:>12.4}", "earth_movers",
-        best.adhesion, normalised.norm_emsc);
+    let _ = writeln!(
+        out,
+        "  {:<20} {:>12} {:>12}",
+        "objective", "raw", "normalized"
+    );
+    let _ = writeln!(
+        out,
+        "  {:<20} {:>12.4} {:>12.4}",
+        "entropic_relevance", best.relevance, normalised.norm_entropic_relevance
+    );
+    let _ = writeln!(
+        out,
+        "  {:<20} {:>12.0} {:>12.4}",
+        "size", best.simplicity, normalised.norm_size
+    );
+    let _ = writeln!(
+        out,
+        "  {:<20} {:>12.4} {:>12.4}",
+        "earth_movers", best.adhesion, normalised.norm_emsc
+    );
     let _ = writeln!(out);
     let _ = write!(out, "  chebyshev_score: {:.6}", score);
 
@@ -145,9 +174,9 @@ fn chebyshev_score(row: &NormalisedEntry, pref: &Preference) -> Fraction {
     let dev_a = &one - &row.norm_emsc;
 
     let weighted = [
-        &pref.w_r * &dev_r,
-        &pref.w_s * &dev_s,
-        &pref.w_a * &dev_a,
+        &pref.weight_relevance * &dev_r,
+        &pref.weight_simplicity * &dev_s,
+        &pref.weight_a * &dev_a,
     ];
 
     let mut max_term = weighted[0].clone();

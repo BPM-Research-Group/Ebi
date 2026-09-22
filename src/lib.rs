@@ -222,7 +222,7 @@ pub mod techniques {
     pub mod fitting_traces;
     pub mod flower_miner;
     pub mod gain_precision_recall;
-    pub mod gaspd;
+    // pub mod gaspd;
     pub mod hellinger_stochastic_conformance;
     pub mod inductive_miner;
     pub mod infinitely_many_traces;
@@ -248,7 +248,6 @@ pub mod techniques {
     pub mod split_miner;
     pub mod stochastic_markovian_abstraction;
     pub mod stochastic_markovian_abstraction_conformance;
-    pub mod select;
     pub mod tau_removal;
     pub mod timestamps_ordered;
     pub mod trace_model_miner;

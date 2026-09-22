@@ -414,6 +414,14 @@ pub fn convert_stochastic_nondeterministic_finite_automaton(javascript_inputs: V
 }
 
 #[wasm_bindgen]
+pub fn discover_alergia(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA;
+    execute_javascript_command(command, javascript_inputs, "discover_alergia", exporter_file_extension);
+}
+
+#[wasm_bindgen]
 pub fn discover_alignments_stochastic_business_process_model_and_notation(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = 
@@ -435,6 +443,14 @@ pub fn discover_directly_follows_graph(javascript_inputs: Vec<JavascriptInput>, 
     let command: &&EbiCommand = 
         &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_DIRECTLY_FOLLOWS;
     execute_javascript_command(command, javascript_inputs, "discover_directly_follows_graph", exporter_file_extension);
+}
+
+#[wasm_bindgen]
+pub fn discover_genetic_algorithm_for_stochastic_process_discovery(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_GASPD;
+    execute_javascript_command(command, javascript_inputs, "discover_genetic_algorithm_for_stochastic_process_discovery", exporter_file_extension);
 }
 
 #[wasm_bindgen]
@@ -2378,6 +2394,54 @@ mod tests {
     }
 
 	#[test]
+	pub fn discover_alergia_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
+			// trait event log#./testfiles/empty.xes
+			,
+			JavascriptInput::from("1".to_string())
+			// fraction 1
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+
+		];
+        crate::javascript::javascript_autogen::discover_alergia(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn discover_alergia_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log#./testfiles/svn60.xes
+			,
+			JavascriptInput::from("1".to_string())
+			// fraction 1
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+
+		];
+        crate::javascript::javascript_autogen::discover_alergia(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn discover_alergia_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
+			// trait event log#./testfiles/simple_log_markovian_abstraction.xes
+			,
+			JavascriptInput::from("1".to_string())
+			// fraction 1
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+
+		];
+        crate::javascript::javascript_autogen::discover_alergia(inputs, ".xes");
+    }
+
+	#[test]
 	pub fn discover_alignments_stochastic_business_process_model_and_notation_test_0() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
@@ -2492,6 +2556,90 @@ mod tests {
 
 		];
         crate::javascript::javascript_autogen::discover_directly_follows_graph(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn discover_genetic_algorithm_for_stochastic_process_discovery_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
+			// trait event log#./testfiles/empty.xes
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+			,
+			JavascriptInput::from("3".to_string())
+			// usize 3
+			,
+			JavascriptInput::from("0".to_string())
+			// fraction 0
+			,
+			JavascriptInput::from("0".to_string())
+			// fraction 0
+			,
+			JavascriptInput::from("1".to_string())
+			// fraction 1
+
+		];
+        crate::javascript::javascript_autogen::discover_genetic_algorithm_for_stochastic_process_discovery(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn discover_genetic_algorithm_for_stochastic_process_discovery_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log#./testfiles/svn60.xes
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+			,
+			JavascriptInput::from("3".to_string())
+			// usize 3
+			,
+			JavascriptInput::from("0".to_string())
+			// fraction 0
+			,
+			JavascriptInput::from("0".to_string())
+			// fraction 0
+			,
+			JavascriptInput::from("1".to_string())
+			// fraction 1
+
+		];
+        crate::javascript::javascript_autogen::discover_genetic_algorithm_for_stochastic_process_discovery(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn discover_genetic_algorithm_for_stochastic_process_discovery_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
+			// trait event log#./testfiles/simple_log_markovian_abstraction.xes
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+			,
+			JavascriptInput::from("3".to_string())
+			// usize 3
+			,
+			JavascriptInput::from("0".to_string())
+			// fraction 0
+			,
+			JavascriptInput::from("0".to_string())
+			// fraction 0
+			,
+			JavascriptInput::from("1".to_string())
+			// fraction 1
+
+		];
+        crate::javascript::javascript_autogen::discover_genetic_algorithm_for_stochastic_process_discovery(inputs, ".xes");
     }
 
 	#[test]

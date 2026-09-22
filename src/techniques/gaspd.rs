@@ -1,39 +1,90 @@
-use std::collections::{HashMap, HashSet};
-
+use crate::ebi_traits::{
+    ebi_trait_event_log::EbiTraitEventLog,
+    ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+};
+use crate::techniques::{
+    alergia::FrequencyPrefixTree,
+    earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
+    entropic_relevance::EntropicRelvance, sample::Sampler, select::Preference, select::select,
+};
+use ebi_objects::ebi_arithmetic::{ConstFraction, ToNative};
 use ebi_objects::{
-    Activity, AutomatonState, EventLog, FiniteStochasticLanguage, StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel, ebi_arithmetic::{
-    Fraction, One, Signed, f, fraction::{approximate::Approximate}, set_exact_globally,
-    },
+    Activity, AutomatonState, EventLog, FiniteStochasticLanguage,
+    StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
+    ebi_arithmetic::{Fraction, One, Signed, f, fraction::approximate::Approximate},
 };
 use ebi_optimisation::anyhow::Result;
 use rand::{RngExt, prelude::SliceRandom};
 use rayon::prelude::*;
 use rustc_hash::FxHashMap;
-
-use crate::{ebi_traits::{
-    ebi_trait_event_log::EbiTraitEventLog,
-    ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-}};
-use crate::techniques::{
-    alergia::{FrequencyPrefixTree, alergia_gaspd},
-    earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
-    entropic_relevance::EntropicRelvance,
-    sample::Sampler,
-    select::select,
-    select::Preference,
-};
-
+use std::collections::{HashMap, HashSet};
 
 const CONFIDENCE_UPPER_BOUND: u64 = 15;
 const CONFIDENCE_LOWER_BOUND: u64 = 0;
 const FILTER_FREQUENCY_LOWER_NUMER: u64 = 10; // 0.00001 * 10^6
-const MUTATION_STEP_FRACTION: f64 = 0.02;
+const MUTATION_STEP_FRACTION: ConstFraction = ConstFraction::of(2, 100);
 
 const CONFIDENCE_FACTOR_RESOLUTION_DIGITS: u32 = 6;
 const FILTER_FACTOR_RESOLUTION_DIGITS: u32 = 6;
 
-/// One candidate ALERGIA parameter setting plus its stochastic conformance scores.
+/// Same algorithm as Alergia, but with the confidence factor, minimum
+/// visit threshold, and trace-filtering frequency exposed as parameters
+/// (used by Gaspd).
+pub fn alergia_gaspd(
+    confidence_factor: &Fraction,
+    filter_frequency: &Fraction,
+    log: &dyn EbiTraitFiniteStochasticLanguage,
+    min_visits: usize,
+) -> Result<StochasticDeterministicFiniteAutomaton> {
+    let filtered_log = filter_log(filter_frequency.clone(), log);
+    let mut fpta: FrequencyPrefixTree = FrequencyPrefixTree::from_log(&filtered_log);
+
+    let sdfa: StochasticDeterministicFiniteAutomaton =
+        alergia_algorithm(confidence_factor, &mut fpta, min_visits);
+    Ok(sdfa)
+}
+
+/// Keeps only the most frequent traces, retaining a `filter_frequency`
+/// fraction (rounded up) of distinct trace variants.
+pub fn filter_log(
+    filter_frequency: Fraction,
+    log: &mut dyn EbiTraitFiniteStochasticLanguage,
+) -> impl EbiTraitEventLog {
+    let mut sorted_traces = log.iter_traces_probabilities().collect::<Vec<_>>();
+    sorted_traces.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
+
+    let len = sorted_traces.len();
+    let target = f!(log.number_of_traces()) * filter_frequency;
+
+    // Smallest `keep` such that Fraction::from(keep) >= target,
+    let mut lo = 0;
+    let mut hi = len;
+    while lo < hi {
+        let mid = lo + (hi - lo) / 2;
+        if Fraction::from(mid) >= target {
+            hi = mid;
+        } else {
+            lo = mid + 1;
+        }
+    }
+    let keep = lo;
+
+    log.retain_traces(Box::new(|trace, prob| true));
+
+    let filtered_traces: Vec<Vec<Activity>> = sorted_traces
+        .into_iter()
+        .take(keep)
+        .flat_map(|(trace, count)| std::iter::repeat(trace).take(count))
+        .collect();
+
+    EventLog {
+        traces: filtered_traces,
+        activity_key: log.activity_key().clone(),
+    }
+}
+
+/// One candidate Alergia parameter setting plus its stochastic conformance scores.
 /// `relevance == -1` means "not yet evaluated".
 #[derive(Debug, Clone, PartialEq)]
 pub struct Entry {
@@ -46,10 +97,12 @@ pub struct Entry {
     pub simplicity: usize,
 }
 
-
 impl Entry {
     /// Creates a random, unevaluated starting population.
-    fn generate_initial_population(most_frequent_fpta_branch: usize, population_size: usize) -> Vec<Entry> {
+    fn generate_initial_population(
+        most_frequent_fpta_branch: usize,
+        population_size: usize,
+    ) -> Vec<Entry> {
         let mut population: Vec<Entry> = vec![];
         let mut rng = rand::rng();
 
@@ -89,12 +142,13 @@ pub trait Gaspd {
         generation_limit: usize,
         number_of_parents: usize,
         population_size: usize,
-        w_s: Fraction,
-        w_r: Fraction
+        weight_simplicity: Fraction,
+        weight_relevance: Fraction,
+        weight_a: Fraction,
     ) -> Result<StochasticDirectlyFollowsModel>;
 }
 
-/// Runs the GASPD genetic search and returns the final Pareto-optimal
+/// Runs the Gaspd genetic search and returns the final Pareto-optimal
 /// model according to the specified weights.
 impl Gaspd for dyn EbiTraitEventLog {
     fn gaspd(
@@ -102,15 +156,15 @@ impl Gaspd for dyn EbiTraitEventLog {
         generation_limit: usize,
         number_of_parents: usize,
         population_size: usize,
-        w_s: Fraction,
-        w_r: Fraction,
+        weight_simplicity: Fraction,
+        weight_relevance: Fraction,
+        weight_a: Fraction,
     ) -> Result<StochasticDirectlyFollowsModel> {
-        set_exact_globally(false);
-        let preference = Preference::new(w_s, w_r)?;
+        let preference = Preference::new(weight_simplicity, weight_relevance, weight_a);
         let event_log = convert_trait_to_log(self);
         let test_lang = convert_trait_to_finite_stochastic_language(self);
         //test_log.translate_using_activity_key(&mut event_log.activity_key);
-        let fpta: FrequencyPrefixTree = FrequencyPrefixTree::create_from_log(self);
+        let fpta: FrequencyPrefixTree = FrequencyPrefixTree::from_log(self);
 
         let most_frequent_fpta_branch = fpta
             .get_immediate_reachable_states(0)
@@ -120,29 +174,41 @@ impl Gaspd for dyn EbiTraitEventLog {
             .unwrap_or(0);
 
         let mut population =
-        Entry::generate_initial_population(most_frequent_fpta_branch, population_size);
+            Entry::generate_initial_population(most_frequent_fpta_branch, population_size);
 
         let mut archive: Vec<Entry> = vec![];
 
         select_parallel(&event_log, &test_lang, &mut population, &mut archive);
-        
+
         for i in 1..generation_limit + 1 {
-            
             let frontier = pareto_frontier(&population);
-            let mut offspring = crossover_mutation(&archive, &frontier, i, most_frequent_fpta_branch, number_of_parents);
+            let mut offspring = crossover_mutation(
+                &archive,
+                &frontier,
+                i,
+                most_frequent_fpta_branch,
+                number_of_parents,
+            );
 
-            retain_elite_parallel(&event_log, &test_lang, &mut offspring, &mut population, &mut archive);
+            retain_elite_parallel(
+                &event_log,
+                &test_lang,
+                &mut offspring,
+                &mut population,
+                &mut archive,
+            );
         }
-        
-        let unique_frontier = dedup_frontier(population);
-        let model_list: Vec<StochasticDirectlyFollowsModel> = create_concrete_models(&unique_frontier, &event_log);
-        //let content = archive_to_csv_for_sdfm(&unique_frontier, &Some(model_list));
-        
-        let model = select(model_list, unique_frontier, preference).unwrap_or_else(|| panic!("Error: no candidates to select from"));     
-        
-        Ok(model) 
 
-    }   
+        let unique_frontier = dedup_frontier(population);
+        let model_list: Vec<StochasticDirectlyFollowsModel> =
+            create_concrete_models(&unique_frontier, &event_log);
+        //let content = archive_to_csv_for_sdfm(&unique_frontier, &Some(model_list));
+
+        let model = select(model_list, unique_frontier, preference)
+            .unwrap_or_else(|| panic!("Error: no candidates to select from"));
+
+        Ok(model)
+    }
 }
 
 /// Rebuilds a trait-object log as a concrete `EventLog`, sorted by
@@ -163,12 +229,13 @@ pub fn convert_trait_to_log(log: &mut dyn EbiTraitEventLog) -> EventLog {
         traces,
         activity_key: log.activity_key().clone(),
     }
-    
 }
 
 /// Converts a trait-object log into a normalized `FiniteStochasticLanguage`,
 /// used as the reference distribution for scoring candidates.
-pub fn convert_trait_to_finite_stochastic_language(log: &mut dyn EbiTraitEventLog) -> FiniteStochasticLanguage {
+pub fn convert_trait_to_finite_stochastic_language(
+    log: &mut dyn EbiTraitEventLog,
+) -> FiniteStochasticLanguage {
     let mut fslang = FiniteStochasticLanguage::new_with_activity_key(log.activity_key().clone());
     for trace in log.iter_traces() {
         fslang
@@ -179,7 +246,7 @@ pub fn convert_trait_to_finite_stochastic_language(log: &mut dyn EbiTraitEventLo
 
     fslang
 }
-/* 
+/*
 /// Standard CSV field escaping (wraps in quotes, doubles embedded quotes).
 fn csv_escape(field: &str) -> String {
     format!("\"{}\"", field.replace('"', "\"\""))
@@ -222,8 +289,16 @@ fn archive_to_csv_for_sdfm(archive: &[Entry], models: &Option<Vec<StochasticDire
 */
 
 /// Hashable key for a candidate's parameters, used for dedup/`seen` sets.
-fn param_key(confidence_factor: &Fraction, filter_frequency: &Fraction, min_visits: usize) -> (u64, u64, u64) {
-    (confidence_factor.clone().approximate().unwrap().to_bits(), filter_frequency.clone().approximate().unwrap().to_bits(), min_visits as u64)
+fn param_key(
+    confidence_factor: &Fraction,
+    filter_frequency: &Fraction,
+    min_visits: usize,
+) -> (u64, u64, u64) {
+    (
+        confidence_factor.clone().approximate().unwrap().to_bits(),
+        filter_frequency.clone().approximate().unwrap().to_bits(),
+        min_visits as u64,
+    )
 }
 
 /// Converts an SDFA into its SDAG: one SDFM node per
@@ -294,7 +369,6 @@ fn create_concrete_models(
     frontier: &Vec<Entry>,
     log: &EventLog,
 ) -> Vec<StochasticDirectlyFollowsModel> {
-
     frontier
         .par_iter()
         .map(|entry| {
@@ -309,7 +383,6 @@ fn create_concrete_models(
             let res = convert_sdfa_to_sdfm(&temp_sdfa)
                 .expect("convert_sdfa_to_dfg failed for a frontier candidate");
             res
-            
         })
         .collect()
 }
@@ -321,14 +394,11 @@ fn select_parallel(
     lang: &FiniteStochasticLanguage,
     population: &mut Vec<Entry>,
     archive: &mut Vec<Entry>,
-)
-{
+) {
     let to_evaluate: Vec<usize> = population
         .iter()
         .enumerate()
-        .filter(|(_, entry)| {
-            entry.relevance == f!(-1)
-        })
+        .filter(|(_, entry)| entry.relevance == f!(-1))
         .map(|(i, _)| i)
         .collect();
 
@@ -352,7 +422,9 @@ fn select_parallel(
 /// Computes an SDFM's "simplicity" size of the ouput type SDFM directly from the SDFA, without
 /// building it.
 fn derived_sdfm_detail(sdfa: &StochasticDeterministicFiniteAutomaton) -> usize {
-    let s0 = sdfa.initial_state.expect("empty language has no meaningful SDFM size");
+    let s0 = sdfa
+        .initial_state
+        .expect("empty language has no meaningful SDFM size");
 
     let sdfm_nodes = sdfa.terminating_probabilities.len() - 1;
 
@@ -387,8 +459,7 @@ fn retain_elite_parallel(
     offspring: &mut Vec<Entry>,
     population: &mut Vec<Entry>,
     archive: &mut Vec<Entry>,
-)
-{
+) {
     let results: Vec<(usize, usize, Fraction, Fraction)> = offspring
         .par_iter()
         .enumerate()
@@ -415,21 +486,36 @@ fn retain_elite_parallel(
     archive.extend(combined.clone());
 
     *population = pareto_frontier(&combined);
-
 }
 
-/// Scores one candidate by rebuilding its SDFA via ALERGIA and computing
+/// Scores one candidate by rebuilding its SDFA via Alergia and computing
 /// its simplicity, entropic relevance, and earth movers' stochastic
 /// conformance against the reference language.
-fn evaluate_entry(entry: &Entry, log: &EventLog, lang: &FiniteStochasticLanguage) -> (usize, Fraction, Fraction) {
-    set_exact_globally(false);
-    let sdfa = alergia_gaspd(&entry.confidence_factor, &entry.filter_frequency, log.clone(), entry.min_visits).unwrap();
+fn evaluate_entry(
+    entry: &Entry,
+    log: &EventLog,
+    lang: &FiniteStochasticLanguage,
+) -> (usize, Fraction, Fraction) {
+    let sdfa = alergia_gaspd(
+        &entry.confidence_factor,
+        &entry.filter_frequency,
+        log.clone(),
+        entry.min_visits,
+    )
+    .unwrap();
     let mut trait_fslang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(lang.clone());
     let size = derived_sdfm_detail(&sdfa);
     let model: Box<dyn EbiTraitQueriableStochasticLanguage> = Box::new(sdfa.clone());
-    let er = trait_fslang.entropic_relevance(model).ok().and_then(|lp| lp.approximate().ok()).and_then(|v| v.to_string().parse::<Fraction>().ok()).unwrap_or(f!(-1));
+    let er = trait_fslang
+        .entropic_relevance(model)
+        .ok()
+        .and_then(|lp| lp.approximate().ok())
+        .and_then(|v| v.to_string().parse::<Fraction>().ok())
+        .unwrap_or(f!(-1));
     let mut slang: FiniteStochasticLanguage = sdfa.sample(200).unwrap();
-    let em = trait_fslang.earth_movers_stochastic_conformance(&mut slang).unwrap();
+    let em = trait_fslang
+        .earth_movers_stochastic_conformance(&mut slang)
+        .unwrap();
     (size, er, em)
 }
 /// Builds the next generation: samples parents from the frontier, applies
@@ -453,12 +539,18 @@ fn crossover_mutation(
             .iter()
             .map(|e| param_key(&e.confidence_factor, &e.filter_frequency, e.min_visits))
             .collect();
-        
+
         let mut archive_candidates: Vec<&Entry> = archive
             .iter()
-            .filter(|e| !selected_keys.contains(&param_key(&e.confidence_factor, &e.filter_frequency, e.min_visits)))
+            .filter(|e| {
+                !selected_keys.contains(&param_key(
+                    &e.confidence_factor,
+                    &e.filter_frequency,
+                    e.min_visits,
+                ))
+            })
             .collect();
-        
+
         archive_candidates.shuffle(&mut rng);
         archive_candidates.truncate(needed);
         selected.extend(archive_candidates.iter().map(|e| (*e).clone()));
@@ -562,9 +654,9 @@ fn mutate_fraction(
     let denom: u64 = 10u64.pow(resolution_digits);
     let perturb_numer: i64 = rng.random_range(-half_range_units..=half_range_units);
     let perturbation: Fraction = if perturb_numer >= 0 {
-        &f!(perturb_numer as u64) / &f!(denom)
+        f!(perturb_numer.to_usize(), denom)
     } else {
-        &f!((-perturb_numer) as u64) / &f!(denom)
+        f!((-perturb_numer).to_usize(), denom)
     };
 
     let mut result: Fraction = current + &perturbation;
@@ -580,28 +672,48 @@ fn mutate_fraction(
 /// Randomly perturbs a confidence factor within MUTATION_STEP_FRACTION of [0, 15], clamped.
 fn mutate_confidence_factor(current: &Fraction, rng: &mut impl rand::Rng) -> Fraction {
     let denom: u64 = 10u64.pow(CONFIDENCE_FACTOR_RESOLUTION_DIGITS);
-    let range = CONFIDENCE_UPPER_BOUND as f64 - CONFIDENCE_LOWER_BOUND as f64; // 15
-    let half_range: i64 = (denom as f64 * range * MUTATION_STEP_FRACTION) as i64;
+    let range = CONFIDENCE_UPPER_BOUND - CONFIDENCE_LOWER_BOUND; // 15
+    let half_range: i64 =
+        (MUTATION_STEP_FRACTION.to_fraction() * f!(denom * range)).to_usize() as i64;
     let zero = f!(CONFIDENCE_LOWER_BOUND);
-    let fifteen: Fraction = &f!(15u64) / &f!(1u64);
-    mutate_fraction(current, CONFIDENCE_FACTOR_RESOLUTION_DIGITS, half_range, &zero, &fifteen, rng)
+    let fifteen = f!(15, 1);
+    mutate_fraction(
+        current,
+        CONFIDENCE_FACTOR_RESOLUTION_DIGITS,
+        half_range,
+        &zero,
+        &fifteen,
+        rng,
+    )
 }
 
 /// Randomly perturbs a filter frequency within MUTATION_STEP_FRACTION of [FILTER_LOWER_BOUND, 1],
 /// clamped.
 fn mutate_filter_frequency(current: &Fraction, rng: &mut impl rand::Rng) -> Fraction {
     let denom: u64 = 10u64.pow(FILTER_FACTOR_RESOLUTION_DIGITS);
-    let range = 1.0; // FILTER_UPPER_BOUND - FILTER_LOWER_BOUND, ≈1.0
-    let half_range: i64 = (denom as f64 * range * MUTATION_STEP_FRACTION) as i64;
-    mutate_fraction(current, FILTER_FACTOR_RESOLUTION_DIGITS, half_range, &filter_lower_bound(), &f!(1), rng)
+    let range = Fraction::one(); // FILTER_UPPER_BOUND - FILTER_LOWER_BOUND, ≈1.0
+    let half_range: i64 =
+        (MUTATION_STEP_FRACTION.to_fraction() * f!(range) * f!(denom)).to_usize() as i64;
+    mutate_fraction(
+        current,
+        FILTER_FACTOR_RESOLUTION_DIGITS,
+        half_range,
+        &filter_lower_bound(),
+        &f!(1),
+        rng,
+    )
 }
 
 /// Randomly perturbs `min_visits` by up to MUTATION_STEP_FRACTION of `most_frequent_fpta_branch`,
 /// clamped to `[1, most_frequent_fpta_branch]`.
-fn mutate_min_visits(current: usize, most_frequent_fpta_branch: usize, rng: &mut impl rand::Rng) -> usize {
-    let half_range: i64 = ((most_frequent_fpta_branch as f64) * MUTATION_STEP_FRACTION)
-        .round()
-        .max(1.0) as i64;
+fn mutate_min_visits(
+    current: usize,
+    most_frequent_fpta_branch: usize,
+    rng: &mut impl rand::Rng,
+) -> usize {
+    let half_range: i64 = (MUTATION_STEP_FRACTION.to_fraction() * f!(most_frequent_fpta_branch))
+        .to_usize()
+        .max(1) as i64;
     let perturbation: i64 = rng.random_range(-half_range..=half_range);
     current
         .saturating_add_signed(perturbation as isize)
@@ -640,7 +752,7 @@ fn pareto_frontier(population: &[Entry]) -> Vec<Entry> {
 }
 
 /// True if `a` dominates `b` on all objectives, strictly on at least one.
-fn dominates_entry(a: &Entry, b: &Entry) -> bool {    
+fn dominates_entry(a: &Entry, b: &Entry) -> bool {
     (a.relevance <= b.relevance && a.simplicity <= b.simplicity && a.adhesion >= b.adhesion)
         && (a.relevance < b.relevance || a.simplicity < b.simplicity || a.adhesion > b.adhesion)
 }
