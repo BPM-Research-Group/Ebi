@@ -66,7 +66,7 @@ pub fn alergia_algorithm(
         for &q_red in &red {
             if alergia_compatible(&confidence_factor, fpta, q_blue, q_red) {
                 found_merge = true;
-                println!("MERGE   qb={q_blue}  into qr={q_red}");
+                // println!("MERGE   qb={q_blue}  into qr={q_red}");
                 stochastic_merge(fpta, &mut parents, q_red, q_blue);
 
                 // fs::write("bla-2.svg", fpta.to_svg().unwrap().to_string()).unwrap();
@@ -433,7 +433,7 @@ mod tests {
         let slang = slang.to_event_log_trait();
         let sdfa = slang.alergia(f!(8, 10)).unwrap();
 
-        println!("final result {:?}", sdfa);
+        // println!("final result {:?}", sdfa);
 
         assert_eq!(sdfa.terminating_probabilities.len(), 2);
     }
