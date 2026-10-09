@@ -30,7 +30,7 @@ impl Alergia for dyn EbiTraitEventLog {
     }
 }
 
-fn alergia_algorithm(
+pub fn alergia_algorithm(
     confidence_factor: &Fraction,
     fpta: &mut FrequencyPrefixTree,
     min_visits: Fraction,

@@ -446,14 +446,6 @@ pub fn discover_directly_follows_graph(javascript_inputs: Vec<JavascriptInput>, 
 }
 
 #[wasm_bindgen]
-pub fn discover_genetic_algorithm_for_stochastic_process_discovery(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = 
-        &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_GASPD;
-    execute_javascript_command(command, javascript_inputs, "discover_genetic_algorithm_for_stochastic_process_discovery", exporter_file_extension);
-}
-
-#[wasm_bindgen]
 pub fn discover_occurrence_stochastic_business_process_model_and_notation(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = 
@@ -716,8 +708,8 @@ mod tests {
 	#[test]
 	pub fn analyse_all_traces_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::analyse_all_traces(inputs, ".xes");
@@ -726,8 +718,8 @@ mod tests {
 	#[test]
 	pub fn analyse_all_traces_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::analyse_all_traces(inputs, ".xes");
@@ -736,8 +728,8 @@ mod tests {
 	#[test]
 	pub fn analyse_all_traces_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 
 		];
         crate::javascript::javascript_autogen::analyse_all_traces(inputs, ".xes");
@@ -745,22 +737,6 @@ mod tests {
 
 	#[test]
 	pub fn analyse_cohort_analysis_test_0() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log with trace attributes#./testfiles/empty.xes
-			,
-			JavascriptInput::from("10".to_string())
-			// usize 10
-			,
-			JavascriptInput::from("0.05".to_string())
-			// fraction 0.05
-
-		];
-        crate::javascript::javascript_autogen::analyse_cohort_analysis(inputs, ".xes");
-    }
-
-	#[test]
-	pub fn analyse_cohort_analysis_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// trait event log with trace attributes#./testfiles/svn60.xes
@@ -776,10 +752,26 @@ mod tests {
     }
 
 	#[test]
+	pub fn analyse_cohort_analysis_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait event log with trace attributes#./testfiles/a-b-double.xes
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+			,
+			JavascriptInput::from("0.05".to_string())
+			// fraction 0.05
+
+		];
+        crate::javascript::javascript_autogen::analyse_cohort_analysis(inputs, ".xes");
+    }
+
+	#[test]
 	pub fn analyse_cohort_analysis_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// trait event log with trace attributes#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/oc-log.ocel").unwrap())
+			// trait event log with trace attributes#./testfiles/oc-log.ocel
 			,
 			JavascriptInput::from("10".to_string())
 			// usize 10
@@ -794,16 +786,6 @@ mod tests {
 	#[test]
 	pub fn analyse_completeness_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log#./testfiles/empty.xes
-
-		];
-        crate::javascript::javascript_autogen::analyse_completeness(inputs, ".xes");
-    }
-
-	#[test]
-	pub fn analyse_completeness_test_1() {
-        let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// trait event log#./testfiles/svn60.xes
 
@@ -812,10 +794,20 @@ mod tests {
     }
 
 	#[test]
+	pub fn analyse_completeness_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait event log#./testfiles/a-b.csv
+
+		];
+        crate::javascript::javascript_autogen::analyse_completeness(inputs, ".xes");
+    }
+
+	#[test]
 	pub fn analyse_completeness_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// trait event log#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait event log#./testfiles/a-b-double.xes
 
 		];
         crate::javascript::javascript_autogen::analyse_completeness(inputs, ".xes");
@@ -824,8 +816,8 @@ mod tests {
 	#[test]
 	pub fn analyse_coverage_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("0".to_string())
 			// fraction 0
@@ -837,8 +829,8 @@ mod tests {
 	#[test]
 	pub fn analyse_coverage_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("0".to_string())
 			// fraction 0
@@ -850,8 +842,8 @@ mod tests {
 	#[test]
 	pub fn analyse_coverage_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("0".to_string())
 			// fraction 0
@@ -941,8 +933,8 @@ mod tests {
 	#[test]
 	pub fn analyse_entropy_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::analyse_entropy(inputs, ".xes");
@@ -951,8 +943,8 @@ mod tests {
 	#[test]
 	pub fn analyse_entropy_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::analyse_entropy(inputs, ".xes");
@@ -961,8 +953,8 @@ mod tests {
 	#[test]
 	pub fn analyse_entropy_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 
 		];
         crate::javascript::javascript_autogen::analyse_entropy(inputs, ".xes");
@@ -971,8 +963,8 @@ mod tests {
 	#[test]
 	pub fn analyse_medoid_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -984,8 +976,8 @@ mod tests {
 	#[test]
 	pub fn analyse_medoid_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -995,11 +987,10 @@ mod tests {
     }
 
 	#[test]
-	#[should_panic]
 	pub fn analyse_medoid_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1024,8 +1015,8 @@ mod tests {
 	#[test]
 	pub fn analyse_minimum_probability_traces_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait stochastic deterministic semantics#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_markovian_abstraction.slpn").unwrap())
+			// trait stochastic deterministic semantics#./testfiles/simple_markovian_abstraction.slpn
 			,
 			JavascriptInput::from("0".to_string())
 			// fraction 0
@@ -1037,8 +1028,8 @@ mod tests {
 	#[test]
 	pub fn analyse_minimum_probability_traces_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait stochastic deterministic semantics#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait stochastic deterministic semantics#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("0".to_string())
 			// fraction 0
@@ -1050,8 +1041,8 @@ mod tests {
 	#[test]
 	pub fn analyse_mode_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::analyse_mode(inputs, ".xes");
@@ -1060,8 +1051,8 @@ mod tests {
 	#[test]
 	pub fn analyse_mode_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::analyse_mode(inputs, ".xes");
@@ -1070,8 +1061,8 @@ mod tests {
 	#[test]
 	pub fn analyse_mode_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 
 		];
         crate::javascript::javascript_autogen::analyse_mode(inputs, ".xes");
@@ -1080,8 +1071,8 @@ mod tests {
 	#[test]
 	pub fn analyse_most_likely_traces_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1093,8 +1084,8 @@ mod tests {
 	#[test]
 	pub fn analyse_most_likely_traces_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1106,8 +1097,8 @@ mod tests {
 	#[test]
 	pub fn analyse_most_likely_traces_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1119,8 +1110,8 @@ mod tests {
 	#[test]
 	pub fn analyse_variety_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::analyse_variety(inputs, ".xes");
@@ -1129,8 +1120,8 @@ mod tests {
 	#[test]
 	pub fn analyse_variety_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::analyse_variety(inputs, ".xes");
@@ -1139,8 +1130,8 @@ mod tests {
 	#[test]
 	pub fn analyse_variety_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 
 		];
         crate::javascript::javascript_autogen::analyse_variety(inputs, ".xes");
@@ -1148,6 +1139,16 @@ mod tests {
 
 	#[test]
 	pub fn analyse_non_stochastic_activities_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/flower.bpmn").unwrap())
+			// trait activities#./testfiles/flower.bpmn
+
+		];
+        crate::javascript::javascript_autogen::analyse_non_stochastic_activities(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn analyse_non_stochastic_activities_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// trait activities#./testfiles/seq(a-xor(b-c)).sptree
@@ -1157,20 +1158,10 @@ mod tests {
     }
 
 	#[test]
-	pub fn analyse_non_stochastic_activities_test_1() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// trait activities#./testfiles/skippable_repeatable.powl
-
-		];
-        crate::javascript::javascript_autogen::analyse_non_stochastic_activities(inputs, ".xes");
-    }
-
-	#[test]
 	pub fn analyse_non_stochastic_activities_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait activities#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// trait activities#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::analyse_non_stochastic_activities(inputs, ".xes");
@@ -1239,8 +1230,8 @@ mod tests {
 	#[test]
 	pub fn analyse_non_stochastic_cluster_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1252,8 +1243,8 @@ mod tests {
 	#[test]
 	pub fn analyse_non_stochastic_cluster_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1263,11 +1254,10 @@ mod tests {
     }
 
 	#[test]
-	#[should_panic]
 	pub fn analyse_non_stochastic_cluster_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1289,8 +1279,8 @@ mod tests {
 	#[test]
 	pub fn analyse_non_stochastic_empty_traces_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.ptree").unwrap())
-			// object process tree#./testfiles/empty.ptree
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object process tree#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::analyse_non_stochastic_empty_traces(inputs, ".xes");
@@ -1299,8 +1289,8 @@ mod tests {
 	#[test]
 	pub fn analyse_non_stochastic_empty_traces_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.ptml").unwrap())
-			// object process tree#./testfiles/aa-ab-ba.ptml
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa.ptree").unwrap())
+			// object process tree#./testfiles/aa.ptree
 
 		];
         crate::javascript::javascript_autogen::analyse_non_stochastic_empty_traces(inputs, ".xes");
@@ -1309,8 +1299,21 @@ mod tests {
 	#[test]
 	pub fn analyse_non_stochastic_executions_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log with event attributes#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log with event attributes#./testfiles/svn60.xes
+			,
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/flower.bpmn").unwrap())
+			// trait semantics#./testfiles/flower.bpmn
+
+		];
+        crate::javascript::javascript_autogen::analyse_non_stochastic_executions(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn analyse_non_stochastic_executions_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log with event attributes#./testfiles/svn60.xes
 			,
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// trait semantics#./testfiles/seq(a-xor(b-c)).sptree
@@ -1320,26 +1323,14 @@ mod tests {
     }
 
 	#[test]
-	pub fn analyse_non_stochastic_executions_test_1() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log with event attributes#./testfiles/empty.xes
-			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// trait semantics#./testfiles/skippable_repeatable.powl
-
-		];
-        crate::javascript::javascript_autogen::analyse_non_stochastic_executions(inputs, ".xes");
-    }
-
-	#[test]
+	#[should_panic]
 	pub fn analyse_non_stochastic_executions_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log with event attributes#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log with event attributes#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait semantics#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// trait semantics#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::analyse_non_stochastic_executions(inputs, ".xes");
@@ -1347,16 +1338,6 @@ mod tests {
 
 	#[test]
 	pub fn analyse_non_stochastic_infinitely_many_traces_test_0() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// object event log#./testfiles/empty.xes
-
-		];
-        crate::javascript::javascript_autogen::analyse_non_stochastic_infinitely_many_traces(inputs, ".xes");
-    }
-
-	#[test]
-	pub fn analyse_non_stochastic_infinitely_many_traces_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// object event log#./testfiles/svn60.xes
@@ -1366,10 +1347,20 @@ mod tests {
     }
 
 	#[test]
+	pub fn analyse_non_stochastic_infinitely_many_traces_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// object event log#./testfiles/a-b.csv
+
+		];
+        crate::javascript::javascript_autogen::analyse_non_stochastic_infinitely_many_traces(inputs, ".xes");
+    }
+
+	#[test]
 	pub fn analyse_non_stochastic_infinitely_many_traces_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// object event log#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// object event log#./testfiles/a-b-double.xes
 
 		];
         crate::javascript::javascript_autogen::analyse_non_stochastic_infinitely_many_traces(inputs, ".xes");
@@ -1378,8 +1369,8 @@ mod tests {
 	#[test]
 	pub fn analyse_non_stochastic_medoid_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1391,8 +1382,8 @@ mod tests {
 	#[test]
 	pub fn analyse_non_stochastic_medoid_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1402,11 +1393,10 @@ mod tests {
     }
 
 	#[test]
-	#[should_panic]
 	pub fn analyse_non_stochastic_medoid_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1418,16 +1408,6 @@ mod tests {
 	#[test]
 	pub fn analyse_non_stochastic_timestamps_ordered_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log with event attributes#./testfiles/empty.xes
-
-		];
-        crate::javascript::javascript_autogen::analyse_non_stochastic_timestamps_ordered(inputs, ".xes");
-    }
-
-	#[test]
-	pub fn analyse_non_stochastic_timestamps_ordered_test_1() {
-        let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// trait event log with event attributes#./testfiles/svn60.xes
 
@@ -1436,10 +1416,20 @@ mod tests {
     }
 
 	#[test]
+	pub fn analyse_non_stochastic_timestamps_ordered_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait event log with event attributes#./testfiles/a-b.csv
+
+		];
+        crate::javascript::javascript_autogen::analyse_non_stochastic_timestamps_ordered(inputs, ".xes");
+    }
+
+	#[test]
 	pub fn analyse_non_stochastic_timestamps_ordered_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// trait event log with event attributes#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait event log with event attributes#./testfiles/a-b-double.xes
 
 		];
         crate::javascript::javascript_autogen::analyse_non_stochastic_timestamps_ordered(inputs, ".xes");
@@ -1447,19 +1437,6 @@ mod tests {
 
 	#[test]
 	pub fn association_all_trace_attributes_test_0() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log with trace attributes#./testfiles/empty.xes
-			,
-			JavascriptInput::from("10".to_string())
-			// usize 10
-
-		];
-        crate::javascript::javascript_autogen::association_all_trace_attributes(inputs, ".xes");
-    }
-
-	#[test]
-	pub fn association_all_trace_attributes_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// trait event log with trace attributes#./testfiles/svn60.xes
@@ -1472,10 +1449,23 @@ mod tests {
     }
 
 	#[test]
+	pub fn association_all_trace_attributes_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait event log with trace attributes#./testfiles/a-b-double.xes
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+
+		];
+        crate::javascript::javascript_autogen::association_all_trace_attributes(inputs, ".xes");
+    }
+
+	#[test]
 	pub fn association_all_trace_attributes_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// trait event log with trace attributes#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/oc-log.ocel").unwrap())
+			// trait event log with trace attributes#./testfiles/oc-log.ocel
 			,
 			JavascriptInput::from("10".to_string())
 			// usize 10
@@ -1488,8 +1478,8 @@ mod tests {
 	#[should_panic]
 	pub fn association_trace_attribute_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log with trace attributes#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log with trace attributes#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("some string".to_string())
 			// string some string
@@ -1505,8 +1495,8 @@ mod tests {
 	#[should_panic]
 	pub fn association_trace_attribute_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
-			// trait event log with trace attributes#./testfiles/svn60.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait event log with trace attributes#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("some string".to_string())
 			// string some string
@@ -1522,8 +1512,8 @@ mod tests {
 	#[should_panic]
 	pub fn association_trace_attribute_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// trait event log with trace attributes#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/oc-log.ocel").unwrap())
+			// trait event log with trace attributes#./testfiles/oc-log.ocel
 			,
 			JavascriptInput::from("some string".to_string())
 			// string some string
@@ -1538,8 +1528,8 @@ mod tests {
 	#[test]
 	pub fn conformance_chi_squared_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree
@@ -1551,11 +1541,11 @@ mod tests {
 	#[test]
 	pub fn conformance_chi_squared_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait queriable stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_markovian_abstraction.slpn").unwrap())
+			// trait queriable stochastic language#./testfiles/simple_markovian_abstraction.slpn
 
 		];
         crate::javascript::javascript_autogen::conformance_chi_squared(inputs, ".xes");
@@ -1564,11 +1554,11 @@ mod tests {
 	#[test]
 	pub fn conformance_chi_squared_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait queriable stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait queriable stochastic language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::conformance_chi_squared(inputs, ".xes");
@@ -1577,11 +1567,11 @@ mod tests {
 	#[test]
 	pub fn conformance_chi_squared_sample_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1593,11 +1583,11 @@ mod tests {
 	#[test]
 	pub fn conformance_chi_squared_sample_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1607,14 +1597,13 @@ mod tests {
     }
 
 	#[test]
-	#[should_panic]
 	pub fn conformance_chi_squared_sample_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1626,11 +1615,11 @@ mod tests {
 	#[test]
 	pub fn conformance_earth_movers_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::conformance_earth_movers(inputs, ".xes");
@@ -1639,25 +1628,24 @@ mod tests {
 	#[test]
 	pub fn conformance_earth_movers_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::conformance_earth_movers(inputs, ".xes");
     }
 
 	#[test]
-	#[should_panic]
 	pub fn conformance_earth_movers_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 
 		];
         crate::javascript::javascript_autogen::conformance_earth_movers(inputs, ".xes");
@@ -1666,11 +1654,11 @@ mod tests {
 	#[test]
 	pub fn conformance_earth_movers_sample_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1682,11 +1670,11 @@ mod tests {
 	#[test]
 	pub fn conformance_earth_movers_sample_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1696,14 +1684,13 @@ mod tests {
     }
 
 	#[test]
-	#[should_panic]
 	pub fn conformance_earth_movers_sample_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1715,8 +1702,8 @@ mod tests {
 	#[test]
 	pub fn conformance_entropic_relevance_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree
@@ -1728,11 +1715,11 @@ mod tests {
 	#[test]
 	pub fn conformance_entropic_relevance_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait queriable stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_markovian_abstraction.slpn").unwrap())
+			// trait queriable stochastic language#./testfiles/simple_markovian_abstraction.slpn
 
 		];
         crate::javascript::javascript_autogen::conformance_entropic_relevance(inputs, ".xes");
@@ -1741,11 +1728,11 @@ mod tests {
 	#[test]
 	pub fn conformance_entropic_relevance_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait queriable stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait queriable stochastic language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::conformance_entropic_relevance(inputs, ".xes");
@@ -1754,8 +1741,8 @@ mod tests {
 	#[test]
 	pub fn conformance_hellinger_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree
@@ -1767,11 +1754,11 @@ mod tests {
 	#[test]
 	pub fn conformance_hellinger_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait queriable stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_markovian_abstraction.slpn").unwrap())
+			// trait queriable stochastic language#./testfiles/simple_markovian_abstraction.slpn
 
 		];
         crate::javascript::javascript_autogen::conformance_hellinger(inputs, ".xes");
@@ -1780,11 +1767,11 @@ mod tests {
 	#[test]
 	pub fn conformance_hellinger_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait queriable stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait queriable stochastic language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::conformance_hellinger(inputs, ".xes");
@@ -1793,11 +1780,11 @@ mod tests {
 	#[test]
 	pub fn conformance_hellinger_sample_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1809,11 +1796,11 @@ mod tests {
 	#[test]
 	pub fn conformance_hellinger_sample_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1823,14 +1810,13 @@ mod tests {
     }
 
 	#[test]
-	#[should_panic]
 	pub fn conformance_hellinger_sample_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1842,11 +1828,11 @@ mod tests {
 	#[test]
 	pub fn conformance_markovian_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1861,11 +1847,11 @@ mod tests {
 	#[test]
 	pub fn conformance_markovian_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1880,11 +1866,11 @@ mod tests {
 	#[test]
 	pub fn conformance_markovian_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1899,8 +1885,8 @@ mod tests {
 	#[test]
 	pub fn conformance_unit_earth_movers_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree
@@ -1912,11 +1898,11 @@ mod tests {
 	#[test]
 	pub fn conformance_unit_earth_movers_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait queriable stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_markovian_abstraction.slpn").unwrap())
+			// trait queriable stochastic language#./testfiles/simple_markovian_abstraction.slpn
 
 		];
         crate::javascript::javascript_autogen::conformance_unit_earth_movers(inputs, ".xes");
@@ -1925,11 +1911,11 @@ mod tests {
 	#[test]
 	pub fn conformance_unit_earth_movers_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait queriable stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait queriable stochastic language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::conformance_unit_earth_movers(inputs, ".xes");
@@ -1938,11 +1924,11 @@ mod tests {
 	#[test]
 	pub fn conformance_unit_earth_movers_sample_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1954,11 +1940,11 @@ mod tests {
 	#[test]
 	pub fn conformance_unit_earth_movers_sample_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1968,14 +1954,13 @@ mod tests {
     }
 
 	#[test]
-	#[should_panic]
 	pub fn conformance_unit_earth_movers_sample_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -1987,8 +1972,21 @@ mod tests {
 	#[test]
 	pub fn conformance_non_stochastic_alignments_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
+			,
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/flower.bpmn").unwrap())
+			// trait semantics#./testfiles/flower.bpmn
+
+		];
+        crate::javascript::javascript_autogen::conformance_non_stochastic_alignments(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn conformance_non_stochastic_alignments_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// trait semantics#./testfiles/seq(a-xor(b-c)).sptree
@@ -1998,26 +1996,14 @@ mod tests {
     }
 
 	#[test]
-	pub fn conformance_non_stochastic_alignments_test_1() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
-			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// trait semantics#./testfiles/skippable_repeatable.powl
-
-		];
-        crate::javascript::javascript_autogen::conformance_non_stochastic_alignments(inputs, ".xes");
-    }
-
-	#[test]
+	#[should_panic]
 	pub fn conformance_non_stochastic_alignments_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait semantics#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// trait semantics#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::conformance_non_stochastic_alignments(inputs, ".xes");
@@ -2030,21 +2016,22 @@ mod tests {
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.sali").unwrap())
 			// object stochastic language of alignments#./testfiles/aa-ab-ba.sali
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
-			// trait semantics#./testfiles/seq(a-xor(b-c)).sptree
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/flower.bpmn").unwrap())
+			// trait semantics#./testfiles/flower.bpmn
 
 		];
         crate::javascript::javascript_autogen::conformance_non_stochastic_escaping_edges_precision(inputs, ".xes");
     }
 
 	#[test]
+	#[should_panic]
 	pub fn conformance_non_stochastic_escaping_edges_precision_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.sali").unwrap())
 			// object stochastic language of alignments#./testfiles/aa-ab-ba.sali
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// trait semantics#./testfiles/skippable_repeatable.powl
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
+			// trait semantics#./testfiles/seq(a-xor(b-c)).sptree
 
 		];
         crate::javascript::javascript_autogen::conformance_non_stochastic_escaping_edges_precision(inputs, ".xes");
@@ -2057,8 +2044,8 @@ mod tests {
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.sali").unwrap())
 			// object stochastic language of alignments#./testfiles/aa-ab-ba.sali
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait semantics#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// trait semantics#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::conformance_non_stochastic_escaping_edges_precision(inputs, ".xes");
@@ -2077,8 +2064,21 @@ mod tests {
 	#[test]
 	pub fn conformance_non_stochastic_set_alignments_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
+			,
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/flower.bpmn").unwrap())
+			// trait semantics#./testfiles/flower.bpmn
+
+		];
+        crate::javascript::javascript_autogen::conformance_non_stochastic_set_alignments(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn conformance_non_stochastic_set_alignments_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
 			,
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// trait semantics#./testfiles/seq(a-xor(b-c)).sptree
@@ -2088,26 +2088,14 @@ mod tests {
     }
 
 	#[test]
-	pub fn conformance_non_stochastic_set_alignments_test_1() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite language#./testfiles/ba-aa-ab.slang
-			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// trait semantics#./testfiles/skippable_repeatable.powl
-
-		];
-        crate::javascript::javascript_autogen::conformance_non_stochastic_set_alignments(inputs, ".xes");
-    }
-
-	#[test]
+	#[should_panic]
 	pub fn conformance_non_stochastic_set_alignments_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait semantics#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// trait semantics#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::conformance_non_stochastic_set_alignments(inputs, ".xes");
@@ -2126,8 +2114,8 @@ mod tests {
 	#[test]
 	pub fn convert_business_process_model_and_notation_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
-			// object business process model and notation#./testfiles/seq(a-xor(b-c)).sptree
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/flower.bpmn").unwrap())
+			// object business process model and notation#./testfiles/flower.bpmn
 
 		];
         crate::javascript::javascript_autogen::convert_business_process_model_and_notation(inputs, ".xes");
@@ -2136,8 +2124,8 @@ mod tests {
 	#[test]
 	pub fn convert_business_process_model_and_notation_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// object business process model and notation#./testfiles/skippable_repeatable.powl
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
+			// object business process model and notation#./testfiles/seq(a-xor(b-c)).sptree
 
 		];
         crate::javascript::javascript_autogen::convert_business_process_model_and_notation(inputs, ".xes");
@@ -2146,8 +2134,8 @@ mod tests {
 	#[test]
 	pub fn convert_business_process_model_and_notation_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/model.bpmn").unwrap())
-			// object business process model and notation#./testfiles/model.bpmn
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object business process model and notation#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::convert_business_process_model_and_notation(inputs, ".xes");
@@ -2156,8 +2144,8 @@ mod tests {
 	#[test]
 	pub fn convert_finite_language_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// object finite language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// object finite language#./testfiles/aa-ab-ba.lang
 
 		];
         crate::javascript::javascript_autogen::convert_finite_language(inputs, ".xes");
@@ -2166,8 +2154,8 @@ mod tests {
 	#[test]
 	pub fn convert_finite_language_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.lang").unwrap())
-			// object finite language#./testfiles/empty.lang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// object finite language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::convert_finite_language(inputs, ".xes");
@@ -2176,8 +2164,8 @@ mod tests {
 	#[test]
 	pub fn convert_finite_language_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/bb.lang").unwrap())
-			// object finite language#./testfiles/bb.lang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// object finite language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::convert_finite_language(inputs, ".xes");
@@ -2186,8 +2174,8 @@ mod tests {
 	#[test]
 	pub fn convert_finite_stochastic_language_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// object finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// object finite stochastic language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::convert_finite_stochastic_language(inputs, ".xes");
@@ -2196,8 +2184,8 @@ mod tests {
 	#[test]
 	pub fn convert_finite_stochastic_language_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// object finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// object finite stochastic language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::convert_finite_stochastic_language(inputs, ".xes");
@@ -2206,8 +2194,8 @@ mod tests {
 	#[test]
 	pub fn convert_finite_stochastic_language_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// object finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// object finite stochastic language#./testfiles/a-b-double.xes
 
 		];
         crate::javascript::javascript_autogen::convert_finite_stochastic_language(inputs, ".xes");
@@ -2226,8 +2214,8 @@ mod tests {
 	#[test]
 	pub fn convert_labelled_petri_net_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// object labelled Petri net#./testfiles/skippable_repeatable.powl
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object labelled Petri net#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::convert_labelled_petri_net(inputs, ".xes");
@@ -2236,8 +2224,8 @@ mod tests {
 	#[test]
 	pub fn convert_labelled_petri_net_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b_star.dfm").unwrap())
-			// object labelled Petri net#./testfiles/a-b_star.dfm
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa.ptree").unwrap())
+			// object labelled Petri net#./testfiles/aa.ptree
 
 		];
         crate::javascript::javascript_autogen::convert_labelled_petri_net(inputs, ".xes");
@@ -2245,16 +2233,6 @@ mod tests {
 
 	#[test]
 	pub fn convert_log_test_0() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// object event log#./testfiles/empty.xes
-
-		];
-        crate::javascript::javascript_autogen::convert_log(inputs, ".xes");
-    }
-
-	#[test]
-	pub fn convert_log_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// object event log#./testfiles/svn60.xes
@@ -2264,10 +2242,20 @@ mod tests {
     }
 
 	#[test]
+	pub fn convert_log_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// object event log#./testfiles/a-b.csv
+
+		];
+        crate::javascript::javascript_autogen::convert_log(inputs, ".xes");
+    }
+
+	#[test]
 	pub fn convert_log_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// object event log#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// object event log#./testfiles/a-b-double.xes
 
 		];
         crate::javascript::javascript_autogen::convert_log(inputs, ".xes");
@@ -2276,8 +2264,8 @@ mod tests {
 	#[test]
 	pub fn convert_stochastic_deterministic_finite_automaton_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// object stochastic deterministic finite automaton#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// object stochastic deterministic finite automaton#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::convert_stochastic_deterministic_finite_automaton(inputs, ".xes");
@@ -2286,8 +2274,8 @@ mod tests {
 	#[test]
 	pub fn convert_stochastic_deterministic_finite_automaton_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// object stochastic deterministic finite automaton#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.sdfa").unwrap())
+			// object stochastic deterministic finite automaton#./testfiles/empty.sdfa
 
 		];
         crate::javascript::javascript_autogen::convert_stochastic_deterministic_finite_automaton(inputs, ".xes");
@@ -2296,8 +2284,8 @@ mod tests {
 	#[test]
 	pub fn convert_stochastic_deterministic_finite_automaton_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// object stochastic deterministic finite automaton#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// object stochastic deterministic finite automaton#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::convert_stochastic_deterministic_finite_automaton(inputs, ".xes");
@@ -2305,16 +2293,6 @@ mod tests {
 
 	#[test]
 	pub fn convert_stochastic_directly_follows_model_test_0() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap())
-			// object stochastic directly follows model#./testfiles/bpic12-a.xes.gz-dfg.dfg
-
-		];
-        crate::javascript::javascript_autogen::convert_stochastic_directly_follows_model(inputs, ".xes");
-    }
-
-	#[test]
-	pub fn convert_stochastic_directly_follows_model_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/bpic12-a.xes.gz-dfg.sdfm").unwrap())
 			// object stochastic directly follows model#./testfiles/bpic12-a.xes.gz-dfg.sdfm
@@ -2324,7 +2302,7 @@ mod tests {
     }
 
 	#[test]
-	pub fn convert_stochastic_directly_follows_model_test_2() {
+	pub fn convert_stochastic_directly_follows_model_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.sdfm").unwrap())
 			// object stochastic directly follows model#./testfiles/aa-ab-ba.sdfm
@@ -2334,10 +2312,20 @@ mod tests {
     }
 
 	#[test]
-	pub fn convert_stochastic_labelled_petri_net_test_0() {
+	pub fn convert_stochastic_directly_follows_model_test_2() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/bpic12-a.xes.gz-dfg.dfg").unwrap())
-			// object stochastic labelled Petri net#./testfiles/bpic12-a.xes.gz-dfg.dfg
+			// object stochastic directly follows model#./testfiles/bpic12-a.xes.gz-dfg.dfg
+
+		];
+        crate::javascript::javascript_autogen::convert_stochastic_directly_follows_model(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn convert_stochastic_labelled_petri_net_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_markovian_abstraction.slpn").unwrap())
+			// object stochastic labelled Petri net#./testfiles/simple_markovian_abstraction.slpn
 
 		];
         crate::javascript::javascript_autogen::convert_stochastic_labelled_petri_net(inputs, ".xes");
@@ -2346,8 +2334,8 @@ mod tests {
 	#[test]
 	pub fn convert_stochastic_labelled_petri_net_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-aa-bb.slpn").unwrap())
-			// object stochastic labelled Petri net#./testfiles/a-aa-bb.slpn
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/bpic12-a.xes.gz-dfg.sdfm").unwrap())
+			// object stochastic labelled Petri net#./testfiles/bpic12-a.xes.gz-dfg.sdfm
 
 		];
         crate::javascript::javascript_autogen::convert_stochastic_labelled_petri_net(inputs, ".xes");
@@ -2356,8 +2344,8 @@ mod tests {
 	#[test]
 	pub fn convert_stochastic_labelled_petri_net_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_markovian_abstraction.slpn").unwrap())
-			// object stochastic labelled Petri net#./testfiles/simple_markovian_abstraction.slpn
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.sdfa").unwrap())
+			// object stochastic labelled Petri net#./testfiles/empty.sdfa
 
 		];
         crate::javascript::javascript_autogen::convert_stochastic_labelled_petri_net(inputs, ".xes");
@@ -2376,8 +2364,8 @@ mod tests {
 	#[test]
 	pub fn convert_stochastic_nondeterministic_finite_automaton_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// object stochastic non-deterministic finite automaton#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// object stochastic non-deterministic finite automaton#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::convert_stochastic_nondeterministic_finite_automaton(inputs, ".xes");
@@ -2386,8 +2374,8 @@ mod tests {
 	#[test]
 	pub fn convert_stochastic_nondeterministic_finite_automaton_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// object stochastic non-deterministic finite automaton#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/all_operators.sptree").unwrap())
+			// object stochastic non-deterministic finite automaton#./testfiles/all_operators.sptree
 
 		];
         crate::javascript::javascript_autogen::convert_stochastic_nondeterministic_finite_automaton(inputs, ".xes");
@@ -2396,14 +2384,11 @@ mod tests {
 	#[test]
 	pub fn discover_alergia_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log#./testfiles/svn60.xes
 			,
-			JavascriptInput::from("1".to_string())
-			// fraction 1
-			,
-			JavascriptInput::from("10".to_string())
-			// usize 10
+			JavascriptInput::from("0.05".to_string())
+			// fraction 0.05
 
 		];
         crate::javascript::javascript_autogen::discover_alergia(inputs, ".xes");
@@ -2412,14 +2397,11 @@ mod tests {
 	#[test]
 	pub fn discover_alergia_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
-			// trait event log#./testfiles/svn60.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait event log#./testfiles/a-b.csv
 			,
-			JavascriptInput::from("1".to_string())
-			// fraction 1
-			,
-			JavascriptInput::from("10".to_string())
-			// usize 10
+			JavascriptInput::from("0.05".to_string())
+			// fraction 0.05
 
 		];
         crate::javascript::javascript_autogen::discover_alergia(inputs, ".xes");
@@ -2428,14 +2410,11 @@ mod tests {
 	#[test]
 	pub fn discover_alergia_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// trait event log#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait event log#./testfiles/a-b-double.xes
 			,
-			JavascriptInput::from("1".to_string())
-			// fraction 1
-			,
-			JavascriptInput::from("10".to_string())
-			// usize 10
+			JavascriptInput::from("0.05".to_string())
+			// fraction 0.05
 
 		];
         crate::javascript::javascript_autogen::discover_alergia(inputs, ".xes");
@@ -2444,8 +2423,21 @@ mod tests {
 	#[test]
 	pub fn discover_alignments_stochastic_business_process_model_and_notation_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
+			,
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/flower.bpmn").unwrap())
+			// object business process model and notation#./testfiles/flower.bpmn
+
+		];
+        crate::javascript::javascript_autogen::discover_alignments_stochastic_business_process_model_and_notation(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn discover_alignments_stochastic_business_process_model_and_notation_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// object business process model and notation#./testfiles/seq(a-xor(b-c)).sptree
@@ -2455,26 +2447,13 @@ mod tests {
     }
 
 	#[test]
-	pub fn discover_alignments_stochastic_business_process_model_and_notation_test_1() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
-			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// object business process model and notation#./testfiles/skippable_repeatable.powl
-
-		];
-        crate::javascript::javascript_autogen::discover_alignments_stochastic_business_process_model_and_notation(inputs, ".xes");
-    }
-
-	#[test]
 	pub fn discover_alignments_stochastic_business_process_model_and_notation_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/model.bpmn").unwrap())
-			// object business process model and notation#./testfiles/model.bpmn
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object business process model and notation#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_alignments_stochastic_business_process_model_and_notation(inputs, ".xes");
@@ -2483,8 +2462,8 @@ mod tests {
 	#[test]
 	pub fn discover_alignments_stochastic_labelled_petri_nets_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// object labelled Petri net#./testfiles/seq(a-xor(b-c)).sptree
@@ -2496,11 +2475,11 @@ mod tests {
 	#[test]
 	pub fn discover_alignments_stochastic_labelled_petri_nets_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// object labelled Petri net#./testfiles/skippable_repeatable.powl
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object labelled Petri net#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_alignments_stochastic_labelled_petri_nets(inputs, ".xes");
@@ -2509,11 +2488,11 @@ mod tests {
 	#[test]
 	pub fn discover_alignments_stochastic_labelled_petri_nets_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b_star.dfm").unwrap())
-			// object labelled Petri net#./testfiles/a-b_star.dfm
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa.ptree").unwrap())
+			// object labelled Petri net#./testfiles/aa.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_alignments_stochastic_labelled_petri_nets(inputs, ".xes");
@@ -2522,8 +2501,8 @@ mod tests {
 	#[test]
 	pub fn discover_directly_follows_graph_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// fraction 1
@@ -2535,8 +2514,8 @@ mod tests {
 	#[test]
 	pub fn discover_directly_follows_graph_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
-			// trait event log#./testfiles/svn60.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait event log#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("1".to_string())
 			// fraction 1
@@ -2548,8 +2527,8 @@ mod tests {
 	#[test]
 	pub fn discover_directly_follows_graph_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// trait event log#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait event log#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// fraction 1
@@ -2559,94 +2538,23 @@ mod tests {
     }
 
 	#[test]
-	pub fn discover_genetic_algorithm_for_stochastic_process_discovery_test_0() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log#./testfiles/empty.xes
-			,
-			JavascriptInput::from("10".to_string())
-			// usize 10
-			,
-			JavascriptInput::from("10".to_string())
-			// usize 10
-			,
-			JavascriptInput::from("3".to_string())
-			// usize 3
-			,
-			JavascriptInput::from("0".to_string())
-			// fraction 0
-			,
-			JavascriptInput::from("0".to_string())
-			// fraction 0
-			,
-			JavascriptInput::from("1".to_string())
-			// fraction 1
-
-		];
-        crate::javascript::javascript_autogen::discover_genetic_algorithm_for_stochastic_process_discovery(inputs, ".xes");
-    }
-
-	#[test]
-	pub fn discover_genetic_algorithm_for_stochastic_process_discovery_test_1() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
-			// trait event log#./testfiles/svn60.xes
-			,
-			JavascriptInput::from("10".to_string())
-			// usize 10
-			,
-			JavascriptInput::from("10".to_string())
-			// usize 10
-			,
-			JavascriptInput::from("3".to_string())
-			// usize 3
-			,
-			JavascriptInput::from("0".to_string())
-			// fraction 0
-			,
-			JavascriptInput::from("0".to_string())
-			// fraction 0
-			,
-			JavascriptInput::from("1".to_string())
-			// fraction 1
-
-		];
-        crate::javascript::javascript_autogen::discover_genetic_algorithm_for_stochastic_process_discovery(inputs, ".xes");
-    }
-
-	#[test]
-	pub fn discover_genetic_algorithm_for_stochastic_process_discovery_test_2() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// trait event log#./testfiles/simple_log_markovian_abstraction.xes
-			,
-			JavascriptInput::from("10".to_string())
-			// usize 10
-			,
-			JavascriptInput::from("10".to_string())
-			// usize 10
-			,
-			JavascriptInput::from("3".to_string())
-			// usize 3
-			,
-			JavascriptInput::from("0".to_string())
-			// fraction 0
-			,
-			JavascriptInput::from("0".to_string())
-			// fraction 0
-			,
-			JavascriptInput::from("1".to_string())
-			// fraction 1
-
-		];
-        crate::javascript::javascript_autogen::discover_genetic_algorithm_for_stochastic_process_discovery(inputs, ".xes");
-    }
-
-	#[test]
 	pub fn discover_occurrence_stochastic_business_process_model_and_notation_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
+			,
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/flower.bpmn").unwrap())
+			// object business process model and notation#./testfiles/flower.bpmn
+
+		];
+        crate::javascript::javascript_autogen::discover_occurrence_stochastic_business_process_model_and_notation(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn discover_occurrence_stochastic_business_process_model_and_notation_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// object business process model and notation#./testfiles/seq(a-xor(b-c)).sptree
@@ -2656,26 +2564,13 @@ mod tests {
     }
 
 	#[test]
-	pub fn discover_occurrence_stochastic_business_process_model_and_notation_test_1() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
-			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// object business process model and notation#./testfiles/skippable_repeatable.powl
-
-		];
-        crate::javascript::javascript_autogen::discover_occurrence_stochastic_business_process_model_and_notation(inputs, ".xes");
-    }
-
-	#[test]
 	pub fn discover_occurrence_stochastic_business_process_model_and_notation_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/model.bpmn").unwrap())
-			// object business process model and notation#./testfiles/model.bpmn
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object business process model and notation#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_occurrence_stochastic_business_process_model_and_notation(inputs, ".xes");
@@ -2684,8 +2579,8 @@ mod tests {
 	#[test]
 	pub fn discover_occurrence_stochastic_labelled_petri_net_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// object labelled Petri net#./testfiles/seq(a-xor(b-c)).sptree
@@ -2697,11 +2592,11 @@ mod tests {
 	#[test]
 	pub fn discover_occurrence_stochastic_labelled_petri_net_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// object labelled Petri net#./testfiles/skippable_repeatable.powl
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object labelled Petri net#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_occurrence_stochastic_labelled_petri_net(inputs, ".xes");
@@ -2710,11 +2605,11 @@ mod tests {
 	#[test]
 	pub fn discover_occurrence_stochastic_labelled_petri_net_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b_star.dfm").unwrap())
-			// object labelled Petri net#./testfiles/a-b_star.dfm
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa.ptree").unwrap())
+			// object labelled Petri net#./testfiles/aa.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_occurrence_stochastic_labelled_petri_net(inputs, ".xes");
@@ -2723,8 +2618,8 @@ mod tests {
 	#[test]
 	pub fn discover_occurrence_stochastic_process_tree_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// object process tree#./testfiles/seq(a-xor(b-c)).sptree
@@ -2736,11 +2631,11 @@ mod tests {
 	#[test]
 	pub fn discover_occurrence_stochastic_process_tree_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.ptree").unwrap())
-			// object process tree#./testfiles/empty.ptree
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object process tree#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_occurrence_stochastic_process_tree(inputs, ".xes");
@@ -2749,11 +2644,11 @@ mod tests {
 	#[test]
 	pub fn discover_occurrence_stochastic_process_tree_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.ptml").unwrap())
-			// object process tree#./testfiles/aa-ab-ba.ptml
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa.ptree").unwrap())
+			// object process tree#./testfiles/aa.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_occurrence_stochastic_process_tree(inputs, ".xes");
@@ -2761,6 +2656,16 @@ mod tests {
 
 	#[test]
 	pub fn discover_random_stochastic_business_process_model_and_notation_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/flower.bpmn").unwrap())
+			// object business process model and notation#./testfiles/flower.bpmn
+
+		];
+        crate::javascript::javascript_autogen::discover_random_stochastic_business_process_model_and_notation(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn discover_random_stochastic_business_process_model_and_notation_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// object business process model and notation#./testfiles/seq(a-xor(b-c)).sptree
@@ -2770,20 +2675,10 @@ mod tests {
     }
 
 	#[test]
-	pub fn discover_random_stochastic_business_process_model_and_notation_test_1() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// object business process model and notation#./testfiles/skippable_repeatable.powl
-
-		];
-        crate::javascript::javascript_autogen::discover_random_stochastic_business_process_model_and_notation(inputs, ".xes");
-    }
-
-	#[test]
 	pub fn discover_random_stochastic_business_process_model_and_notation_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/model.bpmn").unwrap())
-			// object business process model and notation#./testfiles/model.bpmn
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object business process model and notation#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_random_stochastic_business_process_model_and_notation(inputs, ".xes");
@@ -2802,8 +2697,8 @@ mod tests {
 	#[test]
 	pub fn discover_random_stochastic_labelled_petri_net_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// object labelled Petri net#./testfiles/skippable_repeatable.powl
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object labelled Petri net#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_random_stochastic_labelled_petri_net(inputs, ".xes");
@@ -2812,8 +2707,8 @@ mod tests {
 	#[test]
 	pub fn discover_random_stochastic_labelled_petri_net_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b_star.dfm").unwrap())
-			// object labelled Petri net#./testfiles/a-b_star.dfm
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa.ptree").unwrap())
+			// object labelled Petri net#./testfiles/aa.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_random_stochastic_labelled_petri_net(inputs, ".xes");
@@ -2832,8 +2727,8 @@ mod tests {
 	#[test]
 	pub fn discover_random_stochastic_process_tree_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.ptree").unwrap())
-			// object process tree#./testfiles/empty.ptree
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object process tree#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_random_stochastic_process_tree(inputs, ".xes");
@@ -2842,8 +2737,8 @@ mod tests {
 	#[test]
 	pub fn discover_random_stochastic_process_tree_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.ptml").unwrap())
-			// object process tree#./testfiles/aa-ab-ba.ptml
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa.ptree").unwrap())
+			// object process tree#./testfiles/aa.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_random_stochastic_process_tree(inputs, ".xes");
@@ -2851,6 +2746,16 @@ mod tests {
 
 	#[test]
 	pub fn discover_uniform_stochastic_business_process_model_and_notation_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/flower.bpmn").unwrap())
+			// object business process model and notation#./testfiles/flower.bpmn
+
+		];
+        crate::javascript::javascript_autogen::discover_uniform_stochastic_business_process_model_and_notation(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn discover_uniform_stochastic_business_process_model_and_notation_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// object business process model and notation#./testfiles/seq(a-xor(b-c)).sptree
@@ -2860,20 +2765,10 @@ mod tests {
     }
 
 	#[test]
-	pub fn discover_uniform_stochastic_business_process_model_and_notation_test_1() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// object business process model and notation#./testfiles/skippable_repeatable.powl
-
-		];
-        crate::javascript::javascript_autogen::discover_uniform_stochastic_business_process_model_and_notation(inputs, ".xes");
-    }
-
-	#[test]
 	pub fn discover_uniform_stochastic_business_process_model_and_notation_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/model.bpmn").unwrap())
-			// object business process model and notation#./testfiles/model.bpmn
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object business process model and notation#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_uniform_stochastic_business_process_model_and_notation(inputs, ".xes");
@@ -2892,8 +2787,8 @@ mod tests {
 	#[test]
 	pub fn discover_uniform_stochastic_labelled_petri_net_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// object labelled Petri net#./testfiles/skippable_repeatable.powl
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object labelled Petri net#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_uniform_stochastic_labelled_petri_net(inputs, ".xes");
@@ -2902,8 +2797,8 @@ mod tests {
 	#[test]
 	pub fn discover_uniform_stochastic_labelled_petri_net_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b_star.dfm").unwrap())
-			// object labelled Petri net#./testfiles/a-b_star.dfm
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa.ptree").unwrap())
+			// object labelled Petri net#./testfiles/aa.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_uniform_stochastic_labelled_petri_net(inputs, ".xes");
@@ -2922,8 +2817,8 @@ mod tests {
 	#[test]
 	pub fn discover_uniform_stochastic_process_tree_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.ptree").unwrap())
-			// object process tree#./testfiles/empty.ptree
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object process tree#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_uniform_stochastic_process_tree(inputs, ".xes");
@@ -2932,8 +2827,8 @@ mod tests {
 	#[test]
 	pub fn discover_uniform_stochastic_process_tree_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.ptml").unwrap())
-			// object process tree#./testfiles/aa-ab-ba.ptml
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa.ptree").unwrap())
+			// object process tree#./testfiles/aa.ptree
 
 		];
         crate::javascript::javascript_autogen::discover_uniform_stochastic_process_tree(inputs, ".xes");
@@ -2942,8 +2837,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_flower_deterministic_finite_automaton_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_flower_deterministic_finite_automaton(inputs, ".xes");
@@ -2952,8 +2847,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_flower_deterministic_finite_automaton_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_flower_deterministic_finite_automaton(inputs, ".xes");
@@ -2962,8 +2857,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_flower_deterministic_finite_automaton_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_flower_deterministic_finite_automaton(inputs, ".xes");
@@ -2972,8 +2867,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_flower_process_tree_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_flower_process_tree(inputs, ".xes");
@@ -2982,8 +2877,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_flower_process_tree_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_flower_process_tree(inputs, ".xes");
@@ -2992,8 +2887,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_flower_process_tree_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_flower_process_tree(inputs, ".xes");
@@ -3002,8 +2897,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_inductive_miner_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_inductive_miner(inputs, ".xes");
@@ -3012,8 +2907,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_inductive_miner_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_inductive_miner(inputs, ".xes");
@@ -3022,8 +2917,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_inductive_miner_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_inductive_miner(inputs, ".xes");
@@ -3032,8 +2927,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_inductive_miner_infrequent_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("0.2".to_string())
 			// fraction 0.2
@@ -3045,8 +2940,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_inductive_miner_infrequent_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("0.2".to_string())
 			// fraction 0.2
@@ -3058,8 +2953,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_inductive_miner_infrequent_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("0.2".to_string())
 			// fraction 0.2
@@ -3071,8 +2966,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_prefix_tree_deterministic_finite_automaton(inputs, ".xes");
@@ -3081,8 +2976,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_prefix_tree_deterministic_finite_automaton(inputs, ".xes");
@@ -3091,8 +2986,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_prefix_tree_deterministic_finite_automaton(inputs, ".xes");
@@ -3101,8 +2996,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_prefix_tree_process_tree_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_prefix_tree_process_tree(inputs, ".xes");
@@ -3111,8 +3006,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_prefix_tree_process_tree_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_prefix_tree_process_tree(inputs, ".xes");
@@ -3121,8 +3016,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_prefix_tree_process_tree_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_prefix_tree_process_tree(inputs, ".xes");
@@ -3131,8 +3026,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_split_miner_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("0.1".to_string())
 			// fraction 0.1
@@ -3147,8 +3042,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_split_miner_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("0.1".to_string())
 			// fraction 0.1
@@ -3163,8 +3058,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_split_miner_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("0.1".to_string())
 			// fraction 0.1
@@ -3179,8 +3074,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_trace_model_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_trace_model(inputs, ".xes");
@@ -3189,8 +3084,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_trace_model_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_trace_model(inputs, ".xes");
@@ -3199,8 +3094,8 @@ mod tests {
 	#[test]
 	pub fn discover_non_stochastic_trace_model_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::discover_non_stochastic_trace_model(inputs, ".xes");
@@ -3208,16 +3103,6 @@ mod tests {
 
 	#[test]
 	pub fn filter_traces_empty_test_0() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// object XES event log#./testfiles/empty.xes
-
-		];
-        crate::javascript::javascript_autogen::filter_traces_empty(inputs, ".xes");
-    }
-
-	#[test]
-	pub fn filter_traces_empty_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// object XES event log#./testfiles/svn60.xes
@@ -3227,10 +3112,20 @@ mod tests {
     }
 
 	#[test]
+	pub fn filter_traces_empty_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// object XES event log#./testfiles/a-b.csv
+
+		];
+        crate::javascript::javascript_autogen::filter_traces_empty(inputs, ".xes");
+    }
+
+	#[test]
 	pub fn filter_traces_empty_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// object XES event log#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// object XES event log#./testfiles/a-b-double.xes
 
 		];
         crate::javascript::javascript_autogen::filter_traces_empty(inputs, ".xes");
@@ -3239,8 +3134,8 @@ mod tests {
 	#[test]
 	pub fn filter_traces_event_activity_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// object XES event log#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// object XES event log#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("any".to_string())
 			// string any
@@ -3255,8 +3150,8 @@ mod tests {
 	#[test]
 	pub fn filter_traces_event_activity_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
-			// object XES event log#./testfiles/svn60.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// object XES event log#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("any".to_string())
 			// string any
@@ -3271,8 +3166,8 @@ mod tests {
 	#[test]
 	pub fn filter_traces_event_activity_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// object XES event log#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// object XES event log#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("any".to_string())
 			// string any
@@ -3286,22 +3181,6 @@ mod tests {
 
 	#[test]
 	pub fn filter_traces_length_test_0() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// object XES event log#./testfiles/empty.xes
-			,
-			JavascriptInput::from("<".to_string())
-			// string <
-			,
-			JavascriptInput::from("0".to_string())
-			// usize 0
-
-		];
-        crate::javascript::javascript_autogen::filter_traces_length(inputs, ".xes");
-    }
-
-	#[test]
-	pub fn filter_traces_length_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// object XES event log#./testfiles/svn60.xes
@@ -3317,10 +3196,26 @@ mod tests {
     }
 
 	#[test]
+	pub fn filter_traces_length_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// object XES event log#./testfiles/a-b.csv
+			,
+			JavascriptInput::from("<".to_string())
+			// string <
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::filter_traces_length(inputs, ".xes");
+    }
+
+	#[test]
 	pub fn filter_traces_length_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// object XES event log#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// object XES event log#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("<".to_string())
 			// string <
@@ -3335,8 +3230,8 @@ mod tests {
 	#[test]
 	pub fn information_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
-			// object stochastic process tree#./testfiles/seq(a-xor(b-c)).sptree
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/flower.bpmn").unwrap())
+			// object business process model and notation#./testfiles/flower.bpmn
 
 		];
         crate::javascript::javascript_autogen::information(inputs, ".xes");
@@ -3345,8 +3240,8 @@ mod tests {
 	#[test]
 	pub fn information_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// object partially ordered workflow language#./testfiles/skippable_repeatable.powl
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
+			// object stochastic process tree#./testfiles/seq(a-xor(b-c)).sptree
 
 		];
         crate::javascript::javascript_autogen::information(inputs, ".xes");
@@ -3355,8 +3250,8 @@ mod tests {
 	#[test]
 	pub fn information_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// object finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object process tree#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::information(inputs, ".xes");
@@ -3368,8 +3263,8 @@ mod tests {
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
 
 		];
         crate::javascript::javascript_autogen::probability_log(inputs, ".xes");
@@ -3381,8 +3276,8 @@ mod tests {
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite language#./testfiles/svn60.xes
 
 		];
         crate::javascript::javascript_autogen::probability_log(inputs, ".xes");
@@ -3394,8 +3289,8 @@ mod tests {
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// trait queriable stochastic language#./testfiles/seq(a-xor(b-c)).sptree
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite language#./testfiles/a-b.csv
 
 		];
         crate::javascript::javascript_autogen::probability_log(inputs, ".xes");
@@ -3414,8 +3309,8 @@ mod tests {
 	#[test]
 	pub fn reduce_labelled_petri_net_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// object labelled Petri net#./testfiles/skippable_repeatable.powl
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object labelled Petri net#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::reduce_labelled_petri_net(inputs, ".xes");
@@ -3424,8 +3319,8 @@ mod tests {
 	#[test]
 	pub fn reduce_labelled_petri_net_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b_star.dfm").unwrap())
-			// object labelled Petri net#./testfiles/a-b_star.dfm
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa.ptree").unwrap())
+			// object labelled Petri net#./testfiles/aa.ptree
 
 		];
         crate::javascript::javascript_autogen::reduce_labelled_petri_net(inputs, ".xes");
@@ -3444,8 +3339,8 @@ mod tests {
 	#[test]
 	pub fn reduce_process_tree_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.ptree").unwrap())
-			// object process tree#./testfiles/empty.ptree
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// object process tree#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::reduce_process_tree(inputs, ".xes");
@@ -3454,8 +3349,8 @@ mod tests {
 	#[test]
 	pub fn reduce_process_tree_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.ptml").unwrap())
-			// object process tree#./testfiles/aa-ab-ba.ptml
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa.ptree").unwrap())
+			// object process tree#./testfiles/aa.ptree
 
 		];
         crate::javascript::javascript_autogen::reduce_process_tree(inputs, ".xes");
@@ -3463,25 +3358,6 @@ mod tests {
 
 	#[test]
 	pub fn sample_folds_test_0() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// object event log#./testfiles/empty.xes
-			,
-			JavascriptInput::from("1".to_string())
-			// usize 1
-			,
-			JavascriptInput::from("0".to_string())
-			// usize 0
-			,
-			JavascriptInput::from("0".to_string())
-			// usize 0
-
-		];
-        crate::javascript::javascript_autogen::sample_folds(inputs, ".xes");
-    }
-
-	#[test]
-	pub fn sample_folds_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// object event log#./testfiles/svn60.xes
@@ -3500,10 +3376,29 @@ mod tests {
     }
 
 	#[test]
+	pub fn sample_folds_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// object event log#./testfiles/a-b.csv
+			,
+			JavascriptInput::from("1".to_string())
+			// usize 1
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::sample_folds(inputs, ".xes");
+    }
+
+	#[test]
 	pub fn sample_folds_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// object event log#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// object event log#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -3521,19 +3416,6 @@ mod tests {
 	#[test]
 	pub fn sample_partially_ordered_traces_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/model.sbpmn").unwrap())
-			// object stochastic business process model and notation#./testfiles/model.sbpmn
-			,
-			JavascriptInput::from("1".to_string())
-			// usize 1
-
-		];
-        crate::javascript::javascript_autogen::sample_partially_ordered_traces(inputs, ".xes");
-    }
-
-	#[test]
-	pub fn sample_partially_ordered_traces_test_1() {
-        let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/flower.sbpmn").unwrap())
 			// object stochastic business process model and notation#./testfiles/flower.sbpmn
 			,
@@ -3545,10 +3427,23 @@ mod tests {
     }
 
 	#[test]
+	pub fn sample_partially_ordered_traces_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/model.sbpmn").unwrap())
+			// object stochastic business process model and notation#./testfiles/model.sbpmn
+			,
+			JavascriptInput::from("1".to_string())
+			// usize 1
+
+		];
+        crate::javascript::javascript_autogen::sample_partially_ordered_traces(inputs, ".xes");
+    }
+
+	#[test]
 	pub fn sample_traces_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -3560,8 +3455,8 @@ mod tests {
 	#[test]
 	pub fn sample_traces_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -3571,11 +3466,10 @@ mod tests {
     }
 
 	#[test]
-	#[should_panic]
 	pub fn sample_traces_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("1".to_string())
 			// usize 1
@@ -3587,11 +3481,11 @@ mod tests {
 	#[test]
 	pub fn test_bootstrap_test_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("10".to_string())
 			// usize 10
@@ -3606,11 +3500,11 @@ mod tests {
 	#[test]
 	pub fn test_bootstrap_test_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait finite stochastic language#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
 			,
 			JavascriptInput::from("10".to_string())
 			// usize 10
@@ -3623,14 +3517,13 @@ mod tests {
     }
 
 	#[test]
-	#[should_panic]
 	pub fn test_bootstrap_test_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait finite stochastic language#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait finite stochastic language#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
 			,
 			JavascriptInput::from("10".to_string())
 			// usize 10
@@ -3645,26 +3538,6 @@ mod tests {
 	#[test]
 	#[should_panic]
 	pub fn test_log_categorical_attribute_test_0() {
-        let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log with trace attributes#./testfiles/empty.xes
-			,
-			JavascriptInput::from("some string".to_string())
-			// string some string
-			,
-			JavascriptInput::from("10".to_string())
-			// usize 10
-			,
-			JavascriptInput::from("0.05".to_string())
-			// fraction 0.05
-
-		];
-        crate::javascript::javascript_autogen::test_log_categorical_attribute(inputs, ".xes");
-    }
-
-	#[test]
-	#[should_panic]
-	pub fn test_log_categorical_attribute_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// trait event log with trace attributes#./testfiles/svn60.xes
@@ -3684,10 +3557,30 @@ mod tests {
 
 	#[test]
 	#[should_panic]
+	pub fn test_log_categorical_attribute_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait event log with trace attributes#./testfiles/a-b-double.xes
+			,
+			JavascriptInput::from("some string".to_string())
+			// string some string
+			,
+			JavascriptInput::from("10".to_string())
+			// usize 10
+			,
+			JavascriptInput::from("0.05".to_string())
+			// fraction 0.05
+
+		];
+        crate::javascript::javascript_autogen::test_log_categorical_attribute(inputs, ".xes");
+    }
+
+	#[test]
+	#[should_panic]
 	pub fn test_log_categorical_attribute_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_log_markovian_abstraction.xes").unwrap())
-			// trait event log with trace attributes#./testfiles/simple_log_markovian_abstraction.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/oc-log.ocel").unwrap())
+			// trait event log with trace attributes#./testfiles/oc-log.ocel
 			,
 			JavascriptInput::from("some string".to_string())
 			// string some string
@@ -3705,8 +3598,8 @@ mod tests {
 	#[test]
 	pub fn test_permutation_test_log_model_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log#./testfiles/svn60.xes
 			,
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
 			// trait stochastic semantics#./testfiles/seq(a-xor(b-c)).sptree
@@ -3724,11 +3617,11 @@ mod tests {
 	#[test]
 	pub fn test_permutation_test_log_model_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/ba-aa-ab.slang").unwrap())
-			// trait stochastic semantics#./testfiles/ba-aa-ab.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/simple_markovian_abstraction.slpn").unwrap())
+			// trait stochastic semantics#./testfiles/simple_markovian_abstraction.slpn
 			,
 			JavascriptInput::from("10".to_string())
 			// usize 10
@@ -3743,11 +3636,11 @@ mod tests {
 	#[test]
 	pub fn test_permutation_test_log_model_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty.xes").unwrap())
-			// trait event log#./testfiles/empty.xes
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait event log#./testfiles/svn60.xes
 			,
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.slang").unwrap())
-			// trait stochastic semantics#./testfiles/a-b.slang
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait stochastic semantics#./testfiles/svn60.xes
 			,
 			JavascriptInput::from("10".to_string())
 			// usize 10
@@ -3762,8 +3655,8 @@ mod tests {
 	#[test]
 	pub fn visualise_graph_test_0() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
-			// trait graphable#./testfiles/seq(a-xor(b-c)).sptree
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/flower.bpmn").unwrap())
+			// trait graphable#./testfiles/flower.bpmn
 
 		];
         crate::javascript::javascript_autogen::visualise_graph(inputs, ".xes");
@@ -3772,8 +3665,8 @@ mod tests {
 	#[test]
 	pub fn visualise_graph_test_1() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/skippable_repeatable.powl").unwrap())
-			// trait graphable#./testfiles/skippable_repeatable.powl
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/seq(a-xor(b-c)).sptree").unwrap())
+			// trait graphable#./testfiles/seq(a-xor(b-c)).sptree
 
 		];
         crate::javascript::javascript_autogen::visualise_graph(inputs, ".xes");
@@ -3782,8 +3675,8 @@ mod tests {
 	#[test]
 	pub fn visualise_graph_test_2() {
         let inputs = vec![
-			JavascriptInput::from(std::fs::read_to_string("./testfiles/model.bpmn").unwrap())
-			// trait graphable#./testfiles/model.bpmn
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/empty_2.ptree").unwrap())
+			// trait graphable#./testfiles/empty_2.ptree
 
 		];
         crate::javascript::javascript_autogen::visualise_graph(inputs, ".xes");

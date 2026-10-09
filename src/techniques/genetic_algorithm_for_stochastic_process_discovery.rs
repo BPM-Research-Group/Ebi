@@ -3,6 +3,7 @@ use crate::ebi_traits::{
     ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
 };
+use crate::techniques::alergia::alergia_algorithm;
 use crate::techniques::{
     alergia::FrequencyPrefixTree,
     earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
