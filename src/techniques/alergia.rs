@@ -1,22 +1,20 @@
 use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
 use ebi_objects::{
-    Activity, ActivityKey, AutomatonState, Graphable, StochasticDeterministicFiniteAutomaton, ebi_arithmetic::{Fraction, One, Signed, Sqrt, Zero, f, fraction::approximate::Approximate}, ebi_objects::scalable_vector_graphics::ToSVG, traits::graphable,
+    Activity, ActivityKey, AutomatonState, Graphable, StochasticDeterministicFiniteAutomaton, ebi_arithmetic::{Fraction, One, Signed, Sqrt, Zero, f, fraction::approximate::Approximate}, traits::graphable,
 };
 use ebi_optimisation::anyhow::{Ok, Result};
 use layout::{core::base::Orientation, topo::layout::VisualGraph};
-use std::{collections::HashMap, fs};
+use std::collections::{HashMap, HashSet};
 
 /// Learns a stochastic deterministic finite automaton from an event log
 /// using the Alergia state-merging algorithm (Carrasco & Oncina, 1994).
 pub trait Alergia {
-    fn alergia(&self, alpha: Fraction) -> Result<StochasticDeterministicFiniteAutomaton>;
+    fn alergia(&self, alpha: Fraction, log_size: usize) -> Result<StochasticDeterministicFiniteAutomaton>;
 }
 
 impl Alergia for dyn EbiTraitFiniteStochasticLanguage {
-    fn alergia(&self, alpha: Fraction) -> Result<StochasticDeterministicFiniteAutomaton> {
-        let mut fpta = FrequencyPrefixTree::from_log(self);
-
-        fs::write("bla.svg", fpta.to_svg().unwrap().to_string()).unwrap();
+    fn alergia(&self, alpha: Fraction, log_size: usize) -> Result<StochasticDeterministicFiniteAutomaton> {
+        let mut fpta = FrequencyPrefixTree::from_log(self, log_size);
 
         //TODO: here, exact arithmetic is not yet up to the task
         let gamma_approx = (0.5 * (2.0 / alpha.approximate()?).ln()).sqrt();
@@ -158,20 +156,17 @@ fn alergia_compatible(
     q_blue: usize,
     q_red: usize,
 ) -> bool {
+    let mut visited = HashSet::new();
+    if !visited.insert((q_blue, q_red)) {
+        return true;
+    }
+
     if !alergia_test(
-        &confidence_factor,
-        fpta.node_2_termination_counts
-            .get(q_blue)
-            .unwrap_or(&Fraction::zero()),
-        fpta.node_2_termination_counts
-            .get(q_red)
-            .unwrap_or(&Fraction::zero()),
-        fpta.node_2_visit_counts
-            .get(q_blue)
-            .unwrap_or(&Fraction::zero()),
-        fpta.node_2_visit_counts
-            .get(q_red)
-            .unwrap_or(&Fraction::zero()),
+        confidence_factor,
+        &fpta.node_2_termination_counts[q_blue],
+        &fpta.node_2_termination_counts[q_red],
+        &fpta.node_2_visit_counts[q_blue],
+        &fpta.node_2_visit_counts[q_red],
     ) {
         return false;
     }
@@ -179,21 +174,33 @@ fn alergia_compatible(
     let mut activities: Vec<Activity> = fpta.activity_key.name2activity.values().copied().collect();
     activities.sort();
 
-    for activity in &activities {
+    for activity in activities {
         let zero = Fraction::zero();
-        let freq_blue = fpta.get_edge_count(*activity, q_blue).unwrap_or(&zero);
-        let freq_red = fpta.get_edge_count(*activity, q_red).unwrap_or(&zero);
-        let total_blue = fpta.node_2_visit_counts.get(q_blue).unwrap_or(&zero);
-        let total_red = fpta.node_2_visit_counts.get(q_red).unwrap_or(&zero);
+        let freq_blue = fpta.get_edge_count(activity, q_blue).unwrap_or(&zero);
+        let freq_red = fpta.get_edge_count(activity, q_red).unwrap_or(&zero);
 
         if !alergia_test(
-            &confidence_factor,
+            confidence_factor,
             freq_blue,
             freq_red,
-            total_blue,
-            total_red,
+            &fpta.node_2_visit_counts[q_blue],
+            &fpta.node_2_visit_counts[q_red],
         ) {
             return false;
+        }
+
+        if let (Some(blue_target), Some(red_target)) = (
+            fpta.get_edge_target(activity, q_blue),
+            fpta.get_edge_target(activity, q_red),
+        ) {
+            if !alergia_compatible(
+                confidence_factor,
+                fpta,
+                blue_target,
+                red_target,
+            ) {
+                return false;
+            }
         }
     }
 
@@ -231,7 +238,7 @@ fn alergia_test(
 
     let bound = &(&root_red + &root_blue) * confidence_factor;
 
-    dist < bound
+    dist <= bound
 }
 
 /// A frequency-annotated prefix tree built from an event log's traces.
@@ -252,51 +259,53 @@ pub struct FrequencyPrefixTree {
 impl FrequencyPrefixTree {
     /// Builds the prefix tree from the distinct traces of `log`, with edge
     /// and node counts weighted by trace frequency.
-    pub fn from_log(log: &dyn EbiTraitFiniteStochasticLanguage) -> Self {
+    pub fn from_log(log: &dyn EbiTraitFiniteStochasticLanguage, log_size: usize) -> Self {
         let mut node_2_transitions = vec![vec![]];
         let mut node_2_visit_counts = vec![Fraction::zero()];
         let mut node_2_termination_counts = vec![Fraction::zero()];
         let mut child_map = vec![HashMap::default()];
-        let mut paths = vec![vec![]]; // root path = []
-
-        for (trace, weight) in log.iter_traces_probabilities() {
+        let mut paths = vec![vec![]];
+        let log_size = Fraction::from(log_size);
+        for (trace, probability) in log.iter_traces_probabilities() {
+            let frequency = probability * &log_size;
             let mut node = 0usize;
-            node_2_visit_counts[node] += weight;
+            node_2_visit_counts[node] += &frequency;
 
-            for &act in trace {
-                if !child_map[node].contains_key(&act) {
+            for &activity in trace {
+                if !child_map[node].contains_key(&activity) {
                     let new_id = node_2_transitions.len();
                     node_2_transitions.push(vec![]);
                     node_2_visit_counts.push(Fraction::zero());
                     node_2_termination_counts.push(Fraction::zero());
                     child_map.push(HashMap::new());
 
-                    // new node's path = parent's path + this activity
                     let mut child_path = paths[node].clone();
-                    child_path.push(act);
+                    child_path.push(activity);
                     paths.push(child_path);
 
-                    child_map[node].insert(act, new_id);
-                    let pos = node_2_transitions[node].partition_point(|&(a, _, _)| a < act);
-                    node_2_transitions[node].insert(pos, (act, new_id, Fraction::zero()));
+                    child_map[node].insert(activity, new_id);
+                    let position = node_2_transitions[node]
+                        .partition_point(|&(candidate, _, _)| candidate < activity);
+                    node_2_transitions[node].insert(position, (activity, new_id, Fraction::zero()));
                 }
 
-                let next = child_map[node][&act];
-                let pos = node_2_transitions[node].partition_point(|&(a, _, _)| a < act);
-                node_2_transitions[node][pos].2 += weight;
-                node_2_visit_counts[next] += weight;
+                let next = child_map[node][&activity];
+                let position = node_2_transitions[node]
+                    .partition_point(|&(candidate, _, _)| candidate < activity);
+                node_2_transitions[node][position].2 += &frequency;
+                node_2_visit_counts[next] += &frequency;
                 node = next;
             }
-            node_2_termination_counts[node] += weight;
+
+            node_2_termination_counts[node] += &frequency;
         }
 
-        let n: usize = node_2_transitions.len();
-
+        let number_of_nodes = node_2_transitions.len();
         Self {
             node_2_transitions,
             node_2_visit_counts,
             node_2_termination_counts,
-            alive: vec![true; n],
+            alive: vec![true; number_of_nodes],
             activity_key: log.activity_key().clone(),
             paths,
         }
@@ -314,6 +323,13 @@ impl FrequencyPrefixTree {
             .iter()
             .find(|(a_prime, _, _)| *a_prime == a)
             .map(|(_, _, count)| count)
+    }
+
+    pub fn get_edge_target(&self, activity: Activity, state: usize) -> Option<usize> {
+        self.node_2_transitions[state]
+            .iter()
+            .find(|(candidate, _, _)| *candidate == activity)
+            .map(|(_, target, _)| *target)
     }
 
     /// Converts the (possibly merged) prefix tree into a stochastic
@@ -421,7 +437,7 @@ mod tests {
         let fin = fs::read_to_string("testfiles/carrasco.slang").unwrap();
         let slang = fin.parse::<FiniteStochasticLanguage>().unwrap();
         let slang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang);
-        let sdfa = slang.alergia(f!(8, 10)).unwrap();
+        let sdfa = slang.alergia(f!(8, 10),15).unwrap();
 
         println!("final result {:?}", sdfa);
 

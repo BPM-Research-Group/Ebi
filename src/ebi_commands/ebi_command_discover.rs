@@ -76,8 +76,10 @@ pub const EBI_DISCOVER_ALERGIA: EbiCommand = EbiCommand::Command {
             .remove(0)
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let alpha = *inputs.remove(0).to_type::<Fraction>().unwrap();
+        let log_size = log.number_of_traces();
+        print!("log size: {}", log_size);
         Ok(EbiOutput::Object(
-            EbiObject::StochasticDeterministicFiniteAutomaton(log.alergia(alpha)?),
+            EbiObject::StochasticDeterministicFiniteAutomaton(log.alergia(alpha, log_size)?),
         ))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticDeterministicFiniteAutomaton),

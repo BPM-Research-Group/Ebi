@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg width="2785" height="951.25" viewBox="0 0 2785 951.25" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<marker id="startarrow" markerWidth="10" markerHeight="7"
+refX="0" refY="3.5" orient="auto">
+<polygon points="10 0, 10 7, 0 3.5" fill="context-stroke" />
+</marker>
+<marker id="endarrow" markerWidth="10" markerHeight="7"
+refX="10" refY="3.5" orient="auto">
+<polygon points="0 0, 10 3.5, 0 7" fill="context-stroke" />
+</marker>
+
+</defs><style>
+.a15 { font-size: 15px; font-family: Times, serif; }
+</style>
+<g >
+
+            <ellipse cx="122.5" cy="378.75" rx="92.5" ry="92.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="122.5" y="363.75" class="a15"><tspan x = "122.5" dy="1.0em">Exact (3/5)</tspan></text><g >
+
+            <ellipse cx="605" cy="130" rx="100" ry="100" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="605" y="115" class="a15"><tspan x = "605" dy="1.0em">Exact (1/15)</tspan></text><g >
+
+            <ellipse cx="1110" cy="130" rx="100" ry="100" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="1110" y="115" class="a15"><tspan x = "1110" dy="1.0em">Exact (2/15)</tspan></text><g >
+
+            <ellipse cx="605" cy="497.5" rx="77.5" ry="77.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="605" y="482.5" class="a15"><tspan x = "605" dy="1.0em">Exact (0)</tspan></text><g >
+
+            <ellipse cx="1110" cy="367.5" rx="77.5" ry="77.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="1110" y="352.5" class="a15"><tspan x = "1110" dy="1.0em">Exact (0)</tspan></text><g >
+
+            <ellipse cx="1615" cy="248.75" rx="77.5" ry="77.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="1615" y="233.75" class="a15"><tspan x = "1615" dy="1.0em">Exact (0)</tspan></text><g >
+
+            <ellipse cx="2097.5" cy="248.75" rx="77.5" ry="77.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="2097.5" y="233.75" class="a15"><tspan x = "2097.5" dy="1.0em">Exact (0)</tspan></text><g >
+
+            <ellipse cx="2580" cy="248.75" rx="100" ry="100" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="2580" y="233.75" class="a15"><tspan x = "2580" dy="1.0em">Exact (1/15)</tspan></text><g >
+
+            <ellipse cx="1110" cy="746.25" rx="77.5" ry="77.5" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="1110" y="731.25" class="a15"><tspan x = "1110" dy="1.0em">Exact (0)</tspan></text><g >
+
+            <ellipse cx="1615" cy="746.25" rx="100" ry="100" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="1615" y="731.25" class="a15"><tspan x = "1615" dy="1.0em">Exact (1/15)</tspan></text><g >
+
+            <ellipse cx="1615" cy="486.25" rx="100" ry="100" fill="#ffffffff" 
+            stroke-width="2" stroke="#000000ff"/>
+
+            </g>
+<text dominant-baseline="middle" text-anchor="middle" 
+            x="1615" y="471.25" class="a15"><tspan x = "1615" dy="1.0em">Exact (1/15)</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="360" y="239.375" class="a15"><tspan x = "360" dy="1.0em">0: Exact (1/5)</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="360" y="423.125" class="a15"><tspan x = "360" dy="1.0em">1: Exact (1/5)</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="857.5" y="115" class="a15"><tspan x = "857.5" dy="1.0em">0: Exact (2/15)</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="857.5" y="417.5" class="a15"><tspan x = "857.5" dy="1.0em">0: Exact (2/15)</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="857.5" y="606.875" class="a15"><tspan x = "857.5" dy="1.0em">1: Exact (1/15)</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="1362.5" y="411.875" class="a15"><tspan x = "1362.5" dy="1.0em">0: Exact (1/15)</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="1362.5" y="293.125" class="a15"><tspan x = "1362.5" dy="1.0em">1: Exact (1/15)</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="1867.5" y="233.75" class="a15"><tspan x = "1867.5" dy="1.0em">1: Exact (1/15)</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="2327.5" y="233.75" class="a15"><tspan x = "2327.5" dy="1.0em">0: Exact (1/15)</tspan></text><text dominant-baseline="middle" text-anchor="middle" 
+            x="1362.5" y="731.25" class="a15"><tspan x = "1362.5" dy="1.0em">0: Exact (1/15)</tspan></text><g >
+
+            <path id="arrow0" d="M 209.589843616605 347.57935453290577 C 237.8351983030715 337.46995600303734, 445.47035891161124 270.6261511220621, 470 254.375 S 509.3907461822671 218.08445143392981, 531.4544201402055 197.75727033379215 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow0" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow1" d="M 213.67862798009486 394.3290821189011 C 243.25007489255805 399.3817574007069, 441.77502147298793 428.58953101391046, 470 438.125 S 506.5969176814309 454.22086657285155, 534.0582429796362 466.2987642734511 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow1" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow2" d="M 705 130 C 735 130, 945 130, 975 130 S 980 130, 1010 130 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow2" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow3" d="M 681.3310873637992 484.0904846523055 C 710.8786050530117 478.8997045177141, 947.1279836030317 442.8978382475806, 975 432.5 S 1013.1423205008967 414.1351790180867, 1040.1723705936697 401.1207104548997 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow3" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow4" d="M 678.4606754978663 522.1937067974246 C 706.8970660131694 531.752561041589, 950.5798335949767 605.5297127555552, 975 621.875 S 1030.9385016507208 673.4109343911734, 1053.0021756086592 693.7381154913111 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow4" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow5" d="M 1186.5209946027207 379.7795514987474 C 1216.142024771516 384.5329262724561, 1451.8224533925732 417.22612835363515, 1480 426.875 S 1496.000923707777 433.9124432974019, 1523.4622490059824 445.99034099800144 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow5" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow6" d="M 1186.5209946027207 355.2204485012526 C 1216.142024771516 350.4670737275439, 1451.8224533925732 317.77387164636485, 1480 308.125 S 1516.596917681431 292.0291334271484, 1544.0582429796364 279.9512357265489 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow6" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow7" d="M 1692.5 248.75 C 1722.5 248.75, 1955 248.75, 1985 248.75 S 1990 248.75, 2020 248.75 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow7" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow8" d="M 2175 248.75 C 2205 248.75, 2415 248.75, 2445 248.75 S 2450 248.75, 2480 248.75 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow8" startOffset="50%" text-anchor="middle" class="a15"></textPath></text><g >
+
+            <path id="arrow9" d="M 1187.5 746.25 C 1217.5 746.25, 1450 746.25, 1480 746.25 S 1485 746.25, 1515 746.25 " stroke="#000000ff" stroke-width="2"   marker-end="url(#endarrow)" 
+            fill="transparent" />
+
+            </g>
+<text><textPath href="#arrow9" startOffset="50%" text-anchor="middle" class="a15"></textPath></text></svg>
