@@ -5,11 +5,9 @@ use crate::{
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
-    },
-    ebi_traits::{
-        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    },
-    techniques::{
+    }, ebi_traits::{
+        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    }, techniques::{
         alergia::Alergia,
         alignment_stochastic_miner::AlignmentMiner,
         directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
@@ -59,7 +57,7 @@ pub const EBI_DISCOVER_ALERGIA: EbiCommand = EbiCommand::Command {
     cli_command: None,
     exact_arithmetic: true,
     input_types: &[
-        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Trait(EbiTrait::EventLog)],
         &[&EbiInputType::Fraction(
             Some(ConstFraction::zero()),
             Some(ConstFraction::one()),
@@ -74,12 +72,10 @@ pub const EBI_DISCOVER_ALERGIA: EbiCommand = EbiCommand::Command {
     execute: |mut inputs, _| {
         let log = inputs
             .remove(0)
-            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+            .to_type::<dyn EbiTraitEventLog>()?;
         let alpha = *inputs.remove(0).to_type::<Fraction>().unwrap();
-        let log_size = log.number_of_traces();
-        print!("log size: {}", log_size);
         Ok(EbiOutput::Object(
-            EbiObject::StochasticDeterministicFiniteAutomaton(log.alergia(alpha, log_size)?),
+            EbiObject::StochasticDeterministicFiniteAutomaton(log.alergia(alpha)?),
         ))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticDeterministicFiniteAutomaton),
