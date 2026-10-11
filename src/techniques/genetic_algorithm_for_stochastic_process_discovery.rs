@@ -35,7 +35,7 @@ const FILTER_FACTOR_RESOLUTION_DIGITS: u32 = 6;
 pub fn alergia_gaspd(
     confidence_factor: &Fraction,
     filter_frequency: &Fraction,
-    log: &dyn EbiTraitFiniteStochasticLanguage,
+    log: &dyn EbiTraitEventLog,
     min_visits: usize,
 ) -> Result<StochasticDeterministicFiniteAutomaton> {
     let filtered_log = filter_log(filter_frequency.clone(), log);
@@ -50,9 +50,9 @@ pub fn alergia_gaspd(
 /// fraction (rounded up) of distinct trace variants.
 pub fn filter_log(
     filter_frequency: Fraction,
-    log: &mut dyn EbiTraitFiniteStochasticLanguage,
+    log: &dyn EbiTraitEventLog,
 ) -> impl EbiTraitEventLog {
-    let mut sorted_traces = log.iter_traces_probabilities().collect::<Vec<_>>();
+    let mut sorted_traces = log.iter_traces().collect::<Vec<_>>();
     sorted_traces.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
 
     let len = sorted_traces.len();
