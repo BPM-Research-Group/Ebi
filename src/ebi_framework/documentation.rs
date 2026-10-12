@@ -338,7 +338,7 @@ fn commands(f: &mut Vec<u8>) -> Result<()> {
                     f,
                     "This command can be run here, in the browser. 
                     All files remain on your computer, and are not uploaded. 
-                    There is a limit of 4GB of RAM.
+                    There is a limit of 4GB of RAM and single-threaded computation.
                     <p>"
                 )?;
                 javascript_html_form(f, &path)?;
