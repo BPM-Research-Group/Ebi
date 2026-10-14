@@ -42,8 +42,14 @@ pub trait EbiTraitFiniteStochasticLanguage:
      */
     fn retain_traces_probabilities_mut<'a>(
         &'a mut self,
-        f: Box<dyn Fn(&Vec<Activity>, &mut Fraction) -> bool + 'static>,
+        f: Box<dyn FnMut(&Vec<Activity>, &mut Fraction) -> bool + 'static>,
     );
+
+    /// Remove all traces.
+    fn clear(&mut self);
+
+    /// Make the sum of probabilities one, unless there are no traces.
+    fn normalise(&mut self);
 }
 
 impl FromEbiTraitObject for dyn EbiTraitFiniteStochasticLanguage {
@@ -74,18 +80,28 @@ impl EbiTraitFiniteStochasticLanguage for FiniteStochasticLanguage {
     fn retain_traces_probabilities<'a>(
         &'a mut self,
         f: Box<dyn Fn(&Vec<Activity>, &Fraction) -> bool + 'static>,
-    )
-    {
-        self.traces.retain(|trace, probability| f(trace, probability) );
+    ) {
+        self.traces
+            .retain(|trace, probability| f(trace, probability));
         self.normalise();
     }
 
     fn retain_traces_probabilities_mut<'a>(
         &'a mut self,
-        f: Box<dyn Fn(&Vec<Activity>, &mut Fraction) -> bool + 'static>,
+        f: Box<dyn FnMut(&Vec<Activity>, &mut Fraction) -> bool + 'static>,
     ) {
         self.traces.retain(f);
     }
+    
+    fn clear(&mut self) {
+        self.traces.clear();
+    }
+    
+    fn normalise(&mut self) {
+        self.normalise();
+    }
+
+    
 }
 
 impl<T> ToFiniteStochasticLanguageTrait for T

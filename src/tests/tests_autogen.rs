@@ -50168,6 +50168,759 @@ mod tests{
 	}
 
 
+	// ==== command ll ====
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_0() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b-double.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_1() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.csv",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_2() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_3() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_4() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.xes.gz",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_5() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b_multiple_separators.csv",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_6() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/aa-ab-ba.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_7() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/aa.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_8() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/alergia.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/alergia.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/ba.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_13() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/bb.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_14() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/bpic12-a-sample.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a-sample.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_15() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/carrasco.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/carrasco.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_16() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/cohort_test.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/cohort_test.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_17() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/empty.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_18() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/empty.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_19() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/empty_trace.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_20() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_21() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/markovian.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/markovian.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_22() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_23() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/simple_log_markovian_abstraction.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_log_markovian_abstraction.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ll_test_24() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LEAST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/svn60.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/svn60.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+
+
 	// ==== command len ====
 	#[test]
 	#[timeout(10000)]
@@ -50960,6 +51713,759 @@ mod tests{
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+
+
+	// ==== command ml ====
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_0() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b-double.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_1() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.csv",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_2() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_3() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_4() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.xes.gz",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_5() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b_multiple_separators.csv",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_6() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/aa-ab-ba.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_7() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/aa.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_8() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/alergia.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/alergia.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/ba.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_13() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/bb.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_14() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/bpic12-a-sample.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a-sample.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_15() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/carrasco.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/carrasco.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_16() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/cohort_test.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/cohort_test.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_17() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/empty.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_18() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/empty.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_19() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/empty_trace.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_20() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_21() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/markovian.slang",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/markovian.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_22() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_23() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/simple_log_markovian_abstraction.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_log_markovian_abstraction.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_ml_test_24() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_MOST_LIKELY,
+			&[
+				"trait finite stochastic language#./testfiles/svn60.xes",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/svn60.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();

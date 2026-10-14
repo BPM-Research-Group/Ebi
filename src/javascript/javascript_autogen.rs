@@ -646,11 +646,27 @@ pub fn filter_stochastic_language_traces_event_activity(javascript_inputs: Vec<J
 }
 
 #[wasm_bindgen]
+pub fn filter_stochastic_language_traces_least_likely(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LEAST_LIKELY;
+    execute_javascript_command(command, javascript_inputs, "filter_stochastic_language_traces_least_likely", exporter_file_extension);
+}
+
+#[wasm_bindgen]
 pub fn filter_stochastic_language_traces_length(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = 
         &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH;
     execute_javascript_command(command, javascript_inputs, "filter_stochastic_language_traces_length", exporter_file_extension);
+}
+
+#[wasm_bindgen]
+pub fn filter_stochastic_language_traces_most_likely(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_MOST_LIKELY;
+    execute_javascript_command(command, javascript_inputs, "filter_stochastic_language_traces_most_likely", exporter_file_extension);
 }
 
 #[wasm_bindgen]
@@ -3480,6 +3496,45 @@ mod tests {
     }
 
 	#[test]
+	pub fn filter_stochastic_language_traces_least_likely_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_least_likely(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_least_likely_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_least_likely(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_least_likely_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_least_likely(inputs, ".xes");
+    }
+
+	#[test]
 	pub fn filter_stochastic_language_traces_length_test_0() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
@@ -3525,6 +3580,45 @@ mod tests {
 
 		];
         crate::javascript::javascript_autogen::filter_stochastic_language_traces_length(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_most_likely_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_most_likely(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_most_likely_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_most_likely(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_most_likely_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_most_likely(inputs, ".xes");
     }
 
 	#[test]
