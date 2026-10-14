@@ -46111,17 +46111,2338 @@ mod tests{
 	// ==== group fil ====
 
 
+	// ==== group lang ====
+
+
 	// ==== group tr ====
 
 
 	// ==== command empty ====
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_empty_test_0() {
+	pub fn ebi_fil_lang_tr_empty_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EMPTY,
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/a-b-double.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_1() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/a-b.csv"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_2() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/a-b.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_3() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/a-b.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_4() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/a-b.xes.gz"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_5() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/a-b_multiple_separators.csv"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_6() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/aa-ab-ba.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_7() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/aa-ab-ba.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_8() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/aa.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/aa.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/abc-acb-aaabc.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/alergia.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/alergia.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_13() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/ba-aa-ab.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_14() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/ba.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_15() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/ba.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_16() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/bb.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_17() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/bb.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_18() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/bpic12-a-sample.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a-sample.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_19() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/carrasco.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/carrasco.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_20() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/cohort_test.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/cohort_test.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_21() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/empty.lang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_22() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/empty.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_23() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/empty.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_empty_test_24() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EMPTY,
+			&[
+				"trait finite language#./testfiles/empty_trace.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+
+
+	// ==== command len ====
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_0() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/a-b-double.xes",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_1() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/a-b.csv",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_2() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/a-b.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_3() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/a-b.xes",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_4() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/a-b.xes.gz",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_5() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/a-b_multiple_separators.csv",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_6() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/aa-ab-ba.lang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_7() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/aa-ab-ba.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_8() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/aa.lang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/aa.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/abc-acb-aaabc.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/alergia.xes",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/alergia.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_13() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/ba-aa-ab.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_14() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/ba.lang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_15() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/ba.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_16() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/bb.lang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_17() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/bb.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_18() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/bpic12-a-sample.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a-sample.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_19() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/carrasco.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/carrasco.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_20() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/cohort_test.xes",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/cohort_test.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_21() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/empty.lang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_22() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/empty.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_23() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/empty.xes",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_len_test_24() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_LENGTH,
+			&[
+				"trait finite language#./testfiles/empty_trace.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+
+
+	// ==== group event ====
+
+
+	// ==== command act ====
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_0() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/a-b-double.xes",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_1() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/a-b.csv",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_2() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/a-b.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_3() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/a-b.xes",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_4() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/a-b.xes.gz",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_5() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/a-b_multiple_separators.csv",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_6() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/aa-ab-ba.lang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_7() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/aa-ab-ba.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_8() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/aa.lang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/aa.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/abc-acb-aaabc.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/alergia.xes",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/alergia.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_13() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/ba-aa-ab.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_14() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/ba.lang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_15() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/ba.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_16() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/bb.lang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_17() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/bb.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_18() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/bpic12-a-sample.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a-sample.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_19() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/carrasco.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/carrasco.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_20() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/cohort_test.xes",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/cohort_test.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_21() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/empty.lang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.lang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_22() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/empty.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_23() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/empty.xes",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_lang_tr_event_act_test_24() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite language#./testfiles/empty_trace.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+
+
+	// ==== group log ====
+
+
+	// ==== group tr ====
+
+
+	// ==== command empty ====
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_log_tr_empty_test_0() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_LOG_TRACES_EMPTY,
 			&[
 				"object XES event log#./testfiles/a-b-double.xes"			
 			]
@@ -46145,11 +48466,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_empty_test_1() {
+	pub fn ebi_fil_log_tr_empty_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EMPTY,
+			&EBI_FILTER_LOG_TRACES_EMPTY,
 			&[
 				"object XES event log#./testfiles/a-b.csv"			
 			]
@@ -46173,11 +48494,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_empty_test_2() {
+	pub fn ebi_fil_log_tr_empty_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EMPTY,
+			&EBI_FILTER_LOG_TRACES_EMPTY,
 			&[
 				"object XES event log#./testfiles/a-b.xes"			
 			]
@@ -46201,11 +48522,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_empty_test_3() {
+	pub fn ebi_fil_log_tr_empty_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EMPTY,
+			&EBI_FILTER_LOG_TRACES_EMPTY,
 			&[
 				"object XES event log#./testfiles/a-b.xes.gz"			
 			]
@@ -46229,11 +48550,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_empty_test_4() {
+	pub fn ebi_fil_log_tr_empty_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EMPTY,
+			&EBI_FILTER_LOG_TRACES_EMPTY,
 			&[
 				"object XES event log#./testfiles/a-b_multiple_separators.csv"			
 			]
@@ -46257,11 +48578,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_empty_test_5() {
+	pub fn ebi_fil_log_tr_empty_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EMPTY,
+			&EBI_FILTER_LOG_TRACES_EMPTY,
 			&[
 				"object XES event log#./testfiles/alergia.xes"			
 			]
@@ -46285,11 +48606,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_empty_test_6() {
+	pub fn ebi_fil_log_tr_empty_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EMPTY,
+			&EBI_FILTER_LOG_TRACES_EMPTY,
 			&[
 				"object XES event log#./testfiles/cohort_test.xes"			
 			]
@@ -46313,11 +48634,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_empty_test_7() {
+	pub fn ebi_fil_log_tr_empty_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EMPTY,
+			&EBI_FILTER_LOG_TRACES_EMPTY,
 			&[
 				"object XES event log#./testfiles/empty.xes"			
 			]
@@ -46341,11 +48662,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_empty_test_8() {
+	pub fn ebi_fil_log_tr_empty_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EMPTY,
+			&EBI_FILTER_LOG_TRACES_EMPTY,
 			&[
 				"object XES event log#./testfiles/fig_a.xes"			
 			]
@@ -46369,11 +48690,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_empty_test_9() {
+	pub fn ebi_fil_log_tr_empty_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EMPTY,
+			&EBI_FILTER_LOG_TRACES_EMPTY,
 			&[
 				"object XES event log#./testfiles/simple_log_markovian_abstraction.xes"			
 			]
@@ -46397,11 +48718,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_empty_test_10() {
+	pub fn ebi_fil_log_tr_empty_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EMPTY,
+			&EBI_FILTER_LOG_TRACES_EMPTY,
 			&[
 				"object XES event log#./testfiles/svn60.xes"			
 			]
@@ -46428,11 +48749,11 @@ mod tests{
 	// ==== command len ====
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_len_test_0() {
+	pub fn ebi_fil_log_tr_len_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_LENGTH,
+			&EBI_FILTER_LOG_TRACES_LENGTH,
 			&[
 				"object XES event log#./testfiles/a-b-double.xes",
 				"string <",
@@ -46460,11 +48781,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_len_test_1() {
+	pub fn ebi_fil_log_tr_len_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_LENGTH,
+			&EBI_FILTER_LOG_TRACES_LENGTH,
 			&[
 				"object XES event log#./testfiles/a-b.csv",
 				"string <",
@@ -46492,11 +48813,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_len_test_2() {
+	pub fn ebi_fil_log_tr_len_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_LENGTH,
+			&EBI_FILTER_LOG_TRACES_LENGTH,
 			&[
 				"object XES event log#./testfiles/a-b.xes",
 				"string <",
@@ -46524,11 +48845,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_len_test_3() {
+	pub fn ebi_fil_log_tr_len_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_LENGTH,
+			&EBI_FILTER_LOG_TRACES_LENGTH,
 			&[
 				"object XES event log#./testfiles/a-b.xes.gz",
 				"string <",
@@ -46556,11 +48877,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_len_test_4() {
+	pub fn ebi_fil_log_tr_len_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_LENGTH,
+			&EBI_FILTER_LOG_TRACES_LENGTH,
 			&[
 				"object XES event log#./testfiles/a-b_multiple_separators.csv",
 				"string <",
@@ -46588,11 +48909,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_len_test_5() {
+	pub fn ebi_fil_log_tr_len_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_LENGTH,
+			&EBI_FILTER_LOG_TRACES_LENGTH,
 			&[
 				"object XES event log#./testfiles/alergia.xes",
 				"string <",
@@ -46620,11 +48941,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_len_test_6() {
+	pub fn ebi_fil_log_tr_len_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_LENGTH,
+			&EBI_FILTER_LOG_TRACES_LENGTH,
 			&[
 				"object XES event log#./testfiles/cohort_test.xes",
 				"string <",
@@ -46652,11 +48973,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_len_test_7() {
+	pub fn ebi_fil_log_tr_len_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_LENGTH,
+			&EBI_FILTER_LOG_TRACES_LENGTH,
 			&[
 				"object XES event log#./testfiles/empty.xes",
 				"string <",
@@ -46684,11 +49005,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_len_test_8() {
+	pub fn ebi_fil_log_tr_len_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_LENGTH,
+			&EBI_FILTER_LOG_TRACES_LENGTH,
 			&[
 				"object XES event log#./testfiles/fig_a.xes",
 				"string <",
@@ -46716,11 +49037,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_len_test_9() {
+	pub fn ebi_fil_log_tr_len_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_LENGTH,
+			&EBI_FILTER_LOG_TRACES_LENGTH,
 			&[
 				"object XES event log#./testfiles/simple_log_markovian_abstraction.xes",
 				"string <",
@@ -46748,11 +49069,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_len_test_10() {
+	pub fn ebi_fil_log_tr_len_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_LENGTH,
+			&EBI_FILTER_LOG_TRACES_LENGTH,
 			&[
 				"object XES event log#./testfiles/svn60.xes",
 				"string <",
@@ -46786,11 +49107,11 @@ mod tests{
 	// ==== command act ====
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_event_act_test_0() {
+	pub fn ebi_fil_log_tr_event_act_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EVENT_ACTIVITY,
+			&EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY,
 			&[
 				"object XES event log#./testfiles/a-b-double.xes",
 				"string any",
@@ -46818,11 +49139,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_event_act_test_1() {
+	pub fn ebi_fil_log_tr_event_act_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EVENT_ACTIVITY,
+			&EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY,
 			&[
 				"object XES event log#./testfiles/a-b.csv",
 				"string any",
@@ -46850,11 +49171,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_event_act_test_2() {
+	pub fn ebi_fil_log_tr_event_act_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EVENT_ACTIVITY,
+			&EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY,
 			&[
 				"object XES event log#./testfiles/a-b.xes",
 				"string any",
@@ -46882,11 +49203,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_event_act_test_3() {
+	pub fn ebi_fil_log_tr_event_act_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EVENT_ACTIVITY,
+			&EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY,
 			&[
 				"object XES event log#./testfiles/a-b.xes.gz",
 				"string any",
@@ -46914,11 +49235,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_event_act_test_4() {
+	pub fn ebi_fil_log_tr_event_act_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EVENT_ACTIVITY,
+			&EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY,
 			&[
 				"object XES event log#./testfiles/a-b_multiple_separators.csv",
 				"string any",
@@ -46946,11 +49267,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_event_act_test_5() {
+	pub fn ebi_fil_log_tr_event_act_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EVENT_ACTIVITY,
+			&EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY,
 			&[
 				"object XES event log#./testfiles/alergia.xes",
 				"string any",
@@ -46978,11 +49299,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_event_act_test_6() {
+	pub fn ebi_fil_log_tr_event_act_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EVENT_ACTIVITY,
+			&EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY,
 			&[
 				"object XES event log#./testfiles/cohort_test.xes",
 				"string any",
@@ -47010,11 +49331,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_event_act_test_7() {
+	pub fn ebi_fil_log_tr_event_act_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EVENT_ACTIVITY,
+			&EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY,
 			&[
 				"object XES event log#./testfiles/empty.xes",
 				"string any",
@@ -47042,11 +49363,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_event_act_test_8() {
+	pub fn ebi_fil_log_tr_event_act_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EVENT_ACTIVITY,
+			&EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY,
 			&[
 				"object XES event log#./testfiles/fig_a.xes",
 				"string any",
@@ -47074,11 +49395,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_event_act_test_9() {
+	pub fn ebi_fil_log_tr_event_act_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EVENT_ACTIVITY,
+			&EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY,
 			&[
 				"object XES event log#./testfiles/simple_log_markovian_abstraction.xes",
 				"string any",
@@ -47106,11 +49427,11 @@ mod tests{
 	}
 	#[test]
 	#[timeout(10000)]
-	pub fn ebi_fil_tr_event_act_test_10() {
+	pub fn ebi_fil_log_tr_event_act_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
 		(
-			&EBI_FILTER_TRACES_EVENT_ACTIVITY,
+			&EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY,
 			&[
 				"object XES event log#./testfiles/svn60.xes",
 				"string any",
@@ -47127,6 +49448,2324 @@ mod tests{
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+
+
+	// ==== group slang ====
+
+
+	// ==== group tr ====
+
+
+	// ==== command empty ====
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_0() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b-double.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_1() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.csv"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_2() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_3() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_4() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.xes.gz"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_5() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b_multiple_separators.csv"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_6() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/aa-ab-ba.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_7() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/aa.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_8() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/alergia.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/alergia.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/ba.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_13() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/bb.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_14() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/bpic12-a-sample.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a-sample.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_15() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/carrasco.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/carrasco.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_16() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/cohort_test.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/cohort_test.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_17() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/empty.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_18() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/empty.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_19() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/empty_trace.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_20() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/fig_a.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_21() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/markovian.slang"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/markovian.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_22() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/oc-log.ocel"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_23() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/simple_log_markovian_abstraction.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_log_markovian_abstraction.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_empty_test_24() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EMPTY,
+			&[
+				"trait finite stochastic language#./testfiles/svn60.xes"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/svn60.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let inputs = vec![input0];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+
+
+	// ==== command len ====
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_0() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/a-b-double.xes",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_1() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.csv",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_2() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_3() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.xes",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_4() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.xes.gz",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_5() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/a-b_multiple_separators.csv",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_6() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/aa-ab-ba.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_7() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/aa.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_8() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/alergia.xes",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/alergia.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/ba.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_13() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/bb.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_14() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/bpic12-a-sample.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a-sample.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_15() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/carrasco.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/carrasco.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_16() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/cohort_test.xes",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/cohort_test.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_17() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/empty.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_18() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/empty.xes",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_19() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/empty_trace.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_20() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_21() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/markovian.slang",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/markovian.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_22() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_23() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/simple_log_markovian_abstraction.xes",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_log_markovian_abstraction.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_len_test_24() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_LENGTH,
+			&[
+				"trait finite stochastic language#./testfiles/svn60.xes",
+				"string <",
+				"usize 0"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/svn60.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("<".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+
+
+	// ==== group event ====
+
+
+	// ==== command act ====
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_0() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b-double.xes",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_1() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.csv",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_2() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_3() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.xes",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_4() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b.xes.gz",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_5() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/a-b_multiple_separators.csv",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_6() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/aa-ab-ba.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_7() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/aa.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_8() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_9() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_10() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/alergia.xes",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/alergia.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_11() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_12() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/ba.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_13() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/bb.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_14() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/bpic12-a-sample.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a-sample.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_15() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/carrasco.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/carrasco.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_16() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/cohort_test.xes",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/cohort_test.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_17() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/empty.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_18() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/empty.xes",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_19() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/empty_trace.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_20() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/fig_a.xes",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_21() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/markovian.slang",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/markovian.slang").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_22() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/oc-log.ocel",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_23() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/simple_log_markovian_abstraction.xes",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_log_markovian_abstraction.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
+			match (execute)(inputs, None) {
+				Ok(output) => {
+					output.test_activity_key();
+					assert_eq!(&output.get_type(), output_type);
+				}
+				Err(e) => Err(e).unwrap(),
+			}
+		}
+	}
+	#[test]
+	#[timeout(10000)]
+	pub fn ebi_fil_slang_tr_event_act_test_24() {
+		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
+		/* 
+		(
+			&EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY,
+			&[
+				"trait finite stochastic language#./testfiles/svn60.xes",
+				"string any",
+				"string some string"			
+			]
+		),
+		*/
+		
+		let mut reader = MultipleReader::from_file(File::open("./testfiles/svn60.xes").unwrap());
+		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
+		let input0 = EbiInput::Trait(object0, file_handler0);
+		let input1 = EbiInput::String("any".to_string(), &TEST_INPUT_TYPE_STRING);
+		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
+		let inputs = vec![input0, input1, input2];
+
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();

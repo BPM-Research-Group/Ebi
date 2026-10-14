@@ -582,27 +582,75 @@ pub fn discover_non_stochastic_trace_model(javascript_inputs: Vec<JavascriptInpu
 }
 
 #[wasm_bindgen]
-pub fn filter_traces_empty(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+pub fn filter_language_traces_empty(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = 
-        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY;
-    execute_javascript_command(command, javascript_inputs, "filter_traces_empty", exporter_file_extension);
+        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EMPTY;
+    execute_javascript_command(command, javascript_inputs, "filter_language_traces_empty", exporter_file_extension);
 }
 
 #[wasm_bindgen]
-pub fn filter_traces_event_activity(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+pub fn filter_language_traces_event_activity(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = 
-        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EVENT_ACTIVITY;
-    execute_javascript_command(command, javascript_inputs, "filter_traces_event_activity", exporter_file_extension);
+        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_EVENT_ACTIVITY;
+    execute_javascript_command(command, javascript_inputs, "filter_language_traces_event_activity", exporter_file_extension);
 }
 
 #[wasm_bindgen]
-pub fn filter_traces_length(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+pub fn filter_language_traces_length(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = 
-        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_LENGTH;
-    execute_javascript_command(command, javascript_inputs, "filter_traces_length", exporter_file_extension);
+        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_LANG_TRACES_LENGTH;
+    execute_javascript_command(command, javascript_inputs, "filter_language_traces_length", exporter_file_extension);
+}
+
+#[wasm_bindgen]
+pub fn filter_log_traces_empty(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EMPTY;
+    execute_javascript_command(command, javascript_inputs, "filter_log_traces_empty", exporter_file_extension);
+}
+
+#[wasm_bindgen]
+pub fn filter_log_traces_event_activity(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY;
+    execute_javascript_command(command, javascript_inputs, "filter_log_traces_event_activity", exporter_file_extension);
+}
+
+#[wasm_bindgen]
+pub fn filter_log_traces_length(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_LENGTH;
+    execute_javascript_command(command, javascript_inputs, "filter_log_traces_length", exporter_file_extension);
+}
+
+#[wasm_bindgen]
+pub fn filter_stochastic_language_traces_empty(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EMPTY;
+    execute_javascript_command(command, javascript_inputs, "filter_stochastic_language_traces_empty", exporter_file_extension);
+}
+
+#[wasm_bindgen]
+pub fn filter_stochastic_language_traces_event_activity(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_EVENT_ACTIVITY;
+    execute_javascript_command(command, javascript_inputs, "filter_stochastic_language_traces_event_activity", exporter_file_extension);
+}
+
+#[wasm_bindgen]
+pub fn filter_stochastic_language_traces_length(javascript_inputs: Vec<JavascriptInput>, exporter_file_extension: &str) {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = 
+        &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_SLANG_TRACES_LENGTH;
+    execute_javascript_command(command, javascript_inputs, "filter_stochastic_language_traces_length", exporter_file_extension);
 }
 
 #[wasm_bindgen]
@@ -3102,37 +3150,163 @@ mod tests {
     }
 
 	#[test]
-	pub fn filter_traces_empty_test_0() {
+	pub fn filter_language_traces_empty_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
+
+		];
+        crate::javascript::javascript_autogen::filter_language_traces_empty(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_language_traces_empty_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite language#./testfiles/svn60.xes
+
+		];
+        crate::javascript::javascript_autogen::filter_language_traces_empty(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_language_traces_empty_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite language#./testfiles/a-b.csv
+
+		];
+        crate::javascript::javascript_autogen::filter_language_traces_empty(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_language_traces_event_activity_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
+			,
+			JavascriptInput::from("any".to_string())
+			// string any
+			,
+			JavascriptInput::from("some string".to_string())
+			// string some string
+
+		];
+        crate::javascript::javascript_autogen::filter_language_traces_event_activity(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_language_traces_event_activity_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite language#./testfiles/svn60.xes
+			,
+			JavascriptInput::from("any".to_string())
+			// string any
+			,
+			JavascriptInput::from("some string".to_string())
+			// string some string
+
+		];
+        crate::javascript::javascript_autogen::filter_language_traces_event_activity(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_language_traces_event_activity_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite language#./testfiles/a-b.csv
+			,
+			JavascriptInput::from("any".to_string())
+			// string any
+			,
+			JavascriptInput::from("some string".to_string())
+			// string some string
+
+		];
+        crate::javascript::javascript_autogen::filter_language_traces_event_activity(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_language_traces_length_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/aa-ab-ba.lang").unwrap())
+			// trait finite language#./testfiles/aa-ab-ba.lang
+			,
+			JavascriptInput::from("<".to_string())
+			// string <
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::filter_language_traces_length(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_language_traces_length_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite language#./testfiles/svn60.xes
+			,
+			JavascriptInput::from("<".to_string())
+			// string <
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::filter_language_traces_length(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_language_traces_length_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite language#./testfiles/a-b.csv
+			,
+			JavascriptInput::from("<".to_string())
+			// string <
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::filter_language_traces_length(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_log_traces_empty_test_0() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// object XES event log#./testfiles/svn60.xes
 
 		];
-        crate::javascript::javascript_autogen::filter_traces_empty(inputs, ".xes");
+        crate::javascript::javascript_autogen::filter_log_traces_empty(inputs, ".xes");
     }
 
 	#[test]
-	pub fn filter_traces_empty_test_1() {
+	pub fn filter_log_traces_empty_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
 			// object XES event log#./testfiles/a-b.csv
 
 		];
-        crate::javascript::javascript_autogen::filter_traces_empty(inputs, ".xes");
+        crate::javascript::javascript_autogen::filter_log_traces_empty(inputs, ".xes");
     }
 
 	#[test]
-	pub fn filter_traces_empty_test_2() {
+	pub fn filter_log_traces_empty_test_2() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
 			// object XES event log#./testfiles/a-b-double.xes
 
 		];
-        crate::javascript::javascript_autogen::filter_traces_empty(inputs, ".xes");
+        crate::javascript::javascript_autogen::filter_log_traces_empty(inputs, ".xes");
     }
 
 	#[test]
-	pub fn filter_traces_event_activity_test_0() {
+	pub fn filter_log_traces_event_activity_test_0() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// object XES event log#./testfiles/svn60.xes
@@ -3144,11 +3318,11 @@ mod tests {
 			// string some string
 
 		];
-        crate::javascript::javascript_autogen::filter_traces_event_activity(inputs, ".xes");
+        crate::javascript::javascript_autogen::filter_log_traces_event_activity(inputs, ".xes");
     }
 
 	#[test]
-	pub fn filter_traces_event_activity_test_1() {
+	pub fn filter_log_traces_event_activity_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
 			// object XES event log#./testfiles/a-b.csv
@@ -3160,11 +3334,11 @@ mod tests {
 			// string some string
 
 		];
-        crate::javascript::javascript_autogen::filter_traces_event_activity(inputs, ".xes");
+        crate::javascript::javascript_autogen::filter_log_traces_event_activity(inputs, ".xes");
     }
 
 	#[test]
-	pub fn filter_traces_event_activity_test_2() {
+	pub fn filter_log_traces_event_activity_test_2() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
 			// object XES event log#./testfiles/a-b-double.xes
@@ -3176,11 +3350,11 @@ mod tests {
 			// string some string
 
 		];
-        crate::javascript::javascript_autogen::filter_traces_event_activity(inputs, ".xes");
+        crate::javascript::javascript_autogen::filter_log_traces_event_activity(inputs, ".xes");
     }
 
 	#[test]
-	pub fn filter_traces_length_test_0() {
+	pub fn filter_log_traces_length_test_0() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
 			// object XES event log#./testfiles/svn60.xes
@@ -3192,11 +3366,11 @@ mod tests {
 			// usize 0
 
 		];
-        crate::javascript::javascript_autogen::filter_traces_length(inputs, ".xes");
+        crate::javascript::javascript_autogen::filter_log_traces_length(inputs, ".xes");
     }
 
 	#[test]
-	pub fn filter_traces_length_test_1() {
+	pub fn filter_log_traces_length_test_1() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
 			// object XES event log#./testfiles/a-b.csv
@@ -3208,11 +3382,11 @@ mod tests {
 			// usize 0
 
 		];
-        crate::javascript::javascript_autogen::filter_traces_length(inputs, ".xes");
+        crate::javascript::javascript_autogen::filter_log_traces_length(inputs, ".xes");
     }
 
 	#[test]
-	pub fn filter_traces_length_test_2() {
+	pub fn filter_log_traces_length_test_2() {
         let inputs = vec![
 			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
 			// object XES event log#./testfiles/a-b-double.xes
@@ -3224,7 +3398,133 @@ mod tests {
 			// usize 0
 
 		];
-        crate::javascript::javascript_autogen::filter_traces_length(inputs, ".xes");
+        crate::javascript::javascript_autogen::filter_log_traces_length(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_empty_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_empty(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_empty_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_empty(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_empty_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_empty(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_event_activity_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
+			,
+			JavascriptInput::from("any".to_string())
+			// string any
+			,
+			JavascriptInput::from("some string".to_string())
+			// string some string
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_event_activity(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_event_activity_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
+			,
+			JavascriptInput::from("any".to_string())
+			// string any
+			,
+			JavascriptInput::from("some string".to_string())
+			// string some string
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_event_activity(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_event_activity_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
+			,
+			JavascriptInput::from("any".to_string())
+			// string any
+			,
+			JavascriptInput::from("some string".to_string())
+			// string some string
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_event_activity(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_length_test_0() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/svn60.xes").unwrap())
+			// trait finite stochastic language#./testfiles/svn60.xes
+			,
+			JavascriptInput::from("<".to_string())
+			// string <
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_length(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_length_test_1() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b.csv").unwrap())
+			// trait finite stochastic language#./testfiles/a-b.csv
+			,
+			JavascriptInput::from("<".to_string())
+			// string <
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_length(inputs, ".xes");
+    }
+
+	#[test]
+	pub fn filter_stochastic_language_traces_length_test_2() {
+        let inputs = vec![
+			JavascriptInput::from(std::fs::read_to_string("./testfiles/a-b-double.xes").unwrap())
+			// trait finite stochastic language#./testfiles/a-b-double.xes
+			,
+			JavascriptInput::from("<".to_string())
+			// string <
+			,
+			JavascriptInput::from("0".to_string())
+			// usize 0
+
+		];
+        crate::javascript::javascript_autogen::filter_stochastic_language_traces_length(inputs, ".xes");
     }
 
 	#[test]
