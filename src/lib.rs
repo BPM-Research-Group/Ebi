@@ -217,12 +217,13 @@ pub mod techniques {
     pub mod escaping_edges_precision;
     pub mod executions;
     pub mod explain_trace;
-    pub mod filter;
+    pub mod filter_stochastic_trace;
+    pub mod filter_trace;
     pub mod fitness;
     pub mod fitting_traces;
     pub mod flower_miner;
     pub mod gain_precision_recall;
-    pub mod genetic_algorithm_for_stochastic_process_discovery;
+    // pub mod genetic_algorithm_for_stochastic_process_discovery;
     pub mod hellinger_stochastic_conformance;
     pub mod inductive_miner;
     pub mod infinitely_many_traces;

@@ -46133,7 +46133,7 @@ mod tests{
 		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		let inputs = vec![input0];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EMPTY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46161,7 +46161,7 @@ mod tests{
 		let input0 = EbiInput::Object(object0, "comma-separated values".parse().unwrap());
 		let inputs = vec![input0];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EMPTY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46189,7 +46189,7 @@ mod tests{
 		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		let inputs = vec![input0];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EMPTY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46217,7 +46217,7 @@ mod tests{
 		let input0 = EbiInput::Object(object0, "compressed event log".parse().unwrap());
 		let inputs = vec![input0];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EMPTY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46245,7 +46245,7 @@ mod tests{
 		let input0 = EbiInput::Object(object0, "comma-separated values".parse().unwrap());
 		let inputs = vec![input0];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EMPTY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46273,7 +46273,7 @@ mod tests{
 		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		let inputs = vec![input0];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EMPTY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46301,7 +46301,7 @@ mod tests{
 		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		let inputs = vec![input0];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EMPTY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46329,7 +46329,7 @@ mod tests{
 		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		let inputs = vec![input0];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EMPTY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46357,7 +46357,7 @@ mod tests{
 		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		let inputs = vec![input0];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EMPTY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46385,7 +46385,7 @@ mod tests{
 		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		let inputs = vec![input0];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EMPTY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46413,7 +46413,7 @@ mod tests{
 		let input0 = EbiInput::Object(object0, "extensible event stream".parse().unwrap());
 		let inputs = vec![input0];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EMPTY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46448,7 +46448,7 @@ mod tests{
 		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_LENGTH {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_LENGTH {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46480,7 +46480,7 @@ mod tests{
 		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_LENGTH {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_LENGTH {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46512,7 +46512,7 @@ mod tests{
 		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_LENGTH {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_LENGTH {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46544,7 +46544,7 @@ mod tests{
 		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_LENGTH {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_LENGTH {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46576,7 +46576,7 @@ mod tests{
 		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_LENGTH {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_LENGTH {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46608,7 +46608,7 @@ mod tests{
 		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_LENGTH {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_LENGTH {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46640,7 +46640,7 @@ mod tests{
 		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_LENGTH {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_LENGTH {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46672,7 +46672,7 @@ mod tests{
 		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_LENGTH {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_LENGTH {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46704,7 +46704,7 @@ mod tests{
 		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_LENGTH {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_LENGTH {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46736,7 +46736,7 @@ mod tests{
 		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_LENGTH {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_LENGTH {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46768,7 +46768,7 @@ mod tests{
 		let input2 = EbiInput::Usize(0, &TEST_INPUT_TYPE_USIZE);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_LENGTH {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_LENGTH {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46806,7 +46806,7 @@ mod tests{
 		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EVENT_ACTIVITY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46838,7 +46838,7 @@ mod tests{
 		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EVENT_ACTIVITY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46870,7 +46870,7 @@ mod tests{
 		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EVENT_ACTIVITY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46902,7 +46902,7 @@ mod tests{
 		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EVENT_ACTIVITY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46934,7 +46934,7 @@ mod tests{
 		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EVENT_ACTIVITY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46966,7 +46966,7 @@ mod tests{
 		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EVENT_ACTIVITY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -46998,7 +46998,7 @@ mod tests{
 		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EVENT_ACTIVITY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -47030,7 +47030,7 @@ mod tests{
 		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EVENT_ACTIVITY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -47062,7 +47062,7 @@ mod tests{
 		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EVENT_ACTIVITY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -47094,7 +47094,7 @@ mod tests{
 		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EVENT_ACTIVITY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();
@@ -47126,7 +47126,7 @@ mod tests{
 		let input2 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let inputs = vec![input0, input1, input2];
 
-		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EVENT_ACTIVITY {
+		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_filter::EBI_FILTER_LOG_TRACES_EVENT_ACTIVITY {
 			match (execute)(inputs, None) {
 				Ok(output) => {
 					output.test_activity_key();

@@ -3,23 +3,26 @@ use crate::ebi_traits::{
     ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
 };
-use crate::techniques::alergia::alergia_algorithm;
 use crate::techniques::{
-    alergia::FrequencyPrefixTree,
+    alergia::FrequencyPrefixTree, alergia::alergia_algorithm,
     earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
     entropic_relevance::EntropicRelvance, sample::Sampler,
 };
-use ebi_objects::ebi_arithmetic::{ConstFraction, ToNative};
 use ebi_objects::{
     Activity, AutomatonState, EventLog, FiniteStochasticLanguage,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    ebi_arithmetic::{Fraction, One, Signed, f, fraction::approximate::Approximate},
+    anyhow::{Result, anyhow},
+    ebi_arithmetic::{
+        ConstFraction, Fraction, One, Signed, Zero, f, fraction::approximate::Approximate,
+    },
 };
-use ebi_optimisation::anyhow::Result;
 use rand::{RngExt, prelude::SliceRandom};
 use rayon::prelude::*;
 use rustc_hash::FxHashMap;
-use std::collections::{HashMap, HashSet};
+use std::{
+    collections::{HashMap, HashSet},
+    fmt::Write,
+};
 
 const CONFIDENCE_UPPER_BOUND: u64 = 15;
 const CONFIDENCE_LOWER_BOUND: u64 = 0;
@@ -38,7 +41,7 @@ pub fn alergia_gaspd(
     log: &dyn EbiTraitEventLog,
     min_visits: usize,
 ) -> Result<StochasticDeterministicFiniteAutomaton> {
-    let filtered_log = filter_log(filter_frequency.clone(), log);
+    let filtered_log = filter_log(filter_frequency, log);
     let mut fpta: FrequencyPrefixTree = FrequencyPrefixTree::from_log(&filtered_log);
 
     let sdfa: StochasticDeterministicFiniteAutomaton =
@@ -48,7 +51,7 @@ pub fn alergia_gaspd(
 
 /// Keeps only the most frequent traces, retaining a `filter_frequency`
 /// fraction (rounded up) of distinct trace variants.
-pub fn filter_log(filter_frequency: Fraction, log: &dyn EbiTraitEventLog) -> EventLog {
+pub fn filter_log(filter_frequency: &Fraction, log: &dyn EbiTraitEventLog) -> EventLog {
     let mut trace_counts: HashMap<Vec<Activity>, usize> = HashMap::new();
     for t in log.iter_traces() {
         *trace_counts.entry(t.clone()).or_insert(0) += 1;
@@ -58,7 +61,7 @@ pub fn filter_log(filter_frequency: Fraction, log: &dyn EbiTraitEventLog) -> Eve
     sorted_traces.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
 
     let len = sorted_traces.len();
-    let target = f!(log.number_of_traces()) * filter_frequency;
+    let target = filter_frequency * log.number_of_traces();
 
     // Smallest `keep` such that Fraction::from(keep) >= target,
     let mut lo = 0;
@@ -204,16 +207,9 @@ impl Gaspd for dyn EbiTraitEventLog {
             create_concrete_models(&unique_frontier, &event_log);
         //let content = archive_to_csv_for_sdfm(&unique_frontier, &Some(model_list));
 
-        let model = select(
-            model_list,
-            unique_frontier,
-            weight_simplicity,
-            weight_relevance,
-            weight_a,
-        )
-        .unwrap_or_else(|| panic!("Error: no candidates to select from"));
-
-        Ok(model)
+        let preference = Preference::new(weight_simplicity, weight_relevance, weight_a);
+        select(model_list, unique_frontier, preference)
+            .ok_or_else(|| anyhow!("No candidates to select from."))
     }
 }
 
@@ -252,47 +248,6 @@ pub fn convert_trait_to_finite_stochastic_language(
 
     fslang
 }
-/*
-/// Standard CSV field escaping (wraps in quotes, doubles embedded quotes).
-fn csv_escape(field: &str) -> String {
-    format!("\"{}\"", field.replace('"', "\"\""))
-}
-
-/// Serializes the archive to CSV, one row per entry, with an optional
-/// serialized SDFM per row.
-fn archive_to_csv_for_sdfm(archive: &[Entry], models: &Option<Vec<StochasticDirectlyFollowsModel>>) -> String {
-    if let Some(m) = models {
-        assert_eq!(
-            archive.len(),
-            m.len(),
-            "archive and models must be the same length and index-aligned"
-        );
-    }
-
-    let mut out = String::new();
-    let header = match models {
-        Some(_) => "simplicity,relevance,adhesion,sdfm\n",
-        None => "simplicity,relevance,adhesion,sdfm\n",
-    };
-    out.push_str(header);
-
-    for (i, e) in archive.iter().enumerate() {
-
-        out.push_str(&format!(
-            "{},{},{}",
-            e.simplicity, e.relevance, e.adhesion, 
-        ));
-
-        if let Some(m) = models {
-            out.push(',');
-            out.push_str(&csv_escape(&m[i].to_string()));
-        }
-        out.push('\n');
-    }
-
-    out
-}
-*/
 
 /// Hashable key for a candidate's parameters, used for dedup/`seen` sets.
 fn param_key(
@@ -381,7 +336,7 @@ fn create_concrete_models(
             let temp_sdfa = alergia_gaspd(
                 &entry.confidence_factor,
                 &entry.filter_frequency,
-                log.clone(),
+                log,
                 entry.min_visits,
             )
             .expect("alergia_gaspd failed for a frontier candidate");
@@ -499,13 +454,13 @@ fn retain_elite_parallel(
 /// conformance against the reference language.
 fn evaluate_entry(
     entry: &Entry,
-    log: &EventLog,
+    log: &dyn EbiTraitEventLog,
     lang: &FiniteStochasticLanguage,
 ) -> (usize, Fraction, Fraction) {
     let sdfa = alergia_gaspd(
         &entry.confidence_factor,
         &entry.filter_frequency,
-        log.clone(),
+        log,
         entry.min_visits,
     )
     .unwrap();
@@ -717,7 +672,7 @@ fn mutate_min_visits(
     most_frequent_fpta_branch: usize,
     rng: &mut impl rand::Rng,
 ) -> usize {
-    let half_range: i64 = (MUTATION_STEP_FRACTION.to_fraction() * f!(most_frequent_fpta_branch))
+    let half_range = (MUTATION_STEP_FRACTION.to_fraction() * f!(most_frequent_fpta_branch))
         .to_usize()
         .max(1) as i64;
     let perturbation: i64 = rng.random_range(-half_range..=half_range);
@@ -761,4 +716,201 @@ fn pareto_frontier(population: &[Entry]) -> Vec<Entry> {
 fn dominates_entry(a: &Entry, b: &Entry) -> bool {
     (a.relevance <= b.relevance && a.simplicity <= b.simplicity && a.adhesion >= b.adhesion)
         && (a.relevance < b.relevance || a.simplicity < b.simplicity || a.adhesion > b.adhesion)
+}
+
+/// ===== selection =====
+/// /// Holds the normalised objectives for one candidate; 1.0 is best on every objective.
+#[derive(Debug, Clone)]
+pub struct NormalisedEntry {
+    pub norm_entropic_relevance: Fraction,
+    pub norm_size: Fraction,
+    pub norm_emsc: Fraction,
+}
+
+#[derive(Debug, Clone)]
+pub struct Preference {
+    pub weight_simplicity: Fraction, // simplicity
+    pub weight_relevance: Fraction,  // relevance
+    pub weight_a: Fraction,          // remainder, derived: 1 - w_s - w_r
+}
+
+impl Preference {
+    /// Checks that simplicity + relevance is at most 1, and derives the
+    /// remainder weight so all three sum to 1.
+    pub fn new(
+        mut weight_simplicity: Fraction,
+        mut weight_relevance: Fraction,
+        mut weight_a: Fraction,
+    ) -> Self {
+        let sum = &(&weight_simplicity + &weight_relevance) + &weight_a;
+
+        if sum.is_zero() {
+            return Self {
+                weight_simplicity,
+                weight_relevance,
+                weight_a: Fraction::one(),
+            };
+        }
+
+        weight_simplicity /= &sum;
+        weight_relevance /= &sum;
+        weight_a /= &sum;
+
+        Self {
+            weight_simplicity,
+            weight_relevance,
+            weight_a,
+        }
+    }
+}
+
+fn augmentation_rho() -> Fraction {
+    &f!(1u64) / &f!(100u64)
+}
+
+pub fn select(
+    models: Vec<StochasticDirectlyFollowsModel>,
+    entries: Vec<Entry>,
+    preference: Preference,
+) -> Option<StochasticDirectlyFollowsModel> {
+    let normalised = preprocess_objectives(&entries);
+
+    let best = match select_best(&normalised, &preference) {
+        Some(i) => i,
+        None => return None,
+    };
+    let score = chebyshev_score(&normalised[best], &preference);
+    log::info!(
+        "{}",
+        format_trade_off_report(&entries[best], &normalised[best], &preference, score)
+    );
+
+    Some(models[best].clone())
+}
+
+fn format_trade_off_report(
+    best: &Entry,
+    normalised: &NormalisedEntry,
+    preference: &Preference,
+    score: Fraction,
+) -> Result<String> {
+    let mut out = String::new();
+
+    writeln!(out, "trade-off report")?;
+    writeln!(
+        out,
+        "  weights     simplicity={:.3}  relevance={:.3}  remainder={:.3}",
+        preference.weight_simplicity, preference.weight_relevance, preference.weight_a
+    )?;
+    writeln!(out)?;
+    writeln!(
+        out,
+        "  {:<20} {:>12} {:>12}",
+        "objective", "raw", "normalized"
+    )?;
+    writeln!(
+        out,
+        "  {:<20} {:>12.4} {:>12.4}",
+        "entropic_relevance", best.relevance, normalised.norm_entropic_relevance
+    )?;
+    writeln!(
+        out,
+        "  {:<20} {:>12.0} {:>12.4}",
+        "size", best.simplicity, normalised.norm_size
+    )?;
+    writeln!(
+        out,
+        "  {:<20} {:>12.4} {:>12.4}",
+        "earth_movers", best.adhesion, normalised.norm_emsc
+    )?;
+    writeln!(out)?;
+    write!(out, "  chebyshev_score: {:.6}", score)?;
+
+    Ok(out)
+}
+
+/// Min-max normalizes entropic relevance and size across all entries (inverted,
+/// so 1.0 is best), and copies earth_movers straight through as its own
+/// normalized value.
+fn preprocess_objectives(entries: &[Entry]) -> Vec<NormalisedEntry> {
+    if entries.is_empty() {
+        return vec![];
+    }
+
+    let mut min_er = entries[0].relevance.clone();
+    let mut max_er = min_er.clone();
+    let mut min_size = f!(entries[0].simplicity as u64);
+    let mut max_size = min_size.clone();
+
+    for e in entries.iter() {
+        let size = f!(e.simplicity as u64);
+
+        if e.relevance < min_er {
+            min_er = e.relevance.clone();
+        }
+        if e.relevance > max_er {
+            max_er = e.relevance.clone();
+        }
+        if size < min_size {
+            min_size = size.clone();
+        }
+        if size > max_size {
+            max_size = size;
+        }
+    }
+
+    let scale_inverted = |v: &Fraction, min: &Fraction, max: &Fraction| -> Fraction {
+        if min == max {
+            Fraction::one()
+        } else {
+            &(max - v) / &(max - min)
+        }
+    };
+
+    entries
+        .iter()
+        .map(|e| NormalisedEntry {
+            norm_entropic_relevance: scale_inverted(&e.relevance, &min_er, &max_er),
+            norm_size: scale_inverted(&f!(e.simplicity as u64), &min_size, &max_size),
+            norm_emsc: e.adhesion.clone(),
+        })
+        .collect()
+}
+
+/// Computes the augmented weighted Chebyshev distance of `row` from the
+/// ideal point (1.0 on every normalized objective); lower is better.
+fn chebyshev_score(row: &NormalisedEntry, pref: &Preference) -> Fraction {
+    let one = Fraction::one();
+
+    // Deviation from the ideal point (1.0 = best) for each objective.
+    let dev_r = &one - &row.norm_entropic_relevance;
+    let dev_s = &one - &row.norm_size;
+    let dev_a = &one - &row.norm_emsc;
+
+    let weighted = [
+        &pref.weight_relevance * &dev_r,
+        &pref.weight_simplicity * &dev_s,
+        &pref.weight_a * &dev_a,
+    ];
+
+    let mut max_term = weighted[0].clone();
+    let mut sum_term = weighted[0].clone();
+    for w in &weighted[1..] {
+        if w > &max_term {
+            max_term = w.clone();
+        }
+        sum_term = &sum_term + w;
+    }
+
+    &max_term + &(&augmentation_rho() * &sum_term)
+}
+
+/// Returns the index of the entry with the lowest (best) Chebyshev score,
+/// or None if there are no entries.
+fn select_best(rows: &[NormalisedEntry], pref: &Preference) -> Option<usize> {
+    rows.iter()
+        .enumerate()
+        .map(|(i, row)| (i, chebyshev_score(row, pref)))
+        .min_by(|(_, a), (_, b)| a.partial_cmp(b).unwrap_or(std::cmp::Ordering::Equal))
+        .map(|(i, _)| i)
 }
