@@ -7,7 +7,7 @@ use crate::techniques::alergia::alergia_algorithm;
 use crate::techniques::{
     alergia::FrequencyPrefixTree,
     earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
-    entropic_relevance::EntropicRelvance, sample::Sampler, select::Preference, select::select,
+    entropic_relevance::EntropicRelvance, sample::Sampler,
 };
 use ebi_objects::ebi_arithmetic::{ConstFraction, ToNative};
 use ebi_objects::{
@@ -48,11 +48,13 @@ pub fn alergia_gaspd(
 
 /// Keeps only the most frequent traces, retaining a `filter_frequency`
 /// fraction (rounded up) of distinct trace variants.
-pub fn filter_log(
-    filter_frequency: Fraction,
-    log: &dyn EbiTraitEventLog,
-) -> impl EbiTraitEventLog {
-    let mut sorted_traces = log.iter_traces().collect::<Vec<_>>();
+pub fn filter_log(filter_frequency: Fraction, log: &dyn EbiTraitEventLog) -> EventLog {
+    let mut trace_counts: HashMap<Vec<Activity>, usize> = HashMap::new();
+    for t in log.iter_traces() {
+        *trace_counts.entry(t.clone()).or_insert(0) += 1;
+    }
+
+    let mut sorted_traces: Vec<(Vec<Activity>, usize)> = trace_counts.into_iter().collect();
     sorted_traces.sort_by(|a, b| b.1.cmp(&a.1).then(a.0.cmp(&b.0)));
 
     let len = sorted_traces.len();
@@ -70,8 +72,6 @@ pub fn filter_log(
         }
     }
     let keep = lo;
-
-    log.retain_traces(Box::new(|trace, prob| true));
 
     let filtered_traces: Vec<Vec<Activity>> = sorted_traces
         .into_iter()
@@ -161,7 +161,6 @@ impl Gaspd for dyn EbiTraitEventLog {
         weight_relevance: Fraction,
         weight_a: Fraction,
     ) -> Result<StochasticDirectlyFollowsModel> {
-        let preference = Preference::new(weight_simplicity, weight_relevance, weight_a);
         let event_log = convert_trait_to_log(self);
         let test_lang = convert_trait_to_finite_stochastic_language(self);
         //test_log.translate_using_activity_key(&mut event_log.activity_key);
@@ -170,7 +169,7 @@ impl Gaspd for dyn EbiTraitEventLog {
         let most_frequent_fpta_branch = fpta
             .get_immediate_reachable_states(0)
             .iter()
-            .map(|&neighbour| fpta.visit_counts[neighbour])
+            .map(|&neighbour| fpta.node_2_visit_counts[neighbour])
             .max()
             .unwrap_or(0);
 
@@ -205,8 +204,14 @@ impl Gaspd for dyn EbiTraitEventLog {
             create_concrete_models(&unique_frontier, &event_log);
         //let content = archive_to_csv_for_sdfm(&unique_frontier, &Some(model_list));
 
-        let model = select(model_list, unique_frontier, preference)
-            .unwrap_or_else(|| panic!("Error: no candidates to select from"));
+        let model = select(
+            model_list,
+            unique_frontier,
+            weight_simplicity,
+            weight_relevance,
+            weight_a,
+        )
+        .unwrap_or_else(|| panic!("Error: no candidates to select from"));
 
         Ok(model)
     }
