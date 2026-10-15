@@ -19,6 +19,8 @@ pub trait EbiTraitFiniteStochasticLanguage:
 {
     fn get_probability_sum(&self) -> Fraction;
 
+    /// Creates a finite stochastic language. 
+    /// This clones all traces, so if you have a struct, it is probably cheaper to call .into() on it.
     fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage;
 
     /**

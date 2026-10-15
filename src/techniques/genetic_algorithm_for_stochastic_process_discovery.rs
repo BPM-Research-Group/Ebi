@@ -165,7 +165,7 @@ impl Gaspd for dyn EbiTraitEventLog {
         weight_a: Fraction,
     ) -> Result<StochasticDirectlyFollowsModel> {
         let event_log = convert_trait_to_log(self);
-        let test_lang = convert_trait_to_finite_stochastic_language(self);
+        let test_lang = self.to_finite_stochastic_language();
         //test_log.translate_using_activity_key(&mut event_log.activity_key);
         let fpta: FrequencyPrefixTree = FrequencyPrefixTree::from_log(self);
 
@@ -231,22 +231,6 @@ pub fn convert_trait_to_log(log: &mut dyn EbiTraitEventLog) -> EventLog {
         traces,
         activity_key: log.activity_key().clone(),
     }
-}
-
-/// Converts a trait-object log into a normalized `FiniteStochasticLanguage`,
-/// used as the reference distribution for scoring candidates.
-pub fn convert_trait_to_finite_stochastic_language(
-    log: &mut dyn EbiTraitEventLog,
-) -> FiniteStochasticLanguage {
-    let mut fslang = FiniteStochasticLanguage::new_with_activity_key(log.activity_key().clone());
-    for trace in log.iter_traces() {
-        fslang
-            .push_raw(trace.clone(), &Fraction::one())
-            .expect("weight is always positive");
-    }
-    fslang.normalise();
-
-    fslang
 }
 
 /// Hashable key for a candidate's parameters, used for dedup/`seen` sets.
