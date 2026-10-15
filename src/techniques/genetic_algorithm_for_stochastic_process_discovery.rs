@@ -1,21 +1,24 @@
-use crate::ebi_traits::{
-    ebi_trait_event_log::EbiTraitEventLog,
-    ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
-};
-use crate::techniques::{
-    alergia::FrequencyPrefixTree, alergia::alergia_algorithm,
-    earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
-    entropic_relevance::EntropicRelvance, sample::Sampler,
+use crate::{
+    ebi_framework::trait_importers::ToFiniteStochasticLanguageTrait,
+    ebi_traits::{
+        ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
+    },
+    techniques::{
+        alergia::FrequencyPrefixTree, alergia::alergia_algorithm,
+        earth_movers_stochastic_conformance::EarthMoversStochasticConformance,
+        entropic_relevance::EntropicRelvance, sample::Sampler,
+    },
 };
 use ebi_objects::{
     Activity, AutomatonState, EventLog, FiniteStochasticLanguage,
     StochasticDeterministicFiniteAutomaton, StochasticDirectlyFollowsModel,
-    anyhow::{Result, anyhow},
+    anyhow::{Context, Result, anyhow},
     ebi_arithmetic::{
-        ConstFraction, Fraction, One, Signed, Zero, f, fraction::approximate::Approximate,
+        ConstFraction, Fraction, One, Signed, ToNative, Zero, f, fraction::approximate::Approximate,
     },
 };
+use fnv::FnvBuildHasher;
 use rand::{RngExt, prelude::SliceRandom};
 use rayon::prelude::*;
 use rustc_hash::FxHashMap;
@@ -31,6 +34,83 @@ const MUTATION_STEP_FRACTION: ConstFraction = ConstFraction::of(2, 100);
 
 const CONFIDENCE_FACTOR_RESOLUTION_DIGITS: u32 = 6;
 const FILTER_FACTOR_RESOLUTION_DIGITS: u32 = 6;
+
+pub trait Gaspd {
+    fn gaspd(
+        &mut self,
+        generation_limit: usize,
+        number_of_parents: usize,
+        population_size: usize,
+        weight_simplicity: Fraction,
+        weight_relevance: Fraction,
+        weight_a: Fraction,
+    ) -> Result<StochasticDirectlyFollowsModel>;
+}
+
+/// Runs the Gaspd genetic search and returns the final Pareto-optimal
+/// model according to the specified weights.
+impl Gaspd for dyn EbiTraitEventLog {
+    fn gaspd(
+        &mut self,
+        generation_limit: usize,
+        number_of_parents: usize,
+        population_size: usize,
+        weight_simplicity: Fraction,
+        weight_relevance: Fraction,
+        weight_a: Fraction,
+    ) -> Result<StochasticDirectlyFollowsModel> {
+        //special case: empty log
+        if self.number_of_traces() == 0 {
+            return Ok(StochasticDirectlyFollowsModel::new(
+                self.activity_key().clone(),
+            ));
+        }
+        let event_log = convert_trait_to_log(self);
+        let test_lang = self.to_finite_stochastic_language();
+        //test_log.translate_using_activity_key(&mut event_log.activity_key);
+        let fpta: FrequencyPrefixTree = FrequencyPrefixTree::from_log(self);
+
+        let most_frequent_fpta_branch = fpta
+            .get_immediate_reachable_states(0)
+            .iter()
+            .map(|&neighbour| fpta.node_2_visit_counts[neighbour])
+            .max()
+            .unwrap_or(0);
+
+        let mut population =
+            Entry::generate_initial_population(most_frequent_fpta_branch, population_size);
+
+        let mut archive: Vec<Entry> = vec![];
+
+        select_parallel(&event_log, &test_lang, &mut population, &mut archive)?;
+
+        for i in 1..generation_limit + 1 {
+            let frontier = pareto_frontier(&population);
+            let mut offspring = crossover_mutation(
+                &archive,
+                &frontier,
+                i,
+                most_frequent_fpta_branch,
+                number_of_parents,
+            );
+
+            retain_elite_parallel(
+                &event_log,
+                &test_lang,
+                &mut offspring,
+                &mut population,
+                &mut archive,
+            )?;
+        }
+
+        let unique_frontier = dedup_frontier(population);
+        let model_list = create_concrete_models(&unique_frontier, &event_log)?;
+
+        let preference = Preference::new(weight_simplicity, weight_relevance, weight_a);
+        select(model_list, unique_frontier, preference)
+            .ok_or_else(|| anyhow!("No candidates to select from."))
+    }
+}
 
 /// Same algorithm as Alergia, but with the confidence factor, minimum
 /// visit threshold, and trace-filtering frequency exposed as parameters
@@ -140,83 +220,10 @@ impl Entry {
     }
 }
 
-pub trait Gaspd {
-    fn gaspd(
-        &mut self,
-        generation_limit: usize,
-        number_of_parents: usize,
-        population_size: usize,
-        weight_simplicity: Fraction,
-        weight_relevance: Fraction,
-        weight_a: Fraction,
-    ) -> Result<StochasticDirectlyFollowsModel>;
-}
-
-/// Runs the Gaspd genetic search and returns the final Pareto-optimal
-/// model according to the specified weights.
-impl Gaspd for dyn EbiTraitEventLog {
-    fn gaspd(
-        &mut self,
-        generation_limit: usize,
-        number_of_parents: usize,
-        population_size: usize,
-        weight_simplicity: Fraction,
-        weight_relevance: Fraction,
-        weight_a: Fraction,
-    ) -> Result<StochasticDirectlyFollowsModel> {
-        let event_log = convert_trait_to_log(self);
-        let test_lang = self.to_finite_stochastic_language();
-        //test_log.translate_using_activity_key(&mut event_log.activity_key);
-        let fpta: FrequencyPrefixTree = FrequencyPrefixTree::from_log(self);
-
-        let most_frequent_fpta_branch = fpta
-            .get_immediate_reachable_states(0)
-            .iter()
-            .map(|&neighbour| fpta.node_2_visit_counts[neighbour])
-            .max()
-            .unwrap_or(0);
-
-        let mut population =
-            Entry::generate_initial_population(most_frequent_fpta_branch, population_size);
-
-        let mut archive: Vec<Entry> = vec![];
-
-        select_parallel(&event_log, &test_lang, &mut population, &mut archive);
-
-        for i in 1..generation_limit + 1 {
-            let frontier = pareto_frontier(&population);
-            let mut offspring = crossover_mutation(
-                &archive,
-                &frontier,
-                i,
-                most_frequent_fpta_branch,
-                number_of_parents,
-            );
-
-            retain_elite_parallel(
-                &event_log,
-                &test_lang,
-                &mut offspring,
-                &mut population,
-                &mut archive,
-            );
-        }
-
-        let unique_frontier = dedup_frontier(population);
-        let model_list: Vec<StochasticDirectlyFollowsModel> =
-            create_concrete_models(&unique_frontier, &event_log);
-        //let content = archive_to_csv_for_sdfm(&unique_frontier, &Some(model_list));
-
-        let preference = Preference::new(weight_simplicity, weight_relevance, weight_a);
-        select(model_list, unique_frontier, preference)
-            .ok_or_else(|| anyhow!("No candidates to select from."))
-    }
-}
-
 /// Rebuilds a trait-object log as a concrete `EventLog`, sorted by
 /// descending trace frequency.
 pub fn convert_trait_to_log(log: &mut dyn EbiTraitEventLog) -> EventLog {
-    let mut trace_counts: HashMap<Vec<Activity>, usize> = HashMap::new();
+    let mut trace_counts: HashMap<Vec<Activity>, usize, FnvBuildHasher> = HashMap::default();
     for t in log.iter_traces() {
         *trace_counts.entry(t.clone()).or_insert(0) += 1;
     }
@@ -253,7 +260,7 @@ fn convert_sdfa_to_sdfm(
 ) -> Result<StochasticDirectlyFollowsModel> {
     let s0 = sdfa
         .initial_state
-        .expect("SDFA must have an initial state to build its SDAG");
+        .ok_or_else(|| anyhow!("SDFA must have an initial state to build its SDAG"))?;
 
     let mut sdfm = StochasticDirectlyFollowsModel::new(sdfa.activity_key.clone());
 
@@ -278,12 +285,11 @@ fn convert_sdfa_to_sdfm(
     }
     if let Some(starting) = by_source.get(&s0) {
         for &t in starting {
-            let weight = sdfa.probabilities[t].clone();
-            sdfm.start_node_weights[nodes[t].0] += weight;
+            sdfm.start_node_weights[nodes[t].0] += &sdfa.probabilities[t];
         }
     }
     for (t, &target_y) in sdfa.targets.iter().enumerate() {
-        let term = sdfa.terminating_probabilities[target_y.0].clone();
+        let term = &sdfa.terminating_probabilities[target_y.0];
         if term.is_positive() {
             sdfm.end_node_weights[nodes[t].0] += term;
         }
@@ -303,7 +309,7 @@ fn dedup_frontier(frontier: Vec<Entry>) -> Vec<Entry> {
     frontier
         .into_iter()
         .filter(|e| {
-            let key = (f!(e.relevance.clone()) * f!(1000), e.simplicity);
+            let key = (&e.relevance * 1000usize, e.simplicity);
             seen.insert(key)
         })
         .collect()
@@ -313,7 +319,7 @@ fn dedup_frontier(frontier: Vec<Entry>) -> Vec<Entry> {
 fn create_concrete_models(
     frontier: &Vec<Entry>,
     log: &EventLog,
-) -> Vec<StochasticDirectlyFollowsModel> {
+) -> Result<Vec<StochasticDirectlyFollowsModel>> {
     frontier
         .par_iter()
         .map(|entry| {
@@ -323,13 +329,12 @@ fn create_concrete_models(
                 log,
                 entry.min_visits,
             )
-            .expect("alergia_gaspd failed for a frontier candidate");
+            .with_context(|| anyhow!("alergia_gaspd failed for a frontier candidate"))?;
 
-            let res = convert_sdfa_to_sdfm(&temp_sdfa)
-                .expect("convert_sdfa_to_dfg failed for a frontier candidate");
-            res
+            convert_sdfa_to_sdfm(&temp_sdfa)
+                .with_context(|| anyhow!("Convert_sdfa_to_dfg failed for a frontier candidate."))
         })
-        .collect()
+        .collect::<Result<Vec<_>>>()
 }
 
 /// Scores each not-yet-seen population entry in parallel (simplicity,
@@ -339,7 +344,7 @@ fn select_parallel(
     lang: &FiniteStochasticLanguage,
     population: &mut Vec<Entry>,
     archive: &mut Vec<Entry>,
-) {
+) -> Result<()> {
     let to_evaluate: Vec<usize> = population
         .iter()
         .enumerate()
@@ -347,14 +352,14 @@ fn select_parallel(
         .map(|(i, _)| i)
         .collect();
 
-    let results: Vec<(usize, usize, Fraction, Fraction)> = to_evaluate
+    let results = to_evaluate
         .par_iter()
         .map(|&i| {
             let entry = &population[i];
-            let (size, er, em) = evaluate_entry(entry, log, lang);
-            (i, size, er, em)
+            let (size, er, em) = evaluate_entry(entry, log, lang)?;
+            Ok((i, size, er, em))
         })
-        .collect();
+        .collect::<Result<Vec<_>>>()?;
 
     for (i, size, er, em) in results {
         population[i].simplicity = size;
@@ -363,13 +368,14 @@ fn select_parallel(
     }
     population.retain(|e| e.relevance != f!(-1));
     archive.extend(population.clone());
+    Ok(())
 }
 /// Computes an SDFM's "simplicity" size of the ouput type SDFM directly from the SDFA, without
 /// building it.
-fn derived_sdfm_detail(sdfa: &StochasticDeterministicFiniteAutomaton) -> usize {
+fn derived_sdfm_detail(sdfa: &StochasticDeterministicFiniteAutomaton) -> Result<usize> {
     let s0 = sdfa
         .initial_state
-        .expect("empty language has no meaningful SDFM size");
+        .with_context(|| anyhow!("Empty language has no meaningful SDFM size."))?;
 
     let sdfm_nodes = sdfa.terminating_probabilities.len() - 1;
 
@@ -393,7 +399,7 @@ fn derived_sdfm_detail(sdfa: &StochasticDeterministicFiniteAutomaton) -> usize {
         .filter(|&(state, p)| state != s0.0 && p.is_positive())
         .count();
 
-    sdfm_nodes + sdfm_edges + sdfm_start_edges + sdfm_end_nodes
+    Ok(sdfm_nodes + sdfm_edges + sdfm_start_edges + sdfm_end_nodes)
 }
 
 /// Scores offspring in parallel, then merges them into `population` via the
@@ -404,15 +410,15 @@ fn retain_elite_parallel(
     offspring: &mut Vec<Entry>,
     population: &mut Vec<Entry>,
     archive: &mut Vec<Entry>,
-) {
+) -> Result<()> {
     let results: Vec<(usize, usize, Fraction, Fraction)> = offspring
         .par_iter()
         .enumerate()
         .map(|(i, entry)| {
-            let (size, er, em) = evaluate_entry(entry, log, lang);
-            (i, size, er, em)
+            let (size, er, em) = evaluate_entry(entry, log, lang)?;
+            Ok((i, size, er, em))
         })
-        .collect();
+        .collect::<Result<Vec<_>>>()?;
 
     for (i, simplicity, er, em) in results {
         offspring[i].simplicity = simplicity;
@@ -431,6 +437,7 @@ fn retain_elite_parallel(
     archive.extend(combined.clone());
 
     *population = pareto_frontier(&combined);
+    Ok(())
 }
 
 /// Scores one candidate by rebuilding its SDFA via Alergia and computing
@@ -440,16 +447,15 @@ fn evaluate_entry(
     entry: &Entry,
     log: &dyn EbiTraitEventLog,
     lang: &FiniteStochasticLanguage,
-) -> (usize, Fraction, Fraction) {
+) -> Result<(usize, Fraction, Fraction)> {
     let sdfa = alergia_gaspd(
         &entry.confidence_factor,
         &entry.filter_frequency,
         log,
         entry.min_visits,
-    )
-    .unwrap();
-    let mut trait_fslang: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(lang.clone());
-    let size = derived_sdfm_detail(&sdfa);
+    )?;
+    let mut trait_fslang = lang.clone().to_finite_stochastic_language_trait();
+    let size = derived_sdfm_detail(&sdfa)?;
     let model: Box<dyn EbiTraitQueriableStochasticLanguage> = Box::new(sdfa.clone());
     let er = trait_fslang
         .entropic_relevance(model)
@@ -457,11 +463,9 @@ fn evaluate_entry(
         .and_then(|lp| lp.approximate().ok())
         .and_then(|v| v.to_string().parse::<Fraction>().ok())
         .unwrap_or(f!(-1));
-    let mut slang: FiniteStochasticLanguage = sdfa.sample(200).unwrap();
-    let em = trait_fslang
-        .earth_movers_stochastic_conformance(&mut slang)
-        .unwrap();
-    (size, er, em)
+    let mut slang = sdfa.sample(200)?;
+    let em = trait_fslang.earth_movers_stochastic_conformance(&mut slang)?;
+    Ok((size, er, em))
 }
 /// Builds the next generation: samples parents from the frontier, applies
 /// pairwise crossover, then mutation.
@@ -759,14 +763,11 @@ pub fn select(
 ) -> Option<StochasticDirectlyFollowsModel> {
     let normalised = preprocess_objectives(&entries);
 
-    let best = match select_best(&normalised, &preference) {
-        Some(i) => i,
-        None => return None,
-    };
+    let best = select_best(&normalised, &preference)?;
     let score = chebyshev_score(&normalised[best], &preference);
     log::info!(
         "{}",
-        format_trade_off_report(&entries[best], &normalised[best], &preference, score)
+        format_trade_off_report(&entries[best], &normalised[best], &preference, score).ok()?
     );
 
     Some(models[best].clone())
