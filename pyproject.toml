@@ -11,7 +11,8 @@ authors = [
   {name = "Leonhard Mühlmeyer"},
   {name = "Adam Burke"},
   {name = "Renas Demir"},
-  {name = "Felix Britzelmaier"}
+  {name = "Felix Britzelmaier"},
+  {name = "Levi Heiland"}
 ]
 description = "Ebi: a stochastic process mining utility"
 readme = "README.md"
