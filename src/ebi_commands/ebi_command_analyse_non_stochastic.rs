@@ -137,6 +137,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_BOUNDED: EbiCommand = EbiCommand::Command {
             EbiInput::Fraction(_, _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
+            EbiInput::StringList(_, _) => {
+                return Err(anyhow!("Cannot compute whether object is bounded."));
+            }
             EbiInput::Object(EbiObject::Executions(_), _) => {
                 return Err(anyhow!("Cannot compute whether object is bounded."));
             }
@@ -328,6 +331,9 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_ANY_TRACES: EbiCommand = EbiCommand::Comman
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
             EbiInput::Fraction(_, _) => {
+                return Err(anyhow!("Cannot compute whether object has traces."));
+            }
+            EbiInput::StringList(_, _) => {
                 return Err(anyhow!("Cannot compute whether object has traces."));
             }
             EbiInput::Object(EbiObject::Executions(_), _) => {

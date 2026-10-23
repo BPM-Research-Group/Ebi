@@ -208,6 +208,19 @@ impl FromEbiTraitObject for String {
     }
 }
 
+impl FromEbiTraitObject for Vec<String> {
+    fn from_trait_object(object: EbiInput) -> Result<Box<Self>> {
+        match object {
+            EbiInput::StringList(e, _) => Ok(Box::new(e)),
+            _ => Err(anyhow!(
+                "cannot read {} {} as a list of text",
+                object.get_type().get_article(),
+                object.get_type()
+            )),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use strum::IntoEnumIterator;

@@ -1,5 +1,5 @@
 use crate::{
-    ebi_framework::ebi_input::{EbiInput, EbiInputType, attempt_parse}, multiple_reader::MultipleReader, python::python_import::PYTHON_IMPORTERS, text::Joiner
+    ebi_framework::ebi_input::{EbiInput, EbiInputType, attempt_parse}, multiple_reader::MultipleReader, python::{python_handle::{Log, Model}, python_import::PYTHON_IMPORTERS}, text::Joiner
 };
 use ebi_objects::anyhow::Result;
 use polars::prelude::*;
@@ -31,6 +31,18 @@ pub fn import_or_load(
     input_types: &[&'static EbiInputType],
     index: usize,
 ) -> PyResult<EbiInput> {
+    // 0) an object that has been parsed before
+    if let Ok(model) = py_obj.extract::<PyRef<Model>>() {
+        return model
+            .into_input(input_types)
+            .map_err(|e| PyValueError::new_err(format!("Could not use argument {}: {}", index, e)));
+    }
+    if let Ok(log) = py_obj.extract::<PyRef<Log>>() {
+        return log
+            .into_input(input_types)
+            .map_err(|e| PyValueError::new_err(format!("Could not use argument {}: {}", index, e)));
+    }
+
     // 1) try all in‑memory importers
     let input = if let Some(inp) = PYTHON_IMPORTERS
         .iter()
@@ -38,6 +50,13 @@ pub fn import_or_load(
     {
         inp
     } else if let Ok(content) = py_obj.extract::<String>() {
+        if input_types.contains(&&EbiInputType::StringList) {
+            return Err(PyValueError::new_err(format!(
+                "Could not import argument {}. Expected a list or tuple of strings, not a single string.",
+                index
+            )));
+        }
+
         // parse the content string
         attempt_parse(input_types, MultipleReader::String(content)).map_err(|e| {
             PyValueError::new_err(format!("Failed to parse argument {}, which was given as a string literal. Last attempted parsing gave the error {}. Expected {}.", index, e, EbiInputType::get_possible_inputs(input_types).join_with(", ", " or ")))
@@ -56,12 +75,11 @@ pub fn import_or_load(
 
 #[cfg(test)]
 mod tests {
-    use crate::python::{python_export::natural_to_num_biguints, python_module_autogen::ebi};
+    use crate::python::python_export::natural_to_num_biguints;
     use ebi_objects::ebi_arithmetic::malachite::{
         Natural,
         base::num::basic::traits::{One, Zero},
     };
-    use pyo3::{Python, types::PyAnyMethods};
 
     #[test]
     fn num_bigint_conversion() {
@@ -84,20 +102,5 @@ mod tests {
         assert_eq!(n_num.to_string(), n_str);
     }
 
-    #[test]
-    fn test_python() {
-        pyo3::append_to_inittab!(ebi);
-        Python::initialize();
-        Python::attach(|py| {
-            let py_module = py.import("ebi").unwrap();
-            let _py_function = py_module.getattr("visualise_text").unwrap();
-            // let result: PyResult<String> = match py_function.call1((1i32,)) {
-            //     Ok(r) => r.extract(),
-            //     Err(e) => Err(e),
-            // };
-            // let result = result.unwrap();
-            // let expected_result = "1";
-            // assert_eq!(result, expected_result);
-        });
-    }
+    // The generated module (`#[pymodule] fn _ebi`) is not built for tests (it would define PyInit__ebi twice at link time), so it is tested from Python, in tests/python.
 }

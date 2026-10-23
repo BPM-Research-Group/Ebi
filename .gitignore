@@ -1,8 +1,10 @@
 /target
+/xtask/target
 /data
 /.vscode
 /builds
 /python-runtime
+/var/
 
 *.swp
 
@@ -40,3 +42,15 @@ manual/functions.tex
 documentation/commands.html
 documentation/file_handlers.html
 documentation/index.html
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+/ebi-pm/
+/python/ebi/*.pyd
+/python/ebi/*.so
+/python/ebi/*.pdb
