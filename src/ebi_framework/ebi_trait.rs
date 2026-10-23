@@ -200,7 +200,7 @@ impl FromEbiTraitObject for String {
         match object {
             EbiInput::String(e, _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as an integer",
+                "Cannot read {} {} as an integer.",
                 object.get_type().get_article(),
                 object.get_type()
             )),
@@ -213,7 +213,7 @@ impl FromEbiTraitObject for Vec<String> {
         match object {
             EbiInput::StringList(e, _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a list of text",
+                "Cannot read {} {} as a list of text.",
                 object.get_type().get_article(),
                 object.get_type()
             )),
