@@ -333,6 +333,11 @@ pub(crate) fn javascript_html_form(f: &mut Vec<u8>, path: &Vec<&EbiCommand>) -> 
                             </script>"));
                     }
                 }
+                EbiInputType::StringList => {
+                    unreachable!(
+                        "a command with a StringList input is not offered in JavaScript (see is_in_javascript), because JavascriptInput cannot carry a list yet"
+                    );
+                }
                 EbiInputType::Fraction(_, _, def) => {
                     let mut has_default = false;
                     writeln!(

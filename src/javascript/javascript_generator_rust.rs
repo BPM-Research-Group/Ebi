@@ -117,6 +117,9 @@ fn input_to_javascript_test(inputs: &Vec<TestInput>) -> String {
                     TestInput::Usize(u, _) => format!("\"{u}\".to_string()"),
                     TestInput::FileHandler(f) => format!("\"{f}\".to_string()"),
                     TestInput::Fraction(f, _) => format!("\"{f}\".to_string()"),
+                    TestInput::StringList(_, _) => unreachable!(
+                        "a command with a StringList input is not offered in JavaScript (see is_in_javascript), because JavascriptInput cannot carry a list yet"
+                    ),
                 },
                 x.to_unique_string()
             ))
