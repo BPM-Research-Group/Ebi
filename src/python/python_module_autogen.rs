@@ -1418,77 +1418,6 @@ fn discover_non_stochastic_trace_model(py: Python<'_>, arg0: &Bound<'_, PyAny>) 
 }
 
 #[pyfunction]
-fn filter_traces_empty(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EMPTY;
-    let input_types = match **command {
-        EbiCommand::Command { input_types, .. } => input_types,
-        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
-    };
-    let input0 = import_or_load(arg0, input_types[0], 0)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
-        let inputs = vec![input0];
-
-    // Execute the command.
-    let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
-        .export_to_pm4py(py)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-
-    Ok(result)
-}
-
-#[pyfunction]
-fn filter_traces_event_activity(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_EVENT_ACTIVITY;
-    let input_types = match **command {
-        EbiCommand::Command { input_types, .. } => input_types,
-        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
-    };
-    let input0 = import_or_load(arg0, input_types[0], 0)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
-        let input1 = import_or_load(arg1, input_types[1], 1)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
-        let input2 = import_or_load(arg2, input_types[2], 2)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
-        let inputs = vec![input0, input1, input2];
-
-    // Execute the command.
-    let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
-        .export_to_pm4py(py)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-
-    Ok(result)
-}
-
-#[pyfunction]
-fn filter_traces_length(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
-    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_filter::EBI_FILTER_TRACES_LENGTH;
-    let input_types = match **command {
-        EbiCommand::Command { input_types, .. } => input_types,
-        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
-    };
-    let input0 = import_or_load(arg0, input_types[0], 0)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
-        let input1 = import_or_load(arg1, input_types[1], 1)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
-        let input2 = import_or_load(arg2, input_types[2], 2)
-            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
-        let inputs = vec![input0, input1, input2];
-
-    // Execute the command.
-    let result = command.execute_with_inputs(inputs)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
-        .export_to_pm4py(py)
-        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
-
-    Ok(result)
-}
-
-#[pyfunction]
 fn information(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_info::EBI_INFO;
@@ -1767,9 +1696,6 @@ pub fn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {    m.add_
     m.add_function(wrap_pyfunction!(discover_non_stochastic_prefix_tree_deterministic_finite_automaton, m)?)?;
     m.add_function(wrap_pyfunction!(discover_non_stochastic_prefix_tree_process_tree, m)?)?;
     m.add_function(wrap_pyfunction!(discover_non_stochastic_trace_model, m)?)?;
-    m.add_function(wrap_pyfunction!(filter_traces_empty, m)?)?;
-    m.add_function(wrap_pyfunction!(filter_traces_event_activity, m)?)?;
-    m.add_function(wrap_pyfunction!(filter_traces_length, m)?)?;
     m.add_function(wrap_pyfunction!(information, m)?)?;
     m.add_function(wrap_pyfunction!(probability_log, m)?)?;
     m.add_function(wrap_pyfunction!(sample_folds, m)?)?;
