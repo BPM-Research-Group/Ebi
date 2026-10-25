@@ -5,9 +5,12 @@ use crate::{
         ebi_output::{EbiOutput, EbiOutputType},
         ebi_trait::EbiTrait,
         ebi_trait_object::EbiTraitObject,
-    }, ebi_traits::{
-        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    }, techniques::{
+    },
+    ebi_traits::{
+        ebi_trait_event_log::EbiTraitEventLog,
+        ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    },
+    techniques::{
         alergia::Alergia,
         alignment_stochastic_miner::AlignmentMiner,
         directly_follows_model_miner::DirectlyFollowsModelMinerFiltering,
@@ -37,7 +40,6 @@ pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
         &EBI_DISCOVER_ALERGIA,
         &EBI_DISCOVER_ALIGNMENTS,
         &EBI_DISCOVER_DIRECTLY_FOLLOWS,
-        // &EBI_DISCOVER_GASPD,
         &EBI_DISCOVER_OCCURRENCE,
         &EBI_DISCOVER_RANDOM,
         &EBI_DISCOVER_UNIFORM,
@@ -70,9 +72,7 @@ pub const EBI_DISCOVER_ALERGIA: EbiCommand = EbiCommand::Command {
         "Confidence level.",
     ],
     execute: |mut inputs, _| {
-        let log = inputs
-            .remove(0)
-            .to_type::<dyn EbiTraitEventLog>()?;
+        let log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
         let alpha = *inputs.remove(0).to_type::<Fraction>().unwrap();
         Ok(EbiOutput::Object(
             EbiObject::StochasticDeterministicFiniteAutomaton(log.alergia(alpha)?),
@@ -210,77 +210,6 @@ pub const EBI_DISCOVER_DIRECTLY_FOLLOWS: EbiCommand = EbiCommand::Command {
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::DirectlyFollowsGraph),
 };
-// pub const EBI_DISCOVER_GASPD: EbiCommand = EbiCommand::Command {
-//     name_short: "gaspd",
-//     name_long: Some("genetic-algorithm-for-stochastic-process-discovery"),
-//     explanation_short: "Selects a model based on a family of SDFMs from an event log using Gaspd.",
-//     explanation_long: Some(
-//         "Learns a family of Stochastic Directly Follows Models (SDFMs) \
-//                            from an event log by evolving a population of Alergia parameter \
-//                            settings (confidence factor, filter frequency, minimum visits) \
-//                            via a genetic search, retaining the Pareto-optimal trade-offs \
-//                            between model simplicity, relevance and adhesion. Returns the \
-//                            best model according to the given preferences for simplicity, relevance and adhesion.",
-//     ),
-//     latex_link: Some("~\\cite{DBLP:conf/caise/AlkhammashPM24}"),
-//     cli_command: None,
-//     exact_arithmetic: true,
-//     input_types: &[
-//         &[&EbiInputType::Trait(EbiTrait::EventLog)],
-//         &[&EbiInputType::Usize(Some(0), None, Some(50))],
-//         &[&EbiInputType::Usize(Some(0), None, Some(50))],
-//         &[&EbiInputType::Usize(Some(0), None, Some(3))],
-//         &[&EbiInputType::Fraction(
-//             Some(ConstFraction::zero()),
-//             Some(ConstFraction::one()),
-//             Some(ConstFraction::zero()),
-//         )],
-//         &[&EbiInputType::Fraction(
-//             Some(ConstFraction::zero()),
-//             Some(ConstFraction::one()),
-//             Some(ConstFraction::zero()),
-//         )],
-//         &[&EbiInputType::Fraction(
-//             Some(ConstFraction::zero()),
-//             Some(ConstFraction::one()),
-//             Some(ConstFraction::one()),
-//         )],
-//     ],
-//     input_names: &["LOG", "POP", "GENS", "PARENTS", "SIMP", "REL", "A"],
-//     input_helps: &[
-//         "The event log to discover a family of models from.",
-//         "The number of candidate Alergia parameter settings in the initial population.",
-//         "The number of generations the genetic search runs for.",
-//         "The number of parents selected from the Pareto frontier to produce each new generation.",
-//         "The preference (weight) for simplicity.",
-//         "The preference (weight) for relevance.",
-//         "The preference (weight) for a.",
-//     ],
-//     execute: |mut inputs, _| {
-//         let mut log = inputs.remove(0).to_type::<dyn EbiTraitEventLog>()?;
-//         let population_size = *inputs.remove(0).to_type::<usize>().unwrap();
-//         let generation_limit = *inputs.remove(0).to_type::<usize>().unwrap();
-//         let number_of_parents = *inputs.remove(0).to_type::<usize>().unwrap();
-//         let weight_simplicity = *inputs.remove(0).to_type::<Fraction>().unwrap();
-//         let weight_relevance = *inputs.remove(0).to_type::<Fraction>().unwrap();
-//         let weight_a = *inputs.remove(0).to_type::<Fraction>().unwrap();
-
-//         let res = log
-//             .gaspd(
-//                 generation_limit,
-//                 number_of_parents,
-//                 population_size,
-//                 weight_simplicity,
-//                 weight_relevance,
-//                 weight_a,
-//             )
-//             .unwrap();
-//         Ok(EbiOutput::Object(
-//             EbiObject::StochasticDirectlyFollowsModel(res),
-//         ))
-//     },
-//     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticDirectlyFollowsModel),
-// };
 
 pub const EBI_DISCOVER_OCCURRENCE: EbiCommand = EbiCommand::Group {
     name_short: "occ",

@@ -15,7 +15,7 @@ More information on its use can be found in its [PDF manual](https://git.rwth-aa
 
 Most commands of Ebi can be used directly from the browser on the [commands page](https://leemans.ch/ebi/commands.php).
 
-This will run fully on your computer, is limited to 4GB of RAM, and does not upload files.
+This will run fully on your computer, is limited to 4GB of RAM and single-threaded, but does not upload files.
 
 ### Use Ebi as a command line utility
 

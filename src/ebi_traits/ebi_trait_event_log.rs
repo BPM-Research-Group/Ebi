@@ -4,16 +4,18 @@ use crate::ebi_framework::{
 };
 use ebi_objects::{
     Activity, CompressedEventLog, EventLog, EventLogCsv, EventLogOcel, EventLogPython,
-    EventLogTraceAttributes, EventLogXes, HasActivityKey, Importable, IntoRefTraceIterator,
-    NumberOfTraces,
+    EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, Importable,
+    IntoRefTraceIterator, NumberOfTraces,
     anyhow::{Result, anyhow},
+    ebi_arithmetic::Fraction,
+    ebi_arithmetic::f,
     ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_event_attributes::EventLogEventAttributes,
     },
 };
 use fnv::FnvBuildHasher;
-use std::collections::HashMap;
+use std::collections::{HashMap, hash_map::Entry};
 
 #[macro_export]
 macro_rules! trait_definition_logs {
@@ -65,6 +67,32 @@ pub trait EbiTraitEventLog: HasActivityKey + IntoRefTraceIterator + NumberOfTrac
     /// Note to callers: please put the closure definition inside the Box::new in the call of retain_traces.
     /// Otherwise, Rust may give weird compile errors.
     fn retain_traces<'a>(&'a mut self, f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>);
+
+    /// Creates a finite stochastic language. 
+    /// This clones all traces, so if you have a struct, it is probably cheaper to call .into() on it.
+    fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage {
+        if self.number_of_traces() == 0 {
+            return FiniteStochasticLanguage::empty();
+        }
+
+        let mut map = FiniteStochasticLanguage::new_hashmap();
+        let trace_weight = f!((1, self.number_of_traces()));
+
+        for trace in self.iter_traces() {
+            match map.entry(trace.clone()) {
+                Entry::Occupied(mut e) => {
+                    *e.get_mut() += &trace_weight;
+                    ()
+                }
+                Entry::Vacant(e) => {
+                    e.insert(trace_weight.clone());
+                    ()
+                }
+            }
+        }
+
+        FiniteStochasticLanguage::new_raw(map, self.activity_key().clone())
+    }
 }
 
 impl dyn EbiTraitEventLog {
