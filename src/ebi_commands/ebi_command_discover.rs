@@ -473,24 +473,14 @@ pub const EBI_DISCOVER_RANDOM_SPTREE: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticProcessTree),
 };
 
-pub const EBI_DISCOVER_UEMSC: EbiCommand = EbiCommand::Group {
-    name_short: "opt2_uemsc",
-    name_long: Some("optimization2_uemsc"),
-    explanation_short: "Given an event log and a control-flow model, construct a stochastic process model by maximizing uEMSC.",
-    explanation_long: None,
-    children: &[
-        &EBI_DISCOVER_UEMSC_SLPN,
-    ],
-};
-
-pub const EBI_DISCOVER_UEMSC_SLPN: EbiCommand = EbiCommand::Command {
-    name_short: "slpn",
+pub const EBI_DISCOVER_UEMSC: EbiCommand = EbiCommand::Command {
+    name_short: "opt_uemsc",
     name_long: Some("stochastic-labelled-Petri-net"),
-    explanation_short: "Given an event log and an LPN, construct a stochastic labeled Petri net directly from the log.",
+    explanation_short: "Given an event log and an LPN, construct a stochastic labeled Petri net directly from the log by optimizing the uEMSC of the work.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:conf/caise/LeemansLMP24}"),
     cli_command: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)],
@@ -506,7 +496,7 @@ pub const EBI_DISCOVER_UEMSC_SLPN: EbiCommand = EbiCommand::Command {
             .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
         let lpn = inputs.remove(0).to_type::<LabelledPetriNet>()?;
         Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(
-            lpn.mine_uemsc_stochastic_lpn(language),
+            lpn.mine_uemsc_stochastic_lpn(language)?,
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
