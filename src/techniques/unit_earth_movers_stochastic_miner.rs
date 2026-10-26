@@ -1,18 +1,16 @@
-use crate::{ebi_traits::{ebi_trait_semantics::EbiTraitSemantics, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage}, 
+use crate::{ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
 semantics::semantics::Semantics, ebi_framework::displayable::Displayable};
 use ebi_objects::{
     ebi_arithmetic::{
-        fraction::{approximate::Approximate, fraction_enum::FractionEnum},
-        Fraction,
+        ConstFraction, Fraction, One, Round, Signed, Zero,
     },
-    Activity, ActivityKeyTranslator, HasActivityKey, LabelledPetriNet, StochasticLabelledPetriNet,
+    Activity, LabelledPetriNet, StochasticLabelledPetriNet, TranslateActivityKey,
 };
-use ebi_objects::anyhow::{Context, Error, Result, anyhow, ensure};
+use ebi_objects::anyhow::{Context, Result, anyhow, ensure};
 use rayon::iter::ParallelIterator;
 use std::{
     collections::{HashMap, VecDeque},
     fmt,
-    sync::{Arc, Mutex},
 };
 
 use rayon::prelude::*;
@@ -20,25 +18,26 @@ use std::{
     time::{Duration, Instant},
 };
 
-const WEIGHT_LOWER_BOUND: f64 = 0.000001;
-const WEIGHT_UPPER_BOUND: f64 = 100.0;
-const LOG_WEIGHT_SPAN: f64 = 18.420680743952367; // ln(100 / 0.000001)
+const WEIGHT_LOWER_BOUND: ConstFraction = ConstFraction::of(1, 1_000_000);
+const WEIGHT_UPPER_BOUND: ConstFraction = ConstFraction::of(100, 1);
+const WEIGHT_RESOLUTION: usize = 1_000_000;
 const OPTIMIZER_TIME_LIMIT: Duration = Duration::from_secs(300);
 const MAX_GENERATIONS: usize = 10000;
 const STALL_GENERATIONS: usize = 80;
-const DIFFERENTIAL_WEIGHT: f64 = 0.8;
-const CROSSOVER_PROBABILITY: f64 = 0.9;
+const DIFFERENTIAL_WEIGHT: ConstFraction = ConstFraction::of(4, 5);
+const CROSSOVER_PROBABILITY: ConstFraction = ConstFraction::of(9, 10);
 const BASIN_HOP_ITERATIONS: usize = 160;
-const BASIN_INITIAL_TEMPERATURE: f64 = 0.02;
-const BASIN_COOLING_RATE: f64 = 0.985;
+const BASIN_INITIAL_TEMPERATURE: ConstFraction = ConstFraction::of(1, 50);
+const BASIN_MINIMUM_TEMPERATURE: ConstFraction = ConstFraction::of(1, 100_000_000);
+const BASIN_COOLING_RATE: ConstFraction = ConstFraction::of(197, 200);
 const BASIN_ADAPT_INTERVAL: usize = 16;
-const BASIN_TARGET_ACCEPTANCE: f64 = 0.5;
-const BASIN_STEPWISE_FACTOR: f64 = 0.85;
+const BASIN_TARGET_ACCEPTANCE: ConstFraction = ConstFraction::of(1, 2);
+const BASIN_STEPWISE_FACTOR: ConstFraction = ConstFraction::of(17, 20);
 const BASIN_LOCAL_SWEEPS: usize = 40;
-const OBJECTIVE_TOLERANCE: f64 = 1e-10;
-const LINEAR_SOLVE_TOLERANCE: f64 = 1e-11;
-const FIXED_POINT_TOLERANCE: f64 = 1e-12;
-const FIXED_POINT_ITERATION_LIMIT: usize = 20_000;
+const REFINEMENT_INITIAL_STEP: ConstFraction = ConstFraction::of(25, 2);
+const REFINEMENT_MINIMUM_STEP: ConstFraction = ConstFraction::of(1, WEIGHT_RESOLUTION);
+const REFINEMENT_MAXIMUM_SWEEPS: usize = 200;
+const OBJECTIVE_TOLERANCE: ConstFraction = ConstFraction::of(1, 1_000_000_000);
 
 fn divide_monomial(m1: &[String], m2: &[String]) -> Option<Vec<String>> {
     let mut res = Vec::new();
@@ -488,9 +487,9 @@ impl fmt::Display for SymbolicResult {
 fn poly_to_symbolic(
     poly: &Poly,
     coeff_to_prob: &HashMap<String, SymbolicProbability>,
-) -> SymbolicPolynomial {
+) -> Result<SymbolicPolynomial> {
     if poly.is_zero() {
-        return SymbolicPolynomial { terms: vec![] };
+        return Ok(SymbolicPolynomial { terms: vec![] });
     }
     let mut result = Vec::new();
     let mut keys: Vec<_> = poly.terms.keys().collect();
@@ -498,34 +497,34 @@ fn poly_to_symbolic(
 
     for vars in keys {
         let coef = poly.terms[vars];
-        let factors: Vec<SymbolicProbability> = vars
+        let factors = vars
             .iter()
             .map(|name| {
                 coeff_to_prob
                     .get(name)
                     .cloned()
-                    .expect(&format!("Unknown coefficient: {}", name))
+                    .ok_or_else(|| anyhow!("unknown coefficient: {name}"))
             })
-            .collect();
+            .collect::<Result<Vec<_>>>()?;
         result.push(SymbolicMonomial {
             coefficient: coef,
             factors,
         });
     }
-    SymbolicPolynomial { terms: result }
+    Ok(SymbolicPolynomial { terms: result })
 }
 
 /// Convert a solved `SymbolicFraction` into a `SymbolicResult`.
 fn symbolic_fraction_to_symbolic(
     frac: &SymbolicFraction,
     coeff_to_prob: &HashMap<String, SymbolicProbability>,
-) -> SymbolicResult {
+) -> Result<SymbolicResult> {
     let num_poly = frac.num.to_poly();
     let den_poly = frac.den.to_poly();
-    SymbolicResult {
-        numerator: poly_to_symbolic(&num_poly, coeff_to_prob),
-        denominator: poly_to_symbolic(&den_poly, coeff_to_prob),
-    }
+    Ok(SymbolicResult {
+        numerator: poly_to_symbolic(&num_poly, coeff_to_prob)?,
+        denominator: poly_to_symbolic(&den_poly, coeff_to_prob)?,
+    })
 }
 
 /// coefficient * variable, where coefficient is a symbolic name like "a_0"
@@ -623,7 +622,7 @@ impl LinearSystem {
     /// Solve the equation system symbolically via Gaussian elimination.
     /// Returns a `SymbolicResult` expressed in terms of `SymbolicProbability`
     /// (transition / enabled_transitions), not abstract `a_i` names.
-    pub fn solve(&self) -> SymbolicResult {
+    pub fn solve(&self) -> Result<SymbolicResult> {
         let n = self.variables.len();
 
         let mut matrix = vec![vec![SymbolicFraction::new(0); n]; n];
@@ -655,22 +654,7 @@ pub trait EquationSystemConstructor {
     fn create_equation_system(&self, trace: &Vec<Activity>) -> Result<LinearSystem>;
 }
 
-impl EquationSystemConstructor for EbiTraitSemantics {
-    fn create_equation_system(&self, trace: &Vec<Activity>) -> Result<LinearSystem> {
-        match self {
-            EbiTraitSemantics::Usize(_) => todo!(),
-            EbiTraitSemantics::Marking(sem) => sem.create_equation_system(trace),
-            EbiTraitSemantics::TreeMarking(_) => todo!(),
-            &EbiTraitSemantics::AutomatonState(_) | &EbiTraitSemantics::BPMNMarking(_) | &EbiTraitSemantics::FspolangMarking(_) => todo!(),
-        }
-    }
-}
-
-impl<T, State> EquationSystemConstructor for T
-where
-    T: Semantics<SemState = State> + Send + Sync + ?Sized,
-    State: Displayable,
-{
+impl EquationSystemConstructor for LabelledPetriNet {
     fn create_equation_system(&self, trace: &Vec<Activity>) -> Result<LinearSystem> {
         if let Some(linear_system) = build_equation_system(self, trace) {
             Ok(linear_system)
@@ -782,7 +766,7 @@ where
 /// One trace with its observed log probability and its symbolic equation system.
 pub struct TraceInput {
     /// L(σ): the probability of this trace in the event log.
-    pub log_probability: f64,
+    pub log_probability: Fraction,
     /// The cross-product equation system whose initial variable gives p̃_M(σ).
     pub system: LinearSystem,
 }
@@ -790,14 +774,14 @@ pub struct TraceInput {
 /// The solution returned by the optimizer.
 pub struct UemscSolution {
     /// The best uEMSC value found: 1 - Σ max(L(σ) - p̃_M(σ), 0).
-    pub uemsc_value: f64,
+    pub uemsc_value: Fraction,
     /// True only when the known upper bound of 1 was reached within tolerance.
     /// Basin hopping alone is not a global-optimality certificate.
     pub global_optimum_certified: bool,
     /// Optimised weight for each transition, indexed by transition index.
-    pub weights: Vec<f64>,
+    pub weights: Vec<Fraction>,
     /// Optimised model probability for each trace, in input order.
-    pub trace_probabilities: Vec<f64>,
+    pub trace_probabilities: Vec<Fraction>,
 }
 
 // ============================================================================
@@ -808,11 +792,12 @@ pub struct UemscSolution {
 ///
 /// `maximise 1 - Σ_{σ ∈ L̄} max(L(σ) - p̃_M(σ), 0)`.
 ///
-/// Decision variables are the transition weights `w_t >= ε`. The model
-/// probability of each trace is evaluated directly from its [`LinearSystem`].
-/// Differential evolution explores the non-convex weight space, basin hopping
-/// crosses between local minima, and coordinate search performs each local
-/// minimisation. A fixed seed makes the complete search reproducible.
+/// Decision variables are exact rational transition weights `ε <= w_t <= 100`.
+/// The model probability of each trace is evaluated exactly from its
+/// [`LinearSystem`]. Differential evolution explores the non-convex weight
+/// space, rational basin hopping crosses between local minima, and coordinate
+/// search performs each local minimisation. A fixed seed makes the complete
+/// search reproducible.
 ///
 /// # Arguments
 ///
@@ -826,18 +811,19 @@ pub struct UemscSolution {
 /// This derivative-free method does not certify global optimality.
 pub fn maximize_uemsc(traces: &[TraceInput], num_transitions: usize) -> Result<UemscSolution> {
     let prepared_traces = prepare_traces(traces, num_transitions)?;
+    let objective_tolerance = OBJECTIVE_TOLERANCE.to_fraction();
 
     // If every trace is structurally impossible there is nothing to optimise.
     if prepared_traces.iter().all(|trace| trace.structurally_zero) {
         let constant_penalty = prepared_traces
             .iter()
-            .map(|trace| trace.log_probability)
-            .sum::<f64>();
+            .map(|trace| trace.log_probability.clone())
+            .sum::<Fraction>();
         return Ok(UemscSolution {
-            uemsc_value: 1.0 - constant_penalty,
-            global_optimum_certified: constant_penalty <= OBJECTIVE_TOLERANCE,
-            weights: vec![1.0; num_transitions],
-            trace_probabilities: vec![0.0; traces.len()],
+            uemsc_value: &Fraction::one() - &constant_penalty,
+            global_optimum_certified: constant_penalty <= objective_tolerance,
+            weights: vec![Fraction::one(); num_transitions],
+            trace_probabilities: vec![Fraction::zero(); traces.len()],
         });
     }
 
@@ -845,8 +831,8 @@ pub fn maximize_uemsc(traces: &[TraceInput], num_transitions: usize) -> Result<U
         let (deficit_sum, trace_probabilities) = evaluate_weights(&prepared_traces, &[])
             .ok_or_else(|| anyhow!("could not evaluate the transition-free model"))?;
         return Ok(UemscSolution {
-            uemsc_value: 1.0 - deficit_sum,
-            global_optimum_certified: deficit_sum <= OBJECTIVE_TOLERANCE,
+            uemsc_value: &Fraction::one() - &deficit_sum,
+            global_optimum_certified: deficit_sum <= objective_tolerance,
             weights: Vec::new(),
             trace_probabilities,
         });
@@ -860,22 +846,26 @@ pub fn maximize_uemsc(traces: &[TraceInput], num_transitions: usize) -> Result<U
             ^ (traces.len() as u64).rotate_left(41),
     );
 
-    // Differential evolution explores log-weights. Candidate zero is the
-    // previous implementation's deterministic unit-weight warm start.
+    let lower_bound = WEIGHT_LOWER_BOUND.to_fraction();
+    let upper_bound = WEIGHT_UPPER_BOUND.to_fraction();
+    let weight_span = &upper_bound - &lower_bound;
+
+    // Candidate zero is the deterministic unit-weight warm start. The remaining
+    // candidates are exact rational weights sampled on a fixed rational grid.
     let mut positions = Vec::with_capacity(population_size);
-    positions.push(vec![0.0; num_transitions]);
+    positions.push(vec![Fraction::one(); num_transitions]);
     for _ in 1..population_size {
-        let mut position: Vec<f64> = (0..num_transitions)
-            .map(|_| rng.next_f64() * LOG_WEIGHT_SPAN)
+        let mut position: Vec<Fraction> = (0..num_transitions)
+            .map(|_| &lower_bound + &(&rng.next_fraction() * &weight_span))
             .collect();
         canonicalize_position(&mut position);
         positions.push(position);
     }
 
-    let costs: Vec<f64> = positions
+    let costs = positions
         .par_iter()
         .map(|position| candidate_cost(&prepared_traces, position))
-        .collect();
+        .collect::<Result<Vec<_>>>()?;
     let mut evaluations = population_size;
     let mut population: Vec<Candidate> = positions
         .into_iter()
@@ -884,17 +874,13 @@ pub fn maximize_uemsc(traces: &[TraceInput], num_transitions: usize) -> Result<U
         .collect();
     let mut best = population
         .iter()
-        .min_by(|left, right| left.cost.total_cmp(&right.cost))
+        .min_by(|left, right| left.cost.cmp(&right.cost))
         .cloned()
-        .expect("the optimizer population is non-empty");
-    ensure!(
-        best.cost.is_finite(),
-        "the Section 6 equation systems could not be evaluated"
-    );
+        .ok_or_else(|| anyhow!("the optimizer population is empty"))?;
 
     let mut stalled_generations = 0usize;
     for _generation in 0..MAX_GENERATIONS {
-        if started.elapsed() >= OPTIMIZER_TIME_LIMIT || best.cost <= OBJECTIVE_TOLERANCE {
+        if started.elapsed() >= OPTIMIZER_TIME_LIMIT || best.cost <= objective_tolerance {
             break;
         }
 
@@ -905,29 +891,29 @@ pub fn maximize_uemsc(traces: &[TraceInput], num_transitions: usize) -> Result<U
             let mut trial = Vec::with_capacity(num_transitions);
 
             for dimension in 0..num_transitions {
-                let use_mutant =
-                    dimension == forced_dimension || rng.next_f64() < CROSSOVER_PROBABILITY;
+                let use_mutant = dimension == forced_dimension
+                    || rng.next_fraction() < CROSSOVER_PROBABILITY.to_fraction();
                 let value = if use_mutant {
-                    population[a].position[dimension]
-                        + DIFFERENTIAL_WEIGHT
-                            * (population[b].position[dimension]
-                                - population[c].position[dimension])
+                    let difference =
+                        &population[b].position[dimension] - &population[c].position[dimension];
+                    &population[a].position[dimension]
+                        + &(&DIFFERENTIAL_WEIGHT.to_fraction() * &difference)
                 } else {
-                    population[individual].position[dimension]
+                    population[individual].position[dimension].clone()
                 };
-                trial.push(value.clamp(0.0, LOG_WEIGHT_SPAN));
+                trial.push(clamp_fraction(value, &lower_bound, &upper_bound));
             }
             canonicalize_position(&mut trial);
             trials.push(trial);
         }
 
-        let trial_costs: Vec<f64> = trials
+        let trial_costs = trials
             .par_iter()
             .map(|position| candidate_cost(&prepared_traces, position))
-            .collect();
+            .collect::<Result<Vec<_>>>()?;
         evaluations += population_size;
 
-        let previous_best = best.cost;
+        let previous_best = best.cost.clone();
         for ((individual, trial), trial_cost) in population.iter_mut().zip(trials).zip(trial_costs)
         {
             if trial_cost < individual.cost {
@@ -941,7 +927,7 @@ pub fn maximize_uemsc(traces: &[TraceInput], num_transitions: usize) -> Result<U
             }
         }
 
-        if best.cost < previous_best - OBJECTIVE_TOLERANCE {
+        if best.cost < &previous_best - &objective_tolerance {
             stalled_generations = 0;
         } else {
             stalled_generations += 1;
@@ -951,7 +937,7 @@ pub fn maximize_uemsc(traces: &[TraceInput], num_transitions: usize) -> Result<U
         }
     }
 
-    let basin_result = basin_hopping(&prepared_traces, best, &mut rng, started, num_transitions);
+    let basin_result = basin_hopping(&prepared_traces, best, &mut rng, started, num_transitions)?;
     evaluations += basin_result.evaluations;
 
     // A final high-accuracy local search polishes the lowest basin found.
@@ -960,21 +946,21 @@ pub fn maximize_uemsc(traces: &[TraceInput], num_transitions: usize) -> Result<U
         basin_result.best,
         started,
         num_transitions,
-    );
+    )?;
     evaluations += refinement_evaluations;
 
     let weights = position_to_weights(&best.position);
     let (deficit_sum, trace_probabilities) = evaluate_weights(&prepared_traces, &weights)
         .ok_or_else(|| anyhow!("the best candidate could not be re-evaluated"))?;
     log::info!(
-        "uEMSC search: {} evaluations, {} basin hops ({} accepted) in {:.3}s, deficit {:.9}",
+        "uEMSC search: {} evaluations, {} basin hops ({} accepted) in {:?}, deficit {}",
         evaluations,
         basin_result.hops,
         basin_result.accepted,
-        started.elapsed().as_secs_f64(),
+        started.elapsed(),
         deficit_sum
     );
-    if deficit_sum <= OBJECTIVE_TOLERANCE {
+    if deficit_sum <= objective_tolerance {
         log::info!("Global optimum certified within tolerance: uEMSC reached its upper bound of 1");
     } else {
         log::warn!(
@@ -983,8 +969,8 @@ pub fn maximize_uemsc(traces: &[TraceInput], num_transitions: usize) -> Result<U
     }
 
     Ok(UemscSolution {
-        uemsc_value: 1.0 - deficit_sum,
-        global_optimum_certified: deficit_sum <= OBJECTIVE_TOLERANCE,
+        uemsc_value: &Fraction::one() - &deficit_sum,
+        global_optimum_certified: deficit_sum <= objective_tolerance,
         weights,
         trace_probabilities,
     })
@@ -993,8 +979,8 @@ pub fn maximize_uemsc(traces: &[TraceInput], num_transitions: usize) -> Result<U
 // Helpers
 #[derive(Clone)]
 struct Candidate {
-    position: Vec<f64>,
-    cost: f64,
+    position: Vec<Fraction>,
+    cost: Fraction,
 }
 
 struct BasinHoppingResult {
@@ -1023,7 +1009,7 @@ enum PreparedEquation {
 }
 
 struct PreparedTrace {
-    log_probability: f64,
+    log_probability: Fraction,
     structurally_zero: bool,
     initial_variable: usize,
     coefficients: Vec<PreparedCoefficient>,
@@ -1044,14 +1030,14 @@ fn prepare_trace(
     num_transitions: usize,
 ) -> Result<PreparedTrace> {
     ensure!(
-        trace.log_probability.is_finite() && (0.0..=1.0).contains(&trace.log_probability),
+        trace.log_probability >= Fraction::zero() && trace.log_probability <= Fraction::one(),
         "trace {trace_index} has invalid log probability {}",
         trace.log_probability
     );
 
     if trace.system.is_structurally_zero() {
         return Ok(PreparedTrace {
-            log_probability: trace.log_probability,
+            log_probability: trace.log_probability.clone(),
             structurally_zero: true,
             initial_variable: 0,
             coefficients: Vec::new(),
@@ -1166,7 +1152,7 @@ fn prepare_trace(
     );
 
     Ok(PreparedTrace {
-        log_probability: trace.log_probability,
+        log_probability: trace.log_probability.clone(),
         structurally_zero: false,
         initial_variable: system.initial_variable,
         coefficients,
@@ -1177,192 +1163,142 @@ fn prepare_trace(
     })
 }
 
-fn candidate_cost(traces: &[PreparedTrace], position: &[f64]) -> f64 {
+fn candidate_cost(traces: &[PreparedTrace], position: &[Fraction]) -> Result<Fraction> {
     let weights = position_to_weights(position);
     evaluate_weights(traces, &weights)
         .map(|(deficit, _)| deficit)
-        .unwrap_or(f64::INFINITY)
+        .ok_or_else(|| anyhow!("could not evaluate a candidate weight vector"))
 }
 
-fn position_to_weights(position: &[f64]) -> Vec<f64> {
-    if position.is_empty() {
-        return Vec::new();
-    }
-
-    let minimum = position.iter().copied().fold(f64::INFINITY, f64::min);
-    let relative: Vec<f64> = position
-        .iter()
-        .map(|&log_weight| (log_weight - minimum).exp())
-        .collect();
-    let maximum = relative.iter().copied().fold(1.0, f64::max);
-    let scale = (WEIGHT_UPPER_BOUND / maximum).min(1.0);
-
-    relative
-        .into_iter()
-        .map(|weight| (scale * weight).clamp(WEIGHT_LOWER_BOUND, WEIGHT_UPPER_BOUND))
-        .collect()
+fn position_to_weights(position: &[Fraction]) -> Vec<Fraction> {
+    position.to_vec()
 }
 
-fn evaluate_weights(traces: &[PreparedTrace], weights: &[f64]) -> Option<(f64, Vec<f64>)> {
-    if weights
-        .iter()
-        .any(|weight| !weight.is_finite() || *weight <= 0.0)
-    {
+fn evaluate_weights(
+    traces: &[PreparedTrace],
+    weights: &[Fraction],
+) -> Option<(Fraction, Vec<Fraction>)> {
+    if weights.iter().any(|weight| !weight.is_positive()) {
         return None;
     }
 
-    let mut deficit_sum = 0.0;
+    let mut deficit_sum = Fraction::zero();
     let mut probabilities = Vec::with_capacity(traces.len());
     for trace in traces {
         let probability = if trace.structurally_zero {
-            0.0
+            Fraction::zero()
         } else {
             solve_trace_probability(trace, weights)?
         };
-        deficit_sum += (trace.log_probability - probability).max(0.0);
+        let deficit = &trace.log_probability - &probability;
+        if deficit.is_positive() {
+            deficit_sum += &deficit;
+        }
         probabilities.push(probability);
     }
 
-    deficit_sum
-        .is_finite()
-        .then_some((deficit_sum, probabilities))
+    Some((deficit_sum, probabilities))
 }
 
-fn solve_trace_probability(trace: &PreparedTrace, weights: &[f64]) -> Option<f64> {
-    let firing_probabilities: Vec<f64> = trace
+fn solve_trace_probability(trace: &PreparedTrace, weights: &[Fraction]) -> Option<Fraction> {
+    let firing_probabilities: Vec<Fraction> = trace
         .coefficients
         .iter()
         .map(|coefficient| {
             let denominator = coefficient
                 .denominator
                 .iter()
-                .map(|&transition| weights[transition])
-                .sum::<f64>();
-            (denominator > 0.0)
-                .then_some(weights[coefficient.numerator] / denominator)
-                .filter(|probability| probability.is_finite())
+                .map(|&transition| weights[transition].clone())
+                .sum::<Fraction>();
+            if denominator.is_zero() {
+                None
+            } else {
+                Some(&weights[coefficient.numerator] / &denominator)
+            }
         })
         .collect::<Option<_>>()?;
 
     let variable_count = trace.equations.len();
-    let mut matrix = vec![vec![0.0; variable_count]; variable_count];
-    let mut rhs = vec![0.0; variable_count];
+    let mut matrix = vec![vec![Fraction::zero(); variable_count]; variable_count];
+    let mut rhs = vec![Fraction::zero(); variable_count];
     for (lhs, equation) in trace.equations.iter().enumerate() {
-        matrix[lhs][lhs] = 1.0;
+        matrix[lhs][lhs] = Fraction::one();
         match equation {
-            PreparedEquation::Final => rhs[lhs] = 1.0,
+            PreparedEquation::Final => rhs[lhs] = Fraction::one(),
             PreparedEquation::Dead => {}
             PreparedEquation::Linear(terms) => {
                 for term in terms {
-                    matrix[lhs][term.variable] -= firing_probabilities[term.coefficient];
+                    matrix[lhs][term.variable] -= &firing_probabilities[term.coefficient];
                 }
             }
         }
     }
 
-    let solution = solve_linear_system(matrix, rhs)
-        .filter(|values| fixed_point_residual(trace, &firing_probabilities, values) <= 1e-8)
-        .or_else(|| least_fixed_point(trace, &firing_probabilities))?;
-    let probability = solution[trace.initial_variable];
-    (probability.is_finite() && (-1e-8..=1.0 + 1e-8).contains(&probability))
-        .then(|| probability.clamp(0.0, 1.0))
+    let solution = solve_linear_system(matrix, rhs)?;
+    let probability = solution[trace.initial_variable].clone();
+    (probability >= Fraction::zero() && probability <= Fraction::one()).then_some(probability)
 }
 
-fn solve_linear_system(mut matrix: Vec<Vec<f64>>, mut rhs: Vec<f64>) -> Option<Vec<f64>> {
+/// Solve an exact rational linear system. Singular systems are handled by
+/// assigning zero to free variables, yielding the least non-negative solution
+/// for the reachability equations used here.
+fn solve_linear_system(
+    mut matrix: Vec<Vec<Fraction>>,
+    mut rhs: Vec<Fraction>,
+) -> Option<Vec<Fraction>> {
     let dimension = rhs.len();
-    for column in 0..dimension {
-        let pivot = (column..dimension).max_by(|&left, &right| {
-            matrix[left][column]
-                .abs()
-                .total_cmp(&matrix[right][column].abs())
-        })?;
-        if matrix[pivot][column].abs() <= LINEAR_SOLVE_TOLERANCE {
-            return None;
-        }
-        matrix.swap(column, pivot);
-        rhs.swap(column, pivot);
+    let mut pivot_row = 0usize;
+    let mut pivot_columns = Vec::new();
 
-        for row in column + 1..dimension {
-            let (previous_rows, current_and_later_rows) = matrix.split_at_mut(row);
-            let pivot_row = &previous_rows[column];
-            let current_row = &mut current_and_later_rows[0];
-            let factor = current_row[column] / pivot_row[column];
-            if factor == 0.0 {
+    for column in 0..dimension {
+        let pivot = (pivot_row..dimension).find(|&row| !matrix[row][column].is_zero());
+        let Some(pivot) = pivot else {
+            continue;
+        };
+
+        matrix.swap(pivot_row, pivot);
+        rhs.swap(pivot_row, pivot);
+
+        let pivot_value = matrix[pivot_row][column].clone();
+        for entry in &mut matrix[pivot_row][column..] {
+            *entry = &*entry / &pivot_value;
+        }
+        rhs[pivot_row] = &rhs[pivot_row] / &pivot_value;
+        let pivot_rhs = rhs[pivot_row].clone();
+
+        for row in 0..dimension {
+            if row == pivot_row {
                 continue;
             }
-            current_row[column] = 0.0;
-            for (entry, &pivot_entry) in current_row[column + 1..]
-                .iter_mut()
-                .zip(&pivot_row[column + 1..])
-            {
-                *entry -= factor * pivot_entry;
+            let factor = matrix[row][column].clone();
+            if factor.is_zero() {
+                continue;
             }
-            rhs[row] -= factor * rhs[column];
+            let pivot_entries = matrix[pivot_row][column..].to_vec();
+            for (entry, pivot_entry) in matrix[row][column..].iter_mut().zip(pivot_entries) {
+                *entry -= &factor * &pivot_entry;
+            }
+            rhs[row] -= &factor * &pivot_rhs;
+        }
+
+        pivot_columns.push(column);
+        pivot_row += 1;
+        if pivot_row == dimension {
+            break;
         }
     }
 
-    let mut solution = vec![0.0; dimension];
-    for row in (0..dimension).rev() {
-        let remainder = (row + 1..dimension)
-            .map(|column| matrix[row][column] * solution[column])
-            .sum::<f64>();
-        solution[row] = (rhs[row] - remainder) / matrix[row][row];
-        if !solution[row].is_finite() {
+    for row in pivot_row..dimension {
+        if matrix[row].iter().all(Zero::is_zero) && !rhs[row].is_zero() {
             return None;
         }
     }
-    Some(solution)
-}
 
-fn least_fixed_point(trace: &PreparedTrace, firing_probabilities: &[f64]) -> Option<Vec<f64>> {
-    let mut values = vec![0.0; trace.equations.len()];
-    for _ in 0..FIXED_POINT_ITERATION_LIMIT {
-        let mut next = vec![0.0; values.len()];
-        for (lhs, equation) in trace.equations.iter().enumerate() {
-            next[lhs] = match equation {
-                PreparedEquation::Final => 1.0,
-                PreparedEquation::Dead => 0.0,
-                PreparedEquation::Linear(terms) => terms
-                    .iter()
-                    .map(|term| firing_probabilities[term.coefficient] * values[term.variable])
-                    .sum(),
-            };
-        }
-        let change = next
-            .iter()
-            .zip(&values)
-            .map(|(new, old)| (new - old).abs())
-            .fold(0.0, f64::max);
-        values = next;
-        if change <= FIXED_POINT_TOLERANCE {
-            return Some(values);
-        }
+    let mut solution = vec![Fraction::zero(); dimension];
+    for (row, column) in pivot_columns.into_iter().enumerate() {
+        solution[column] = rhs[row].clone();
     }
-
-    (fixed_point_residual(trace, firing_probabilities, &values) <= 1e-8).then_some(values)
-}
-
-fn fixed_point_residual(
-    trace: &PreparedTrace,
-    firing_probabilities: &[f64],
-    values: &[f64],
-) -> f64 {
-    trace
-        .equations
-        .iter()
-        .enumerate()
-        .map(|(lhs, equation)| {
-            let expected = match equation {
-                PreparedEquation::Final => 1.0,
-                PreparedEquation::Dead => 0.0,
-                PreparedEquation::Linear(terms) => terms
-                    .iter()
-                    .map(|term| firing_probabilities[term.coefficient] * values[term.variable])
-                    .sum(),
-            };
-            (values[lhs] - expected).abs()
-        })
-        .fold(0.0, f64::max)
+    Some(solution)
 }
 
 fn refine_coordinates(
@@ -1370,15 +1306,15 @@ fn refine_coordinates(
     best: Candidate,
     started: Instant,
     dimensions: usize,
-) -> (Candidate, usize) {
+) -> Result<(Candidate, usize)> {
     local_minimize(
         traces,
         best,
         started,
         dimensions,
-        LOG_WEIGHT_SPAN / 8.0,
-        1e-7,
-        200,
+        REFINEMENT_INITIAL_STEP.to_fraction(),
+        REFINEMENT_MINIMUM_STEP.to_fraction(),
+        REFINEMENT_MAXIMUM_SWEEPS,
     )
 }
 
@@ -1388,26 +1324,28 @@ fn basin_hopping(
     rng: &mut DeterministicRng,
     started: Instant,
     dimensions: usize,
-) -> BasinHoppingResult {
+) -> Result<BasinHoppingResult> {
     let (mut current, initial_evaluations) = local_minimize(
         traces,
         initial,
         started,
         dimensions,
-        LOG_WEIGHT_SPAN / 16.0,
-        1e-5,
+        ConstFraction::of(25, 4).to_fraction(),
+        ConstFraction::of(1, 100_000).to_fraction(),
         80,
-    );
+    )?;
     let mut best = current.clone();
     let mut evaluations = initial_evaluations;
     let mut accepted = 0usize;
     let mut accepted_in_window = 0usize;
     let mut hops = 0usize;
-    let mut step_size = LOG_WEIGHT_SPAN / 4.0;
-    let mut temperature = BASIN_INITIAL_TEMPERATURE;
+    let mut step_size = ConstFraction::of(25, 1).to_fraction();
+    let mut temperature = BASIN_INITIAL_TEMPERATURE.to_fraction();
 
     for hop in 0..BASIN_HOP_ITERATIONS {
-        if started.elapsed() >= OPTIMIZER_TIME_LIMIT || best.cost <= OBJECTIVE_TOLERANCE {
+        if started.elapsed() >= OPTIMIZER_TIME_LIMIT
+            || best.cost <= OBJECTIVE_TOLERANCE.to_fraction()
+        {
             break;
         }
         hops = hop + 1;
@@ -1415,15 +1353,22 @@ fn basin_hopping(
         let forced_dimension = rng.index(dimensions);
         let mut position = current.position.clone();
         for (dimension, coordinate) in position.iter_mut().enumerate() {
-            if dimension == forced_dimension || rng.next_f64() < 0.65 {
-                let displacement = (2.0 * rng.next_f64() - 1.0) * step_size;
-                *coordinate = (*coordinate + displacement).clamp(0.0, LOG_WEIGHT_SPAN);
+            if dimension == forced_dimension
+                || rng.next_fraction() < ConstFraction::of(13, 20).to_fraction()
+            {
+                let signed_random = &(&rng.next_fraction() * 2) - 1;
+                let displacement = &signed_random * &step_size;
+                *coordinate = clamp_fraction(
+                    &*coordinate + &displacement,
+                    &WEIGHT_LOWER_BOUND.to_fraction(),
+                    &WEIGHT_UPPER_BOUND.to_fraction(),
+                );
             }
         }
         canonicalize_position(&mut position);
 
         let trial = Candidate {
-            cost: candidate_cost(traces, &position),
+            cost: candidate_cost(traces, &position)?,
             position,
         };
         evaluations += 1;
@@ -1432,19 +1377,26 @@ fn basin_hopping(
             trial,
             started,
             dimensions,
-            (step_size / 4.0).max(LOG_WEIGHT_SPAN / 512.0),
-            1e-5,
+            max_fraction(
+                &step_size / 4,
+                ConstFraction::of(25, 128).to_fraction(),
+            ),
+            ConstFraction::of(1, 100_000).to_fraction(),
             BASIN_LOCAL_SWEEPS,
-        );
+        )?;
         evaluations += local_evaluations;
 
         if trial.cost < best.cost {
             best = trial.clone();
         }
 
-        let increase = trial.cost - current.cost;
-        let accept = increase <= 0.0
-            || rng.next_f64() < (-increase / temperature.max(f64::MIN_POSITIVE)).exp();
+        let increase = &trial.cost - &current.cost;
+        let accept = !increase.is_positive() || {
+            // This rational alternative to the exponential Metropolis rule
+            // preserves exact arithmetic and decreases monotonically with cost.
+            let acceptance_probability = &temperature / &(&temperature + &increase);
+            rng.next_fraction() < acceptance_probability
+        };
         if accept {
             current = trial;
             accepted += 1;
@@ -1452,24 +1404,31 @@ fn basin_hopping(
         }
 
         if (hop + 1) % BASIN_ADAPT_INTERVAL == 0 {
-            let acceptance_rate = accepted_in_window as f64 / BASIN_ADAPT_INTERVAL as f64;
-            if acceptance_rate > BASIN_TARGET_ACCEPTANCE {
-                step_size /= BASIN_STEPWISE_FACTOR;
+            let acceptance_rate = Fraction::from((accepted_in_window, BASIN_ADAPT_INTERVAL));
+            if acceptance_rate > BASIN_TARGET_ACCEPTANCE.to_fraction() {
+                step_size /= BASIN_STEPWISE_FACTOR.to_fraction();
             } else {
-                step_size *= BASIN_STEPWISE_FACTOR;
+                step_size *= BASIN_STEPWISE_FACTOR.to_fraction();
             }
-            step_size = step_size.clamp(LOG_WEIGHT_SPAN / 256.0, LOG_WEIGHT_SPAN / 2.0);
+            step_size = clamp_fraction(
+                step_size,
+                &ConstFraction::of(25, 64).to_fraction(),
+                &ConstFraction::of(50, 1).to_fraction(),
+            );
             accepted_in_window = 0;
         }
-        temperature = (temperature * BASIN_COOLING_RATE).max(1e-8);
+        temperature = max_fraction(
+            &temperature * &BASIN_COOLING_RATE.to_fraction(),
+            BASIN_MINIMUM_TEMPERATURE.to_fraction(),
+        );
     }
 
-    BasinHoppingResult {
+    Ok(BasinHoppingResult {
         best,
         evaluations,
         hops,
         accepted,
-    }
+    })
 }
 
 fn local_minimize(
@@ -1477,50 +1436,104 @@ fn local_minimize(
     mut best: Candidate,
     started: Instant,
     dimensions: usize,
-    initial_step: f64,
-    minimum_step: f64,
+    initial_step: Fraction,
+    minimum_step: Fraction,
     maximum_sweeps: usize,
-) -> (Candidate, usize) {
+) -> Result<(Candidate, usize)> {
     let mut evaluations = 0usize;
     let mut step = initial_step;
     let mut sweeps = 0usize;
 
-    while step > minimum_step && sweeps < maximum_sweeps && started.elapsed() < OPTIMIZER_TIME_LIMIT
+    while step > minimum_step
+        && sweeps < maximum_sweeps
+        && started.elapsed() < OPTIMIZER_TIME_LIMIT
     {
         sweeps += 1;
         let mut improved = false;
         for dimension in 0..dimensions {
-            for direction in [-1.0, 1.0] {
+            for direction in [-1i8, 1i8] {
                 let mut position = best.position.clone();
-                position[dimension] =
-                    (position[dimension] + direction * step).clamp(0.0, LOG_WEIGHT_SPAN);
+                let value = &position[dimension] + &(&step * direction);
+                position[dimension] = clamp_fraction(
+                    value,
+                    &WEIGHT_LOWER_BOUND.to_fraction(),
+                    &WEIGHT_UPPER_BOUND.to_fraction(),
+                );
                 canonicalize_position(&mut position);
                 if position == best.position {
                     continue;
                 }
-                let cost = candidate_cost(traces, &position);
+                let cost = candidate_cost(traces, &position)?;
                 evaluations += 1;
                 if cost < best.cost {
                     best = Candidate { position, cost };
                     improved = true;
                 }
-                if started.elapsed() >= OPTIMIZER_TIME_LIMIT || best.cost <= OBJECTIVE_TOLERANCE {
-                    return (best, evaluations);
+                if started.elapsed() >= OPTIMIZER_TIME_LIMIT
+                    || best.cost <= OBJECTIVE_TOLERANCE.to_fraction()
+                {
+                    return Ok((best, evaluations));
                 }
             }
         }
         if !improved {
-            step *= 0.5;
+            step /= 2;
         }
     }
-    (best, evaluations)
+    Ok((best, evaluations))
 }
 
-fn canonicalize_position(position: &mut [f64]) {
-    let minimum = position.iter().copied().fold(f64::INFINITY, f64::min);
-    for coordinate in position {
-        *coordinate -= minimum;
+/// Normalise the scale-invariant weight vector and project it onto the exact
+/// search grid.
+fn canonicalize_position(position: &mut [Fraction]) {
+    if position.is_empty() {
+        return;
     }
+
+    let minimum = position.iter().min().cloned().unwrap_or_else(Fraction::one);
+    if minimum.is_zero() {
+        return;
+    }
+    for coordinate in position.iter_mut() {
+        *coordinate = &*coordinate / &minimum;
+    }
+
+    let maximum = position.iter().max().cloned().unwrap_or_else(Fraction::one);
+    let upper_bound = WEIGHT_UPPER_BOUND.to_fraction();
+    if maximum > upper_bound {
+        let scale = &upper_bound / &maximum;
+        for coordinate in position.iter_mut() {
+            *coordinate *= &scale;
+        }
+    }
+
+    let lower_bound = WEIGHT_LOWER_BOUND.to_fraction();
+    for coordinate in position {
+        *coordinate = clamp_fraction(coordinate.clone(), &lower_bound, &upper_bound);
+    }
+}
+
+fn clamp_fraction(value: Fraction, minimum: &Fraction, maximum: &Fraction) -> Fraction {
+    let bounded = if value < *minimum {
+        minimum.clone()
+    } else if value > *maximum {
+        maximum.clone()
+    } else {
+        value
+    };
+    quantize_weight(bounded)
+}
+
+/// Keep search coordinates on a bounded exact grid so repeated mutations do
+/// not cause unbounded rational-denominator growth.
+fn quantize_weight(value: Fraction) -> Fraction {
+    let scaled = &value * WEIGHT_RESOLUTION;
+    let rounded = (&scaled + &ConstFraction::of(1, 2).to_fraction()).floor();
+    &rounded / WEIGHT_RESOLUTION
+}
+
+fn max_fraction(left: Fraction, right: Fraction) -> Fraction {
+    if left >= right { left } else { right }
 }
 
 fn distinct_population_indices(
@@ -1558,8 +1571,9 @@ impl DeterministicRng {
         value ^ (value >> 31)
     }
 
-    fn next_f64(&mut self) -> f64 {
-        ((self.next_u64() >> 11) as f64) * (1.0 / ((1u64 << 53) as f64))
+    /// Return an exact rational in [0, 1] on a fixed one-million-point grid.
+    fn next_fraction(&mut self) -> Fraction {
+        Fraction::from((self.next_u64() % 1_000_001, 1_000_000u64))
     }
 
     fn index(&mut self, upper: usize) -> usize {
@@ -1571,51 +1585,28 @@ pub trait UEMSCStochasticMinerLPN {
     fn mine_uemsc_stochastic_lpn(
         self,
         language: Box<dyn EbiTraitFiniteStochasticLanguage>,
-    ) -> StochasticLabelledPetriNet;
+    ) -> Result<StochasticLabelledPetriNet>;
 }
 
 impl UEMSCStochasticMinerLPN for LabelledPetriNet {
     fn mine_uemsc_stochastic_lpn(
-        self,
+        mut self,
         log: Box<dyn EbiTraitFiniteStochasticLanguage>,
-    ) -> StochasticLabelledPetriNet {
-        // Step 1: translate activity keys.
-        let mut activity_key = self.activity_key().clone();
-        let translator = Arc::new(ActivityKeyTranslator::new(
-            log.activity_key(),
-            &mut activity_key,
-        ));
-        let error: Arc<Mutex<Option<Error>>> = Arc::new(Mutex::new(None));
-
-        log::info!("Building equation systems for all traces");
+    ) -> Result<StochasticLabelledPetriNet> {
+        // Step 1: translate the LPN once, before entering the parallel trace loop.
+        let mut activity_key = log.activity_key().clone();
+        self.translate_using_activity_key(&mut activity_key);
 
         // Step 2: build equation systems and collect probabilities in parallel.
-        let trace_data: Vec<(LinearSystem, f64)> = log
+        let trace_data = log
             .par_iter_traces_probabilities()
-            .filter_map(|(trace, probability)| {
-                let translator = Arc::clone(&translator);
-                let trace_translated = translator.translate_trace(&trace);
-                let result = self
-                    .create_equation_system(&trace_translated)
-                    .with_context(|| format!("Building equation system for trace {trace:?}"));
-
-                match result {
-                    Ok(system) => {
-                        let log_probability = probability.clone().approximate().unwrap();
-                        Some((system, log_probability))
-                    }
-                    Err(build_error) => {
-                        *Arc::clone(&error).lock().unwrap() = Some(build_error);
-                        None
-                    }
-                }
+            .map(|(trace, probability)| -> Result<(LinearSystem, Fraction)> {
+                let system = self
+                    .create_equation_system(trace)
+                    .with_context(|| anyhow!("Building equation system for trace {trace:?}"))?;
+                Ok((system, probability.clone()))
             })
-            .collect();
-
-        // Omitting a failed trace would change Equation (5), so fail explicitly.
-        if let Some(build_error) = error.lock().unwrap().take() {
-            panic!("Could not build every trace equation system: {build_error:#}");
-        }
+            .collect::<Result<Vec<_>>>()?;
 
         // Step 3: build optimizer inputs.
         let trace_inputs: Vec<TraceInput> = trace_data
@@ -1633,19 +1624,13 @@ impl UEMSCStochasticMinerLPN for LabelledPetriNet {
             num_transitions
         );
 
-        // Step 4: run the self-contained pure-Rust optimisation.
+        // Step 4: run the optimisation.
         let solution = maximize_uemsc(&trace_inputs, num_transitions)
-            .expect("The pure-Rust search could not evaluate the uEMSC discovery model");
+            .context("The search could not evaluate the uEMSC discovery model")?;
 
-        log::info!("Best uEMSC = {:.6}", solution.uemsc_value);
+        log::info!("Best uEMSC = {}", solution.uemsc_value);
 
-        // Step 5: convert f64 weights to Fraction and build the SLPN.
-        let weights: Vec<Fraction> = solution
-            .weights
-            .iter()
-            .map(|&weight| FractionEnum::Approx(weight))
-            .collect();
-
-        (self, weights).into()
+        // Step 5: build the SLPN directly from the exact weights.
+        Ok((self, solution.weights).into())
     }
 }
