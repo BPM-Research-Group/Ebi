@@ -1634,3 +1634,30 @@ impl UEMSCStochasticMinerLPN for LabelledPetriNet {
         Ok((self, solution.weights).into())
     }
 }
+
+
+#[cfg(test)]
+mod tests {
+    use std::fs;
+
+    use ebi_objects::{
+        FiniteStochasticLanguage, LabelledPetriNet
+    };
+
+    use crate::techniques::{unit_earth_movers_stochastic_miner::UEMSCStochasticMinerLPN};
+
+    #[test]
+    fn lpn_uniform() {
+        let fin = fs::read_to_string("testfiles/caise24_concurrency.lpn").unwrap();
+        let lpn = Box::new(fin.parse::<LabelledPetriNet>().unwrap());
+
+        let fin2 = fs::read_to_string("testfiles/caise24_concurrency.slang").unwrap();
+        let slang: Box<FiniteStochasticLanguage> =
+            Box::new(fin2.parse::<FiniteStochasticLanguage>().unwrap());
+
+        let slpn: ebi_objects::StochasticLabelledPetriNet = lpn.mine_uemsc_stochastic_lpn(slang).unwrap();
+        let fout = fs::read_to_string("testfiles/caise24_concurrency.slpn").unwrap();
+
+        assert_eq!(fout, slpn.to_string())
+    }
+}
