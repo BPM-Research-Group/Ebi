@@ -30,6 +30,31 @@ fn analyse_all_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<Py
 }
 
 #[pyfunction]
+fn analyse_cohort_analysis(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COHORT_ANALYSIS;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let input2 = import_or_load(arg2, input_types[2], 2)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
+        let inputs = vec![input0, input1, input2];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
 fn analyse_completeness(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COMPLETENESS;
@@ -77,6 +102,29 @@ fn analyse_coverage(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, Py
 fn analyse_directly_follows_edge_difference(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn analyse_directly_follows_edge_difference_no_frequencies(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_DIRECTLY_FOLLOWS_EDGE_DIFFERENCE_NO_FREQUENCIES;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
         _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
@@ -304,6 +352,27 @@ fn analyse_non_stochastic_cluster(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1:
         let input1 = import_or_load(arg1, input_types[1], 1)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
         let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn analyse_non_stochastic_empty_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_analyse_non_stochastic::EBI_ANALYSE_NON_STOCHASTIC_EMPTY_TRACES;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -767,7 +836,7 @@ fn conformance_unit_earth_movers(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: 
 
 #[pyfunction]
 fn conformance_unit_earth_movers_sample(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
-    ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance::EBI_CONFORMANCE_UEMSC_SAMPLE;
     let input_types = match **command {
         EbiCommand::Command { input_types, .. } => input_types,
@@ -826,6 +895,27 @@ fn conformance_non_stochastic_escaping_edges_precision(py: Python<'_>, arg0: &Bo
         let input1 = import_or_load(arg1, input_types[1], 1)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
         let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn conformance_non_stochastic_fitting_traces(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_conformance_non_stochastic::EBI_CONFORMANCE_NON_STOCHASTIC_FITTING_TRACES;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1007,6 +1097,27 @@ fn convert_stochastic_deterministic_finite_automaton(py: Python<'_>, arg0: &Boun
 }
 
 #[pyfunction]
+fn convert_stochastic_directly_follows_model(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SDFM;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
 fn convert_stochastic_labelled_petri_net(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_convert::EBI_CONVERT_SLPN;
@@ -1038,6 +1149,29 @@ fn convert_stochastic_nondeterministic_finite_automaton(py: Python<'_>, arg0: &B
     let input0 = import_or_load(arg0, input_types[0], 0)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
         let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn discover_alergia(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1355,6 +1489,50 @@ fn discover_non_stochastic_flower_process_tree(py: Python<'_>, arg0: &Bound<'_, 
 }
 
 #[pyfunction]
+fn discover_non_stochastic_inductive_miner(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn discover_non_stochastic_inductive_miner_infrequent(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
 fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_TREE_DFA;
@@ -1386,6 +1564,31 @@ fn discover_non_stochastic_prefix_tree_process_tree(py: Python<'_>, arg0: &Bound
     let input0 = import_or_load(arg0, input_types[0], 0)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
         let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn discover_non_stochastic_split_miner(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let input2 = import_or_load(arg2, input_types[2], 2)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
+        let inputs = vec![input0, input1, input2];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1439,6 +1642,31 @@ fn information(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
 }
 
 #[pyfunction]
+fn probability_explain_trace(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_EXPLAIN_TRACE;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let input2 = import_or_load(arg2, input_types[2], 2)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
+        let inputs = vec![input0, input1, input2];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
 fn probability_log(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_LOG;
@@ -1451,6 +1679,71 @@ fn probability_log(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyA
         let input1 = import_or_load(arg1, input_types[1], 1)
             .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
         let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn probability_trace(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_probability::EBI_PROBABILITY_TRACE;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let inputs = vec![input0, input1];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn reduce_labelled_petri_net(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_reduce::EBI_REDUCE_PETRI_NET;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
+fn reduce_process_tree(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_reduce::EBI_REDUCE_PROCESS_TREE;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let inputs = vec![input0];
 
     // Execute the command.
     let result = command.execute_with_inputs(inputs)
@@ -1589,6 +1882,33 @@ fn test_log_categorical_attribute(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1:
 }
 
 #[pyfunction]
+fn test_permutation_test_log_model(py: Python<'_>, arg0: &Bound<'_, PyAny>, arg1: &Bound<'_, PyAny>, arg2: &Bound<'_, PyAny>, arg3: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
+    ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
+    let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL;
+    let input_types = match **command {
+        EbiCommand::Command { input_types, .. } => input_types,
+        _ => return Err(pyo3::exceptions::PyValueError::new_err("Expected a command.")),
+    };
+    let input0 = import_or_load(arg0, input_types[0], 0)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 0: {}", e)))?;
+        let input1 = import_or_load(arg1, input_types[1], 1)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 1: {}", e)))?;
+        let input2 = import_or_load(arg2, input_types[2], 2)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 2: {}", e)))?;
+        let input3 = import_or_load(arg3, input_types[3], 3)
+            .map_err(|e| pyo3::exceptions::PyValueError::new_err(format!("Could not import argument 3: {}", e)))?;
+        let inputs = vec![input0, input1, input2, input3];
+
+    // Execute the command.
+    let result = command.execute_with_inputs(inputs)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Command error: {}", e)))?
+        .export_to_pm4py(py)
+        .map_err(|e| pyo3::exceptions::PyException::new_err(format!("Export error: {}", e)))?;
+
+    Ok(result)
+}
+
+#[pyfunction]
 fn visualise_graph(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>> {
     ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
     let command: &&EbiCommand = &&crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_GRAPH;
@@ -1633,10 +1953,15 @@ fn visualise_text(py: Python<'_>, arg0: &Bound<'_, PyAny>) -> PyResult<Py<PyAny>
 
 
 #[pymodule]
-pub fn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {    m.add_function(wrap_pyfunction!(analyse_all_traces, m)?)?;
+pub fn _ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {
+    m.add_class::<super::python_handle::Model>()?;
+    m.add_class::<super::python_handle::Log>()?;
+    m.add_function(wrap_pyfunction!(analyse_all_traces, m)?)?;
+    m.add_function(wrap_pyfunction!(analyse_cohort_analysis, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_completeness, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_coverage, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_directly_follows_edge_difference, m)?)?;
+    m.add_function(wrap_pyfunction!(analyse_directly_follows_edge_difference_no_frequencies, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_entropy, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_medoid, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_minimum_probability_traces, m)?)?;
@@ -1647,6 +1972,7 @@ pub fn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {    m.add_
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_any_traces, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_bounded, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_cluster, m)?)?;
+    m.add_function(wrap_pyfunction!(analyse_non_stochastic_empty_traces, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_executions, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_infinitely_many_traces, m)?)?;
     m.add_function(wrap_pyfunction!(analyse_non_stochastic_medoid, m)?)?;
@@ -1669,6 +1995,7 @@ pub fn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {    m.add_
     m.add_function(wrap_pyfunction!(conformance_unit_earth_movers_sample, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_non_stochastic_alignments, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_non_stochastic_escaping_edges_precision, m)?)?;
+    m.add_function(wrap_pyfunction!(conformance_non_stochastic_fitting_traces, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_non_stochastic_set_alignments, m)?)?;
     m.add_function(wrap_pyfunction!(conformance_non_stochastic_trace_fitness, m)?)?;
     m.add_function(wrap_pyfunction!(convert_business_process_model_and_notation, m)?)?;
@@ -1677,8 +2004,10 @@ pub fn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {    m.add_
     m.add_function(wrap_pyfunction!(convert_labelled_petri_net, m)?)?;
     m.add_function(wrap_pyfunction!(convert_log, m)?)?;
     m.add_function(wrap_pyfunction!(convert_stochastic_deterministic_finite_automaton, m)?)?;
+    m.add_function(wrap_pyfunction!(convert_stochastic_directly_follows_model, m)?)?;
     m.add_function(wrap_pyfunction!(convert_stochastic_labelled_petri_net, m)?)?;
     m.add_function(wrap_pyfunction!(convert_stochastic_nondeterministic_finite_automaton, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_alergia, m)?)?;
     m.add_function(wrap_pyfunction!(discover_alignments_stochastic_business_process_model_and_notation, m)?)?;
     m.add_function(wrap_pyfunction!(discover_alignments_stochastic_labelled_petri_nets, m)?)?;
     m.add_function(wrap_pyfunction!(discover_directly_follows_graph, m)?)?;
@@ -1693,16 +2022,24 @@ pub fn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {    m.add_
     m.add_function(wrap_pyfunction!(discover_uniform_stochastic_process_tree, m)?)?;
     m.add_function(wrap_pyfunction!(discover_non_stochastic_flower_deterministic_finite_automaton, m)?)?;
     m.add_function(wrap_pyfunction!(discover_non_stochastic_flower_process_tree, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_non_stochastic_inductive_miner, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_non_stochastic_inductive_miner_infrequent, m)?)?;
     m.add_function(wrap_pyfunction!(discover_non_stochastic_prefix_tree_deterministic_finite_automaton, m)?)?;
     m.add_function(wrap_pyfunction!(discover_non_stochastic_prefix_tree_process_tree, m)?)?;
+    m.add_function(wrap_pyfunction!(discover_non_stochastic_split_miner, m)?)?;
     m.add_function(wrap_pyfunction!(discover_non_stochastic_trace_model, m)?)?;
     m.add_function(wrap_pyfunction!(information, m)?)?;
+    m.add_function(wrap_pyfunction!(probability_explain_trace, m)?)?;
     m.add_function(wrap_pyfunction!(probability_log, m)?)?;
+    m.add_function(wrap_pyfunction!(probability_trace, m)?)?;
+    m.add_function(wrap_pyfunction!(reduce_labelled_petri_net, m)?)?;
+    m.add_function(wrap_pyfunction!(reduce_process_tree, m)?)?;
     m.add_function(wrap_pyfunction!(sample_folds, m)?)?;
     m.add_function(wrap_pyfunction!(sample_partially_ordered_traces, m)?)?;
     m.add_function(wrap_pyfunction!(sample_traces, m)?)?;
     m.add_function(wrap_pyfunction!(test_bootstrap_test, m)?)?;
     m.add_function(wrap_pyfunction!(test_log_categorical_attribute, m)?)?;
+    m.add_function(wrap_pyfunction!(test_permutation_test_log_model, m)?)?;
     m.add_function(wrap_pyfunction!(visualise_graph, m)?)?;
     m.add_function(wrap_pyfunction!(visualise_text, m)?)?;
     Ok(())

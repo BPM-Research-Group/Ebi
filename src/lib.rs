@@ -143,10 +143,13 @@ pub mod python {
     #[cfg(feature = "python")]
     pub mod python_export;
     #[cfg(feature = "python")]
+    pub mod python_handle;
+    #[cfg(feature = "python")]
     pub mod python_import;
     #[cfg(feature = "python")]
     pub mod python_link;
-    #[cfg(feature = "python")]
+    // Not built for tests: it exports PyInit__ebi, which would be defined twice in a test binary.
+    #[cfg(all(feature = "python", not(test)))]
     pub mod python_module_autogen;
     #[cfg(feature = "python")]
     pub mod python_module_generator;

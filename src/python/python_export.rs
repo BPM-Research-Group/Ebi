@@ -5,7 +5,7 @@ use crate::ebi_framework::{
 use ebi_objects::{
     EbiObject, EventLogPython, NumberOfTraces,
     ebi_arithmetic::{
-        Fraction, MaybeExact, fraction::approximate::Approximate, malachite::Natural,
+        Fraction, MaybeExact, Signed, malachite::Natural,
     },
 };
 use process_mining::core::event_data::case_centric::AttributeValue;
@@ -80,33 +80,12 @@ impl ExportableToPM4Py for usize {
 
 impl ExportableToPM4Py for Fraction {
     fn export_to_pm4py(&self, py: Python<'_>) -> PyResult<Py<PyAny>> {
-        if let Ok(rat) = self.exact_ref() {
-            // malachite does not offer any direct way to convert Rational to f64
+        if let Some((numerator, denominator)) = exact_parts(self) {
+            let py_numerator = numerator.into_py_any(py)?;
+            let py_denominator = denominator.into_py_any(py)?;
 
-            //create an approximation float
-            let approx_float = match rat.clone().approximate() {
-                Ok(x) => x,
-                Err(e) => {
-                    return Err(PyValueError::new_err(format!(
-                        "Cannot approximate the fraction {}",
-                        e
-                    )));
-                }
-            };
-            let py_approx_float = approx_float.into_py_any(py)?;
-
-            //create the exact values
-            let numerator = rat.numerator_ref();
-            let py_numerator = natural_to_num_biguints(numerator).into_py_any(py)?;
-
-            let denominator = rat.denominator_ref();
-            let py_denominator = natural_to_num_biguints(denominator).into_py_any(py)?;
-
-            //create the list
-            let py_events = vec![py_approx_float, py_numerator, py_denominator];
-            let py_list = PyList::new(py, py_events)?;
-
-            Ok(py_list.into_py_any(py)?)
+            let ebi_fraction = py.import("ebi._fraction")?.getattr("EbiFraction")?;
+            Ok(ebi_fraction.call1((py_numerator, py_denominator))?.unbind())
         } else if let Ok(flo) = self.approx_ref() {
             Ok(flo.into_py_any(py)?)
         } else {
@@ -114,6 +93,48 @@ impl ExportableToPM4Py for Fraction {
                 "Cannot export a Fraction that combines Exact and Approx",
             ))
         }
+    }
+}
+
+/// The numerator, carrying the sign of the whole fraction, and the denominator of an exact fraction.
+pub(crate) fn exact_parts(fraction: &Fraction) -> Option<(num_bigint::BigInt, num_bigint::BigUint)> {
+    let rational = fraction.exact_ref().ok()?;
+    let sign = if fraction.is_negative() {
+        num_bigint::Sign::Minus
+    } else {
+        num_bigint::Sign::Plus
+    };
+    Some((
+        num_bigint::BigInt::from_biguint(sign, natural_to_num_biguints(rational.numerator_ref())),
+        natural_to_num_biguints(rational.denominator_ref()),
+    ))
+}
+
+#[cfg(test)]
+mod exact_parts_tests {
+    use super::exact_parts;
+    use ebi_objects::ebi_arithmetic::{Fraction, exact::set_exact_globally};
+
+    fn parts(text: &str) -> (String, String) {
+        set_exact_globally(true);
+        let fraction: Fraction = text.parse().unwrap();
+        let (numerator, denominator) = exact_parts(&fraction).unwrap();
+        (numerator.to_string(), denominator.to_string())
+    }
+
+    #[test]
+    fn a_positive_fraction_keeps_its_parts() {
+        assert_eq!(parts("3/5"), ("3".to_string(), "5".to_string()));
+    }
+
+    #[test]
+    fn a_negative_fraction_carries_its_sign_in_the_numerator() {
+        assert_eq!(parts("-3/5"), ("-3".to_string(), "5".to_string()));
+    }
+
+    #[test]
+    fn zero_has_a_zero_numerator_and_a_denominator_of_one() {
+        assert_eq!(parts("0"), ("0".to_string(), "1".to_string()));
     }
 }
 
