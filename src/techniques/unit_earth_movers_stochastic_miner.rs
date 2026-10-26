@@ -1,12 +1,13 @@
-use crate::{ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-semantics::semantics::Semantics, ebi_framework::displayable::Displayable};
-use ebi_objects::{
-    ebi_arithmetic::{
-        ConstFraction, Fraction, One, Round, Signed, Zero,
-    },
-    Activity, LabelledPetriNet, StochasticLabelledPetriNet, TranslateActivityKey,
+use crate::{
+    ebi_framework::displayable::Displayable,
+    ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    semantics::semantics::Semantics,
 };
 use ebi_objects::anyhow::{Context, Result, anyhow, ensure};
+use ebi_objects::{
+    Activity, LabelledPetriNet, StochasticLabelledPetriNet, TranslateActivityKey,
+    ebi_arithmetic::{ConstFraction, Fraction, One, OneMinus, Round, Signed, Zero},
+};
 use rayon::iter::ParallelIterator;
 use std::{
     collections::{HashMap, VecDeque},
@@ -14,9 +15,7 @@ use std::{
 };
 
 use rayon::prelude::*;
-use std::{
-    time::{Duration, Instant},
-};
+use std::time::{Duration, Instant};
 
 const WEIGHT_LOWER_BOUND: ConstFraction = ConstFraction::of(1, 1_000_000);
 const WEIGHT_UPPER_BOUND: ConstFraction = ConstFraction::of(100, 1);
@@ -45,16 +44,21 @@ fn divide_monomial(m1: &[String], m2: &[String]) -> Option<Vec<String>> {
     let mut j = 0;
     while i < m1.len() && j < m2.len() {
         if m1[i] == m2[j] {
-            i += 1; j += 1;
+            i += 1;
+            j += 1;
         } else if m1[i] < m2[j] {
-            res.push(m1[i].clone()); i += 1;
+            res.push(m1[i].clone());
+            i += 1;
         } else {
             return None;
         }
     }
-    if j < m2.len() { return None; }
+    if j < m2.len() {
+        return None;
+    }
     while i < m1.len() {
-        res.push(m1[i].clone()); i += 1;
+        res.push(m1[i].clone());
+        i += 1;
     }
     Some(res)
 }
@@ -68,7 +72,9 @@ pub struct Poly {
 impl Poly {
     fn new(val: i64) -> Self {
         let mut terms = HashMap::new();
-        if val != 0 { terms.insert(vec![], val); }
+        if val != 0 {
+            terms.insert(vec![], val);
+        }
         Poly { terms }
     }
 
@@ -110,20 +116,30 @@ impl Poly {
         Poly { terms }
     }
 
-    fn is_zero(&self) -> bool { self.terms.is_empty() }
+    fn is_zero(&self) -> bool {
+        self.terms.is_empty()
+    }
 
     fn leading_term(&self) -> Option<(Vec<String>, i64)> {
-        self.terms.iter()
+        self.terms
+            .iter()
             .max_by(|(k1, _), (k2, _)| {
-                if k1.len() != k2.len() { k1.len().cmp(&k2.len()) }
-                else { k1.cmp(k2) }
+                if k1.len() != k2.len() {
+                    k1.len().cmp(&k2.len())
+                } else {
+                    k1.cmp(k2)
+                }
             })
             .map(|(k, v)| (k.clone(), *v))
     }
 
     fn exact_div(&self, other: &Poly) -> Option<Poly> {
-        if other.is_zero() { return None; }
-        if self.is_zero() { return Some(Poly::new(0)); }
+        if other.is_zero() {
+            return None;
+        }
+        if self.is_zero() {
+            return Some(Poly::new(0));
+        }
 
         let mut remainder = self.clone();
         let mut quotient = Poly::new(0);
@@ -131,7 +147,9 @@ impl Poly {
 
         while !remainder.is_zero() {
             let rem_lt = remainder.leading_term()?;
-            if rem_lt.1 % divisor_lt.1 != 0 { return None; }
+            if rem_lt.1 % divisor_lt.1 != 0 {
+                return None;
+            }
             let coef_div = rem_lt.1 / divisor_lt.1;
 
             if let Some(vars_div) = divide_monomial(&rem_lt.0, &divisor_lt.0) {
@@ -152,33 +170,52 @@ impl Poly {
 
 impl fmt::Display for Poly {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.is_zero() { return write!(f, "0"); }
+        if self.is_zero() {
+            return write!(f, "0");
+        }
         let mut keys: Vec<_> = self.terms.keys().collect();
-        keys.sort_by(|a, b| if a.len() != b.len() { a.len().cmp(&b.len()) } else { a.cmp(b) });
+        keys.sort_by(|a, b| {
+            if a.len() != b.len() {
+                a.len().cmp(&b.len())
+            } else {
+                a.cmp(b)
+            }
+        });
 
         let mut parts = Vec::new();
         for vars in keys {
             let coef = self.terms[vars];
             let mut term_str = String::new();
-            if coef == -1 && !vars.is_empty() { term_str.push('-'); }
-            else if coef != 1 || vars.is_empty() {
+            if coef == -1 && !vars.is_empty() {
+                term_str.push('-');
+            } else if coef != 1 || vars.is_empty() {
                 term_str.push_str(&coef.to_string());
-                if !vars.is_empty() { term_str.push('*'); }
+                if !vars.is_empty() {
+                    term_str.push('*');
+                }
             }
             term_str.push_str(&vars.join("*"));
             parts.push(term_str);
         }
         let res = parts.join(" + ").replace("+ -", "- ");
-        if res.is_empty() { write!(f, "0") } else { write!(f, "{}", res) }
+        if res.is_empty() {
+            write!(f, "0")
+        } else {
+            write!(f, "{}", res)
+        }
     }
 }
 
 /// A list of polynomial factors kept unexpanded for efficiency.
 #[derive(Clone, Debug)]
-pub struct FactoredPoly { factors: Vec<Poly> }
+pub struct FactoredPoly {
+    factors: Vec<Poly>,
+}
 
 impl FactoredPoly {
-    fn new(p: Poly) -> Self { FactoredPoly { factors: vec![p] } }
+    fn new(p: Poly) -> Self {
+        FactoredPoly { factors: vec![p] }
+    }
 
     fn mul(&self, other: &FactoredPoly) -> Self {
         let mut new = self.factors.clone();
@@ -188,24 +225,38 @@ impl FactoredPoly {
 
     fn to_poly(&self) -> Poly {
         let mut res = Poly::new(1);
-        for f in &self.factors { res = res.mul(f); }
+        for f in &self.factors {
+            res = res.mul(f);
+        }
         res
     }
 }
 
 impl fmt::Display for FactoredPoly {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.factors.is_empty() { return write!(f, "1"); }
+        if self.factors.is_empty() {
+            return write!(f, "1");
+        }
         let mut parts = Vec::new();
         let mut sign = "";
         for factor in &self.factors {
             let s = format!("{}", factor);
-            if s == "1" { continue; }
-            if s == "-1" { sign = "-"; continue; }
-            if factor.terms.len() > 1 { parts.push(format!("({})", s)); }
-            else { parts.push(s); }
+            if s == "1" {
+                continue;
+            }
+            if s == "-1" {
+                sign = "-";
+                continue;
+            }
+            if factor.terms.len() > 1 {
+                parts.push(format!("({})", s));
+            } else {
+                parts.push(s);
+            }
         }
-        if parts.is_empty() { return write!(f, "{}1", sign); }
+        if parts.is_empty() {
+            return write!(f, "{}1", sign);
+        }
         write!(f, "{}{}", sign, parts.join(" * "))
     }
 }
@@ -224,13 +275,17 @@ fn lcm_factored(f1: &FactoredPoly, f2: &FactoredPoly) -> (FactoredPoly, Poly, Po
                 if let Some(q) = f_self.exact_div(f_other) {
                     let qs = format!("{}", q);
                     if qs == "1" || qs == "-1" {
-                        used_in_self[i] = true; found = true;
-                        if qs == "-1" { self_mult = self_mult.mul(&Poly::new(-1)); }
+                        used_in_self[i] = true;
+                        found = true;
+                        if qs == "-1" {
+                            self_mult = self_mult.mul(&Poly::new(-1));
+                        }
                         break;
                     }
                 } else if let Some(q) = f_other.exact_div(f_self) {
                     if format!("{}", q) == "-1" {
-                        used_in_self[i] = true; found = true;
+                        used_in_self[i] = true;
+                        found = true;
                         other_mult = other_mult.mul(&Poly::new(-1));
                         break;
                     }
@@ -243,9 +298,17 @@ fn lcm_factored(f1: &FactoredPoly, f2: &FactoredPoly) -> (FactoredPoly, Poly, Po
         }
     }
     for (i, f_self) in f1.factors.iter().enumerate() {
-        if !used_in_self[i] { other_mult = other_mult.mul(f_self); }
+        if !used_in_self[i] {
+            other_mult = other_mult.mul(f_self);
+        }
     }
-    (FactoredPoly { factors: lcm_factors }, self_mult, other_mult)
+    (
+        FactoredPoly {
+            factors: lcm_factors,
+        },
+        self_mult,
+        other_mult,
+    )
 }
 
 /// An algebraic SymbolicFraction: numerator / denominator, both in factored form.
@@ -257,37 +320,66 @@ pub struct SymbolicFraction {
 
 impl SymbolicFraction {
     fn new(val: i64) -> Self {
-        SymbolicFraction { num: FactoredPoly::new(Poly::new(val)), den: FactoredPoly::new(Poly::new(1)) }
+        SymbolicFraction {
+            num: FactoredPoly::new(Poly::new(val)),
+            den: FactoredPoly::new(Poly::new(1)),
+        }
     }
 
     fn sym(name: &str) -> Self {
-        SymbolicFraction { num: FactoredPoly::new(Poly::sym(name)), den: FactoredPoly::new(Poly::new(1)) }
+        SymbolicFraction {
+            num: FactoredPoly::new(Poly::sym(name)),
+            den: FactoredPoly::new(Poly::new(1)),
+        }
     }
 
-    fn is_zero(&self) -> bool { self.num.factors.iter().any(|f| f.is_zero()) }
+    fn is_zero(&self) -> bool {
+        self.num.factors.iter().any(|f| f.is_zero())
+    }
 
     fn mul(&self, other: &SymbolicFraction) -> Self {
-        if self.is_zero() || other.is_zero() { return SymbolicFraction::new(0); }
-        let mut res = SymbolicFraction { num: self.num.mul(&other.num), den: self.den.mul(&other.den) };
+        if self.is_zero() || other.is_zero() {
+            return SymbolicFraction::new(0);
+        }
+        let mut res = SymbolicFraction {
+            num: self.num.mul(&other.num),
+            den: self.den.mul(&other.den),
+        };
         res.simplify();
         res
     }
 
     fn div(&self, other: &SymbolicFraction) -> Self {
-        if self.is_zero() { return SymbolicFraction::new(0); }
-        let mut res = SymbolicFraction { num: self.num.mul(&other.den), den: self.den.mul(&other.num) };
+        if self.is_zero() {
+            return SymbolicFraction::new(0);
+        }
+        let mut res = SymbolicFraction {
+            num: self.num.mul(&other.den),
+            den: self.den.mul(&other.num),
+        };
         res.simplify();
         res
     }
 
     fn add(&self, other: &SymbolicFraction) -> Self {
-        if self.is_zero() { return other.clone(); }
-        if other.is_zero() { return self.clone(); }
+        if self.is_zero() {
+            return other.clone();
+        }
+        if other.is_zero() {
+            return self.clone();
+        }
 
         let (lcm_den, self_mult, other_mult) = lcm_factored(&self.den, &other.den);
-        let new_num = self.num.to_poly().mul(&self_mult).add(&other.num.to_poly().mul(&other_mult));
+        let new_num = self
+            .num
+            .to_poly()
+            .mul(&self_mult)
+            .add(&other.num.to_poly().mul(&other_mult));
 
-        let mut res = SymbolicFraction { num: FactoredPoly::new(new_num), den: lcm_den };
+        let mut res = SymbolicFraction {
+            num: FactoredPoly::new(new_num),
+            den: lcm_den,
+        };
         res.simplify();
         res
     }
@@ -315,26 +407,49 @@ impl SymbolicFraction {
                 if let Some(quotient) = self.num.factors[n].exact_div(den_factor) {
                     self.num.factors[n] = quotient;
                     self.den.factors.remove(d);
-                    canceled = true; break;
+                    canceled = true;
+                    break;
                 }
             }
-            if !canceled { d += 1; }
+            if !canceled {
+                d += 1;
+            }
         }
 
         let mut sign = 1;
         self.num.factors.retain(|f| {
             let s = format!("{}", f);
-            if s == "1" { false } else if s == "-1" { sign *= -1; false } else { true }
+            if s == "1" {
+                false
+            } else if s == "-1" {
+                sign *= -1;
+                false
+            } else {
+                true
+            }
         });
-        if self.num.factors.is_empty() { self.num.factors.push(Poly::new(1)); }
-        if sign == -1 { self.num.factors[0] = self.num.factors[0].mul(&Poly::new(-1)); }
+        if self.num.factors.is_empty() {
+            self.num.factors.push(Poly::new(1));
+        }
+        if sign == -1 {
+            self.num.factors[0] = self.num.factors[0].mul(&Poly::new(-1));
+        }
 
         let mut den_sign = 1;
         self.den.factors.retain(|f| {
             let s = format!("{}", f);
-            if s == "1" { false } else if s == "-1" { den_sign *= -1; false } else { true }
+            if s == "1" {
+                false
+            } else if s == "-1" {
+                den_sign *= -1;
+                false
+            } else {
+                true
+            }
         });
-        if self.den.factors.is_empty() { self.den.factors.push(Poly::new(1)); }
+        if self.den.factors.is_empty() {
+            self.den.factors.push(Poly::new(1));
+        }
         if den_sign == -1 {
             self.num.factors[0] = self.num.factors[0].mul(&Poly::new(-1));
             self.den.factors[0] = self.den.factors[0].mul(&Poly::new(-1));
@@ -353,32 +468,49 @@ impl SymbolicFraction {
 
 impl fmt::Display for SymbolicFraction {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.is_zero() { return write!(f, "0"); }
+        if self.is_zero() {
+            return write!(f, "0");
+        }
         let n = format!("{}", self.num);
         let d = format!("{}", self.den);
-        if d == "1" { write!(f, "{}", n) } else { write!(f, "{} / {}", n, d) }
+        if d == "1" {
+            write!(f, "{}", n)
+        } else {
+            write!(f, "{} / {}", n, d)
+        }
     }
 }
 
 /// Gaussian elimination on a symbolic matrix to solve Ax = b.
-fn solve_system(mut matrix: Vec<Vec<SymbolicFraction>>, mut rhs: Vec<SymbolicFraction>) -> Vec<SymbolicFraction> {
+fn solve_system(
+    mut matrix: Vec<Vec<SymbolicFraction>>,
+    mut rhs: Vec<SymbolicFraction>,
+) -> Vec<SymbolicFraction> {
     let n = matrix.len();
     for i in 0..n {
         let mut pivot = i;
-        while pivot < n && matrix[pivot][i].is_zero() { pivot += 1; }
-        if pivot == n { continue; }
+        while pivot < n && matrix[pivot][i].is_zero() {
+            pivot += 1;
+        }
+        if pivot == n {
+            continue;
+        }
 
         matrix.swap(i, pivot);
         rhs.swap(i, pivot);
 
         let pivot_val = matrix[i][i].clone();
-        for j in 0..n { matrix[i][j] = matrix[i][j].div(&pivot_val); }
+        for j in 0..n {
+            matrix[i][j] = matrix[i][j].div(&pivot_val);
+        }
         rhs[i] = rhs[i].div(&pivot_val);
 
         for j in 0..n {
             if i != j {
                 let factor = matrix[j][i].clone();
-                if factor.is_zero() { continue; }
+                if factor.is_zero() {
+                    continue;
+                }
                 for k in 0..n {
                     let sub_val = factor.mul(&matrix[i][k]);
                     matrix[j][k] = matrix[j][k].sub(&sub_val);
@@ -426,7 +558,9 @@ impl fmt::Display for SymbolicMonomial {
             write!(f, "{} * ", self.coefficient)?;
         }
         for (i, sp) in self.factors.iter().enumerate() {
-            if i > 0 { write!(f, " * ")?; }
+            if i > 0 {
+                write!(f, " * ")?;
+            }
             write!(f, "{}", sp)?;
         }
         Ok(())
@@ -441,7 +575,9 @@ pub struct SymbolicPolynomial {
 
 impl fmt::Display for SymbolicPolynomial {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        if self.terms.is_empty() { return write!(f, "0"); }
+        if self.terms.is_empty() {
+            return write!(f, "0");
+        }
         for (i, m) in self.terms.iter().enumerate() {
             if i > 0 {
                 if m.coefficient < 0 {
@@ -493,7 +629,13 @@ fn poly_to_symbolic(
     }
     let mut result = Vec::new();
     let mut keys: Vec<_> = poly.terms.keys().collect();
-    keys.sort_by(|a, b| if a.len() != b.len() { a.len().cmp(&b.len()) } else { a.cmp(b) });
+    keys.sort_by(|a, b| {
+        if a.len() != b.len() {
+            a.len().cmp(&b.len())
+        } else {
+            a.cmp(b)
+        }
+    });
 
     for vars in keys {
         let coef = poly.terms[vars];
@@ -556,7 +698,9 @@ pub struct LinearSystem {
 impl fmt::Display for LinearSystem {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         for (i, eq) in self.equations.iter().enumerate() {
-            if i > 0 { write!(f, "\n")?; }
+            if i > 0 {
+                write!(f, "\n")?;
+            }
             let lhs_name = &self.variables[eq.lhs];
 
             if eq.is_final {
@@ -566,8 +710,14 @@ impl fmt::Display for LinearSystem {
             } else {
                 write!(f, "{} = ", lhs_name)?;
                 for (j, term) in eq.terms.iter().enumerate() {
-                    if j > 0 { write!(f, " + ")?; }
-                    write!(f, "{} * {}", term.coefficient, &self.variables[term.variable])?;
+                    if j > 0 {
+                        write!(f, " + ")?;
+                    }
+                    write!(
+                        f,
+                        "{} * {}",
+                        term.coefficient, &self.variables[term.variable]
+                    )?;
                 }
             }
         }
@@ -636,8 +786,8 @@ impl LinearSystem {
                 rhs[row] = SymbolicFraction::new(1);
             } else {
                 for term in &eq.terms {
-                    let neg_coeff = SymbolicFraction::sym(&term.coefficient)
-                        .mul(&SymbolicFraction::new(-1));
+                    let neg_coeff =
+                        SymbolicFraction::sym(&term.coefficient).mul(&SymbolicFraction::new(-1));
                     matrix[row][term.variable] = matrix[row][term.variable].add(&neg_coeff);
                 }
             }
@@ -648,7 +798,6 @@ impl LinearSystem {
         symbolic_fraction_to_symbolic(frac, &self.coeff_to_prob)
     }
 }
-
 
 pub trait EquationSystemConstructor {
     fn create_equation_system(&self, trace: &Vec<Activity>) -> Result<LinearSystem>;
@@ -667,10 +816,7 @@ impl EquationSystemConstructor for LabelledPetriNet {
     }
 }
 
-pub fn build_equation_system<T, State>(
-    semantics: &T,
-    trace: &Vec<Activity>,
-) -> Option<LinearSystem>
+pub fn build_equation_system<T, State>(semantics: &T, trace: &Vec<Activity>) -> Option<LinearSystem>
 where
     T: Semantics<SemState = State> + ?Sized,
     State: Displayable + Eq + std::hash::Hash + Clone,
@@ -683,22 +829,21 @@ where
     let mut equations: Vec<LinearEquation> = Vec::new();
     let mut queue: VecDeque<(usize, State)> = VecDeque::new();
 
-    let get_or_create_var =
-        |state: &(usize, State),
-         state_to_var: &mut HashMap<(usize, State), usize>,
-         variables: &mut Vec<String>,
-         queue: &mut VecDeque<(usize, State)>|
-         -> usize {
-            if let Some(&idx) = state_to_var.get(state) {
-                idx
-            } else {
-                let idx = variables.len();
-                variables.push(format!("x_{}", idx));
-                state_to_var.insert(state.clone(), idx);
-                queue.push_back(state.clone());
-                idx
-            }
-        };
+    let get_or_create_var = |state: &(usize, State),
+                             state_to_var: &mut HashMap<(usize, State), usize>,
+                             variables: &mut Vec<String>,
+                             queue: &mut VecDeque<(usize, State)>|
+     -> usize {
+        if let Some(&idx) = state_to_var.get(state) {
+            idx
+        } else {
+            let idx = variables.len();
+            variables.push(format!("x_{}", idx));
+            state_to_var.insert(state.clone(), idx);
+            queue.push_back(state.clone());
+            idx
+        }
+    };
 
     let initial_var = get_or_create_var(&start, &mut state_to_var, &mut variables, &mut queue);
 
@@ -710,7 +855,11 @@ where
         let lhs = state_to_var[&current];
 
         if trace_index == trace.len() && semantics.is_final_state(state) {
-            equations.push(LinearEquation { lhs, terms: vec![], is_final: true });
+            equations.push(LinearEquation {
+                lhs,
+                terms: vec![],
+                is_final: true,
+            });
             continue;
         }
 
@@ -735,20 +884,32 @@ where
                 if trace_index < trace.len() && activity == trace[trace_index] {
                     let successor = (trace_index + 1, new_state);
                     let target = get_or_create_var(
-                        &successor, &mut state_to_var, &mut variables, &mut queue,
+                        &successor,
+                        &mut state_to_var,
+                        &mut variables,
+                        &mut queue,
                     );
-                    terms.push(Term { coefficient: coeff_name, variable: target });
+                    terms.push(Term {
+                        coefficient: coeff_name,
+                        variable: target,
+                    });
                 }
             } else {
                 let successor = (trace_index, new_state);
-                let target = get_or_create_var(
-                    &successor, &mut state_to_var, &mut variables, &mut queue,
-                );
-                terms.push(Term { coefficient: coeff_name, variable: target });
+                let target =
+                    get_or_create_var(&successor, &mut state_to_var, &mut variables, &mut queue);
+                terms.push(Term {
+                    coefficient: coeff_name,
+                    variable: target,
+                });
             }
         }
 
-        equations.push(LinearEquation { lhs, terms, is_final: false });
+        equations.push(LinearEquation {
+            lhs,
+            terms,
+            is_final: false,
+        });
     }
 
     Some(LinearSystem {
@@ -817,11 +978,12 @@ pub fn maximize_uemsc(traces: &[TraceInput], num_transitions: usize) -> Result<U
     if prepared_traces.iter().all(|trace| trace.structurally_zero) {
         let constant_penalty = prepared_traces
             .iter()
-            .map(|trace| trace.log_probability.clone())
+            .map(|trace| &trace.log_probability)
             .sum::<Fraction>();
+        let global_optimum_certified = constant_penalty <= objective_tolerance;
         return Ok(UemscSolution {
-            uemsc_value: &Fraction::one() - &constant_penalty,
-            global_optimum_certified: constant_penalty <= objective_tolerance,
+            uemsc_value: constant_penalty.one_minus(),
+            global_optimum_certified,
             weights: vec![Fraction::one(); num_transitions],
             trace_probabilities: vec![Fraction::zero(); traces.len()],
         });
@@ -830,9 +992,10 @@ pub fn maximize_uemsc(traces: &[TraceInput], num_transitions: usize) -> Result<U
     if num_transitions == 0 {
         let (deficit_sum, trace_probabilities) = evaluate_weights(&prepared_traces, &[])
             .ok_or_else(|| anyhow!("could not evaluate the transition-free model"))?;
+        let global_optimum_certified = deficit_sum <= objective_tolerance;
         return Ok(UemscSolution {
-            uemsc_value: &Fraction::one() - &deficit_sum,
-            global_optimum_certified: deficit_sum <= objective_tolerance,
+            uemsc_value: deficit_sum.one_minus(),
+            global_optimum_certified,
             weights: Vec::new(),
             trace_probabilities,
         });
@@ -968,9 +1131,10 @@ pub fn maximize_uemsc(traces: &[TraceInput], num_transitions: usize) -> Result<U
         );
     }
 
+    let global_optimum_certified = deficit_sum <= objective_tolerance;
     Ok(UemscSolution {
-        uemsc_value: &Fraction::one() - &deficit_sum,
-        global_optimum_certified: deficit_sum <= objective_tolerance,
+        uemsc_value: deficit_sum.one_minus(),
+        global_optimum_certified,
         weights,
         trace_probabilities,
     })
@@ -1030,7 +1194,7 @@ fn prepare_trace(
     num_transitions: usize,
 ) -> Result<PreparedTrace> {
     ensure!(
-        trace.log_probability >= Fraction::zero() && trace.log_probability <= Fraction::one(),
+        trace.log_probability.is_not_negative() && trace.log_probability <= Fraction::one(),
         "trace {trace_index} has invalid log probability {}",
         trace.log_probability
     );
@@ -1236,7 +1400,7 @@ fn solve_trace_probability(trace: &PreparedTrace, weights: &[Fraction]) -> Optio
 
     let solution = solve_linear_system(matrix, rhs)?;
     let probability = solution[trace.initial_variable].clone();
-    (probability >= Fraction::zero() && probability <= Fraction::one()).then_some(probability)
+    (probability.is_not_negative() && probability <= Fraction::one()).then_some(probability)
 }
 
 /// Solve an exact rational linear system. Singular systems are handled by
@@ -1377,10 +1541,7 @@ fn basin_hopping(
             trial,
             started,
             dimensions,
-            max_fraction(
-                &step_size / 4,
-                ConstFraction::of(25, 128).to_fraction(),
-            ),
+            max_fraction(&step_size / 4, ConstFraction::of(25, 128).to_fraction()),
             ConstFraction::of(1, 100_000).to_fraction(),
             BASIN_LOCAL_SWEEPS,
         )?;
@@ -1444,9 +1605,7 @@ fn local_minimize(
     let mut step = initial_step;
     let mut sweeps = 0usize;
 
-    while step > minimum_step
-        && sweeps < maximum_sweeps
-        && started.elapsed() < OPTIMIZER_TIME_LIMIT
+    while step > minimum_step && sweeps < maximum_sweeps && started.elapsed() < OPTIMIZER_TIME_LIMIT
     {
         sweeps += 1;
         let mut improved = false;
@@ -1635,16 +1794,13 @@ impl UEMSCStochasticMinerLPN for LabelledPetriNet {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use std::fs;
 
-    use ebi_objects::{
-        FiniteStochasticLanguage, LabelledPetriNet
-    };
+    use ebi_objects::{FiniteStochasticLanguage, LabelledPetriNet};
 
-    use crate::techniques::{unit_earth_movers_stochastic_miner::UEMSCStochasticMinerLPN};
+    use crate::techniques::unit_earth_movers_stochastic_miner::UEMSCStochasticMinerLPN;
 
     #[test]
     fn lpn_uniform() {
@@ -1655,7 +1811,8 @@ mod tests {
         let slang: Box<FiniteStochasticLanguage> =
             Box::new(fin2.parse::<FiniteStochasticLanguage>().unwrap());
 
-        let slpn: ebi_objects::StochasticLabelledPetriNet = lpn.mine_uemsc_stochastic_lpn(slang).unwrap();
+        let slpn: ebi_objects::StochasticLabelledPetriNet =
+            lpn.mine_uemsc_stochastic_lpn(slang).unwrap();
         let fout = fs::read_to_string("testfiles/caise24_concurrency.slpn").unwrap();
 
         assert_eq!(fout, slpn.to_string())
