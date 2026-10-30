@@ -21,10 +21,12 @@ jobs:
               uses: xu-cheng/texlive-action@v3
               with:
                 run: |
-                    lualatex -shell-escape manual/manual.tex
-                    bibtex manual/manual
-                    lualatex -shell-escape manual/manual.tex
-                    lualatex -shell-escape manual/manual.text
+                    cd manual
+                    lualatex -shell-escape manual.tex
+                    bibtex manual
+                    lualatex -shell-escape manual.tex
+                    lualatex -shell-escape manual.tex
+                    cd ..
 
             - name: Release
               uses: softprops/action-gh-release@v3
