@@ -23,6 +23,7 @@ use crate::{
             UniformStochasticBusinessProcessModelAndNotation, UniformStochasticMinerLPN,
             UniformStochasticMinerTree,
         },
+        unit_earth_movers_stochastic_miner::UEMSCStochasticMinerLPN,
     },
 };
 use ebi_objects::{
@@ -42,6 +43,7 @@ pub const EBI_DISCOVER: EbiCommand = EbiCommand::Group {
         &EBI_DISCOVER_DIRECTLY_FOLLOWS,
         &EBI_DISCOVER_OCCURRENCE,
         &EBI_DISCOVER_RANDOM,
+        &EBI_DISCOVER_UEMSC,
         &EBI_DISCOVER_UNIFORM,
     ],
 };
@@ -398,6 +400,35 @@ pub const EBI_DISCOVER_RANDOM_SPTREE: EbiCommand = EbiCommand::Command {
         )))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticProcessTree),
+};
+
+pub const EBI_DISCOVER_UEMSC: EbiCommand = EbiCommand::Command {
+    name_short: "opt_uemsc",
+    name_long: Some("stochastic-labelled-Petri-net"),
+    explanation_short: "Given an event log and an LPN, construct a stochastic labeled Petri net directly from the log by optimizing the uEMSC of the work.",
+    explanation_long: None,
+    latex_link: Some("~\\cite{DBLP:conf/caise/LeemansLMP24}"),
+    cli_command: None,
+    exact_arithmetic: true,
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
+        &[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)],
+    ],
+    input_names: &["FILE_1", "FILE_2"],
+    input_helps: &[
+        "A finite stochastic language (log) to get the occurrences from.",
+        "A labelled Petri net with the control flow.",
+    ],
+    execute: |mut inputs, _| {
+        let language = inputs
+            .remove(0)
+            .to_type::<dyn EbiTraitFiniteStochasticLanguage>()?;
+        let lpn = inputs.remove(0).to_type::<LabelledPetriNet>()?;
+        Ok(EbiOutput::Object(EbiObject::StochasticLabelledPetriNet(
+            lpn.mine_uemsc_stochastic_lpn(language)?,
+        )))
+    },
+    output_type: &EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet),
 };
 
 pub const EBI_DISCOVER_UNIFORM: EbiCommand = EbiCommand::Group {
