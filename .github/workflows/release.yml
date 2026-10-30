@@ -12,19 +12,22 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
-            - name: Build manual
+            - name: Generate manual parts
               run: |
                 cargo run itself manual -o manual/functions.tex
                 cargo run itself graph -o manual/graph.pdf
-                lualatex -shell-escape manual/manual.tex
-                bibtex manual/manual
-                lualatex -shell-escape manual/manual.tex
-                lualatex -shell-escape manual/manual.tex
+
+            - name: Compile manual
+              uses: xu-cheng/latex-action@v4
+              with:
+                root_file: manual.tex
+                latexmk_use_lualatex: true
+                latexmk_shell_escape: true
+                working_directory: manual
 
             - name: Release
               uses: softprops/action-gh-release@v3
               if: github.ref_type == 'tag'
               with:
                 files: |
-                    Release.txt
-                    LICENSE
+                    manual/manual.pdf
