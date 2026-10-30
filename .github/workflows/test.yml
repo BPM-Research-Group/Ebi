@@ -1,19 +1,20 @@
-name: Run Rust tests
+name: Run Ebi tests
 
 on:
   pull_request:
     branches: [ "main" ]
+  workflow_call:
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
+  generate:
+    uses: $/.github/workflows/generate.yml
 
+  test:
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v4
     - name: Run tests mixed mode 1
       run: cargo test --verbose
     - name: Run tests mixed mode 2
@@ -22,3 +23,7 @@ jobs:
       run: cargo test --verbose --features exactarithmetic
     - name: Run tests approximate mode
       run: cargo test --verbose --features approximatearithmetic
+    - name: Run tests java
+      run: cargo test --verbose --features java
+    - name: Run tests javascript
+      run: cargo test --verbose --features javascript

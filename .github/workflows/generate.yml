@@ -1,0 +1,19 @@
+name: Generate tests and links
+
+on:
+    workflow_call:
+
+env:
+    CARGO_TERM_COLOR: always
+
+jobs:
+    generate_tests_and_links:
+        runs-on: ubuntu-latest
+        steps:
+        - name: generate test and links
+          run: |
+                > src/tests/tests_autogen.rs
+                > src/javascript/javascript_autogen.rs
+                cargo run --features test_generation itself tests -o src/tests/tests_autogen.rs 
+                cargo run --features "javascript test_generation" -- itself javascript -o src/javascript/javascript_autogen.rs
+                cargo run --features python itself python -o src/python/python_module_autogen.rs
