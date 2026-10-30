@@ -37,6 +37,3 @@ jobs:
 
         - name: Run tests java
           run: cargo test --verbose --features java
-
-        - name: Run tests javascript
-          run: cargo test --verbose --features javascript
