@@ -10,7 +10,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  generate:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,26 +21,24 @@ jobs:
               cargo run --features test_generation itself tests -o src/tests/tests_autogen.rs 
               cargo run --features "javascript test_generation" -- itself javascript -o src/javascript/javascript_autogen.rs
     
-      - name: Run tests mixed mode 1
-        background: true
-        run: cargo test --verbose
+      - parallel: 
+        - name: Check formatting
+          run: cargo fmt --check
 
-      - name: Run tests mixed mode 2
-        background: true
-        run: cargo test --verbose --features exactarithmetic,approximatearithmetic
+        - name: Run tests mixed mode 1
+          run: cargo test --verbose
 
-      - name: Run tests exact mode
-        background: true
-        run: cargo test --verbose --features exactarithmetic
+        - name: Run tests mixed mode 2
+          run: cargo test --verbose --features exactarithmetic,approximatearithmetic
 
-      - name: Run tests approximate mode
-        background: true
-        run: cargo test --verbose --features approximatearithmetic
+        - name: Run tests exact mode
+          run: cargo test --verbose --features exactarithmetic
 
-      - name: Run tests java
-        background: true  
-        run: cargo test --verbose --features java
+        - name: Run tests approximate mode
+          run: cargo test --verbose --features approximatearithmetic
 
-      - name: Run tests javascript
-        background: true
-        run: cargo test --verbose --features javascript
+        - name: Run tests java
+          run: cargo test --verbose --features java
+
+        - name: Run tests javascript
+          run: cargo test --verbose --features javascript
