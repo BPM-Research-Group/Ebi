@@ -1,0 +1,30 @@
+name: Release Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Build manual
+              run: |
+                cargo run itself manual -o manual/functions.tex
+                cargo run itself graph -o manual/graph.pdf
+                lualatex -shell-escape manual/manual.tex
+                bibtex manual/manual
+                lualatex -shell-escape manual/manual.tex
+                lualatex -shell-escape manual/manual.tex
+
+            - name: Release
+              uses: softprops/action-gh-release@v3
+              if: github.ref_type == 'tag'
+              with:
+                files: |
+                    Release.txt
+                    LICENSE
