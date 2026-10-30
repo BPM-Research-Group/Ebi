@@ -18,12 +18,13 @@ jobs:
                 cargo run itself graph -o manual/graph.pdf
 
             - name: Compile manual
-              uses: xu-cheng/latex-action@v4
+              uses: xu-cheng/texlive-action@v3
               with:
-                root_file: manual.tex
-                latexmk_use_lualatex: true
-                latexmk_shell_escape: true
-                working_directory: manual
+                run: |
+                    lualatex -shell-escape manual/manual.tex
+                    bibtex manual/manual
+                    lualatex -shell-escape manual/manual.tex
+                    lualatex -shell-escape manual/manual.text
 
             - name: Release
               uses: softprops/action-gh-release@v3
