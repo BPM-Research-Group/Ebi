@@ -5,59 +5,42 @@ on:
     branches: [ "main" ]
   push:
     branches: [ "main" ]
-  workflow_call:
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   generate:
-    uses: $/.github/workflows/generate.yml
-
-  test_mixed_mode_1:
     runs-on: ubuntu-latest
-    needs: generate
     steps:
-    - uses: actions/checkout@v4
-    - name: Run tests mixed mode 1
-      run: cargo test --verbose
+      - uses: actions/checkout@v4
+      - name: generate tests and links
+        run: |
+              > src/tests/tests_autogen.rs
+              > src/javascript/javascript_autogen.rs
+              cargo run --features test_generation itself tests -o src/tests/tests_autogen.rs 
+              cargo run --features "javascript test_generation" -- itself javascript -o src/javascript/javascript_autogen.rs
+    
+      - name: Run tests mixed mode 1
+        background: true
+        run: cargo test --verbose
 
-  test_mixed_mode_2:
-    runs-on: ubuntu-latest
-    needs: generate
-    steps:
-    - uses: actions/checkout@v4
-    - name: Run tests mixed mode 2
-      run: cargo test --verbose --features exactarithmetic,approximatearithmetic
+      - name: Run tests mixed mode 2
+        background: true
+        run: cargo test --verbose --features exactarithmetic,approximatearithmetic
 
-  test_exact_mode:
-    runs-on: ubuntu-latest
-    needs: generate
-    steps:  
-    - uses: actions/checkout@v4
-    - name: Run tests exact mode
-      run: cargo test --verbose --features exactarithmetic
+      - name: Run tests exact mode
+        background: true
+        run: cargo test --verbose --features exactarithmetic
 
-  test_approximate_mode:
-    runs-on: ubuntu-latest
-    needs: generate
-    steps:
-    - uses: actions/checkout@v4
-    - name: Run tests approximate mode
-      run: cargo test --verbose --features approximatearithmetic
+      - name: Run tests approximate mode
+        background: true
+        run: cargo test --verbose --features approximatearithmetic
 
-  test_java:
-    runs-on: ubuntu-latest
-    needs: generate
-    steps:
-    - uses: actions/checkout@v4
-    - name: Run tests java
-      run: cargo test --verbose --features java
+      - name: Run tests java
+        background: true  
+        run: cargo test --verbose --features java
 
-  test_javascript:
-    runs-on: ubuntu-latest
-    needs: generate
-    steps:
-    - uses: actions/checkout@v4
-    - name: Run tests javascript
-      run: cargo test --verbose --features javascript
+      - name: Run tests javascript
+        background: true
+        run: cargo test --verbose --features javascript
