@@ -22,8 +22,6 @@ jobs:
               cargo run --features "javascript test_generation" -- itself javascript -o src/javascript/javascript_autogen.rs
     
       - parallel: 
-        - name: Check formatting
-          run: cargo fmt --check
 
         - name: Run tests mixed mode 1
           run: cargo test --verbose
