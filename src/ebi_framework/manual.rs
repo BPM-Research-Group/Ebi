@@ -98,8 +98,8 @@ pub fn manual() -> Result<EbiOutput> {
         writeln!(f, "{}", etrait.get_explanation())?;
 
         writeln!(f, "\\\\File types that can be imported as {} {}: {}.", 
-            etrait.get_article(), 
-            etrait, 
+            etrait.get_article(),
+            etrait,
             or_none(
                     &etrait.get_file_handlers().iter().map(|file_handler| 
                         format!("\\\\\\null\\qquad\\hyperref[filehandler:{}]{{{}}} (.{} -- \\cref{{filehandler:{}}})", file_handler.name, file_handler.name, file_handler.file_extension, file_handler.name)
