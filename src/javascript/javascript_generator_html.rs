@@ -179,7 +179,7 @@ pub(crate) fn javascript_html_header() -> String {
             .join(", "),
         lifted_functions = EBI_COMMANDS.get_command_paths()
             .iter()
-            .filter_map(|path| 
+            .filter_map(|path|
                     if path.last().unwrap().is_in_javascript() {
                         Some(format!("window.{function_name} = {function_name};", function_name = javascript_function_name(&path))) 
                     } else {
