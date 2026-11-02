@@ -1,9 +1,6 @@
 name: Build javascript
 
-on:
-  push:
-    tags:
-      - 'n*'
+on: [workflow_call, workflow_dispatch]
 
 env:
   CARGO_TERM_COLOR: always
