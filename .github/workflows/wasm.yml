@@ -1,8 +1,7 @@
 name: Build javascript
 
 on:
-  push:
-    branches: [ "main" ]
+  workflow_dispatch
 
 env:
   CARGO_TERM_COLOR: always
