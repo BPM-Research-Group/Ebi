@@ -11,6 +11,9 @@ permissions:
   pages: write
   id-token: write
 
+env:
+  CARGO_TERM_COLOR: always
+
 jobs:
 
     build_release:
@@ -20,38 +23,6 @@ jobs:
 
             - name: Checkout
               uses: actions/checkout@v4
-
-            - parallel:
-
-              - name: Build manual
-                uses: xu-cheng/texlive-action@v3
-                with:
-                  run: |
-                      cargo run itself manual -o manual/functions.tex
-                      cargo run itself graph -o manual/graph.pdf
-                      cd manual
-                      lualatex -shell-escape manual.tex
-                      bibtex manual
-                      lualatex -shell-escape manual.tex
-                      lualatex -shell-escape manual.tex
-                      cd ..
-
-              - name: Build Ebi for Linux 64 bit
-                run: |
-                  rustup target add x86_64-unknown-linux-gnu
-                  cargo build --release --target x86_64-unknown-linux-gnu
-
-              - name: Build Ebi for Windows 64 bit
-                run: |
-                  sudo apt-get install mingw-w64
-                  rustup target add x86_64-pc-windows-gnu
-                  cargo build --release --target x86_64-pc-windows-gnu
-
-              - name: Build Ebi-Java library for Linux
-                run: cargo build --target x86_64-unknown-linux-gnu --release --features java --target-dir target/java
-
-              - name: Build Ebi-Java for Windows
-                run: cargo build --target x86_64-pc-windows-gnu --release --features java --target-dir target/java
 
             - name: Create release
               uses: actions/create-release@v1
@@ -63,7 +34,20 @@ jobs:
                 tag_name: ${{ github.ref_name }}
                 release_name: Release ${{ github.ref_name }}
 
-            - name: Add manual to release
+            - name: Build manual
+              uses: xu-cheng/texlive-action@v3
+              with:
+                run: |
+                    cargo run itself manual -o manual/functions.tex
+                    cargo run itself graph -o manual/graph.pdf
+                    cd manual
+                    lualatex -shell-escape manual.tex
+                    bibtex manual
+                    lualatex -shell-escape manual.tex
+                    lualatex -shell-escape manual.tex
+                    cd ..
+
+            - name: Upload manual
               uses: actions/upload-release-asset@v1
               env:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -72,7 +56,13 @@ jobs:
                 asset_path: manual/manual.pdf
                 asset_name: manual.pdf
                 asset_content_type: application/pdf
+                
 
+            - name: Build Ebi for Linux 64 bit
+              run: |
+                rustup target add x86_64-unknown-linux-gnu
+                cargo build --release --target x86_64-unknown-linux-gnu
+            
             - name: Add Linux to release
               uses: actions/upload-release-asset@v1
               env:
@@ -83,6 +73,12 @@ jobs:
                 asset_name: Ebi-x86_64-linux
                 asset_content_type: application/x-executable
 
+            - name: Build Ebi for Windows 64 bit
+              run: |
+                sudo apt-get install mingw-w64
+                rustup target add x86_64-pc-windows-gnu
+                cargo build --release --target x86_64-pc-windows-gnu
+            
             - name: Add Windows to release
               uses: actions/upload-release-asset@v1
               env:
@@ -92,7 +88,10 @@ jobs:
                 asset_path: target/x86_64-pc-windows-gnu/release/ebi.exe
                 asset_name: Ebi-x86_64-windows.exe
                 asset_content_type: application/vnd.microsoft.portable-executable
-            
+
+            - name: Build Ebi-Java library for Linux
+              run: cargo build --target x86_64-unknown-linux-gnu --release --features java
+
             - name: Add Java-Linux to release
               uses: actions/upload-release-asset@v1
               env:
@@ -103,6 +102,9 @@ jobs:
                 asset_name: java-library-x86_64-linux_libebi.so
                 asset_content_type: application/x-sharedlib
 
+            - name: Build Ebi-Java for Windows
+              run: cargo build --target x86_64-pc-windows-gnu --release --features java
+
             - name: Add Java-Windows to release
               uses: actions/upload-release-asset@v1
               env:
@@ -111,7 +113,4 @@ jobs:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
                 asset_path: target/java/x86_64-pc-windows-gnu/release/ebi.dll
                 asset_name: java-library-x86_64-windows_ebi.dll
-                asset_content_type: application/vnd.microsoft.portable-executable
-
-    build_website:
-      uses: ./.github/workflows/website.yml
+                asset_content_type: application/vnd.microsoft.portable-executable            
