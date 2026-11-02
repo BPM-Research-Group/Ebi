@@ -6,7 +6,13 @@ on:
       - 'v*'
 
 jobs:
-    build:
+    build_documentation:
+      uses: ./.github/workflows/documentation.yml
+
+    build_npm:
+      uses: ./.github/workflows/npm.yml
+
+    build_release:
         runs-on: ubuntu-latest
         permissions: write-all
         steps:
