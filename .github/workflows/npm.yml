@@ -1,7 +1,9 @@
 name: Build javascript
 
 on:
-  workflow_call
+  push:
+    tags:
+      - 'n*'
 
 env:
   CARGO_TERM_COLOR: always
