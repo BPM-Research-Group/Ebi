@@ -101,7 +101,7 @@ jobs:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
-                asset_path: target/java/x86_64-unknown-linux-gnu/release/ebi
+                asset_path: target/x86_64-unknown-linux-gnu/release/ebi
                 asset_name: java-library-x86_64-linux_libebi.so
                 asset_content_type: application/x-sharedlib
 
@@ -114,6 +114,6 @@ jobs:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
-                asset_path: target/java/x86_64-pc-windows-gnu/release/ebi.dll
+                asset_path: target/x86_64-pc-windows-gnu/release/ebi.dll
                 asset_name: java-library-x86_64-windows_ebi.dll
                 asset_content_type: application/vnd.microsoft.portable-executable            
