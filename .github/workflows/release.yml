@@ -24,17 +24,14 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
-            - name: Generate manual parts
-              run: |
-                cargo run itself manual -o manual/functions.tex
-                cargo run itself graph -o manual/graph.pdf
-
             - parallel:
 
-              - name: Compile manual
+              - name: Build manual
                 uses: xu-cheng/texlive-action@v3
                 with:
                   run: |
+                      cargo run itself manual -o manual/functions.tex
+                      cargo run itself graph -o manual/graph.pdf
                       cd manual
                       lualatex -shell-escape manual.tex
                       bibtex manual
@@ -42,21 +39,21 @@ jobs:
                       lualatex -shell-escape manual.tex
                       cd ..
 
-              - name: build Ebi for Linux 64 bit
+              - name: Build Ebi for Linux 64 bit
                 run: |
                   rustup target add x86_64-unknown-linux-gnu
                   cargo build --release --target x86_64-unknown-linux-gnu
 
-              - name: build Ebi for Windows 64 bit
+              - name: Build Ebi for Windows 64 bit
                 run: |
                   sudo apt-get install mingw-w64
                   rustup target add x86_64-pc-windows-gnu
                   cargo build --release --target x86_64-pc-windows-gnu
 
-              - name: build Ebi-Java library for Linux
+              - name: Build Ebi-Java library for Linux
                 run: cargo build --target x86_64-unknown-linux-gnu --release --features java --target-dir target/java
 
-              - name: build Ebi-Java for Windows
+              - name: Build Ebi-Java for Windows
                 run: cargo build --target x86_64-pc-windows-gnu --release --features java --target-dir target/java
 
             - name: Create release
