@@ -6,16 +6,12 @@ on:
       - 'v*'
 
 jobs:
-    build_website:
-      uses: ./.github/workflows/website.yml
-
-    build_npm:
-      uses: ./.github/workflows/npm.yml
 
     build_release:
         runs-on: ubuntu-latest
         permissions: write-all
         steps:
+
             - name: Checkout
               uses: actions/checkout@v4
 
@@ -47,6 +43,12 @@ jobs:
                   sudo apt-get install mingw-w64
                   rustup target add x86_64-pc-windows-gnu
                   cargo build --release --target x86_64-pc-windows-gnu
+
+              - name: build Ebi-Java library for Linux
+                run: cargo build --target x86_64-unknown-linux-gnu --release --features java --target-dir target/java
+
+              - name: build Ebi-Java for Windows
+                run: cargo build --target x86_64-pc-windows-gnu --release --features java --target-dir target/java
 
             - name: Create release
               uses: actions/create-release@v1
@@ -87,3 +89,26 @@ jobs:
                 asset_path: target/x86_64-pc-windows-gnu/release/ebi.exe
                 asset_name: Ebi-x86_64-windows.exe
                 asset_content_type: application/vnd.microsoft.portable-executable
+            
+            - name: Add Java-Linux to release
+              uses: actions/upload-release-asset@v1
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                upload_url: ${{ steps.create_release.outputs.upload_url }}
+                asset_path: target/java/x86_64-unknown-linux-gnu/release/ebi
+                asset_name: java-library-x86_64-linux_libebi.so
+                asset_content_type: application/x-sharedlib
+
+            - name: Add Java-Windows to release
+              uses: actions/upload-release-asset@v1
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                upload_url: ${{ steps.create_release.outputs.upload_url }}
+                asset_path: target/java/x86_64-pc-windows-gnu/release/ebi.dll
+                asset_name: java-library-x86_64-windows_ebi.dll
+                asset_content_type: application/vnd.microsoft.portable-executable
+
+    build_website:
+      uses: ./.github/workflows/website.yml
