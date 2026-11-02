@@ -1,10 +1,6 @@
 name: Build website
 
-on:
-  push:
-    tags:
-      - 'website*'
-  workflow_call:
+on: [workflow_call, workflow_dispatch]
 
 permissions:
   contents: read
