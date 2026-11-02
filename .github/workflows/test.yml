@@ -18,20 +18,18 @@ jobs:
               > src/javascript/javascript_autogen.rs
               cargo run --features test_generation itself tests -o src/tests/tests_autogen.rs 
               cargo run --features "javascript test_generation" -- itself javascript -o src/javascript/javascript_autogen.rs
-    
-      - parallel: 
 
-        - name: Run tests mixed mode 1
-          run: cargo test --verbose
+      - name: Run tests mixed mode 1
+        run: cargo test --verbose
 
-        - name: Run tests mixed mode 2
-          run: cargo test --verbose --features exactarithmetic,approximatearithmetic
+      - name: Run tests mixed mode 2
+        run: cargo test --verbose --features exactarithmetic,approximatearithmetic
 
-        - name: Run tests exact mode
-          run: cargo test --verbose --features exactarithmetic
+      - name: Run tests exact mode
+        run: cargo test --verbose --features exactarithmetic
 
-        - name: Run tests approximate mode
-          run: cargo test --verbose --features approximatearithmetic
+      - name: Run tests approximate mode
+        run: cargo test --verbose --features approximatearithmetic
 
-        - name: Run tests java
-          run: cargo test --verbose --features java
+      - name: Run tests java
+        run: cargo test --verbose --features java
