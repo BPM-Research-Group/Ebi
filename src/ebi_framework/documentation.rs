@@ -24,8 +24,8 @@ use std::{
     io::Write,
 };
 
-pub const COMMANDS_PAGE: &'static str = "https://leemans.ch/ebi/commands.php";
-pub const FILE_HANDLERS_PAGE: &'static str = "https://leemans.ch/ebi/file_handlers.php";
+pub const COMMANDS_PAGE: &'static str = "https://bpm-research-group.github.io/Ebi/commands.html";
+pub const FILE_HANDLERS_PAGE: &'static str = "https://bpm-research-group.github.io/Ebi/file_handlers.html";
 
 pub fn page_start(f: &mut Vec<u8>, headers: &str) -> Result<()> {
     // #016764, #005958, #014848, #00312F, #001E1E
@@ -86,7 +86,7 @@ pub fn documentation_commands() -> Result<EbiOutput> {
 
 fn menu_0(f: &mut Vec<u8>) -> Result<()> {
     writeln!(f, "<div class=\"menu0\" id =\"menu0\">")?;
-    writeln!(f, "<a href=\"index.php\">Ebi</a>")?;
+    writeln!(f, "<a href=\"index.html\">Ebi</a>")?;
     writeln!(f, "<a href=\"{}\">Commands</a>", COMMANDS_PAGE)?;
     writeln!(f, "<a href=\"{}\">Files</a>", FILE_HANDLERS_PAGE)?;
     writeln!(
