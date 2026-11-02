@@ -1740,15 +1740,15 @@ impl DeterministicRng {
     }
 }
 
-pub trait UEMSCStochasticMinerLPN {
-    fn mine_uemsc_stochastic_lpn(
+pub trait CIBDOStochasticMinerLPN {
+    fn mine_cibdo_stochastic_lpn(
         self,
         language: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<StochasticLabelledPetriNet>;
 }
 
-impl UEMSCStochasticMinerLPN for LabelledPetriNet {
-    fn mine_uemsc_stochastic_lpn(
+impl CIBDOStochasticMinerLPN for LabelledPetriNet {
+    fn mine_cibdo_stochastic_lpn(
         mut self,
         log: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<StochasticLabelledPetriNet> {
@@ -1800,7 +1800,7 @@ mod tests {
 
     use ebi_objects::{FiniteStochasticLanguage, LabelledPetriNet};
 
-    use crate::techniques::unit_earth_movers_stochastic_miner::UEMSCStochasticMinerLPN;
+    use crate::techniques::cibdo_stochastic_miner::CIBDOStochasticMinerLPN;
 
     #[test]
     fn lpn_uniform() {
@@ -1812,7 +1812,7 @@ mod tests {
             Box::new(fin2.parse::<FiniteStochasticLanguage>().unwrap());
 
         let slpn: ebi_objects::StochasticLabelledPetriNet =
-            lpn.mine_uemsc_stochastic_lpn(slang).unwrap();
+            lpn.mine_cibdo_stochastic_lpn(slang).unwrap();
         let fout = fs::read_to_string("testfiles/caise24_concurrency.slpn").unwrap();
 
         assert_eq!(fout, slpn.to_string())

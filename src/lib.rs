@@ -191,6 +191,7 @@ pub mod techniques {
     pub mod association;
     pub mod bootstrap_test;
     pub mod bounded;
+    pub mod cibdo_stochastic_miner;
     pub mod chi_square_stochastic_conformance;
     pub mod cohort_analysis;
     pub mod completeness;
@@ -254,7 +255,6 @@ pub mod techniques {
     pub mod trace_probability;
     pub mod uniform_stochastic_miner;
     pub mod unit_earth_movers_stochastic_conformance;
-    pub mod unit_earth_movers_stochastic_miner;
 }
 pub mod tests {
     #[cfg(feature = "test_generation")]
