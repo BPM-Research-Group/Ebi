@@ -1,0 +1,52 @@
+name: Build documentation
+
+on:
+  push:
+    branches: [ "main" ]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Wasm
+        uses: jetli/wasm-pack-action@v0.4.0
+
+      - name: Setup Github pages
+        uses: actions/configure-pages@v4
+        
+      - name: Build documentation
+        run: |
+          > src/javascript/javascript_autogen.rs
+          cargo run --features "javascript test_generation" -- itself javascript -o src/javascript/javascript_autogen.rs
+          wasm-pack build -d ./documentation/javascript --target web --features javascript
+          cargo run itself documentation home -o documentation/index.html
+          cargo run itself documentation commands -o documentation/commands.html
+          cargo run itself documentation file-handlers -o documentation/file_handlers.html
+      
+      - name: Upload site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'documentation/'
+          
+      - name: Deploy to Github Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+          
