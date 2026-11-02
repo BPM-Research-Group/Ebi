@@ -1,9 +1,9 @@
-name: Build documentation
+name: Build website
 
 on:
   push:
     tags:
-      - 'docs*'
+      - 'website*'
   workflow_call:
 
 permissions:
@@ -34,20 +34,19 @@ jobs:
       - name: Setup Github pages
         uses: actions/configure-pages@v4
         
-      - name: Build documentation
+      - name: Build website
         run: |
           > src/javascript/javascript_autogen.rs
           cargo run --features "javascript test_generation" -- itself javascript -o src/javascript/javascript_autogen.rs
-          wasm-pack --version
-          wasm-pack build -d ./documentation/javascript --target web -- --features javascript
-          cargo run itself documentation home -o documentation/index.html
-          cargo run itself documentation commands -o documentation/commands.html
-          cargo run itself documentation file-handlers -o documentation/file_handlers.html
+          wasm-pack build -d ./website/javascript --target web -- --features javascript
+          cargo run itself website home -o website/index.html
+          cargo run itself website commands -o website/commands.html
+          cargo run itself website file-handlers -o website/file_handlers.html
       
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: 'documentation/'
+          path: 'website/'
           
       - name: Deploy to Github Pages
         id: deployment

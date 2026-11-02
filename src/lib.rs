@@ -1,6 +1,5 @@
 pub mod ebi_framework {
     pub mod displayable;
-    pub mod documentation;
     pub mod ebi_command;
     pub mod ebi_file_handler;
     pub mod ebi_importer_parameters;
@@ -183,6 +182,11 @@ pub mod stochastic_semantics {
     pub mod stochastic_process_tree_semantics;
     pub mod stochastic_semantics;
 }
+pub mod surfaces {
+    pub mod website {
+        pub mod website_generation;
+    }
+}
 pub mod techniques {
     pub mod alergia;
     pub mod align;
@@ -191,8 +195,8 @@ pub mod techniques {
     pub mod association;
     pub mod bootstrap_test;
     pub mod bounded;
-    pub mod cibdo_stochastic_miner;
     pub mod chi_square_stochastic_conformance;
+    pub mod cibdo_stochastic_miner;
     pub mod cohort_analysis;
     pub mod completeness;
     pub mod directly_follows_graph_abstractor;

@@ -1,8 +1,7 @@
+use crate::surfaces::website::website_generation::FILE_HANDLERS_PAGE;
 use const_format::concatcp;
 use regex::{Captures, Regex};
 use std::fmt::Display;
-
-use crate::ebi_framework::documentation::FILE_HANDLERS_PAGE;
 
 pub trait Rank {
     fn rank(&self) -> String;
@@ -53,7 +52,7 @@ where
 {
     fn join_with(&self, sep: &str, last_sep: &str) -> String {
         if self.len() == 0 {
-            return String::new()
+            return String::new();
         }
         if self.len() == 1 {
             return self[0].to_string();

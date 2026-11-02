@@ -1,12 +1,11 @@
 use super::{
-    ebi_command::{EBI_COMMANDS, EbiCommand},
+    ebi_command::{EbiCommand, EBI_COMMANDS},
     ebi_file_handler::EBI_FILE_HANDLERS,
     ebi_trait::{EbiTrait, FromEbiTraitObject},
 };
 use crate::{
     ebi_framework::{
-        documentation::FILE_HANDLERS_PAGE,
-        ebi_file_handler::{EbiFileHandler, get_file_handlers, get_file_handlers_fallible},
+        ebi_file_handler::{get_file_handlers, get_file_handlers_fallible, EbiFileHandler},
         ebi_importer_parameters,
         ebi_trait_object::EbiTraitObject,
     },
@@ -27,14 +26,15 @@ use crate::{
     },
     ebi_validate,
     multiple_reader::MultipleReader,
+    surfaces::website::website_generation::FILE_HANDLERS_PAGE,
     text::Joiner,
 };
-use clap::{ArgMatches, builder::ValueParser, value_parser};
+use clap::{builder::ValueParser, value_parser, ArgMatches};
 use ebi_objects::{
-    EbiObject, EbiObjectType,
-    anyhow::{Context, Error, Result, anyhow},
-    ebi_arithmetic::{ConstFraction, Fraction, parsing::FractionNotParsedYet},
+    anyhow::{anyhow, Context, Error, Result},
+    ebi_arithmetic::{parsing::FractionNotParsedYet, ConstFraction, Fraction},
     traits::importable::{ImporterParameter, ImporterParameterValues},
+    EbiObject, EbiObjectType,
 };
 use std::{
     collections::{BTreeSet, HashSet},
@@ -1656,7 +1656,7 @@ pub const TEST_INPUT_TYPE_STRING: EbiInputType = EbiInputType::String(None, None
 
 #[cfg(test)]
 mod tests {
-    use super::{EbiInputType, validate_object_of};
+    use super::{validate_object_of, EbiInputType};
     use crate::ebi_framework::ebi_input;
     use crate::{
         ebi_file_handlers::compressed_event_log::EBI_COMPRESSED_EVENT_LOG,

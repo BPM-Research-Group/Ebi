@@ -52,7 +52,7 @@ pub fn page_start(f: &mut Vec<u8>, headers: &str) -> Result<()> {
             {headers}
         </head>
         <body>",
-        styles = fs::read_to_string("documentation/stijlen.css").unwrap(),
+        styles = fs::read_to_string("src/surfaces/website/stijlen.css").unwrap(),
     )?;
     Ok(())
 }
@@ -66,7 +66,7 @@ fn page_end(f: &mut Vec<u8>) -> Result<()> {
     Ok(())
 }
 
-pub fn documentation_filehandlers() -> Result<EbiOutput> {
+pub fn generate_file_handlers() -> Result<EbiOutput> {
     let mut f = vec![];
     page_start(&mut f, "")?;
     menu_0(&mut f)?;
@@ -75,7 +75,7 @@ pub fn documentation_filehandlers() -> Result<EbiOutput> {
     Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
 }
 
-pub fn documentation_commands() -> Result<EbiOutput> {
+pub fn generate_commands() -> Result<EbiOutput> {
     let mut f = vec![];
     page_start(&mut f, &javascript_html_header())?;
     menu_0(&mut f)?;
@@ -672,7 +672,7 @@ fn command_exact_arithmetic(f: &mut Vec<u8>, exact_arithmetic: bool) -> Result<(
     Ok(())
 }
 
-pub fn documentation_home() -> Result<EbiOutput> {
+pub fn generate_home_page() -> Result<EbiOutput> {
     let mut f = vec![];
     page_start(&mut f, "")?;
     menu_0(&mut f)?;

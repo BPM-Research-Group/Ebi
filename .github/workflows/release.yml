@@ -6,8 +6,8 @@ on:
       - 'v*'
 
 jobs:
-    build_documentation:
-      uses: ./.github/workflows/documentation.yml
+    build_website:
+      uses: ./.github/workflows/website.yml
 
     build_npm:
       uses: ./.github/workflows/npm.yml
