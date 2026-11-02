@@ -325,7 +325,7 @@ fn commands(f: &mut Vec<u8>) -> Result<()> {
                 if latex_link.is_some() {
                     writeln!(
                         f,
-                        " More information is available in the <a href=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true\">PDF manual</a>."
+                        " More information is available in the <a href=\"https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf\">PDF manual</a>."
                     )?;
                 }
                 writeln!(f, "</div>")?;

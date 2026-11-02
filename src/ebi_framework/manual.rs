@@ -509,7 +509,7 @@ pub fn html() -> String {
     format!(
         "<h2>Commands</h2>\
         Ebi offers the following comands and techniques. \
-        Please refer to the <a href=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true\">manual</a> for more information. \
+        Please refer to the <a href=\"https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf\">manual</a> for more information. \
         <ul><li>{}</li></ul>\
         <h2>Supported file formats</h2>\
         <ul><li>{}</li></ul>",
