@@ -34,12 +34,15 @@ jobs:
                 tag_name: ${{ github.ref_name }}
                 release_name: Release ${{ github.ref_name }}
 
+            - name: Generate manual parts
+              run: |
+                cargo run itself manual -o manual/functions.tex
+                cargo run itself graph -o manual/graph.pdf
+
             - name: Build manual
               uses: xu-cheng/texlive-action@v3
               with:
                 run: |
-                    cargo run itself manual -o manual/functions.tex
-                    cargo run itself graph -o manual/graph.pdf
                     cd manual
                     lualatex -shell-escape manual.tex
                     bibtex manual
