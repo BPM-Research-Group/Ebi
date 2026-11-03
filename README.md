@@ -20,6 +20,7 @@ This will run fully on your computer, is limited to 4GB of RAM and single-thread
 ### Use Ebi as a command line utility
 
 1. Download Ebi CLI for [Windows](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-windows.exe) or for [Linux](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-linux).
+    Older versions are available [here](https://github.com/BPM-Research-Group/Ebi/releases/).
 1. In Linux, give the file execution permissions. In Windows, this step is not necessary.
 1. Open a command prompt and run the executable.
     Installation is not necessary, and Ebi does not require internet access.
@@ -103,7 +104,7 @@ Ebi can be used as a Rust crate, available from [crates.io](https://crates.io/cr
 ### Call Ebi from Java
 
 To use Ebi from Java:
-1.  Download the Ebi library for [Windows](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/java/ebi.dll?ref_type=heads&inline=false) or [Linux](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/java/libebi.so?ref_type=heads&inline=false) and put it in a folder that is accessible to the Path of your program.
+1.  Download the Ebi library for [Windows](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/ebi.dll) or [Linux](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/libebi.so) and put it in a folder that is accessible to the Path of your program.
 
 1.  Add the following static declarations:
 
