@@ -1,0 +1,134 @@
+name: Release Binaries
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+
+    build_release:
+        runs-on: ubuntu-latest
+        permissions: write-all
+        steps:
+
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Generate manual parts 
+              run: |
+                cargo run itself manual -o manual/functions.tex
+                cargo run itself graph -o manual/graph.pdf
+
+            
+            - name: setup build environment
+              run: |
+                rustup target add x86_64-unknown-linux-gnu
+                sudo apt-get install mingw-w64
+                rustup target add x86_64-pc-windows-gnu
+
+
+            - name: Build manual
+              uses: xu-cheng/texlive-action@v3
+              with:
+                run: |
+                    cd manual
+                    lualatex -shell-escape manual.tex
+                    bibtex manual
+                    lualatex -shell-escape manual.tex
+                    lualatex -shell-escape manual.tex
+                    cd ..
+
+            - parallel:
+
+              - name: Build Ebi for Linux 64 bit
+                run: |
+                  cargo build --release --target x86_64-unknown-linux-gnu
+                  mv target/x86_64-unknown-linux-gnu/release/ebi Ebi-x86_64-linux
+
+              - name: Build Ebi for Windows 64 bit
+                run: |
+                  cargo build --release --target x86_64-pc-windows-gnu
+                  mv target/x86_64-pc-windows-gnu/release/ebi.exe Ebi-x86_64-windows.exe
+
+            - parallel:
+
+              - name: Build Ebi-Java library for Linux
+                run: |
+                  cargo build --target x86_64-unknown-linux-gnu --release --features java
+                  mv target/x86_64-unknown-linux-gnu/release/ebi java-library-x86_64-linux_libebi.so
+
+              - name: Build Ebi-Java for Windows
+                run: |
+                  cargo build --target x86_64-pc-windows-gnu --release --features java
+                  mv target/x86_64-pc-windows-gnu/release/ebi.dll java-library-x86_64-windows_ebi.dll
+
+
+            - name: Create release
+              uses: actions/create-release@v1
+              id: create_release
+              if: github.ref_type == 'tag'
+              env: 
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with: 
+                tag_name: ${{ github.ref_name }}
+                release_name: Release ${{ github.ref_name }}
+
+            - name: Add manual to release
+              uses: actions/upload-release-asset@v1
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                upload_url: ${{ steps.create_release.outputs.upload_url }}
+                asset_path: manual/manual.pdf
+                asset_name: manual.pdf
+                asset_content_type: application/pdf
+
+            - name: Add Linux to release
+              uses: actions/upload-release-asset@v1
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                upload_url: ${{ steps.create_release.outputs.upload_url }}
+                asset_path: Ebi-x86_64-linux
+                asset_name: Ebi-x86_64-linux
+                asset_content_type: application/x-executable
+
+            - name: Add Windows to release
+              uses: actions/upload-release-asset@v1
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                upload_url: ${{ steps.create_release.outputs.upload_url }}
+                asset_path: Ebi-x86_64-windows.exe
+                asset_name: Ebi-x86_64-windows.exe
+                asset_content_type: application/vnd.microsoft.portable-executable
+
+            - name: Add Java-Linux to release
+              uses: actions/upload-release-asset@v1
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                upload_url: ${{ steps.create_release.outputs.upload_url }}
+                asset_path: java-library-x86_64-linux_libebi.so
+                asset_name: java-library-x86_64-linux_libebi.so
+                asset_content_type: application/x-sharedlib
+
+            - name: Add Java-Windows to release
+              uses: actions/upload-release-asset@v1
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                upload_url: ${{ steps.create_release.outputs.upload_url }}
+                asset_path: java-library-x86_64-windows_ebi.dll
+                asset_name: java-library-x86_64-windows_ebi.dll
+                asset_content_type: application/vnd.microsoft.portable-executable            

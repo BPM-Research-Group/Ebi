@@ -7,23 +7,23 @@ Furthermore, Ebi can be called from Rust, Python, Java and Javascript.
 
 Ebi provides process mining and stochastic process mining algorithms, and supports exact arithmetic for most of these algorithms.
 
-More information on its use can be found in its [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
+More information on its use can be found in its [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 
 ## Using Ebi
 
 ### Use Ebi from a browser
 
-Most commands of Ebi can be used directly from the browser on the [commands page](https://leemans.ch/ebi/commands.php).
+Most commands of Ebi can be used directly from the browser on the [commands page](https://bpm-research-group.github.io/Ebi/commands.html).
 
-This will run fully on your computer, is limited to 4GB of RAM, and does not upload files.
+This will run fully on your computer, is limited to 4GB of RAM and single-threaded, but does not upload files.
 
 ### Use Ebi as a command line utility
 
-1. Download Ebi CLI for [Windows](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/cli/Ebi-x86_64-windows.exe?ref_type=heads&inline=false) or for [Linux](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/cli/Ebi-x86_64-linux?ref_type=heads&inline=false).
-1. In Linux, give the file execution permissions.
+1. Download Ebi CLI for [Windows](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-windows.exe) or for [Linux](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-linux).
+1. In Linux, give the file execution permissions. In Windows, this step is not necessary.
 1. Open a command prompt and run the executable.
     Installation is not necessary, and Ebi does not require internet access.
-1. For an overview of the commands, refer to the [commands page](https://leemans.ch/ebi/commands.php) or the [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
+1. For an overview of the commands, refer to the [commands page](https://bpm-research-group.github.io/Ebi/commands.html) or the [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 
 Ebi runs on Mac OS X and many other platforms by self-compilation; please see below.
 
@@ -36,7 +36,7 @@ In the ProM Package Manager, install Ebi.
 Then, several Ebi commands can be used like any other ProM plug-in. 
 As Ebi is extremely flexible in its inputs and outputs, please ensure you choose the correct input and output plug-in (there are many). 
 
-The [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true) indicates which commands are available in ProM.
+The [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf) indicates which commands are available in ProM.
 
 ### Call Ebi from Python
 
@@ -63,7 +63,7 @@ Ebi can be used as a Python package, which integrates with [PM4Py](https://pypi.
         )
         print(result)
 
-The names of the Ebi functions can be found on the [commands page](https://leemans.ch/ebi/commands.php) or in the [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
+The names of the Ebi functions can be found on the [commands page](https://bpm-research-group.github.io/Ebi/commands.html) or in the [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 
 Some PM4Py objects, such as event logs, are read directly by Ebi, but most are passed as strings.
 If Ebi returns an exact fraction, it is returned as an array consisting of 1) a floating-point approximation, 2) the full numerator, and 3) the full denominator.
@@ -121,7 +121,7 @@ To use Ebi from Java:
         String log = Files.readString("log.xes", StandardCharsets.UTF_8);
         String result = call_ebi_internal("Ebi analyse completeness", ".frac", new String[] {log});
 
-The [commands](https://leemans.ch/ebi/commands.php) page indicates the commands that can be called from Java.
+The [commands](https://bpm-research-group.github.io/Ebi/commands.html) page indicates the commands that can be called from Java.
 
 ### Call Ebi from Javascript
 
@@ -143,7 +143,7 @@ To get started with development, or to compile for Mac OS X:
 1. To run Ebi, use the terminal of Visual Studio Code to give the command "cargo run --" instead of "ebi". Everything else is equivalent to the commands mentioned in the manual.
 1. To compile Ebi, give the command "cargo build --release". The binary is then placed in the project folder, in the "build/release" sub-folder.
 
-Information on the architecture of Ebi, including its sub-crates, can be found in the [PDF manual](https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true).
+Information on the architecture of Ebi, including its sub-crates, can be found in the [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 
 We welcome pull requests on [Github](https://github.com/BPM-Research-Group/Ebi).
 Before opening a pull request, please ensure that the test batch file src/tests/test.sh finishes without errors (on Windows, rename it to .bat and remove the first three lines).

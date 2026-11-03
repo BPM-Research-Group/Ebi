@@ -7,7 +7,7 @@ use ebi_optimisation::anyhow::Result;
 use itertools::Itertools;
 use std::io::Write;
 
-pub const EBIJS: &str = "ebi.php";
+pub const EBIJS: &str = "ebi.js";
 
 pub fn javascript_function_name(path: &Vec<&EbiCommand>) -> String {
     let raw_name = EbiCommand::path_to_string(path);
@@ -179,7 +179,7 @@ pub(crate) fn javascript_html_header() -> String {
             .join(", "),
         lifted_functions = EBI_COMMANDS.get_command_paths()
             .iter()
-            .filter_map(|path| 
+            .filter_map(|path|
                     if path.last().unwrap().is_in_javascript() {
                         Some(format!("window.{function_name} = {function_name};", function_name = javascript_function_name(&path))) 
                     } else {

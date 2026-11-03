@@ -24,8 +24,8 @@ use std::{
     io::Write,
 };
 
-pub const COMMANDS_PAGE: &'static str = "https://leemans.ch/ebi/commands.php";
-pub const FILE_HANDLERS_PAGE: &'static str = "https://leemans.ch/ebi/file_handlers.php";
+pub const COMMANDS_PAGE: &'static str = "https://bpm-research-group.github.io/Ebi/commands.html";
+pub const FILE_HANDLERS_PAGE: &'static str = "https://bpm-research-group.github.io/Ebi/file_handlers.html";
 
 pub fn page_start(f: &mut Vec<u8>, headers: &str) -> Result<()> {
     // #016764, #005958, #014848, #00312F, #001E1E
@@ -52,7 +52,7 @@ pub fn page_start(f: &mut Vec<u8>, headers: &str) -> Result<()> {
             {headers}
         </head>
         <body>",
-        styles = fs::read_to_string("documentation/stijlen.css").unwrap(),
+        styles = fs::read_to_string("src/surfaces/website/stijlen.css").unwrap(),
     )?;
     Ok(())
 }
@@ -66,7 +66,7 @@ fn page_end(f: &mut Vec<u8>) -> Result<()> {
     Ok(())
 }
 
-pub fn documentation_filehandlers() -> Result<EbiOutput> {
+pub fn generate_file_handlers() -> Result<EbiOutput> {
     let mut f = vec![];
     page_start(&mut f, "")?;
     menu_0(&mut f)?;
@@ -75,7 +75,7 @@ pub fn documentation_filehandlers() -> Result<EbiOutput> {
     Ok(EbiOutput::String(String::from_utf8(f).unwrap()))
 }
 
-pub fn documentation_commands() -> Result<EbiOutput> {
+pub fn generate_commands() -> Result<EbiOutput> {
     let mut f = vec![];
     page_start(&mut f, &javascript_html_header())?;
     menu_0(&mut f)?;
@@ -86,7 +86,7 @@ pub fn documentation_commands() -> Result<EbiOutput> {
 
 fn menu_0(f: &mut Vec<u8>) -> Result<()> {
     writeln!(f, "<div class=\"menu0\" id =\"menu0\">")?;
-    writeln!(f, "<a href=\"index.php\">Ebi</a>")?;
+    writeln!(f, "<a href=\"index.html\">Ebi</a>")?;
     writeln!(f, "<a href=\"{}\">Commands</a>", COMMANDS_PAGE)?;
     writeln!(f, "<a href=\"{}\">Files</a>", FILE_HANDLERS_PAGE)?;
     writeln!(
@@ -325,7 +325,7 @@ fn commands(f: &mut Vec<u8>) -> Result<()> {
                 if latex_link.is_some() {
                     writeln!(
                         f,
-                        " More information is available in the <a href=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true\">PDF manual</a>."
+                        " More information is available in the <a href=\"https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf\">PDF manual</a>."
                     )?;
                 }
                 writeln!(f, "</div>")?;
@@ -338,7 +338,7 @@ fn commands(f: &mut Vec<u8>) -> Result<()> {
                     f,
                     "This command can be run here, in the browser. 
                     All files remain on your computer, and are not uploaded. 
-                    There is a limit of 4GB of RAM.
+                    There is a limit of 4GB of RAM and single-threaded computation.
                     <p>"
                 )?;
                 javascript_html_form(f, &path)?;
@@ -672,7 +672,7 @@ fn command_exact_arithmetic(f: &mut Vec<u8>, exact_arithmetic: bool) -> Result<(
     Ok(())
 }
 
-pub fn documentation_home() -> Result<EbiOutput> {
+pub fn generate_home_page() -> Result<EbiOutput> {
     let mut f = vec![];
     page_start(&mut f, "")?;
     menu_0(&mut f)?;

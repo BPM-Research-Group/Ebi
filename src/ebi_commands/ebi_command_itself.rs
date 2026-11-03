@@ -1,14 +1,13 @@
-use crate::ebi_framework::{
-    documentation::{documentation_commands, documentation_filehandlers, documentation_home},
+use crate::{ebi_framework::{
     ebi_command::EbiCommand,
     ebi_output::{EbiOutput, EbiOutputType},
     manual::{graph, html, manual},
-};
+}, surfaces::website::website_generation::{generate_commands, generate_file_handlers, generate_home_page}};
 #[cfg(all(feature = "javascript", feature = "test_generation"))]
 use crate::javascript::javascript_generator_rust::generate_javascript_rust;
 #[cfg(feature = "java")]
 use crate::prom::prom_plugin_generator::print_java_plugins;
-use ebi_objects::{EbiObject, EbiObjectType, ebi_objects::scalable_vector_graphics::ToSVGMut};
+use ebi_objects::{ebi_objects::scalable_vector_graphics::ToSVGMut, EbiObject, EbiObjectType};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
  □ □ □ □ □ □ □ □ □ □ □ □ □ □ 
@@ -33,7 +32,7 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
     explanation_short: "Print things on Ebi.",
     explanation_long: None,
     children: &[
-        &EBI_ITSELF_DOCUMENTATION,
+        &EBI_ITSELF_WEBSITE,
         &EBI_ITSELF_GRAPH,
         &EBI_ITSELF_HTML,
         #[cfg(feature = "java")]
@@ -49,22 +48,22 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
     ],
 };
 
-pub const EBI_ITSELF_DOCUMENTATION: EbiCommand = EbiCommand::Group {
-    name_short: "docs",
-    name_long: Some("documentation"),
-    explanation_short: "Print the HTML documentation of Ebi.",
+pub const EBI_ITSELF_WEBSITE: EbiCommand = EbiCommand::Group {
+    name_short: "ws",
+    name_long: Some("website"),
+    explanation_short: "Print the HTML website of Ebi.",
     explanation_long: None,
     children: &[
-        &EBI_ITSELF_DOCUMENTATION_COMMANDS,
-        &EBI_ITSELF_DOCUMENTATION_FILE_HANDLERS,
-        &EBI_ITSELF_DOCUMENTATION_HOME,
+        &EBI_ITSELF_WEBSITE_COMMANDS,
+        &EBI_ITSELF_WEBSITE_FILE_HANDLERS,
+        &EBI_ITSELF_WEBSITE_HOME,
     ],
 };
 
-pub const EBI_ITSELF_DOCUMENTATION_COMMANDS: EbiCommand = EbiCommand::Command {
+pub const EBI_ITSELF_WEBSITE_COMMANDS: EbiCommand = EbiCommand::Command {
     name_short: "comm",
     name_long: Some("commands"),
-    explanation_short: "Print the HTML documentation of Ebi's commands.",
+    explanation_short: "Print the HTML website of Ebi's commands.",
     explanation_long: None,
     latex_link: None,
     cli_command: None,
@@ -72,14 +71,14 @@ pub const EBI_ITSELF_DOCUMENTATION_COMMANDS: EbiCommand = EbiCommand::Command {
     input_types: &[],
     input_names: &[],
     input_helps: &[],
-    execute: |_, _| Ok(documentation_commands()?),
+    execute: |_, _| Ok(generate_commands()?),
     output_type: &EbiOutputType::String,
 };
 
-pub const EBI_ITSELF_DOCUMENTATION_FILE_HANDLERS: EbiCommand = EbiCommand::Command {
+pub const EBI_ITSELF_WEBSITE_FILE_HANDLERS: EbiCommand = EbiCommand::Command {
     name_short: "fhs",
     name_long: Some("file-handlers"),
-    explanation_short: "Print the HTML documentation of Ebi's file handlers.",
+    explanation_short: "Print the HTML website of Ebi's file handlers.",
     explanation_long: None,
     latex_link: None,
     cli_command: None,
@@ -87,14 +86,14 @@ pub const EBI_ITSELF_DOCUMENTATION_FILE_HANDLERS: EbiCommand = EbiCommand::Comma
     input_types: &[],
     input_names: &[],
     input_helps: &[],
-    execute: |_, _| Ok(documentation_filehandlers()?),
+    execute: |_, _| Ok(generate_file_handlers()?),
     output_type: &EbiOutputType::String,
 };
 
-pub const EBI_ITSELF_DOCUMENTATION_HOME: EbiCommand = EbiCommand::Command {
+pub const EBI_ITSELF_WEBSITE_HOME: EbiCommand = EbiCommand::Command {
     name_short: "home",
     name_long: None,
-    explanation_short: "Print the HTML home of Ebi's documentation.",
+    explanation_short: "Print the HTML home of Ebi's website.",
     explanation_long: None,
     latex_link: None,
     cli_command: None,
@@ -102,7 +101,7 @@ pub const EBI_ITSELF_DOCUMENTATION_HOME: EbiCommand = EbiCommand::Command {
     input_types: &[],
     input_names: &[],
     input_helps: &[],
-    execute: |_, _| Ok(documentation_home()?),
+    execute: |_, _| Ok(generate_home_page()?),
     output_type: &EbiOutputType::String,
 };
 
@@ -124,7 +123,8 @@ pub const EBI_ITSELF_LOGO: EbiCommand = EbiCommand::Command {
 pub const EBI_ITSELF_MANUAL: EbiCommand = EbiCommand::Command {
     name_short: "man",
     name_long: Some("manual"),
-    explanation_short: "Print the automatically generated parts of the manual of Ebi in Latex format.",
+    explanation_short:
+        "Print the automatically generated parts of the manual of Ebi in Latex format.",
     explanation_long: None,
     cli_command: None,
     latex_link: None,

@@ -98,8 +98,8 @@ pub fn manual() -> Result<EbiOutput> {
         writeln!(f, "{}", etrait.get_explanation())?;
 
         writeln!(f, "\\\\File types that can be imported as {} {}: {}.", 
-            etrait.get_article(), 
-            etrait, 
+            etrait.get_article(),
+            etrait,
             or_none(
                     &etrait.get_file_handlers().iter().map(|file_handler| 
                         format!("\\\\\\null\\qquad\\hyperref[filehandler:{}]{{{}}} (.{} -- \\cref{{filehandler:{}}})", file_handler.name, file_handler.name, file_handler.file_extension, file_handler.name)
@@ -509,7 +509,7 @@ pub fn html() -> String {
     format!(
         "<h2>Commands</h2>\
         Ebi offers the following comands and techniques. \
-        Please refer to the <a href=\"https://git.rwth-aachen.de/rwth-bpm/rustlibrary/-/raw/main/build/nightly/manual.pdf?ref_type=heads&inline=true\">manual</a> for more information. \
+        Please refer to the <a href=\"https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf\">manual</a> for more information. \
         <ul><li>{}</li></ul>\
         <h2>Supported file formats</h2>\
         <ul><li>{}</li></ul>",

@@ -98,7 +98,7 @@ impl dyn EbiTraitFiniteStochasticLanguage {
         &mut self,
         edges_to_filter: HashSet<(Option<Activity>, Option<Activity>)>,
     ) {
-        self.retain_traces(Box::new(move |trace, _| {
+        self.retain_traces(Box::new(move |trace| {
             let mut edge = (None, None);
             for activity in trace {
                 let activity: &Activity = activity;

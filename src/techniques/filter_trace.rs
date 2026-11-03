@@ -1,15 +1,17 @@
 use crate::{
-    ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject},
-    ebi_traits::ebi_trait_event_log::EbiTraitEventLog,
+    ebi_framework::{ebi_input::EbiInput, ebi_trait::FromEbiTraitObject}, ebi_traits::{
+        ebi_trait_event_log::EbiTraitEventLog, ebi_trait_finite_language::EbiTraitFiniteLanguage, ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
+    },
 };
 use ebi_objects::{
-    Activity, EventLog, EventLogTraceAttributes, EventLogXes,
+    Activity, EventLog, EventLogTraceAttributes, EventLogXes, FiniteLanguage,
+    FiniteStochasticLanguage,
     anyhow::{Result, anyhow},
     ebi_derive::EbiInputEnum,
     ebi_objects::event_log_event_attributes::EventLogEventAttributes,
 };
 
-pub trait Filter {
+pub trait FilterTrace {
     /// keep all traces that have a given length
     fn remove_traces_length(&mut self, operator: Operator, value: usize);
 
@@ -21,8 +23,8 @@ pub trait Filter {
 }
 
 macro_rules! filter {
-    ($t:ident) => {
-        impl Filter for $t {
+    ($t:ty) => {
+        impl FilterTrace for $t {
             fn remove_traces_length(&mut self, operator: Operator, value: usize) {
                 self.retain_traces(Box::new(move |trace| !operator.apply(trace.len(), value)));
             }
@@ -48,6 +50,11 @@ filter!(EventLog);
 filter!(EventLogTraceAttributes);
 filter!(EventLogEventAttributes);
 filter!(EventLogXes);
+filter!(FiniteLanguage);
+filter!(FiniteStochasticLanguage);
+filter!(dyn EbiTraitFiniteLanguage);
+filter!(dyn EbiTraitFiniteStochasticLanguage);
+filter!(dyn EbiTraitEventLog);
 
 #[derive(EbiInputEnum)]
 pub enum EventSelector {
@@ -117,7 +124,7 @@ mod tests {
 
     use ebi_objects::{EventLog, EventLogTraceAttributes, HasActivityKey, NumberOfTraces};
 
-    use crate::techniques::filter::{EventSelector, Filter, Operator};
+    use crate::techniques::filter_trace::{EventSelector, FilterTrace, Operator};
 
     #[test]
     fn filter_traces_length() {
