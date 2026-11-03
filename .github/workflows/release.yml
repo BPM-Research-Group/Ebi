@@ -120,7 +120,7 @@ jobs:
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
                 asset_path: java-library-x86_64-linux_libebi.so
-                asset_name: java-library-x86_64-linux_libebi.so
+                asset_name: libebi.so
                 asset_content_type: application/x-sharedlib
 
             - name: Add Java-Windows to release
@@ -130,5 +130,5 @@ jobs:
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
                 asset_path: java-library-x86_64-windows_ebi.dll
-                asset_name: java-library-x86_64-windows_ebi.dll
+                asset_name: ebi.dll
                 asset_content_type: application/vnd.microsoft.portable-executable            
