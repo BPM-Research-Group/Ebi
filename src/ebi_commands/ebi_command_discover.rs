@@ -176,7 +176,7 @@ pub const EBI_DISCOVER_CIBDO: EbiCommand = EbiCommand::Command {
         &[&EbiInputType::Trait(EbiTrait::FiniteStochasticLanguage)],
         &[&EbiInputType::Object(EbiObjectType::LabelledPetriNet)],
     ],
-    input_names: &["FILE_1", "FILE_2"],
+    input_names: &["SLANG", "LPN"],
     input_helps: &[
         "A finite stochastic language (log) to get the occurrences from.",
         "A labelled Petri net with the control flow.",
