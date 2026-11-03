@@ -167,7 +167,7 @@ pub const EBI_DISCOVER_ALIGNMENTS_SLPN: EbiCommand = EbiCommand::Command {
 pub const EBI_DISCOVER_CIBDO: EbiCommand = EbiCommand::Command {
     name_short: "cibdo",
     name_long: Some("can-it-be-done-optimally"),
-    explanation_short: "Given an event log and an LPN, construct a stochastic labeled Petri net directly from the log by optimizing the uEMSC of the work.",
+    explanation_short: "Given an event log and a labelled Petri net, assign weights to the transitions in the net, such that the uEMSC score of the net and the log is optimised.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:conf/caise/LeemansLMP24}"),
     cli_command: None,
