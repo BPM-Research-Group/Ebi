@@ -1,6 +1,10 @@
 name: Build website
 
-on: [workflow_call, workflow_dispatch]
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -15,7 +19,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  test:
+  build_website:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
