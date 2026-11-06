@@ -9,6 +9,7 @@ use ebi_objects::{
     ebi_objects::process_tree::Node,
 };
 use ebi_optimisation::anyhow::Result;
+use fnv::FnvBuildHasher;
 use std::collections::HashMap;
 
 pub trait OccurrencesStochasticMinerBPMN {
@@ -40,7 +41,7 @@ impl OccurrencesStochasticMinerBPMN for BusinessProcessModelAndNotation {
         let translator =
             ActivityKeyTranslator::new(language.activity_key(), self.activity_key_mut());
 
-        let mut model_activity2frequency = HashMap::new();
+        let mut model_activity2frequency = HashMap::<_, _, FnvBuildHasher>::default();
         for activity in self.activity_key().get_activities() {
             model_activity2frequency.insert(*activity, Fraction::zero());
         }
