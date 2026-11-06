@@ -93,7 +93,7 @@ impl OccurrencesStochasticMinerLPN for LabelledPetriNet {
         let translator =
             ActivityKeyTranslator::new(language.activity_key(), self.activity_key_mut());
 
-        let mut model_activity2frequency = HashMap::new();
+        let mut model_activity2frequency = HashMap::<_, _, FnvBuildHasher>::default();
         for activity in self.activity_key().get_activities() {
             model_activity2frequency.insert(*activity, Fraction::zero());
         }
@@ -134,7 +134,7 @@ impl OccurrencesStochasticMinerTree for ProcessTree {
         let translator =
             ActivityKeyTranslator::new(language.activity_key(), self.activity_key_mut());
 
-        let mut model_activity2frequency = HashMap::new();
+        let mut model_activity2frequency = HashMap::<_, _, FnvBuildHasher>::default();
         for activity in self.activity_key().get_activities() {
             model_activity2frequency.insert(*activity, Fraction::zero());
         }
