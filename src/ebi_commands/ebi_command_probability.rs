@@ -13,10 +13,9 @@ use crate::{
     follower_semantics::FollowerSemantics,
     techniques::explain_trace::ExplainTrace,
 };
-use clap::{Arg, ArgAction, value_parser};
 use ebi_objects::{
     EbiObject, EbiObjectType, HasActivityKey,
-    anyhow::{Context, anyhow},
+    anyhow::Context,
     ebi_arithmetic::{ConstFraction, Fraction},
 };
 
@@ -71,42 +70,34 @@ pub const EBI_PROBABILITY_TRACE: EbiCommand = EbiCommand::Command {
     explanation_short: "Compute the probability of a trace in a stochastic model.",
     explanation_long: None,
     latex_link: Some("~\\cite{DBLP:journals/is/LeemansMM24}"),
-    cli_command: Some(|command| {
-        command.arg(
-            Arg::new("trace")
-                .action(ArgAction::Set)
-                .value_name("TRACE")
-                .help("The remaining multiple standard arguments after FILE are  interpreted as the TRACE. Provide event labels in trace order, separated as normal command line arguments (e.g., a space).")
-                .required(true)
-                .value_parser(value_parser!(String))
-                .num_args(0..),
-        )
-    }),
+    cli_command: None,
     exact_arithmetic: true,
-    input_types: &[&[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)]],
-    input_names: &["FILE"],
-    input_helps: &["The queriable stochastic language (model)."],
-    execute: |mut inputs, cli_matches| {
+    input_types: &[
+        &[&EbiInputType::Trait(EbiTrait::QueriableStochasticLanguage)],
+        &[&EbiInputType::StringList],
+    ],
+    input_names: &["FILE", "TRACE"],
+    input_helps: &[
+        "The queriable stochastic language (model).",
+        "The remaining multiple standard arguments after FILE are interpreted as the TRACE. Provide event labels in trace order, separated as normal command line arguments (e.g., a space).",
+    ],
+    execute: |mut inputs, _| {
         let mut model = inputs
             .remove(0)
             .to_type::<dyn EbiTraitQueriableStochasticLanguage>()?;
-        if let Some(x) = cli_matches.unwrap().get_many::<String>("trace") {
-            let t: Vec<&String> = x.collect();
-            let trace = t
-                .into_iter()
-                .map(|activity| activity.as_str())
-                .collect::<Vec<_>>();
-            let trace = model.activity_key_mut().process_trace_ref(&trace);
+        let trace = inputs.remove(0).to_type::<Vec<String>>()?;
+        let trace = trace
+            .iter()
+            .map(|activity| activity.as_str())
+            .collect::<Vec<_>>();
+        let trace = model.activity_key_mut().process_trace_ref(&trace);
 
-            log::trace!("compute probability of trace {:?}", trace);
+        log::trace!("compute probability of trace {:?}", trace);
 
-            let result = model
-                .get_probability(&FollowerSemantics::Trace(&trace))
-                .with_context(|| format!("cannot compute probability of trace {:?}", trace))?;
-            return Ok(EbiOutput::Fraction(result));
-        } else {
-            return Err(anyhow!("no trace given"));
-        }
+        let result = model
+            .get_probability(&FollowerSemantics::Trace(&trace))
+            .with_context(|| format!("cannot compute probability of trace {:?}", trace))?;
+        Ok(EbiOutput::Fraction(result))
     },
     output_type: &EbiOutputType::Fraction,
 };
@@ -117,17 +108,7 @@ pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command {
     explanation_short: "Compute the most likely explanation of a trace given the stochastic model.",
     explanation_long: None,
     latex_link: None,
-    cli_command: Some(|command| {
-        command.arg(
-            Arg::new("trace")
-                .action(ArgAction::Set)
-                .value_name("TRACE")
-                .help("The trace.")
-                .required(true)
-                .value_parser(value_parser!(String))
-                .num_args(0..),
-        )
-    }),
+    cli_command: None,
     exact_arithmetic: true,
     input_types: &[
         &[&EbiInputType::Trait(EbiTrait::StochasticSemantics)],
@@ -136,32 +117,50 @@ pub const EBI_PROBABILITY_EXPLAIN_TRACE: EbiCommand = EbiCommand::Command {
             Some(ConstFraction::one()),
             None,
         )],
+        &[&EbiInputType::StringList],
     ],
-    input_names: &["FILE", "VALUE"],
+    input_names: &["FILE", "VALUE", "TRACE"],
     input_helps: &[
         "The model.",
         "Balance between 0 (=only consider deviations) to 1 (=only consider weight in the model)",
+        "The trace: the activity labels in trace order.",
     ],
-    execute: |mut inputs, cli_matches| {
+    execute: |mut inputs, _| {
         let mut semantics = inputs.remove(0).to_type::<EbiTraitStochasticSemantics>()?;
         let balance = inputs.remove(0).to_type::<Fraction>()?;
-        if let Some(x) = cli_matches.unwrap().get_many::<String>("trace") {
-            let t: Vec<&String> = x.collect();
-            let trace = t
-                .into_iter()
-                .map(|activity| activity.as_str())
-                .collect::<Vec<_>>();
-            let trace = semantics.activity_key_mut().process_trace_ref(&trace);
+        let trace = inputs.remove(0).to_type::<Vec<String>>()?;
+        let trace = trace
+            .iter()
+            .map(|activity| activity.as_str())
+            .collect::<Vec<_>>();
+        let trace = semantics.activity_key_mut().process_trace_ref(&trace);
 
-            log::trace!("explain the trace {:?} given the model", trace);
+        log::trace!("explain the trace {:?} given the model", trace);
 
-            let result = semantics
-                .explain_trace(&trace, &balance)
-                .with_context(|| format!("cannot explain the trace {:?}", trace))?;
-            return Ok(EbiOutput::Object(EbiObject::LanguageOfAlignments(result)));
-        } else {
-            return Err(anyhow!("no trace given"));
-        }
+        let result = semantics
+            .explain_trace(&trace, &balance)
+            .with_context(|| format!("cannot explain the trace {:?}", trace))?;
+        Ok(EbiOutput::Object(EbiObject::LanguageOfAlignments(result)))
     },
     output_type: &EbiOutputType::ObjectType(EbiObjectType::LanguageOfAlignments),
 };
+
+#[cfg(test)]
+mod tests {
+    use super::{EBI_PROBABILITY_EXPLAIN_TRACE, EBI_PROBABILITY_TRACE};
+
+    #[test]
+    fn prob_trac_and_exptra_are_exposed_to_python() {
+        assert!(EBI_PROBABILITY_TRACE.is_in_python());
+        assert!(EBI_PROBABILITY_EXPLAIN_TRACE.is_in_python());
+    }
+
+    #[test]
+    fn prob_trac_and_exptra_are_not_exposed_to_javascript_or_java() {
+        //JavascriptInput can only carry text or bytes, so it cannot carry a list of texts yet
+        for command in [&EBI_PROBABILITY_TRACE, &EBI_PROBABILITY_EXPLAIN_TRACE] {
+            assert!(!command.is_in_javascript());
+            assert!(!command.is_in_java());
+        }
+    }
+}
