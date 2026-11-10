@@ -27,7 +27,9 @@ jobs:
             - name: Update version number
               run: |
                 cargo install cargo-edit
-                cargo set-version "${{ github.ref_name }}"
+                VERSION=${{ github.ref_name }}
+                VERSION="${VERSION:1}"
+                cargo set-version "$VERSION"
 
             - name: Generate manual parts 
               run: |
