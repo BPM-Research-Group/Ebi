@@ -31,7 +31,7 @@ jobs:
                 VERS=${{ github.ref_name }}
                 VERS="${VERS:1}"
                 cargo set-version "$VERS"
-                echo "{version}={$VERS}" >> $GITHUB_OUTPUT
+                echo "version=$(echo $VERS)" >> $GITHUB_OUTPUT
 
             - name: Generate manual parts 
               run: |
