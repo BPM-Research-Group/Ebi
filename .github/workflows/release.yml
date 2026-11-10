@@ -24,6 +24,11 @@ jobs:
             - name: Checkout
               uses: actions/checkout@v4
 
+            - name: Update version number
+              run: |
+                cargo install cargo-edit
+                cargo set-version "${{ github.ref_name }}"
+
             - name: Generate manual parts 
               run: |
                 cargo run itself manual -o manual/functions.tex
