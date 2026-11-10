@@ -21,7 +21,7 @@ use crate::ebi_framework::ebi_command::EbiCommand;"
     );
     let mut functions = String::new();
     let mut module = format!(
-        "#[pymodule]\npub fn ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {{"
+        "#[pymodule]\npub fn _ebi(_py: Python<'_>, m: &Bound<'_, PyModule>) -> PyResult<()> {{\n    m.add_class::<super::python_handle::Model>()?;\n    m.add_class::<super::python_handle::Log>()?;\n"
     );
 
     for path in EBI_COMMANDS.get_command_paths() {
@@ -43,6 +43,25 @@ use crate::ebi_framework::ebi_command::EbiCommand;"
 
     let result = format!("{}\n\n{}\n\n{}", imports, functions, module);
     Ok(EbiOutput::String(result))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::generate_pm4py_module;
+    use crate::ebi_framework::ebi_output::EbiOutput;
+    use std::fs;
+
+    #[test]
+    fn checked_in_module_is_up_to_date() {
+        let EbiOutput::String(generated) = generate_pm4py_module().unwrap() else {
+            panic!("the generator must produce a string");
+        };
+        let checked_in = fs::read_to_string("src/python/python_module_autogen.rs").unwrap();
+        assert!(
+            generated.replace("\r\n", "\n").trim_end() == checked_in.replace("\r\n", "\n").trim_end(),
+            "python_module_autogen.rs is out of date; regenerate it with `ebi itself python`"
+        );
+    }
 }
 
 /// return the tupe (string1, string2) where

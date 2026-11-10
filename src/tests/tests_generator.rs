@@ -15,7 +15,7 @@ pub(crate) fn generate_tests() -> Result<String> {
 mod tests{{
 \tuse crate::ebi_framework::{{
 \t\tebi_command::EbiCommand,
-\t\tebi_input::{{self, EbiInput, read_as_object_with_file_handler, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE, TEST_INPUT_TYPE_FRACTION}}
+\t\tebi_input::{{self, EbiInput, read_as_object_with_file_handler, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE, TEST_INPUT_TYPE_FRACTION, TEST_INPUT_TYPE_STRING_LIST}}
 \t}};
 \tuse ebi_objects::ebi_activity_key::TestActivityKey;
 \tuse crate::multiple_reader::MultipleReader;
@@ -178,6 +178,10 @@ fn test_inputs_to_import_code(test_inputs: &Vec<TestInput>) -> String {
             ),
             TestInput::FileHandler(f) => format!("let input{input_i} = \"{f}\".to_string();"),
             TestInput::Fraction(f, _) => format!("let input{input_i} = EbiInput::Fraction(\"{f}\".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);"),
+            TestInput::StringList(l, _) => format!(
+                "let input{input_i} = EbiInput::StringList(vec![{}], &TEST_INPUT_TYPE_STRING_LIST);",
+                l.iter().map(|s| format!("\"{s}\".to_string()")).join(", ")
+            ),
         })
         .collect::<Vec<_>>()
         .join("\n\t\t"),

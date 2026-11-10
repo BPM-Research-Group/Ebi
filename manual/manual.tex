@@ -446,14 +446,18 @@ for dyn EbiTraitFiniteStochasticLanguage {
 					This should be \verb=None= for the far majority of plug-ins.
 					If it is not \verb=None=, then the command will not be callable from external libraries (such as ProM, PM4PY or Knime).
 					Furthermore, parameters defined through \verb=cli_command= are not read, parsed or imported by the Ebi framework.
-					An example of an optional attribute can be found in \verb=ebi_commands/ebi_command_association.rs=.
+						An example of an optional attribute can be found in \verb=ebi_commands/ebi_command_association.rs=.
+					For a list of values, such as the activity labels of a trace, declare an input of type \verb=StringList= instead of using \verb=cli_command= (see \verb=input_types= below).
+						Such a command stays callable from the command line and Python; it is not offered in JavaScript or Java, whose inputs cannot carry a list of values yet.
 					
 					\item \verb=exact_arithmetic= indicates whether your plug-in \emph{can} handle exact arithmetic. 
 					That is, even if this is \verb=true=, the user can still disable exact arithmetic (which will be handled by Ebi).
 					The far majority of plug-ins support exact arithmetic; only set this to \verb=false= if exact arithmetic is unbearably slow.
 					
 					\item \verb=input_types= gives a sequence of inputs.
-					That is, the number of inputs is fixed per command (unless through \verb=cli_command=).
+					That is, the number of inputs is fixed per command.
+					An input of type \verb=StringList= is still a single input, but it takes any number of texts (for example the activity labels of the trace in \verb=Ebi probability trace=).
+						As it takes all the remaining values on the command line, it must be the last input, so a command has at most one; a test checks this.
 					Each input is again a list of possible traits or objects that can be accepted.
 					For each input, Ebi will try to parse the file given, and return the first trait/object type using which the file can be parsed.
 					

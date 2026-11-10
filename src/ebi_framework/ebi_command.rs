@@ -184,6 +184,11 @@ impl EbiCommand {
                         arg = arg.required(true);
                     }
 
+                    if input_type.contains(&&EbiInputType::StringList) {
+                        //takes all remaining values, so it must be the last argument
+                        arg = arg.num_args(0..);
+                    }
+
                     command = command.arg(arg);
                 }
 
@@ -606,6 +611,11 @@ impl EbiCommand {
                         }
                     }
                 }
+                EbiInputType::StringList => {
+                    if let Some(values) = cli_matches.get_many::<String>(&cli_id) {
+                        return Ok(EbiInput::StringList(values.cloned().collect(), input_type));
+                    }
+                }
                 EbiInputType::Fraction(min, max, _) => {
                     if let Some(value) = cli_matches.get_one::<FractionNotParsedYet>(&cli_id) {
                         let value: Fraction = value.try_into()?;
@@ -770,7 +780,11 @@ impl EbiCommand {
             ..
         } = &self
         {
-            return cli_command.is_none() && !input_types.is_empty();
+            //JavascriptInput carries only text or bytes, so it cannot carry a list of texts
+            let has_list = input_types
+                .iter()
+                .any(|alternatives| alternatives.contains(&&EbiInputType::StringList));
+            return cli_command.is_none() && !input_types.is_empty() && !has_list;
         } else {
             false
         }
@@ -1068,12 +1082,51 @@ fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use super::{EBI_COMMANDS, EbiCommand};
+    use super::{EBI_COMMANDS, EbiCommand, EbiInputType};
     use std::collections::HashSet;
+
+    /// A StringList takes all remaining values on the command line, so it can only be the last input.
+    /// Returns a description of the problem, if there is one.
+    fn string_list_position_error(input_types: &[&[&EbiInputType]]) -> Option<String> {
+        let last = input_types.len().checked_sub(1)?;
+        input_types
+            .iter()
+            .enumerate()
+            .find(|(index, alternatives)| {
+                *index != last && alternatives.contains(&&EbiInputType::StringList)
+            })
+            .map(|(index, _)| {
+                format!(
+                    "input {} is a StringList, which takes all remaining values, so it must be the last input",
+                    index + 1
+                )
+            })
+    }
 
     #[test]
     fn build_cli() {
         EBI_COMMANDS.build_cli();
+    }
+
+    #[test]
+    fn a_string_list_must_be_the_last_input() {
+        let list = EbiInputType::StringList;
+        let object = EbiInputType::AnyObject;
+        assert_eq!(string_list_position_error(&[&[&object], &[&list]]), None);
+        assert!(string_list_position_error(&[&[&list], &[&object]]).is_some());
+        assert!(string_list_position_error(&[&[&list], &[&list]]).is_some());
+        assert!(string_list_position_error(&[&[&object, &list], &[&object]]).is_some());
+    }
+
+    #[test]
+    fn registered_commands_keep_a_string_list_last() {
+        for path in EBI_COMMANDS.get_command_paths() {
+            if let EbiCommand::Command { input_types, .. } = path.last().unwrap() {
+                if let Some(error) = string_list_position_error(input_types) {
+                    panic!("{}: {}", EbiCommand::path_to_string(&path), error);
+                }
+            }
+        }
     }
 
     #[test]

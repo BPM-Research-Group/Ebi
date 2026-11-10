@@ -23,6 +23,7 @@ pub(crate) enum TestInput {
     Usize(usize, &'static EbiInputType),
     FileHandler(EbiFileHandler),
     Fraction(Fraction, &'static EbiInputType),
+    StringList(Vec<String>, &'static EbiInputType),
 }
 
 impl TestInput {
@@ -47,6 +48,7 @@ impl TestInput {
             TestInput::Usize(u, input_type) => EbiInput::Usize(u, input_type),
             TestInput::FileHandler(fh) => EbiInput::FileHandler(fh),
             TestInput::Fraction(f, input_type) => EbiInput::Fraction(f, input_type),
+            TestInput::StringList(l, input_type) => EbiInput::StringList(l, input_type),
         }
     }
 
@@ -78,6 +80,7 @@ impl TestInput {
             TestInput::Usize(u, _) => format!("usize {u}"),
             TestInput::FileHandler(ebi_file_handler) => format!("filehandler {ebi_file_handler}"),
             TestInput::Fraction(f, _) => format!("fraction {f}"),
+            TestInput::StringList(l, _) => format!("stringlist {l:?}"),
         }
     }
 
@@ -201,6 +204,12 @@ impl TestInput {
                 EbiInputType::Fraction(_, _, _) => {
                     result.push(TestInput::Fraction(Fraction::from((1, 2)), &input_type));
                 }
+                EbiInputType::StringList => {
+                    result.push(TestInput::StringList(
+                        vec!["a".to_string(), "b".to_string()],
+                        &input_type,
+                    ));
+                }
                 EbiInputType::String(_, Some(default)) => {
                     result.push(TestInput::String(default.to_string(), &input_type));
                 }
@@ -308,6 +317,7 @@ impl Debug for TestInput {
             Self::Usize(arg0, _) => f.debug_tuple("Usize").field(arg0).finish(),
             Self::FileHandler(arg0) => f.debug_tuple("FileHandler").field(&arg0.name).finish(),
             Self::Fraction(arg0, _) => f.debug_tuple("Fraction").field(arg0).finish(),
+            Self::StringList(arg0, _) => f.debug_tuple("StringList").field(arg0).finish(),
         }
     }
 }

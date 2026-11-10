@@ -105,6 +105,10 @@ impl JavaInputTypes for EbiInputType {
                 x.extend(JAVA_OBJECT_HANDLERS_FRACTION);
                 x
             }
+            EbiInputType::StringList => {
+                //not supported in Java; commands with a list of texts are not available in Java
+                vec![]
+            }
         }
     }
 }
