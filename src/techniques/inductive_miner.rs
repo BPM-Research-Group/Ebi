@@ -5,7 +5,7 @@ use crate::{
     },
     techniques::{
         inductive_miner::{
-            cut_finding::{Cut, find_default_cut},
+            cut_finding::{find_default_cut, Cut},
             find_base_cases::{
                 base_case_empty_log, base_case_single_activity, base_case_single_activity_filtering,
             },
@@ -16,13 +16,13 @@ use crate::{
             log_info::{ComputeLogInfo, LogInfo},
             log_splitting::SplitLog,
         },
-        reduce::ReduceLanguageEquivalently,
+        reduce::ReduceLanguageEquivalentlyForPetriNets,
     },
 };
 use ebi_objects::{
-    FiniteLanguage, FiniteStochasticLanguage, ProcessTree,
     ebi_arithmetic::{Fraction, One, Signed, Zero},
     ebi_objects::process_tree::{Node, Operator},
+    FiniteLanguage, FiniteStochasticLanguage, ProcessTree,
 };
 use intmap::IntMap;
 use std::fmt::Display;
@@ -97,7 +97,7 @@ fn inductive_miner(
     let nodes = inductive_miner_recursion(log, parameters, 0);
     let mut tree: ProcessTree = (log.activity_key().clone(), nodes).into();
     if parameters.reduce {
-        tree.reduce_language_equivalently();
+        tree.reduce_language_equivalently_for_petri_nets();
     }
     tree
 }
@@ -190,9 +190,9 @@ fn build_operator_node(operator: Operator, subtrees: Vec<Vec<Node>>) -> Vec<Node
 }
 
 mod find_base_cases {
-    use crate::techniques::inductive_miner::{InductiveMinerParameters, debug, log_info::LogInfo};
+    use crate::techniques::inductive_miner::{debug, log_info::LogInfo, InductiveMinerParameters};
     use ebi_objects::{
-        ebi_arithmetic::{Fraction, Signed, Zero, f},
+        ebi_arithmetic::{f, Fraction, Signed, Zero},
         ebi_objects::process_tree::Node,
     };
 
@@ -505,9 +505,9 @@ mod cut_finding {
         techniques::inductive_miner::{build_operator_node, log_info::LogInfo},
     };
     use ebi_objects::{
-        Activity,
         ebi_arithmetic::Signed,
         ebi_objects::process_tree::{Node, Operator},
+        Activity,
     };
     use std::collections::{HashMap, HashSet};
 
@@ -628,8 +628,8 @@ mod cut_finding {
         if info.activities.len() < 2 {
             return None;
         }
-        if info.dfg.start_activities().next().is_some()
-            || info.dfg.end_activities().next().is_some()
+        if info.dfg.start_activities().next().is_none()
+            || info.dfg.end_activities().next().is_none()
         {
             return None;
         }
@@ -656,8 +656,10 @@ mod cut_finding {
         //make sure that activities on the minimum-self-distance-path are not separated by a parallel operator.
         {
             for activity in &info.activities {
-                for (activity2, _) in info.msd.get(*activity).unwrap() {
-                    components.merge_components(*activity, activity2);
+                if let Some(a) = info.msd.get(*activity) {
+                    for (activity2, _) in a {
+                        components.merge_components(*activity, activity2);
+                    }
                 }
             }
         }
@@ -714,8 +716,8 @@ mod cut_finding {
         if info.activities.len() < 2 {
             return None;
         }
-        if info.dfg.start_activities().next().is_some()
-            || info.dfg.end_activities().next().is_some()
+        if info.dfg.start_activities().next().is_none()
+            || info.dfg.end_activities().next().is_none()
         {
             return None;
         }
@@ -724,72 +726,75 @@ mod cut_finding {
 
         //merge all start + end activities
         let mut it = info.dfg.start_activities();
-        let pivot = it.next().unwrap();
-        for a in it.chain(info.dfg.end_activities()) {
-            components.merge_components(pivot, a);
-        }
-
-        for (src, tgt) in info.dfg.get_sources().zip(info.dfg.get_targets()) {
-            let src_is_start = info.dfg.is_start_activity(src);
-            let src_is_end = info.dfg.is_end_activity(src);
-            let tgt_is_start = info.dfg.is_start_activity(tgt);
-            if !src_is_start && !src_is_end && !tgt_is_start {
-                components.merge_components(src, tgt);
-            } else if src_is_start && !src_is_end {
-                components.merge_components(src, tgt);
+        if let Some(pivot) = it.next() {
+            for a in it.chain(info.dfg.end_activities()) {
+                components.merge_components(pivot, a);
             }
-        }
 
-        let (sub_ends, sub_starts): (HashSet<Activity>, HashSet<Activity>) = info
-            .dfg
-            .get_sources()
-            .zip(info.dfg.get_targets())
-            .filter(|(src, tgt)| !components.same_component(*src, *tgt))
-            .fold(
-                (HashSet::new(), HashSet::new()),
-                |(mut ends, mut starts), (src, tgt)| {
-                    ends.insert(src);
-                    starts.insert(tgt);
-                    (ends, starts)
-                },
-            );
-
-        // sub-end of redo connects to all start acts
-        for &sub_end in &sub_ends {
-            if components.same_component(sub_end, pivot) {
-                continue;
+            for (src, tgt) in info.dfg.get_sources().zip(info.dfg.get_targets()) {
+                let src_is_start = info.dfg.is_start_activity(src);
+                let src_is_end = info.dfg.is_end_activity(src);
+                let tgt_is_start = info.dfg.is_start_activity(tgt);
+                if !src_is_start && !src_is_end && !tgt_is_start {
+                    components.merge_components(src, tgt);
+                } else if src_is_start && !src_is_end {
+                    components.merge_components(src, tgt);
+                }
             }
-            if info
+
+            let (sub_ends, sub_starts): (HashSet<Activity>, HashSet<Activity>) = info
                 .dfg
-                .start_activities()
-                .any(|s| info.dfg.edge_weight(sub_end, s).is_not_positive())
-            {
-                components.merge_components(sub_end, pivot);
-            }
-        }
-        // sub-tart of redo reachable from all end acts
-        for &sub_start in &sub_starts {
-            if components.same_component(sub_start, pivot) {
-                continue;
-            }
-            if info
-                .dfg
-                .end_activities()
-                .any(|e| info.dfg.edge_weight(e, sub_start).is_not_positive())
-            {
-                components.merge_components(sub_start, pivot);
-            }
-        }
+                .get_sources()
+                .zip(info.dfg.get_targets())
+                .filter(|(src, tgt)| !components.same_component(*src, *tgt))
+                .fold(
+                    (HashSet::new(), HashSet::new()),
+                    |(mut ends, mut starts), (src, tgt)| {
+                        ends.insert(src);
+                        starts.insert(tgt);
+                        (ends, starts)
+                    },
+                );
 
-        let mut parts = components.into_components();
-        if parts.len() <= 1 {
-            return None;
-        }
-        let body_idx = parts.iter().position(|p| p.contains(&pivot))?;
-        parts.swap(0, body_idx);
-        let body = parts.remove(0);
+            // sub-end of redo connects to all start acts
+            for &sub_end in &sub_ends {
+                if components.same_component(sub_end, pivot) {
+                    continue;
+                }
+                if info
+                    .dfg
+                    .start_activities()
+                    .any(|s| info.dfg.edge_weight(sub_end, s).is_not_positive())
+                {
+                    components.merge_components(sub_end, pivot);
+                }
+            }
+            // sub-tart of redo reachable from all end acts
+            for &sub_start in &sub_starts {
+                if components.same_component(sub_start, pivot) {
+                    continue;
+                }
+                if info
+                    .dfg
+                    .end_activities()
+                    .any(|e| info.dfg.edge_weight(e, sub_start).is_not_positive())
+                {
+                    components.merge_components(sub_start, pivot);
+                }
+            }
 
-        Some(Cut::Loop { body, redos: parts })
+            let mut parts = components.into_components();
+            if parts.len() <= 1 {
+                return None;
+            }
+            let body_idx = parts.iter().position(|p| p.contains(&pivot))?;
+            parts.swap(0, body_idx);
+            let body = parts.remove(0);
+
+            Some(Cut::Loop { body, redos: parts })
+        } else {
+            None
+        }
     }
 }
 
@@ -797,16 +802,16 @@ mod find_fall_throughs {
     use crate::{
         ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         techniques::inductive_miner::{
-            InductiveMinerParameters, build_operator_node, debug, find_default_cut,
-            inductive_miner_recursion,
+            build_operator_node, debug, find_default_cut, inductive_miner_recursion,
             log_info::{ComputeLogInfo, LogInfo},
             log_splitting::split_log_concurrent,
+            InductiveMinerParameters,
         },
     };
     use ebi_objects::{
-        Activity, FiniteStochasticLanguage, IntoRefTraceIterator,
         ebi_arithmetic::Signed,
         ebi_objects::process_tree::{Node, Operator},
+        Activity, FiniteStochasticLanguage, IntoRefTraceIterator,
     };
     use std::collections::HashSet;
 
@@ -885,7 +890,7 @@ mod find_fall_throughs {
         }
 
         for &activity in &info.activities {
-            let mut parts_1 = HashSet::new();
+            let mut parts_1 = HashSet::default();
             parts_1.insert(activity);
             let mut parts_2 = info.activities.clone();
             parts_2.remove(&activity);
@@ -893,7 +898,7 @@ mod find_fall_throughs {
             let sub_log_1 = &sub_logs[0];
             let sub_log_2 = &sub_logs[1];
 
-            //perform cut dection on empty traces
+            //perform cut dection without empty traces
             let mut check_log = sub_log_2.clone();
             check_log.traces.retain(|trace, _| !trace.is_empty());
             check_log.normalise();
@@ -1029,9 +1034,9 @@ mod log_info {
         techniques::directly_follows_graph_abstractor::DirectlyFollowsAbstractor,
     };
     use ebi_objects::{
+        ebi_arithmetic::{Fraction, Zero},
         Activity, DirectlyFollowsGraph, FiniteStochasticLanguage, IntoRefTraceIterator,
         IntoRefTraceProbabilityIterator,
-        ebi_arithmetic::{Fraction, Zero},
     };
     use intmap::IntMap;
     use std::collections::HashSet;
@@ -1152,16 +1157,19 @@ pub fn filter_log_info(
 ) -> LogInfo {
     debug("filter log info", recursion_depth);
     let mut result = info.clone();
+    let zero = Fraction::zero();
 
     //filter start activities
     {
-        let sum: Fraction = result
+        let max = result
             .dfg
             .start_states
             .iter()
             .map(|(_, weight)| weight)
-            .sum();
-        let threshold = &parameters.noise_filtering * &sum;
+            .max()
+            .unwrap_or_else(|| &zero);
+
+        let threshold = &parameters.noise_filtering * max;
         result
             .dfg
             .start_states
@@ -1175,13 +1183,15 @@ pub fn filter_log_info(
             activity_2_threshold.insert(
                 *activity,
                 &parameters.noise_filtering
-                    * &(result.dfg.end_activity_weight(*activity)
-                        + &result
+                    * (result.dfg.end_activity_weight(*activity).max(
+                        result
                             .dfg
                             .outgoing_edges(*activity)
                             .into_iter()
                             .map(|(_, weight)| weight)
-                            .sum::<Fraction>()),
+                            .max()
+                            .unwrap_or_else(|| &zero),
+                    )),
             );
         }
 
@@ -1207,50 +1217,54 @@ pub fn filter_log_info(
 
 #[cfg(test)]
 mod tests {
-    use crate::techniques::inductive_miner::{InductiveMiner, InductiveMinerInfrequent};
+    use crate::techniques::inductive_miner::{
+        activity_concurrent,
+        cut_finding::{concurrent_cut, loop_cut, sequence_cut, xor_cut},
+        filter_log_info,
+        log_info::ComputeLogInfo,
+        InductiveMinerInfrequent, InductiveMinerParameters, SplitLog,
+    };
     use ebi_objects::{
-        ActivityKey, ActivityKeyTranslator, EventLog, FiniteLanguage, FiniteStochasticLanguage,
-        ProcessTree, activity, con,
-        ebi_arithmetic::Fraction,
-        ebi_arithmetic::f,
+        activity, con,
+        ebi_arithmetic::{f, Fraction, One},
         ebi_objects::process_tree::{Node, Operator},
-        event_log, or, seq, tau, trace, xor,
+        event_log, seq, trace, ActivityKey, ActivityKeyTranslator, EventLog, FiniteLanguage,
+        FiniteStochasticLanguage, ProcessTree,
     };
 
     #[test]
-    fn im_l67() {
+    /// The thesis is correct, but there are multiple options. Therefore, only the first decision is tested.
+    fn im_l69() {
         let log = event_log!(
-            trace!("a", "b", "c", "d", "e"),
-            trace!("a", "d", "b", "e"),
-            trace!("a", "e", "b"),
-            trace!("a", "c", "b"),
-            trace!("a", "b", "d", "e", "c")
+            trace!("b", "c", "d", "e"),
+            trace!("d", "b", "e"),
+            trace!("e", "b"),
+            trace!("c", "b"),
+            trace!("b", "d", "e", "c")
         );
+        let slang = FiniteStochasticLanguage::from(log);
+        let info = slang.compute_log_info();
 
-        let lang = FiniteLanguage::from(log);
-        let tree = lang.inductive_miner();
-
-        let should_tree = seq!(
-            activity!("a"),
-            con!(
-                activity!("b"),
-                xor!(
-                    tau!(),
-                    or!(
-                        activity!("c"),
-                        seq!(xor!(tau!(), activity!("d")), activity!("e"))
-                    )
-                )
-            )
+        let cut = concurrent_cut(&info);
+        println!("{:?}", cut);
+        assert!(
+            format!("{:?}", cut) == "Some(Concurrent([{ac0}, {ac1, ac2, ac3}]))"
+                || format!("{:?}", cut) == "Some(Concurrent([{ac0}, {ac1, ac3, ac2}]))"
+                || format!("{:?}", cut) == "Some(Concurrent([{ac0}, {ac2, ac1, ac3}]))"
+                || format!("{:?}", cut) == "Some(Concurrent([{ac0}, {ac2, ac3, ac1}]))"
+                || format!("{:?}", cut) == "Some(Concurrent([{ac0}, {ac3, ac1, ac2}]))"
+                || format!("{:?}", cut) == "Some(Concurrent([{ac0}, {ac3, ac2, ac1}]))"
+                || format!("{:?}", cut) == "Some(Concurrent([{ac1, ac2, ac3}, {ac0}]))"
+                || format!("{:?}", cut) == "Some(Concurrent([{ac1, ac3, ac2}, {ac0}]))"
+                || format!("{:?}", cut) == "Some(Concurrent([{ac2, ac1, ac3}, {ac0}]))"
+                || format!("{:?}", cut) == "Some(Concurrent([{ac2, ac3, ac1}, {ac0}]))"
+                || format!("{:?}", cut) == "Some(Concurrent([{ac3, ac1, ac2}, {ac0}]))"
+                || format!("{:?}", cut) == "Some(Concurrent([{ac3, ac2, ac1}, {ac0}]))"
         );
-
-        println!("{}", tree);
-
-        assert_eq!(tree, should_tree);
     }
 
     #[test]
-    fn im_l71() {
+    fn im_l71_fallthrough() {
         let log = event_log!(
             trace!("c", "d", "e"),
             trace!("d", "e"),
@@ -1258,22 +1272,73 @@ mod tests {
             trace!("c"),
             trace!("d", "e", "c")
         );
-
         let lang = FiniteLanguage::from(log);
-        let tree = lang.inductive_miner();
+        let slang = FiniteStochasticLanguage {
+            activity_key: lang.activity_key.clone(),
+            traces: lang
+                .traces
+                .iter()
+                .map(|trace| (trace.clone(), Fraction::one()))
+                .collect(),
+        };
+        let info = slang.compute_log_info();
+        let parameters = InductiveMinerParameters::default();
 
-        let should_tree = xor!(
-            tau!(),
-            or!(
-                activity!("c"),
-                seq!(xor!(tau!(), activity!("d")), activity!("e"))
-            )
+        activity_concurrent(&slang, &info, &parameters, 0);
+
+        println!("{}", slang.activity_key);
+    }
+
+    #[test]
+    fn im_l71_concurrent() {
+        let log = event_log!(
+            trace!("c", "e"),
+            trace!("e"),
+            trace!("e"),
+            trace!("c"),
+            trace!("e", "c")
         );
+        let lang = FiniteLanguage::from(log);
+        let slang = FiniteStochasticLanguage {
+            activity_key: lang.activity_key.clone(),
+            traces: lang
+                .traces
+                .iter()
+                .map(|trace| (trace.clone(), Fraction::one()))
+                .collect(),
+        };
+        let info = slang.compute_log_info();
 
-        println!("{}", tree.activity_key);
-        println!("result {}", tree);
+        let cut = concurrent_cut(&info);
 
-        assert_eq!(tree, should_tree);
+        assert!(cut.is_some())
+    }
+
+    #[test]
+    fn im_l71_sequence() {
+        let log = event_log!(
+            trace!("d", "e"),
+            trace!("d", "e"),
+            trace!("e"),
+            trace!(),
+            trace!("d", "e")
+        );
+        let lang = FiniteLanguage::from(log);
+        let slang = FiniteStochasticLanguage {
+            activity_key: lang.activity_key.clone(),
+            traces: lang
+                .traces
+                .iter()
+                .map(|trace| (trace.clone(), Fraction::one()))
+                .collect(),
+        };
+        let info = slang.compute_log_info();
+
+        let cut = concurrent_cut(&info);
+        assert!(cut.is_none());
+
+        let cut = sequence_cut(&info);
+        assert!(cut.is_some());
     }
 
     #[test]
@@ -1332,22 +1397,59 @@ mod tests {
             trace!("a", "b", "d", "e", "c"),
             trace!("c", "a", "b")
         );
+        let slang = FiniteStochasticLanguage::from(log);
+        let mut parameters = InductiveMinerParameters::default();
+        parameters.noise_filtering = f!(15, 100);
+        let info = slang.compute_log_info();
+
+        assert!(sequence_cut(&info).is_none());
+        assert!(concurrent_cut(&info).is_none());
+        assert!(loop_cut(&info).is_none());
+        assert!(xor_cut(&info).is_none());
+
+        let info_2 = filter_log_info(&info, &parameters, 0);
+        let cut_2 = sequence_cut(&info_2).unwrap();
+
+        let slang_3 = slang.split_log(&cut_2, 1);
+
+        assert_eq!(slang_3.len(), 2);
+    }
+
+    #[test]
+    fn parallel() {
+        let log = event_log!(
+            trace!("a", "b", "c"),
+            trace!("b", "c", "a"),
+            trace!("c", "a", "b")
+        );
 
         let slang = FiniteStochasticLanguage::from(log);
 
-        let tree = slang.inductive_miner_infrequent(&f!(15, 100));
+        let tree = slang.inductive_miner_infrequent(&f!(2, 10));
+        let should_tree = con!(activity!("a"), activity!("b"), activity!("c"));
+        assert_eq!(tree, should_tree);
 
-        let should_tree = seq!(
-            activity!("a"),
-            con!(
-                activity!("b"),
-                activity!("c"),
-                xor!(tau!(), seq!(activity!("d"), activity!("e")))
-            )
+        let tree = slang.inductive_miner_infrequent(&f!(5, 10));
+        let should_tree = con!(activity!("a"), activity!("b"), activity!("c"));
+        assert_eq!(tree, should_tree);
+    }
+
+    #[test]
+    fn parallel_2() {
+        let log = event_log!(
+            trace!("x1", "x2", "y1", "y2"),
+            trace!("y1", "y2", "x1", "x2"),
+            trace!("x1", "y1", "x2", "y2"),
+            trace!("y1", "x1", "y2", "x2")
         );
 
-        println!("{}", tree);
+        let slang = FiniteStochasticLanguage::from(log);
 
+        let tree = slang.inductive_miner_infrequent(&f!(2, 10));
+        let should_tree = con!(
+            seq!(activity!("x1"), activity!("x2")),
+            seq!(activity!("y1"), activity!("y2"))
+        );
         assert_eq!(tree, should_tree);
     }
 }
