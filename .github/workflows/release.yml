@@ -13,6 +13,7 @@ permissions:
 
 env:
   CARGO_TERM_COLOR: always
+  VERSION: 0.0.0
 
 jobs:
 
@@ -30,6 +31,7 @@ jobs:
                 VERSION=${{ github.ref_name }}
                 VERSION="${VERSION:1}"
                 cargo set-version "$VERSION"
+                echo "{VERSION}={$VERSION}" >> $GITHUB_ENV
 
             - name: Generate manual parts 
               run: |
@@ -88,7 +90,7 @@ jobs:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with: 
                 tag_name: ${{ github.ref_name }}
-                release_name: Release $VERSION
+                release_name: Release ${{ env.VERSION }}
 
             - name: Add manual to release
               uses: actions/upload-release-asset@v1
