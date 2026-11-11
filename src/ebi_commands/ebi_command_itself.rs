@@ -4,7 +4,7 @@ use crate::{ebi_framework::{
     manual::{graph, html, manual},
 }, surfaces::website::website_generation::{generate_commands, generate_file_handlers, generate_home_page}};
 #[cfg(all(feature = "javascript", feature = "test_generation"))]
-use crate::javascript::javascript_generator_rust::generate_javascript_rust;
+use crate::surfaces::javascript::javascript_generator_rust::generate_javascript_rust;
 #[cfg(feature = "java")]
 use crate::prom::prom_plugin_generator::print_java_plugins;
 use ebi_objects::{ebi_objects::scalable_vector_graphics::ToSVGMut, EbiObject, EbiObjectType};

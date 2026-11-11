@@ -1,9 +1,10 @@
 use crate::{
     ebi_framework::{
-        ebi_command::{EBI_COMMANDS, EbiCommand, search_command_in_source_files},
+        ebi_command::{search_command_in_source_files, EbiCommand, EBI_COMMANDS},
         ebi_output::EbiOutput,
     },
-    javascript::javascript_generator_html::javascript_function_name, tests::{fallible_test::is_fallible, test_input::TestInput},
+    surfaces::javascript::javascript_generator_html::javascript_function_name,
+    tests::{fallible_test::is_fallible, test_input::TestInput},
 };
 use ebi_objects::anyhow::anyhow;
 use ebi_optimisation::anyhow::Result;
@@ -13,7 +14,7 @@ pub fn generate_javascript_rust() -> Result<EbiOutput> {
         "// This file has been automatically generated. Manual changes will be overridden.
 
 use crate::{{
-    ebi_framework::ebi_command::EbiCommand, javascript::javascript_link::{{execute_javascript_command, JavascriptInput}}
+    ebi_framework::ebi_command::EbiCommand, surfaces::javascript::javascript_link::{{execute_javascript_command, JavascriptInput}}
 }};
 use wasm_bindgen::prelude::*;"
     );
@@ -29,7 +30,7 @@ use wasm_bindgen::prelude::*;"
     }
 
     Ok(EbiOutput::String(format!(
-        "{result}\n\n#[cfg(test)]\nmod tests {{\n\tuse crate::javascript::javascript_link::JavascriptInput;\n\n{tests}}}"
+        "{result}\n\n#[cfg(test)]\nmod tests {{\n\tuse crate::surfaces::javascript::javascript_link::JavascriptInput;\n\n{tests}}}"
     )))
 }
 
@@ -83,7 +84,7 @@ fn generate_javascript_rust_tests(command: &EbiCommand, path: &Vec<&EbiCommand>)
                 "\t#[test]
 \t{fallible}pub fn {function_name}_test_{input_i}() {{
         let inputs = {inputs_string};
-        crate::javascript::javascript_autogen::{function_name}(inputs, \".xes\");
+        crate::surfaces::javascript::javascript_autogen::{function_name}(inputs, \".xes\");
     }}\n\n",
                 fallible = if is_fallible(path, &inputs) {
                     "#[should_panic]\n\t"

@@ -6,7 +6,7 @@ use crate::{
         ebi_input::{self, EbiInputType},
         ebi_output::{EbiExporter, EbiOutput, EbiOutputType},
     },
-    javascript::javascript_generator_html::{
+    surfaces::javascript::javascript_generator_html::{
         javascript_function_name, javascript_html_form, javascript_html_header,
     },
     multiple_reader::MultipleReader,

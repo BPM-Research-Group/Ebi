@@ -80,15 +80,6 @@ pub mod ebi_traits {
     pub mod ebi_trait_stochastic_partially_ordered_semantics;
     pub mod ebi_trait_stochastic_semantics;
 }
-pub mod javascript {
-    #[cfg(feature = "javascript")]
-    pub mod javascript_autogen;
-    pub mod javascript_generator_html;
-    #[cfg(all(feature = "javascript", feature = "test_generation"))]
-    pub mod javascript_generator_rust;
-    #[cfg(feature = "javascript")]
-    pub mod javascript_link;
-}
 pub mod math {
     pub mod average;
     pub mod components;
@@ -183,6 +174,15 @@ pub mod stochastic_semantics {
     pub mod stochastic_semantics;
 }
 pub mod surfaces {
+    pub mod javascript {
+        #[cfg(feature = "javascript")]
+        pub mod javascript_autogen;
+        pub mod javascript_generator_html;
+        #[cfg(all(feature = "javascript", feature = "test_generation"))]
+        pub mod javascript_generator_rust;
+        #[cfg(feature = "javascript")]
+        pub mod javascript_link;
+    }
     pub mod website {
         pub mod website_generation;
     }

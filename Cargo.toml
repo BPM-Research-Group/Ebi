@@ -16,7 +16,7 @@ name = "ebi"
 crate-type = ["cdylib", "lib"]
 
 [features]
-default = [ ]
+default = [ "javascript" ]
 test_generation = ["dep:syn"]
 eexactarithmetic = []
 exactarithmetic = [
