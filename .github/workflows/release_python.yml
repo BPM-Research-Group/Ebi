@@ -134,10 +134,9 @@ jobs:
         id: version
         run: |
           cargo install cargo-edit
-          VERS=${{ github.ref_name }}
-          VERS="${VERS:1}"
-          cargo set-version "$VERS"
-          echo "version=$(echo $VERS)" >> $GITHUB_OUTPUT
+          SET VERS=${{ github.ref_name }}
+          SET VERS=%VERS:~1%
+          cargo set-version %VERS%
       - name: autogen Ebi python files
         run: cargo run --features python -- itself python -o src/python/python_module_autogen.rs
       - name: Build wheels
