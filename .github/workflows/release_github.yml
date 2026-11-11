@@ -1,4 +1,4 @@
-name: Release Binaries
+name: Release CLI, Java and manual
 
 on:
   push:
@@ -15,7 +15,6 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-
     build_release:
         runs-on: ubuntu-latest
         permissions: write-all
@@ -79,11 +78,6 @@ jobs:
                   cargo build --target x86_64-pc-windows-gnu --release --features java
                   mv target/x86_64-pc-windows-gnu/release/ebi.dll java-library-x86_64-windows_ebi.dll
 
-              - name: Test-build crates.io publishing
-                run: cargo publish --allow-dirty --dry-run
-                env:
-                  CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_TOKEN }}
-
             - name: Create CLI release
               uses: actions/create-release@v1
               id: create_release
@@ -144,7 +138,4 @@ jobs:
                 asset_name: ebi.dll
                 asset_content_type: application/vnd.microsoft.portable-executable     
 
-            - name: Publish on crates.io
-              run: cargo publish --allow-dirty
-              env:
-                CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_TOKEN }}
+            
