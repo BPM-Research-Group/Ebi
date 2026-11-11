@@ -81,7 +81,6 @@ jobs:
                   cargo build --target x86_64-pc-windows-gnu --release --features java
                   mv target/x86_64-pc-windows-gnu/release/ebi.dll java-library-x86_64-windows_ebi.dll
 
-
             - name: Create release
               uses: actions/create-release@v1
               id: create_release
@@ -140,4 +139,9 @@ jobs:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
                 asset_path: java-library-x86_64-windows_ebi.dll
                 asset_name: ebi.dll
-                asset_content_type: application/vnd.microsoft.portable-executable            
+                asset_content_type: application/vnd.microsoft.portable-executable     
+
+            - name: Publish on crates.io
+              run: cargo publish
+              env:
+                CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_TOKEN }}
