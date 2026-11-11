@@ -1,0 +1,31 @@
+name: Release Cargo
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+    release_cargo:
+        runs-on: ubuntu-latest
+        steps:
+            
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Update version number
+              id: version
+              run: |
+                cargo install cargo-edit
+                VERS=${{ github.ref_name }}
+                VERS="${VERS:1}"
+                cargo set-version "$VERS"
+                echo "version=$(echo $VERS)" >> $GITHUB_OUTPUT
+
+            - name: Publish on crates.io
+              run: cargo publish --allow-dirty
+              env:
+                CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_TOKEN }}
+
+        
