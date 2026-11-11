@@ -5,11 +5,7 @@
 #
 name: Release PyPi
 
-on:
-  push:
-    tags:
-      - 'v*'
-  workflow_dispatch:
+on: workflow_dispatch:
 
 permissions:
   contents: read
