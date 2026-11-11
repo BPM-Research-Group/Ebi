@@ -36,7 +36,7 @@ jobs:
         
       - name: Build website
         run: |
-          > src/javascript/javascript_autogen.rs
+          > src/surfaces/javascript/javascript_autogen.rs
           cargo run --features "javascript test_generation" -- itself javascript -o src/surfaces/javascript/javascript_autogen.rs
           wasm-pack build -d ./website/javascript --target web -- --features javascript
           cargo run itself website home -o website/index.html
