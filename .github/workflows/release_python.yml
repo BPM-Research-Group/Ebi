@@ -3,10 +3,13 @@
 #
 #    maturin generate-ci github
 #
-name: Publish on PyPi
+name: Release PyPi
 
 on:
-  workflow_dispatch
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -34,6 +37,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
+
+      - name: Update version number
+        id: version
+        run: |
+          cargo install cargo-edit
+          VERS=${{ github.ref_name }}
+          VERS="${VERS:1}"
+          cargo set-version "$VERS"
+          echo "version=$(echo $VERS)" >> $GITHUB_OUTPUT
+
       - name: autogen Ebi python files
         run: cargo run --features python itself python -o src/python/python_module_autogen.rs  
       - name: Build wheels
@@ -74,6 +87,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
+      - name: Update version number
+        id: version
+        run: |
+          cargo install cargo-edit
+          VERS=${{ github.ref_name }}
+          VERS="${VERS:1}"
+          cargo set-version "$VERS"
+          echo "version=$(echo $VERS)" >> $GITHUB_OUTPUT
       - name: autogen Ebi python files
         run: cargo run --features python itself python -o src/python/python_module_autogen.rs  
       - name: Build wheels
@@ -109,6 +130,14 @@ jobs:
         with:
           python-version: 3.x
           architecture: ${{ matrix.platform.target }}
+      - name: Update version number
+        id: version
+        run: |
+          cargo install cargo-edit
+          VERS=${{ github.ref_name }}
+          VERS="${VERS:1}"
+          cargo set-version "$VERS"
+          echo "version=$(echo $VERS)" >> $GITHUB_OUTPUT
       - name: autogen Ebi python files
         run: cargo run --features python -- itself python -o src/python/python_module_autogen.rs
       - name: Build wheels
@@ -147,6 +176,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: 3.x
+      - name: Update version number
+        id: version
+        run: |
+          cargo install cargo-edit
+          VERS=${{ github.ref_name }}
+          VERS="${VERS:1}"
+          cargo set-version "$VERS"
+          echo "version=$(echo $VERS)" >> $GITHUB_OUTPUT
       - name: autogen Ebi python files
         run: cargo run --features python itself python -o src/python/python_module_autogen.rs  
       - name: Build wheels
@@ -172,7 +209,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: autogen Ebi python files
-        run: cargo run --features python itself python -o src/python/python_module_autogen.rs  
+        run: cargo run --features python itself python -o src/python/python_module_autogen.rs 
+      - name: Update version number
+        id: version
+        run: |
+          cargo install cargo-edit
+          VERS=${{ github.ref_name }}
+          VERS="${VERS:1}"
+          cargo set-version "$VERS"
+          echo "version=$(echo $VERS)" >> $GITHUB_OUTPUT 
       - name: Build sdist
         uses: PyO3/maturin-action@v1
         with:
