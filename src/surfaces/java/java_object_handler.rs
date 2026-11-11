@@ -3,7 +3,7 @@ use std::{collections::HashSet, fmt::Display};
 use ebi_objects::EbiObjectType;
 
 use crate::ebi_framework::{
-    ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler, get_file_handlers},
+    ebi_file_handler::{get_file_handlers, EbiFileHandler, EBI_FILE_HANDLERS},
     ebi_input::EbiInputType,
     ebi_output::EbiOutputType,
     ebi_trait::EbiTrait,
@@ -188,7 +188,7 @@ pub const JAVA_OBJECT_HANDLERS_BOOL: &[JavaObjectHandler] = &[JavaObjectHandler 
 mod test {
     use crate::{
         ebi_framework::ebi_input::EbiInputType,
-        prom::java_object_handler::{JavaInputTypes, get_possible_inputs_with_java},
+        surfaces::java::java_object_handler::{get_possible_inputs_with_java, JavaInputTypes},
     };
     use strum::IntoEnumIterator;
 

@@ -13,11 +13,11 @@ use crate::{
         },
         validate::Validate,
     },
-    prom::java_object_handler::JavaObjectHandler,
+    surfaces::java::java_object_handler::JavaObjectHandler,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
     EbiObject, Exportable, Importable, ProcessTree,
-    anyhow::{Result, anyhow},
 };
 
 pub const EBI_PROCESS_TREE: EbiFileHandler = EbiFileHandler {

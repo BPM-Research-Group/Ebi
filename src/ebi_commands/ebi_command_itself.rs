@@ -6,7 +6,7 @@ use crate::{ebi_framework::{
 #[cfg(all(feature = "javascript", feature = "test_generation"))]
 use crate::surfaces::javascript::javascript_generator_rust::generate_javascript_rust;
 #[cfg(feature = "java")]
-use crate::prom::prom_plugin_generator::print_java_plugins;
+use crate::surfaces::java::java_module_generator_rust::generate_java_module_rust;
 use ebi_objects::{ebi_objects::scalable_vector_graphics::ToSVGMut, EbiObject, EbiObjectType};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
@@ -112,7 +112,7 @@ pub const EBI_ITSELF_LOGO: EbiCommand = EbiCommand::Command {
     explanation_long: None,
     cli_command: None,
     latex_link: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[],
     input_names: &[],
     input_helps: &[],
@@ -128,7 +128,7 @@ pub const EBI_ITSELF_MANUAL: EbiCommand = EbiCommand::Command {
     explanation_long: None,
     cli_command: None,
     latex_link: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[],
     input_names: &[],
     input_helps: &[],
@@ -143,7 +143,7 @@ pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command {
     explanation_long: None,
     cli_command: None,
     latex_link: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[],
     input_names: &[],
     input_helps: &[],
@@ -155,18 +155,29 @@ pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command {
 };
 
 #[cfg(feature = "java")]
-pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Command {
+pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Group {
     name_short: "java",
     name_long: None,
-    explanation_short: "Print the classes for Java.",
+    explanation_short: "Print files for Java.",
+    explanation_long: None,
+    children: &[ 
+        &EBI_ITSELF_JAVA_RUST
+    ],
+};
+
+#[cfg(feature = "java")]
+pub const EBI_ITSELF_JAVA_RUST: EbiCommand = EbiCommand::Command {
+    name_short: "rust",
+    name_long: None,
+    explanation_short: "Print the Rust classes for Java.",
     explanation_long: None,
     cli_command: None,
     latex_link: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[],
     input_names: &[],
     input_helps: &[],
-    execute: |_, _| Ok(print_java_plugins()?),
+    execute: |_, _| Ok(generate_java_module_rust()?),
     output_type: &EbiOutputType::String,
 };
 
@@ -178,7 +189,7 @@ pub const EBI_ITSELF_JAVASCRIPT: EbiCommand = EbiCommand::Command {
     explanation_long: None,
     cli_command: None,
     latex_link: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[],
     input_names: &[],
     input_helps: &[],
@@ -193,7 +204,7 @@ pub const EBI_ITSELF_HTML: EbiCommand = EbiCommand::Command {
     explanation_long: None,
     cli_command: None,
     latex_link: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[],
     input_names: &[],
     input_helps: &[],
@@ -209,7 +220,7 @@ pub const EBI_ITSELF_PYTHON: EbiCommand = EbiCommand::Command {
     explanation_long: None,
     cli_command: None,
     latex_link: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[],
     input_names: &[],
     input_helps: &[],
@@ -225,7 +236,7 @@ pub const EBI_ITSELF_TESTS: EbiCommand = EbiCommand::Command {
     explanation_long: None,
     cli_command: None,
     latex_link: None,
-    exact_arithmetic: false,
+    exact_arithmetic: true,
     input_types: &[],
     input_names: &[],
     input_helps: &[],

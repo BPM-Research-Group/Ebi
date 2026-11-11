@@ -14,17 +14,15 @@ use crate::{
         ebi_command_validate, ebi_command_visualise,
     },
     ebi_framework::{ebi_importer_parameters, ebi_output},
-    prom::java_object_handler::get_possible_inputs_with_java,
     text::Joiner,
 };
-use clap::{Arg, ArgAction, ArgMatches, Command, value_parser};
+use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
 use ebi_objects::{
+    anyhow::{anyhow, Context, Result},
+    ebi_arithmetic::{exact::set_exact_globally, parsing::FractionNotParsedYet, Fraction},
     EbiObjectType,
-    anyhow::{Context, Result, anyhow},
-    ebi_arithmetic::{Fraction, exact::set_exact_globally, parsing::FractionNotParsedYet},
 };
 use indicatif::{ProgressBar, ProgressStyle};
-use itertools::Itertools;
 use log::Level;
 use logging_timer::timer;
 use std::{
@@ -723,28 +721,11 @@ impl EbiCommand {
     pub fn is_in_java(&self) -> bool {
         if let EbiCommand::Command {
             cli_command,
-            output_type,
-            input_types: input_typess,
+            input_types,
             ..
         } = &self
         {
-            if cli_command.is_some() {
-                return false;
-            }
-            for exporter in output_type.get_exporters() {
-                for output_java_object_handler in exporter.get_java_object_handlers() {
-                    if let Some(_) = output_java_object_handler.translator_ebi_to_java {
-                        let input_typesss = input_typess
-                            .iter()
-                            .map(|arr| get_possible_inputs_with_java(arr))
-                            .collect::<Vec<_>>();
-                        for _ in input_typesss.iter().multi_cartesian_product() {
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
+            return cli_command.is_none() && !input_types.is_empty();
         } else {
             false
         }
@@ -918,7 +899,7 @@ pub fn get_applicable_commands(object_type: &EbiObjectType) -> BTreeSet<Vec<&'st
     result
 }
 
-#[cfg(any(feature = "python", feature = "test_generation"))]
+#[cfg(any(feature = "python", feature = "test_generation", feature = "java"))]
 pub(crate) fn search_command_in_source_files(path: &Vec<&EbiCommand>) -> Result<String> {
     //start the search from the EBI_COMMANDS const
     let mut path = path.clone();
@@ -940,7 +921,7 @@ pub(crate) fn search_command_in_source_files(path: &Vec<&EbiCommand>) -> Result<
     ))
 }
 
-#[cfg(any(feature = "python", feature = "test_generation"))]
+#[cfg(any(feature = "python", feature = "test_generation", feature = "java"))]
 fn root_command() -> Result<(PathBuf, syn::ItemConst)> {
     let file = "src/ebi_framework/ebi_command.rs";
     let contents = std::fs::read_to_string(file)?;
@@ -961,7 +942,7 @@ fn root_command() -> Result<(PathBuf, syn::ItemConst)> {
     return Err(anyhow!("source file not found"));
 }
 
-#[cfg(any(feature = "python", feature = "test_generation"))]
+#[cfg(any(feature = "python", feature = "test_generation", feature = "java"))]
 fn search_child(
     parent_declaration: &syn::ItemConst,
     child_command: &EbiCommand,
@@ -1024,7 +1005,7 @@ fn search_child(
     return Err(anyhow!("todo file not found {}", child_command));
 }
 
-#[cfg(any(feature = "python", feature = "test_generation"))]
+#[cfg(any(feature = "python", feature = "test_generation", feature = "java"))]
 fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
     if let syn::Expr::Struct(x) = &*const_item.expr {
         for field in &x.fields {
@@ -1068,7 +1049,7 @@ fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use super::{EBI_COMMANDS, EbiCommand};
+    use super::{EbiCommand, EBI_COMMANDS};
     use std::collections::HashSet;
 
     #[test]

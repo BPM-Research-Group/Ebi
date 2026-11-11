@@ -120,14 +120,6 @@ pub mod math {
     pub mod sign;
 }
 
-pub mod prom {
-    pub mod java_object_handler;
-    #[cfg(feature = "java")]
-    pub mod prom_link;
-    #[cfg(feature = "java")]
-    pub mod prom_plugin_generator;
-}
-
 pub mod python {
     pub mod python;
     #[cfg(feature = "python")]
@@ -182,6 +174,19 @@ pub mod surfaces {
         pub mod javascript_generator_rust;
         #[cfg(feature = "javascript")]
         pub mod javascript_link;
+    }
+    pub mod java {
+        #[cfg(feature = "java")]
+        pub mod java_autogen;
+        #[cfg(feature = "java")]
+        pub mod java_export;
+        #[cfg(feature = "java")]
+        pub mod java_link;
+        #[cfg(feature = "java")]
+        pub mod java_module_generator_rust;
+        pub mod java_object_handler;
+        #[cfg(feature = "java")]
+        pub mod prom_plugin_generator;
     }
     pub mod website {
         pub mod website_generation;

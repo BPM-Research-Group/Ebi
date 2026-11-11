@@ -10,7 +10,7 @@ use crate::{
         },
         validate::Validate,
     },
-    prom::java_object_handler::JavaObjectHandler,
+    surfaces::java::java_object_handler::JavaObjectHandler,
 };
 use ebi_objects::{
     EbiObject, Exportable, Importable, LabelledPetriNet,

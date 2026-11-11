@@ -1,6 +1,6 @@
 use super::{
-    ebi_command::{EBI_COMMANDS, EbiCommand},
-    ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+    ebi_command::{EbiCommand, EBI_COMMANDS},
+    ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS},
 };
 use crate::{
     ebi_file_handlers::{
@@ -27,19 +27,15 @@ use crate::{
         stochastic_process_tree::EBI_STOCHASTIC_PROCESS_TREE,
     },
     math::{log_div::LogDiv, root::ContainsRoot, root_log_div::RootLogDiv},
-    prom::java_object_handler::{
-        JAVA_OBJECT_HANDLERS_BOOL, JAVA_OBJECT_HANDLERS_CONTAINSROOT,
+    surfaces::java::java_object_handler::{
+        JavaObjectHandler, JAVA_OBJECT_HANDLERS_BOOL, JAVA_OBJECT_HANDLERS_CONTAINSROOT,
         JAVA_OBJECT_HANDLERS_FRACTION, JAVA_OBJECT_HANDLERS_LOGDIV,
         JAVA_OBJECT_HANDLERS_LOGPOLYNOMIAL, JAVA_OBJECT_HANDLERS_ROOTLOGDIV,
-        JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE, JavaObjectHandler,
+        JAVA_OBJECT_HANDLERS_STRING, JAVA_OBJECT_HANDLERS_USIZE,
     },
 };
 use ebi_objects::{
-    BusinessProcessModelAndNotation, CompressedEventLogXes, EbiObject, EbiObjectType,
-    EventLogPython, Exportable, FiniteStochasticPartiallyOrderedLanguage, PortableDocumentFormat,
-    PortableNetworkGraphics, StochasticBusinessProcessModelAndNotation,
-    StochasticNondeterministicFiniteAutomaton,
-    anyhow::{Context, Result, anyhow},
+    anyhow::{anyhow, Context, Result},
     ebi_arithmetic::{Exporter, Fraction},
     ebi_objects::{
         compressed_event_log::CompressedEventLog,
@@ -58,6 +54,10 @@ use ebi_objects::{
         stochastic_language_of_alignments::StochasticLanguageOfAlignments,
         stochastic_process_tree::StochasticProcessTree,
     },
+    BusinessProcessModelAndNotation, CompressedEventLogXes, EbiObject, EbiObjectType,
+    EventLogPython, Exportable, FiniteStochasticPartiallyOrderedLanguage, PortableDocumentFormat,
+    PortableNetworkGraphics, StochasticBusinessProcessModelAndNotation,
+    StochasticNondeterministicFiniteAutomaton,
 };
 use ebi_optimisation::ebi_arithmetic::log_polynomial::log_polynomial::LogPolynomial;
 use std::{
@@ -746,7 +746,7 @@ pub fn export_to_bytes(object: EbiOutput, exporter: &EbiExporter) -> Result<Vec<
 
 #[cfg(test)]
 mod tests {
-    use super::{EbiExporter, EbiOutputType, export_to_bytes, export_to_string};
+    use super::{export_to_bytes, export_to_string, EbiExporter, EbiOutputType};
     use crate::{
         ebi_framework::{
             ebi_command::EbiCommand, ebi_file_handler::EBI_FILE_HANDLERS, ebi_input::EbiInput,
@@ -888,60 +888,48 @@ mod tests {
     #[test]
     fn unreachable_string() {
         let mut f = vec![];
-        assert!(
-            EbiExporter::String
-                .export_from_object(EbiOutput::Usize(10), &mut f)
-                .is_err()
-        );
+        assert!(EbiExporter::String
+            .export_from_object(EbiOutput::Usize(10), &mut f)
+            .is_err());
     }
 
     #[test]
     fn unreachable_usize() {
         let mut f = vec![];
-        assert!(
-            EbiExporter::Usize
-                .export_from_object(EbiOutput::String("a".to_string()), &mut f)
-                .is_err()
-        );
+        assert!(EbiExporter::Usize
+            .export_from_object(EbiOutput::String("a".to_string()), &mut f)
+            .is_err());
     }
 
     #[test]
     fn unreachable_fraction() {
         let mut f = vec![];
-        assert!(
-            EbiExporter::Fraction
-                .export_from_object(EbiOutput::Usize(10), &mut f)
-                .is_err()
-        );
+        assert!(EbiExporter::Fraction
+            .export_from_object(EbiOutput::Usize(10), &mut f)
+            .is_err());
     }
 
     #[test]
     fn unreachable_logdiv() {
         let mut f = vec![];
-        assert!(
-            EbiExporter::LogDiv
-                .export_from_object(EbiOutput::Usize(10), &mut f)
-                .is_err()
-        );
+        assert!(EbiExporter::LogDiv
+            .export_from_object(EbiOutput::Usize(10), &mut f)
+            .is_err());
     }
 
     #[test]
     fn unreachable_containsroot() {
         let mut f = vec![];
-        assert!(
-            EbiExporter::ContainsRoot
-                .export_from_object(EbiOutput::Usize(10), &mut f)
-                .is_err()
-        );
+        assert!(EbiExporter::ContainsRoot
+            .export_from_object(EbiOutput::Usize(10), &mut f)
+            .is_err());
     }
 
     #[test]
     fn unreachable_rootlogdiv() {
         let mut f = vec![];
-        assert!(
-            EbiExporter::RootLogDiv
-                .export_from_object(EbiOutput::Usize(10), &mut f)
-                .is_err()
-        );
+        assert!(EbiExporter::RootLogDiv
+            .export_from_object(EbiOutput::Usize(10), &mut f)
+            .is_err());
     }
 }

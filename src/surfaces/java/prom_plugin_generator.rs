@@ -1,11 +1,13 @@
 use crate::{
     ebi_framework::{
-        ebi_command::{EBI_COMMANDS, EbiCommand},
+        ebi_command::{EbiCommand, EBI_COMMANDS},
         ebi_file_handler::EBI_FILE_HANDLERS,
         ebi_input::EbiInputType,
         ebi_output::EbiOutput,
     },
-    prom::java_object_handler::{JavaInputTypes, JavaObjectHandler, get_possible_inputs_with_java},
+    surfaces::java::java_object_handler::{
+        get_possible_inputs_with_java, JavaInputTypes, JavaObjectHandler,
+    },
     text::JavaEscaper,
 };
 use ebi_objects::anyhow::Result;

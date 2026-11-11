@@ -1,5 +1,5 @@
 use super::{
-    ebi_command::{EBI_COMMANDS, EbiCommand},
+    ebi_command::{EbiCommand, EBI_COMMANDS},
     ebi_input::{EbiInput, EbiObjectImporter, EbiTraitImporter},
     ebi_output::{EbiObjectExporter, EbiOutputType},
     ebi_trait::FromEbiTraitObject,
@@ -37,11 +37,11 @@ use crate::{
         ebi_command::get_applicable_commands, ebi_input::EbiObjectImporterFallible,
         ebi_trait::EbiTrait,
     },
-    prom::java_object_handler::JavaObjectHandler,
+    surfaces::java::java_object_handler::JavaObjectHandler,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Error, Result},
     EbiObjectType,
-    anyhow::{Error, Result, anyhow},
 };
 use std::{collections::BTreeSet, fmt::Display, hash::Hash, io::BufRead, str::FromStr};
 
@@ -344,11 +344,9 @@ mod tests {
         EbiFileHandler::get_producing_commands(&EBI_PROCESS_TREE);
         EbiFileHandler::get_producing_commands(&EBI_STOCHASTIC_LABELLED_PETRI_NET);
 
-        assert!(
-            EBI_PROCESS_TREE
-                .cmp(&EBI_STOCHASTIC_LABELLED_PETRI_NET)
-                .is_lt()
-        );
+        assert!(EBI_PROCESS_TREE
+            .cmp(&EBI_STOCHASTIC_LABELLED_PETRI_NET)
+            .is_lt());
 
         EbiFileHandler::from_trait_object(EbiInput::FileHandler(EBI_EXECUTIONS)).unwrap();
     }

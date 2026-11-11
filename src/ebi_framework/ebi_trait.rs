@@ -1,6 +1,6 @@
 use super::{
-    ebi_command::{EBI_COMMANDS, EbiCommand},
-    ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+    ebi_command::{EbiCommand, EBI_COMMANDS},
+    ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS},
     ebi_input::{EbiInput, EbiInputType},
 };
 use crate::ebi_traits::{
@@ -10,7 +10,7 @@ use crate::ebi_traits::{
     ebi_trait_stochastic_semantics,
 };
 use ebi_objects::{
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::Fraction,
 };
 use std::{
@@ -214,7 +214,7 @@ mod tests {
 
     use crate::{
         ebi_framework::ebi_input::{EbiInput, TEST_INPUT_TYPE_STRING, TEST_INPUT_TYPE_USIZE},
-        prom::java_object_handler::JavaObjectHandlerQueryImport,
+        surfaces::java::java_object_handler::JavaObjectHandlerQueryImport,
     };
 
     use super::{EbiTrait, FromEbiTraitObject};
