@@ -771,7 +771,7 @@ pub fn visualise_text(javascript_inputs: Vec<JavascriptInput>, exporter_file_ext
     let command: &&EbiCommand = 
         &&crate::ebi_commands::ebi_command_visualise::EBI_VISUALISE_TEXT;
     execute_javascript_command(command, javascript_inputs, "visualise_text", exporter_file_extension);
-}
+} 
 
 #[cfg(test)]
 mod tests {

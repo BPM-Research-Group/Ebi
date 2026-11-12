@@ -3,10 +3,10 @@ use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
     semantics::semantics::Semantics,
 };
-use ebi_objects::anyhow::{Context, Result, anyhow, ensure};
+use ebi_objects::anyhow::{anyhow, ensure, Context, Result};
 use ebi_objects::{
-    Activity, LabelledPetriNet, StochasticLabelledPetriNet, TranslateActivityKey,
     ebi_arithmetic::{ConstFraction, Fraction, One, OneMinus, Round, Signed, Zero},
+    Activity, LabelledPetriNet, StochasticLabelledPetriNet, TranslateActivityKey,
 };
 use rayon::iter::ParallelIterator;
 use std::{
@@ -1692,7 +1692,11 @@ fn quantize_weight(value: Fraction) -> Fraction {
 }
 
 fn max_fraction(left: Fraction, right: Fraction) -> Fraction {
-    if left >= right { left } else { right }
+    if left >= right {
+        left
+    } else {
+        right
+    }
 }
 
 fn distinct_population_indices(
@@ -1752,6 +1756,11 @@ impl CIBDOStochasticMinerLPN for LabelledPetriNet {
         mut self,
         log: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<StochasticLabelledPetriNet> {
+        //if there is no initial marking, then the language is empty and we can return an SLPN with the empty language.
+        if self.initial_marking.is_none() {
+            return Ok(StochasticLabelledPetriNet::new_empty_language());
+        }
+
         // Step 1: translate the LPN once, before entering the parallel trace loop.
         let mut activity_key = log.activity_key().clone();
         self.translate_using_activity_key(&mut activity_key);
