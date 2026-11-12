@@ -40,7 +40,7 @@ pub fn import_or_load<'caller>(
 // cargo build --release ; cp target/release/libebi.so ~/eclipse-workspace/Ebi/ ; cargo run itself java -o ~/eclipse-workspace/Ebi/src/org/processmining/ebi/plugins/EbiPlugins.java
 
 // This keeps Rust from "mangling" the name and making it unique for this crate.
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn call_ebi<'caller>(
     mut unowned_env: EnvUnowned<'caller>,
     _class: JClass<'caller>,

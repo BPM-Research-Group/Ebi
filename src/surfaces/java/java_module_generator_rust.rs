@@ -8,14 +8,11 @@ use crate::{
 use ebi_objects::anyhow::Result;
 use itertools::Itertools;
 
-pub const JAVA_PATH: &str = "Ebi";
+pub const JAVA_PATH: &str = "ebi";
 
 pub fn generate_java_module_rust() -> Result<EbiOutput> {
     let imports = format!(
-        "#![allow(unsafe_op_in_unsafe_fn)]
-#![allow(unused_variables)]
-
-// This file has been automatically generated. Manual changes will be overridden.
+        "// This file has been automatically generated. Manual changes will be overridden.
 
 use crate::{{ebi_framework::ebi_command::EbiCommand, surfaces::java::{{java_export::ExportableToJava, java_link::import_or_load}}}};
 use ebi_objects::anyhow::{{anyhow, Context}};
@@ -37,9 +34,6 @@ use jni::{{
     Ok(EbiOutput::String(result))
 }
 
-/// return the tupe (string1, string2) where
-/// string1 - function name
-/// string2 - function body
 fn ebi_command_to_java_function(path: &Vec<&EbiCommand>) -> Result<String> {
     // Derive raw name and fn name
     let fn_name = java_function_name(path);

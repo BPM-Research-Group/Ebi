@@ -183,6 +183,8 @@ pub mod surfaces {
         #[cfg(feature = "java")]
         pub mod java_link;
         #[cfg(feature = "java")]
+        pub mod java_module_generator_java;
+        #[cfg(feature = "java")]
         pub mod java_module_generator_rust;
         pub mod java_object_handler;
         #[cfg(feature = "java")]

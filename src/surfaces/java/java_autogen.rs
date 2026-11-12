@@ -1,6 +1,3 @@
-#![allow(unsafe_op_in_unsafe_fn)]
-#![allow(unused_variables)]
-
 // This file has been automatically generated. Manual changes will be overridden.
 
 use crate::{ebi_framework::ebi_command::EbiCommand, surfaces::java::{java_export::ExportableToJava, java_link::import_or_load}};
@@ -9,7 +6,7 @@ use jni::{
     EnvUnowned, jni_mangle, objects::{JClass, JString},
 };
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_all_traces<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -46,7 +43,7 @@ pub fn analyse_all_traces<'caller>(mut unowned_env: EnvUnowned<'caller>, _class:
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_cohort_analysis<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -99,7 +96,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_completeness<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -136,7 +133,7 @@ pub fn analyse_completeness<'caller>(mut unowned_env: EnvUnowned<'caller>, _clas
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_coverage<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -181,7 +178,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_directly_follows_edge_difference<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -226,7 +223,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_directly_follows_edge_difference_no_frequencies<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -271,7 +268,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_entropy<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -308,7 +305,7 @@ pub fn analyse_entropy<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JC
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_medoid<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -353,7 +350,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_minimum_probability_traces<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -398,7 +395,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_mode<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -435,7 +432,7 @@ pub fn analyse_mode<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClas
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_most_likely_traces<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -480,7 +477,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_variety<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -517,7 +514,7 @@ pub fn analyse_variety<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JC
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_non_stochastic_activities<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -554,7 +551,7 @@ pub fn analyse_non_stochastic_activities<'caller>(mut unowned_env: EnvUnowned<'c
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_non_stochastic_any_traces<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -591,7 +588,7 @@ pub fn analyse_non_stochastic_any_traces<'caller>(mut unowned_env: EnvUnowned<'c
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_non_stochastic_bounded<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -628,7 +625,7 @@ pub fn analyse_non_stochastic_bounded<'caller>(mut unowned_env: EnvUnowned<'call
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_non_stochastic_cluster<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -673,7 +670,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_non_stochastic_empty_traces<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -710,7 +707,7 @@ pub fn analyse_non_stochastic_empty_traces<'caller>(mut unowned_env: EnvUnowned<
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_non_stochastic_executions<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -755,7 +752,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_non_stochastic_infinitely_many_traces<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -792,7 +789,7 @@ pub fn analyse_non_stochastic_infinitely_many_traces<'caller>(mut unowned_env: E
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_non_stochastic_medoid<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -837,7 +834,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn analyse_non_stochastic_timestamps_ordered<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -874,7 +871,7 @@ pub fn analyse_non_stochastic_timestamps_ordered<'caller>(mut unowned_env: EnvUn
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn association_all_trace_attributes<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -919,7 +916,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn association_trace_attribute<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -972,7 +969,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_chi_squared<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1017,7 +1014,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_chi_squared_sample<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1070,7 +1067,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_earth_movers<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1115,7 +1112,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_earth_movers_sample<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1168,7 +1165,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_entropic_relevance<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1213,7 +1210,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_gain_precision<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
@@ -1266,7 +1263,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_gain_recall<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
@@ -1319,7 +1316,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_hellinger<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1364,7 +1361,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_hellinger_sample<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1417,7 +1414,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_jensen_shannon<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
@@ -1462,7 +1459,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_jensen_shannon_sample<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);
@@ -1515,7 +1512,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_markovian<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>, arg3: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1576,7 +1573,7 @@ let input3 = match import_or_load(arg3, input_types[3], 3).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_unit_earth_movers<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1621,7 +1618,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_unit_earth_movers_sample<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1674,7 +1671,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_non_stochastic_alignments<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1719,7 +1716,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_non_stochastic_escaping_edges_precision<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1764,7 +1761,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_non_stochastic_fitting_traces<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1801,7 +1798,7 @@ pub fn conformance_non_stochastic_fitting_traces<'caller>(mut unowned_env: EnvUn
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_non_stochastic_set_alignments<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1846,7 +1843,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn conformance_non_stochastic_trace_fitness<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1883,7 +1880,7 @@ pub fn conformance_non_stochastic_trace_fitness<'caller>(mut unowned_env: EnvUno
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn convert_business_process_model_and_notation<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1920,7 +1917,7 @@ pub fn convert_business_process_model_and_notation<'caller>(mut unowned_env: Env
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn convert_finite_language<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1957,7 +1954,7 @@ pub fn convert_finite_language<'caller>(mut unowned_env: EnvUnowned<'caller>, _c
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn convert_finite_stochastic_language<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -1994,7 +1991,7 @@ pub fn convert_finite_stochastic_language<'caller>(mut unowned_env: EnvUnowned<'
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn convert_labelled_petri_net<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2031,7 +2028,7 @@ pub fn convert_labelled_petri_net<'caller>(mut unowned_env: EnvUnowned<'caller>,
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn convert_log<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2068,7 +2065,7 @@ pub fn convert_log<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn convert_stochastic_deterministic_finite_automaton<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2105,7 +2102,7 @@ pub fn convert_stochastic_deterministic_finite_automaton<'caller>(mut unowned_en
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn convert_stochastic_directly_follows_model<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2142,7 +2139,7 @@ pub fn convert_stochastic_directly_follows_model<'caller>(mut unowned_env: EnvUn
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn convert_stochastic_labelled_petri_net<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2179,7 +2176,7 @@ pub fn convert_stochastic_labelled_petri_net<'caller>(mut unowned_env: EnvUnowne
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn convert_stochastic_nondeterministic_finite_automaton<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2216,7 +2213,7 @@ pub fn convert_stochastic_nondeterministic_finite_automaton<'caller>(mut unowned
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_alergia<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2261,7 +2258,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_alignments_stochastic_business_process_model_and_notation<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2306,7 +2303,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_alignments_stochastic_labelled_petri_nets<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2351,7 +2348,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_can_it_be_done_optimally<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2396,7 +2393,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_directly_follows_graph<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2441,7 +2438,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_occurrence_stochastic_business_process_model_and_notation<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2486,7 +2483,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_occurrence_stochastic_labelled_petri_net<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2531,7 +2528,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_occurrence_stochastic_process_tree<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2576,7 +2573,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_random_stochastic_business_process_model_and_notation<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2613,7 +2610,7 @@ pub fn discover_random_stochastic_business_process_model_and_notation<'caller>(m
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_random_stochastic_labelled_petri_net<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2650,7 +2647,7 @@ pub fn discover_random_stochastic_labelled_petri_net<'caller>(mut unowned_env: E
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_random_stochastic_process_tree<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2687,7 +2684,7 @@ pub fn discover_random_stochastic_process_tree<'caller>(mut unowned_env: EnvUnow
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_uniform_stochastic_business_process_model_and_notation<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2724,7 +2721,7 @@ pub fn discover_uniform_stochastic_business_process_model_and_notation<'caller>(
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_uniform_stochastic_labelled_petri_net<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2761,7 +2758,7 @@ pub fn discover_uniform_stochastic_labelled_petri_net<'caller>(mut unowned_env: 
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_uniform_stochastic_process_tree<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2798,7 +2795,7 @@ pub fn discover_uniform_stochastic_process_tree<'caller>(mut unowned_env: EnvUno
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_non_stochastic_flower_deterministic_finite_automaton<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2835,7 +2832,7 @@ pub fn discover_non_stochastic_flower_deterministic_finite_automaton<'caller>(mu
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_non_stochastic_flower_process_tree<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2872,7 +2869,7 @@ pub fn discover_non_stochastic_flower_process_tree<'caller>(mut unowned_env: Env
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_non_stochastic_inductive_miner<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2909,7 +2906,7 @@ pub fn discover_non_stochastic_inductive_miner<'caller>(mut unowned_env: EnvUnow
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_non_stochastic_inductive_miner_infrequent<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2954,7 +2951,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -2991,7 +2988,7 @@ pub fn discover_non_stochastic_prefix_tree_deterministic_finite_automaton<'calle
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_non_stochastic_prefix_tree_process_tree<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3028,7 +3025,7 @@ pub fn discover_non_stochastic_prefix_tree_process_tree<'caller>(mut unowned_env
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_non_stochastic_split_miner<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3081,7 +3078,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn discover_non_stochastic_trace_model<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3118,7 +3115,7 @@ pub fn discover_non_stochastic_trace_model<'caller>(mut unowned_env: EnvUnowned<
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn filter_language_traces_empty<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3155,7 +3152,7 @@ pub fn filter_language_traces_empty<'caller>(mut unowned_env: EnvUnowned<'caller
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn filter_language_traces_event_activity<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3208,7 +3205,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn filter_language_traces_length<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3261,7 +3258,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn filter_log_traces_empty<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3298,7 +3295,7 @@ pub fn filter_log_traces_empty<'caller>(mut unowned_env: EnvUnowned<'caller>, _c
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn filter_log_traces_event_activity<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3351,7 +3348,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn filter_log_traces_length<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3404,7 +3401,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn filter_stochastic_language_traces_empty<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3441,7 +3438,7 @@ pub fn filter_stochastic_language_traces_empty<'caller>(mut unowned_env: EnvUnow
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn filter_stochastic_language_traces_event_activity<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3494,7 +3491,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn filter_stochastic_language_traces_least_likely<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3539,7 +3536,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn filter_stochastic_language_traces_length<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3592,7 +3589,7 @@ let input2 = match import_or_load(arg2, input_types[2], 2).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn filter_stochastic_language_traces_most_likely<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3637,7 +3634,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn information<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3674,7 +3671,7 @@ pub fn information<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn probability_log<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3719,7 +3716,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn reduce_labelled_petri_net<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3756,7 +3753,7 @@ pub fn reduce_labelled_petri_net<'caller>(mut unowned_env: EnvUnowned<'caller>, 
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn reduce_process_tree<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3793,7 +3790,7 @@ pub fn reduce_process_tree<'caller>(mut unowned_env: EnvUnowned<'caller>, _class
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn sample_folds<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>, arg3: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3854,7 +3851,7 @@ let input3 = match import_or_load(arg3, input_types[3], 3).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn sample_partially_ordered_traces<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3899,7 +3896,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn sample_traces<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -3944,7 +3941,7 @@ let input1 = match import_or_load(arg1, input_types[1], 1).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn test_bootstrap_test<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>, arg3: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -4005,7 +4002,7 @@ let input3 = match import_or_load(arg3, input_types[3], 3).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn test_log_categorical_attribute<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>, arg3: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -4066,7 +4063,7 @@ let input3 = match import_or_load(arg3, input_types[3], 3).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn test_permutation_test_log_model<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>, arg1: JString<'caller>, arg2: JString<'caller>, arg3: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -4127,7 +4124,7 @@ let input3 = match import_or_load(arg3, input_types[3], 3).with_context(|| anyho
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn visualise_graph<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(true);
@@ -4164,7 +4161,7 @@ pub fn visualise_graph<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JC
     }).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-#[jni_mangle("Ebi")]
+#[jni_mangle("ebi")]
 pub fn visualise_text<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, arg0: JString<'caller>) -> JString<'caller> {
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {
         ebi_objects::ebi_arithmetic::exact::set_exact_globally(false);

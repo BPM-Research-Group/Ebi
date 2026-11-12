@@ -29,16 +29,16 @@ jobs:
                 cargo set-version "$VERS"
                 echo "version=$(echo $VERS)" >> $GITHUB_OUTPUT
 
-            - name: Generate manual parts 
-              run: |
-                cargo run itself manual -o manual/functions.tex
-                cargo run itself graph -o manual/graph.pdf
-
             - name: setup build environment
               run: |
                 rustup target add x86_64-unknown-linux-gnu
                 sudo apt-get install mingw-w64
                 rustup target add x86_64-pc-windows-gnu
+
+            - name: Generate parts for manual 
+              run: |
+                cargo run itself manual -o manual/functions.tex
+                cargo run itself graph -o manual/graph.pdf
 
             - name: Build manual
               uses: xu-cheng/texlive-action@v3
@@ -63,17 +63,17 @@ jobs:
                   cargo build --release --target x86_64-pc-windows-gnu
                   mv target/x86_64-pc-windows-gnu/release/ebi.exe Ebi-x86_64-windows.exe
 
-            - parallel:
+            - name: Build Java library for Linux
+              run: |
+                cargo run itself java rust -o src/surfaces/java/java_autogen.rs
+                cargo run itself java java -o src/surfaces/java/ebi.java
+                cargo build --target x86_64-unknown-linux-gnu --release --features java
+                mv target/x86_64-unknown-linux-gnu/release/ebi java-library-x86_64-linux_libebi.so
 
-              - name: Build Java library for Linux
-                run: |
-                  cargo build --target x86_64-unknown-linux-gnu --release --features java
-                  mv target/x86_64-unknown-linux-gnu/release/ebi java-library-x86_64-linux_libebi.so
-
-              - name: Build Java for Windows
-                run: |
-                  cargo build --target x86_64-pc-windows-gnu --release --features java
-                  mv target/x86_64-pc-windows-gnu/release/ebi.dll java-library-x86_64-windows_ebi.dll
+            - name: Build Java for Windows
+              run: |
+                cargo build --target x86_64-pc-windows-gnu --release --features java
+                mv target/x86_64-pc-windows-gnu/release/ebi.dll java-library-x86_64-windows_ebi.dll
 
             - name: Create CLI release
               uses: actions/create-release@v1
@@ -114,6 +114,16 @@ jobs:
                 asset_path: Ebi-x86_64-windows.exe
                 asset_name: Ebi-x86_64-windows.exe
                 asset_content_type: application/vnd.microsoft.portable-executable
+
+            - name: Add Ebi-Java to release
+              uses: actions/upload-release-asset@v1
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                upload_url: ${{ steps.create_release.outputs.upload_url }}
+                asset_path: src/surfaces/java/ebi.java
+                asset_name: ebi.java
+                asset_content_type: text/x-c++
 
             - name: Add Java-Linux to release
               uses: actions/upload-release-asset@v1

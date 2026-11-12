@@ -1,12 +1,17 @@
-use crate::{ebi_framework::{
-    ebi_command::EbiCommand,
-    ebi_output::{EbiOutput, EbiOutputType},
-    manual::{graph, html, manual},
-}, surfaces::website::website_generation::{generate_commands, generate_file_handlers, generate_home_page}};
+#[cfg(feature = "java")]
+use crate::surfaces::java::{java_module_generator_java::generate_java_module_java, java_module_generator_rust::generate_java_module_rust};
 #[cfg(all(feature = "javascript", feature = "test_generation"))]
 use crate::surfaces::javascript::javascript_generator_rust::generate_javascript_rust;
-#[cfg(feature = "java")]
-use crate::surfaces::java::java_module_generator_rust::generate_java_module_rust;
+use crate::{
+    ebi_framework::{
+        ebi_command::EbiCommand,
+        ebi_output::{EbiOutput, EbiOutputType},
+        manual::{graph, html, manual},
+    },
+    surfaces::website::website_generation::{
+        generate_commands, generate_file_handlers, generate_home_page,
+    },
+};
 use ebi_objects::{ebi_objects::scalable_vector_graphics::ToSVGMut, EbiObject, EbiObjectType};
 
 pub const LOGO: &str = r"□ □ □ □ □ □ □ □ □ □ □ □ □ □ □
@@ -160,9 +165,23 @@ pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Group {
     name_long: None,
     explanation_short: "Print files for Java.",
     explanation_long: None,
-    children: &[ 
-        &EBI_ITSELF_JAVA_RUST
-    ],
+    children: &[&EBI_ITSELF_JAVA_JAVA, &EBI_ITSELF_JAVA_RUST],
+};
+
+#[cfg(feature = "java")]
+pub const EBI_ITSELF_JAVA_JAVA: EbiCommand = EbiCommand::Command {
+    name_short: "java",
+    name_long: None,
+    explanation_short: "Print the Java classes for Java.",
+    explanation_long: None,
+    cli_command: None,
+    latex_link: None,
+    exact_arithmetic: true,
+    input_types: &[],
+    input_names: &[],
+    input_helps: &[],
+    execute: |_, _| Ok(generate_java_module_java()?),
+    output_type: &EbiOutputType::String,
 };
 
 #[cfg(feature = "java")]
