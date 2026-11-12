@@ -3,7 +3,7 @@ set -e
 set -x
 # generate test code
 cargo run --features test_generation itself tests -o src/tests/tests_autogen.rs
-cargo run --features "javascript test_generation" -- itself javascript -o src/javascript/javascript_autogen.rs
+cargo run --features "javascript test_generation" -- itself javascript -o src/surfaces/javascript/javascript_autogen.rs
 # perform compile checks
 cargo build --features exactarithmetic,approximatearithmetic
 cargo build --features exactarithmetic

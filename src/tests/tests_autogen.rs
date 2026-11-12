@@ -19,7 +19,7 @@ mod tests{
 
 	// ==== command all ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47,7 +47,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -75,7 +75,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -103,7 +103,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -131,7 +131,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -159,7 +159,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -187,7 +187,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -215,7 +215,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -243,7 +243,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -271,7 +271,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -299,7 +299,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -327,7 +327,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -355,7 +355,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -383,7 +383,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -411,7 +411,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -439,7 +439,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -467,7 +467,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -495,7 +495,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -523,7 +523,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -551,7 +551,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -579,7 +579,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -607,7 +607,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -635,7 +635,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -663,7 +663,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -691,7 +691,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_all_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -722,7 +722,7 @@ mod tests{
 
 	// ==== command ca ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_ca_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -731,7 +731,7 @@ mod tests{
 			&[
 				"trait event log with trace attributes#./testfiles/a-b-double.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -740,7 +740,7 @@ mod tests{
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with trace attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input2 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COHORT_ANALYSIS {
@@ -754,7 +754,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_ca_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -763,7 +763,7 @@ mod tests{
 			&[
 				"trait event log with trace attributes#./testfiles/a-b.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -772,7 +772,7 @@ mod tests{
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with trace attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input2 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COHORT_ANALYSIS {
@@ -786,7 +786,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_ca_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -795,7 +795,7 @@ mod tests{
 			&[
 				"trait event log with trace attributes#./testfiles/a-b.xes.gz",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -804,7 +804,7 @@ mod tests{
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with trace attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input2 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COHORT_ANALYSIS {
@@ -818,7 +818,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_ca_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -827,7 +827,7 @@ mod tests{
 			&[
 				"trait event log with trace attributes#./testfiles/alergia.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -836,7 +836,7 @@ mod tests{
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with trace attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input2 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COHORT_ANALYSIS {
@@ -850,7 +850,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_ca_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -859,7 +859,7 @@ mod tests{
 			&[
 				"trait event log with trace attributes#./testfiles/cohort_test.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -868,7 +868,7 @@ mod tests{
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with trace attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input2 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COHORT_ANALYSIS {
@@ -882,7 +882,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_ca_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -891,7 +891,7 @@ mod tests{
 			&[
 				"trait event log with trace attributes#./testfiles/empty.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -900,7 +900,7 @@ mod tests{
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with trace attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input2 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COHORT_ANALYSIS {
@@ -914,7 +914,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_ca_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -923,7 +923,7 @@ mod tests{
 			&[
 				"trait event log with trace attributes#./testfiles/fig_a.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -932,7 +932,7 @@ mod tests{
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with trace attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input2 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COHORT_ANALYSIS {
@@ -946,7 +946,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_ca_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -955,7 +955,7 @@ mod tests{
 			&[
 				"trait event log with trace attributes#./testfiles/oc-log.ocel",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -964,7 +964,7 @@ mod tests{
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with trace attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input2 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COHORT_ANALYSIS {
@@ -978,7 +978,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_ca_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -987,7 +987,7 @@ mod tests{
 			&[
 				"trait event log with trace attributes#./testfiles/simple_log_markovian_abstraction.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -996,7 +996,7 @@ mod tests{
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with trace attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input2 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COHORT_ANALYSIS {
@@ -1010,7 +1010,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_ca_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1019,7 +1019,7 @@ mod tests{
 			&[
 				"trait event log with trace attributes#./testfiles/svn60.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -1028,7 +1028,7 @@ mod tests{
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log with trace attributes".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input2 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_analyse::EBI_ANALYSE_COHORT_ANALYSIS {
@@ -1045,7 +1045,7 @@ mod tests{
 
 	// ==== command comp ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_comp_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1073,7 +1073,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_comp_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1101,7 +1101,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_comp_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1129,7 +1129,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_comp_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1157,7 +1157,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_comp_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1185,7 +1185,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_comp_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1213,7 +1213,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_comp_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1241,7 +1241,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_comp_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1269,7 +1269,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_comp_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1297,7 +1297,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_comp_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1325,7 +1325,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_comp_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1353,7 +1353,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_comp_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1384,7 +1384,7 @@ mod tests{
 
 	// ==== command cov ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1414,7 +1414,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1444,7 +1444,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1474,7 +1474,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1504,7 +1504,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1534,7 +1534,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1564,7 +1564,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1594,7 +1594,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1624,7 +1624,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1654,7 +1654,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1684,7 +1684,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1714,7 +1714,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1744,7 +1744,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1774,7 +1774,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1804,7 +1804,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1834,7 +1834,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1864,7 +1864,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1894,7 +1894,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1924,7 +1924,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1954,7 +1954,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -1984,7 +1984,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2014,7 +2014,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2044,7 +2044,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2074,7 +2074,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2104,7 +2104,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_cov_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2137,7 +2137,7 @@ mod tests{
 
 	// ==== command dfgedi ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_dfgedi_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2169,7 +2169,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_dfgedi_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2201,7 +2201,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_dfgedi_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2233,7 +2233,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_dfgedi_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2268,7 +2268,7 @@ mod tests{
 
 	// ==== command dfgedi-nf ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_dfgedi_nf_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2300,7 +2300,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_dfgedi_nf_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2332,7 +2332,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_dfgedi_nf_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2364,7 +2364,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_dfgedi_nf_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2399,7 +2399,7 @@ mod tests{
 
 	// ==== command en ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2427,7 +2427,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2455,7 +2455,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2483,7 +2483,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2511,7 +2511,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2539,7 +2539,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2567,7 +2567,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2595,7 +2595,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2623,7 +2623,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2651,7 +2651,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2679,7 +2679,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2707,7 +2707,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2735,7 +2735,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2763,7 +2763,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2791,7 +2791,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2819,7 +2819,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2847,7 +2847,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2875,7 +2875,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2903,7 +2903,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2931,7 +2931,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2959,7 +2959,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -2987,7 +2987,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3015,7 +3015,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3043,7 +3043,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3071,7 +3071,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_en_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3102,7 +3102,7 @@ mod tests{
 
 	// ==== command med ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3132,7 +3132,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3162,7 +3162,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3192,7 +3192,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3222,7 +3222,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3252,7 +3252,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3282,7 +3282,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3312,7 +3312,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3342,7 +3342,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3372,7 +3372,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3402,7 +3402,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3432,7 +3432,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3462,7 +3462,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3492,7 +3492,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3522,7 +3522,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3552,7 +3552,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3582,7 +3582,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3612,7 +3612,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3642,7 +3642,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_18() {
 		// this test has been indicated as to be expected to fail
 		
@@ -3657,7 +3657,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_19() {
 		// this test has been indicated as to be expected to fail
 		
@@ -3672,7 +3672,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3702,7 +3702,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3732,7 +3732,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3762,7 +3762,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3792,7 +3792,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_med_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3825,7 +3825,7 @@ mod tests{
 
 	// ==== command minprob ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3855,7 +3855,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3885,7 +3885,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3915,7 +3915,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3945,7 +3945,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -3975,7 +3975,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4005,7 +4005,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4035,7 +4035,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4065,7 +4065,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_8() {
 		// this test has been indicated as to be expected to fail
 		
@@ -4080,7 +4080,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4110,7 +4110,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_10() {
 		// this test has been indicated as to be expected to fail
 		
@@ -4125,7 +4125,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4155,7 +4155,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4185,7 +4185,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4215,7 +4215,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4245,7 +4245,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4275,7 +4275,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4305,7 +4305,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4335,7 +4335,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4365,7 +4365,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4395,7 +4395,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4425,7 +4425,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4455,7 +4455,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_22() {
 		// this test has been indicated as to be expected to fail
 		
@@ -4470,7 +4470,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4500,7 +4500,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_minprob_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4533,7 +4533,7 @@ mod tests{
 
 	// ==== command mode ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4561,7 +4561,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4589,7 +4589,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4617,7 +4617,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4645,7 +4645,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4673,7 +4673,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4701,7 +4701,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4729,7 +4729,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4757,7 +4757,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4785,7 +4785,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4813,7 +4813,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4841,7 +4841,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4869,7 +4869,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4897,7 +4897,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4925,7 +4925,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4953,7 +4953,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -4981,7 +4981,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5009,7 +5009,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5037,7 +5037,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5065,7 +5065,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5093,7 +5093,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5121,7 +5121,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5149,7 +5149,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5177,7 +5177,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5205,7 +5205,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mode_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5236,7 +5236,7 @@ mod tests{
 
 	// ==== command mostlikely ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5266,7 +5266,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5296,7 +5296,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5326,7 +5326,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5356,7 +5356,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5386,7 +5386,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5416,7 +5416,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5446,7 +5446,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5476,7 +5476,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5506,7 +5506,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5536,7 +5536,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5566,7 +5566,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5596,7 +5596,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5626,7 +5626,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5656,7 +5656,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5686,7 +5686,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5716,7 +5716,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5746,7 +5746,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5776,7 +5776,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5806,7 +5806,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5836,7 +5836,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5866,7 +5866,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5896,7 +5896,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5926,7 +5926,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5956,7 +5956,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_mostlikely_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -5989,7 +5989,7 @@ mod tests{
 
 	// ==== command var ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6017,7 +6017,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6045,7 +6045,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6073,7 +6073,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6101,7 +6101,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6129,7 +6129,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6157,7 +6157,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6185,7 +6185,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6213,7 +6213,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6241,7 +6241,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6269,7 +6269,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6297,7 +6297,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6325,7 +6325,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6353,7 +6353,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6381,7 +6381,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6409,7 +6409,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6437,7 +6437,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6465,7 +6465,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6493,7 +6493,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6521,7 +6521,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6549,7 +6549,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6577,7 +6577,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6605,7 +6605,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6633,7 +6633,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6661,7 +6661,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_ana_var_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6695,7 +6695,7 @@ mod tests{
 
 	// ==== command act ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6723,7 +6723,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6751,7 +6751,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6779,7 +6779,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6807,7 +6807,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6835,7 +6835,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6863,7 +6863,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6891,7 +6891,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6919,7 +6919,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6947,7 +6947,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -6975,7 +6975,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7003,7 +7003,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7031,7 +7031,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7059,7 +7059,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7087,7 +7087,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7115,7 +7115,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7143,7 +7143,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7171,7 +7171,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7199,7 +7199,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7227,7 +7227,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7255,7 +7255,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7283,7 +7283,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7311,7 +7311,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7339,7 +7339,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7367,7 +7367,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_act_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7398,7 +7398,7 @@ mod tests{
 
 	// ==== command at ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7426,7 +7426,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7454,7 +7454,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7482,7 +7482,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7510,7 +7510,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7538,7 +7538,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7566,7 +7566,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7594,7 +7594,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7622,7 +7622,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7650,7 +7650,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7678,7 +7678,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7706,7 +7706,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7734,7 +7734,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7762,7 +7762,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7790,7 +7790,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7818,7 +7818,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7846,7 +7846,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7874,7 +7874,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7902,7 +7902,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7930,7 +7930,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7958,7 +7958,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -7986,7 +7986,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8014,7 +8014,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8042,7 +8042,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8070,7 +8070,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_at_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8101,7 +8101,7 @@ mod tests{
 
 	// ==== command bnd ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8129,7 +8129,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8157,7 +8157,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8185,7 +8185,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8213,7 +8213,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8241,7 +8241,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8269,7 +8269,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8297,7 +8297,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8325,7 +8325,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8353,7 +8353,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8381,7 +8381,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8409,7 +8409,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8437,7 +8437,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8465,7 +8465,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8493,7 +8493,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8521,7 +8521,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8549,7 +8549,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8577,7 +8577,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8605,7 +8605,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8633,7 +8633,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8661,7 +8661,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8689,7 +8689,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8717,7 +8717,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8745,7 +8745,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8773,7 +8773,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_bnd_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8804,7 +8804,7 @@ mod tests{
 
 	// ==== command clus ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8834,7 +8834,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8864,7 +8864,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8894,7 +8894,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8924,7 +8924,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8954,7 +8954,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -8984,7 +8984,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9014,7 +9014,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9044,7 +9044,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9074,7 +9074,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9104,7 +9104,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9134,7 +9134,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9164,7 +9164,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9194,7 +9194,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9224,7 +9224,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9254,7 +9254,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9284,7 +9284,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9314,7 +9314,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9344,7 +9344,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9374,7 +9374,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9404,7 +9404,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9434,7 +9434,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9464,7 +9464,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_22() {
 		// this test has been indicated as to be expected to fail
 		
@@ -9479,7 +9479,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_23() {
 		// this test has been indicated as to be expected to fail
 		
@@ -9494,7 +9494,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_clus_test_24() {
 		// this test has been indicated as to be expected to fail
 		
@@ -9512,7 +9512,7 @@ mod tests{
 
 	// ==== command et ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_et_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9540,7 +9540,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_et_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9568,7 +9568,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_et_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9596,7 +9596,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_et_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9624,7 +9624,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_et_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9652,7 +9652,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_et_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9680,7 +9680,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_et_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9708,7 +9708,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_et_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9736,7 +9736,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_et_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9764,7 +9764,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_et_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9792,7 +9792,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_et_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9820,7 +9820,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_et_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9848,7 +9848,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_et_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9879,7 +9879,7 @@ mod tests{
 
 	// ==== command exs ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9911,7 +9911,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9943,7 +9943,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -9975,7 +9975,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10007,7 +10007,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10039,7 +10039,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10071,7 +10071,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10103,7 +10103,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10135,7 +10135,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10167,7 +10167,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10199,7 +10199,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10231,7 +10231,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10263,7 +10263,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10295,7 +10295,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10327,7 +10327,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10359,7 +10359,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10391,7 +10391,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10423,7 +10423,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10455,7 +10455,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10487,7 +10487,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10519,7 +10519,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10551,7 +10551,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10583,7 +10583,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10615,7 +10615,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10647,7 +10647,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_exs_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10682,7 +10682,7 @@ mod tests{
 
 	// ==== command inft ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10710,7 +10710,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10738,7 +10738,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10766,7 +10766,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10794,7 +10794,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10822,7 +10822,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10850,7 +10850,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10878,7 +10878,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10906,7 +10906,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10934,7 +10934,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10962,7 +10962,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -10990,7 +10990,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11018,7 +11018,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11046,7 +11046,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11074,7 +11074,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11102,7 +11102,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11130,7 +11130,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11158,7 +11158,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11186,7 +11186,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11214,7 +11214,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11242,7 +11242,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11270,7 +11270,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11298,7 +11298,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11326,7 +11326,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11354,7 +11354,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_inft_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11385,7 +11385,7 @@ mod tests{
 
 	// ==== command med ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11415,7 +11415,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11445,7 +11445,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11475,7 +11475,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11505,7 +11505,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11535,7 +11535,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11565,7 +11565,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11595,7 +11595,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11625,7 +11625,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11655,7 +11655,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11685,7 +11685,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11715,7 +11715,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11745,7 +11745,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11775,7 +11775,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11805,7 +11805,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11835,7 +11835,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11865,7 +11865,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11895,7 +11895,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11925,7 +11925,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11955,7 +11955,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -11985,7 +11985,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12015,7 +12015,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12045,7 +12045,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_22() {
 		// this test has been indicated as to be expected to fail
 		
@@ -12060,7 +12060,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_23() {
 		// this test has been indicated as to be expected to fail
 		
@@ -12075,7 +12075,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_med_test_24() {
 		// this test has been indicated as to be expected to fail
 		
@@ -12093,7 +12093,7 @@ mod tests{
 
 	// ==== command to ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12121,7 +12121,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12149,7 +12149,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12177,7 +12177,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12205,7 +12205,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12233,7 +12233,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12261,7 +12261,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12289,7 +12289,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12317,7 +12317,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12345,7 +12345,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12373,7 +12373,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12401,7 +12401,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12429,7 +12429,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12457,7 +12457,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_anans_to_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12491,7 +12491,7 @@ mod tests{
 
 	// ==== command att ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_att_test_0() {
 		// this test has been indicated as to be expected to fail
 		
@@ -12507,7 +12507,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_att_test_1() {
 		// this test has been indicated as to be expected to fail
 		
@@ -12523,7 +12523,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_att_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -12539,7 +12539,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_att_test_3() {
 		// this test has been indicated as to be expected to fail
 		
@@ -12555,7 +12555,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_att_test_4() {
 		// this test has been indicated as to be expected to fail
 		
@@ -12571,7 +12571,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_att_test_5() {
 		// this test has been indicated as to be expected to fail
 		
@@ -12587,7 +12587,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_att_test_6() {
 		// this test has been indicated as to be expected to fail
 		
@@ -12603,7 +12603,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_att_test_7() {
 		// this test has been indicated as to be expected to fail
 		
@@ -12619,7 +12619,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_att_test_8() {
 		// this test has been indicated as to be expected to fail
 		
@@ -12635,7 +12635,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_att_test_9() {
 		// this test has been indicated as to be expected to fail
 		
@@ -12654,7 +12654,7 @@ mod tests{
 
 	// ==== command atts ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_atts_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12684,7 +12684,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_atts_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12714,7 +12714,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_atts_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12744,7 +12744,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_atts_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12774,7 +12774,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_atts_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12804,7 +12804,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_atts_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12834,7 +12834,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_atts_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12864,7 +12864,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_atts_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12894,7 +12894,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_atts_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12924,7 +12924,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_asso_atts_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12960,7 +12960,7 @@ mod tests{
 
 	// ==== command cssc ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -12992,7 +12992,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13024,7 +13024,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13056,7 +13056,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13088,7 +13088,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13120,7 +13120,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13152,7 +13152,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13184,7 +13184,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13216,7 +13216,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13248,7 +13248,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13280,7 +13280,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13312,7 +13312,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13344,7 +13344,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13376,7 +13376,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13408,7 +13408,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13440,7 +13440,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13472,7 +13472,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13504,7 +13504,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13536,7 +13536,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13568,7 +13568,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13600,7 +13600,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13632,7 +13632,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13664,7 +13664,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13696,7 +13696,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13728,7 +13728,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13763,7 +13763,7 @@ mod tests{
 
 	// ==== command cssc-sample ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13797,7 +13797,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13831,7 +13831,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13865,7 +13865,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13899,7 +13899,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13933,7 +13933,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -13967,7 +13967,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14001,7 +14001,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14035,7 +14035,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14069,7 +14069,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14103,7 +14103,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14137,7 +14137,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14171,7 +14171,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14205,7 +14205,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14239,7 +14239,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14273,7 +14273,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14307,7 +14307,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14341,7 +14341,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14375,7 +14375,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_18() {
 		// this test has been indicated as to be expected to fail
 		
@@ -14393,7 +14393,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_19() {
 		// this test has been indicated as to be expected to fail
 		
@@ -14411,7 +14411,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14445,7 +14445,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14479,7 +14479,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14513,7 +14513,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14547,7 +14547,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_cssc_sample_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14584,7 +14584,7 @@ mod tests{
 
 	// ==== command emsc ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14616,7 +14616,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14648,7 +14648,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14680,7 +14680,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14712,7 +14712,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14744,7 +14744,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14776,7 +14776,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14808,7 +14808,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14840,7 +14840,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14872,7 +14872,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14904,7 +14904,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14936,7 +14936,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -14968,7 +14968,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15000,7 +15000,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15032,7 +15032,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15064,7 +15064,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15096,7 +15096,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15128,7 +15128,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15160,7 +15160,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15192,7 +15192,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15224,7 +15224,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_20() {
 		// this test has been indicated as to be expected to fail
 		
@@ -15241,7 +15241,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_21() {
 		// this test has been indicated as to be expected to fail
 		
@@ -15258,7 +15258,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15290,7 +15290,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15322,7 +15322,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15357,7 +15357,7 @@ mod tests{
 
 	// ==== command emsc-sample ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15391,7 +15391,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15425,7 +15425,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15459,7 +15459,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15493,7 +15493,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15527,7 +15527,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15561,7 +15561,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15595,7 +15595,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15629,7 +15629,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15663,7 +15663,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15697,7 +15697,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15731,7 +15731,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15765,7 +15765,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15799,7 +15799,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15833,7 +15833,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15867,7 +15867,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15901,7 +15901,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15935,7 +15935,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -15969,7 +15969,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_18() {
 		// this test has been indicated as to be expected to fail
 		
@@ -15987,7 +15987,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_19() {
 		// this test has been indicated as to be expected to fail
 		
@@ -16005,7 +16005,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16039,7 +16039,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16073,7 +16073,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16107,7 +16107,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16141,7 +16141,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_emsc_sample_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16178,7 +16178,7 @@ mod tests{
 
 	// ==== command er ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16210,7 +16210,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16242,7 +16242,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16274,7 +16274,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16306,7 +16306,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16338,7 +16338,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16370,7 +16370,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16402,7 +16402,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16434,7 +16434,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16466,7 +16466,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16498,7 +16498,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16530,7 +16530,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16562,7 +16562,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16594,7 +16594,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16626,7 +16626,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16658,7 +16658,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16690,7 +16690,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16722,7 +16722,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16754,7 +16754,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16786,7 +16786,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16818,7 +16818,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16850,7 +16850,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16882,7 +16882,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16914,7 +16914,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16946,7 +16946,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_er_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -16981,7 +16981,7 @@ mod tests{
 
 	// ==== command gp ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17017,7 +17017,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_1() {
 		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
@@ -17037,7 +17037,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17073,7 +17073,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17109,7 +17109,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17145,7 +17145,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_5() {
 		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
@@ -17165,7 +17165,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17201,7 +17201,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17237,7 +17237,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17273,7 +17273,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_9() {
 		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
@@ -17293,7 +17293,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17329,7 +17329,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17365,7 +17365,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17401,7 +17401,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17437,7 +17437,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17473,7 +17473,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_15() {
 		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
@@ -17493,7 +17493,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_16() {
 		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
@@ -17513,7 +17513,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17549,7 +17549,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17585,7 +17585,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17621,7 +17621,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17657,7 +17657,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17693,7 +17693,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_22() {
 		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
@@ -17713,7 +17713,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_23() {
 		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
@@ -17733,7 +17733,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gp_test_24() {
 		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
@@ -17756,7 +17756,7 @@ mod tests{
 
 	// ==== command gr ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17792,7 +17792,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17828,7 +17828,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17864,7 +17864,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17900,7 +17900,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17936,7 +17936,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -17972,7 +17972,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18008,7 +18008,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18044,7 +18044,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18080,7 +18080,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18116,7 +18116,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18152,7 +18152,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18188,7 +18188,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18224,7 +18224,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18260,7 +18260,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18296,7 +18296,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18332,7 +18332,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18368,7 +18368,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18404,7 +18404,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18440,7 +18440,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18476,7 +18476,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18512,7 +18512,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18548,7 +18548,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18584,7 +18584,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18620,7 +18620,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_gr_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18659,7 +18659,7 @@ mod tests{
 
 	// ==== command hsc ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18691,7 +18691,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18723,7 +18723,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18755,7 +18755,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18787,7 +18787,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18819,7 +18819,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18851,7 +18851,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18883,7 +18883,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18915,7 +18915,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18947,7 +18947,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -18979,7 +18979,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19011,7 +19011,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19043,7 +19043,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19075,7 +19075,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19107,7 +19107,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19139,7 +19139,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19171,7 +19171,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19203,7 +19203,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19235,7 +19235,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19267,7 +19267,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19299,7 +19299,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19331,7 +19331,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19363,7 +19363,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19395,7 +19395,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19427,7 +19427,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19462,7 +19462,7 @@ mod tests{
 
 	// ==== command hsc-sample ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19496,7 +19496,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19530,7 +19530,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19564,7 +19564,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19598,7 +19598,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19632,7 +19632,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19666,7 +19666,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19700,7 +19700,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19734,7 +19734,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19768,7 +19768,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19802,7 +19802,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19836,7 +19836,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19870,7 +19870,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19904,7 +19904,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19938,7 +19938,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -19972,7 +19972,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20006,7 +20006,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20040,7 +20040,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20074,7 +20074,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_18() {
 		// this test has been indicated as to be expected to fail
 		
@@ -20092,7 +20092,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_19() {
 		// this test has been indicated as to be expected to fail
 		
@@ -20110,7 +20110,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20144,7 +20144,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20178,7 +20178,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20212,7 +20212,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20246,7 +20246,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_hsc_sample_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20283,7 +20283,7 @@ mod tests{
 
 	// ==== command jssc ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20317,7 +20317,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20351,7 +20351,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20385,7 +20385,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20419,7 +20419,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20453,7 +20453,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20487,7 +20487,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20521,7 +20521,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20555,7 +20555,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20589,7 +20589,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20623,7 +20623,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20657,7 +20657,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20691,7 +20691,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20725,7 +20725,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20759,7 +20759,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20793,7 +20793,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20827,7 +20827,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20861,7 +20861,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20895,7 +20895,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20929,7 +20929,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20963,7 +20963,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -20997,7 +20997,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21031,7 +21031,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21065,7 +21065,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21099,7 +21099,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21136,7 +21136,7 @@ mod tests{
 
 	// ==== command jssc-sample ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21172,7 +21172,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21208,7 +21208,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21244,7 +21244,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21280,7 +21280,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21316,7 +21316,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21352,7 +21352,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21388,7 +21388,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21424,7 +21424,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21460,7 +21460,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21496,7 +21496,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21532,7 +21532,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21568,7 +21568,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21604,7 +21604,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21640,7 +21640,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21676,7 +21676,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21712,7 +21712,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21748,7 +21748,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21784,7 +21784,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_18() {
 		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
@@ -21804,7 +21804,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_19() {
 		// this test has been indicated as to be expected to fail
 		if ebi_objects::ebi_arithmetic::is_exact_globally() {
@@ -21824,7 +21824,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21860,7 +21860,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21896,7 +21896,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21932,7 +21932,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -21968,7 +21968,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_jssc_sample_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22007,7 +22007,7 @@ mod tests{
 
 	// ==== command ma ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22043,7 +22043,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22079,7 +22079,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22115,7 +22115,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22151,7 +22151,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22187,7 +22187,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22223,7 +22223,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22259,7 +22259,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22295,7 +22295,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22331,7 +22331,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22367,7 +22367,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22403,7 +22403,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22439,7 +22439,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22475,7 +22475,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22511,7 +22511,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22547,7 +22547,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22583,7 +22583,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22619,7 +22619,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22655,7 +22655,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22691,7 +22691,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22727,7 +22727,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22763,7 +22763,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22799,7 +22799,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22835,7 +22835,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22871,7 +22871,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_ma_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22910,7 +22910,7 @@ mod tests{
 
 	// ==== command uemsc ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22942,7 +22942,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -22974,7 +22974,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23006,7 +23006,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23038,7 +23038,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23070,7 +23070,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23102,7 +23102,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23134,7 +23134,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23166,7 +23166,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23198,7 +23198,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23230,7 +23230,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23262,7 +23262,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23294,7 +23294,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23326,7 +23326,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23358,7 +23358,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23390,7 +23390,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23422,7 +23422,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23454,7 +23454,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23486,7 +23486,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23518,7 +23518,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23550,7 +23550,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23582,7 +23582,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23614,7 +23614,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23646,7 +23646,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23678,7 +23678,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23713,7 +23713,7 @@ mod tests{
 
 	// ==== command uemsc-sample ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23747,7 +23747,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23781,7 +23781,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23815,7 +23815,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23849,7 +23849,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23883,7 +23883,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23917,7 +23917,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23951,7 +23951,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -23985,7 +23985,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24019,7 +24019,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24053,7 +24053,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24087,7 +24087,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24121,7 +24121,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24155,7 +24155,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24189,7 +24189,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24223,7 +24223,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24257,7 +24257,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24291,7 +24291,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24325,7 +24325,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_18() {
 		// this test has been indicated as to be expected to fail
 		
@@ -24343,7 +24343,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_19() {
 		// this test has been indicated as to be expected to fail
 		
@@ -24361,7 +24361,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24395,7 +24395,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24429,7 +24429,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24463,7 +24463,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24497,7 +24497,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conf_uemsc_sample_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24537,7 +24537,7 @@ mod tests{
 
 	// ==== command ali ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24569,7 +24569,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24601,7 +24601,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24633,7 +24633,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24665,7 +24665,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24697,7 +24697,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24729,7 +24729,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24761,7 +24761,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24793,7 +24793,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24825,7 +24825,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24857,7 +24857,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24889,7 +24889,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24921,7 +24921,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24953,7 +24953,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -24985,7 +24985,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25017,7 +25017,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25049,7 +25049,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25081,7 +25081,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25113,7 +25113,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25145,7 +25145,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25177,7 +25177,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25209,7 +25209,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25241,7 +25241,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25273,7 +25273,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25305,7 +25305,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_ali_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25340,7 +25340,7 @@ mod tests{
 
 	// ==== command eep ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_0() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25357,7 +25357,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_1() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25374,7 +25374,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25391,7 +25391,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25423,7 +25423,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_4() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25440,7 +25440,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_5() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25457,7 +25457,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_6() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25474,7 +25474,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25506,7 +25506,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_8() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25523,7 +25523,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_9() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25540,7 +25540,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_10() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25557,7 +25557,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_11() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25574,7 +25574,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25606,7 +25606,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25638,7 +25638,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_14() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25655,7 +25655,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_15() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25672,7 +25672,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_16() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25689,7 +25689,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_17() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25706,7 +25706,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_18() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25723,7 +25723,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_19() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25740,7 +25740,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_20() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25757,7 +25757,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_21() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25774,7 +25774,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_22() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25791,7 +25791,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_23() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25808,7 +25808,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_eep_test_24() {
 		// this test has been indicated as to be expected to fail
 		
@@ -25828,7 +25828,7 @@ mod tests{
 
 	// ==== command fitt ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_fitt_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25859,7 +25859,7 @@ mod tests{
 
 	// ==== command setali ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25891,7 +25891,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25923,7 +25923,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25955,7 +25955,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -25987,7 +25987,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26019,7 +26019,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26051,7 +26051,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26083,7 +26083,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26115,7 +26115,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26147,7 +26147,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26179,7 +26179,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26211,7 +26211,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26243,7 +26243,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26275,7 +26275,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26307,7 +26307,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26339,7 +26339,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26371,7 +26371,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26403,7 +26403,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26435,7 +26435,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26467,7 +26467,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26499,7 +26499,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26531,7 +26531,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26563,7 +26563,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26595,7 +26595,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26627,7 +26627,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_setali_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26662,7 +26662,7 @@ mod tests{
 
 	// ==== command tfit ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_confns_tfit_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26696,7 +26696,7 @@ mod tests{
 
 	// ==== command bpmn ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26724,7 +26724,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26752,7 +26752,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26780,7 +26780,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26808,7 +26808,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26836,7 +26836,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26864,7 +26864,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26892,7 +26892,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26920,7 +26920,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26948,7 +26948,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -26976,7 +26976,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27004,7 +27004,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27032,7 +27032,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27060,7 +27060,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27088,7 +27088,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27116,7 +27116,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27144,7 +27144,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27172,7 +27172,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27200,7 +27200,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27228,7 +27228,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27256,7 +27256,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27284,7 +27284,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27312,7 +27312,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27340,7 +27340,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27368,7 +27368,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_bpmn_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27399,7 +27399,7 @@ mod tests{
 
 	// ==== command lang ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27427,7 +27427,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27455,7 +27455,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27483,7 +27483,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27511,7 +27511,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27539,7 +27539,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27567,7 +27567,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27595,7 +27595,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27623,7 +27623,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27651,7 +27651,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27679,7 +27679,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27707,7 +27707,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27735,7 +27735,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27763,7 +27763,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27791,7 +27791,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27819,7 +27819,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27847,7 +27847,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lang_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27878,7 +27878,7 @@ mod tests{
 
 	// ==== command log ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_log_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27906,7 +27906,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_log_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27934,7 +27934,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_log_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27962,7 +27962,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_log_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -27990,7 +27990,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_log_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28018,7 +28018,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_log_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28046,7 +28046,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_log_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28074,7 +28074,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_log_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28102,7 +28102,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_log_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28130,7 +28130,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_log_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28158,7 +28158,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_log_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28186,7 +28186,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_log_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28217,7 +28217,7 @@ mod tests{
 
 	// ==== command lpn ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28245,7 +28245,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28273,7 +28273,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28301,7 +28301,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28329,7 +28329,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28357,7 +28357,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28385,7 +28385,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28413,7 +28413,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28441,7 +28441,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28469,7 +28469,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28497,7 +28497,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28525,7 +28525,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28553,7 +28553,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28581,7 +28581,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28609,7 +28609,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28637,7 +28637,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28665,7 +28665,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28693,7 +28693,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28721,7 +28721,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28749,7 +28749,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28777,7 +28777,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28805,7 +28805,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28833,7 +28833,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28861,7 +28861,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28889,7 +28889,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_lpn_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28920,7 +28920,7 @@ mod tests{
 
 	// ==== command slang ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28948,7 +28948,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -28976,7 +28976,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29004,7 +29004,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29032,7 +29032,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29060,7 +29060,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29088,7 +29088,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29116,7 +29116,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29144,7 +29144,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29172,7 +29172,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29200,7 +29200,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29228,7 +29228,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29256,7 +29256,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29284,7 +29284,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29312,7 +29312,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29340,7 +29340,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29368,7 +29368,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29396,7 +29396,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29424,7 +29424,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29452,7 +29452,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29480,7 +29480,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29508,7 +29508,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29536,7 +29536,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29564,7 +29564,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29592,7 +29592,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slang_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29623,7 +29623,7 @@ mod tests{
 
 	// ==== command sdfa ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29651,7 +29651,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29679,7 +29679,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29707,7 +29707,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29735,7 +29735,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29763,7 +29763,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29791,7 +29791,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29819,7 +29819,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29847,7 +29847,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29875,7 +29875,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29903,7 +29903,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29931,7 +29931,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29959,7 +29959,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -29987,7 +29987,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30015,7 +30015,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30043,7 +30043,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30071,7 +30071,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30099,7 +30099,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30127,7 +30127,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30155,7 +30155,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30183,7 +30183,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30211,7 +30211,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30239,7 +30239,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30267,7 +30267,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30295,7 +30295,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfa_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30326,7 +30326,7 @@ mod tests{
 
 	// ==== command sdfm ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfm_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30354,7 +30354,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfm_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30382,7 +30382,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfm_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30410,7 +30410,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_sdfm_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30441,7 +30441,7 @@ mod tests{
 
 	// ==== command slpn ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30469,7 +30469,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30497,7 +30497,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30525,7 +30525,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30553,7 +30553,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30581,7 +30581,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30609,7 +30609,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30637,7 +30637,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30665,7 +30665,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30693,7 +30693,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30721,7 +30721,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30749,7 +30749,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30777,7 +30777,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30805,7 +30805,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30833,7 +30833,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30861,7 +30861,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30889,7 +30889,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30917,7 +30917,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30945,7 +30945,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_slpn_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -30976,7 +30976,7 @@ mod tests{
 
 	// ==== command snfa ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31004,7 +31004,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31032,7 +31032,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31060,7 +31060,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31088,7 +31088,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31116,7 +31116,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31144,7 +31144,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31172,7 +31172,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31200,7 +31200,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31228,7 +31228,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31256,7 +31256,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31284,7 +31284,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31312,7 +31312,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31340,7 +31340,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31368,7 +31368,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31396,7 +31396,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31424,7 +31424,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31452,7 +31452,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31480,7 +31480,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31508,7 +31508,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31536,7 +31536,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31564,7 +31564,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31592,7 +31592,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31620,7 +31620,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31648,7 +31648,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_conv_snfa_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31682,7 +31682,7 @@ mod tests{
 
 	// ==== command al ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_al_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31690,7 +31690,7 @@ mod tests{
 			&EBI_DISCOVER_ALERGIA,
 			&[
 				"trait event log#./testfiles/a-b-double.xes",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -31698,7 +31698,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA {
@@ -31712,7 +31712,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_al_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31720,7 +31720,7 @@ mod tests{
 			&EBI_DISCOVER_ALERGIA,
 			&[
 				"trait event log#./testfiles/a-b.csv",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -31728,7 +31728,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA {
@@ -31742,7 +31742,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_al_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31750,7 +31750,7 @@ mod tests{
 			&EBI_DISCOVER_ALERGIA,
 			&[
 				"trait event log#./testfiles/a-b.xes",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -31758,7 +31758,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA {
@@ -31772,7 +31772,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_al_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31780,7 +31780,7 @@ mod tests{
 			&EBI_DISCOVER_ALERGIA,
 			&[
 				"trait event log#./testfiles/a-b.xes.gz",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -31788,7 +31788,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA {
@@ -31802,7 +31802,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_al_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31810,7 +31810,7 @@ mod tests{
 			&EBI_DISCOVER_ALERGIA,
 			&[
 				"trait event log#./testfiles/a-b_multiple_separators.csv",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -31818,7 +31818,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA {
@@ -31832,7 +31832,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_al_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31840,7 +31840,7 @@ mod tests{
 			&EBI_DISCOVER_ALERGIA,
 			&[
 				"trait event log#./testfiles/alergia.xes",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -31848,7 +31848,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/alergia.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA {
@@ -31862,7 +31862,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_al_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31870,7 +31870,7 @@ mod tests{
 			&EBI_DISCOVER_ALERGIA,
 			&[
 				"trait event log#./testfiles/cohort_test.xes",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -31878,7 +31878,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/cohort_test.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA {
@@ -31892,7 +31892,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_al_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31900,7 +31900,7 @@ mod tests{
 			&EBI_DISCOVER_ALERGIA,
 			&[
 				"trait event log#./testfiles/empty.xes",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -31908,7 +31908,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA {
@@ -31922,7 +31922,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_al_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31930,7 +31930,7 @@ mod tests{
 			&EBI_DISCOVER_ALERGIA,
 			&[
 				"trait event log#./testfiles/fig_a.xes",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -31938,7 +31938,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA {
@@ -31952,7 +31952,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_al_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31960,7 +31960,7 @@ mod tests{
 			&EBI_DISCOVER_ALERGIA,
 			&[
 				"trait event log#./testfiles/oc-log.ocel",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -31968,7 +31968,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA {
@@ -31982,7 +31982,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_al_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -31990,7 +31990,7 @@ mod tests{
 			&EBI_DISCOVER_ALERGIA,
 			&[
 				"trait event log#./testfiles/simple_log_markovian_abstraction.xes",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -31998,7 +31998,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_log_markovian_abstraction.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA {
@@ -32012,7 +32012,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_al_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32020,7 +32020,7 @@ mod tests{
 			&EBI_DISCOVER_ALERGIA,
 			&[
 				"trait event log#./testfiles/svn60.xes",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -32028,7 +32028,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/svn60.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("event log".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover::EBI_DISCOVER_ALERGIA {
@@ -32048,7 +32048,7 @@ mod tests{
 
 	// ==== command sbpmn ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32080,7 +32080,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32112,7 +32112,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32144,7 +32144,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32176,7 +32176,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32208,7 +32208,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32240,7 +32240,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32272,7 +32272,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32304,7 +32304,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32336,7 +32336,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32368,7 +32368,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32400,7 +32400,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32432,7 +32432,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32464,7 +32464,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32496,7 +32496,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32528,7 +32528,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32560,7 +32560,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32592,7 +32592,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32624,7 +32624,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32656,7 +32656,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32688,7 +32688,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32720,7 +32720,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32752,7 +32752,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32784,7 +32784,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32816,7 +32816,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_sbpmn_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32851,7 +32851,7 @@ mod tests{
 
 	// ==== command slpn ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32883,7 +32883,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32915,7 +32915,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32947,7 +32947,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -32979,7 +32979,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33011,7 +33011,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33043,7 +33043,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33075,7 +33075,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33107,7 +33107,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33139,7 +33139,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33171,7 +33171,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33203,7 +33203,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33235,7 +33235,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33267,7 +33267,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33299,7 +33299,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33331,7 +33331,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33363,7 +33363,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33395,7 +33395,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33427,7 +33427,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33459,7 +33459,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33491,7 +33491,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33523,7 +33523,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33555,7 +33555,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33587,7 +33587,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33619,7 +33619,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_ali_slpn_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33654,7 +33654,7 @@ mod tests{
 
 	// ==== command cibdo ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33686,7 +33686,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33718,7 +33718,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33750,7 +33750,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33782,7 +33782,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33814,7 +33814,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33846,7 +33846,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33878,7 +33878,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33910,7 +33910,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33942,7 +33942,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -33974,7 +33974,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34006,7 +34006,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34038,7 +34038,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34070,7 +34070,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34102,7 +34102,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34134,7 +34134,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34166,7 +34166,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34198,7 +34198,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34230,7 +34230,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34262,7 +34262,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34294,7 +34294,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34326,7 +34326,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34358,7 +34358,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34390,7 +34390,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34422,7 +34422,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_cibdo_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34457,7 +34457,7 @@ mod tests{
 
 	// ==== command dfg ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34487,7 +34487,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34517,7 +34517,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34547,7 +34547,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34577,7 +34577,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34607,7 +34607,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34637,7 +34637,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34667,7 +34667,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34697,7 +34697,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34727,7 +34727,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34757,7 +34757,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34787,7 +34787,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34817,7 +34817,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34847,7 +34847,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34877,7 +34877,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34907,7 +34907,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34937,7 +34937,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34967,7 +34967,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -34997,7 +34997,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35027,7 +35027,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35057,7 +35057,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35087,7 +35087,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35117,7 +35117,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35147,7 +35147,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35177,7 +35177,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_dfg_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35213,7 +35213,7 @@ mod tests{
 
 	// ==== command sbpmn ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35245,7 +35245,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35277,7 +35277,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35309,7 +35309,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35341,7 +35341,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35373,7 +35373,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35405,7 +35405,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35437,7 +35437,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35469,7 +35469,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35501,7 +35501,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35533,7 +35533,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35565,7 +35565,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35597,7 +35597,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35629,7 +35629,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35661,7 +35661,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35693,7 +35693,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35725,7 +35725,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35757,7 +35757,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35789,7 +35789,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35821,7 +35821,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35853,7 +35853,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35885,7 +35885,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35917,7 +35917,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35949,7 +35949,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -35981,7 +35981,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sbpmn_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36016,7 +36016,7 @@ mod tests{
 
 	// ==== command slpn ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36048,7 +36048,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36080,7 +36080,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36112,7 +36112,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36144,7 +36144,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36176,7 +36176,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36208,7 +36208,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36240,7 +36240,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36272,7 +36272,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36304,7 +36304,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36336,7 +36336,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36368,7 +36368,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36400,7 +36400,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36432,7 +36432,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36464,7 +36464,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36496,7 +36496,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36528,7 +36528,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36560,7 +36560,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36592,7 +36592,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36624,7 +36624,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36656,7 +36656,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36688,7 +36688,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36720,7 +36720,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36752,7 +36752,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36784,7 +36784,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_slpn_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36819,7 +36819,7 @@ mod tests{
 
 	// ==== command sptree ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36851,7 +36851,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36883,7 +36883,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36915,7 +36915,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36947,7 +36947,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -36979,7 +36979,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37011,7 +37011,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37043,7 +37043,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37075,7 +37075,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37107,7 +37107,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37139,7 +37139,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37171,7 +37171,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37203,7 +37203,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37235,7 +37235,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37267,7 +37267,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37299,7 +37299,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37331,7 +37331,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37363,7 +37363,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37395,7 +37395,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37427,7 +37427,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37459,7 +37459,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37491,7 +37491,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37523,7 +37523,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37555,7 +37555,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37587,7 +37587,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_occ_sptree_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37625,7 +37625,7 @@ mod tests{
 
 	// ==== command sbpmn ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37653,7 +37653,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37681,7 +37681,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37709,7 +37709,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37737,7 +37737,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37765,7 +37765,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37793,7 +37793,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37821,7 +37821,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37849,7 +37849,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37877,7 +37877,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37905,7 +37905,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37933,7 +37933,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37961,7 +37961,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -37989,7 +37989,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38017,7 +38017,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38045,7 +38045,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38073,7 +38073,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38101,7 +38101,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38129,7 +38129,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38157,7 +38157,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38185,7 +38185,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38213,7 +38213,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38241,7 +38241,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38269,7 +38269,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38297,7 +38297,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sbpmn_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38328,7 +38328,7 @@ mod tests{
 
 	// ==== command slpn ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38356,7 +38356,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38384,7 +38384,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38412,7 +38412,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38440,7 +38440,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38468,7 +38468,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38496,7 +38496,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38524,7 +38524,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38552,7 +38552,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38580,7 +38580,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38608,7 +38608,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38636,7 +38636,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38664,7 +38664,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38692,7 +38692,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38720,7 +38720,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38748,7 +38748,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38776,7 +38776,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38804,7 +38804,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38832,7 +38832,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38860,7 +38860,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38888,7 +38888,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38916,7 +38916,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38944,7 +38944,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -38972,7 +38972,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39000,7 +39000,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_slpn_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39031,7 +39031,7 @@ mod tests{
 
 	// ==== command sptree ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sptree_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39059,7 +39059,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sptree_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39087,7 +39087,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sptree_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39115,7 +39115,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sptree_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39143,7 +39143,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sptree_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39171,7 +39171,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sptree_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39199,7 +39199,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sptree_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39227,7 +39227,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sptree_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39255,7 +39255,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sptree_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39283,7 +39283,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sptree_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39311,7 +39311,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sptree_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39339,7 +39339,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sptree_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39367,7 +39367,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_rnd_sptree_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39401,7 +39401,7 @@ mod tests{
 
 	// ==== command sbpmn ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39429,7 +39429,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39457,7 +39457,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39485,7 +39485,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39513,7 +39513,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39541,7 +39541,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39569,7 +39569,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39597,7 +39597,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39625,7 +39625,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39653,7 +39653,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39681,7 +39681,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39709,7 +39709,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39737,7 +39737,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39765,7 +39765,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39793,7 +39793,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39821,7 +39821,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39849,7 +39849,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39877,7 +39877,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39905,7 +39905,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39933,7 +39933,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39961,7 +39961,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -39989,7 +39989,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40017,7 +40017,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40045,7 +40045,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40073,7 +40073,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sbpmn_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40104,7 +40104,7 @@ mod tests{
 
 	// ==== command slpn ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40132,7 +40132,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40160,7 +40160,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40188,7 +40188,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40216,7 +40216,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40244,7 +40244,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40272,7 +40272,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40300,7 +40300,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40328,7 +40328,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40356,7 +40356,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40384,7 +40384,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40412,7 +40412,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40440,7 +40440,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40468,7 +40468,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40496,7 +40496,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40524,7 +40524,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40552,7 +40552,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40580,7 +40580,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40608,7 +40608,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40636,7 +40636,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40664,7 +40664,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40692,7 +40692,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40720,7 +40720,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40748,7 +40748,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40776,7 +40776,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_slpn_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40807,7 +40807,7 @@ mod tests{
 
 	// ==== command sptree ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sptree_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40835,7 +40835,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sptree_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40863,7 +40863,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sptree_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40891,7 +40891,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sptree_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40919,7 +40919,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sptree_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40947,7 +40947,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sptree_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -40975,7 +40975,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sptree_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41003,7 +41003,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sptree_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41031,7 +41031,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sptree_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41059,7 +41059,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sptree_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41087,7 +41087,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sptree_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41115,7 +41115,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sptree_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41143,7 +41143,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_disc_uni_sptree_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41180,7 +41180,7 @@ mod tests{
 
 	// ==== command dfa ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41208,7 +41208,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41236,7 +41236,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41264,7 +41264,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41292,7 +41292,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41320,7 +41320,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41348,7 +41348,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41376,7 +41376,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41404,7 +41404,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41432,7 +41432,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41460,7 +41460,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41488,7 +41488,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41516,7 +41516,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41544,7 +41544,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41572,7 +41572,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41600,7 +41600,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41628,7 +41628,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41656,7 +41656,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41684,7 +41684,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41712,7 +41712,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41740,7 +41740,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41768,7 +41768,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41796,7 +41796,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41824,7 +41824,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41852,7 +41852,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_dfa_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41883,7 +41883,7 @@ mod tests{
 
 	// ==== command ptree ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41911,7 +41911,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41939,7 +41939,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41967,7 +41967,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -41995,7 +41995,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42023,7 +42023,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42051,7 +42051,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42079,7 +42079,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42107,7 +42107,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42135,7 +42135,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42163,7 +42163,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42191,7 +42191,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42219,7 +42219,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42247,7 +42247,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42275,7 +42275,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42303,7 +42303,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42331,7 +42331,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42359,7 +42359,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42387,7 +42387,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42415,7 +42415,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42443,7 +42443,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42471,7 +42471,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42499,7 +42499,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42527,7 +42527,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42555,7 +42555,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_flw_ptree_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42589,7 +42589,7 @@ mod tests{
 
 	// ==== command dfa ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42617,7 +42617,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42645,7 +42645,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42673,7 +42673,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42701,7 +42701,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42729,7 +42729,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42757,7 +42757,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42785,7 +42785,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42813,7 +42813,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42841,7 +42841,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42869,7 +42869,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42897,7 +42897,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42925,7 +42925,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42953,7 +42953,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -42981,7 +42981,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43009,7 +43009,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43037,7 +43037,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43065,7 +43065,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43093,7 +43093,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43121,7 +43121,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43149,7 +43149,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43177,7 +43177,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43205,7 +43205,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43233,7 +43233,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43261,7 +43261,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_dfa_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43292,7 +43292,7 @@ mod tests{
 
 	// ==== command ptree ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43320,7 +43320,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43348,7 +43348,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43376,7 +43376,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43404,7 +43404,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43432,7 +43432,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43460,7 +43460,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43488,7 +43488,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43516,7 +43516,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43544,7 +43544,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43572,7 +43572,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43600,7 +43600,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43628,7 +43628,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43656,7 +43656,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43684,7 +43684,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43712,7 +43712,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43740,7 +43740,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43768,7 +43768,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43796,7 +43796,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43824,7 +43824,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43852,7 +43852,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43880,7 +43880,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43908,7 +43908,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43936,7 +43936,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43964,7 +43964,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_pfxt_ptree_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -43995,7 +43995,7 @@ mod tests{
 
 	// ==== command tm ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44023,7 +44023,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44051,7 +44051,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44079,7 +44079,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44107,7 +44107,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44135,7 +44135,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44163,7 +44163,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44191,7 +44191,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44219,7 +44219,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44247,7 +44247,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44275,7 +44275,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44303,7 +44303,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44331,7 +44331,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44359,7 +44359,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44387,7 +44387,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44415,7 +44415,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44443,7 +44443,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44471,7 +44471,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44499,7 +44499,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44527,7 +44527,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44555,7 +44555,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44583,7 +44583,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44611,7 +44611,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44639,7 +44639,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44667,7 +44667,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_tm_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44698,7 +44698,7 @@ mod tests{
 
 	// ==== command im ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44726,7 +44726,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44754,7 +44754,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44782,7 +44782,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44810,7 +44810,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44838,7 +44838,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44866,7 +44866,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44894,7 +44894,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44922,7 +44922,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44950,7 +44950,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -44978,7 +44978,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45006,7 +45006,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45034,7 +45034,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45062,7 +45062,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45090,7 +45090,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45118,7 +45118,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45146,7 +45146,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45174,7 +45174,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45202,7 +45202,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45230,7 +45230,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45258,7 +45258,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45286,7 +45286,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45314,7 +45314,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45342,7 +45342,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45370,7 +45370,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_im_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45401,7 +45401,7 @@ mod tests{
 
 	// ==== command imf ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45409,7 +45409,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45417,7 +45417,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45431,7 +45431,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45439,7 +45439,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/a-b.csv",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45447,7 +45447,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45461,7 +45461,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45469,7 +45469,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/a-b.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45477,7 +45477,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45491,7 +45491,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45499,7 +45499,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/a-b.xes",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45507,7 +45507,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45521,7 +45521,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45529,7 +45529,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/a-b.xes.gz",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45537,7 +45537,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45551,7 +45551,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45559,7 +45559,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/a-b_multiple_separators.csv",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45567,7 +45567,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45581,7 +45581,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45589,7 +45589,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/aa-ab-ba.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45597,7 +45597,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45611,7 +45611,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45619,7 +45619,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/aa.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45627,7 +45627,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45641,7 +45641,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45649,7 +45649,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45657,7 +45657,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45671,7 +45671,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45679,7 +45679,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45687,7 +45687,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45701,7 +45701,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45709,7 +45709,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/alergia.xes",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45717,7 +45717,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/alergia.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45731,7 +45731,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45739,7 +45739,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45747,7 +45747,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45761,7 +45761,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45769,7 +45769,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/ba.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45777,7 +45777,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45791,7 +45791,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45799,7 +45799,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/bb.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45807,7 +45807,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45821,7 +45821,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45829,7 +45829,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/bpic12-a-sample.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45837,7 +45837,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a-sample.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45851,7 +45851,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45859,7 +45859,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/caise24_concurrency.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45867,7 +45867,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/caise24_concurrency.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45881,7 +45881,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45889,7 +45889,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/carrasco.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45897,7 +45897,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/carrasco.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45911,7 +45911,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45919,7 +45919,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/cohort_test.xes",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45927,7 +45927,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/cohort_test.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45941,7 +45941,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45949,7 +45949,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/empty.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45957,7 +45957,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -45971,7 +45971,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -45979,7 +45979,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/empty.xes",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -45987,7 +45987,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -46001,7 +46001,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46009,7 +46009,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/empty_trace.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -46017,7 +46017,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -46031,7 +46031,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46039,7 +46039,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/fig_a.xes",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -46047,7 +46047,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -46061,7 +46061,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46069,7 +46069,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/markovian.slang",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -46077,7 +46077,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/markovian.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -46091,7 +46091,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46099,7 +46099,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/oc-log.ocel",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -46107,7 +46107,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -46121,7 +46121,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_imf_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46129,7 +46129,7 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT,
 			&[
 				"trait finite stochastic language#./testfiles/simple_log_markovian_abstraction.xes",
-				"fraction 0.2"			
+				"fraction 1/5"			
 			]
 		),
 		*/
@@ -46137,7 +46137,7 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_log_markovian_abstraction.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.2".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_INDUCTIVE_MINER_INFREQUENT {
@@ -46154,7 +46154,7 @@ mod tests{
 
 	// ==== command sm ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46162,8 +46162,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46171,8 +46171,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b-double.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46186,7 +46186,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46194,8 +46194,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/a-b.csv",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46203,8 +46203,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.csv").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46218,7 +46218,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46226,8 +46226,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/a-b.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46235,8 +46235,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46250,7 +46250,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46258,8 +46258,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/a-b.xes",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46267,8 +46267,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46282,7 +46282,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46290,8 +46290,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/a-b.xes.gz",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46299,8 +46299,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b.xes.gz").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46314,7 +46314,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46322,8 +46322,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/a-b_multiple_separators.csv",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46331,8 +46331,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/a-b_multiple_separators.csv").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46346,7 +46346,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46354,8 +46354,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/aa-ab-ba.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46363,8 +46363,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa-ab-ba.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46378,7 +46378,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46386,8 +46386,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/aa.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46395,8 +46395,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/aa.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46410,7 +46410,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46418,8 +46418,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46427,8 +46427,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/abc-acb-aaabc.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46442,7 +46442,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46450,8 +46450,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46459,8 +46459,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/acb-abc-ad-aded-adeded-adededed.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46474,7 +46474,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46482,8 +46482,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/alergia.xes",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46491,8 +46491,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/alergia.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46506,7 +46506,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46514,8 +46514,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46523,8 +46523,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba-aa-ab.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46538,7 +46538,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46546,8 +46546,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/ba.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46555,8 +46555,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/ba.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46570,7 +46570,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46578,8 +46578,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/bb.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46587,8 +46587,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/bb.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46602,7 +46602,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46610,8 +46610,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/bpic12-a-sample.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46619,8 +46619,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/bpic12-a-sample.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46634,7 +46634,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46642,8 +46642,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/caise24_concurrency.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46651,8 +46651,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/caise24_concurrency.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46666,7 +46666,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46674,8 +46674,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/carrasco.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46683,8 +46683,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/carrasco.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46698,7 +46698,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46706,8 +46706,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/cohort_test.xes",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46715,8 +46715,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/cohort_test.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46730,7 +46730,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46738,8 +46738,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/empty.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46747,8 +46747,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46762,7 +46762,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46770,8 +46770,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/empty.xes",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46779,8 +46779,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46794,7 +46794,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46802,8 +46802,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/empty_trace.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46811,8 +46811,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/empty_trace.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46826,7 +46826,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46834,8 +46834,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/fig_a.xes",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46843,8 +46843,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/fig_a.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46858,7 +46858,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46866,8 +46866,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/markovian.slang",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46875,8 +46875,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/markovian.slang").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46890,7 +46890,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46898,8 +46898,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/oc-log.ocel",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46907,8 +46907,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/oc-log.ocel").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46922,7 +46922,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_dins_sm_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46930,8 +46930,8 @@ mod tests{
 			&EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER,
 			&[
 				"trait finite stochastic language#./testfiles/simple_log_markovian_abstraction.xes",
-				"fraction 0.1",
-				"fraction 0.4"			
+				"fraction 1/10",
+				"fraction 2/5"			
 			]
 		),
 		*/
@@ -46939,8 +46939,8 @@ mod tests{
 		let mut reader = MultipleReader::from_file(File::open("./testfiles/simple_log_markovian_abstraction.xes").unwrap());
 		let (object0, file_handler0) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input0 = EbiInput::Trait(object0, file_handler0);
-		let input1 = EbiInput::Fraction("0.1".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
-		let input2 = EbiInput::Fraction("0.4".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input1 = EbiInput::Fraction("1/10".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input2 = EbiInput::Fraction("2/5".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_discover_non_stochastic::EBI_DISCOVER_NON_STOCHASTIC_SPLIT_MINER {
@@ -46966,7 +46966,7 @@ mod tests{
 
 	// ==== command empty ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -46994,7 +46994,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47022,7 +47022,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47050,7 +47050,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47078,7 +47078,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47106,7 +47106,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47134,7 +47134,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47162,7 +47162,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47190,7 +47190,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47218,7 +47218,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47246,7 +47246,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47274,7 +47274,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47302,7 +47302,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47330,7 +47330,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47358,7 +47358,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47386,7 +47386,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47414,7 +47414,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47442,7 +47442,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47470,7 +47470,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47498,7 +47498,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47526,7 +47526,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47554,7 +47554,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47582,7 +47582,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47610,7 +47610,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47638,7 +47638,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_empty_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47669,7 +47669,7 @@ mod tests{
 
 	// ==== command len ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47701,7 +47701,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47733,7 +47733,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47765,7 +47765,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47797,7 +47797,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47829,7 +47829,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47861,7 +47861,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47893,7 +47893,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47925,7 +47925,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47957,7 +47957,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -47989,7 +47989,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48021,7 +48021,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48053,7 +48053,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48085,7 +48085,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48117,7 +48117,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48149,7 +48149,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48181,7 +48181,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48213,7 +48213,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48245,7 +48245,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48277,7 +48277,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48309,7 +48309,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48341,7 +48341,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48373,7 +48373,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48405,7 +48405,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48437,7 +48437,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_len_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48475,7 +48475,7 @@ mod tests{
 
 	// ==== command act ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48507,7 +48507,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48539,7 +48539,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48571,7 +48571,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48603,7 +48603,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48635,7 +48635,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48667,7 +48667,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48699,7 +48699,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48731,7 +48731,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48763,7 +48763,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48795,7 +48795,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48827,7 +48827,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48859,7 +48859,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48891,7 +48891,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48923,7 +48923,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48955,7 +48955,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -48987,7 +48987,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49019,7 +49019,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49051,7 +49051,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49083,7 +49083,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49115,7 +49115,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49147,7 +49147,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49179,7 +49179,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49211,7 +49211,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49243,7 +49243,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_lang_tr_event_act_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49284,7 +49284,7 @@ mod tests{
 
 	// ==== command empty ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_empty_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49312,7 +49312,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_empty_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49340,7 +49340,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_empty_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49368,7 +49368,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_empty_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49396,7 +49396,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_empty_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49424,7 +49424,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_empty_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49452,7 +49452,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_empty_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49480,7 +49480,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_empty_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49508,7 +49508,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_empty_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49536,7 +49536,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_empty_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49564,7 +49564,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_empty_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49595,7 +49595,7 @@ mod tests{
 
 	// ==== command len ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_len_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49627,7 +49627,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_len_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49659,7 +49659,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_len_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49691,7 +49691,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_len_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49723,7 +49723,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_len_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49755,7 +49755,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_len_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49787,7 +49787,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_len_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49819,7 +49819,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_len_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49851,7 +49851,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_len_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49883,7 +49883,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_len_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49915,7 +49915,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_len_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49953,7 +49953,7 @@ mod tests{
 
 	// ==== command act ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_event_act_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -49985,7 +49985,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_event_act_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50017,7 +50017,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_event_act_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50049,7 +50049,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_event_act_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50081,7 +50081,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_event_act_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50113,7 +50113,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_event_act_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50145,7 +50145,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_event_act_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50177,7 +50177,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_event_act_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50209,7 +50209,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_event_act_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50241,7 +50241,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_event_act_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50273,7 +50273,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_log_tr_event_act_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50314,7 +50314,7 @@ mod tests{
 
 	// ==== command empty ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50342,7 +50342,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50370,7 +50370,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50398,7 +50398,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50426,7 +50426,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50454,7 +50454,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50482,7 +50482,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50510,7 +50510,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50538,7 +50538,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50566,7 +50566,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50594,7 +50594,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50622,7 +50622,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50650,7 +50650,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50678,7 +50678,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50706,7 +50706,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50734,7 +50734,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50762,7 +50762,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50790,7 +50790,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50818,7 +50818,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50846,7 +50846,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50874,7 +50874,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50902,7 +50902,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50930,7 +50930,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50958,7 +50958,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -50986,7 +50986,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_empty_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51017,7 +51017,7 @@ mod tests{
 
 	// ==== command ll ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51047,7 +51047,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51077,7 +51077,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51107,7 +51107,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51137,7 +51137,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51167,7 +51167,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51197,7 +51197,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51227,7 +51227,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51257,7 +51257,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51287,7 +51287,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51317,7 +51317,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51347,7 +51347,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51377,7 +51377,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51407,7 +51407,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51437,7 +51437,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51467,7 +51467,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51497,7 +51497,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51527,7 +51527,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51557,7 +51557,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51587,7 +51587,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51617,7 +51617,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51647,7 +51647,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51677,7 +51677,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51707,7 +51707,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51737,7 +51737,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ll_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51770,7 +51770,7 @@ mod tests{
 
 	// ==== command len ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51802,7 +51802,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51834,7 +51834,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51866,7 +51866,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51898,7 +51898,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51930,7 +51930,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51962,7 +51962,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -51994,7 +51994,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52026,7 +52026,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52058,7 +52058,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52090,7 +52090,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52122,7 +52122,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52154,7 +52154,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52186,7 +52186,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52218,7 +52218,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52250,7 +52250,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52282,7 +52282,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52314,7 +52314,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52346,7 +52346,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52378,7 +52378,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52410,7 +52410,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52442,7 +52442,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52474,7 +52474,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52506,7 +52506,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52538,7 +52538,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_len_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52573,7 +52573,7 @@ mod tests{
 
 	// ==== command ml ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52603,7 +52603,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52633,7 +52633,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52663,7 +52663,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52693,7 +52693,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52723,7 +52723,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52753,7 +52753,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52783,7 +52783,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52813,7 +52813,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52843,7 +52843,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52873,7 +52873,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52903,7 +52903,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52933,7 +52933,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52963,7 +52963,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -52993,7 +52993,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53023,7 +53023,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53053,7 +53053,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53083,7 +53083,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53113,7 +53113,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53143,7 +53143,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53173,7 +53173,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53203,7 +53203,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53233,7 +53233,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53263,7 +53263,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53293,7 +53293,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_ml_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53329,7 +53329,7 @@ mod tests{
 
 	// ==== command act ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53361,7 +53361,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53393,7 +53393,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53425,7 +53425,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53457,7 +53457,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53489,7 +53489,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53521,7 +53521,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53553,7 +53553,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53585,7 +53585,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53617,7 +53617,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53649,7 +53649,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53681,7 +53681,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53713,7 +53713,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53745,7 +53745,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53777,7 +53777,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53809,7 +53809,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53841,7 +53841,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53873,7 +53873,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53905,7 +53905,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53937,7 +53937,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -53969,7 +53969,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54001,7 +54001,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54033,7 +54033,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54065,7 +54065,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54097,7 +54097,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_fil_slang_tr_event_act_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54141,12 +54141,17 @@ mod tests{
 
 
 
+	// ==== group java ====
+
+
+
+
 
 
 
 	// ==== command info ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54174,7 +54179,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54202,7 +54207,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54230,7 +54235,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54258,7 +54263,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54286,7 +54291,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54314,7 +54319,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54342,7 +54347,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54370,7 +54375,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54398,7 +54403,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54426,7 +54431,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54454,7 +54459,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54482,7 +54487,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54510,7 +54515,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54538,7 +54543,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54566,7 +54571,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54594,7 +54599,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54622,7 +54627,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54650,7 +54655,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54678,7 +54683,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54706,7 +54711,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54734,7 +54739,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54762,7 +54767,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54790,7 +54795,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54818,7 +54823,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_info_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54852,7 +54857,7 @@ mod tests{
 
 	// ==== command log ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54884,7 +54889,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54916,7 +54921,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54948,7 +54953,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -54980,7 +54985,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55012,7 +55017,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55044,7 +55049,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55076,7 +55081,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55108,7 +55113,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55140,7 +55145,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55172,7 +55177,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55204,7 +55209,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55236,7 +55241,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55268,7 +55273,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55300,7 +55305,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55332,7 +55337,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55364,7 +55369,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55396,7 +55401,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55428,7 +55433,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55460,7 +55465,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55492,7 +55497,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55524,7 +55529,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55556,7 +55561,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55588,7 +55593,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55620,7 +55625,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_prob_log_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55660,7 +55665,7 @@ mod tests{
 
 	// ==== command lpn ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55688,7 +55693,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55716,7 +55721,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55744,7 +55749,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55772,7 +55777,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55800,7 +55805,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55828,7 +55833,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55856,7 +55861,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55884,7 +55889,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55912,7 +55917,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55940,7 +55945,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55968,7 +55973,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -55996,7 +56001,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56024,7 +56029,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56052,7 +56057,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56080,7 +56085,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56108,7 +56113,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56136,7 +56141,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56164,7 +56169,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56192,7 +56197,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56220,7 +56225,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56248,7 +56253,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56276,7 +56281,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56304,7 +56309,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56332,7 +56337,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_lpn_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56363,7 +56368,7 @@ mod tests{
 
 	// ==== command ptr ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_ptr_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56391,7 +56396,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_ptr_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56419,7 +56424,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_ptr_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56447,7 +56452,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_ptr_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56475,7 +56480,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_ptr_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56503,7 +56508,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_ptr_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56531,7 +56536,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_ptr_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56559,7 +56564,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_ptr_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56587,7 +56592,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_ptr_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56615,7 +56620,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_ptr_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56643,7 +56648,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_ptr_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56671,7 +56676,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_ptr_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56699,7 +56704,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_red_ptr_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56733,7 +56738,7 @@ mod tests{
 
 	// ==== command folds ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_folds_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56767,7 +56772,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_folds_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56801,7 +56806,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_folds_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56835,7 +56840,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_folds_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56869,7 +56874,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_folds_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56903,7 +56908,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_folds_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56937,7 +56942,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_folds_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -56971,7 +56976,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_folds_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57005,7 +57010,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_folds_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57039,7 +57044,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_folds_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57073,7 +57078,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_folds_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57107,7 +57112,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_folds_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57144,7 +57149,7 @@ mod tests{
 
 	// ==== command potr ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_potr_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57174,7 +57179,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_potr_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57207,7 +57212,7 @@ mod tests{
 
 	// ==== command tra ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57237,7 +57242,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57267,7 +57272,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57297,7 +57302,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57327,7 +57332,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57357,7 +57362,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57387,7 +57392,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57417,7 +57422,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57447,7 +57452,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57477,7 +57482,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57507,7 +57512,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57537,7 +57542,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57567,7 +57572,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57597,7 +57602,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57627,7 +57632,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57657,7 +57662,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57687,7 +57692,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57717,7 +57722,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57747,7 +57752,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_18() {
 		// this test has been indicated as to be expected to fail
 		
@@ -57762,7 +57767,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_19() {
 		// this test has been indicated as to be expected to fail
 		
@@ -57777,7 +57782,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57807,7 +57812,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57837,7 +57842,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57867,7 +57872,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57897,7 +57902,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_sam_tra_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57933,7 +57938,7 @@ mod tests{
 
 	// ==== command btst ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57943,7 +57948,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -57955,7 +57960,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -57969,7 +57974,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -57979,7 +57984,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/a-b.csv",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -57991,7 +57996,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58005,7 +58010,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58015,7 +58020,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/a-b.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58027,7 +58032,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58041,7 +58046,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58051,7 +58056,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/a-b.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58063,7 +58068,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58077,7 +58082,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58087,7 +58092,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/a-b.xes.gz",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58099,7 +58104,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58113,7 +58118,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58123,7 +58128,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/a-b_multiple_separators.csv",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58135,7 +58140,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58149,7 +58154,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58159,7 +58164,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/aa-ab-ba.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58171,7 +58176,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58185,7 +58190,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58195,7 +58200,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/aa.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58207,7 +58212,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58221,7 +58226,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58231,7 +58236,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/abc-acb-aaabc.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58243,7 +58248,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58257,7 +58262,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58267,7 +58272,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58279,7 +58284,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58293,7 +58298,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58303,7 +58308,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/alergia.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58315,7 +58320,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58329,7 +58334,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58339,7 +58344,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/ba-aa-ab.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58351,7 +58356,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58365,7 +58370,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58375,7 +58380,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/ba.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58387,7 +58392,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58401,7 +58406,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58411,7 +58416,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/bb.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58423,7 +58428,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58437,7 +58442,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58447,7 +58452,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/bpic12-a-sample.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58459,7 +58464,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58473,7 +58478,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58483,7 +58488,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/caise24_concurrency.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58495,7 +58500,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58509,7 +58514,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58519,7 +58524,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/carrasco.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58531,7 +58536,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58545,7 +58550,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58555,7 +58560,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/cohort_test.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58567,7 +58572,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58581,7 +58586,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_18() {
 		// this test has been indicated as to be expected to fail
 		
@@ -58592,7 +58597,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58600,7 +58605,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_19() {
 		// this test has been indicated as to be expected to fail
 		
@@ -58611,7 +58616,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58619,7 +58624,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58629,7 +58634,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/empty_trace.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58641,7 +58646,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58655,7 +58660,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58665,7 +58670,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/fig_a.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58677,7 +58682,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58691,7 +58696,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58701,7 +58706,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/markovian.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58713,7 +58718,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58727,7 +58732,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58737,7 +58742,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/oc-log.ocel",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58749,7 +58754,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58763,7 +58768,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_btst_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58773,7 +58778,7 @@ mod tests{
 				"trait finite stochastic language#./testfiles/a-b-double.xes",
 				"trait finite stochastic language#./testfiles/simple_log_markovian_abstraction.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58785,7 +58790,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("finite stochastic language".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_BOOTSTRAP {
@@ -58802,7 +58807,7 @@ mod tests{
 
 	// ==== command perm-l-m ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58812,7 +58817,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/a-aa-bb.slpn",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58824,7 +58829,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -58838,7 +58843,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58848,7 +58853,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/a-b-double.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58860,7 +58865,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -58874,7 +58879,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58884,7 +58889,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/a-b.csv",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58896,7 +58901,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -58910,7 +58915,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58920,7 +58925,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/a-b.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58932,7 +58937,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -58946,7 +58951,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58956,7 +58961,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/a-b.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -58968,7 +58973,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -58982,7 +58987,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -58992,7 +58997,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/a-b.xes.gz",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59004,7 +59009,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59018,7 +59023,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59028,7 +59033,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/a-b_multiple_separators.csv",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59040,7 +59045,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59054,7 +59059,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59064,7 +59069,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/aa-aaa-bb.slpn",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59076,7 +59081,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59090,7 +59095,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59100,7 +59105,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/aa-ab-ba.dfg",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59112,7 +59117,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59126,7 +59131,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59136,7 +59141,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/aa-ab-ba.sdfa",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59148,7 +59153,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59162,7 +59167,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59172,7 +59177,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/aa-ab-ba.sdfm",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59184,7 +59189,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59198,7 +59203,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59208,7 +59213,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/aa-ab-ba.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59220,7 +59225,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59234,7 +59239,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59244,7 +59249,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/aa-ab-ba.snfa",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59256,7 +59261,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59270,7 +59275,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59280,7 +59285,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/aa-ab-ba_ali.slpn",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59292,7 +59297,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59306,7 +59311,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59316,7 +59321,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/aa-ab-ba_occ-f64.slpn",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59328,7 +59333,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59342,7 +59347,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59352,7 +59357,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/aa-ab-ba_occ.slpn",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59364,7 +59369,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59378,7 +59383,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59388,7 +59393,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/aa-ab-ba_uni.slpn",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59400,7 +59405,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59414,7 +59419,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59424,7 +59429,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/aa.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59436,7 +59441,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59450,7 +59455,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59460,7 +59465,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/abc-acb-aaabc.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59472,7 +59477,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59486,7 +59491,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59496,7 +59501,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/acb-abc-ad-aded-adeded-adededed.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59508,7 +59513,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59522,7 +59527,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59532,7 +59537,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/acb-abc-ad-aded-adeded-adededed.slang.sdfa",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59544,7 +59549,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59558,7 +59563,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59568,7 +59573,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/alergia.xes",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59580,7 +59585,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59594,7 +59599,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59604,7 +59609,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/all_operators.sptree",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59616,7 +59621,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59630,7 +59635,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59640,7 +59645,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/ba-aa-ab.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59652,7 +59657,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59666,7 +59671,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_perm_l_m_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59676,7 +59681,7 @@ mod tests{
 				"trait event log#./testfiles/a-b-double.xes",
 				"trait stochastic semantics#./testfiles/ba.slang",
 				"usize 10",
-				"fraction 0.05"			
+				"fraction 1/20"			
 			]
 		),
 		*/
@@ -59688,7 +59693,7 @@ mod tests{
 		let (object1, file_handler1) = ebi_input::read_as_trait(&("stochastic semantics".parse().unwrap()), &mut reader, None, 0).unwrap();
 		let input1 = EbiInput::Trait(object1, file_handler1);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, output_type, ..} = crate::ebi_commands::ebi_command_test::EBI_PERMUTATION_TEST_LOG_MODEL {
@@ -59705,7 +59710,7 @@ mod tests{
 
 	// ==== command lcat ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_lcat_test_0() {
 		// this test has been indicated as to be expected to fail
 		
@@ -59714,7 +59719,7 @@ mod tests{
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_LOG_ATTRIBUTE {
@@ -59722,7 +59727,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_lcat_test_1() {
 		// this test has been indicated as to be expected to fail
 		
@@ -59731,7 +59736,7 @@ mod tests{
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_LOG_ATTRIBUTE {
@@ -59739,7 +59744,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_lcat_test_2() {
 		// this test has been indicated as to be expected to fail
 		
@@ -59748,7 +59753,7 @@ mod tests{
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_LOG_ATTRIBUTE {
@@ -59756,7 +59761,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_lcat_test_3() {
 		// this test has been indicated as to be expected to fail
 		
@@ -59765,7 +59770,7 @@ mod tests{
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_LOG_ATTRIBUTE {
@@ -59773,7 +59778,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_lcat_test_4() {
 		// this test has been indicated as to be expected to fail
 		
@@ -59782,7 +59787,7 @@ mod tests{
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_LOG_ATTRIBUTE {
@@ -59790,7 +59795,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_lcat_test_5() {
 		// this test has been indicated as to be expected to fail
 		
@@ -59799,7 +59804,7 @@ mod tests{
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_LOG_ATTRIBUTE {
@@ -59807,7 +59812,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_lcat_test_6() {
 		// this test has been indicated as to be expected to fail
 		
@@ -59816,7 +59821,7 @@ mod tests{
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_LOG_ATTRIBUTE {
@@ -59824,7 +59829,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_lcat_test_7() {
 		// this test has been indicated as to be expected to fail
 		
@@ -59833,7 +59838,7 @@ mod tests{
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_LOG_ATTRIBUTE {
@@ -59841,7 +59846,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_lcat_test_8() {
 		// this test has been indicated as to be expected to fail
 		
@@ -59850,7 +59855,7 @@ mod tests{
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_LOG_ATTRIBUTE {
@@ -59858,7 +59863,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_tst_lcat_test_9() {
 		// this test has been indicated as to be expected to fail
 		
@@ -59867,7 +59872,7 @@ mod tests{
 		let input0 = EbiInput::Trait(object0, file_handler0);
 		let input1 = EbiInput::String("some string".to_string(), &TEST_INPUT_TYPE_STRING);
 		let input2 = EbiInput::Usize(10, &TEST_INPUT_TYPE_USIZE);
-		let input3 = EbiInput::Fraction("0.05".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
+		let input3 = EbiInput::Fraction("1/20".parse().unwrap(), &TEST_INPUT_TYPE_FRACTION);
 		let inputs = vec![input0, input1, input2, input3];
 
 		if let EbiCommand::Command{execute, ..} = crate::ebi_commands::ebi_command_test::EBI_TEST_LOG_ATTRIBUTE {
@@ -59882,7 +59887,7 @@ mod tests{
 
 	// ==== command graph ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59910,7 +59915,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59938,7 +59943,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59966,7 +59971,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -59994,7 +59999,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60022,7 +60027,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60050,7 +60055,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60078,7 +60083,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60106,7 +60111,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60134,7 +60139,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60162,7 +60167,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60190,7 +60195,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60218,7 +60223,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60246,7 +60251,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60274,7 +60279,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60302,7 +60307,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60330,7 +60335,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60358,7 +60363,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60386,7 +60391,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60414,7 +60419,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60442,7 +60447,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60470,7 +60475,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60498,7 +60503,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60526,7 +60531,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60554,7 +60559,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_graph_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60585,7 +60590,7 @@ mod tests{
 
 	// ==== command txt ====
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_0() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60615,7 +60620,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_1() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60645,7 +60650,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_2() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60675,7 +60680,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_3() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60705,7 +60710,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_4() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60735,7 +60740,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_5() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60765,7 +60770,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_6() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60795,7 +60800,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_7() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60825,7 +60830,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_8() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60855,7 +60860,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_9() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60885,7 +60890,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_10() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60915,7 +60920,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_11() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60945,7 +60950,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_12() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -60975,7 +60980,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_13() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -61005,7 +61010,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_14() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -61035,7 +61040,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_15() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -61065,7 +61070,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_16() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -61095,7 +61100,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_17() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -61125,7 +61130,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_18() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -61155,7 +61160,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_19() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -61185,7 +61190,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_20() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -61215,7 +61220,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_21() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -61245,7 +61250,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_22() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -61275,7 +61280,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_23() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 
@@ -61305,7 +61310,7 @@ mod tests{
 		}
 	}
 	#[test]
-	#[timeout(10000)]
+	#[timeout(20000)]
 	pub fn ebi_vis_txt_test_24() {
 		// to indicate that this test is expected to fail, add the following to src/tests/fallible_test_list.rs:
 		/* 

@@ -626,10 +626,28 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
         &EBI_TEST_BOOTSTRAP,
         &[
             "*",
+            "trait finite stochastic language#./testfiles/empty.xes",
+            "usize 10",
+            "fraction 1/20"			
+        ]
+    ),
+    (
+        &EBI_TEST_BOOTSTRAP,
+        &[
+            "*",
             "trait finite stochastic language#./testfiles/empty.slang",
             "usize 10",
             "fraction 0.05",
         ],
+    ),
+    (
+        &EBI_TEST_BOOTSTRAP,
+        &[
+            "trait finite stochastic language#./testfiles/a-b-double.xes",
+            "trait finite stochastic language#./testfiles/empty.slang",
+            "usize 10",
+            "fraction 1/20"			
+        ]
     ),
     (
         &EBI_TEST_LOG_ATTRIBUTE,
