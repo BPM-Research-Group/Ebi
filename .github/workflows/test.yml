@@ -16,12 +16,12 @@ jobs:
       - name: generate tests and links
         run: |
               > src/tests/tests_autogen.rs
-              > src/javascript/javascript_autogen.rs
+              > src/surfaces/javascript/javascript_autogen.rs
               cargo run --features test_generation itself tests -o src/tests/tests_autogen.rs 
               cargo run --features "javascript test_generation" -- itself javascript -o src/surfaces/javascript/javascript_autogen.rs
 
       - parallel:
-        
+
         - name: Run tests mixed mode 1
           run: cargo test --verbose
 
