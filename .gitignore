@@ -37,5 +37,3 @@ manual/graph.svg
 manual/graph.pdf
 manual/functions.tex
 */.DS_Store
-src/surfaces/java/ebi.java
-src/surfaces/java/java_autogen.rs
