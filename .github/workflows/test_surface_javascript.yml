@@ -1,0 +1,24 @@
+name: Test Ebi surface Javascript
+
+on:
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: generate tests and links
+        run: |
+              > src/tests/tests_autogen.rs
+              > src/surfaces/javascript/javascript_autogen.rs
+              cargo run --features test_generation itself tests -o src/tests/tests_autogen.rs 
+              cargo run --features "javascript test_generation" -- itself javascript -o src/surfaces/javascript/javascript_autogen.rs
+
+      - name: Run tests javascript
+        run: cargo test --verbose --features javascript
