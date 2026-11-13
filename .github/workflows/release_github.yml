@@ -65,8 +65,8 @@ jobs:
 
             - name: Build Java library for Linux
               run: |
-                cargo run itself java rust -o src/surfaces/java/java_autogen.rs
-                cargo run itself java java -o src/surfaces/java/ebi.java
+                cargo run itself java rust -o src/surfaces/java/java_autogen.rs --features java
+                cargo run itself java java -o src/surfaces/java/ebi.java --features java
                 cargo build --target x86_64-unknown-linux-gnu --release --features java
                 mv target/x86_64-unknown-linux-gnu/release/ebi java-library-x86_64-linux_libebi.so
 
