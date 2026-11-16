@@ -1,9 +1,17 @@
+package org.processmining.ebi;
+//to compile: from the Ebi root:
+// cargo run --features java -- itself java rust -o src/surfaces/java/java_autogen.rs
+// cargo build --features java
+//to run: from the surfaces/java folder:
+// javac org/processmining/ebi/TestEbi.java
+// java -Djava.library.path="../../../target/debug" org.processmining.ebi.TestEbi
+
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class test_ebi {
+public class TestEbi {
 
     // static native String callEbi(String command_name, String output_format, String[] inputs);
 
@@ -23,12 +31,12 @@ public class test_ebi {
     public static void main(String args[]) {
         try {
             //call directly
-            String log = Files.readString(Path.of("testfiles/aa.slang"), StandardCharsets.UTF_8);
-            String info = ebi.information(log);
+            String log = Files.readString(Path.of("../../../testfiles/aa.slang"), StandardCharsets.UTF_8);
+            String info = Ebi.information(".txt", log);
             System.out.println(info);
             
             //call through polymorphic function
-            String result = ebi.callEbi("Ebi information", ".txt", new String[] { log });
+            String result = Ebi.callEbi("Ebi information", ".txt", new String[] { log });
             System.out.println(result);
         } catch (IOException e) {
             e.printStackTrace();

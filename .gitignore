@@ -37,3 +37,5 @@ manual/graph.svg
 manual/graph.pdf
 manual/functions.tex
 */.DS_Store
+src/surfaces/java/org/processmining/ebi/Ebi.class
+src/surfaces/java/org/processmining/ebi/TestEbi.class

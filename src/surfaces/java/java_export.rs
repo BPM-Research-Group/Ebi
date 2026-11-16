@@ -7,6 +7,7 @@ pub trait ExportableToJava {
     /// Exports an Ebi Output as its Java equivalent.
     fn export_to_java<'caller>(
         self,
+        output_format: String,
         env: &mut jni::Env<'caller>,
     ) -> Result<JString<'caller>, jni::errors::Error>;
 }
@@ -14,11 +15,12 @@ pub trait ExportableToJava {
 impl ExportableToJava for EbiOutput {
     fn export_to_java<'caller>(
         self,
+        output_format: String,
         env: &mut jni::Env<'caller>,
     ) -> Result<JString<'caller>, jni::errors::Error> {
         let mut p = PathBuf::new();
         p.set_file_name("file");
-        p.set_extension("txt");
+        p.set_extension(output_format);
         let exporter = EbiCommand::select_exporter(&self.get_type(), Some(&p), None).unwrap();
         match ebi_output::export_to_string(self, &exporter) {
             Ok(s) => JString::from_str(env, s),

@@ -21,7 +21,9 @@ pub fn generate_java_module_java() -> Result<EbiOutput> {
     Ok(EbiOutput::String(format!(
         r###"// This file has been automatically generated. Manual changes will be overridden.
 
-class ebi {{
+package org.processmining.ebi;
+
+public class Ebi {{
     static {{
         try {{
             System.loadLibrary("ebi");
@@ -31,7 +33,7 @@ class ebi {{
         }}
     }}
 
-    static native String callEbi(String command_name, String output_format, String[] inputs);
+    public static native String callEbi(String command_name, String output_format, String[] inputs);
 
 {functions}
 }}"###
@@ -52,5 +54,5 @@ fn ebi_command_to_java_function(path: &Vec<&EbiCommand>) -> Result<String> {
         .collect::<Vec<_>>()
         .join(", ");
 
-    Ok(format!("\tstatic native String {fn_name}({args});"))
+    Ok(format!("\tpublic static native String {fn_name}(String output_format, {args});"))
 }

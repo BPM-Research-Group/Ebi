@@ -8,7 +8,7 @@ use crate::{
 use ebi_objects::anyhow::Result;
 use itertools::Itertools;
 
-pub const JAVA_PATH: &str = "ebi";
+pub const JAVA_PATH: &str = "org.processmining.ebi.Ebi";
 
 pub fn generate_java_module_rust() -> Result<EbiOutput> {
     let imports = format!(
@@ -86,7 +86,7 @@ fn ebi_command_to_java_function(path: &Vec<&EbiCommand>) -> Result<String> {
     // Start building function
     Ok(format!(
         r###"#[jni_mangle("{JAVA_PATH}")]
-pub fn {fn_name}<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, {args}) -> JString<'caller> {{
+pub fn {fn_name}<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'caller>, output_format: JString<'caller>, {args}) -> JString<'caller> {{
     unowned_env.with_env(|env| -> Result<_, jni::errors::Error> {{
         {exact}
         let command: &&EbiCommand = &&{library_name};
@@ -111,7 +111,7 @@ pub fn {fn_name}<'caller>(mut unowned_env: EnvUnowned<'caller>, _class: JClass<'
             }}
         }};
         
-        output.export_to_java(env)
+        output.export_to_java(output_format.to_string(), env)
     }}).resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }}
 "###
