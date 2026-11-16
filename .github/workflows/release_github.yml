@@ -66,9 +66,9 @@ jobs:
             - name: Build Java library for Linux
               run: |
                 cargo run --features java -- itself java rust -o src/surfaces/java/java_autogen.rs
-                cargo run --features java -- itself java java -o src/surfaces/java/ebi.java
+                cargo run --features java -- itself java java -o src/surfaces/java/org/processmining/ebi/Ebi.java
                 cargo build --target x86_64-unknown-linux-gnu --release --features java
-                mv target/x86_64-unknown-linux-gnu/release/ebi java-library-x86_64-linux_libebi.so
+                mv target/x86_64-unknown-linux-gnu/release/libebi.so java-library-x86_64-linux_libebi.so
 
             - name: Build Java for Windows
               run: |
@@ -121,8 +121,8 @@ jobs:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
-                asset_path: src/surfaces/java/ebi.java
-                asset_name: ebi.java
+                asset_path: src/surfaces/java/org/processmining/ebi/Ebi.java
+                asset_name: Ebi.java
                 asset_content_type: text/x-c++
 
             - name: Add Java-Linux to release

@@ -8,7 +8,7 @@ use crate::{
 use ebi_objects::anyhow::Result;
 use itertools::Itertools;
 
-pub const JAVA_PATH: &str = "org.processmining.ebi.Ebi";
+pub const JAVA_PATH: &str = "org.ebitools.Ebi";
 
 pub fn generate_java_module_rust() -> Result<EbiOutput> {
     let imports = format!(

@@ -1,14 +1,46 @@
 // This file has been automatically generated. Manual changes will be overridden.
 
-package org.processmining.ebi;
+package org.ebitools;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Date;
 
 public class Ebi {
     static {
-        try {
-            System.loadLibrary("ebi");
-            System.out.println("Ebi library loaded");
-        } catch (Exception e) {
-            e.printStackTrace();
+		try {
+			// load from path initially
+			System.loadLibrary("ebi");
+			System.out.println("Ebi library loaded from path.");
+        } catch (UnsatisfiedLinkError e) {
+			// if that's not available, load from JAR
+			try {
+				String path = "Ebi_" + new Date().getTime();
+				String os = System.getProperty("os.name").toLowerCase();
+				InputStream in;
+				File fileOut;
+				if (os.contains("win")) {
+					// windows
+					in = Ebi.class.getResourceAsStream("/ebi.dll");
+					fileOut = new File(System.getProperty("java.io.tmpdir") + "/" + path + ".dll");
+                } else {
+					// linux
+					in = Ebi.class.getResourceAsStream("/libebi.so");
+					fileOut = new File(System.getProperty("java.io.tmpdir") + "/" + path + ".so");
+                }
+				OutputStream out = new FileOutputStream(fileOut);
+				in.transferTo(out);
+				in.close();
+				out.close();
+				System.load(fileOut.getAbsolutePath());
+				System.out.println("Ebi library loaded from jar.");
+				fileOut.deleteOnExit();
+            } catch (Exception f) {
+				System.out.println("Could not load the Ebi library.");
+				f.printStackTrace();
+            }
         }
     }
 
