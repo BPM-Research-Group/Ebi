@@ -87,14 +87,17 @@ Ebi can be used as a Rust crate, available from [crates.io](https://crates.io/cr
         };
         use ebi_objects::ebi_arithmetic::{Fraction, One};
         use std::fs;
-        // Read the first file and box it
+
+        // Read the first file, box it and cast it as a trait
         let fin1 = fs::read_to_string("testfiles/empty_trace.slang").unwrap();
         let slang1 = fin1.parse::<FiniteStochasticLanguage>().unwrap();
         let mut object1: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang1);
-        // Read the second file and box it
+
+        // Read the second file, box it and cast it as a trait
         let fin2 = fs::read_to_string("testfiles/empty_trace.slang").unwrap();
         let slang2 = fin2.parse::<FiniteStochasticLanguage>().unwrap();
         let mut object2: Box<dyn EbiTraitFiniteStochasticLanguage> = Box::new(slang2);
+
         // Compute EMSC
         let emsc = object1
             .earth_movers_stochastic_conformance(object2.as_mut())
@@ -104,23 +107,26 @@ Ebi can be used as a Rust crate, available from [crates.io](https://crates.io/cr
 ### Call Ebi from Java
 
 To use Ebi from Java:
-1.  Download the Ebi library for [Windows](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/ebi.dll) or [Linux](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/libebi.so) and put it in a folder that is accessible to the Path of your program.
+1.  Download the Ebi [Java library](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi.jar) and add it to the Class Path of your program.
 
-1.  Add the following static declarations:
+1.  Then, one can use Ebi as follows:
+        
+        import org.ebitools.Ebi;
+        import java.nio.file.Files;
+        import java.nio.charset.StandardCharsets;
 
-        static native String call_ebi_internal(String command_name, String output_format, String[] inputs);
-        static {
-            try {
-                System.loadLibrary("ebi");
-                System.out.println("Ebi library loaded");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-1.  Then, Ebi can be called through the native function, for instance:
-
+        //Load the inputs as strings.
         String log = Files.readString("log.xes", StandardCharsets.UTF_8);
-        String result = call_ebi_internal("Ebi analyse completeness", ".frac", new String[] {log});
+
+        //Call Ebi through a generic function.
+        //The first argument is the full name of the Ebi command, 
+        // the second is the desired output format, 
+        // and the third is an array of command parameters in string format.
+        String result = Ebi.callEbi("Ebi analyse completeness", ".frac", new String[] {log});
+
+        //Call Ebi through a command-specific function.
+        //The first argument is the desired output format, the remaining arguments are the command's inputs.
+        String info = Ebi.information(".txt", log);
 
 The [commands](https://bpm-research-group.github.io/Ebi/commands.html) page indicates the commands that can be called from Java.
 
