@@ -45,7 +45,7 @@ extension-module = ["pyo3/extension-module"]
 
 [dependencies]
 ebi_optimisation = { git = "https://github.com/BPM-Research-Group/Ebi_optimisation.git", version = "0.3.10" }
-ebi_objects = { git = "https://github.com/BPM-Research-Group/Ebi_objects.git", version = "0.3.194" }
+ebi_objects = { git = "https://github.com/BPM-Research-Group/Ebi_objects.git", version = "0.3.195" }
 ebi_derive = "0.2.11"
 bitvec = "1.0.1"
 clap = { version = "4.6.6", features = ["derive", "cargo", "string"] }
@@ -58,7 +58,7 @@ priority-queue = "2.6.0"
 process_mining = { version = "0.6.2", features = ["graphviz-export"] }
 rand = "0.10.1"
 rand_chacha = "0.10.0"
-chrono = "0.4.44"
+chrono = "0.4.45"
 flate2 = "1.1.11"
 rayon = "1.10.0"
 strsim = "0.11.1"
