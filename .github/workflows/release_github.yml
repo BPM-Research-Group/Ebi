@@ -48,7 +48,6 @@ jobs:
         - name: Upload artifact
           uses: actions/upload-artifact@v7
           with:
-            name: manual.pdf
             path: manual/manual.pdf
             if-no-files-found: error
             overwrite: true
@@ -79,7 +78,6 @@ jobs:
         - name: Upload artifact
           uses: actions/upload-artifact@v7
           with:
-            name: Ebi-x86_64-linux
             path: target/x86_64-unknown-linux-gnu/release/ebi
             if-no-files-found: error
             overwrite: true
@@ -111,7 +109,6 @@ jobs:
         - name: Upload artifact
           uses: actions/upload-artifact@v7
           with:
-            name: Ebi-x86_64-windows.exe
             path: target/x86_64-pc-windows-gnu/release/ebi.exe
             if-no-files-found: error
             overwrite: true
@@ -161,7 +158,6 @@ jobs:
         - name: Upload artifact
           uses: actions/upload-artifact@v7
           with:
-            name: Ebi.jar
             path: Ebi.jar
             if-no-files-found: error
             overwrite: true
@@ -200,7 +196,7 @@ jobs:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
-                asset_path: manual.pdf
+                asset_path: manual/manual.pdf
                 asset_name: manual.pdf
                 asset_content_type: application/pdf
 
@@ -210,7 +206,7 @@ jobs:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
-                asset_path: Ebi-x86_64-linux
+                asset_path: target/x86_64-unknown-linux-gnu/release/ebi
                 asset_name: Ebi-x86_64-linux
                 asset_content_type: application/x-executable
 
@@ -220,7 +216,7 @@ jobs:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
-                asset_path: Ebi-x86_64-windows.exe
+                asset_path: target/x86_64-pc-windows-gnu/release/ebi.exe
                 asset_name: Ebi-x86_64-windows.exe
                 asset_content_type: application/vnd.microsoft.portable-executable
 
