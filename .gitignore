@@ -39,3 +39,4 @@ manual/functions.tex
 */.DS_Store
 *.class
 src/surfaces/java/target
+pkg
