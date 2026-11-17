@@ -200,7 +200,7 @@ jobs:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
-                asset_path: manual/manual.pdf
+                asset_path: Ebi/manual.pdf/manual.pdf
                 asset_name: manual.pdf
                 asset_content_type: application/pdf
 
@@ -210,7 +210,7 @@ jobs:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
-                asset_path: Ebi-x86_64-linux/ebi
+                asset_path: Ebi/ebi/ebi
                 asset_name: Ebi-x86_64-linux
                 asset_content_type: application/x-executable
 
@@ -220,7 +220,7 @@ jobs:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
-                asset_path: Ebi-x86_64-windows/ebi.exe
+                asset_path: Ebi/ebi.exe/ebi.exe
                 asset_name: Ebi-x86_64-windows.exe
                 asset_content_type: application/vnd.microsoft.portable-executable
 
@@ -230,7 +230,7 @@ jobs:
                 GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               with:
                 upload_url: ${{ steps.create_release.outputs.upload_url }}
-                asset_path: Ebi.jar/Ebi.jar
+                asset_path: Ebi/Ebi.jar/Ebi.jar
                 asset_name: Ebi.jar
                 asset_content_type: application/java-archive
 
