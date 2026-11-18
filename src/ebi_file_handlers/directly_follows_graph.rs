@@ -101,7 +101,7 @@ impl FromEbiTraitObject for DirectlyFollowsGraph {
         match object {
             EbiInput::Object(EbiObject::DirectlyFollowsGraph(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a directly follows graph",
+                "Cannot read {} {} as a directly follows graph.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

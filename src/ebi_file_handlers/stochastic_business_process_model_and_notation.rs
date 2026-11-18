@@ -68,7 +68,7 @@ impl FromEbiTraitObject for StochasticBusinessProcessModelAndNotation {
                 Ok(Box::new(e))
             }
             _ => Err(anyhow!(
-                "cannot read {} {} as a stochastic Business Process Model and Notation",
+                "Cannot read {} {} as a stochastic Business Process Model and Notation.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

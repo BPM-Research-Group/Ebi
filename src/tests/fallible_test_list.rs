@@ -314,27 +314,31 @@ pub(crate) const FALLIBLE_TESTS: &'static [(&'static EbiCommand, &'static [&'sta
     ),
     (
         &EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
-        &["*", "trait semantics#./testfiles/empty.xes"],
+        &["*", "trait semantics#./testfiles/empty.xes", "string auto"],
     ),
     (
         &EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
-        &["*", "trait semantics#./testfiles/empty_2.ptree"],
+        &["*", "object process tree#./testfiles/empty.ptree", "string auto"],
     ),
     (
         &EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
-        &["*", "trait semantics#./testfiles/empty.dfm"],
+        &["*", "trait semantics#./testfiles/empty_2.ptree", "string auto"],
     ),
     (
         &EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
-        &["*", "trait semantics#./testfiles/empty.sdfa"],
+        &["*", "object process tree#./testfiles/empty_2.ptree", "string auto"]
     ),
     (
         &EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
-        &["*", "trait semantics#./testfiles/empty.lang"],
+        &["*", "trait semantics#./testfiles/empty.dfm", "string auto"],
     ),
     (
-        &EBI_CONFORMANCE_NON_STOCHASTIC_SET_ALIGNMENTS,
-        &["*", "trait semantics#./testfiles/empty.lang"],
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
+        &["*", "trait semantics#./testfiles/empty.sdfa", "string auto"],
+    ),
+    (
+        &EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS,
+        &["*", "trait semantics#./testfiles/empty.lang", "string auto"],
     ),
     (
         &EBI_ANALYSE_NON_STOCHASTIC_CLUSTER,

@@ -89,7 +89,7 @@ impl FromEbiTraitObject for dyn EbiTraitEventLogTraceAttributes {
         match object {
             EbiInput::Trait(EbiTraitObject::EventLogTraceAttributes(e), _) => Ok(e),
             _ => Err(anyhow!(
-                "cannot read {} {} as an event log",
+                "Cannot read {} {} as an event log.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

@@ -1,4 +1,4 @@
-use crate::{ebi_framework::displayable::Displayable, techniques::align::AlignmentHeuristics};
+use crate::{ebi_framework::displayable::Displayable, techniques::align_astar::AlignmentHeuristics};
 use ebi_objects::{
     Activity, HasActivityKey, anyhow::Result, ebi_objects::labelled_petri_net::TransitionIndex,
 };

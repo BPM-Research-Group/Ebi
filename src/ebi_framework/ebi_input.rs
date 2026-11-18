@@ -89,6 +89,13 @@ macro_rules! EbiInputTypeEnum {
     };
 }
 
+#[macro_export]
+macro_rules! EbiInputTypeEnumDefault {
+    ($t:ident, $d:expr) => {
+        EbiInputType::String(Some($t::VARIANTS), Some($d.into_str()))
+    };
+}
+
 #[derive(PartialEq, Eq, EnumIter, Clone, Debug, EnumIs)]
 pub enum EbiInputType {
     Trait(EbiTrait),

@@ -234,7 +234,7 @@ impl FromEbiTraitObject for EbiFileHandler {
         match object {
             EbiInput::FileHandler(e) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as an file handler",
+                "Cannot read {} {} as a file handler.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

@@ -83,7 +83,7 @@ impl FromEbiTraitObject for ProcessTree {
         match object {
             EbiInput::Object(EbiObject::ProcessTree(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a process tree",
+                "Cannot read {} {} as a process tree.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

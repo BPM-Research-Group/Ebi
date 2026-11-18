@@ -197,6 +197,8 @@ pub mod surfaces {
 pub mod techniques {
     pub mod alergia;
     pub mod align;
+    pub mod align_astar;
+    pub mod align_process_tree;
     pub mod alignment_stochastic_miner;
     pub mod any_traces;
     pub mod association;

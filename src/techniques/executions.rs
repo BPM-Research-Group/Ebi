@@ -9,11 +9,11 @@ use crate::{
 };
 use chrono::{DateTime, FixedOffset};
 use ebi_objects::{
-    Activity, ActivityKey, Attribute, Executions,
-    anyhow::{Context, Error, Ok, Result, anyhow},
+    anyhow::{anyhow, Context, Error, Ok, Result},
     ebi_objects::{
         executions::Execution, labelled_petri_net::TransitionIndex, language_of_alignments::Move,
     },
+    Activity, ActivityKey, Attribute, Executions,
 };
 use intmap::IntMap;
 use process_mining::core::event_data::case_centric::AttributeValue;
@@ -302,7 +302,11 @@ impl C {
                 _ => last = false,
             }
         }
-        if last { Some(event_index - 1) } else { None }
+        if last {
+            Some(event_index - 1)
+        } else {
+            None
+        }
     }
 
     /**
@@ -442,7 +446,11 @@ impl ExecutionsSorter {
                 })
                 .min_by(|a, b| {
                     let c = a.1.cmp(&b.1);
-                    if !c.is_eq() { c } else { a.0.cmp(&b.0) }
+                    if !c.is_eq() {
+                        c
+                    } else {
+                        a.0.cmp(&b.0)
+                    }
                 })
             {
                 //process the trace with the lowest timestamp
@@ -485,9 +493,9 @@ mod tests {
         techniques::executions::FindExecutions,
     };
     use ebi_objects::{
-        LabelledPetriNet, StochasticDeterministicFiniteAutomaton,
-        StochasticNondeterministicFiniteAutomaton, ebi_arithmetic::is_exact_globally,
-        ebi_objects::event_log_event_attributes::EventLogEventAttributes,
+        ebi_arithmetic::is_exact_globally,
+        ebi_objects::event_log_event_attributes::EventLogEventAttributes, LabelledPetriNet,
+        StochasticDeterministicFiniteAutomaton, StochasticNondeterministicFiniteAutomaton,
     };
     use std::fs;
 

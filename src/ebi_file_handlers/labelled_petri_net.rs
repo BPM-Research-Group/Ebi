@@ -91,7 +91,7 @@ impl FromEbiTraitObject for LabelledPetriNet {
         match object {
             EbiInput::Object(EbiObject::LabelledPetriNet(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a labelled Petri net",
+                "Cannot read {} {} as a labelled Petri net.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

@@ -1,12 +1,12 @@
 use super::align::Align;
 use crate::ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage;
 use ebi_objects::{
-    BusinessProcessModelAndNotation, LabelledPetriNet, StochasticBusinessProcessModelAndNotation,
-    StochasticLabelledPetriNet,
-    anyhow::{Context, Result, anyhow},
+    anyhow::{anyhow, Context, Result},
     ebi_arithmetic::{Fraction, Zero},
     ebi_bpmn::Token,
     ebi_objects::language_of_alignments::Move,
+    BusinessProcessModelAndNotation, LabelledPetriNet, StochasticBusinessProcessModelAndNotation,
+    StochasticLabelledPetriNet,
 };
 
 pub trait AlignmentMiner {
@@ -129,7 +129,9 @@ mod tests {
     use std::fs;
 
     use ebi_objects::{
-        BusinessProcessModelAndNotation, FiniteStochasticLanguage, HasActivityKey, LabelledPetriNet, TranslateActivityKey, ebi_bpmn::{GlobalIndex, Token},
+        ebi_bpmn::{GlobalIndex, Token},
+        BusinessProcessModelAndNotation, FiniteStochasticLanguage, HasActivityKey,
+        LabelledPetriNet, TranslateActivityKey,
     };
 
     use crate::techniques::alignment_stochastic_miner::AlignmentMiner;

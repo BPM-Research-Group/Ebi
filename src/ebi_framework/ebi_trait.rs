@@ -174,7 +174,7 @@ impl FromEbiTraitObject for Fraction {
         match object {
             EbiInput::Fraction(e, _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a fraction",
+                "Cannot read {} {} as a fraction.",
                 object.get_type().get_article(),
                 object.get_type()
             )),
@@ -187,7 +187,7 @@ impl FromEbiTraitObject for usize {
         match object {
             EbiInput::Usize(e, _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as an integer",
+                "Cannot read {} {} as an integer.",
                 object.get_type().get_article(),
                 object.get_type()
             )),
@@ -200,7 +200,7 @@ impl FromEbiTraitObject for String {
         match object {
             EbiInput::String(e, _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as an integer",
+                "Cannot read {} {} as an integer.",
                 object.get_type().get_article(),
                 object.get_type()
             )),

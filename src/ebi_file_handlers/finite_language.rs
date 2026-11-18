@@ -68,7 +68,7 @@ impl FromEbiTraitObject for FiniteLanguage {
         match object {
             EbiInput::Object(EbiObject::FiniteLanguage(e), _) => Ok(Box::new(e)),
             _ => Err(anyhow!(
-                "cannot read {} {} as a finite language",
+                "Cannot read {} {} as a finite language.",
                 object.get_type().get_article(),
                 object.get_type()
             )),
