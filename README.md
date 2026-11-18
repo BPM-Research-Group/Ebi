@@ -19,16 +19,16 @@ This will run fully on your computer, is limited to 4GB of RAM and single-thread
 
 ### Use Ebi as a command line utility
 
-1. Download Ebi CLI for [Windows](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-windows.exe) or for [Linux](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-linux).
+1. Download Ebi CLI for [Windows](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-windows.exe), for [Linux](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-x86_64-linux), or for [Mac](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/Ebi-arm-apple).
     Older versions are available [here](https://github.com/BPM-Research-Group/Ebi/releases/).
-1. In Linux, give the file execution permissions. In Windows, this step is not necessary.
+1. In Linux or on a Mac, give the file execution permissions. In Windows, this step is not necessary.
 1. Open a command prompt and run the executable.
     Installation is not necessary, and Ebi does not require internet access.
 1. For an overview of the commands, refer to the [commands page](https://bpm-research-group.github.io/Ebi/commands.html) or the [PDF manual](https://github.com/BPM-Research-Group/Ebi/releases/latest/download/manual.pdf).
 
-Ebi runs on Mac OS X and many other platforms by self-compilation; please see below.
+Ebi runs on many other platforms by self-compilation; please see below.
 
-A good way to get started is to try `ebi info` followed by a file name, which will parse the file and print some information about it.
+A good way to get started is to try `ebi info` followed by the name of a file, which will parse the file and print some information about it.
 
 ### Use Ebi in ProM
 
@@ -140,7 +140,7 @@ Got a feature request? Found a bug?
 Please use our [Github issue page](https://github.com/BPM-Research-Group/Ebi/issues).
 
 Ebi is hosted on [Github](https://github.com/BPM-Research-Group/Ebi).
-To get started with development, or to compile for Mac OS X:
+To get started with development, or to compile Ebi yourself:
 
 1. Install [Rustup](https://www.rust-lang.org/tools/install)
 1. Log out and in again
