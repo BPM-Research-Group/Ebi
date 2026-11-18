@@ -40,12 +40,17 @@ pub const EBI_CONFORMANCE_NON_STOCHASTIC_ALIGNMENTS: EbiCommand = EbiCommand::Co
     name_long: Some("alignments"),
     explanation_short: "Compute alignments.",
     explanation_long: Some(
-        "Compute alignments.\nThe model must be able to terminate and its states must be bounded.",
+        "Compute alignments.\nThe model must be able to terminate (that is, reach a deadlock state) and its number of states must be bounded.",
     ),
     latex_link: Some(
         "If the model is a process tree that is free of duplicated activity labels, alignments will be computed using~\\cite{DBLP:conf/icpm/SchwanenPA24}.
         Otherwise, alignments are computed according to the method described by Adriansyah~\\cite{DBLP:conf/edoc/AdriansyahDA11}.
         This choice can be overridden using the ALGO parameter.
+
+        Every deadlock is considered to be an accepting state (or final marking).
+        For Petri nets, this may lead to different outcomes compared to other alignment computing tools, where an explicit final marking must be given.
+        For sound workflow nets, process trees and automata, Ebi yields however equivalent alignments.
+
         By default, all traces are computed concurrently on all CPU cores. 
         If this requires too much RAM, please consider applying some speed tricks~\\ref{speedtrick:multithreaded} in Section~\\ref{sec:speedtricks} to reduce the number of CPU cores utilised.",
     ),
