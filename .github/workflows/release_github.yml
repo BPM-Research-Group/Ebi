@@ -56,7 +56,7 @@ jobs:
 
 
     build_cli_linux:
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-22.04
       permissions: write-all
       steps:
         - name: Checkout
@@ -117,6 +117,37 @@ jobs:
             overwrite: true
             archive: false
 
+    build_cli_apple:
+      runs-on: macos-latest
+      permissions: write-all
+      steps:
+        - name: Checkout
+          uses: actions/checkout@v4
+  
+        - name: Update version number
+          id: version
+          run: |
+            cargo install cargo-edit
+            VERS=${{ github.ref_name }}
+            VERS="${VERS:1}"
+            cargo set-version "$VERS"
+            echo "version=$(echo $VERS)" >> $GITHUB_OUTPUT
+            
+        - name: Build CLI for Apple ARM
+          run: |
+            rustup target add aarch64-apple-darwin
+            cargo build --release --target aarch64-apple-darwin
+            mv target/aarch64-apple-darwin/release/ebi target/aarch64-apple-darwin/release/ebi.app
+
+        - name: Upload artifact
+          uses: actions/upload-artifact@v7
+          with:
+            name: Ebi-arm-apple
+            path: target/aarch64-apple-darwin/release/ebi.app
+            if-no-files-found: error
+            overwrite: true
+            archive: false
+
 
     build_java:
       runs-on: ubuntu-latest
@@ -154,7 +185,7 @@ jobs:
 
         - name: Build Java library
           run: |
-            cargo build --target x86_64-unknown-linux-gnu --release --features java
+            RUSTFLAGS="-C target-feature=-crt-static" cargo build --target x86_64-unknown-linux-gnu --release --features java
             cargo build --target x86_64-pc-windows-gnu --release --features java
             jar cvf Ebi.jar src/surfaces/java/org/ebitools/Ebi.java -C target/x86_64-unknown-linux-gnu/release libebi.so -C target/x86_64-pc-windows-gnu/release/ ebi.dll
 
@@ -171,7 +202,7 @@ jobs:
     create_Github_release:
         runs-on: ubuntu-latest
         permissions: write-all
-        needs: [build_java, build_cli_linux, build_cli_windows, build_manual]
+        needs: [build_java, build_cli_linux, build_cli_windows, build_cli_apple, build_manual]
         steps:
 
             - name: Get version number
@@ -226,6 +257,16 @@ jobs:
                 asset_path: ebi.exe/ebi.exe
                 asset_name: Ebi-x86_64-windows.exe
                 asset_content_type: application/vnd.microsoft.portable-executable
+            
+            - name: Add Apple to CLI release
+              uses: actions/upload-release-asset@v1
+              env:
+                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              with:
+                upload_url: ${{ steps.create_release.outputs.upload_url }}
+                asset_path: ebi.app/ebi.app
+                asset_name: Ebi-arm-apple
+                asset_content_type: application/x-mach-binary
 
             - name: Add Ebi-Java to release
               uses: actions/upload-release-asset@v1
