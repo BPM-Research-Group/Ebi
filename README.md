@@ -1,6 +1,6 @@
 # Ebi - a process mining tool
 
-Ebi is a process mining software suite, maintained by the [BPM group](https://bpm.rwth-aachen.de) of RWTH Aachen University, Germany. 
+Ebi is a process mining software suite, maintained by the [BPM group](https://leemans.ch/group) of the RWTH Aachen University, Germany. 
 It contains several algorithms and techniques that perform analyses on event logs and process models.
 Ebi can be used as a command-line utility, from a browser and in ProM.
 Furthermore, Ebi can be called from Rust, Python, Java and Javascript. 
