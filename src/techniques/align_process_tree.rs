@@ -980,7 +980,7 @@ where
         .map(|(trace, probability)| {
             let translator = Arc::clone(&translator);
 
-            let trace_translated = translator.translate_trace(&trace);
+            let trace_translated = translator.translate_trace(trace);
 
             let result = align_trace(&trace_translated)
                 .with_context(|| format!("Aligning trace {:?}", trace))?;

@@ -296,7 +296,7 @@ impl EbiOutputType {
             }
             EbiOutputType::ObjectType(EbiObjectType::FiniteStochasticPartiallyOrderedLanguage) => {
                 EbiExporter::Object(
-                    &&EbiObjectExporter::FiniteStochasticPartiallyOrderedLanguage(
+                    &EbiObjectExporter::FiniteStochasticPartiallyOrderedLanguage(
                         FiniteStochasticPartiallyOrderedLanguage::export_from_object,
                     ),
                     &EBI_FINITE_STOCHASTIC_PARTIALLY_ORDERED_LANGUAGE,
@@ -308,7 +308,7 @@ impl EbiOutputType {
             ),
             EbiOutputType::ObjectType(EbiObjectType::StochasticDeterministicFiniteAutomaton) => {
                 EbiExporter::Object(
-                    &&EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
+                    &EbiObjectExporter::StochasticDeterministicFiniteAutomaton(
                         StochasticDeterministicFiniteAutomaton::export_from_object,
                     ),
                     &EBI_STOCHASTIC_DETERMINISTIC_FINITE_AUTOMATON,
@@ -316,7 +316,7 @@ impl EbiOutputType {
             }
             EbiOutputType::ObjectType(EbiObjectType::StochasticNondeterministicFiniteAutomaton) => {
                 EbiExporter::Object(
-                    &&EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(
+                    &EbiObjectExporter::StochasticNondeterministicFiniteAutomaton(
                         StochasticNondeterministicFiniteAutomaton::export_from_object,
                     ),
                     &EBI_STOCHASTIC_NONDETERMINISTIC_FINITE_AUTOMATON,
@@ -324,25 +324,25 @@ impl EbiOutputType {
             }
             EbiOutputType::ObjectType(EbiObjectType::StochasticLabelledPetriNet) => {
                 EbiExporter::Object(
-                    &&EbiObjectExporter::StochasticLabelledPetriNet(
+                    &EbiObjectExporter::StochasticLabelledPetriNet(
                         StochasticLabelledPetriNet::export_from_object,
                     ),
                     &EBI_STOCHASTIC_LABELLED_PETRI_NET,
                 )
             }
             EbiOutputType::ObjectType(EbiObjectType::ProcessTree) => EbiExporter::Object(
-                &&EbiObjectExporter::ProcessTree(ProcessTree::export_from_object),
+                &EbiObjectExporter::ProcessTree(ProcessTree::export_from_object),
                 &EBI_PROCESS_TREE,
             ),
             EbiOutputType::ObjectType(EbiObjectType::StochasticProcessTree) => EbiExporter::Object(
-                &&EbiObjectExporter::StochasticProcessTree(
+                &EbiObjectExporter::StochasticProcessTree(
                     StochasticProcessTree::export_from_object,
                 ),
                 &EBI_STOCHASTIC_PROCESS_TREE,
             ),
             EbiOutputType::ObjectType(EbiObjectType::PartiallyOrderedWorkflowLanguage) => {
                 EbiExporter::Object(
-                    &&EbiObjectExporter::PartiallyOrderedWorkflowLanguage(
+                    &EbiObjectExporter::PartiallyOrderedWorkflowLanguage(
                         PartiallyOrderedWorkflowLanguage::export_from_object,
                     ),
                     &EBI_PARTIALLY_ORDERED_WORKFLOW_LANGUAGE,

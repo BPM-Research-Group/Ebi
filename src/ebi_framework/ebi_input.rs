@@ -1531,7 +1531,7 @@ pub fn attempt_parse(
             }
             EbiInputType::String(None, _) => {
                 if let MultipleReader::String(string) = &reader {
-                    return Ok(EbiInput::String(string.clone(), &input_type));
+                    return Ok(EbiInput::String(string.clone(), input_type));
                 } else {
                     return Err(anyhow!(
                         "Cannot get a string from a non-string multireader."
@@ -1541,7 +1541,7 @@ pub fn attempt_parse(
             EbiInputType::String(Some(allowed_values), _) => {
                 if let MultipleReader::String(string) = &reader {
                     if allowed_values.contains(&string.as_str()) {
-                        return Ok(EbiInput::String(string.clone(), &input_type));
+                        return Ok(EbiInput::String(string.clone(), input_type));
                     } else {
                         error = Some(anyhow!("value should be one of {:?}", allowed_values));
                     }
@@ -1556,20 +1556,20 @@ pub fn attempt_parse(
                     && let Ok(value) = string.parse::<usize>() {
                         match (min, max) {
                             (None, None) => {
-                                return Ok(EbiInput::Usize(value, &input_type));
+                                return Ok(EbiInput::Usize(value, input_type));
                             }
                             (None, Some(max)) => {
                                 if max < &value {
                                     error = Some(anyhow!("value should be at most {}", max));
                                 } else {
-                                    return Ok(EbiInput::Usize(value, &input_type));
+                                    return Ok(EbiInput::Usize(value, input_type));
                                 }
                             }
                             (Some(min), None) => {
                                 if min > &value {
                                     error = Some(anyhow!("value should be at least {}", min));
                                 } else {
-                                    return Ok(EbiInput::Usize(value, &input_type));
+                                    return Ok(EbiInput::Usize(value, input_type));
                                 }
                             }
                             (Some(min), Some(max)) => {
@@ -1580,7 +1580,7 @@ pub fn attempt_parse(
                                         max
                                     ));
                                 } else {
-                                    return Ok(EbiInput::Usize(value, &input_type));
+                                    return Ok(EbiInput::Usize(value, input_type));
                                 }
                             }
                         }
@@ -1593,20 +1593,20 @@ pub fn attempt_parse(
 
                         match (min, max) {
                             (None, None) => {
-                                return Ok(EbiInput::Fraction(value.clone(), &input_type));
+                                return Ok(EbiInput::Fraction(value.clone(), input_type));
                             }
                             (None, Some(max)) => {
                                 if max < &value {
                                     error = Some(anyhow!("value should be at most {}", max));
                                 } else {
-                                    return Ok(EbiInput::Fraction(value.clone(), &input_type));
+                                    return Ok(EbiInput::Fraction(value.clone(), input_type));
                                 }
                             }
                             (Some(min), None) => {
                                 if min > &value {
                                     error = Some(anyhow!("value should be at least {}", min));
                                 } else {
-                                    return Ok(EbiInput::Fraction(value.clone(), &input_type));
+                                    return Ok(EbiInput::Fraction(value.clone(), input_type));
                                 }
                             }
                             (Some(min), Some(max)) => {
@@ -1617,7 +1617,7 @@ pub fn attempt_parse(
                                         max
                                     ));
                                 } else {
-                                    return Ok(EbiInput::Fraction(value.clone(), &input_type));
+                                    return Ok(EbiInput::Fraction(value.clone(), input_type));
                                 }
                             }
                         }

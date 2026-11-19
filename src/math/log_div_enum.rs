@@ -408,8 +408,8 @@ impl AddAssign for LogDivEnum {
                     LogDivEnum::Exact((ab_log, c_denom)),
                     LogDivEnum::Exact((rhs_ab_log, rhs_c_denom)),
                 ) => {
-                    *ab_log = Self::power_f_u(&ab_log, &rhs_c_denom)
-                        * Self::power_f_u(&rhs_ab_log, &c_denom);
+                    *ab_log = Self::power_f_u(ab_log, &rhs_c_denom)
+                        * Self::power_f_u(&rhs_ab_log, c_denom);
                     *c_denom *= &rhs_c_denom;
                 }
                 (LogDivEnum::Approx(f), LogDivEnum::Approx(g)) => f.add_assign(g),
@@ -447,8 +447,8 @@ impl SubAssign for LogDivEnum {
                     LogDivEnum::Exact((ab_log, c_denom)),
                     LogDivEnum::Exact((rhs_ab_log, rhs_c_denom)),
                 ) => {
-                    *ab_log = Self::power_f_u(&ab_log, &rhs_c_denom)
-                        / Self::power_f_u(&rhs_ab_log, &c_denom);
+                    *ab_log = Self::power_f_u(ab_log, &rhs_c_denom)
+                        / Self::power_f_u(&rhs_ab_log, c_denom);
                     *c_denom *= &rhs_c_denom;
                 }
                 (LogDivEnum::Approx(f), LogDivEnum::Approx(g)) => f.sub_assign(g),
@@ -473,7 +473,7 @@ impl MulAssign<FractionEnum> for LogDivEnum {
         } else {
             match (self, rhs) {
                 (LogDivEnum::Exact((ab_log, c)), FractionEnum::Exact(f)) => {
-                    *ab_log = Self::power_f_u(&ab_log, f.numerator_ref());
+                    *ab_log = Self::power_f_u(ab_log, f.numerator_ref());
                     *c *= f.denominator_ref();
                 }
                 (LogDivEnum::Approx(f), FractionEnum::Approx(g)) => *f *= g,
@@ -490,7 +490,7 @@ impl MulAssign<&FractionEnum> for LogDivEnum {
         }
         match (self, rhs) {
             (LogDivEnum::Exact((ab_log, c)), FractionEnum::Exact(f)) => {
-                *ab_log = Self::power_f_u(&ab_log, f.numerator_ref());
+                *ab_log = Self::power_f_u(ab_log, f.numerator_ref());
                 *c *= f.denominator_ref();
             }
             (LogDivEnum::Approx(f), FractionEnum::Approx(g)) => *f *= g,
@@ -503,7 +503,7 @@ impl MulAssign<usize> for LogDivEnum {
     fn mul_assign(&mut self, rhs: usize) {
         match self {
             LogDivEnum::Exact((ab_log, _)) => {
-                *ab_log = Self::power_f_u(&ab_log, &Natural::from(rhs))
+                *ab_log = Self::power_f_u(ab_log, &Natural::from(rhs))
             }
             LogDivEnum::Approx(f) => *f *= rhs as f64,
             _ => {}
@@ -515,7 +515,7 @@ impl MulAssign<u64> for LogDivEnum {
     fn mul_assign(&mut self, rhs: u64) {
         match self {
             LogDivEnum::Exact((ab_log, _)) => {
-                *ab_log = Self::power_f_u(&ab_log, &Natural::from(rhs))
+                *ab_log = Self::power_f_u(ab_log, &Natural::from(rhs))
             }
             LogDivEnum::Approx(f) => *f *= rhs as f64,
             _ => {}

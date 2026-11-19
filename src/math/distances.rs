@@ -197,7 +197,7 @@ impl<'a> TriangularIterator<'a> {
             i: 1,
             j: 0,
             index: 0,
-            distances: &distances,
+            distances: distances,
         }
     }
 }

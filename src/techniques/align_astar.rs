@@ -170,7 +170,7 @@ where
                 let translator = Arc::clone(&translator);
                 let self2 = Arc::from(&self);
 
-                let trace_translated = translator.translate_trace(&trace);
+                let trace_translated = translator.translate_trace(trace);
 
                 // log::debug!("align trace {:?}", trace);
                 let result = self2
@@ -251,7 +251,7 @@ where
             // println!("\t\tenabled {:?}", semantics.get_enabled_transitions(&state));
 
             //walk through the enabled transitions in the model
-            for transition in semantics.get_enabled_transitions(&state) {
+            for transition in semantics.get_enabled_transitions(state) {
                 let mut new_state = state.clone();
                 let _ = semantics
                     .execute_transition(&mut new_state, transition)
@@ -290,7 +290,7 @@ where
 
         //function that returns whether we are in a final synchronous product state
         let success = |(trace_index, state): &(usize, State)| {
-            let result = trace_index == &trace.len() && semantics.is_final_state(&state);
+            let result = trace_index == &trace.len() && semantics.is_final_state(state);
             // println!("state {} {} is final: {}", trace_index, state, result);
             result
         };

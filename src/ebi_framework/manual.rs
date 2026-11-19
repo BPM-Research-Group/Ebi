@@ -499,7 +499,7 @@ pub(crate) fn object_importers_table() -> Result<String> {
     for file_handler in handlers {
         writeln!(f, "{}\\hfill .{}", file_handler.name, file_handler.file_extension)?;
         for object_type in &types {
-            write!(f, "&{}", file_handler.can_import_as_object(&object_type).to_latex_circle())?;
+            write!(f, "&{}", file_handler.can_import_as_object(object_type).to_latex_circle())?;
         }
         writeln!(f, "\\\\")?;
     }
@@ -536,7 +536,7 @@ pub(crate) fn trait_importers_table() -> Result<String> {
         writeln!(f, "{}\\hfill .{}", file_handler.name, file_handler.file_extension)?;
 
         for object_type in &types {
-            if file_handler.can_import_as_trait(&object_type) {
+            if file_handler.can_import_as_trait(object_type) {
                 write!(f, "&\\CIRCLE")?;
             } else {
                 write!(f, "&\\Circle")?;

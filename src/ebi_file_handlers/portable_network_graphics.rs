@@ -9,7 +9,7 @@ pub const EBI_PORTABLE_NETWORK_GRAPHCIS: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "png",
     is_binary: true,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: FORMAT_SPECIFICATION,
     validator: None,
     trait_importers: &[],
     object_importers: &[],

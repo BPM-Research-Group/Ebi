@@ -53,7 +53,7 @@ impl AlignmentAlgorithm {
             AlignmentAlgorithm::Auto => {
                 // Attempt to create a ProcessTreeAligner. If that succeeds, we can align using it.
                 if let EbiInput::Object(EbiObject::ProcessTree(tree), _) = &model
-                    && let Ok(mut tree_aligner) = ProcessTreeAligner::new(&tree)
+                    && let Ok(mut tree_aligner) = ProcessTreeAligner::new(tree)
                 {
                     log::info!("Align a process tree without duplicated activity labels");
                     return tree_aligner.align_stochastic_language(log);

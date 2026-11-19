@@ -51,7 +51,7 @@ impl Associations for dyn EbiTraitEventLogTraceAttributes {
                         .attribute_to_label(attribute)
                         .unwrap()
                         .to_owned(),
-                    self.association_type(number_of_samples, attribute, &data_type),
+                    self.association_type(number_of_samples, attribute, data_type),
                 )
             })
             .collect()
@@ -174,7 +174,7 @@ impl dyn EbiTraitEventLogTraceAttributes {
                 let mut sum_different = Fraction::zero();
                 for i in &sample {
                     for j in &sample {
-                        let trace_dist = levenshtein::normalised(&pairs[*i].1, &pairs[*j].1);
+                        let trace_dist = levenshtein::normalised(pairs[*i].1, pairs[*j].1);
 
                         if pairs[*i].0 != pairs[*j].0 {
                             count_same += 1;
@@ -270,7 +270,7 @@ impl<'a> IntoIterator for &'a SamplePairsSpace {
     fn into_iter(self) -> Self::IntoIter {
         Self::IntoIter {
             done: 0,
-            sample_space: &self,
+            sample_space: self,
         }
     }
 }

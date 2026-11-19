@@ -273,7 +273,7 @@ impl EbiCommand {
                 ..
             } => match name_long {
                 Some(x) => x,
-                None => &name_short,
+                None => name_short,
             },
             EbiCommand::Command {
                 name_short,
@@ -281,7 +281,7 @@ impl EbiCommand {
                 ..
             } => match name_long {
                 Some(x) => x,
-                None => &name_short,
+                None => name_short,
             },
         }
     }
@@ -290,11 +290,11 @@ impl EbiCommand {
         match self {
             EbiCommand::Group {
                 explanation_short, ..
-            } => &explanation_short,
+            } => explanation_short,
 
             EbiCommand::Command {
                 explanation_short, ..
-            } => &explanation_short,
+            } => explanation_short,
         }
     }
 
@@ -306,7 +306,7 @@ impl EbiCommand {
                 ..
             } => match explanation_long {
                 Some(x) => x,
-                None => &explanation_short,
+                None => explanation_short,
             },
             EbiCommand::Command {
                 explanation_short,
@@ -314,7 +314,7 @@ impl EbiCommand {
                 ..
             } => match explanation_long {
                 Some(x) => x,
-                None => &explanation_short,
+                None => explanation_short,
             },
         }
     }
@@ -332,7 +332,7 @@ impl EbiCommand {
 
     pub fn get_progress_bar_message(message: String) -> ProgressBar {
         let pb = ProgressBar::new_spinner();
-        pb.set_style(ProgressStyle::with_template(&("{spinner} {wide_msg}")).unwrap());
+        pb.set_style(ProgressStyle::with_template(("{spinner} {wide_msg}")).unwrap());
         pb.enable_steady_tick(Duration::from_millis(100));
         pb.set_message(message);
         pb.tick();
@@ -616,26 +616,26 @@ impl EbiCommand {
                     }
                 }
                 EbiInputType::FileHandler => {
-                    if let Some(value) = cli_matches.get_one::<EbiFileHandler>(&cli_id) {
+                    if let Some(value) = cli_matches.get_one::<EbiFileHandler>(cli_id) {
                         return Ok(EbiInput::FileHandler(value.clone()));
                     }
                 }
                 EbiInputType::String(None, _) => {
-                    if let Some(value) = cli_matches.get_one::<String>(&cli_id) {
-                        return Ok(EbiInput::String(value.clone(), &input_type));
+                    if let Some(value) = cli_matches.get_one::<String>(cli_id) {
+                        return Ok(EbiInput::String(value.clone(), input_type));
                     }
                 }
                 EbiInputType::String(Some(allowed_values), _) => {
-                    if let Some(value) = cli_matches.get_one::<String>(&cli_id) {
+                    if let Some(value) = cli_matches.get_one::<String>(cli_id) {
                         if allowed_values.contains(&value.as_str()) {
-                            return Ok(EbiInput::String(value.clone(), &input_type));
+                            return Ok(EbiInput::String(value.clone(), input_type));
                         } else {
                             error = Some(anyhow!("value should be one of {:?}", allowed_values));
                         }
                     }
                 }
                 EbiInputType::Usize(min, max, _) => {
-                    if let Some(value) = cli_matches.get_one::<usize>(&cli_id) {
+                    if let Some(value) = cli_matches.get_one::<usize>(cli_id) {
                         match (min, max) {
                             (Some(min), Some(max)) => {
                                 if value < min || value > max {
@@ -666,7 +666,7 @@ impl EbiCommand {
                     }
                 }
                 EbiInputType::Fraction(min, max, _) => {
-                    if let Some(value) = cli_matches.get_one::<FractionNotParsedYet>(&cli_id) {
+                    if let Some(value) = cli_matches.get_one::<FractionNotParsedYet>(cli_id) {
                         let value: Fraction = value.try_into()?;
 
                         match (min, max) {

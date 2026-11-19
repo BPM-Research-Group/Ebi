@@ -9,7 +9,7 @@ pub const EBI_SCALABLE_VECTOR_GRAPHICS: EbiFileHandler = EbiFileHandler {
     article: "a",
     file_extension: "svg",
     is_binary: false,
-    format_specification: &FORMAT_SPECIFICATION,
+    format_specification: FORMAT_SPECIFICATION,
     validator: None,
     trait_importers: &[],
     object_importers: &[],

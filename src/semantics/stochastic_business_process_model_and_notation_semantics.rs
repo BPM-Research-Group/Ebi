@@ -16,7 +16,7 @@ impl Semantics for StochasticBusinessProcessModelAndNotation {
         state: &mut <Self as Semantics>::SemState,
         transition: TransitionIndex,
     ) -> Result<()> {
-        StochasticBusinessProcessModelAndNotation::execute_transition(&self, state, transition)
+        StochasticBusinessProcessModelAndNotation::execute_transition(self, state, transition)
     }
 
     fn is_final_state(&self, state: &<Self as Semantics>::SemState) -> bool {
@@ -28,7 +28,7 @@ impl Semantics for StochasticBusinessProcessModelAndNotation {
         transition: TransitionIndex,
         state: &<Self as Semantics>::SemState,
     ) -> bool {
-        StochasticBusinessProcessModelAndNotation::is_transition_silent(&self, transition, state)
+        StochasticBusinessProcessModelAndNotation::is_transition_silent(self, transition, state)
     }
 
     fn get_transition_activity(
@@ -36,13 +36,13 @@ impl Semantics for StochasticBusinessProcessModelAndNotation {
         transition: TransitionIndex,
         state: &<Self as Semantics>::SemState,
     ) -> Option<Activity> {
-        StochasticBusinessProcessModelAndNotation::get_transition_activity(&self, transition, state)
+        StochasticBusinessProcessModelAndNotation::get_transition_activity(self, transition, state)
     }
 
     fn get_enabled_transitions(
         &self,
         state: &<Self as Semantics>::SemState,
     ) -> Vec<TransitionIndex> {
-        StochasticBusinessProcessModelAndNotation::get_enabled_transitions(&self, state).unwrap()
+        StochasticBusinessProcessModelAndNotation::get_enabled_transitions(self, state).unwrap()
     }
 }

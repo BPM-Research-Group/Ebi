@@ -31,7 +31,7 @@ pub const EBI_COMPRESSED_EVENT_LOG: EbiFileHandler = EbiFileHandler {
     name: "compressed event log",
     article: "a",
     file_extension: "xes.gz",
-    format_specification: &CompressedEventLogXes::FILE_FORMAT_SPECIFICATION_LATEX,
+    format_specification: CompressedEventLogXes::FILE_FORMAT_SPECIFICATION_LATEX,
     is_binary: true,
     validator: Some(CompressedEventLog::validate),
     trait_importers: &[
