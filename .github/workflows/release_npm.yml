@@ -6,6 +6,9 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
@@ -21,9 +24,10 @@ jobs:
         id: version
         run: |
           cargo install cargo-edit
-          VERS=${{ github.ref_name }}
-          VERS="${VERS:1}"
-          cargo set-version "$VERS"
+          #VERS=${{ github.ref_name }}
+          #VERS="${VERS:1}"
+          #cargo set-version "$VERS"
+          cargo set-version "0.3.29"
 
       - name: Build NPM package
         run: |
@@ -35,8 +39,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
           registery-url: https://registry.npmjs.org
+          package-manager-cache: false
       
       - name: Publish to NPM
         run: |
