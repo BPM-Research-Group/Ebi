@@ -16,14 +16,20 @@ name = "ebi"
 crate-type = ["cdylib", "lib"]
 
 [features]
+## By default, Ebi does not need any features.
 default = [ ]
-test_generation = ["dep:syn"]
-eexactarithmetic = []
+
+#! Arithmetic features
+
+## The exactarithmetic feature compiles Ebi in exact arithmetic mode only, which is generally faster than mixed mode.
 exactarithmetic = [
     "eexactarithmetic",
     "ebi_objects/exactarithmetic",
     "ebi_optimisation/exactarithmetic",
 ]
+eexactarithmetic = []
+
+## The approximatearithmietc feature compiles Ebi in approximate mode only, which is generally faster than mixed mode.
 approximatearithmetic = [
     "eapproximatearithmetic",
     "ebi_objects/approximatearithmetic",
@@ -31,17 +37,38 @@ approximatearithmetic = [
 ]
 eapproximatearithmetic = []
 testactivities = ["ebi_objects/testactivities"]
+
+## Use this feature to enable generating tests; this reads the source code of Ebi and is disabled in normal runs.
+test_generation = [ "dep:syn" ]
+
+## generate surface-related files
+surface_generation = [ "dep:syn" ] 
+
+## Enable the compilation of a Python library.
 python = [
-    "java",
     "dep:pyo3",
     "dep:polars",
     "dep:num-traits",
     "dep:syn",
     "dep:num-bigint",
 ]
-java = ["dep:jni", "dep:syn", "dep:jni-macros" ]
-javascript = ["dep:wasm-bindgen", "dep:syn", "dep:js-sys", "dep:console_error_panic_hook" ]
+
+## Enable the compilation of a Java library.
+java = [
+    "dep:jni", 
+    "dep:syn", 
+    "dep:jni-macros" 
+]
+
+ ## Enable the compilation of a Javascript library.
+javascript = [ 
+    "dep:wasm-bindgen", 
+    "dep:console_error_panic_hook", 
+    "dep:js-sys" 
+]
 extension-module = ["pyo3/extension-module"]
+
+
 
 [dependencies]
 ebi_optimisation = { git = "https://github.com/BPM-Research-Group/Ebi_optimisation.git", version = "0.3.10" }
@@ -97,6 +124,7 @@ num-bigint = { version = "0.4.6", optional = true }
 wasm-bindgen = { version = "0.2.127", optional = true }
 js-sys = { version = "0.3.104", optional = true }
 console_error_panic_hook = { version = "0.1.7", optional = true }
+document-features = { version = "0.2.12" }
 
 [profile.release]
 debug = false

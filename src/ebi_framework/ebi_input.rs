@@ -5,11 +5,8 @@ use super::{
 };
 use crate::{
     ebi_framework::{
-        ebi_file_handler::{get_file_handlers, get_file_handlers_fallible, EbiFileHandler},
-        ebi_importer_parameters,
-        ebi_trait_object::EbiTraitObject,
-    },
-    ebi_traits::{
+        ebi_file_handler::{EbiFileHandler, get_file_handlers, get_file_handlers_fallible}, ebi_importer_parameters, ebi_trait_object::EbiTraitObject,
+    }, ebi_traits::{
         ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
         ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
         ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
@@ -23,11 +20,7 @@ use crate::{
         ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics,
         ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics,
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
-    },
-    ebi_validate,
-    multiple_reader::MultipleReader,
-    surfaces::website::website_generation::FILE_HANDLERS_PAGE,
-    text::Joiner,
+    }, ebi_validate, multiple_reader::MultipleReader, surfaces::website::website_link::FILE_HANDLERS_PAGE, text::Joiner,
 };
 use clap::{builder::ValueParser, value_parser, ArgMatches};
 use ebi_objects::{

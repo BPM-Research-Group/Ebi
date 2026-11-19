@@ -1,16 +1,20 @@
 use crate::{
     ebi_framework::{
-        ebi_command::{EBI_COMMANDS, EbiCommand},
-        ebi_file_handler::{EBI_FILE_HANDLERS, EbiFileHandler},
+        ebi_command::{EbiCommand, EBI_COMMANDS},
+        ebi_file_handler::{EbiFileHandler, EBI_FILE_HANDLERS},
         ebi_importer_parameters,
         ebi_input::{self, EbiInputType},
         ebi_output::{EbiExporter, EbiOutput, EbiOutputType},
     },
-    surfaces::javascript::javascript_generator_html::{
-        javascript_function_name, javascript_html_form, javascript_html_header,
-    },
     multiple_reader::MultipleReader,
     python::python::pm4py_function_name,
+    surfaces::{
+        javascript::{
+            javascript_generator_html::{javascript_html_form, javascript_html_header},
+            javascript_link::javascript_function_name,
+        },
+        website::website_link::{COMMANDS_PAGE, FILE_HANDLERS_PAGE},
+    },
     text::HTMLEscaper,
 };
 use clap::Command;
@@ -23,9 +27,6 @@ use std::{
     fs::{self, File},
     io::Write,
 };
-
-pub const COMMANDS_PAGE: &'static str = "https://bpm-research-group.github.io/Ebi/commands.html";
-pub const FILE_HANDLERS_PAGE: &'static str = "https://bpm-research-group.github.io/Ebi/file_handlers.html";
 
 pub fn page_start(f: &mut Vec<u8>, headers: &str) -> Result<()> {
     // #016764, #005958, #014848, #00312F, #001E1E

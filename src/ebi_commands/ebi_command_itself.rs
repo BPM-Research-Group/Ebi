@@ -1,16 +1,16 @@
-#[cfg(feature = "java")]
-use crate::surfaces::java::{java_module_generator_java::generate_java_module_java, java_module_generator_rust::generate_java_module_rust};
-#[cfg(all(feature = "javascript", feature = "test_generation"))]
-use crate::surfaces::javascript::javascript_generator_rust::generate_javascript_rust;
-use crate::{
-    ebi_framework::{
-        ebi_command::EbiCommand,
-        ebi_output::{EbiOutput, EbiOutputType},
-        manual::{graph, html, manual},
+use crate::ebi_framework::{
+    ebi_command::EbiCommand,
+    ebi_output::{EbiOutput, EbiOutputType},
+    manual::{graph, manual},
+};
+#[cfg(feature = "surface_generation")]
+use crate::surfaces::{
+    java::{
+        java_module_generator_java::generate_java_module_java,
+        java_module_generator_rust::generate_java_module_rust,
     },
-    surfaces::website::website_generation::{
-        generate_commands, generate_file_handlers, generate_home_page,
-    },
+    javascript::javascript_generator_rust::generate_javascript_rust,
+    website::website_generation::{generate_commands, generate_file_handlers, generate_home_page},
 };
 use ebi_objects::{ebi_objects::scalable_vector_graphics::ToSVGMut, EbiObject, EbiObjectType};
 
@@ -37,23 +37,32 @@ pub const EBI_ITSELF: EbiCommand = EbiCommand::Group {
     explanation_short: "Print things on Ebi.",
     explanation_long: None,
     children: &[
-        &EBI_ITSELF_WEBSITE,
+        #[cfg(feature = "surface_generation")]
+        &EBI_ITSELF_SURFACE,
         &EBI_ITSELF_GRAPH,
-        &EBI_ITSELF_HTML,
-        #[cfg(feature = "java")]
-        &EBI_ITSELF_JAVA,
-        #[cfg(all(feature = "javascript", feature = "test_generation"))]
-        &EBI_ITSELF_JAVASCRIPT,
         &EBI_ITSELF_LOGO,
         &EBI_ITSELF_MANUAL,
-        #[cfg(feature = "python")]
-        &EBI_ITSELF_PYTHON,
         #[cfg(feature = "test_generation")]
         &EBI_ITSELF_TESTS,
     ],
 };
 
-pub const EBI_ITSELF_WEBSITE: EbiCommand = EbiCommand::Group {
+#[cfg(feature = "surface_generation")]
+pub const EBI_ITSELF_SURFACE: EbiCommand = EbiCommand::Group {
+    name_short: "sf",
+    name_long: Some("surface"),
+    explanation_short: "Print files related to the surfaces of Ebi.",
+    explanation_long: None,
+    children: &[
+        &EBI_ITSELF_SURFACE_JAVA,
+        &EBI_ITSELF_SURFACE_JAVASCRIPT,
+        &EBI_ITSELF_SURFACE_PYTHON,
+        &EBI_ITSELF_SURFACE_WEBSITE,
+    ],
+};
+
+#[cfg(feature = "surface_generation")]
+pub const EBI_ITSELF_SURFACE_WEBSITE: EbiCommand = EbiCommand::Group {
     name_short: "ws",
     name_long: Some("website"),
     explanation_short: "Print the HTML website of Ebi.",
@@ -65,6 +74,7 @@ pub const EBI_ITSELF_WEBSITE: EbiCommand = EbiCommand::Group {
     ],
 };
 
+#[cfg(feature = "surface_generation")]
 pub const EBI_ITSELF_WEBSITE_COMMANDS: EbiCommand = EbiCommand::Command {
     name_short: "comm",
     name_long: Some("commands"),
@@ -80,6 +90,7 @@ pub const EBI_ITSELF_WEBSITE_COMMANDS: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
+#[cfg(feature = "surface_generation")]
 pub const EBI_ITSELF_WEBSITE_FILE_HANDLERS: EbiCommand = EbiCommand::Command {
     name_short: "fhs",
     name_long: Some("file-handlers"),
@@ -95,6 +106,7 @@ pub const EBI_ITSELF_WEBSITE_FILE_HANDLERS: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
+#[cfg(feature = "surface_generation")]
 pub const EBI_ITSELF_WEBSITE_HOME: EbiCommand = EbiCommand::Command {
     name_short: "home",
     name_long: None,
@@ -159,8 +171,8 @@ pub const EBI_ITSELF_GRAPH: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::ObjectType(EbiObjectType::ScalableVectorGraphics),
 };
 
-#[cfg(feature = "java")]
-pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Group {
+#[cfg(feature = "surface_generation")]
+pub const EBI_ITSELF_SURFACE_JAVA: EbiCommand = EbiCommand::Group {
     name_short: "java",
     name_long: None,
     explanation_short: "Print files for Java.",
@@ -168,7 +180,7 @@ pub const EBI_ITSELF_JAVA: EbiCommand = EbiCommand::Group {
     children: &[&EBI_ITSELF_JAVA_JAVA, &EBI_ITSELF_JAVA_RUST],
 };
 
-#[cfg(feature = "java")]
+#[cfg(feature = "surface_generation")]
 pub const EBI_ITSELF_JAVA_JAVA: EbiCommand = EbiCommand::Command {
     name_short: "java",
     name_long: None,
@@ -184,7 +196,7 @@ pub const EBI_ITSELF_JAVA_JAVA: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
-#[cfg(feature = "java")]
+#[cfg(feature = "surface_generation")]
 pub const EBI_ITSELF_JAVA_RUST: EbiCommand = EbiCommand::Command {
     name_short: "rust",
     name_long: None,
@@ -200,8 +212,8 @@ pub const EBI_ITSELF_JAVA_RUST: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
-#[cfg(all(feature = "javascript", feature = "test_generation"))]
-pub const EBI_ITSELF_JAVASCRIPT: EbiCommand = EbiCommand::Command {
+#[cfg(all(feature = "surface_generation"))]
+pub const EBI_ITSELF_SURFACE_JAVASCRIPT: EbiCommand = EbiCommand::Command {
     name_short: "js",
     name_long: Some("javascript"),
     explanation_short: "Print the rust code bindings for javascript.",
@@ -216,23 +228,8 @@ pub const EBI_ITSELF_JAVASCRIPT: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
-pub const EBI_ITSELF_HTML: EbiCommand = EbiCommand::Command {
-    name_short: "html",
-    name_long: None,
-    explanation_short: "Print parts of the website.",
-    explanation_long: None,
-    cli_command: None,
-    latex_link: None,
-    exact_arithmetic: true,
-    input_types: &[],
-    input_names: &[],
-    input_helps: &[],
-    execute: |_, _| Ok(EbiOutput::String(html())),
-    output_type: &EbiOutputType::String,
-};
-
-#[cfg(feature = "python")]
-pub const EBI_ITSELF_PYTHON: EbiCommand = EbiCommand::Command {
+#[cfg(feature = "surface_generation")]
+pub const EBI_ITSELF_SURFACE_PYTHON: EbiCommand = EbiCommand::Command {
     name_short: "python",
     name_long: None,
     explanation_short: "Generate the module exposed to Python with all functions.",

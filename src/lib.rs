@@ -130,7 +130,7 @@ pub mod python {
     pub mod python_link;
     #[cfg(feature = "python")]
     pub mod python_module_autogen;
-    #[cfg(feature = "python")]
+    #[cfg(feature = "surface_generation")]
     pub mod python_module_generator;
 }
 
@@ -169,29 +169,37 @@ pub mod surfaces {
     pub mod javascript {
         #[cfg(feature = "javascript")]
         pub mod javascript_autogen;
+        #[cfg(feature = "surface_generation")]
         pub mod javascript_generator_html;
-        #[cfg(all(feature = "javascript", feature = "test_generation"))]
+        #[cfg(all(feature = "surface_generation"))]
         pub mod javascript_generator_rust;
-        #[cfg(feature = "javascript")]
+        #[cfg(all(feature = "test_generation"))]
+        pub mod javascript_generator_tests;
         pub mod javascript_link;
+        #[cfg(feature = "javascript")]
+        pub mod javascript_runner;
     }
     pub mod java {
         #[cfg(feature = "java")]
         pub mod java_autogen;
         #[cfg(feature = "java")]
         pub mod java_export;
-        #[cfg(feature = "java")]
         pub mod java_link;
-        #[cfg(feature = "java")]
+        #[cfg(feature = "surface_generation")]
         pub mod java_module_generator_java;
-        #[cfg(feature = "java")]
+        #[cfg(feature = "surface_generation")]
         pub mod java_module_generator_rust;
         pub mod java_object_handler;
-        #[cfg(feature = "java")]
-        pub mod prom_plugin_generator;
     }
     pub mod website {
+        #[cfg(all(feature = "surface_generation"))]
         pub mod website_generation;
+        pub mod website_link;
+    }
+    pub mod prom {
+        pub mod prom_link;
+        #[cfg(feature = "surface_generation")]
+        pub mod prom_plugin_generator;
     }
 }
 pub mod techniques {

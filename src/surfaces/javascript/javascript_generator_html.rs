@@ -1,24 +1,13 @@
-use crate::ebi_framework::{
+use crate::{ebi_framework::{
     ebi_command::{EBI_COMMANDS, EbiCommand},
     ebi_input::EbiInputType,
-};
+}, surfaces::javascript::javascript_link::javascript_function_name};
 use ebi_objects::anyhow::anyhow;
 use ebi_optimisation::anyhow::Result;
 use itertools::Itertools;
 use std::io::Write;
 
 pub const EBIJS: &str = "ebi.js";
-
-pub fn javascript_function_name(path: &Vec<&EbiCommand>) -> String {
-    let raw_name = EbiCommand::path_to_string(path);
-    raw_name
-        .strip_prefix("Ebi ")
-        .unwrap_or(&raw_name)
-        .to_lowercase()
-        .chars()
-        .map(|c| if c == ' ' || c == '-' { '_' } else { c })
-        .collect()
-}
 
 pub(crate) fn javascript_html_header() -> String {
     format!("

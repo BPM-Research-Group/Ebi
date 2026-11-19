@@ -800,6 +800,7 @@ dependencies = [
  "clap-verbosity-flag",
  "console_error_panic_hook",
  "const_format",
+ "document-features",
  "ebi",
  "ebi_derive",
  "ebi_objects",

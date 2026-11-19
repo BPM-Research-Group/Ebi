@@ -13,7 +13,8 @@ use crate::{
         ebi_command_probability, ebi_command_reduce, ebi_command_sample, ebi_command_test,
         ebi_command_validate, ebi_command_visualise,
     },
-    ebi_framework::{ebi_importer_parameters, ebi_output},
+    ebi_framework::{ebi_importer_parameters, ebi_input::attempt_parse, ebi_output},
+    multiple_reader::MultipleReader,
     text::Joiner,
 };
 use clap::{value_parser, Arg, ArgAction, ArgMatches, Command};
@@ -428,6 +429,67 @@ impl EbiCommand {
         Err(anyhow!("command not recognised"))
     }
 
+    /**
+     * Execute a command (given as a string) with inputs (given as strings).
+     */
+    pub fn execute_command_strings(
+        command_name: &str,
+        string_inputs: Vec<String>,
+    ) -> Result<EbiOutput> {
+        let binding = EBI_COMMANDS
+            .find_command_with_string(command_name)
+            .ok_or(anyhow!("Command `{command_name}` not found"))?;
+        let command = binding
+            .last()
+            .ok_or(anyhow!("Command not found as binding not found."))?;
+
+        if let EbiCommand::Command {
+            execute,
+            input_types: input_typess,
+            input_names,
+            output_type,
+            ..
+        } = command
+        {
+            //read the inputs
+            let mut inputs = vec![];
+            for ((input_types, input_name), string_input) in input_typess
+                .iter()
+                .zip(input_names.iter())
+                .zip(string_inputs.into_iter())
+            {
+                //read input
+                let input = attempt_parse(input_types, MultipleReader::String(string_input))
+                    .with_context(|| format!("Reading parameter {}.", input_name))?;
+                inputs.push(input);
+            }
+
+            //call the command
+            let result = (execute)(inputs, None)?;
+
+            if &&result.get_type() != output_type {
+                return Err(anyhow!(
+                    "Output type {} does not match the declared output of {}.",
+                    result.get_type(),
+                    output_type
+                ));
+            }
+
+            Ok(result)
+        } else {
+            Err(anyhow!("Command not found"))
+        }
+    }
+
+    pub fn execute_command_strings_string(
+        command_name: &str,
+        output_format_extension: &str,
+        string_inputs: Vec<String>,
+    ) -> Result<String> {
+        Self::execute_command_strings(command_name, string_inputs)?
+            .attempt_export_as_string(output_format_extension)
+    }
+
     pub fn select_exporter(
         output_type: &EbiOutputType,
         to_file: Option<&PathBuf>,
@@ -656,7 +718,7 @@ impl EbiCommand {
         result.join(" ")
     }
 
-    pub fn find_command_with_string(&self, name: &String) -> Option<Vec<&EbiCommand>> {
+    pub fn find_command_with_string(&self, name: &str) -> Option<Vec<&EbiCommand>> {
         for path in self.get_command_paths() {
             if Self::path_to_string(&path) == *name {
                 return Some(path);
@@ -899,7 +961,7 @@ pub fn get_applicable_commands(object_type: &EbiObjectType) -> BTreeSet<Vec<&'st
     result
 }
 
-#[cfg(any(feature = "python", feature = "test_generation", feature = "java"))]
+#[cfg(any(feature = "surface_generation", feature = "test_generation"))]
 pub(crate) fn search_command_in_source_files(path: &Vec<&EbiCommand>) -> Result<String> {
     //start the search from the EBI_COMMANDS const
     let mut path = path.clone();
@@ -921,7 +983,7 @@ pub(crate) fn search_command_in_source_files(path: &Vec<&EbiCommand>) -> Result<
     ))
 }
 
-#[cfg(any(feature = "python", feature = "test_generation", feature = "java"))]
+#[cfg(any(feature = "surface_generation", feature = "test_generation"))]
 fn root_command() -> Result<(PathBuf, syn::ItemConst)> {
     let file = "src/ebi_framework/ebi_command.rs";
     let contents = std::fs::read_to_string(file)?;
@@ -942,7 +1004,7 @@ fn root_command() -> Result<(PathBuf, syn::ItemConst)> {
     return Err(anyhow!("source file not found"));
 }
 
-#[cfg(any(feature = "python", feature = "test_generation", feature = "java"))]
+#[cfg(any(feature = "surface_generation", feature = "test_generation"))]
 fn search_child(
     parent_declaration: &syn::ItemConst,
     child_command: &EbiCommand,
@@ -1005,7 +1067,7 @@ fn search_child(
     return Err(anyhow!("todo file not found {}", child_command));
 }
 
-#[cfg(any(feature = "python", feature = "test_generation", feature = "java"))]
+#[cfg(any(feature = "surface_generation", feature = "test_generation"))]
 fn extract_children_names(const_item: &syn::ItemConst) -> Result<Vec<String>> {
     if let syn::Expr::Struct(x) = &*const_item.expr {
         for field in &x.fields {

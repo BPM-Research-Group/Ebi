@@ -1,7 +1,8 @@
-use crate::surfaces::website::website_generation::FILE_HANDLERS_PAGE;
 use const_format::concatcp;
 use regex::{Captures, Regex};
 use std::fmt::Display;
+
+use crate::surfaces::website::website_link::FILE_HANDLERS_PAGE;
 
 pub trait Rank {
     fn rank(&self) -> String;

@@ -83,7 +83,7 @@ public class Ebi {
 	public static native String conformanceMarkovian(String output_format, String arg0, String arg1, String arg2, String arg3);
 	public static native String conformanceUnitEarthMovers(String output_format, String arg0, String arg1);
 	public static native String conformanceUnitEarthMoversSample(String output_format, String arg0, String arg1, String arg2);
-	public static native String conformanceNonStochasticAlignments(String output_format, String arg0, String arg1);
+	public static native String conformanceNonStochasticAlignments(String output_format, String arg0, String arg1, String arg2);
 	public static native String conformanceNonStochasticEscapingEdgesPrecision(String output_format, String arg0, String arg1);
 	public static native String conformanceNonStochasticFittingTraces(String output_format, String arg0);
 	public static native String conformanceNonStochasticSetAlignments(String output_format, String arg0, String arg1);

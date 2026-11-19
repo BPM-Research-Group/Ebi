@@ -96,6 +96,14 @@ impl EbiOutput {
             EbiOutput::Bool(_) => EbiOutputType::Bool,
         }
     }
+
+    pub fn attempt_export_as_string(self, output_format_extension: &str) -> Result<String> {
+        //write result to string
+        let mut output_path = PathBuf::new();
+        output_path.push(output_format_extension);
+        let exporter = EbiCommand::select_exporter(&self.get_type(), Some(&output_path), None)?;
+        export_to_string(self, &exporter)
+    }
 }
 
 #[cfg(any(test, feature = "testactivities"))]

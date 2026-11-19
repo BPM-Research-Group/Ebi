@@ -1,15 +1,18 @@
+use crate::{ebi_framework::ebi_command::EbiCommand, text::JavaEscaper};
+#[cfg(feature = "java")]
 use crate::{
-    ebi_framework::{
-        ebi_command::{EBI_COMMANDS, EbiCommand}, ebi_input::{EbiInput, EbiInputType, attempt_parse}, ebi_output::{self},
-    }, multiple_reader::MultipleReader, text::{JavaEscaper, Joiner},
+    ebi_framework::ebi_input::{attempt_parse, EbiInput, EbiInputType},
+    multiple_reader::MultipleReader,
+    text::Joiner,
 };
-use ebi_objects::anyhow::{anyhow, Context, Result};
+#[cfg(feature = "java")]
+use ebi_objects::anyhow::{anyhow, Result};
+#[cfg(feature = "java")]
 use jni::{
     jni_mangle,
     objects::{JClass, JObjectArray, JString},
     EnvUnowned,
 };
-use std::path::PathBuf;
 
 pub fn java_function_name(path: &Vec<&EbiCommand>) -> String {
     let raw_name = EbiCommand::path_to_string(path);
@@ -22,6 +25,7 @@ pub fn java_function_name(path: &Vec<&EbiCommand>) -> String {
         .escape_java_code()
 }
 
+#[cfg(feature = "java")]
 // helper: try import via Java importer, else if it's a str, import it directly
 pub fn import_or_load<'caller>(
     to_import: JString<'caller>,
@@ -36,9 +40,7 @@ pub fn import_or_load<'caller>(
         })
 }
 
-//command line to push Ebi to the Java project:
-// cargo build --release ; cp target/release/libebi.so ~/eclipse-workspace/Ebi/ ; cargo run itself java -o ~/eclipse-workspace/Ebi/src/org/processmining/ebi/plugins/EbiPlugins.java
-
+#[cfg(feature = "java")]
 // This keeps Rust from "mangling" the name and making it unique for this crate.
 #[jni_mangle("org.ebitools.Ebi")]
 pub fn call_ebi<'caller>(
@@ -84,7 +86,11 @@ pub fn call_ebi<'caller>(
         //     Ok(result) => result,
         //     Err(err) => "Ebi: error: ".to_string() + err.to_string().as_str(),
         // };
-        let output_ebi = match handle_prom_request(command_name, output_format, inputss) {
+        let output_ebi = match EbiCommand::execute_command_strings_string(
+            &command_name,
+            &output_format,
+            inputss,
+        ) {
             Ok(result) => result,
             Err(err) => {
                 env.throw(format!("Ebi error: {}", err.to_string().as_str()))?;
@@ -115,88 +121,20 @@ pub fn call_ebi<'caller>(
     outcome.resolve::<jni::errors::ThrowRuntimeExAndDefault>()
 }
 
-pub fn handle_prom_request(
-    command_name: String,
-    output_format: String,
-    string_inputs: Vec<String>,
-) -> Result<String> {
-    let binding = EBI_COMMANDS
-        .find_command_with_string(&command_name)
-        .ok_or(anyhow!("command not found"))?;
-    let command = binding.last().ok_or(anyhow!("command not found as binding not found"))?;
-
-    if let EbiCommand::Command {
-        execute,
-        input_types: input_typess,
-        input_names,
-        output_type,
-        ..
-    } = command
-    {
-        //read the inputs
-        let mut inputs = vec![];
-        for ((input_types, input_name), string_input) in input_typess
-            .iter()
-            .zip(input_names.iter())
-            .zip(string_inputs.into_iter())
-        {
-            //read input
-            let input = attempt_parse(input_types, MultipleReader::String(string_input))
-                .with_context(|| format!("Reading parameter {}.", input_name))?;
-            inputs.push(input);
-        }
-
-        //call the command
-        let result = (execute)(inputs, None)?;
-
-        if &&result.get_type() != output_type {
-            return Err(anyhow!(
-                "Output type {} does not match the declared output of {}.",
-                result.get_type(),
-                output_type
-            ));
-        }
-
-        //write result to string
-        let mut output_path = PathBuf::new();
-        output_path.push(output_format);
-        let exporter = EbiCommand::select_exporter(output_type, Some(&output_path), None)?;
-        ebi_output::export_to_string(result, &exporter)
-    } else {
-        Err(anyhow!("Command not found"))
-    }
-}
-
 #[cfg(test)]
 mod tests {
-    use super::handle_prom_request;
     use crate::{
         ebi_framework::{
             ebi_file_handler::get_file_handlers,
             ebi_input::{EbiInput, TEST_INPUT_TYPE_STRING},
             ebi_trait::FromEbiTraitObject,
         },
-        surfaces::java::{
-            java_object_handler::{JavaObjectHandlerQueryExport, JavaObjectHandlerQueryImport},
-            prom_plugin_generator::print_java_plugins,
+        surfaces::java::java_object_handler::{
+            JavaObjectHandlerQueryExport, JavaObjectHandlerQueryImport,
         },
     };
     use ebi_objects::EbiObjectType;
-    use std::fs;
     use strum::IntoEnumIterator;
-
-    #[test]
-    fn java() {
-        let fin = fs::read_to_string("testfiles/a-b.xes").unwrap();
-        assert!(handle_prom_request(
-            "Ebi visualise text".to_string(),
-            "txt".to_string(),
-            vec![fin]
-        )
-        .is_ok());
-
-        let _ = print_java_plugins();
-    }
 
     #[test]
     fn object_types() {
