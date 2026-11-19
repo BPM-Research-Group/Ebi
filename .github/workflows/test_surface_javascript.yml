@@ -18,7 +18,7 @@ jobs:
               > src/tests/tests_autogen.rs
               > src/surfaces/javascript/javascript_autogen.rs
               cargo run --features test_generation itself tests -o src/tests/tests_autogen.rs 
-              cargo run --features "javascript test_generation" -- itself javascript -o src/surfaces/javascript/javascript_autogen.rs
+              cargo run --features "surface_generation test_generation" -- itself surface javascript -o src/surfaces/javascript/javascript_autogen.rs
 
       - name: Run tests javascript
         run: cargo test --verbose --features javascript
