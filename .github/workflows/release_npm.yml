@@ -24,10 +24,9 @@ jobs:
         id: version
         run: |
           cargo install cargo-edit
-          #VERS=${{ github.ref_name }}
-          #VERS="${VERS:1}"
-          #cargo set-version "$VERS"
-          cargo set-version "0.3.29"
+          VERS=${{ github.ref_name }}
+          VERS="${VERS:1}"
+          cargo set-version "$VERS"
 
       - name: Build NPM package
         run: |
