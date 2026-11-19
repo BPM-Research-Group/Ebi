@@ -3,18 +3,18 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
-    follower_semantics::FollowerSemantics,
-    techniques::entropy::{Entropy, number_of_average_visits_per_state_approximate},
+    semantics::follower_semantics::FollowerSemantics,
+    techniques::entropy::{number_of_average_visits_per_state_approximate, Entropy},
 };
 use ebi_objects::{
-    StochasticDeterministicFiniteAutomaton,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{
-        ConstFraction, Fraction, Log, MaybeExact, One, OneMinus, Signed, Zero,
         fraction::approximate::Approximate,
         is_exact_globally,
         log_polynomial::{log_polynomial::LogPolynomial, log_polynomial_f64::LogPolynomialF64},
+        ConstFraction, Fraction, Log, MaybeExact, One, OneMinus, Signed, Zero,
     },
+    StochasticDeterministicFiniteAutomaton,
 };
 
 pub const DEFAULT_LAMBDA_HIGHER_THAN_ZERO: ConstFraction = ConstFraction::of(1, 1_000_000);
@@ -70,8 +70,8 @@ impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
             ));
         }
 
-        let numerator = gain_numerator_lambda(&slang, self, lambda)?;
-        let denominator = entropy_sdfa_with_lambda(&self, lambda)?;
+        let numerator = gain_numerator_lambda(slang, self, lambda)?;
+        let denominator = entropy_sdfa_with_lambda(self, lambda)?;
 
         if denominator.is_zero() {
             return Err(anyhow!(
@@ -254,7 +254,7 @@ mod tests {
         use super::*;
         use ebi_objects::anyhow::Result;
         use ebi_objects::ebi_arithmetic::f;
-        use ebi_objects::{AutomatonState, StochasticDeterministicFiniteAutomaton, a};
+        use ebi_objects::{a, AutomatonState, StochasticDeterministicFiniteAutomaton};
 
         /// Figure (c): 2-state SDFA with a self-loop.
         pub fn build_fig_c_loop() -> Result<StochasticDeterministicFiniteAutomaton> {

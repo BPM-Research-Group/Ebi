@@ -1,7 +1,7 @@
 use ebi_objects::{
-    Activity, AutomatonState, StochasticNondeterministicFiniteAutomaton,
     anyhow::{Context, Ok, Result},
     ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, Inversion, One, Zero},
+    Activity, AutomatonState, StochasticNondeterministicFiniteAutomaton,
 };
 use std::collections::{HashMap, VecDeque};
 
@@ -170,13 +170,13 @@ impl TauRemoval for StochasticNondeterministicFiniteAutomaton {
         }
 
         // Merge parallel edges
-        for p in 0..n {
+        for item in new_transitions.iter_mut().take(n) {
             let mut map: HashMap<(AutomatonState, Option<Activity>), Fraction> = HashMap::new();
-            for tr in new_transitions[p].drain(..) {
-                *map.entry((tr.target, tr.label.clone()))
+            for tr in item.drain(..) {
+                *map.entry((tr.target, tr.label))
                     .or_insert_with(Fraction::zero) += tr.probability.clone();
             }
-            new_transitions[p] = map
+            *item = map
                 .into_iter()
                 .map(|((tgt, lbl), prob)| Transition {
                     target: tgt,
@@ -267,8 +267,8 @@ fn compute_scc(n: usize, adj: &Vec<Vec<(AutomatonState, Fraction)>>) -> Vec<Vec<
 
     // Build reverse graph
     let mut radj: Vec<Vec<AutomatonState>> = vec![vec![]; n];
-    for u in 0..n {
-        for &(v, _) in &adj[u] {
+    for (u, item) in adj.iter().enumerate().take(n) {
+        for &(v, _) in item {
             radj[v].push(AutomatonState::of(u));
         }
     }
@@ -369,8 +369,9 @@ fn replace_states(
 mod tests {
     use super::*;
     use ebi_objects::{
-        Activity, AutomatonState, StochasticNondeterministicFiniteAutomaton, a,
-        ebi_arithmetic::{Fraction, f0, f1},
+        a,
+        ebi_arithmetic::{f0, f1, Fraction},
+        Activity, AutomatonState, StochasticNondeterministicFiniteAutomaton,
     };
     use std::collections::HashMap;
 

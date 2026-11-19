@@ -3,14 +3,14 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
-    follower_semantics::FollowerSemantics,
+    semantics::follower_semantics::FollowerSemantics,
 };
 use ebi_objects::{
-    Activity, ActivityKeyTranslator,
     anyhow::{Context, Result},
     ebi_arithmetic::{
-        Fraction, Log, One, Signed, Zero, log_polynomial::log_polynomial::LogPolynomial,
+        log_polynomial::log_polynomial::LogPolynomial, Fraction, Log, One, Signed, Zero,
     },
+    Activity, ActivityKeyTranslator,
 };
 use std::collections::HashSet;
 
@@ -137,7 +137,7 @@ mod tests {
         },
         techniques::entropic_relevance::EntropicRelvance,
     };
-    use ebi_objects::{EventLog, FiniteStochasticLanguage, ebi_arithmetic::ebi_number::One};
+    use ebi_objects::{ebi_arithmetic::ebi_number::One, EventLog, FiniteStochasticLanguage};
     use std::fs;
 
     #[test]

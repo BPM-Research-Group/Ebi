@@ -143,9 +143,8 @@ where
                     // execute transition
                     self.execute_transition(&mut current_state, chosen_transition)?;
 
-                    match activity {
-                        Some(activity) => trace.push(activity),
-                        None => {}
+                    if let Some(activity) = activity {
+                        trace.push(activity);
                     }
 
                     // Ensure we do not end up in a livelock, but only every 1000 states.
@@ -198,7 +197,7 @@ where
 
             Ok((self.activity_key().clone(), result).into())
         } else {
-            return Err(anyhow!("Language contains no traces, so cannot sample."));
+            Err(anyhow!("Language contains no traces, so cannot sample."))
         }
     }
 }
@@ -218,7 +217,7 @@ impl Resampler for dyn EbiTraitFiniteStochasticLanguage {
     fn resample(&self, cache: &FractionRandomCache, number_of_traces: usize) -> Vec<Fraction> {
         let mut result = vec![0usize; self.number_of_traces()];
         for _ in 0..number_of_traces {
-            let trace_index = Fraction::choose_randomly_cached(&cache);
+            let trace_index = Fraction::choose_randomly_cached(cache);
             result[trace_index] += 1;
         }
 
@@ -277,9 +276,8 @@ impl Sampler
                     // execute transition
                     self.execute_transition(&mut current_state, chosen_transition)?;
 
-                    match activity {
-                        Some(activity) => trace.push(activity),
-                        None => {}
+                    if let Some(activity) = activity {
+                        trace.push(activity)
                     }
                 }
 
@@ -301,7 +299,7 @@ impl Sampler
 
             Ok((self.activity_key().clone(), result).into())
         } else {
-            return Err(anyhow!("Language contains no traces, so cannot sample."));
+            Err(anyhow!("Language contains no traces, so cannot sample."))
         }
     }
 }
@@ -309,11 +307,11 @@ impl Sampler
 /**
  * Fills the given vector with uniformly random numbers in the range 0..`number_of_indices`.
  */
-pub fn sample_indices_uniform(number_of_indices: usize, result: &mut Vec<usize>) {
+pub fn sample_indices_uniform(number_of_indices: usize, result: &mut [usize]) {
     let mut rng = rand::rng();
-    for i in 0..result.len() {
+    for item in result {
         let trace_index = rng.random_range(0..number_of_indices);
-        result[i] = trace_index;
+        *item = trace_index;
     }
 }
 

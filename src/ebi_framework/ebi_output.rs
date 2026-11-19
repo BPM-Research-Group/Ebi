@@ -64,6 +64,7 @@ use std::{
     collections::BTreeSet,
     fmt::{self, Debug, Display},
     fs::File,
+    hash::Hash,
     io::Write,
     path::PathBuf,
 };
@@ -543,7 +544,7 @@ impl Display for EbiExporter {
     }
 }
 
-#[derive(Hash, IntoStaticStr, Eq, EnumIs)]
+#[derive(IntoStaticStr, Eq, EnumIs)]
 pub enum EbiObjectExporter {
     BusinessProcessModelAndNotation(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
     EventLog(fn(object: EbiObject, &mut dyn std::io::Write) -> Result<()>),
@@ -713,6 +714,12 @@ impl Debug for EbiObjectExporter {
 impl PartialEq for EbiObjectExporter {
     fn eq(&self, other: &Self) -> bool {
         self.get_type() == other.get_type()
+    }
+}
+
+impl Hash for EbiObjectExporter {
+    fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+        self.get_type().hash(state);
     }
 }
 

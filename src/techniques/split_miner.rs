@@ -208,8 +208,8 @@ fn algorithm_1_prune_dfg(
     let mut e_o = IntMap::new();
 
     //line 17
-    algorithm_2_discover_best_incoming_edges(&dfg, &mut c_f, &mut e_i)?;
-    algorithm_3_discover_best_outgoing_edges(&dfg, &mut c_b, &mut e_o)?;
+    algorithm_2_discover_best_incoming_edges(dfg, &mut c_f, &mut e_i)?;
+    algorithm_3_discover_best_outgoing_edges(dfg, &mut c_b, &mut e_o)?;
 
     //line 19
     //here, the paper removes edges; we instead remove them

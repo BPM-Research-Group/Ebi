@@ -3,13 +3,13 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
-    follower_semantics::FollowerSemantics,
     math::{log_div::LogDiv, root_log_div::RootLogDiv},
+    semantics::follower_semantics::FollowerSemantics,
 };
 use ebi_objects::{
-    ActivityKeyTranslator,
     anyhow::Result,
     ebi_arithmetic::{Fraction, OneMinus, Signed, Zero},
+    ActivityKeyTranslator,
 };
 
 pub trait JensenShannonStochasticConformance {
@@ -30,7 +30,7 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
         event_log2: Box<dyn EbiTraitFiniteStochasticLanguage>,
     ) -> Result<RootLogDiv> {
         let mut activity_key1 = self.activity_key().clone();
-        let translator = ActivityKeyTranslator::new(&event_log2.activity_key(), &mut activity_key1);
+        let translator = ActivityKeyTranslator::new(event_log2.activity_key(), &mut activity_key1);
 
         let mut sum = LogDiv::zero();
 
@@ -42,8 +42,8 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
                 if trace1 == &translator.translate_trace(trace2) {
                     log1_prob_intersection_sum += probability1;
                     log2_prob_intersection_sum += probability2;
-                    sum += LogDiv::n_log_n(&probability1)?;
-                    sum += LogDiv::n_log_n(&probability2)?;
+                    sum += LogDiv::n_log_n(probability1)?;
+                    sum += LogDiv::n_log_n(probability2)?;
                     sum -= LogDiv::n_log_n(&(probability1 + probability2))?;
                     sum += LogDiv::try_from(probability1 + probability2)?; // move it out of the loop and handle at the end
                 }
@@ -56,7 +56,7 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
 
         sum /= 2usize;
 
-        return Ok(RootLogDiv::sqrt(sum).one_minus());
+        Ok(RootLogDiv::sqrt(sum).one_minus())
     }
 
     fn jssc_log2model(
@@ -76,7 +76,7 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
             if probability2.is_positive() {
                 sum4log += probability1;
                 sum4model += &probability2;
-                sum += LogDiv::n_log_n(&probability1)?;
+                sum += LogDiv::n_log_n(probability1)?;
                 sum += LogDiv::n_log_n(&probability2)?;
                 sum -= LogDiv::n_log_n(&(probability1 + &probability2))?;
                 sum += LogDiv::try_from(probability1 + &probability2)?;
@@ -86,7 +86,8 @@ impl JensenShannonStochasticConformance for dyn EbiTraitFiniteStochasticLanguage
         sum4log += sum4model.one_minus();
         sum += LogDiv::try_from(sum4log)?;
         sum /= 2usize;
-        return Ok(RootLogDiv::sqrt(sum).one_minus());
+
+        Ok(RootLogDiv::sqrt(sum).one_minus())
     }
 }
 
@@ -98,8 +99,8 @@ mod tests {
         techniques::jensen_shannon_stochastic_conformance::JensenShannonStochasticConformance,
     };
     use ebi_objects::{
+        ebi_arithmetic::{ebi_number::Zero, f, Fraction},
         EventLog, FiniteStochasticLanguage, StochasticLabelledPetriNet,
-        ebi_arithmetic::{Fraction, ebi_number::Zero, f},
     };
     use std::fs;
 

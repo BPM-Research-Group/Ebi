@@ -68,7 +68,7 @@ pub enum EventSelector {
 }
 
 impl EventSelector {
-    pub fn apply<F>(&self, trace: &Vec<Activity>, f: F) -> bool
+    pub fn apply<F>(&self, trace: &[Activity], f: F) -> bool
     where
         F: Fn(&Activity) -> bool,
     {

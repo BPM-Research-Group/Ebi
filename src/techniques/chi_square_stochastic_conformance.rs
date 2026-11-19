@@ -3,12 +3,12 @@ use crate::{
         ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     },
-    follower_semantics::FollowerSemantics,
+    semantics::follower_semantics::FollowerSemantics,
 };
 use ebi_objects::{
-    ActivityKeyTranslator,
     anyhow::Result,
     ebi_arithmetic::{Fraction, OneMinus},
+    ActivityKeyTranslator,
 };
 use rayon::iter::ParallelIterator;
 use std::sync::{Arc, Mutex};
@@ -70,8 +70,8 @@ mod tests {
         techniques::chi_square_stochastic_conformance::ChiSquareStochasticConformance,
     };
     use ebi_objects::{
-        FiniteStochasticLanguage,
         ebi_arithmetic::{Fraction, One},
+        FiniteStochasticLanguage,
     };
     use std::fs;
 

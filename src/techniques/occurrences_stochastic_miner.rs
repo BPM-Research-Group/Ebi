@@ -154,7 +154,7 @@ impl OccurrencesStochasticMinerTree for ProcessTree {
                     //labelled transition
                     weights.push(
                         model_activity2frequency
-                            .get(&model_activity)
+                            .get(model_activity)
                             .unwrap()
                             .clone(),
                     );

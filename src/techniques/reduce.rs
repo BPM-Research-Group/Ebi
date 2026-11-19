@@ -108,7 +108,7 @@ mod tree {
                             return true;
                         }
                     }
-                    return false;
+                    false
                 }
                 Node::Operator(Operator::Loop, number_of_children) => {
                     for (c, child) in tree.get_children(node).enumerate() {
@@ -132,7 +132,7 @@ mod tree {
                             }
                         }
                     }
-                    return false;
+                    false
                 }
             }
         }
@@ -169,7 +169,7 @@ mod tree {
                             return true;
                         }
                     }
-                    return false;
+                    false
                 }
                 Node::Operator(Operator::Or, number_of_children) if number_of_children > 1 => {
                     //option 1: diect tau
@@ -211,7 +211,7 @@ mod tree {
                             }
                         }
                     }
-                    return false;
+                    false
                 }
                 Node::Operator(Operator::Xor, number_of_children) if number_of_children > 1 => {
                     if let Some(tau_child) = tree
@@ -231,7 +231,7 @@ mod tree {
                             return true;
                         }
                     }
-                    return false;
+                    false
                 }
                 Node::Operator(Operator::Loop, number_of_children) if number_of_children > 1 => {
                     if let Some(tau_child) = tree
@@ -272,7 +272,7 @@ mod tree {
                         return true;
                     }
 
-                    return false;
+                    false
                 }
                 _ => false,
             }

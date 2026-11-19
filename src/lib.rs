@@ -11,7 +11,7 @@
 //! 1. The crate [Ebi_optimisation](https://docs.rs/ebi_optimisation/latest/ebi_optimisation/) contains optimisation routines.
 //! 1. The crate [Ebi_derive](https://docs.rs/ebi_derive/latest/ebi_derive/) contains derivation macros.
 
-/// A commands makes a technique available to the Ebi framework.
+/// A command makes a technique available to the Ebi framework.
 /// This module contains the command hierarchy.
 pub mod ebi_commands {
     pub mod ebi_command_analyse;
@@ -158,12 +158,13 @@ pub mod python {
 }
 
 /// Semantics provide meaning and interpretation to behaviour.
-/// This module contains code that defines behaviour, if it is not included in the Ebi_objects crate.
+/// This module contains code that defines the behaviour of objects, if that is not included in the Ebi_objects crate.
 pub mod semantics {
     pub mod automaton_semantics;
     pub mod business_process_model_and_notation_semantics;
     pub mod finite_stochastic_language_semantics;
     pub mod finite_stochastic_partially_ordered_language_semantics;
+    pub mod follower_semantics;
     pub mod labelled_petri_net_semantics;
     pub mod partially_ordered_workflow_language_semantics;
     pub mod process_tree_semantics;
@@ -308,7 +309,7 @@ pub mod techniques {
     pub mod unit_earth_movers_stochastic_conformance;
 }
 
-/// Ebi generates its own tests, for which generation code is found in this module.
+/// Ebi generates its some of its own tests, for which generation code is found in this module.
 pub mod tests {
     #[cfg(feature = "test_generation")]
     pub mod fallible_test;
@@ -323,8 +324,10 @@ pub mod tests {
     #[cfg(feature = "test_generation")]
     pub mod tests_generator;
 }
-pub mod follower_semantics;
+
 pub mod multiple_reader;
+
+/// Helper functions for text manipulation.
 pub mod text;
 
 pub use ebi_objects;

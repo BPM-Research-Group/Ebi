@@ -90,13 +90,13 @@ where
     let mut min_pos = 0;
     let mut min_value = &Fraction::one();
     for (pos, value) in sum_distance.iter().enumerate() {
-        if value < &min_value {
+        if value < min_value {
             min_pos = pos;
             min_value = value;
         }
     }
 
-    return Some(min_pos);
+    Some(min_pos)
 }
 
 pub fn sum_distances<T>(log: &T, distances: &TriangularDistanceMatrix) -> Vec<Fraction>

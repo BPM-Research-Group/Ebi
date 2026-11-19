@@ -158,16 +158,16 @@ fn inductive_miner_recursion(
         return tree;
     }
 
-    if info.dfg.empty_traces_weight.is_not_positive() {
-        if let Some(cut) = (parameters.cut_finders)(log, &info, parameters, recursion_depth) {
-            debug(format!("cut found {:?}", cut), recursion_depth);
-            let sublogs = log.split_log(&cut, recursion_depth);
-            let subtrees = sublogs
-                .iter()
-                .map(|s| inductive_miner_recursion(s, parameters, recursion_depth + 1))
-                .collect();
-            return cut.build_tree(subtrees);
-        }
+    if info.dfg.empty_traces_weight.is_not_positive()
+        && let Some(cut) = (parameters.cut_finders)(log, &info, parameters, recursion_depth)
+    {
+        debug(format!("cut found {:?}", cut), recursion_depth);
+        let sublogs = log.split_log(&cut, recursion_depth);
+        let subtrees = sublogs
+            .iter()
+            .map(|s| inductive_miner_recursion(s, parameters, recursion_depth + 1))
+            .collect();
+        return cut.build_tree(subtrees);
     }
 
     (parameters.fall_throughs)(log, &info, parameters, recursion_depth)
@@ -290,13 +290,11 @@ mod log_splitting {
         let mut eventclass2sigma_index = HashMap::new();
         let mut sigma_index2sigma = HashMap::new();
         {
-            let mut p = 0;
-            for sigma in parts {
+            for (p, sigma) in parts.iter().enumerate() {
                 sigma_index2sigma.insert(p, sigma);
                 for activity in sigma {
                     eventclass2sigma_index.insert(activity, p);
                 }
-                p += 1;
             }
         }
 
@@ -390,7 +388,7 @@ mod log_splitting {
     }
 
     fn find_optimal_split(
-        trace: &Vec<Activity>,
+        trace: &[Activity],
         sigma: &HashSet<Activity>,
         start_position: usize,
         ignore: &HashSet<Activity>,
@@ -406,12 +404,12 @@ mod log_splitting {
 
         //move to the start position
         while position < start_position && it.peek().is_some() {
-            position = position + 1;
-            position_least_cost = position_least_cost + 1;
+            position += 1;
+            position_least_cost += 1;
             it.next();
         }
 
-        while let Some(activity) = it.next() {
+        for activity in it {
             if ignore.contains(activity) {
                 //skip
             } else if sigma.contains(activity) {
@@ -428,7 +426,7 @@ mod log_splitting {
             }
         }
 
-        return position_least_cost;
+        position_least_cost
     }
 
     pub(super) fn split_log_concurrent(
@@ -568,10 +566,10 @@ mod cut_finding {
 
         let mut adj: Vec<Vec<usize>> = vec![vec![]; n];
         for (source, (target, _)) in info.dfg.edges() {
-            if let (Some(&u), Some(&v)) = (act_to_idx.get(&source), act_to_idx.get(&target)) {
-                if !adj[u].contains(&v) {
-                    adj[u].push(v);
-                }
+            if let (Some(&u), Some(&v)) = (act_to_idx.get(&source), act_to_idx.get(&target))
+                && !adj[u].contains(&v)
+            {
+                adj[u].push(v);
             }
         }
 
@@ -735,9 +733,8 @@ mod cut_finding {
                 let src_is_start = info.dfg.is_start_activity(src);
                 let src_is_end = info.dfg.is_end_activity(src);
                 let tgt_is_start = info.dfg.is_start_activity(tgt);
-                if !src_is_start && !src_is_end && !tgt_is_start {
-                    components.merge_components(src, tgt);
-                } else if src_is_start && !src_is_end {
+                if (!src_is_start && !src_is_end && !tgt_is_start) || (src_is_start && !src_is_end)
+                {
                     components.merge_components(src, tgt);
                 }
             }
@@ -939,13 +936,14 @@ mod find_fall_throughs {
         for (trace, probability) in log.iter_traces_probabilities() {
             let mut current: Vec<Activity> = Vec::new();
             for &a in trace {
-                if let Some(&last) = current.last() {
-                    if info.dfg.is_end_activity(last) && info.dfg.is_start_activity(a) {
-                        new_log
-                            .push_raw(std::mem::take(&mut current), probability)
-                            .unwrap();
-                        any_split = true;
-                    }
+                if let Some(&last) = current.last()
+                    && info.dfg.is_end_activity(last)
+                    && info.dfg.is_start_activity(a)
+                {
+                    new_log
+                        .push_raw(std::mem::take(&mut current), probability)
+                        .unwrap();
+                    any_split = true;
                 }
                 current.push(a);
             }
@@ -1167,7 +1165,7 @@ pub fn filter_log_info(
             .iter()
             .map(|(_, weight)| weight)
             .max()
-            .unwrap_or_else(|| &zero);
+            .unwrap_or(&zero);
 
         let threshold = &parameters.noise_filtering * max;
         result
@@ -1190,7 +1188,7 @@ pub fn filter_log_info(
                             .into_iter()
                             .map(|(_, weight)| weight)
                             .max()
-                            .unwrap_or_else(|| &zero),
+                            .unwrap_or(&zero),
                     )),
             );
         }

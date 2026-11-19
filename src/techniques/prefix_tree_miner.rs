@@ -2,9 +2,9 @@ use crate::{
     ebi_traits::ebi_trait_finite_language::EbiTraitFiniteLanguage, semantics::semantics::Semantics,
 };
 use ebi_objects::{
-    DeterministicFiniteAutomaton, FiniteLanguage, NumberOfTraces, ProcessTree,
     ebi_arithmetic::ebi_number::Zero,
     ebi_objects::process_tree::{Node, Operator},
+    DeterministicFiniteAutomaton, FiniteLanguage, NumberOfTraces, ProcessTree,
 };
 use std::collections::HashMap;
 
@@ -68,7 +68,7 @@ pub fn node_2_tree(lang: FiniteLanguage, tree: &mut Vec<Node>) {
             let first_activity = trace.remove(0);
             activity_2_lang
                 .entry(first_activity)
-                .or_insert_with(|| FiniteLanguage::new())
+                .or_insert_with(FiniteLanguage::new)
                 .push(trace);
         }
     }

@@ -77,7 +77,7 @@ impl StochasticMarkovianConformance for MarkovianAbstraction {
         let abslang1 = Box::new(FiniteStochasticLanguage::from(self));
         let abslang2 = Box::new(FiniteStochasticLanguage::from(other));
 
-        return measure.apply(abslang1, abslang2);
+        measure.apply(abslang1, abslang2)
     }
 }
 

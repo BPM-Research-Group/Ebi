@@ -221,7 +221,7 @@ impl AbstractMarkovian for StochasticNondeterministicFiniteAutomaton {
         // 3 Build matrix and solve for x
         let n = self.termination_probabilities.len();
         // Build sparse A = (I - Delta)^T
-        let delta = build_delta(&self);
+        let delta = build_delta(self);
 
         // println!("delta {:?}", delta);
 
@@ -257,7 +257,7 @@ impl AbstractMarkovian for StochasticNondeterministicFiniteAutomaton {
 
         // 4 Compute phi for each state
         // Compute phi on ID space then translate back to Strings using the shared ActivityKey
-        let phi_ids = compute_phi_ids(&self, order, start_activity, end_activity);
+        let phi_ids = compute_phi_ids(self, order, start_activity, end_activity);
 
         // println!("phi ids {:?}", phi_ids);
 
@@ -325,7 +325,7 @@ impl AbstractMarkovian for dyn EbiTraitFiniteStochasticLanguage {
         for (trace, probability) in self.iter_traces_probabilities() {
             // Compute M_σ^k for this trace (k-th order multiset Markovian abstraction)
             let m_sigma_k = compute_multiset_abstraction_for_trace_with_key(
-                &trace,
+                trace,
                 order,
                 start_activity,
                 end_activity,
@@ -645,7 +645,7 @@ fn solve_sparse_linear_system_optimized(
     for i in 0..n {
         // 1. Pivot search (find first row r >= i with non zero col i)
         let pivot = (i..n)
-            .find(|&r| find_col(&a[r], i).map_or(false, |idx| !a[r][idx].1.is_zero()))
+            .find(|&r| find_col(&a[r], i).is_some_and(|idx| !a[r][idx].1.is_zero()))
             .ok_or_else(|| anyhow!("Matrix is singular"))?;
 
         if pivot != i {
@@ -675,18 +675,16 @@ fn solve_sparse_linear_system_optimized(
             left.par_iter_mut()
                 .enumerate()
                 .filter_map(|(r, row)| {
-                    find_col(row, i)
-                        .map(|idx| {
-                            let factor = row[idx].1.clone();
-                            row[idx].1 = Fraction::zero(); // lazy zeroing avoids shift
-                            if factor.is_zero() {
-                                None
-                            } else {
-                                saxpy_row(row, i, pivot_ref, &factor);
-                                Some((r, factor))
-                            }
-                        })
-                        .flatten()
+                    find_col(row, i).and_then(|idx| {
+                        let factor = row[idx].1.clone();
+                        row[idx].1 = Fraction::zero(); // lazy zeroing avoids shift
+                        if factor.is_zero() {
+                            None
+                        } else {
+                            saxpy_row(row, i, pivot_ref, &factor);
+                            Some((r, factor))
+                        }
+                    })
                 })
                 .collect::<Vec<_>>(),
         );
@@ -698,18 +696,16 @@ fn solve_sparse_linear_system_optimized(
                 .enumerate()
                 .filter_map(|(off, row)| {
                     let r = i + 1 + off;
-                    find_col(row, i)
-                        .map(|idx| {
-                            let factor = row[idx].1.clone();
-                            row[idx].1 = Fraction::zero();
-                            if factor.is_zero() {
-                                None
-                            } else {
-                                saxpy_row(row, i, pivot_ref, &factor);
-                                Some((r, factor))
-                            }
-                        })
-                        .flatten()
+                    find_col(row, i).and_then(|idx| {
+                        let factor = row[idx].1.clone();
+                        row[idx].1 = Fraction::zero();
+                        if factor.is_zero() {
+                            None
+                        } else {
+                            saxpy_row(row, i, pivot_ref, &factor);
+                            Some((r, factor))
+                        }
+                    })
                 })
                 .collect::<Vec<_>>(),
         );
@@ -733,7 +729,7 @@ fn solve_sparse_linear_system(
     for i in 0..n {
         // Find pivot
         let mut pivot = i;
-        while pivot < n && a[pivot].get(&i).map_or(true, |v| v.is_zero()) {
+        while pivot < n && a[pivot].get(&i).is_none_or(|v| v.is_zero()) {
             pivot += 1;
         }
         if pivot == n {
@@ -759,21 +755,21 @@ fn solve_sparse_linear_system(
             if r == i {
                 continue;
             }
-            if let Some(factor_val) = a[r].get(&i).cloned() {
-                if !factor_val.is_zero() {
-                    // subtract factor * row_i from row_r
-                    let keys: Vec<(usize, Fraction)> =
-                        a[i].iter().map(|(k, v)| (*k, v.clone())).collect();
-                    for (c, val_i) in keys {
-                        let product = &factor_val * &val_i;
-                        let entry = a[r].entry(c).or_insert_with(Fraction::zero);
-                        *entry = &*entry - &product;
-                        if entry.is_zero() {
-                            a[r].remove(&c);
-                        }
+            if let Some(factor_val) = a[r].get(&i).cloned()
+                && !factor_val.is_zero()
+            {
+                // subtract factor * row_i from row_r
+                let keys: Vec<(usize, Fraction)> =
+                    a[i].iter().map(|(k, v)| (*k, v.clone())).collect();
+                for (c, val_i) in keys {
+                    let product = &factor_val * &val_i;
+                    let entry = a[r].entry(c).or_insert_with(Fraction::zero);
+                    *entry = &*entry - &product;
+                    if entry.is_zero() {
+                        a[r].remove(&c);
                     }
-                    b[r] -= &factor_val * &pivot_b;
                 }
+                b[r] -= &factor_val * &pivot_b;
             }
         }
     }
@@ -811,7 +807,6 @@ fn compute_phi_ids(
         state_idx: AutomatonState,
         remaining: usize,
         snfa: &StochasticNondeterministicFiniteAutomaton,
-        start_activity: Activity,
         end_activity: Activity,
         cache: &mut FxHashMap<(AutomatonState, usize), SuffixMap>,
     ) -> SuffixMap {
@@ -836,14 +831,8 @@ fn compute_phi_ids(
                         .or_insert_with(|| probability.clone());
                 } else {
                     // Recurse to target with one fewer remaining symbol
-                    let child_map = collect_suffixes(
-                        *target,
-                        remaining - 1,
-                        snfa,
-                        start_activity,
-                        end_activity,
-                        cache,
-                    );
+                    let child_map =
+                        collect_suffixes(*target, remaining - 1, snfa, end_activity, cache);
                     for (suf, w) in &child_map {
                         let mut vec = Vec::with_capacity(1 + suf.len());
                         //at this point, every label should have a transition
@@ -866,14 +855,8 @@ fn compute_phi_ids(
 
     // Build phi for every potential start state
     for state in 0..n {
-        let suffixes = collect_suffixes(
-            AutomatonState::of(state),
-            k,
-            snfa,
-            start_activity,
-            end_activity,
-            &mut cache,
-        );
+        let suffixes =
+            collect_suffixes(AutomatonState::of(state), k, snfa, end_activity, &mut cache);
 
         // println!("\tstate {}, suffixes {:?}", state, suffixes);
 

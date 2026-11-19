@@ -10,7 +10,7 @@ use crate::{
         ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
-    follower_semantics::FollowerSemantics,
+    semantics::follower_semantics::FollowerSemantics,
     techniques::explain_trace::ExplainTrace,
 };
 use clap::{Arg, ArgAction, value_parser};

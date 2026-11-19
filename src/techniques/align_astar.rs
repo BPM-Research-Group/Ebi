@@ -313,7 +313,7 @@ where
  */
 pub fn transform_alignment<T, State>(
     semantics: &T,
-    trace: &Vec<Activity>,
+    trace: &[Activity],
     states: Vec<(usize, State)>,
 ) -> Result<Vec<Move>>
 where
