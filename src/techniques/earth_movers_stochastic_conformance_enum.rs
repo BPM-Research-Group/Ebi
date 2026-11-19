@@ -71,7 +71,7 @@ impl dyn WeightedDistances {
             // );
 
             // 2c. If the LCMs are within the range of i64, use i64 for the NetworkSimplex computation (remains exact but faster). Otherwise use BigInt.
-            if lcm_probabilities <= Integer::from(i64::MAX)
+            if lcm_probabilities <= i64::MAX
                 && (Into::<Integer>::into(lcm_distances.clone()) + Integer::ONE)
                     * Integer::from(n + m)
                     <= i64::MAX
@@ -145,7 +145,7 @@ impl dyn WeightedDistances {
                 result -= distance;
 
                 Ok(result)
-            } else if lcm_probabilities <= Integer::from(i128::MAX)
+            } else if lcm_probabilities <= i128::MAX
                 && (Into::<Integer>::into(lcm_distances.clone()) + Integer::ONE)
                     * Integer::from(n + m)
                     <= i128::MAX

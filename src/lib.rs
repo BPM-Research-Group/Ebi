@@ -1,6 +1,10 @@
-#![allow(clippy::needless_range_loop, clippy::doc_lazy_continuation, warnings)]
-#![deny(clippy::needless_return, clippy::useless_format, clippy::cmp_owned)]
-
+#![allow(
+    clippy::needless_range_loop,
+    clippy::doc_lazy_continuation,
+    clippy::doc_overindented_list_items,
+    warnings
+)]
+#![deny(clippy::needless_return, clippy::useless_format, clippy::cmp_owned, clippy::clone_on_copy)]
 #![doc = include_str!("../README.md")]
 
 //! ## Sister crates
