@@ -152,7 +152,8 @@ impl Poly {
             }
             let coef_div = rem_lt.1 / divisor_lt.1;
 
-            if let Some(vars_div) = divide_monomial(&rem_lt.0, &divisor_lt.0) {
+            {
+                let vars_div = divide_monomial(&rem_lt.0, &divisor_lt.0)?;
                 let mut term_map = HashMap::new();
                 term_map.insert(vars_div, coef_div);
                 let q_term = Poly { terms: term_map };
@@ -160,8 +161,6 @@ impl Poly {
                 quotient = quotient.add(&q_term);
                 let sub_poly = q_term.mul(other);
                 remainder = remainder.sub(&sub_poly);
-            } else {
-                return None;
             }
         }
         Some(quotient)
@@ -282,13 +281,13 @@ fn lcm_factored(f1: &FactoredPoly, f2: &FactoredPoly) -> (FactoredPoly, Poly, Po
                         }
                         break;
                     }
-                } else if let Some(q) = f_other.exact_div(f_self) {
-                    if format!("{}", q) == "-1" {
-                        used_in_self[i] = true;
-                        found = true;
-                        other_mult = other_mult.mul(&Poly::new(-1));
-                        break;
-                    }
+                } else if let Some(q) = f_other.exact_div(f_self)
+                    && format!("{}", q) == "-1"
+                {
+                    used_in_self[i] = true;
+                    found = true;
+                    other_mult = other_mult.mul(&Poly::new(-1));
+                    break;
                 }
             }
         }

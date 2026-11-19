@@ -127,13 +127,11 @@ where
 
         if aligned_traces.len() != log.number_of_traces() {
             //something went wrong
-            if let Ok(mutex) = Arc::try_unwrap(error) {
-                if let Ok(err) = mutex.into_inner() {
-                    if let Some(err) = err {
+            if let Ok(mutex) = Arc::try_unwrap(error)
+                && let Ok(err) = mutex.into_inner()
+                    && let Some(err) = err {
                         return Err(err);
                     }
-                }
-            }
             return Err(anyhow!("Something went wrong when computing alignments."));
         }
 
@@ -193,13 +191,11 @@ where
 
         if aligned_traces.len() != log_len {
             //something went wrong
-            if let Ok(mutex) = Arc::try_unwrap(error) {
-                if let Ok(err) = mutex.into_inner() {
-                    if let Some(err) = err {
+            if let Ok(mutex) = Arc::try_unwrap(error)
+                && let Ok(err) = mutex.into_inner()
+                    && let Some(err) = err {
                         return Err(err);
                     }
-                }
-            }
             return Err(anyhow!("Something went wrong when computing alignments."));
         }
 

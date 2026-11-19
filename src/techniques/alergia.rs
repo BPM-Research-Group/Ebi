@@ -99,14 +99,13 @@ fn stochastic_merge(
     q: usize,
     q_prime: usize,
 ) {
-    if let Some(&parent) = parents.get(&q_prime) {
-        if let Some((_, next_q, _)) = fpta.node_2_transitions[parent]
+    if let Some(&parent) = parents.get(&q_prime)
+        && let Some((_, next_q, _)) = fpta.node_2_transitions[parent]
             .iter_mut()
             .find(|(_, next_q, _)| *next_q == q_prime)
         {
             *next_q = q;
         }
-    }
 
     stochastic_fold(fpta, parents, q, q_prime);
 }
@@ -194,11 +193,10 @@ fn alergia_compatible(
         if let (Some(blue_target), Some(red_target)) = (
             fpta.get_edge_target(activity, q_blue),
             fpta.get_edge_target(activity, q_red),
-        ) {
-            if !alergia_compatible(confidence_factor, fpta, blue_target, red_target) {
+        )
+            && !alergia_compatible(confidence_factor, fpta, blue_target, red_target) {
                 return false;
             }
-        }
     }
 
     true

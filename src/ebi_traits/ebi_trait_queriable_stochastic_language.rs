@@ -60,13 +60,11 @@ pub trait EbiTraitQueriableStochasticLanguage: HasActivityKey + Sync {
         progress_bar.finish_and_clear();
 
         //see whether an error was reported
-        if let Result::Ok(mutex) = Arc::try_unwrap(error) {
-            if let Result::Ok(err) = mutex.into_inner() {
-                if let Some(err) = err {
+        if let Result::Ok(mutex) = Arc::try_unwrap(error)
+            && let Result::Ok(err) = mutex.into_inner()
+                && let Some(err) = err {
                     return Err(err);
                 }
-            }
-        }
 
         Ok(sum)
     }

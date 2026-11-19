@@ -524,15 +524,14 @@ impl EbiCommand {
 
                     //see whether an output extension matches the requested file
                     for exporter in exporters {
-                        if let EbiExporter::Object(_, file_handler) = exporter {
-                            if file
+                        if let EbiExporter::Object(_, file_handler) = exporter
+                            && file
                                 .display()
                                 .to_string()
                                 .ends_with(&(".".to_string() + file_handler.file_extension))
                             {
                                 return Ok(exporter);
                             }
-                        }
                     }
                 }
 

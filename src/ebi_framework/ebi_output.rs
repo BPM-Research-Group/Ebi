@@ -148,11 +148,9 @@ impl EbiOutputType {
                 output_type: output,
                 ..
             } = path[path.len() - 1]
-            {
-                if output == &self {
+                && output == &self {
                     return true;
                 }
-            }
             false
         });
         result

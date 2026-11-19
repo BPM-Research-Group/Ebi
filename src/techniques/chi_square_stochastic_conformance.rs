@@ -50,13 +50,11 @@ impl ChiSquareStochasticConformance for dyn EbiTraitFiniteStochasticLanguage {
             .sum::<Fraction>();
 
         //something went wrong
-        if let Ok(mutex) = Arc::try_unwrap(error) {
-            if let Ok(err) = mutex.into_inner() {
-                if let Some(err) = err {
+        if let Ok(mutex) = Arc::try_unwrap(error)
+            && let Ok(err) = mutex.into_inner()
+                && let Some(err) = err {
                     return Err(err);
                 }
-            }
-        }
         sum /= 2usize;
         sum = sum.one_minus();
         Ok(sum)

@@ -149,13 +149,11 @@ impl EbiFileHandler {
         //get commands that can output any of the objects
         let mut result = BTreeSet::new();
         for command_path in EBI_COMMANDS.get_command_paths() {
-            if let Some(EbiCommand::Command { output_type, .. }) = command_path.last() {
-                if let EbiOutputType::ObjectType(x) = output_type {
-                    if objects.contains(x) {
+            if let Some(EbiCommand::Command { output_type, .. }) = command_path.last()
+                && let EbiOutputType::ObjectType(x) = output_type
+                    && objects.contains(x) {
                         result.insert(command_path);
                     }
-                }
-            }
         }
 
         result

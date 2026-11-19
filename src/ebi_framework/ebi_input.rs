@@ -1524,11 +1524,10 @@ pub fn attempt_parse(
                 }
             }
             EbiInputType::FileHandler => {
-                if let MultipleReader::String(string) = &reader {
-                    if let Ok(value) = string.parse::<EbiFileHandler>() {
+                if let MultipleReader::String(string) = &reader
+                    && let Ok(value) = string.parse::<EbiFileHandler>() {
                         return Ok(EbiInput::FileHandler(value));
-                    }
-                };
+                    };
             }
             EbiInputType::String(None, _) => {
                 if let MultipleReader::String(string) = &reader {
@@ -1553,8 +1552,8 @@ pub fn attempt_parse(
                 }
             }
             EbiInputType::Usize(min, max, _) => {
-                if let MultipleReader::String(string) = &reader {
-                    if let Ok(value) = string.parse::<usize>() {
+                if let MultipleReader::String(string) = &reader
+                    && let Ok(value) = string.parse::<usize>() {
                         match (min, max) {
                             (None, None) => {
                                 return Ok(EbiInput::Usize(value, &input_type));
@@ -1586,11 +1585,10 @@ pub fn attempt_parse(
                             }
                         }
                     }
-                }
             }
             EbiInputType::Fraction(min, max, _) => {
-                if let MultipleReader::String(string) = &reader {
-                    if let Ok(value) = &string.parse::<FractionNotParsedYet>() {
+                if let MultipleReader::String(string) = &reader
+                    && let Ok(value) = &string.parse::<FractionNotParsedYet>() {
                         let value: Fraction = value.try_into()?;
 
                         match (min, max) {
@@ -1624,7 +1622,6 @@ pub fn attempt_parse(
                             }
                         }
                     }
-                }
             }
         }
     }

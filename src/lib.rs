@@ -4,7 +4,14 @@
     clippy::doc_overindented_list_items,
     warnings
 )]
-#![deny(clippy::needless_return, clippy::useless_format, clippy::cmp_owned, clippy::clone_on_copy, clippy::collapsible_if)]
+#![deny(
+    clippy::needless_return,
+    clippy::useless_format,
+    clippy::cmp_owned,
+    clippy::clone_on_copy,
+    clippy::collapsible_if,
+    clippy::needless_borrow
+)]
 #![doc = include_str!("../README.md")]
 
 //! ## Sister crates
