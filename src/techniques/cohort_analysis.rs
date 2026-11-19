@@ -7,9 +7,9 @@ use crate::{
     math::{distances::WeightedDistances, distances_triangular::WeightedTriangularDistanceMatrix},
 };
 use ebi_objects::{
-    Attribute, AttributeKey, DataType,
     anyhow::Result,
-    ebi_arithmetic::{Fraction, Recip, ToNative, Zero, fraction::approximate::Approximate},
+    ebi_arithmetic::{fraction::approximate::Approximate, Fraction, Recip, ToNative, Zero},
+    Attribute, AttributeKey, DataType,
 };
 use fnv::FnvBuildHasher;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
@@ -198,8 +198,7 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
         //create variant map
         let variant_2_cardinality = <dyn EbiTraitEventLog>::to_multiset(self);
         let variant_2_variant_index = variant_2_cardinality
-            .iter()
-            .map(|(trace, _)| trace)
+            .keys()
             .enumerate()
             .map(|(x, y)| (y, x))
             .collect::<HashMap<_, _, FnvBuildHasher>>();
@@ -258,12 +257,12 @@ impl CohortAnalysis for dyn EbiTraitEventLogTraceAttributes {
 
         results.sort_by(|a, b| {
             if number_of_random_splits == 0 {
-                a.1.0
-                    .partial_cmp(&b.1.0)
+                a.1 .0
+                    .partial_cmp(&b.1 .0)
                     .unwrap_or(std::cmp::Ordering::Equal)
             } else {
-                a.1.1
-                    .partial_cmp(&b.1.1)
+                a.1 .1
+                    .partial_cmp(&b.1 .1)
                     .unwrap_or(std::cmp::Ordering::Equal)
             }
         });
@@ -284,7 +283,6 @@ fn elicit_features(
     log: &dyn EbiTraitEventLogTraceAttributes,
     minimum_cohort_size_fraction: &Fraction,
 ) -> Vec<Feature> {
-
     if log.number_of_traces() == 0 {
         return vec![];
     }
@@ -341,7 +339,7 @@ fn elicit_features(
 
 fn split_log_on_feature(
     log: &dyn EbiTraitEventLogTraceAttributes,
-    trace_index_2_variant_index: &Vec<usize>,
+    trace_index_2_variant_index: &[usize],
     feature: &Feature,
     distances: Arc<WeightedTriangularDistanceMatrix>,
 ) -> (Box<dyn WeightedDistances>, usize) {

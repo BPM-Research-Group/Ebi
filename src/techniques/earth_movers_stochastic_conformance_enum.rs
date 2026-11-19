@@ -38,12 +38,12 @@ impl dyn WeightedDistances {
     ///     g. Calculate the EMSC value as `1 - (result / (LCM of distances * LCM of probabilities))` (i.e., undo the scaling trick).<br>
     ///
     /// 3. **If exact arithmetic is not required**, use `f64` for the `NetworkSimplex` computation.<br>
-    ///     a. Create a network graph with the scaled distances and probabilities:<br>
-    ///         i. For each trace in the first language, create a supply node with the corresponding trace probability as supply.<br>
-    ///        ii. For each trace in the second language, create a demand node with the corresponding trace probability as demand (i.e., negative supply).<br>
-    ///       iii. Create an edge between each pair of traces with the respective distance as cost.<br>
-    ///     b. Run the `NetworkSimplex` algorithm to find the optimal flow between the supply and demand nodes.<br>
-    ///     c. Calculate the EMSC value as `1 - result`.
+    ///  a. Create a network graph with the scaled distances and probabilities:<br>
+    ///   i. For each trace in the first language, create a supply node with the corresponding trace probability as supply.<br>
+    ///   ii. For each trace in the second language, create a demand node with the corresponding trace probability as demand (i.e., negative supply).<br>
+    ///   iii. Create an edge between each pair of traces with the respective distance as cost.<br>
+    ///  b. Run the `NetworkSimplex` algorithm to find the optimal flow between the supply and demand nodes.<br>
+    ///  c. Calculate the EMSC value as `1 - result`.
     pub fn earth_movers_stochastic_conformance(&self) -> Result<FractionEnum> {
         if self.len_a() == 0 || self.len_b() == 0 {
             return Err(anyhow!("One of the languages is empty."));
