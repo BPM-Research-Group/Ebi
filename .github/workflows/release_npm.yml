@@ -1,7 +1,11 @@
 name: Build javascript
 
 on:
-  workflow_dispatch
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
 
 env:
   CARGO_TERM_COLOR: always
@@ -12,6 +16,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: jetli/wasm-pack-action@v0.4.0
+
+      - name: Update version number
+        id: version
+        run: |
+          cargo install cargo-edit
+          VERS=${{ github.ref_name }}
+          VERS="${VERS:1}"
+          cargo set-version "$VERS"
 
       - name: Build NPM package
         run: |
@@ -27,6 +39,8 @@ jobs:
           registery-url: https://registry.npmjs.org
       
       - name: Publish to NPM
-        run: npm publish --dry-run
+        run: |
+          cd pkg
+          npm publish --dry-run
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
