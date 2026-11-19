@@ -1,20 +1,22 @@
 use crate::{
     ebi_framework::displayable::Displayable,
     ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics,
-    math::markov_model::MarkovModel, semantics::labelled_petri_net_semantics::LPNMarking,
-    semantics::semantics::Semantics,
-    stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    math::markov_model::MarkovModel,
+    semantics::labelled_petri_net_semantics::LPNMarking,
+    semantics::{
+        semantics::Semantics, stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    },
     techniques::non_decreasing_livelock::NonDecreasingLivelock,
 };
 use ebi_objects::{
-    Activity, AutomatonState, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
     anyhow::Result,
     ebi_arithmetic::{Fraction, One, Signed, Zero},
     ebi_objects::process_tree::TreeMarking,
+    Activity, AutomatonState, StochasticDirectlyFollowsModel, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
 };
 use std::{
-    collections::{HashMap, hash_map::Entry},
+    collections::{hash_map::Entry, HashMap},
     fmt::{self, Debug},
     hash::{DefaultHasher, Hash, Hasher},
 };
@@ -424,8 +426,8 @@ impl<S: Displayable> Displayable for MarkovMarking<S> {}
 mod tests {
     use crate::ebi_traits::ebi_trait_stochastic_deterministic_semantics::StochasticDeterministicSemantics;
     use ebi_objects::{
-        HasActivityKey, StochasticLabelledPetriNet,
         ebi_arithmetic::{Fraction, Zero},
+        HasActivityKey, StochasticLabelledPetriNet,
     };
     use std::fs;
 
@@ -442,69 +444,62 @@ mod tests {
         assert_eq!(state.p_marking.len(), 1);
         assert_eq!(state.termination_probability, Fraction::zero());
         assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
-        assert!(
-            slpn.get_deterministic_enabled_activities(&state)
-                .contains(&a)
-        );
+        assert!(slpn
+            .get_deterministic_enabled_activities(&state)
+            .contains(&a));
 
         //prefix <a>
         state = slpn.execute_deterministic_activity(&state, a).unwrap();
         assert_eq!(state.p_marking.len(), 1);
         assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
-        assert!(
-            slpn.get_deterministic_enabled_activities(&state)
-                .contains(&a)
-        );
+        assert!(slpn
+            .get_deterministic_enabled_activities(&state)
+            .contains(&a));
         assert_eq!(state.termination_probability, Fraction::zero());
 
         //prefix <a, a>
         state = slpn.execute_deterministic_activity(&state, a).unwrap();
         assert_eq!(state.p_marking.len(), 2);
         assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
-        assert!(
-            slpn.get_deterministic_enabled_activities(&state)
-                .contains(&a)
-        );
+        assert!(slpn
+            .get_deterministic_enabled_activities(&state)
+            .contains(&a));
         assert_eq!(state.termination_probability, Fraction::from((1, 4)));
 
         //prefix <a, a, a>
         state = slpn.execute_deterministic_activity(&state, a).unwrap();
         assert_eq!(state.p_marking.len(), 3);
         assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
-        assert!(
-            slpn.get_deterministic_enabled_activities(&state)
-                .contains(&a)
-        );
+        assert!(slpn
+            .get_deterministic_enabled_activities(&state)
+            .contains(&a));
         assert_eq!(state.termination_probability, Fraction::zero());
 
         //prefix <a, a, a, a>
         state = slpn.execute_deterministic_activity(&state, a).unwrap();
         assert_eq!(state.p_marking.len(), 4);
         assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
-        assert!(
-            slpn.get_deterministic_enabled_activities(&state)
-                .contains(&a)
-        );
+        assert!(slpn
+            .get_deterministic_enabled_activities(&state)
+            .contains(&a));
         assert_eq!(state.termination_probability, Fraction::zero());
 
         //prefix <a, a, a, a, a>
         state = slpn.execute_deterministic_activity(&state, a).unwrap();
         assert_eq!(state.p_marking.len(), 6);
         assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
-        assert!(
-            slpn.get_deterministic_enabled_activities(&state)
-                .contains(&a)
-        );
+        assert!(slpn
+            .get_deterministic_enabled_activities(&state)
+            .contains(&a));
         assert_eq!(state.termination_probability, Fraction::from((1, 16)));
 
         //prefix <a, a, a, a, a, a>
         state = slpn.execute_deterministic_activity(&state, a).unwrap();
         assert_eq!(state.p_marking.len(), 7);
         assert_eq!(slpn.get_deterministic_enabled_activities(&state).len(), 1);
-        assert!(
-            slpn.get_deterministic_enabled_activities(&state)
-                .contains(&a)
-        );
+        assert!(slpn
+            .get_deterministic_enabled_activities(&state)
+            .contains(&a));
         assert_eq!(state.termination_probability, Fraction::zero());
     }
 }

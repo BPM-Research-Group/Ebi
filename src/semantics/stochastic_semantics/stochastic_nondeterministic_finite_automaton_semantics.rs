@@ -1,12 +1,12 @@
-use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;
+use crate::semantics::stochastic_semantics::stochastic_semantics::StochasticSemantics;
 use ebi_objects::{
-    AutomatonState, StochasticAutomatonSemantics, StochasticDeterministicFiniteAutomaton,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::Fraction,
     ebi_objects::labelled_petri_net::TransitionIndex,
+    AutomatonState, StochasticAutomatonSemantics, StochasticNondeterministicFiniteAutomaton,
 };
 
-impl StochasticSemantics for StochasticDeterministicFiniteAutomaton {
+impl StochasticSemantics for StochasticNondeterministicFiniteAutomaton {
     type StoSemState = AutomatonState;
 
     fn get_transition_weight(

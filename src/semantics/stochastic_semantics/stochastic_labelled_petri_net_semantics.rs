@@ -1,23 +1,20 @@
-use crate::{
-    semantics::labelled_petri_net_semantics::LPNMarking,
+use crate::semantics::{
+    labelled_petri_net_semantics::LPNMarking,
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
 use ebi_objects::{
-    StochasticLabelledPetriNet,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{Fraction, Zero},
+    StochasticLabelledPetriNet,
 };
 
 impl StochasticSemantics for StochasticLabelledPetriNet {
     type StoSemState = LPNMarking;
 
     fn get_transition_weight(&self, _state: &LPNMarking, transition: usize) -> Result<&Fraction> {
-        self.weights.get(transition).ok_or_else(|| {
-            anyhow!(
-                "Transition {} does not exist.",
-                transition
-            )
-        })
+        self.weights
+            .get(transition)
+            .ok_or_else(|| anyhow!("Transition {} does not exist.", transition))
     }
 
     fn get_total_weight_of_enabled_transitions(&self, state: &LPNMarking) -> Result<Fraction> {

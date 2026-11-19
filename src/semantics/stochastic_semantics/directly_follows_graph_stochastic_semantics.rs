@@ -1,9 +1,9 @@
-use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;
+use crate::semantics::stochastic_semantics::stochastic_semantics::StochasticSemantics;
 use ebi_objects::{
-    AutomatonState, DirectlyFollowsGraph, StochasticAutomatonSemantics,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::Fraction,
     ebi_objects::labelled_petri_net::TransitionIndex,
+    AutomatonState, DirectlyFollowsGraph, StochasticAutomatonSemantics,
 };
 
 impl StochasticSemantics for DirectlyFollowsGraph {

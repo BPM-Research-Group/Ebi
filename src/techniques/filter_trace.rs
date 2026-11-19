@@ -20,7 +20,7 @@ pub trait FilterTrace {
     /// keep all non-empty traces
     fn remove_traces_empty(&mut self);
 
-    /// remove all traces that have [event_selector] [activity]
+    /// remove all traces that have `event_selector` `activity`
     fn remove_traces_event_activity(&mut self, event_selector: EventSelector, activity: Activity);
 }
 

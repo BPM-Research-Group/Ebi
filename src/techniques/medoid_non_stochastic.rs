@@ -159,7 +159,7 @@ where
 }
 
 /**
- * All functions below are GPL-3, and adapted from https://github.com/kno10/rust-kmedoids/tree/main.
+ * All functions below are GPL-3, and adapted from <https://github.com/kno10/rust-kmedoids/tree/main>.
  *
 /// ## Example
 /// Given a dissimilarity matrix of size 4 x 4, use:

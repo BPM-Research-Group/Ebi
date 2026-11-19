@@ -1,4 +1,4 @@
-use crate::stochastic_semantics::stochastic_semantics::StochasticSemantics;
+use crate::semantics::stochastic_semantics::stochastic_semantics::StochasticSemantics;
 use ebi_objects::{
     StochasticProcessTree,
     anyhow::{Result, anyhow},

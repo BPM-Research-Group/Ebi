@@ -1,18 +1,20 @@
 use crate::{
     ebi_traits::ebi_trait_finite_stochastic_language::EbiTraitFiniteStochasticLanguage,
-    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
-    stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    semantics::{
+        labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
+        stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    },
     techniques::tau_removal::TauRemoval,
 };
 use ebi_objects::{
-    Activity, ActivityKey, AutomatonState, HasActivityKey,
-    StochasticNondeterministicFiniteAutomaton,
-    anyhow::{Ok, Result, anyhow},
-    ebi_arithmetic::{Fraction, One, Recip, ebi_number::Zero},
+    anyhow::{anyhow, Ok, Result},
+    ebi_arithmetic::{ebi_number::Zero, Fraction, One, Recip},
     ebi_objects::{
         finite_stochastic_language::FiniteStochasticLanguage,
         stochastic_labelled_petri_net::StochasticLabelledPetriNet,
     },
+    Activity, ActivityKey, AutomatonState, HasActivityKey,
+    StochasticNondeterministicFiniteAutomaton,
 };
 use itertools::Itertools;
 use rayon::prelude::*;
@@ -902,12 +904,12 @@ mod tests {
         },
     };
     use ebi_objects::{
-        ActivityKeyTranslator, HasActivityKey, IntoRefTraceProbabilityIterator,
-        TranslateActivityKey,
         ebi_objects::{
             event_log::EventLog, finite_stochastic_language::FiniteStochasticLanguage,
             stochastic_labelled_petri_net::StochasticLabelledPetriNet,
         },
+        ActivityKeyTranslator, HasActivityKey, IntoRefTraceProbabilityIterator,
+        TranslateActivityKey,
     };
     use std::fs;
 

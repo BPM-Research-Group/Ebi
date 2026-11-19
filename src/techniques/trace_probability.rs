@@ -1,15 +1,17 @@
 use crate::{
     ebi_traits::ebi_trait_queriable_stochastic_language::EbiTraitQueriableStochasticLanguage,
     follower_semantics::FollowerSemantics,
-    semantics::{labelled_petri_net_semantics::LPNMarking, semantics::Semantics},
-    stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    semantics::{
+        labelled_petri_net_semantics::LPNMarking, semantics::Semantics,
+        stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    },
 };
 use ebi_objects::{
-    AutomatonState, StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
-    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
-    anyhow::{Context, Result, anyhow},
+    anyhow::{anyhow, Context, Result},
     ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, GaussJordan, One, Zero},
     ebi_objects::process_tree::TreeMarking,
+    AutomatonState, StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
+    StochasticNondeterministicFiniteAutomaton, StochasticProcessTree,
 };
 use std::{
     collections::{HashMap, HashSet},
@@ -467,9 +469,9 @@ mod tests {
         follower_semantics::FollowerSemantics,
     };
     use ebi_objects::{
+        ebi_arithmetic::{Fraction, Zero},
         FiniteLanguage, HasActivityKey, StochasticDeterministicFiniteAutomaton,
         StochasticLabelledPetriNet, StochasticProcessTree,
-        ebi_arithmetic::{Fraction, Zero},
     };
     use std::fs;
 

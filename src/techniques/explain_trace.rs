@@ -1,13 +1,13 @@
 use crate::{
     ebi_framework::displayable::Displayable,
     ebi_traits::ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
-    stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    semantics::stochastic_semantics::stochastic_semantics::StochasticSemantics,
     techniques::align_astar::transform_alignment,
 };
 use ebi_objects::{
-    Activity, LanguageOfAlignments,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{Fraction, One, OneMinus, Zero},
+    Activity, LanguageOfAlignments,
 };
 use ebi_optimisation::astar;
 use std::ops::{Add, AddAssign};
@@ -99,7 +99,14 @@ impl ExplainTrace for EbiTraitStochasticSemantics {
     }
 }
 
-impl<State: Displayable> dyn StochasticSemantics<StoSemState = State, SemState = State, AliState = State, LivState = State> {
+impl<State: Displayable>
+    dyn StochasticSemantics<
+        StoSemState = State,
+        SemState = State,
+        AliState = State,
+        LivState = State,
+    >
+{
     pub fn explain_trace(
         &self,
         trace: &Vec<Activity>,

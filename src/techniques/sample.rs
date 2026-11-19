@@ -5,16 +5,18 @@ use crate::{
         ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics,
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
     },
-    stochastic_partially_ordered_semantics::stochastic_partially_ordered_semantics::StochasticPartiallyOrderedSemantics,
-    stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    semantics::{
+        stochastic_partially_ordered_semantics::stochastic_partially_ordered_semantics::StochasticPartiallyOrderedSemantics,
+        stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    },
     techniques::livelock::LiveLockCache,
 };
 use ebi_objects::{
+    anyhow::{anyhow, Result},
+    ebi_arithmetic::{f, ChooseRandomly, Fraction, FractionRandomCache, One, Recip, Zero},
+    ebi_bpmn::{partially_ordered_run::PartiallyOrderedRun, BPMNMarking},
     FiniteStochasticLanguage, FiniteStochasticPartiallyOrderedLanguage, HasActivityKey,
     StochasticBusinessProcessModelAndNotation,
-    anyhow::{Result, anyhow},
-    ebi_arithmetic::{ChooseRandomly, Fraction, FractionRandomCache, One, Recip, Zero, f},
-    ebi_bpmn::{BPMNMarking, partially_ordered_run::PartiallyOrderedRun},
 };
 use rand::RngExt;
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
@@ -240,10 +242,10 @@ impl Sampler for EbiTraitStochasticPartiallyOrderedSemantics {
 
 impl Sampler
     for dyn StochasticPartiallyOrderedSemantics<
-            StoPOSemState = BPMNMarking,
-            SemState = BPMNMarking,
-            AliState = BPMNMarking,
-        >
+        StoPOSemState = BPMNMarking,
+        SemState = BPMNMarking,
+        AliState = BPMNMarking,
+    >
 {
     fn sample(&self, number_of_traces: usize) -> Result<FiniteStochasticLanguage> {
         if let Some(initial_state) = self.get_initial_state() {

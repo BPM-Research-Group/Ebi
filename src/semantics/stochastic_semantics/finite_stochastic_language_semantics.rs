@@ -1,9 +1,9 @@
-use crate::{
-    semantics::finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
+use crate::semantics::{
+    finite_stochastic_language_semantics::FiniteStochasticLanguageSemantics,
     stochastic_semantics::stochastic_semantics::StochasticSemantics,
 };
 use ebi_objects::{
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{Fraction, Zero},
     ebi_objects::labelled_petri_net::TransitionIndex,
 };

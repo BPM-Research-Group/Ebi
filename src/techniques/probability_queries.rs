@@ -9,9 +9,9 @@ use crate::{
 };
 use core::hash::Hash;
 use ebi_objects::{
-    Activity, FiniteStochasticLanguage,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{Fraction, One, OneMinus, Signed, Zero},
+    Activity, FiniteStochasticLanguage,
 };
 use fnv::FnvBuildHasher;
 use priority_queue::PriorityQueue;
@@ -40,7 +40,7 @@ pub trait ProbabilityQueries {
      * Find the most likely traces that together have a sum probability.
      */
     fn analyse_probability_coverage(&self, coverage: &Fraction)
-    -> Result<FiniteStochasticLanguage>;
+        -> Result<FiniteStochasticLanguage>;
 }
 
 impl ProbabilityQueries for EbiTraitStochasticDeterministicSemantics {
@@ -253,7 +253,9 @@ impl ProbabilityQueries for dyn EbiTraitFiniteStochasticLanguage {
     }
 }
 
-impl<DState: Displayable, LState: Displayable> dyn StochasticDeterministicSemantics<DetState = DState, LivState = LState> {
+impl<DState: Displayable, LState: Displayable>
+    dyn StochasticDeterministicSemantics<DetState = DState, LivState = LState>
+{
     pub fn iterate_most_likely_traces<F>(
         &self,
         mut stop: F,
@@ -589,14 +591,16 @@ mod tests {
                 EbiTraitStochasticDeterministicSemantics, StochasticDeterministicSemantics,
             },
         },
-        semantics::labelled_petri_net_semantics::LPNMarking,
-        stochastic_deterministic_semantics::deterministic_semantics_for_stochastic_semantics::PMarking,
+        semantics::{
+            labelled_petri_net_semantics::LPNMarking,
+            stochastic_deterministic_semantics::deterministic_semantics_for_stochastic_semantics::PMarking,
+        },
         techniques::probability_queries::ProbabilityQueries,
     };
     use ebi_objects::{
+        ebi_arithmetic::{f, Fraction, One, Zero},
         EventLogXes, FiniteStochasticLanguage, HasActivityKey, NumberOfTraces,
         StochasticDeterministicFiniteAutomaton, StochasticLabelledPetriNet,
-        ebi_arithmetic::{Fraction, One, Zero, f},
     };
     use std::fs;
 
@@ -605,9 +609,9 @@ mod tests {
         let fin = fs::read_to_string("testfiles/aa-aaa-bb.slpn").unwrap();
         let mut slpn: Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<LPNMarking>,
-                    LivState = LPNMarking,
-                >,
+                DetState = PMarking<LPNMarking>,
+                LivState = LPNMarking,
+            >,
         > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
 
         let state1 = slpn.get_deterministic_initial_state().unwrap().unwrap();
@@ -643,9 +647,9 @@ mod tests {
         let fin = fs::read_to_string("testfiles/infinite_bs.slpn").unwrap();
         let slpn: Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<LPNMarking>,
-                    LivState = LPNMarking,
-                >,
+                DetState = PMarking<LPNMarking>,
+                LivState = LPNMarking,
+            >,
         > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
         assert_eq!(
             slpn.analyse_probability_coverage(&Fraction::from((4, 10)))
@@ -660,9 +664,9 @@ mod tests {
         let fin = fs::read_to_string("testfiles/infinite_bs.slpn").unwrap();
         let slpn: Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<LPNMarking>,
-                    LivState = LPNMarking,
-                >,
+                DetState = PMarking<LPNMarking>,
+                LivState = LPNMarking,
+            >,
         > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
         assert_eq!(
             slpn.analyse_minimum_probability(&Fraction::from((51, 100)))
@@ -690,9 +694,9 @@ mod tests {
         let fin = fs::read_to_string("testfiles/livelock_empty_lang_multiple_silent.slpn").unwrap();
         let slpn: Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<LPNMarking>,
-                    LivState = LPNMarking,
-                >,
+                DetState = PMarking<LPNMarking>,
+                LivState = LPNMarking,
+            >,
         > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
 
         let slang2 = slpn
@@ -716,9 +720,9 @@ mod tests {
 
         let slpn: Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<LPNMarking>,
-                    LivState = LPNMarking,
-                >,
+                DetState = PMarking<LPNMarking>,
+                LivState = LPNMarking,
+            >,
         > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
         let slang2 = slpn
             .analyse_probability_coverage(&Fraction::zero())
@@ -740,9 +744,9 @@ mod tests {
         let fin = fs::read_to_string("testfiles/infinite_bs.slpn").unwrap();
         let slpn: Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<LPNMarking>,
-                    LivState = LPNMarking,
-                >,
+                DetState = PMarking<LPNMarking>,
+                LivState = LPNMarking,
+            >,
         > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
 
         let state1 = slpn.get_deterministic_initial_state().unwrap().unwrap();
@@ -765,9 +769,9 @@ mod tests {
 
         let slpn: Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<LPNMarking>,
-                    LivState = LPNMarking,
-                >,
+                DetState = PMarking<LPNMarking>,
+                LivState = LPNMarking,
+            >,
         > = slpn;
         let slang2 = slpn
             .analyse_probability_coverage(&Fraction::zero())
@@ -798,9 +802,9 @@ mod tests {
 
         let slpn: Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<LPNMarking>,
-                    LivState = LPNMarking,
-                >,
+                DetState = PMarking<LPNMarking>,
+                LivState = LPNMarking,
+            >,
         > = slpn;
         let slang2 = slpn
             .analyse_probability_coverage(&Fraction::zero())
@@ -822,9 +826,9 @@ mod tests {
         let fin = fs::read_to_string("testfiles/aa-ab-ba_ali.slpn").unwrap();
         let slpn: Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<LPNMarking>,
-                    LivState = LPNMarking,
-                >,
+                DetState = PMarking<LPNMarking>,
+                LivState = LPNMarking,
+            >,
         > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
 
         let slang2 = slpn
@@ -848,11 +852,9 @@ mod tests {
         let slang3 = slang.analyse_probability_coverage(&Fraction::one());
         assert!(slang3.is_err());
 
-        assert!(
-            slang
-                .analyse_probability_coverage(&Fraction::from((1, 2)))
-                .is_err()
-        );
+        assert!(slang
+            .analyse_probability_coverage(&Fraction::from((1, 2)))
+            .is_err());
     }
 
     #[test]
@@ -860,9 +862,9 @@ mod tests {
         let fin = fs::read_to_string("testfiles/livelock_empty_lang_labelled.slpn").unwrap();
         let slpn: Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<LPNMarking>,
-                    LivState = LPNMarking,
-                >,
+                DetState = PMarking<LPNMarking>,
+                LivState = LPNMarking,
+            >,
         > = Box::new(fin.parse::<StochasticLabelledPetriNet>().unwrap());
         let slang2 = slpn
             .analyse_probability_coverage(&Fraction::zero())
@@ -876,9 +878,9 @@ mod tests {
         let slpn = fin.parse::<StochasticLabelledPetriNet>().unwrap();
         let x: Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<LPNMarking>,
-                    LivState = LPNMarking,
-                >,
+                DetState = PMarking<LPNMarking>,
+                LivState = LPNMarking,
+            >,
         > = Box::new(slpn);
         let slang1 = x
             .analyse_minimum_probability(&Fraction::from((1, 5)))
@@ -1004,9 +1006,9 @@ mod tests {
 
         let x: Box<
             dyn StochasticDeterministicSemantics<
-                    DetState = PMarking<LPNMarking>,
-                    LivState = LPNMarking,
-                >,
+                DetState = PMarking<LPNMarking>,
+                LivState = LPNMarking,
+            >,
         > = Box::new(slpn);
         let slang = x.analyse_most_likely_traces(&1).unwrap();
 

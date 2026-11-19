@@ -12,10 +12,10 @@ use crate::{
     },
 };
 use ebi_objects::{
-    FiniteStochasticLanguage,
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::Fraction,
     ebi_derive::EbiInputEnum,
+    FiniteStochasticLanguage,
 };
 
 /// Supported distance metrics for Markovian abstraction comparison.
@@ -43,10 +43,9 @@ impl DistanceMeasure {
 }
 
 pub trait StochasticMarkovianConformance {
-    /// Compare `self` with a stochastic labelled Petri net using the selected
-    /// distance measure over their k-th order Markovian abstractions, and
-    /// return a conformance score in the range [0,1] where 1 means perfect
-    /// match.
+    /**
+     * Compare `self` with a stochastic labelled Petri net using the selected distance measure over their k-th order Markovian abstractions, and return a conformance score between 0 and 1 (both inclusive) where 1 means a perfect match.
+     */
     fn markovian_conformance(
         self,
         other: MarkovianAbstraction,
@@ -94,7 +93,7 @@ mod tests {
         },
     };
     use ebi_objects::{
-        FiniteStochasticLanguage, StochasticLabelledPetriNet, ebi_arithmetic::Fraction,
+        ebi_arithmetic::Fraction, FiniteStochasticLanguage, StochasticLabelledPetriNet,
     };
     use std::fs;
 

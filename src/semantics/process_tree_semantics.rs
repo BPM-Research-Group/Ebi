@@ -1,14 +1,14 @@
 use crate::semantics::semantics::Semantics;
 use ebi_objects::{
-    Activity, ProcessTree,
     anyhow::Result,
     ebi_objects::{
         labelled_petri_net::TransitionIndex,
         process_tree::{
-            TreeMarking, execute_transition, get_enabled_transitions, get_initial_state,
-            get_transition_activity, is_final_state,
+            execute_transition, get_enabled_transitions, get_initial_state,
+            get_transition_activity, is_final_state, TreeMarking,
         },
     },
+    Activity, ProcessTree,
 };
 
 impl Semantics for ProcessTree {
@@ -56,13 +56,12 @@ impl Semantics for ProcessTree {
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        semantics::semantics::Semantics,
-        stochastic_semantics::stochastic_semantics::StochasticSemantics,
+    use crate::semantics::{
+        semantics::Semantics, stochastic_semantics::stochastic_semantics::StochasticSemantics,
     };
     use ebi_objects::{
-        LabelledPetriNet, ProcessTree, StochasticProcessTree,
         ebi_arithmetic::{Fraction, One},
+        LabelledPetriNet, ProcessTree, StochasticProcessTree,
     };
     use std::fs;
 
