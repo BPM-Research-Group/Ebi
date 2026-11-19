@@ -1,6 +1,8 @@
 #![allow(
-  clippy::needless_range_loop
+  clippy::needless_range_loop,
+  warnings
 )]
+#![deny(clippy::needless_return)]
 
 #![doc = include_str!("../README.md")]
 

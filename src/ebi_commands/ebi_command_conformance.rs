@@ -736,7 +736,7 @@ pub const EBI_CONFORMANCE_GAIN_PRECISION: EbiCommand = EbiCommand::Command {
         let lambda = inputs.remove(0).to_type::<Fraction>()?;
 
         let precision = sdfa
-            .potential_gain_precision(&slang, &lambda)
+            .potential_gain_precision(slang.as_ref(), &lambda)
             .context("Cannot compute gain precision.")?;
 
         Ok(EbiOutput::LogPolynomial(precision))
@@ -781,7 +781,7 @@ pub const EBI_CONFORMANCE_GAIN_RECALL: EbiCommand = EbiCommand::Command {
         let lambda = inputs.remove(0).to_type::<Fraction>()?;
 
         let recall = sdfa
-            .potential_gain_recall(&slang, &lambda)
+            .potential_gain_recall(slang.as_ref(), &lambda)
             .context("Cannot compute gain recall.")?;
 
         Ok(EbiOutput::LogPolynomial(recall))

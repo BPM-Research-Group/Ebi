@@ -54,7 +54,7 @@ impl Entropy for StochasticDeterministicFiniteAutomaton {
             }
         }
 
-        return Ok(-sum);
+        Ok(-sum)
     }
 }
 

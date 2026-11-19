@@ -234,7 +234,7 @@ pub const EBI_ANALYSE_NON_STOCHASTIC_EXECUTIONS: EbiCommand = EbiCommand::Comman
         let mut log: Box<dyn EbiTraitEventLogEventAttributes> = objects.remove(0).to_type::<dyn EbiTraitEventLogEventAttributes>()?;
         let mut model = objects.remove(0).to_type::<EbiTraitSemantics>()?;
 
-        let result = model.find_executions(&mut log)?;
+        let result = model.find_executions(log.as_mut())?;
 
         return Ok(EbiOutput::Object(EbiObject::Executions(result)));
     },

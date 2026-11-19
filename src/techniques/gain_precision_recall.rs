@@ -23,14 +23,14 @@ pub trait PotentialGainRecallPrecision {
     /// Recall(L, M, λ) = Numerator(L, M, λ) / H(L, λ)
     fn potential_gain_recall(
         &self,
-        slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+        slang: &dyn EbiTraitFiniteStochasticLanguage,
         lambda: &Fraction,
     ) -> Result<LogPolynomial>;
 
     /// Precision(L, M, λ) = Numerator(L, M, λ) / H(M, λ)
     fn potential_gain_precision(
         &self,
-        slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+        slang: &dyn EbiTraitFiniteStochasticLanguage,
         lambda: &Fraction,
     ) -> Result<LogPolynomial>;
 }
@@ -38,7 +38,7 @@ pub trait PotentialGainRecallPrecision {
 impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
     fn potential_gain_recall(
         &self,
-        slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+        slang: &dyn EbiTraitFiniteStochasticLanguage,
         lambda: &Fraction,
     ) -> Result<LogPolynomial> {
         if is_exact_globally() {
@@ -61,7 +61,7 @@ impl PotentialGainRecallPrecision for StochasticDeterministicFiniteAutomaton {
 
     fn potential_gain_precision(
         &self,
-        slang: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+        slang: &dyn EbiTraitFiniteStochasticLanguage,
         lambda: &Fraction,
     ) -> Result<LogPolynomial> {
         if is_exact_globally() {
@@ -105,7 +105,7 @@ fn entropy_term(p: &Fraction) -> Result<LogPolynomial> {
 /// Entropy of the event log with lambda.
 /// If lambda = 0, this becomes the normal entropy.
 fn entropy_eventlog_with_lambda(
-    fsl: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+    fsl: &dyn EbiTraitFiniteStochasticLanguage,
     lambda: &Fraction,
 ) -> Result<LogPolynomial> {
     if lambda.is_zero() {
@@ -133,7 +133,7 @@ fn log_div_min(left: LogPolynomial, right: LogPolynomial) -> Result<LogPolynomia
 /// Only traces that exist in both the event log and the model are counted.
 /// For each trace, use min(-pL log pL, -pM log pM).
 fn gain_numerator_lambda(
-    fsl: &Box<dyn EbiTraitFiniteStochasticLanguage>,
+    fsl: &dyn EbiTraitFiniteStochasticLanguage,
     sdfa: &StochasticDeterministicFiniteAutomaton,
     lambda: &Fraction,
 ) -> Result<LogPolynomial> {

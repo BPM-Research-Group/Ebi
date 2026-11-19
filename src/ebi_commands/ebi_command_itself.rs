@@ -212,7 +212,7 @@ pub const EBI_ITSELF_JAVA_RUST: EbiCommand = EbiCommand::Command {
     output_type: &EbiOutputType::String,
 };
 
-#[cfg(all(feature = "surface_generation"))]
+#[cfg(feature = "surface_generation")]
 pub const EBI_ITSELF_SURFACE_JAVASCRIPT: EbiCommand = EbiCommand::Command {
     name_short: "js",
     name_long: Some("javascript"),
