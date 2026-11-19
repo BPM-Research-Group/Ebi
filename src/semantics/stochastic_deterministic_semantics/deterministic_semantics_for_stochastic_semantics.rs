@@ -4,7 +4,8 @@ use crate::{
     math::markov_model::MarkovModel,
     semantics::labelled_petri_net_semantics::LPNMarking,
     semantics::{
-        semantics_trait::Semantics, stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
+        semantics_trait::Semantics,
+        stochastic_semantics::stochastic_semantics_trait::StochasticSemantics,
     },
     techniques::non_decreasing_livelock::NonDecreasingLivelock,
 };
@@ -188,19 +189,16 @@ macro_rules! default_stochastic_deterministic_semantics {
                                     Entry::Occupied(mut x) => *x.get_mut() += &probability,
                                     Entry::Vacant(x) => {
                                         x.insert(probability.clone());
-                                        ()
                                     }
                                 };
                                 match q_state.activity_2_p_markings.entry(activity) {
                                     Entry::Occupied(mut x) => {
                                         x.get_mut().insert(marking, probability);
-                                        ()
                                     }
                                     Entry::Vacant(x) => {
                                         let mut map = HashMap::new();
                                         map.insert(marking, probability);
                                         x.insert(map);
-                                        ()
                                     }
                                 }
                             }
@@ -261,7 +259,7 @@ macro_rules! default_stochastic_deterministic_semantics {
                 &self,
                 q_state: &PMarking<$s>,
             ) -> Result<MarkovModel<MarkovMarking<$s>>> {
-                let mut markov: MarkovModel<MarkovMarking<$s>> = MarkovModel::new();
+                let mut markov: MarkovModel<MarkovMarking<$s>> = MarkovModel::default();
 
                 let mut queue = vec![];
                 {

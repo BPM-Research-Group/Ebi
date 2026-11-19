@@ -224,8 +224,8 @@ pub struct SamplePairsSpace {
 impl SamplePairsSpace {
     pub fn new(number_of_samples: usize, len: usize) -> Self {
         Self {
-            number_of_samples: number_of_samples,
-            len: len,
+            number_of_samples,
+            len,
         }
     }
 }

@@ -143,8 +143,8 @@ struct C {
 impl C {
     fn new(trace_index: usize, moves: Vec<Move>) -> Self {
         Self {
-            trace_index: trace_index,
-            moves: moves,
+            trace_index,
+            moves,
         }
     }
 

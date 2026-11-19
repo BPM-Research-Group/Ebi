@@ -147,7 +147,7 @@ impl PrefixTreeNode {
     pub fn new(number_of_outgoing_edges_in_model: usize) -> Self {
         Self {
             probability: Fraction::zero(),
-            number_of_outgoing_edges_in_model: number_of_outgoing_edges_in_model,
+            number_of_outgoing_edges_in_model,
             children: HashMap::default(),
         }
     }

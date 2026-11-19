@@ -94,7 +94,7 @@ pub(crate) fn manual() -> Result<EbiOutput> {
     writeln!(f, "\\long\\def\\ebitraitlist{{")?;
     for etrait in EbiTrait::iter() {
         writeln!(f, "\\subsection{{{}}}", etrait.to_string().to_sentence_case())?;
-        writeln!(f, "\\label{{trait:{}}}", etrait.to_string())?;
+        writeln!(f, "\\label{{trait:{}}}", etrait)?;
         writeln!(f, "{}", etrait.get_explanation())?;
 
         writeln!(f, "\\\\File types that can be imported as {} {}: {}.", 
@@ -214,7 +214,7 @@ fn write_command(f: &mut Vec<u8>, path: Vec<&EbiCommand>) -> Result<()> {
     if let EbiCommand::Command { name_long, explanation_short, explanation_long, latex_link, cli_command, exact_arithmetic, input_types: input_typess, input_names, input_helps, output_type, .. } = path[path.len()-1] {
 
         //alias
-        if let Some(_) = name_long {
+        if name_long.is_some() {
             writeln!(f, "Alias: \\texttt{{{}}}.\\\\", EbiCommand::path_to_short_string(&path))?;
         }
 

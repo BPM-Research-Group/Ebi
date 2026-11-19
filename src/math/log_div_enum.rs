@@ -1,21 +1,21 @@
 use ebi_objects::{
-    Infoable,
-    anyhow::{Error, Result, anyhow},
+    anyhow::{anyhow, Error, Result},
     ebi_arithmetic::{
-        Recip, Signed,
         ebi_number::{One, Zero},
-        exact::{MaybeExact, is_exact_globally},
+        exact::{is_exact_globally, MaybeExact},
         fraction::{fraction::APPROX_DIGITS, fraction_enum::FractionEnum},
         malachite::{
-            Natural,
             base::num::{
                 arithmetic::traits::{Parity, Pow},
                 basic::traits::Two,
                 logic::traits::{BitAccess, SignificantBits},
             },
             rational::Rational,
+            Natural,
         },
+        Recip, Signed,
     },
+    Infoable,
 };
 use ebi_optimisation::ebi_arithmetic::{
     fraction::approximate::Approximate, log_polynomial::log_polynomial_enum::LogPolynomialEnum,
@@ -43,22 +43,20 @@ impl LogDivEnum {
      * Returns whether the two given logdivs are either both exact or both approximate
      */
     pub(crate) fn matches(&self, rhs: &Self) -> bool {
-        match (self, rhs) {
-            (Self::Exact(_), Self::Exact(_)) => true,
-            (Self::Approx(_), Self::Approx(_)) => true,
-            _ => false,
-        }
+        matches!(
+            (self, rhs),
+            (Self::Exact(_), Self::Exact(_)) | (Self::Approx(_), Self::Approx(_))
+        )
     }
 
     /**
      * Returns whether the two given logdivs are either both exact or both approximate
      */
     pub(crate) fn matches_f(&self, rhs: &FractionEnum) -> bool {
-        match (self, rhs.is_exact()) {
-            (Self::Exact(_), true) => true,
-            (Self::Approx(_), false) => true,
-            _ => false,
-        }
+        matches!(
+            (self, rhs.is_exact()),
+            (Self::Exact(_), true) | (Self::Approx(_), false)
+        )
     }
 
     pub fn log2_div(log_of: FractionEnum, divide_by: u64) -> Result<Self> {
@@ -595,7 +593,7 @@ impl TryFrom<LogPolynomialEnum> for LogDivEnum {
 
     fn try_from(value: LogPolynomialEnum) -> Result<Self> {
         match value {
-            LogPolynomialEnum::Approx(f) => Ok(LogDivEnum::Approx(f.approximate()?.into())),
+            LogPolynomialEnum::Approx(f) => Ok(LogDivEnum::Approx(f.approximate()?)),
             LogPolynomialEnum::Exact(_) => Err(anyhow!(
                 "Cannot transform an exact log polynomial into an exact log div."
             )),

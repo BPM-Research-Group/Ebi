@@ -49,7 +49,7 @@ use std::{collections::BTreeSet, fmt::Display, hash::Hash, io::BufRead, str::Fro
  * The order of this list is important: for the "any object" input type and for trait importers,
  * they are attempted in order. Thus, the more restrictive formats should come first.
  */
-pub const EBI_FILE_HANDLERS: &'static [EbiFileHandler] = &[
+pub const EBI_FILE_HANDLERS: &[EbiFileHandler] = &[
     EBI_COMPRESSED_EVENT_LOG,
     EBI_DIRECTLY_FOLLOWS_GRAPH,
     EBI_DETERMINISTIC_FINITE_AUTOMATON,
@@ -151,9 +151,10 @@ impl EbiFileHandler {
         for command_path in EBI_COMMANDS.get_command_paths() {
             if let Some(EbiCommand::Command { output_type, .. }) = command_path.last()
                 && let EbiOutputType::ObjectType(x) = output_type
-                    && objects.contains(x) {
-                        result.insert(command_path);
-                    }
+                && objects.contains(x)
+            {
+                result.insert(command_path);
+            }
         }
 
         result
@@ -250,9 +251,7 @@ impl PartialEq for EbiFileHandler {
 
 impl PartialOrd for EbiFileHandler {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.name
-            .to_lowercase()
-            .partial_cmp(&other.name.to_lowercase())
+        Some(self.cmp(other))
     }
 }
 

@@ -90,6 +90,10 @@ impl MatchedDistances {
         self.len
     }
 
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
+    }
+
     fn get_index(i: usize, j: usize) -> usize {
         (i * (i - 1)) / 2 + j
     }

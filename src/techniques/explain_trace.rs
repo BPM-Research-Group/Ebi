@@ -40,7 +40,7 @@ impl Add for StochasticWeightedCost {
         let probability = &self.probability * &other.probability;
         let cost = self.cost + other.cost;
         StochasticWeightedCost {
-            cost: cost,
+            cost,
             probability: probability.clone(),
             stochastic_weighted_cost: &probability.clone().one_minus() * cost,
         }

@@ -5,8 +5,11 @@ use super::{
 };
 use crate::{
     ebi_framework::{
-        ebi_file_handler::{EbiFileHandler, get_file_handlers, get_file_handlers_fallible}, ebi_importer_parameters, ebi_trait_object::EbiTraitObject,
-    }, ebi_traits::{
+        ebi_file_handler::{get_file_handlers, get_file_handlers_fallible, EbiFileHandler},
+        ebi_importer_parameters,
+        ebi_trait_object::EbiTraitObject,
+    },
+    ebi_traits::{
         ebi_trait_activities::EbiTraitActivities, ebi_trait_event_log::EbiTraitEventLog,
         ebi_trait_event_log_event_attributes::EbiTraitEventLogEventAttributes,
         ebi_trait_event_log_trace_attributes::EbiTraitEventLogTraceAttributes,
@@ -20,7 +23,11 @@ use crate::{
         ebi_trait_stochastic_deterministic_semantics::EbiTraitStochasticDeterministicSemantics,
         ebi_trait_stochastic_partially_ordered_semantics::EbiTraitStochasticPartiallyOrderedSemantics,
         ebi_trait_stochastic_semantics::EbiTraitStochasticSemantics,
-    }, ebi_validate, multiple_reader::MultipleReader, surfaces::website::website_link::FILE_HANDLERS_PAGE, text::Joiner,
+    },
+    ebi_validate,
+    multiple_reader::MultipleReader,
+    surfaces::website::website_link::FILE_HANDLERS_PAGE,
+    text::Joiner,
 };
 use clap::{builder::ValueParser, value_parser, ArgMatches};
 use ebi_objects::{
@@ -38,6 +45,7 @@ use std::{
 };
 use strum_macros::{EnumIs, EnumIter, IntoStaticStr};
 
+#[allow(clippy::large_enum_variant)]
 pub enum EbiInput {
     Trait(EbiTraitObject, &'static EbiFileHandler),
     Object(EbiObject, &'static EbiFileHandler),
@@ -118,18 +126,13 @@ impl EbiInputType {
             EbiInputType::Object(_) => None,
             EbiInputType::AnyObject => None,
             EbiInputType::FileHandler => None,
-            EbiInputType::String(_, string) => match string {
-                Some(string) => Some(string.to_string()),
-                None => None,
-            },
-            EbiInputType::Usize(_, _, integer) => match integer {
-                Some(integer) => Some(integer.to_string()),
-                None => None,
-            },
-            EbiInputType::Fraction(_, _, default) => match default {
-                Some(fraction) => Some(fraction.to_string()),
-                None => None,
-            },
+            EbiInputType::String(_, string) => string.as_ref().map(|string| string.to_string()),
+            EbiInputType::Usize(_, _, integer) => {
+                integer.as_ref().map(|integer| integer.to_string())
+            }
+            EbiInputType::Fraction(_, _, default) => {
+                default.as_ref().map(|fraction| fraction.to_string())
+            }
         }
     }
 
@@ -150,7 +153,7 @@ impl EbiInputType {
             EbiInputType::Trait(_) => value_parser!(PathBuf),
             EbiInputType::Object(_) => value_parser!(PathBuf),
             EbiInputType::AnyObject => value_parser!(PathBuf),
-            EbiInputType::String(_, _) => value_parser!(String).into(),
+            EbiInputType::String(_, _) => value_parser!(String),
             EbiInputType::Usize(_, _, _) => value_parser!(usize).into(),
             EbiInputType::FileHandler => value_parser!(EbiFileHandler).into(),
             EbiInputType::Fraction(_, _, _) => value_parser!(FractionNotParsedYet).into(),
@@ -817,7 +820,7 @@ impl EbiTraitImporter {
 
 impl Display for EbiTraitImporter {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.get_trait().to_string())
+        write!(f, "{}", self.get_trait())
     }
 }
 
@@ -1407,35 +1410,31 @@ pub fn read_as_object_with_file_handler(
     file_handler: &'static EbiFileHandler,
 ) -> Result<EbiObject> {
     for importer in file_handler.object_importers {
-        if &importer.get_type() == etype {
-            //attempt to import
-            match ebi_importer_parameters::extract_parameter_values(
+        //attempt to import
+        if &importer.get_type() == etype
+            && let Ok(importer_parameter_values) = ebi_importer_parameters::extract_parameter_values(
                 cli_matches,
                 importer.parameters(),
                 input_index,
-            ) {
-                Ok(importer_parameter_values) => {
-                    if let Ok(object) = (importer.get_importer())(
-                        reader.get().context("Could not obtain reader.")?.as_mut(),
-                        &importer_parameter_values,
-                    ) {
-                        //object parsed; return it
-                        return Ok(object);
-                    }
-                }
-                Err(_) => {}
-            }
+            )
+            && let Ok(object) = (importer.get_importer())(
+                reader.get().context("Could not obtain reader.")?.as_mut(),
+                &importer_parameter_values,
+            )
+        {
+            //object parsed; return it
+            return Ok(object);
         }
     }
     for importer in file_handler.object_importers_fallible {
         if &importer.get_type() == etype {
             //attempt to import
-            match ebi_importer_parameters::extract_parameter_values(
+            if let Ok(importer_parameter_values) = ebi_importer_parameters::extract_parameter_values(
                 cli_matches,
                 importer.parameters(),
                 input_index,
             ) {
-                Ok(importer_parameter_values) => {
+                {
                     match (importer.get_importer())(
                         reader.get().context("Could not obtain reader.")?.as_mut(),
                         &importer_parameter_values,
@@ -1447,7 +1446,6 @@ pub fn read_as_object_with_file_handler(
                         Err(FallibleImporterError::ImporterError(_)) => {}
                     }
                 }
-                Err(_) => {}
             }
         }
     }
@@ -1462,21 +1460,16 @@ pub fn read_as_any_object(
     for file_handler in EBI_FILE_HANDLERS {
         //attempt to import
         for importer in file_handler.object_importers {
-            match ebi_importer_parameters::extract_parameter_values(
+            if let Ok(importer_parameter_values) = ebi_importer_parameters::extract_parameter_values(
                 cli_matches,
                 importer.parameters(),
                 input_index,
+            ) && let Ok(object) = (importer.get_importer())(
+                reader.get().context("Could not obtain reader.")?.as_mut(),
+                &importer_parameter_values,
             ) {
-                Ok(importer_parameter_values) => {
-                    if let Ok(object) = (importer.get_importer())(
-                        reader.get().context("Could not obtain reader.")?.as_mut(),
-                        &importer_parameter_values,
-                    ) {
-                        //object parsed; return it
-                        return Ok((object, file_handler));
-                    }
-                }
-                Err(_) => {}
+                //object parsed; return it
+                return Ok((object, file_handler));
             }
         }
     }
@@ -1525,9 +1518,10 @@ pub fn attempt_parse(
             }
             EbiInputType::FileHandler => {
                 if let MultipleReader::String(string) = &reader
-                    && let Ok(value) = string.parse::<EbiFileHandler>() {
-                        return Ok(EbiInput::FileHandler(value));
-                    };
+                    && let Ok(value) = string.parse::<EbiFileHandler>()
+                {
+                    return Ok(EbiInput::FileHandler(value));
+                };
             }
             EbiInputType::String(None, _) => {
                 if let MultipleReader::String(string) = &reader {
@@ -1553,75 +1547,71 @@ pub fn attempt_parse(
             }
             EbiInputType::Usize(min, max, _) => {
                 if let MultipleReader::String(string) = &reader
-                    && let Ok(value) = string.parse::<usize>() {
-                        match (min, max) {
-                            (None, None) => {
+                    && let Ok(value) = string.parse::<usize>()
+                {
+                    match (min, max) {
+                        (None, None) => {
+                            return Ok(EbiInput::Usize(value, input_type));
+                        }
+                        (None, Some(max)) => {
+                            if max < &value {
+                                error = Some(anyhow!("value should be at most {}", max));
+                            } else {
                                 return Ok(EbiInput::Usize(value, input_type));
                             }
-                            (None, Some(max)) => {
-                                if max < &value {
-                                    error = Some(anyhow!("value should be at most {}", max));
-                                } else {
-                                    return Ok(EbiInput::Usize(value, input_type));
-                                }
+                        }
+                        (Some(min), None) => {
+                            if min > &value {
+                                error = Some(anyhow!("value should be at least {}", min));
+                            } else {
+                                return Ok(EbiInput::Usize(value, input_type));
                             }
-                            (Some(min), None) => {
-                                if min > &value {
-                                    error = Some(anyhow!("value should be at least {}", min));
-                                } else {
-                                    return Ok(EbiInput::Usize(value, input_type));
-                                }
-                            }
-                            (Some(min), Some(max)) => {
-                                if min > &value || max < &value {
-                                    error = Some(anyhow!(
-                                        "value should be between {} and {}",
-                                        min,
-                                        max
-                                    ));
-                                } else {
-                                    return Ok(EbiInput::Usize(value, input_type));
-                                }
+                        }
+                        (Some(min), Some(max)) => {
+                            if min > &value || max < &value {
+                                error =
+                                    Some(anyhow!("value should be between {} and {}", min, max));
+                            } else {
+                                return Ok(EbiInput::Usize(value, input_type));
                             }
                         }
                     }
+                }
             }
             EbiInputType::Fraction(min, max, _) => {
                 if let MultipleReader::String(string) = &reader
-                    && let Ok(value) = &string.parse::<FractionNotParsedYet>() {
-                        let value: Fraction = value.try_into()?;
+                    && let Ok(value) = &string.parse::<FractionNotParsedYet>()
+                {
+                    let value: Fraction = value.try_into()?;
 
-                        match (min, max) {
-                            (None, None) => {
+                    match (min, max) {
+                        (None, None) => {
+                            return Ok(EbiInput::Fraction(value.clone(), input_type));
+                        }
+                        (None, Some(max)) => {
+                            if max < &value {
+                                error = Some(anyhow!("value should be at most {}", max));
+                            } else {
                                 return Ok(EbiInput::Fraction(value.clone(), input_type));
                             }
-                            (None, Some(max)) => {
-                                if max < &value {
-                                    error = Some(anyhow!("value should be at most {}", max));
-                                } else {
-                                    return Ok(EbiInput::Fraction(value.clone(), input_type));
-                                }
+                        }
+                        (Some(min), None) => {
+                            if min > &value {
+                                error = Some(anyhow!("value should be at least {}", min));
+                            } else {
+                                return Ok(EbiInput::Fraction(value.clone(), input_type));
                             }
-                            (Some(min), None) => {
-                                if min > &value {
-                                    error = Some(anyhow!("value should be at least {}", min));
-                                } else {
-                                    return Ok(EbiInput::Fraction(value.clone(), input_type));
-                                }
-                            }
-                            (Some(min), Some(max)) => {
-                                if min > &value || max < &value {
-                                    error = Some(anyhow!(
-                                        "value should be between {} and {}",
-                                        min,
-                                        max
-                                    ));
-                                } else {
-                                    return Ok(EbiInput::Fraction(value.clone(), input_type));
-                                }
+                        }
+                        (Some(min), Some(max)) => {
+                            if min > &value || max < &value {
+                                error =
+                                    Some(anyhow!("value should be between {} and {}", min, max));
+                            } else {
+                                return Ok(EbiInput::Fraction(value.clone(), input_type));
                             }
                         }
                     }
+                }
             }
         }
     }
@@ -1637,8 +1627,7 @@ pub fn validate_object_of(
     file_handler: &EbiFileHandler,
 ) -> Result<()> {
     if let Some(validator) = file_handler.validator {
-        let result = (validator)(reader.get()?.as_mut());
-        result
+        (validator)(reader.get()?.as_mut())
     } else {
         Err(anyhow!(
             "file hanlder {} does not have a validator",

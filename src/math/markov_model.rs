@@ -1,5 +1,5 @@
 use ebi_objects::{
-    anyhow::{Result, anyhow},
+    anyhow::{anyhow, Result},
     ebi_arithmetic::{EbiMatrix, Fraction, FractionMatrix, IdentityMinus, Inversion, Signed, Zero},
 };
 use std::fmt::{Debug, Display};
@@ -10,15 +10,17 @@ pub struct MarkovModel<S> {
     initial_vector: Vec<Fraction>,
 }
 
-impl<S: PartialEq + Clone> MarkovModel<S> {
-    pub fn new() -> Self {
+impl<S: PartialEq + Clone> Default for MarkovModel<S> {
+    fn default() -> Self {
         Self {
             edges: FractionMatrix::new(0, 0),
             states: vec![],
             initial_vector: vec![],
         }
     }
+}
 
+impl<S: PartialEq + Clone> MarkovModel<S> {
     pub fn add_or_find_state(&mut self, state: S, initial_value: Fraction) -> (usize, bool) {
         if let Some(state_index) = self.states.iter().position(|s| s == &state) {
             //already present
@@ -75,7 +77,7 @@ impl<S: PartialEq + Clone> MarkovModel<S> {
         }
     }
 
-    pub fn set_states(&mut self, states: &Vec<bool>, state: S) {
+    pub fn set_states(&mut self, states: &[bool], state: S) {
         for (index, maybe) in states.iter().enumerate() {
             if *maybe {
                 self.states[index] = state.clone();
@@ -86,7 +88,7 @@ impl<S: PartialEq + Clone> MarkovModel<S> {
     /**
      * Remove all outgoing transitions of this state, and make the state absorbing.
      */
-    pub fn make_states_absorbing(&mut self, states: &Vec<bool>) {
+    pub fn make_states_absorbing(&mut self, states: &[bool]) {
         for (state, maybe) in states.iter().enumerate() {
             if *maybe {
                 self.edges.set_row_zero(state);

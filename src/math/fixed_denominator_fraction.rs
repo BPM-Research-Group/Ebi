@@ -2,7 +2,6 @@
  * A fixed denominator fraction is a fraction on which a limited set of operations is available.
  * In return, the denominator is fixed and operations are much cheaper.
  */
-
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),

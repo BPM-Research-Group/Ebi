@@ -2,14 +2,7 @@
     clippy::needless_range_loop,
     clippy::doc_lazy_continuation,
     clippy::doc_overindented_list_items,
-)]
-#![deny(
-    clippy::needless_return,
-    clippy::useless_format,
-    clippy::cmp_owned,
-    clippy::clone_on_copy,
-    clippy::collapsible_if,
-    clippy::needless_borrow
+    clippy::type_complexity
 )]
 #![doc = include_str!("../README.md")]
 
@@ -213,9 +206,9 @@ pub mod surfaces {
         pub mod javascript_autogen;
         #[cfg(feature = "surface_generation")]
         pub mod javascript_generator_html;
-        #[cfg(all(feature = "surface_generation"))]
+        #[cfg(feature = "surface_generation")]
         pub mod javascript_generator_rust;
-        #[cfg(all(feature = "test_generation"))]
+        #[cfg(feature = "test_generation")]
         pub mod javascript_generator_tests;
         pub mod javascript_link;
         #[cfg(feature = "javascript")]
@@ -234,7 +227,7 @@ pub mod surfaces {
         pub mod java_object_handler;
     }
     pub mod website {
-        #[cfg(all(feature = "surface_generation"))]
+        #[cfg(feature = "surface_generation")]
         pub mod website_generation;
         pub mod website_link;
     }

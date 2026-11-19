@@ -149,7 +149,7 @@ pub const EBI_ITSELF_MANUAL: EbiCommand = EbiCommand::Command {
     input_types: &[],
     input_names: &[],
     input_helps: &[],
-    execute: |_, _| Ok(manual()?),
+    execute: |_, _| manual(),
     output_type: &EbiOutputType::String,
 };
 

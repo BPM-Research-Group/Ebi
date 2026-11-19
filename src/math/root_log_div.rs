@@ -15,7 +15,7 @@ impl RootLogDiv {
     pub fn sqrt(log_div: LogDiv) -> Self {
         Self {
             one_minus: false,
-            log_div: log_div,
+            log_div,
         }
     }
 

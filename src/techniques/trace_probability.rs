@@ -193,6 +193,7 @@ impl EbiTraitQueriableStochasticLanguage for StochasticDeterministicFiniteAutoma
     }
 }
 
+#[allow(clippy::too_many_arguments)]
 fn process_new_state<T: StochasticSemantics<StoSemState = A>, A: Eq + Hash + Clone + Display>(
     semantics: &T,
     z: &mut Z<A>,

@@ -124,7 +124,7 @@ where
 {
     let sum_distance = sum_distances(log, distances);
 
-    if distances.len() == 0 {
+    if distances.is_empty() {
         return None;
     }
 
@@ -496,9 +496,9 @@ pub(crate) fn debug_assert_assignment(
 
 /// Find the minimum (index and value)
 #[inline]
-pub(crate) fn find_min<'a, I: 'a>(a: &mut I) -> (usize, &'a Fraction)
+pub(crate) fn find_min<'a, I>(a: &mut I) -> (usize, &'a Fraction)
 where
-    I: std::iter::Iterator<Item = &'a Fraction>,
+    I: std::iter::Iterator<Item = &'a Fraction> + 'a,
 {
     let mut a = a.enumerate();
     let mut best = (0, a.next().unwrap().1);

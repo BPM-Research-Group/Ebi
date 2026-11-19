@@ -10,8 +10,8 @@ use std::sync::Arc;
 ))]
 use ebi_objects::ebi_arithmetic::malachite::Natural;
 use ebi_objects::{
-    Activity,
     ebi_arithmetic::{Fraction, Recip, Zero},
+    Activity,
 };
 use rayon::iter::{IndexedParallelIterator, IntoParallelRefIterator, ParallelIterator};
 
@@ -61,11 +61,8 @@ impl WeightedTriangularDistanceMatrix {
         // log::debug!("weights_a {:?}", weights_a);
         // log::debug!("weights_b {:?}", weights_b);
 
-        let progress_bar = EbiCommand::get_progress_bar_ticks(
-            (lang.number_of_traces() * lang.number_of_traces())
-                .try_into()
-                .unwrap(),
-        );
+        let progress_bar =
+            EbiCommand::get_progress_bar_ticks(lang.number_of_traces() * lang.number_of_traces());
 
         // Compute in chunks for better cache utilisation
         let distances = lang
@@ -151,11 +148,8 @@ impl WeightedTriangularDistanceMatrix {
         // log::debug!("weights_a {:?}", weights_a);
         // log::debug!("weights_b {:?}", weights_b);
 
-        let progress_bar = EbiCommand::get_progress_bar_ticks(
-            (log.number_of_traces() * log.number_of_traces())
-                .try_into()
-                .unwrap(),
-        );
+        let progress_bar =
+            EbiCommand::get_progress_bar_ticks(log.number_of_traces() * log.number_of_traces());
 
         // Compute in chunks for better cache utilisation
         let distances = log

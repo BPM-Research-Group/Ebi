@@ -82,7 +82,7 @@ where
 {
     let sum_distance = sum_distances(log, distances);
 
-    if distances.len() == 0 {
+    if distances.is_empty() {
         return None;
     }
 

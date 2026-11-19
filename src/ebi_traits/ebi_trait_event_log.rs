@@ -3,19 +3,19 @@ use crate::ebi_framework::{
     trait_importers::ToEventLogTrait,
 };
 use ebi_objects::{
-    Activity, CompressedEventLog, EventLog, EventLogCsv, EventLogOcel, EventLogPython,
-    EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, Importable,
-    IntoRefTraceIterator, NumberOfTraces,
-    anyhow::{Result, anyhow},
-    ebi_arithmetic::Fraction,
+    anyhow::{anyhow, Result},
     ebi_arithmetic::f,
+    ebi_arithmetic::Fraction,
     ebi_objects::{
         compressed_event_log_trace_attributes::CompressedEventLogTraceAttributes,
         event_log_event_attributes::EventLogEventAttributes,
     },
+    Activity, CompressedEventLog, EventLog, EventLogCsv, EventLogOcel, EventLogPython,
+    EventLogTraceAttributes, EventLogXes, FiniteStochasticLanguage, HasActivityKey, Importable,
+    IntoRefTraceIterator, NumberOfTraces,
 };
 use fnv::FnvBuildHasher;
-use std::collections::{HashMap, hash_map::Entry};
+use std::collections::{hash_map::Entry, HashMap};
 
 #[macro_export]
 macro_rules! trait_definition_logs {
@@ -68,7 +68,7 @@ pub trait EbiTraitEventLog: HasActivityKey + IntoRefTraceIterator + NumberOfTrac
     /// Otherwise, Rust may give weird compile errors.
     fn retain_traces<'a>(&'a mut self, f: Box<dyn Fn(&Vec<Activity>) -> bool + 'static>);
 
-    /// Creates a finite stochastic language. 
+    /// Creates a finite stochastic language.
     /// This clones all traces, so if you have a struct, it is probably cheaper to call .into() on it.
     fn to_finite_stochastic_language(&self) -> FiniteStochasticLanguage {
         if self.number_of_traces() == 0 {
@@ -82,11 +82,9 @@ pub trait EbiTraitEventLog: HasActivityKey + IntoRefTraceIterator + NumberOfTrac
             match map.entry(trace.clone()) {
                 Entry::Occupied(mut e) => {
                     *e.get_mut() += &trace_weight;
-                    ()
                 }
                 Entry::Vacant(e) => {
                     e.insert(trace_weight.clone());
-                    ()
                 }
             }
         }
@@ -102,11 +100,9 @@ impl dyn EbiTraitEventLog {
             match map.entry(trace.clone()) {
                 std::collections::hash_map::Entry::Occupied(mut e) => {
                     *e.get_mut() += 1;
-                    ()
                 }
                 std::collections::hash_map::Entry::Vacant(e) => {
                     e.insert(1);
-                    ()
                 }
             }
         }

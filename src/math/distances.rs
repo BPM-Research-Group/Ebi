@@ -10,8 +10,6 @@ use crate::math::levenshtein;
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use ebi_objects::anyhow::Result;
-use ebi_objects::ebi_arithmetic::Fraction;
-use ebi_objects::ebi_arithmetic::Zero;
 #[cfg(any(
     all(
         not(feature = "eexactarithmetic"),
@@ -21,6 +19,8 @@ use ebi_objects::ebi_arithmetic::Zero;
     all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
 ))]
 use ebi_objects::ebi_arithmetic::malachite::Natural;
+use ebi_objects::ebi_arithmetic::Fraction;
+use ebi_objects::ebi_arithmetic::Zero;
 use ebi_objects::{IntoRefTraceIterator, NumberOfTraces};
 use rayon::iter::{IntoParallelIterator, ParallelIterator};
 use std::fmt;
@@ -109,13 +109,13 @@ impl TriangularDistanceMatrix {
                 result
             })
             .collect::<Vec<_>>();
-        let distances = distances.into_iter().map(|d| Arc::new(d)).collect();
+        let distances = distances.into_iter().map(Arc::new).collect();
 
         progress_bar.finish_and_clear();
 
         Self {
             len,
-            distances: distances,
+            distances,
             zero: Arc::new(Fraction::zero()),
         }
     }
@@ -125,6 +125,10 @@ impl TriangularDistanceMatrix {
      */
     pub fn len(&self) -> usize {
         self.len
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len == 0
     }
 
     pub fn get_zero(&self) -> Arc<Fraction> {
@@ -197,7 +201,7 @@ impl<'a> TriangularIterator<'a> {
             i: 1,
             j: 0,
             index: 0,
-            distances: distances,
+            distances,
         }
     }
 }
@@ -261,7 +265,7 @@ impl DistanceMatrix {
         let len_a = lang_a.number_of_traces();
         let len_b = lang_b.number_of_traces();
 
-        let progress_bar = EbiCommand::get_progress_bar_ticks((len_a * len_b).try_into().unwrap());
+        let progress_bar = EbiCommand::get_progress_bar_ticks(len_a * len_b);
 
         // Compute in chunks for better cache utilization
         let distances = lang_a

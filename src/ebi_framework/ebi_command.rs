@@ -322,7 +322,7 @@ impl EbiCommand {
     pub fn get_progress_bar_ticks(total_ticks: usize) -> ProgressBar {
         let pb = ProgressBar::new(total_ticks.try_into().unwrap());
         pb.set_style(
-            ProgressStyle::with_template(&("[{wide_bar:.cyan/blue}] {pos:>7}/{len:7}".to_owned()))
+            ProgressStyle::with_template("[{wide_bar:.cyan/blue}] {pos:>7}/{len:7}")
                 .unwrap()
                 .progress_chars("#>-"),
         );
@@ -456,7 +456,7 @@ impl EbiCommand {
             for ((input_types, input_name), string_input) in input_typess
                 .iter()
                 .zip(input_names.iter())
-                .zip(string_inputs.into_iter())
+                .zip(string_inputs)
             {
                 //read input
                 let input = attempt_parse(input_types, MultipleReader::String(string_input))
@@ -520,7 +520,7 @@ impl EbiCommand {
                 //strategy: take the exporter with the longest extension first (to export .xes.gz before .xes)
                 {
                     let mut exporters = exporters.clone();
-                    exporters.sort_by(|a, b| a.get_extension().len().cmp(&b.get_extension().len()));
+                    exporters.sort_by_key(|a| a.get_extension().len());
 
                     //see whether an output extension matches the requested file
                     for exporter in exporters {
@@ -716,12 +716,9 @@ impl EbiCommand {
     }
 
     pub fn find_command_with_string(&self, name: &str) -> Option<Vec<&EbiCommand>> {
-        for path in self.get_command_paths() {
-            if Self::path_to_string(&path) == *name {
-                return Some(path);
-            }
-        }
-        None
+        self.get_command_paths()
+            .into_iter()
+            .find(|path| Self::path_to_string(path) == *name)
     }
 
     pub fn get_command_paths(&self) -> BTreeSet<Vec<&'static EbiCommand>> {
@@ -825,7 +822,7 @@ impl Ord for EbiCommand {
 
 impl PartialOrd for EbiCommand {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.long_name().partial_cmp(other.long_name())
+        Some(self.cmp(other))
     }
 }
 

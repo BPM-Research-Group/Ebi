@@ -62,8 +62,8 @@ impl FiniteStochasticLanguageSemantics {
         }
 
         Self {
-            activity_key: activity_key,
-            nodes: nodes,
+            activity_key,
+            nodes,
         }
     }
 

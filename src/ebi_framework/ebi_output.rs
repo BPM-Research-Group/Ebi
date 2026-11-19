@@ -70,6 +70,7 @@ use std::{
 };
 use strum_macros::{Display, EnumIs, EnumIter, IntoStaticStr};
 
+#[allow(clippy::large_enum_variant)]
 #[derive(Display, Clone)]
 pub enum EbiOutput {
     Object(EbiObject),
@@ -148,9 +149,10 @@ impl EbiOutputType {
                 output_type: output,
                 ..
             } = path[path.len() - 1]
-                && output == &self {
-                    return true;
-                }
+                && output == &self
+            {
+                return true;
+            }
             false
         });
         result
@@ -418,28 +420,20 @@ impl EbiExporter {
         match (self, output) {
             (EbiExporter::Object(exporter, _), object) => exporter.export(object, f),
             (EbiExporter::String, EbiOutput::String(object)) => object.export(f),
-            (EbiExporter::String, _) => {
-                Err(anyhow!("Cannot export {} as string", self.get_name()))
-            }
+            (EbiExporter::String, _) => Err(anyhow!("Cannot export {} as string", self.get_name())),
             (EbiExporter::Usize, EbiOutput::Usize(object)) => object.export(f),
-            (EbiExporter::Usize, _) => {
-                Err(anyhow!("Cannot export {} as number", self.get_name()))
-            }
+            (EbiExporter::Usize, _) => Err(anyhow!("Cannot export {} as number", self.get_name())),
             (EbiExporter::Fraction, EbiOutput::Fraction(object)) => object.export(f),
             (EbiExporter::Fraction, _) => {
                 Err(anyhow!("Cannot export {} as fraction", self.get_name()))
             }
             (EbiExporter::LogDiv, EbiOutput::LogDiv(object)) => object.export(f),
-            (EbiExporter::LogDiv, _) => {
-                Err(anyhow!("Cannot export {} as logdiv", self.get_name()))
-            }
+            (EbiExporter::LogDiv, _) => Err(anyhow!("Cannot export {} as logdiv", self.get_name())),
             (EbiExporter::LogPolynomial, EbiOutput::LogPolynomial(object)) => object.export(f),
-            (EbiExporter::LogPolynomial, _) => {
-                Err(anyhow!(
-                    "Cannot export {} as log polynomial",
-                    self.get_name()
-                ))
-            }
+            (EbiExporter::LogPolynomial, _) => Err(anyhow!(
+                "Cannot export {} as log polynomial",
+                self.get_name()
+            )),
             (EbiExporter::ContainsRoot, EbiOutput::ContainsRoot(object)) => object.export(f),
             (EbiExporter::ContainsRoot, _) => {
                 Err(anyhow!("Cannot export {} as containsroot", self.get_name()))
@@ -449,9 +443,7 @@ impl EbiExporter {
                 Err(anyhow!("Cannot export {} as rootlogdiv", self.get_name()))
             }
             (EbiExporter::Bool, EbiOutput::Bool(object)) => object.export(f),
-            (EbiExporter::Bool, _) => {
-                Err(anyhow!("Cannot export {} as bool", self.get_name()))
-            }
+            (EbiExporter::Bool, _) => Err(anyhow!("Cannot export {} as bool", self.get_name())),
         }
     }
 
@@ -723,7 +715,7 @@ impl Hash for EbiObjectExporter {
 
 impl PartialOrd for EbiObjectExporter {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.get_type().partial_cmp(&other.get_type())
+        Some(self.cmp(other))
     }
 }
 

@@ -8,8 +8,8 @@
 ))]
 use ebi_objects::ebi_arithmetic::malachite::Natural;
 use ebi_objects::{
-    FiniteStochasticPartiallyOrderedLanguage,
     ebi_arithmetic::{Fraction, Zero},
+    FiniteStochasticPartiallyOrderedLanguage,
 };
 #[cfg(any(
     all(
@@ -65,9 +65,7 @@ impl WeightedDistanceMatrix {
         let weights_b = lang_b.iter_probabilities().cloned().collect();
 
         let progress_bar = EbiCommand::get_progress_bar_ticks(
-            (lang_a.number_of_traces() * lang_b.number_of_traces())
-                .try_into()
-                .unwrap(),
+            lang_a.number_of_traces() * lang_b.number_of_traces(),
         );
 
         // Compute in chunks for better cache utilisation
@@ -118,9 +116,7 @@ impl WeightedDistanceMatrix {
         let weights_b = lang_b.probabilities.clone();
 
         let progress_bar = EbiCommand::get_progress_bar_ticks(
-            (lang_a.number_of_traces() * lang_b.number_of_traces())
-                .try_into()
-                .unwrap(),
+            lang_a.number_of_traces() * lang_b.number_of_traces(),
         );
 
         // Compute in chunks for better cache utilisation
@@ -164,9 +160,7 @@ impl WeightedDistanceMatrix {
         let weights_b = lang_b.probabilities.clone();
 
         let progress_bar = EbiCommand::get_progress_bar_ticks(
-            (lang_a.number_of_traces() * lang_b.number_of_traces())
-                .try_into()
-                .unwrap(),
+            lang_a.number_of_traces() * lang_b.number_of_traces(),
         );
 
         // Compute in chunks for better cache utilisation
@@ -254,8 +248,8 @@ impl WeightedDistances for WeightedDistanceMatrix {
         // 2a. Calculate the Least Common Multiple (LCM) of all denominators of distances (i.e. the elements in the DistanceMatrix).
 
         use ebi_objects::ebi_arithmetic::malachite::{
-            Natural,
             base::num::{arithmetic::traits::Lcm, basic::traits::One},
+            Natural,
         };
 
         let denominators: Vec<Natural> = self
@@ -287,9 +281,9 @@ impl WeightedDistances for WeightedDistanceMatrix {
         all(feature = "eexactarithmetic", not(feature = "eapproximatearithmetic")),
     ))]
     fn lowest_common_multiple_denominators_weights(&self) -> ebi_objects::anyhow::Result<Natural> {
-        use ebi_objects::ebi_arithmetic::malachite::Natural;
         use ebi_objects::ebi_arithmetic::malachite::base::num::arithmetic::traits::Lcm;
         use ebi_objects::ebi_arithmetic::malachite::base::num::basic::traits::One;
+        use ebi_objects::ebi_arithmetic::malachite::Natural;
 
         let self_denominators: Vec<Natural> = self
             .weights_a
@@ -387,7 +381,7 @@ pub struct WeightedDistanceMatrixIterator {
     it_b: std::vec::IntoIter<Fraction>,
 }
 
-impl<'a> WeightedDistanceMatrixIterator {
+impl WeightedDistanceMatrixIterator {
     pub fn new(distances: WeightedDistanceMatrix) -> Self {
         let len = distances.len_a() * distances.len_b();
         let mut it_a = distances.distances.into_iter();
@@ -416,14 +410,12 @@ impl Iterator for WeightedDistanceMatrixIterator {
                     self.len -= 1;
                     return Some((self.i, self.j - 1, f));
                 }
-                None => match self.it_a.next() {
-                    Some(arr) => {
-                        self.i += 1;
-                        self.j = 0;
-                        self.it_b = arr.into_iter();
-                    }
-                    None => return None,
-                },
+                None => {
+                    let arr = self.it_a.next()?;
+                    self.i += 1;
+                    self.j = 0;
+                    self.it_b = arr.into_iter();
+                }
             }
         }
     }
