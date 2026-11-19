@@ -16,7 +16,7 @@ jobs:
       - name: generate tests and links
         run: |
               > src/tests/tests_autogen.rs
-              cargo run --features test_generation itself tests -o src/tests/tests_autogen.rs 
+              cargo run --features test_generation -- itself tests -o src/tests/tests_autogen.rs 
 
       - name: Run tests java
         run: cargo test --verbose --features java
