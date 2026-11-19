@@ -1,4 +1,4 @@
-name: Release Cargo
+name: Release crates.io
 
 on:
   push:
